@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,18 +28,13 @@ package op.care;
 
 import entity.SYSRunningClasses;
 import entity.SYSRunningClassesTools;
+import op.OPDE;
+import op.tools.*;
+
 import java.sql.*;
 import java.util.GregorianCalendar;
-import op.OPDE;
-import op.tools.DBRetrieve;
-import op.tools.SYSCalendar;
-import op.tools.Database;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
- *
  * @author tloehr
  */
 public class BHPImport {
@@ -52,12 +47,11 @@ public class BHPImport {
     }
 
     /**
-     * @param verid Die ID der Verordnung, auf den sich der Import Vorgang beschr‰nken soll.
-     * Steht hier eine 0, dann wird die BHP f¸r alle erstellt.
-     * Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
-     * Es wird noch gepr¸ft, ob es abgehakte BHPs in dieser Schicht gibt. Wenn ja, wird alles erst ab der n‰chsten
-     * Schicht eingetragen.
-     *
+     * @param verid Die ID der Verordnung, auf den sich der Import Vorgang beschr√§nken soll.
+     *              Steht hier eine 0, dann wird die BHP f√ºr alle erstellt.
+     *              Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
+     *              Es wird noch gepr√ºft, ob es abgehakte BHPs in dieser Schicht gibt. Wenn ja, wird alles erst ab der n√§chsten
+     *              Schicht eingetragen.
      */
     public static void importBHP(long verid, long zeit, int daysoffset)
             throws SQLException {
@@ -88,15 +82,15 @@ public class BHPImport {
         }
         Connection db = OPDE.getDb().db;
 
-        // Zugriffskonflikt auflˆsen.
+        // Zugriffskonflikt aufl√∂sen.
         String pk = null;
         if (verid > 0) {
             pk = (String) DBRetrieve.getSingleValue("BHPVerordnung", "BWKennung", "VerID", verid);
         }
 //        SYSMessenger.emergencyExit("op.care.BHPImport", pk);
 
-        // Nicht l‰nger als 5 Minuten versuchen. Es kann passieren, dass der abzuschiessende
-        // Computer es nicht mehr schafft auf die Anfrage zu antworten BEVOR er runterf‰hrt.
+        // Nicht l√§nger als 5 Minuten versuchen. Es kann passieren, dass der abzuschiessende
+        // Computer es nicht mehr schafft auf die Anfrage zu antworten BEVOR er runterf√§hrt.
 //        int i = 0;
 //        while (i < 5 && !SYSMessenger.allApplied()) {
 //            try {
@@ -112,7 +106,7 @@ public class BHPImport {
         SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClasses.STATUS_RW);
         SYSRunningClasses runningClass = result[0];
         if (runningClass != null) {
-            
+
             OPDE.getLogger().debug("VerID: " + verid);
             OPDE.getLogger().debug("Zeit: " + zeit);
             OPDE.getLogger().debug("Offset:" + daysoffset);
@@ -148,21 +142,21 @@ public class BHPImport {
                         + "bhp.Don, bhp.Fre, bhp.Sam, bhp.Son, bhp.Taeglich, bhp.Woechentlich, bhp.Monatlich, bhp.TagNum, bhp.LDatum "
                         + "FROM BHPPlanung bhp "
                         + "INNER JOIN BHPVerordnung v ON bhp.VerID = v.VerID "
-                        + // nur die Verordnungen, die ¸berhaupt g¸ltig sind
-                        // das sind die mit G¸ltigkeit BAW oder G¸ltigkeit endet irgendwann in der Zukunft.
+                        + // nur die Verordnungen, die √ºberhaupt g√ºltig sind
+                        // das sind die mit G√ºltigkeit BAW oder G√ºltigkeit endet irgendwann in der Zukunft.
                         // Das heisst, wenn eine Verordnung heute endet, dann wird sie dennoch eingetragen.
-                        // Also alle, die bis EINSCHLIEﬂLICH heute g¸ltig sind.
+                        // Also alle, die bis EINSCHLIE√üLICH heute g√ºltig sind.
                         "WHERE v.SitID = 0 AND date(v.AnDatum) <= date(DATE_ADD(NOW(), INTERVAL ? DAY)) AND "
                         + "                       date(v.AbDatum) >= date(DATE_ADD(NOW(), INTERVAL ? DAY)) "
-                        + // Einschr‰nkung auf bestimmte Verordnung0en, wenn gew¸nscht
+                        + // Einschr√§nkung auf bestimmte Verordnung0en, wenn gew√ºnscht
                         (verid > 0 ? " AND bhp.VerID = ? " : " ")
-                        + // und nur die Planungen, die ¸berhaupt auf den Stichtag passen kˆnnten.
+                        + // und nur die Planungen, die √ºberhaupt auf den Stichtag passen k√∂nnten.
                         // Hier werden bereits die falschen Wochentage rausgefiltert. Brauchen
-                        // wir uns nachher nicht mehr drum zu k¸mmern.
+                        // wir uns nachher nicht mehr drum zu k√ºmmern.
                         "AND ((Taeglich > 0) OR (Woechentlich > 0 AND " + wtag + " > 0) OR (monatlich > 0 AND (TagNum = ? OR " + wtag + " = ?))) "
                         + // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
                         "AND Date(LDatum) <= Date(DATE_ADD(NOW(), INTERVAL ? DAY)) AND tmp = 0 AND BWKennung <> 'MM4'";
-                // Einschr‰nkung auf bestimmten Bewohner, wenn gew¸nscht.
+                // Einschr√§nkung auf bestimmten Bewohner, wenn gew√ºnscht.
                 //(bwkennung.equalsIgnoreCase("") ? "" : "AND v.BWKennung = ?");
 
 
@@ -198,7 +192,7 @@ public class BHPImport {
                 rs.first();
 
 
-                // Erstmal alle Eintr‰ge, die t‰glich oder wˆchentlich nˆtig sind.
+                // Erstmal alle Eintr√§ge, die t√§glich oder w√∂chentlich n√∂tig sind.
                 while (maxrows > 0 && !rs.isAfterLast()) {
 
 
@@ -251,7 +245,7 @@ public class BHPImport {
                             } while (!(SYSCalendar.sameWeek(ref, gcStichtag) >= 0));
                         }
                         // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
-                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage ¸berhaupt zugelassen wurden, muss das somit der richtige sein.
+                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage √ºberhaupt zugelassen wurden, muss das somit der richtige sein.
                         treffer = (ref.equals(gcStichtag)) || (SYSCalendar.sameWeek(ref, gcStichtag) == 0);
                     }
 
@@ -263,7 +257,7 @@ public class BHPImport {
                             } while (!(SYSCalendar.sameMonth(ref, gcStichtag) >= 0));
                         }
                         // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest im selben Monat desselben Jahres liegt.
-                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat ¸berhaupt zugelassen wurden, muss das somit der richtige sein.
+                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat √ºberhaupt zugelassen wurden, muss das somit der richtige sein.
                         treffer = (ref.equals(gcStichtag)) || (SYSCalendar.sameMonth(ref, gcStichtag) == 0);
                     }
 //
@@ -271,7 +265,7 @@ public class BHPImport {
 //
 //                }
 
-                    // Es wird immer erst eine Schicht sp‰ter eingetragen. Damit man nicht mit bereits
+                    // Es wird immer erst eine Schicht sp√§ter eingetragen. Damit man nicht mit bereits
                     // abgelaufenen Zeitpunkten arbeitet.
                     boolean erstAbFM = (zeit == 0) || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.FM;
                     boolean erstAbMO = (zeit == 0) || erstAbFM || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.MO;
@@ -279,7 +273,7 @@ public class BHPImport {
                     boolean erstAbNM = (zeit == 0) || erstAbMI || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.NM;
                     boolean erstAbAB = (zeit == 0) || erstAbNM || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.AB;
                     boolean erstAbNA = (zeit == 0) || erstAbAB || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.NA;
-                    // X07: DEBUG: klappt das mit Uhrzeiten f¸r denselben Tag ?
+                    // X07: DEBUG: klappt das mit Uhrzeiten f√ºr denselben Tag ?
                     boolean uhrzeitOK = (zeit == 0) || (uhrzeit != null && SYSCalendar.compareTime(uhrzeit.getTime(), zeit) > 0);
 
                     long insertTS = gcStichtag.getTimeInMillis();
@@ -336,7 +330,7 @@ public class BHPImport {
 
                     } // if (treffer)
                     //////////////////////////////////////////////////////////////
-                    rs.next(); // N‰chster
+                    rs.next(); // N√§chster
                 } // while(!rs.isAfterLast()){
                 if (doCommit) {
                     db.commit();

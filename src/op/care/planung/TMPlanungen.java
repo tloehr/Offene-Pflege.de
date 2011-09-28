@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,19 +26,19 @@
  */
 package op.care.planung;
 
+import op.OPDE;
+import op.tools.DBRetrieve;
+import op.tools.DlgException;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+
+import javax.swing.table.AbstractTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import javax.swing.table.AbstractTableModel;
-import op.tools.DlgException;
-import op.OPDE;
-import op.tools.DBRetrieve;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 
 /**
- *
  * @author root
  */
 public class TMPlanungen extends AbstractTableModel {
@@ -71,7 +71,7 @@ public class TMPlanungen extends AbstractTableModel {
                     " p.AbUKennung, p.NKontrolle, b.Bezeichnung, b.Sortierung " +
                     " FROM Planung p " +
                     " INNER JOIN BWInfoKat b ON b.BWIKID = p.BWIKID " +
-//                    // Hier die angehangenen Vorgänge
+//                    // Hier die angehangenen VorgÃ¤nge
 //                    " INNER JOIN " +
 //                    " (" +
 //                    " 	SELECT DISTINCT f2.PlanID, ifnull(anzahl,0) anzahl" +
@@ -84,7 +84,7 @@ public class TMPlanungen extends AbstractTableModel {
 //                    " 	WHERE f2.BWKennung=? " +
 //                    " ) vrg ON vrg.PlanID = p.PlanID " +
                     " WHERE BWKennung = ? " +
-                    // Nur für die Sturzgeschichte
+                    // Nur fÃ¼r die Sturzgeschichte
                     // (!abgesetzt ? " AND p.Von <= now() AND p.Bis >= now() " : "");
                     " AND p.Von <= '2011-01-03 12:20:00' AND p.Bis >= '2011-01-03 12:20:00' ";
 
@@ -189,7 +189,7 @@ public class TMPlanungen extends AbstractTableModel {
                 result += "<font " + SYSConst.html_darkred + ">";
             }
 
-            result += "<b>Nächste Kontrolle:</b> " + df.format(rs.getDate("NKontrolle")) + "</font>";
+            result += "<b>NÃ¤chste Kontrolle:</b> " + df.format(rs.getDate("NKontrolle")) + "</font>";
             if (isAbgesetzt()) {//if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
                 result += "</s>"; // Abgesetzte
             }

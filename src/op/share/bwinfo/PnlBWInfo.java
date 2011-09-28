@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,11 +28,16 @@ package op.share.bwinfo;
 
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.SYSFiles;
 import entity.SYSFilesTools;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Point;
+import op.OCSec;
+import op.OPDE;
+import op.care.CleanablePanel;
+import op.tools.*;
+
+import javax.persistence.Query;
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -44,28 +49,9 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.Query;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumnModel;
-import op.OCSec;
-import op.OPDE;
-import op.care.CleanablePanel;
-import op.tools.DlgException;
-import op.tools.ListElement;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
 
 /**
- *
- * @author  root
+ * @author root
  */
 public class PnlBWInfo extends CleanablePanel {
 
@@ -81,9 +67,8 @@ public class PnlBWInfo extends CleanablePanel {
     private Bewohner bewohner;
 
     /**
-     * 
-     * @param parent - zu welchem Fenster gehört dieses Panel ?
-     * @param mode - Welche Fragen sollen angeboten werden ? Verwenden Sie: BWInfo.ART_*
+     * @param parent    - zu welchem Fenster gehÃ¶rt dieses Panel ?
+     * @param mode      - Welche Fragen sollen angeboten werden ? Verwenden Sie: BWInfo.ART_*
      * @param bwkennung - Um wen geht es ?
      */
     public PnlBWInfo(Frame parent, int mode, String bwkennung, String preselection) {
@@ -115,9 +100,9 @@ public class PnlBWInfo extends CleanablePanel {
         // Dieses Panel kann von verschiedenen Parents aus aufgerufen werden. Je nachdem von wo, ist die Liste
         // der Kategorien unterschiedlich. Stellt man jetzt die Kategorien von Parent A aus auf ein bestimmtes
         // Item ein, ruft dann dieses Panel von einem Parent B auf, dann kann es passieren, dass das System versucht
-        // die Combobox in leere zu setzen, was zu einer Exception führt. Daher müssen die Kriterien, die zur
-        // Auswahl der Kategorien für die ComboBox führen ebenfalls mit in den Klassen-String für storeState und restoreState
-        // mit aufgenommen werden. Allerdings nur für die ComboBox.
+        // die Combobox in leere zu setzen, was zu einer Exception fÃ¼hrt. Daher mÃ¼ssen die Kriterien, die zur
+        // Auswahl der Kategorien fÃ¼r die ComboBox fÃ¼hren ebenfalls mit in den Klassen-String fÃ¼r storeState und restoreState
+        // mit aufgenommen werden. Allerdings nur fÃ¼r die ComboBox.
         // Siehe Problem Nr. 15 und 20.
         String classname = this.getClass().getName() + ":" + mode;
         SYSTools.restoreState(classname + "::cmbKategorie", cmbKategorie);
@@ -138,7 +123,8 @@ public class PnlBWInfo extends CleanablePanel {
         reloadTable();
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -168,15 +154,15 @@ public class PnlBWInfo extends CleanablePanel {
 
         tblBWInfo.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         tblBWInfo.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         tblBWInfo.setShowVerticalLines(false);
         tblBWInfo.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -195,7 +181,7 @@ public class PnlBWInfo extends CleanablePanel {
             }
         });
 
-        cmbKategorie.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbKategorie.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
         cmbKategorie.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbKategorieItemStateChanged(evt);
@@ -226,54 +212,54 @@ public class PnlBWInfo extends CleanablePanel {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(cbPast)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cbDetail)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
-                .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(cbTooltip)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbEinzel)
-                .addGap(409, 409, 409))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(cbPast)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cbDetail)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+                                .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(cbTooltip)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbEinzel)
+                                .addGap(409, 409, 409))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPast)
-                    .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbDetail))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbTooltip)
-                    .addComponent(cbEinzel)))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cbPast)
+                                        .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(cbDetail))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cbTooltip)
+                                        .addComponent(cbEinzel)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
-                    .addComponent(jspBWInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
+                                        .addComponent(jspBWInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblBW, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jspBWInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblBW, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspBWInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -331,11 +317,11 @@ public class PnlBWInfo extends CleanablePanel {
         final int interval = (Integer) entry.get("intervalmode");
         final int katart = (Integer) entry.get("katart");
         Date von = (Date) entry.get("von");
-        
+
 
         /**
          * KORRIGIEREN
-         * Eine Frage kann geändert werden (Korrektur)
+         * Eine Frage kann geÃ¤ndert werden (Korrektur)
          * - Vom Admin immer
          * - Wenn sie nicht HAUF ist
          * - wenn es eine Verwaltungsfrage ist
@@ -343,28 +329,28 @@ public class PnlBWInfo extends CleanablePanel {
          *      - wenn sie vom selben OCUser ist.
          *      - wenn sie vom selben Tag ist.
          * - Wenn sie nicht abgesetzt ist.
-         * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geöffnet haben.
+         * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geÃ¶ffnet haben.
          */
         // wenn es sich nicht um eine Heimaufnahme handelt.
-        boolean bearbeitenMöglich = !bwinftyp.equalsIgnoreCase("hauf") & singleRowSelected;
-        // Entweder bin ich Admin, dann darf ich alles. Ansonsten nur wenn es meine Info ist und nur dann wenn sie früh genug ist.
-        bearbeitenMöglich &= (OPDE.isAdmin() ||
+        boolean bearbeitenMÃ¶glich = !bwinftyp.equalsIgnoreCase("hauf") & singleRowSelected;
+        // Entweder bin ich Admin, dann darf ich alles. Ansonsten nur wenn es meine Info ist und nur dann wenn sie frÃ¼h genug ist.
+        bearbeitenMÃ¶glich &= (OPDE.isAdmin() ||
                 (sameUser &&
-                (unbeantwortet || SYSCalendar.sameDay(von.getTime(), SYSCalendar.now()) == 0)) ||
+                        (unbeantwortet || SYSCalendar.sameDay(von.getTime(), SYSCalendar.now()) == 0)) ||
                 // SYSCalendar.earlyEnough(von.getTime(), 30)) ||  << Das hier nicht mehr. Geht schief, weil manche Sachen direkt ab Mittag angesetzt werden. Somit kann man die nicht nachbearbeiten.
                 katart == BWInfo.ART_STAMMDATEN || katart == BWInfo.ART_VERWALTUNG);
         // Je nachdem, von wo dieses Panel aufgerufen wurde. Aus Pflege, bzw. Pflegestammdaten Umgebung heraus, dann darf die zu
         // bearbeitetende Info nicht vom Typ Stammdaten oder Verwaltung sein.
-        bearbeitenMöglich &= OPDE.isAdmin() || !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
+        bearbeitenMÃ¶glich &= OPDE.isAdmin() || !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
                 (katart == BWInfo.ART_STAMMDATEN || katart == BWInfo.ART_VERWALTUNG));
 
         // Nur zu Testzwecken. Warum darf ich nicht nachbearbeiten.
-        if (!bearbeitenMöglich) {
+        if (!bearbeitenMÃ¶glich) {
             if (bwinftyp.equalsIgnoreCase("hauf")) {
-                OPDE.info("Heimaufnahmen können nicht bearbeitet werden.");
+                OPDE.info("Heimaufnahmen kÃ¶nnen nicht bearbeitet werden.");
             }
             if (!singleRowSelected) {
-                OPDE.info("Es wurde mehr als eine Zeile ausgewählt.");
+                OPDE.info("Es wurde mehr als eine Zeile ausgewÃ¤hlt.");
             }
             if (!sameUser) {
                 OPDE.info("Der Eintrag wurde von einem ANDEREN Benutzer eingetragen.");
@@ -414,7 +400,7 @@ public class PnlBWInfo extends CleanablePanel {
             });
             menu.add(itemPopupEdit);
 
-            JMenuItem itemPopupChange = new JMenuItem("Hat sich geändert");
+            JMenuItem itemPopupChange = new JMenuItem("Hat sich geÃ¤ndert");
             itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -451,8 +437,8 @@ public class PnlBWInfo extends CleanablePanel {
             itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diese Information wirklich abschließen ?",
-                            entry.get("bwinfokurz").toString() + " abschließen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    if (JOptionPane.showConfirmDialog(parent, "MÃ¶chten Sie diese Information wirklich abschlieÃŸen ?",
+                            entry.get("bwinfokurz").toString() + " abschlieÃŸen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         HashMap data = new HashMap();
                         if (interval == BWInfo.MODE_INTERVAL_BYDAY) {
                             data.put("Bis", new Date(SYSCalendar.endOfDay()));
@@ -493,12 +479,12 @@ public class PnlBWInfo extends CleanablePanel {
             });
             menu.add(itemPopupQuit);
 
-            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            JMenuItem itemPopupDelete = new JMenuItem("LÃ¶schen");
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diese Information wirklich löschen ?",
-                            entry.get("bwinfokurz").toString() + " löschen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    if (JOptionPane.showConfirmDialog(parent, "MÃ¶chten Sie diese Information wirklich lÃ¶schen ?",
+                            entry.get("bwinfokurz").toString() + " lÃ¶schen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         op.tools.DBHandling.deleteRecords("BWInfo", "BWINFOID", entry.get("bwinfoid"));
                         reloadTable();
                     }
@@ -520,7 +506,7 @@ public class PnlBWInfo extends CleanablePanel {
             menu.add(new JSeparator()); // ---------------------------------------
 
             // #0000029
-            JMenuItem itemPopupPrint = new JMenuItem("Markierte Einträge drucken");
+            JMenuItem itemPopupPrint = new JMenuItem("Markierte EintrÃ¤ge drucken");
             itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -531,8 +517,8 @@ public class PnlBWInfo extends CleanablePanel {
             menu.add(itemPopupPrint);
 
             /**
-             * Löschen
-             * Eine Frage kann gelöscht werden
+             * LÃ¶schen
+             * Eine Frage kann gelÃ¶scht werden
              * - Wenn sie nicht HAUF ist
              * - wenn es eine Verwaltungsfrage ist
              * - bei einer Pflegefrage nur dann:
@@ -540,47 +526,47 @@ public class PnlBWInfo extends CleanablePanel {
              *      - ODER
              *      - wenn sie vom selben OCUser ist. UND wenn sie noch keine 30 Minuten alt ist.
              * - man mindestens Examen oder ADMIN ist
-             * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geöffnet haben.
+             * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geÃ¶ffnet haben.
              */
-            boolean löschenMöglich =
+            boolean lÃ¶schenMÃ¶glich =
                     // Nicht HAUF
                     !entry.get("bwinftyp").toString().equalsIgnoreCase("hauf") && singleRowSelected &&
-                    // Admins immer
-                    OPDE.isAdmin() ||
-                    // wenn es eine Verwaltungsfrage ist
-                    ((((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG || ((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN) ||
-                    // oder bei einer Pflegefrage, nur wenn sie unbeantwortet ODER noch nicht so alt ist.
-                    (unbeantwortet || (sameUser && SYSCalendar.earlyEnough(von.getTime(), 30)))) &&
-                    // Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geöffnet haben.
-                    !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
-                    (((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN ||
-                    ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG));
+                            // Admins immer
+                            OPDE.isAdmin() ||
+                            // wenn es eine Verwaltungsfrage ist
+                            ((((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG || ((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN) ||
+                                    // oder bei einer Pflegefrage, nur wenn sie unbeantwortet ODER noch nicht so alt ist.
+                                    (unbeantwortet || (sameUser && SYSCalendar.earlyEnough(von.getTime(), 30)))) &&
+                                    // Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geÃ¶ffnet haben.
+                                    !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
+                                            (((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN ||
+                                                    ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG));
 
             /**
-             * Verändern
-             * Eine Frage kann verändert werden
+             * VerÃ¤ndern
+             * Eine Frage kann verÃ¤ndert werden
              * - Wenn sie nicht HAUF ist
              * - Keine Single Incidents sind
              * - Wenn sie nicht NoCONSTRAINT ist.
              * - ansonsten FAST IMMER
-             * - Die Veränderung läuft immer ab jetzt (bzw. ab heute 0h) (je nach ByDAY oder BySECOND)
-             * - Es können nur Fragen verändert werden, die BAW laufen.
-             * - Sollte es bereits eine Antwort geben, die heute beginnt, dann kann man NICHT verändern.
+             * - Die VerÃ¤nderung lÃ¤uft immer ab jetzt (bzw. ab heute 0h) (je nach ByDAY oder BySECOND)
+             * - Es kÃ¶nnen nur Fragen verÃ¤ndert werden, die BAW laufen.
+             * - Sollte es bereits eine Antwort geben, die heute beginnt, dann kann man NICHT verÃ¤ndern.
              *   In dem Fall bietet sich "BEARBEITEN" an.
-             * - ab Examen aufwärts. (Muss über SYSRights geändert werden)
-             * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geöffnet haben.
+             * - ab Examen aufwÃ¤rts. (Muss Ã¼ber SYSRights geÃ¤ndert werden)
+             * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geÃ¶ffnet haben.
              * - Nicht bei unbeantworteten.
-             * 
+             *
              */
             Date bis = (Date) entry.get("bis");
 
 
-            boolean verändernMöglich = !bwinftyp.equalsIgnoreCase("hauf") & singleRowSelected;
-            verändernMöglich &= !unbeantwortet;
-            verändernMöglich &= (interval != BWInfo.MODE_INTERVAL_NOCONSTRAINTS && interval != BWInfo.MODE_INTERVAL_SINGLE_INCIDENTS);
-            verändernMöglich &= SYSCalendar.sameDay(von, SYSCalendar.nowDBDate()) < 0;
-            verändernMöglich &= bis.getTime() == SYSConst.DATE_BIS_AUF_WEITERES.getTime();
-            verändernMöglich &= !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
+            boolean verÃ¤ndernMÃ¶glich = !bwinftyp.equalsIgnoreCase("hauf") & singleRowSelected;
+            verÃ¤ndernMÃ¶glich &= !unbeantwortet;
+            verÃ¤ndernMÃ¶glich &= (interval != BWInfo.MODE_INTERVAL_NOCONSTRAINTS && interval != BWInfo.MODE_INTERVAL_SINGLE_INCIDENTS);
+            verÃ¤ndernMÃ¶glich &= SYSCalendar.sameDay(von, SYSCalendar.nowDBDate()) < 0;
+            verÃ¤ndernMÃ¶glich &= bis.getTime() == SYSConst.DATE_BIS_AUF_WEITERES.getTime();
+            verÃ¤ndernMÃ¶glich &= !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
                     (katart == BWInfo.ART_STAMMDATEN || katart == BWInfo.ART_VERWALTUNG));
 
             /**
@@ -589,35 +575,35 @@ public class PnlBWInfo extends CleanablePanel {
              * - Wenn sie nicht HAUF ist
              * - Keine Single Incidents sind
              * - FAST Immer
-             * - Sollte es bereits eine Antwort geben, die heute beginnt, dann kann man NICHT verändern.
+             * - Sollte es bereits eine Antwort geben, die heute beginnt, dann kann man NICHT verÃ¤ndern.
              *   In dem Fall bietet sich "BEARBEITEN" an.
-             * - ab Examen aufwärts.
+             * - ab Examen aufwÃ¤rts.
              * - Nur, was nicht bereits abgesetzt ist.
-             * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geöffnet haben.
+             * - Nicht, falls das ein Stammdatum ist und wir das Panel von der Pflege aus geÃ¶ffnet haben.
              * - Nicht bei unbeantworteten.
-             * 
+             *
              */
-            boolean absetzenMöglich = !entry.get("bwinftyp").toString().equalsIgnoreCase("hauf") && singleRowSelected &&
+            boolean absetzenMÃ¶glich = !entry.get("bwinftyp").toString().equalsIgnoreCase("hauf") && singleRowSelected &&
                     !unbeantwortet &&
                     ((Integer) entry.get("intervalmode")).intValue() != BWInfo.MODE_INTERVAL_SINGLE_INCIDENTS &&
                     SYSCalendar.sameDay(von, SYSCalendar.nowDBDate()) < 0 &&
                     bis.getTime() == SYSConst.DATE_BIS_AUF_WEITERES.getTime() &&
                     !((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
-                    (((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN ||
-                    ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG));
+                            (((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN ||
+                                    ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG));
 
 
-            ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, bearbeitenMöglich);
-            ocs.setEnabled(this, "itemPopupChange", itemPopupChange, verändernMöglich);
-            ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, löschenMöglich);
-            ocs.setEnabled(this, "itemPopupQuit", itemPopupQuit, absetzenMöglich);
+            ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, bearbeitenMÃ¶glich);
+            ocs.setEnabled(this, "itemPopupChange", itemPopupChange, verÃ¤ndernMÃ¶glich);
+            ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, lÃ¶schenMÃ¶glich);
+            ocs.setEnabled(this, "itemPopupQuit", itemPopupQuit, absetzenMÃ¶glich);
             ocs.setEnabled(this, "itemPopupClone", itemPopupClone, singleRowSelected && (interval == BWInfo.MODE_INTERVAL_NOCONSTRAINTS || interval == BWInfo.MODE_INTERVAL_SINGLE_INCIDENTS));
 
             if (singleRowSelected) {
                 // Dokumente zu Stammdaten werden in der Pflege nicht angezeigt.
                 if (!((this.mode == BWInfo.ART_PFLEGE || this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) &&
                         (((Integer) entry.get("katart")).intValue() == BWInfo.ART_STAMMDATEN ||
-                        ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG))) {
+                                ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG))) {
                     menu.add(new JSeparator());
 
                     menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, fileActionListener));
@@ -632,7 +618,7 @@ public class PnlBWInfo extends CleanablePanel {
             }
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-        } else if (bearbeitenMöglich && evt.getClickCount() == 2) { // Bearbeiten, wenn möglich
+        } else if (bearbeitenMÃ¶glich && evt.getClickCount() == 2) { // Bearbeiten, wenn mÃ¶glich
             if (entry.containsKey("java")) {
                 Class c = null;
                 try {
@@ -667,12 +653,12 @@ public class PnlBWInfo extends CleanablePanel {
         }
         SYSTools.storeState(this.getClass().getName() + "::cbPast", cbPast);
         reloadTable();
-}//GEN-LAST:event_cbPastActionPerformed
+    }//GEN-LAST:event_cbPastActionPerformed
 
     private void jspBWInfoComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBWInfoComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
-        // Größe der Text Spalten im DFN ändern.
+        // GrÃ¶ÃŸe der Text Spalten im DFN Ã¤ndern.
         // Summe der fixen Spalten + ein bisschen
         int textWidth = dim.width - (200 + 25 + 120 + 80);
         TableColumnModel tcm1 = tblBWInfo.getColumnModel();
@@ -704,34 +690,34 @@ public class PnlBWInfo extends CleanablePanel {
         reloadTable();
     }//GEN-LAST:event_cbDetailActionPerformed
 
-private void cbEinzelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEinzelActionPerformed
-    if (ignoreEvent) {
-        return;
-    }
-    SYSTools.storeState(this.getClass().getName() + "::cbEinzel", cbEinzel);
-    reloadTable();
-}//GEN-LAST:event_cbEinzelActionPerformed
+    private void cbEinzelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEinzelActionPerformed
+        if (ignoreEvent) {
+            return;
+        }
+        SYSTools.storeState(this.getClass().getName() + "::cbEinzel", cbEinzel);
+        reloadTable();
+    }//GEN-LAST:event_cbEinzelActionPerformed
 
-private void cbTooltipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTooltipActionPerformed
-    if (ignoreEvent) {
-        return;
-    }
-    SYSTools.storeState(this.getClass().getName() + "::cbTooltip", cbTooltip);
-    reloadTable();
-}//GEN-LAST:event_cbTooltipActionPerformed
+    private void cbTooltipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTooltipActionPerformed
+        if (ignoreEvent) {
+            return;
+        }
+        SYSTools.storeState(this.getClass().getName() + "::cbTooltip", cbTooltip);
+        reloadTable();
+    }//GEN-LAST:event_cbTooltipActionPerformed
 
     /*
      * mit dieser Methode wird nach neuen Informationen gefragt. Sie wird hier als public implementiert, damit man sie 
      * von umgebenden Fenstern aus aufrufen kann.
      * <ul>
      * <li>Gibts die Frage schon. Das heisst aktuell. <code>Von <= now() AND Bis > now()</code> Wenn nicht, 
-     * dann kann sie einfach als unbeantwortet eingefügt werden. Nachbearbeitet wird sie dann durch Aufruf von "Bearbeiten" aus
-     * dem Kontextmenü.<b>ENDE</b></li>
-     * <li>Wenn ja, dann passiert gar nichts. Rückgabe = ""</li>
+     * dann kann sie einfach als unbeantwortet eingefÃ¼gt werden. Nachbearbeitet wird sie dann durch Aufruf von "Bearbeiten" aus
+     * dem KontextmenÃ¼.<b>ENDE</b></li>
+     * <li>Wenn ja, dann passiert gar nichts. RÃ¼ckgabe = ""</li>
      * </ul>
      */
     public void neu() {
-        // Von der Pflege aus kann man zwar STAMMDATEN sehen, soll aber keine neuen eingeben können.
+        // Von der Pflege aus kann man zwar STAMMDATEN sehen, soll aber keine neuen eingeben kÃ¶nnen.
         int mymode = this.mode;
         if (this.mode == BWInfo.ART_PFLEGE_STAMMDATEN) {
             mymode = BWInfo.ART_PFLEGE;
@@ -772,6 +758,7 @@ private void cbTooltipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 //            JOptionPane.showMessageDialog(this, "Der Druckvorgang ist abgeschlossen.", "Drucker", JOptionPane.INFORMATION_MESSAGE);
 //        }
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbDetail;
     private javax.swing.JCheckBox cbEinzel;

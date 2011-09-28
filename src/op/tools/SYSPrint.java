@@ -26,30 +26,23 @@
  */
 package op.tools;
 
-import java.awt.Component;
-import java.awt.Desktop;
+import op.OPDE;
+
+import javax.print.*;
+import javax.print.attribute.Attribute;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
-import javax.print.attribute.Attribute;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.MediaSizeName;
-import javax.swing.JOptionPane;
-import op.OPDE;
 
 /**
- *
  * @author tloehr
  */
 public class SYSPrint {
@@ -84,7 +77,9 @@ public class SYSPrint {
     public static final String EPL2_PRINT = "P1\n";
     public static String PRINTER = "prt0009";
 
-    /** Creates a new instance of OCPrint */
+    /**
+     * Creates a new instance of OCPrint
+     */
     public SYSPrint() {
     }
 
@@ -290,7 +285,7 @@ public class SYSPrint {
 //                }
 //                OPDE.info("Druck " + reportFilenameWOExtension + " von " + OPDE.getLogin().getUser().getUKennung());
 //            } else {
-//                OPDE.info("Reportdatei " + reportFilenameWOExtension + " nicht verf¸gbar.");
+//                OPDE.info("Reportdatei " + reportFilenameWOExtension + " nicht verfÂ¸gbar.");
 //            }
 //        } catch (JRException ex) {
 //            new DlgException(ex);
@@ -314,8 +309,8 @@ public class SYSPrint {
 ////        File target = null;
 ////        SYSFiles ocfiles = new SYSFiles();
 ////
-////        if (ocfidtarget > 0) { // Gibts ¸berhaupt eine .jasper Datei ?
-////            if (ocfidsource > 0) { // Habe ich ¸berhaupt Zugriff auf den Source und ist der Source auch neuer ?
+////        if (ocfidtarget > 0) { // Gibts Â¸berhaupt eine .jasper Datei ?
+////            if (ocfidsource > 0) { // Habe ich Â¸berhaupt Zugriff auf den Source und ist der Source auch neuer ?
 ////                Date datetarget = (Date) DBRetrieve.getSingleValue("OCFiles", "Filedate", "OCFID", ocfidtarget);
 ////                Date datesource = (Date) DBRetrieve.getSingleValue("OCFiles", "Filedate", "OCFID", ocfidsource);
 ////                if (datesource.after(datetarget)) { // er ist neuer!
@@ -331,7 +326,7 @@ public class SYSPrint {
 ////                target = ocfiles.getFile(ocfidtarget);
 ////            }
 ////        } else { // keine Jasper Datei
-////            if (ocfidsource > 0) { // Habe ich ¸berhaupt Zugriff auf den Source ?
+////            if (ocfidsource > 0) { // Habe ich Â¸berhaupt Zugriff auf den Source ?
 ////                OPDE.info("Neu ?bersetzung der Reportdatei n?tig: " + reportFilenameWOExtension);
 ////                source = ocfiles.getFile(ocfidsource);
 ////                JasperCompileManager.compileReportToFile(reportSourceFilename, reportTargetFilename);
@@ -363,6 +358,7 @@ public class SYSPrint {
     /**
      * Standard Druck Routine. Nimmt einen HTML Text entgegen und ?ffnet den lokal installierten Browser damit.
      * Erstellt tempor?re Dateien im temp Verzeichnis opde<irgendwas>.html
+     *
      * @param parent
      * @param html
      * @param addPrintJScript. Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
@@ -431,7 +427,7 @@ public class SYSPrint {
                             "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parent, "JAVA Desktop UnterstÃ¼tzung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

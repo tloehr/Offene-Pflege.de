@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,19 +26,15 @@
  */
 package op.care.bhp;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import tablerenderer.RNDHTML;
 
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
+
 /**
- *
  * @author tloehr
  */
 public class RNDBHP
@@ -111,7 +107,7 @@ public class RNDBHP
             if (status == TMBHP.STATUS_OFFEN) {
 //                if (dafid > 0 && bestid == 0) { // kein Bestand angebrochen
 //                    icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infored.png"));
-//                    j.setToolTipText("Es befindet sich kein Bestand im Anbruch. Um dieses Medikament zu geben, müssen sie erst einen anbrechen.");
+//                    j.setToolTipText("Es befindet sich kein Bestand im Anbruch. Um dieses Medikament zu geben, mÃ¼ssen sie erst einen anbrechen.");
 //                } else {
 //                    icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
 //                }
@@ -133,7 +129,7 @@ public class RNDBHP
             j.setIcon(icon);
             j.setOpaque(true);
             j.setBackground(color);
-            // Hier den Code der <p> in eine Table packen für die Zeilenumbrüche.
+            // Hier den Code der <p> in eine Table packen fÃ¼r die ZeilenumbrÃ¼che.
             String text = "<html><body><table border=\"0\">";
             text += "    <tr><td align=\"left\" width=\"600\">" + bembhp + "</td></tr>";
             text += "   </table></body></html>";

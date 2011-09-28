@@ -4,18 +4,15 @@
  */
 package entity;
 
-import com.mysql.jdbc.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import op.OPDE;
+
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import op.OPDE;
 
 /**
- *
  * @author tloehr
  */
 public class SYSPropsTools {
@@ -33,7 +30,7 @@ public class SYSPropsTools {
         if (user != null) {
             query.setParameter("user", user);
         }
-        
+
         SYSProps prop = null;
 
         try {
@@ -65,15 +62,15 @@ public class SYSPropsTools {
     public static void storeProp(String key, String value) {
         storeProp(key, value, null);
     }
-    
+
 
     /**
-     * Lädt Properties aus der Tabelle OCProps ein.
-     * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
-     * @param ip String mit der IP-Adresse oder '*'
+     * LÃ¤dt Properties aus der Tabelle OCProps ein.
+     * Passend zu einer IP bzw. IP='*', wenn die Properties fÃ¼r alle gedacht sind.
+     *
+     * @param ip       String mit der IP-Adresse oder '*'
      * @param only4me, true, dann werden nur die Properties geladen, die zu der aktuellen Userkennung passen. false, alle.
      * @return Ergebnis in einem Properties Objekt.
-     *
      */
     public static Properties loadProps(Users user) {
 
@@ -82,9 +79,9 @@ public class SYSPropsTools {
         if (user == null) {
             namedQuery = "SYSProps.findAllWOUsers";
         }
-        
+
         Query query = OPDE.getEM().createNamedQuery(namedQuery);
-        
+
         if (user != null) {
             query.setParameter("user", user);
         }
@@ -92,11 +89,11 @@ public class SYSPropsTools {
         List<SYSProps> props = (List<SYSProps>) query.getResultList();
         Properties p = new Properties();
         Iterator<SYSProps> it = props.iterator();
-        while (!props.isEmpty() && it.hasNext()){
+        while (!props.isEmpty() && it.hasNext()) {
             SYSProps prop = it.next();
             p.put(prop.getKey(), prop.getValue());
         }
-        
+
         return p;
     }
 }

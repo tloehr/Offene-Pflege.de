@@ -4,37 +4,36 @@
  */
 package tablerenderer;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
+import op.tools.SYSTools;
+
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import java.awt.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * Diese Klasse implementiert einen Renderer für den JTable mit automatischer Anpassung der Zeilenhöhe und
+ * Diese Klasse implementiert einen Renderer fÃ¼r den JTable mit automatischer Anpassung der ZeilenhÃ¶he und
  * Interpretation von HTML Code in den Zellen.
- * Ich habe die ursprüngliche Klasse im JavaSpecialist Newsletter #106 gefunden und weitestgehend* unverändert übernommen. 
+ * Ich habe die ursprÃ¼ngliche Klasse im JavaSpecialist Newsletter #106 gefunden und weitestgehend* unverÃ¤ndert Ã¼bernommen.
  * Vielen Dank an den Autor Dr. Heinz M. Kabutz.
+ *
  * @author Heinz Kabutz: This code is from The Java Specialists' Newsletter http://www.javaspecialists.eu, used with permission.
  * @see http://www.offene-pflege.de/component/content/article/3-informationen/9-quellen#TJSN
- * 
- * geringe Änderung zur HTML Fähigkeit. JTextPane statt JTextArea
+ *      <p/>
+ *      geringe Ã„nderung zur HTML FÃ¤higkeit. JTextPane statt JTextArea
  */
 public class RNDHTML extends JTextPane implements TableCellRenderer {
 
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
-    /** map from table to map of rows to map of column heights */
+    /**
+     * map from table to map of rows to map of column heights
+     */
     private final Map cellSizes = new HashMap();
 
     public RNDHTML() {
@@ -112,7 +111,7 @@ public class RNDHTML extends JTextPane implements TableCellRenderer {
         }
         int maximum_height = 0;
         for (Iterator it = rowheights.entrySet().iterator();
-                it.hasNext();) {
+             it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             int cellHeight = ((Integer) entry.getValue()).intValue();
             maximum_height = Math.max(maximum_height, cellHeight);

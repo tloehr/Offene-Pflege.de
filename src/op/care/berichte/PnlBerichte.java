@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,39 +28,7 @@ package op.care.berichte;
 
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
-import entity.Bewohner;
-import entity.PBerichtTAGS;
-import entity.PBerichtTAGSTools;
-import entity.Pflegeberichte;
-import entity.PflegeberichteTools;
-import entity.SYSFilesTools;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import javax.persistence.Query;
-import javax.swing.JCheckBox;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumnModel;
+import entity.*;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
@@ -69,9 +37,22 @@ import op.tools.SYSCalendar;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
+import javax.persistence.Query;
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+
 /**
- *
- * @author  root
+ * @author root
  */
 public class PnlBerichte extends CleanablePanel {
 
@@ -81,24 +62,26 @@ public class PnlBerichte extends CleanablePanel {
     private boolean initPhase;
     private javax.swing.JFrame parent;
     /**
-     * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
-     * aufgerufen wurden, einen reloadTable() auslösen können.
+     * Dieser Actionlistener wird gebraucht, damit die einzelnen MenÃ¼punkte des KontextmenÃ¼s, nachdem sie
+     * aufgerufen wurden, einen reloadTable() auslÃ¶sen kÃ¶nnen.
      */
     private ActionListener fileActionListener;
     /**
-     * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
-     * Bericht ausgewählt wurde, steht hier immer der Verweis auf den ERSTEN Bericht der Auswahl.
+     * Dies ist immer der zur Zeit ausgewÃ¤hlte Bericht. null, wenn nichts ausgewÃ¤hlt ist. Wenn mehr als ein
+     * Bericht ausgewÃ¤hlt wurde, steht hier immer der Verweis auf den ERSTEN Bericht der Auswahl.
      */
     private Pflegeberichte bericht;
     private final int TAB_DATE = 0;
     private final int TAB_SEARCH = 1;
     private final int TAB_TAGS = 2;
     /**
-     * Diese Liste enhtält die Menge der Tags, die im Suchfenster gesetzt wurden.
+     * Diese Liste enhtÃ¤lt die Menge der Tags, die im Suchfenster gesetzt wurden.
      */
     private ArrayList<PBerichtTAGS> tagFilter;
 
-    /** Creates new form PnlBerichte */
+    /**
+     * Creates new form PnlBerichte
+     */
     public PnlBerichte(FrmPflege pflege) {
         this.initPhase = true;
         bewohner = pflege.getBewohner();
@@ -113,7 +96,7 @@ public class PnlBerichte extends CleanablePanel {
             lblBW.setText(pflege.bwlabel.getText());
             lblBW.setToolTipText(pflege.bwlabel.getToolTipText());
         }
-        //TODO: die RestoreStates müssen nach nach JPA gewandelt werden.
+        //TODO: die RestoreStates mÃ¼ssen nach nach JPA gewandelt werden.
         SYSTools.restoreState(this.getClass().getName() + ":cbShowEdits", cbShowEdits);
         SYSTools.restoreState(this.getClass().getName() + ":cbTBIDS", cbTBIDS);
 
@@ -159,9 +142,9 @@ public class PnlBerichte extends CleanablePanel {
                 reloadTable();
             }
         }, new ArrayList<PBerichtTAGS>(), new GridLayout(3, 4)));
-        
+
         btnNew.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-        
+
         this.initPhase = false;
 
         reloadTable();
@@ -181,7 +164,8 @@ public class PnlBerichte extends CleanablePanel {
         jdc.firePropertyChange("date", 0, 0);
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -218,12 +202,12 @@ public class PnlBerichte extends CleanablePanel {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE)
         );
 
         jToolBar2.setFloatable(false);
@@ -255,8 +239,8 @@ public class PnlBerichte extends CleanablePanel {
         });
         jToolBar2.add(btnLogout);
 
-        cbShowEdits.setText("Änderungen anzeigen");
-        cbShowEdits.setToolTipText("<html>Damit Änderungen und Löschungen trotzdem nachvollziehbar bleiben<br/>werden sie nur ausgeblendet. Mit diesem Schalter werden diese Änderungen wieder angezeigt.</html>");
+        cbShowEdits.setText("Ã„nderungen anzeigen");
+        cbShowEdits.setToolTipText("<html>Damit Ã„nderungen und LÃ¶schungen trotzdem nachvollziehbar bleiben<br/>werden sie nur ausgeblendet. Mit diesem Schalter werden diese Ã„nderungen wieder angezeigt.</html>");
         cbShowEdits.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbShowEditsActionPerformed(evt);
@@ -265,7 +249,7 @@ public class PnlBerichte extends CleanablePanel {
         jToolBar2.add(cbShowEdits);
 
         cbTBIDS.setText("Berichte-Nr. anzeigen");
-        cbTBIDS.setToolTipText("<html>Jeder Bericht hat immer eine eindeutige Nummer.<br/>Diese Nummern werden im Alltag nicht benötigt.<br/>Sollten Sie diese Nummern dennoch sehen wollen<br/>dann schalten Sie diese hier ein.</html>");
+        cbTBIDS.setToolTipText("<html>Jeder Bericht hat immer eine eindeutige Nummer.<br/>Diese Nummern werden im Alltag nicht benÃ¶tigt.<br/>Sollten Sie diese Nummern dennoch sehen wollen<br/>dann schalten Sie diese hier ein.</html>");
         cbTBIDS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbTBIDSActionPerformed(evt);
@@ -284,15 +268,15 @@ public class PnlBerichte extends CleanablePanel {
         });
 
         tblTB.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         tblTB.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -349,45 +333,45 @@ public class PnlBerichte extends CleanablePanel {
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jdcBis, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jdcVon, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btn2Wochen)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btn4Wochen)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnVonAnfangAn)
-                .addContainerGap(442, Short.MAX_VALUE))
+                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel2))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jdcBis, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jdcVon, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn2Wochen)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn4Wochen)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnVonAnfangAn)
+                                .addContainerGap(442, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-                    .addComponent(jdcVon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btn2Wochen, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btn4Wochen)
-                        .addComponent(btnVonAnfangAn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jdcBis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                                        .addComponent(jdcVon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(btn2Wochen, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btn4Wochen)
+                                                .addComponent(btnVonAnfangAn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jdcBis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btn2Wochen, btnVonAnfangAn, jLabel1, jdcVon});
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{btn2Wochen, btnVonAnfangAn, jLabel1, jdcVon});
 
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel2, jdcBis});
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{jLabel2, jdcBis});
 
         pnlFilter.addTab("Zeiraum", jPanel4);
 
@@ -408,22 +392,22 @@ public class PnlBerichte extends CleanablePanel {
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 1017, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSearch)
-                .addContainerGap())
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 1017, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSearch)
+                                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtSuche, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                    .addComponent(btnSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtSuche, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                                        .addComponent(btnSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         pnlFilter.addTab("Suchbegriff", jPanel5);
@@ -431,12 +415,12 @@ public class PnlBerichte extends CleanablePanel {
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jspFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 1117, Short.MAX_VALUE)
+                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jspFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 1117, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jspFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jspFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
         );
 
         pnlFilter.addTab("Markierung", jPanel6);
@@ -444,32 +428,32 @@ public class PnlBerichte extends CleanablePanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jspTblTB, javax.swing.GroupLayout.DEFAULT_SIZE, 1117, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(pnlFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 1117, Short.MAX_VALUE))
-                    .addComponent(jToolBar2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1123, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 1111, Short.MAX_VALUE)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jspTblTB, javax.swing.GroupLayout.DEFAULT_SIZE, 1117, Short.MAX_VALUE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(pnlFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 1117, Short.MAX_VALUE))
+                                        .addComponent(jToolBar2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1123, Short.MAX_VALUE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addGap(12, 12, 12)
+                                                .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 1111, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblBW)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jspTblTB, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblBW)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspTblTB, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -491,12 +475,12 @@ public class PnlBerichte extends CleanablePanel {
             jdcVon.setDate(jdcBis.getDate());
         }
         reloadTable();
-}//GEN-LAST:event_jdcVonPropertyChange
+    }//GEN-LAST:event_jdcVonPropertyChange
 
     private void jspTblTBComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspTblTBComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
-        // Größe der Text Spalte im TB ändern.
+        // GrÃ¶ÃŸe der Text Spalte im TB Ã¤ndern.
         // Summe der fixen Spalten  = 210 + ein bisschen
         int textWidth = dim.width - 200 - 50;
         TableColumnModel tcm1 = tblTB.getColumnModel();
@@ -512,7 +496,7 @@ public class PnlBerichte extends CleanablePanel {
 
     private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
         OPDE.ocmain.lockOC();
-}//GEN-LAST:event_btnLogoutbtnLogoutHandler
+    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     public void cleanup() {
         jdcVon.cleanup();
@@ -565,10 +549,10 @@ public class PnlBerichte extends CleanablePanel {
         if (evt.isPopupTrigger()) {
             /**
              * KORRIGIEREN
-             * Ein Bericht kann geändert werden (Korrektur)
-             * - Wenn sie nicht im Übergabeprotokoll abgehakt wurde.
+             * Ein Bericht kann geÃ¤ndert werden (Korrektur)
+             * - Wenn sie nicht im Ãœbergabeprotokoll abgehakt wurde.
              */
-            boolean bearbeitenMöglich = !alreadyEdited && singleRowSelected && bericht.getUsersAcknowledged().isEmpty();
+            boolean bearbeitenMÃ¶glich = !alreadyEdited && singleRowSelected && bericht.getUsersAcknowledged().isEmpty();
 
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
@@ -584,12 +568,12 @@ public class PnlBerichte extends CleanablePanel {
             });
             menu.add(itemPopupEdit);
 
-            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            JMenuItem itemPopupDelete = new JMenuItem("LÃ¶schen");
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diesen Eintrag wirklich löschen ?",
-                            "Bericht löschen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    if (JOptionPane.showConfirmDialog(parent, "MÃ¶chten Sie diesen Eintrag wirklich lÃ¶schen ?",
+                            "Bericht lÃ¶schen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         PflegeberichteTools.deleteBericht(bericht);
                         reloadTable();
                     }
@@ -611,12 +595,12 @@ public class PnlBerichte extends CleanablePanel {
             itemPopupEdit.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
             itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
 
-            // Nur anzeigen wenn derselbe User die Änderung versucht, der auch den Text geschrieben hat.
-            if (bearbeitenMöglich && (sameUser || OPDE.isAdmin())) {
+            // Nur anzeigen wenn derselbe User die Ã„nderung versucht, der auch den Text geschrieben hat.
+            if (bearbeitenMÃ¶glich && (sameUser || OPDE.isAdmin())) {
                 menu.add(PBerichtTAGSTools.createMenuForTags(bericht));
             }
 
-            
+
             if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                 menu.add(new JSeparator());
                 menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bericht, fileActionListener));
@@ -737,11 +721,11 @@ public class PnlBerichte extends CleanablePanel {
                 break;
             }
         }
-        
+
         tblTB.setModel(new TMPflegeberichte(query, cbTBIDS.isSelected()));
 
         btnPrint.setEnabled(tblTB.getModel().getRowCount() > 0 && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
-        
+
         tblTB.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         jspTblTB.dispatchEvent(new ComponentEvent(jspTblTB, ComponentEvent.COMPONENT_RESIZED));
@@ -750,6 +734,7 @@ public class PnlBerichte extends CleanablePanel {
         tblTB.getColumnModel().getColumn(1).setCellRenderer(new RNDBerichte());
         tblTB.getColumnModel().getColumn(2).setCellRenderer(new RNDBerichte());
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgSuche;
     private javax.swing.JButton btn2Wochen;

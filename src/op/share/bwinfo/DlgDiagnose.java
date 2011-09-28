@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,41 +26,32 @@
  */
 package op.share.bwinfo;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.ComponentEvent;
-import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import op.OPDE;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.ListElement;
-import op.tools.SYSTools;
-import tablerenderer.RNDStandard;
-import op.tools.TMResultSet;
+import op.tools.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+import tablerenderer.RNDStandard;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
- *
- * @author  root
+ * @author root
  */
 public class DlgDiagnose extends DlgCustom {
 
@@ -69,14 +60,16 @@ public class DlgDiagnose extends DlgCustom {
     private String text;
     private JCheckBox[] boxes;
 
-    /** Creates new form DlgVorlage */
+    /**
+     * Creates new form DlgVorlage
+     */
     public DlgDiagnose(Frame parent, HashMap entry, int mode) {
         super(parent, entry, mode);
         this.entry = entry;
         this.mode = mode;
         if (mode != MODE_EDIT) {
             return;
-        } // Diagnosen können nicht verändert werden.
+        } // Diagnosen kÃ¶nnen nicht verÃ¤ndert werden.
         initComponents();
         SYSTools.centerOnParent(parent, this);
         initDialog();
@@ -88,7 +81,7 @@ public class DlgDiagnose extends DlgCustom {
         this.mode = mode;
         if (mode != MODE_EDIT) {
             return;
-        } // Diagnosen können nicht verändert werden.
+        } // Diagnosen kÃ¶nnen nicht verÃ¤ndert werden.
         initComponents();
         SYSTools.centerOnParent(parent, this);
         initDialog();
@@ -96,7 +89,7 @@ public class DlgDiagnose extends DlgCustom {
 
     private void initDialog() {
         setTitle(SYSTools.getWindowTitle("Diagnosen nach ICD10"));
-        fillÄrzte();
+        fillÃ„rzte();
         reloadTable();
         // XML parsen und daten setzen.
         String xml = entry.get("xmlc").toString();
@@ -122,7 +115,8 @@ public class DlgDiagnose extends DlgCustom {
         dispose();
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -151,7 +145,7 @@ public class DlgDiagnose extends DlgCustom {
         btnOK = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -173,15 +167,15 @@ public class DlgDiagnose extends DlgCustom {
         });
 
         tblDiagnosen.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         jspDiagnosen.setViewportView(tblDiagnosen);
 
@@ -189,14 +183,14 @@ public class DlgDiagnose extends DlgCustom {
 
         jLabel2.setText("Festgestellt durch:");
 
-        cmbArzt.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbArzt.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
         cmbArzt.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbArztItemStateChanged(evt);
             }
         });
 
-        cmbKH.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbKH.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
         cmbKH.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbKHItemStateChanged(evt);
@@ -205,11 +199,11 @@ public class DlgDiagnose extends DlgCustom {
 
         jLabel3.setText("Diagnosesicherheit:");
 
-        jLabel4.setText("Körperseite:");
+        jLabel4.setText("KÃ¶rperseite:");
 
-        cmbKoerper.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Nicht festgelegt", "links", "rechts", "beidseitig" }));
+        cmbKoerper.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Nicht festgelegt", "links", "rechts", "beidseitig"}));
 
-        cmbSicherheit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Nicht festgelegt", "gesichert", "Verdacht auf", "Ausschluß von", "Zustand nach" }));
+        cmbSicherheit.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Nicht festgelegt", "gesichert", "Verdacht auf", "AusschluÃŸ von", "Zustand nach"}));
 
         txtBemerkung.setColumns(20);
         txtBemerkung.setRows(5);
@@ -224,66 +218,66 @@ public class DlgDiagnose extends DlgCustom {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jspDiagnosen, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbKH, 0, 489, Short.MAX_VALUE)
-                            .addComponent(cmbArzt, 0, 489, Short.MAX_VALUE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cmbKoerper, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbSicherheit, 0, 190, Short.MAX_VALUE))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)))
-                    .addComponent(lblDiagnose, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jspDiagnosen, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel1)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel2)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(jLabel5))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(cmbKH, 0, 489, Short.MAX_VALUE)
+                                                        .addComponent(cmbArzt, 0, 489, Short.MAX_VALUE)
+                                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                .addComponent(cmbKoerper, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jLabel3)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(cmbSicherheit, 0, 190, Short.MAX_VALUE))
+                                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)))
+                                        .addComponent(lblDiagnose, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jspDiagnosen, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblDiagnose)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(cmbArzt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbKH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(jLabel4))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cmbKoerper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3)
-                            .addComponent(cmbSicherheit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspDiagnosen, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblDiagnose)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(cmbArzt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbKH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGap(12, 12, 12)
+                                                .addComponent(jLabel4))
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGap(6, 6, 6)
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(cmbKoerper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel3)
+                                                        .addComponent(cmbSicherheit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel5)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
@@ -296,7 +290,7 @@ public class DlgDiagnose extends DlgCustom {
         });
 
         btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
-        btnCancel.setText("Schließen");
+        btnCancel.setText("SchlieÃŸen");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
@@ -306,34 +300,35 @@ public class DlgDiagnose extends DlgCustom {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblTitel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnOK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancel)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lblTitel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnOK)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnCancel)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblTitel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCancel)
-                    .addComponent(btnOK))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblTitel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnCancel)
+                                        .addComponent(btnOK))
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         save();
         setVisible(false);
@@ -343,7 +338,7 @@ public class DlgDiagnose extends DlgCustom {
         setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void fillÄrzte() {
+    private void fillÃ„rzte() {
         ResultSet rs1 = DBRetrieve.getResultSet("Arzt", new String[]{"ArztID", "Name", "Vorname", "Ort"}, new String[]{"Name", "Vorname"});
         cmbArzt.setModel(SYSTools.rs2cmb(rs1, true));
         cmbArzt.setSelectedIndex(0);
@@ -365,7 +360,7 @@ public class DlgDiagnose extends DlgCustom {
 
         tcm1.getColumn(0).setHeaderValue("ICD10");
         tcm1.getColumn(1).setHeaderValue("Text");
-}//GEN-LAST:event_jspDiagnosenComponentResized
+    }//GEN-LAST:event_jspDiagnosenComponentResized
 
     private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
         reloadTable();
@@ -394,8 +389,8 @@ public class DlgDiagnose extends DlgCustom {
 
         btnOK.setEnabled((!SYSTools.catchNull(icd).equalsIgnoreCase("") || tblDiagnosen.getSelectedRow() >= 0) && arztOK);
         if (!btnOK.isEnabled()) {
-            String ursache = "<html><body>Es fehlen noch Angaben, bevor Sie speichern können.<ul>";
-            ursache += (arztOK ? "" : "<li>Die Informationen zum Arzt oder zum KH sind unvollständig.</li>");
+            String ursache = "<html><body>Es fehlen noch Angaben, bevor Sie speichern kÃ¶nnen.<ul>";
+            ursache += (arztOK ? "" : "<li>Die Informationen zum Arzt oder zum KH sind unvollstÃ¤ndig.</li>");
             ursache += "</ul></body></html>";
             btnOK.setToolTipText(ursache);
         } else {
@@ -430,12 +425,12 @@ public class DlgDiagnose extends DlgCustom {
         }
         if (arztid > 0) {
             if (khid > 0) {
-                html += "&lt;br/&gt;bestätigt durch: ";
+                html += "&lt;br/&gt;bestÃ¤tigt durch: ";
             }
             HashMap hmarzt = DBRetrieve.getSingleRecord("Arzt", "ArztID", arztid);
             html += "&lt;b&gt;" + hmarzt.get("Anrede").toString() + " " + hmarzt.get("Titel").toString() + " " + hmarzt.get("Name").toString() + "&lt;/b&gt;" + " &lt;br/&gt;";
         }
-        html += "Körperseite: &lt;b&gt;" + cmbKoerper.getSelectedItem().toString() + "&lt;/b&gt;&lt;br/&gt;";
+        html += "KÃ¶rperseite: &lt;b&gt;" + cmbKoerper.getSelectedItem().toString() + "&lt;/b&gt;&lt;br/&gt;";
         html += "Diagnosesicherheit: &lt;b&gt;" + cmbSicherheit.getSelectedItem().toString() + "&lt;/b&gt;";
 
         xml += "html=\"" + html;
@@ -479,6 +474,7 @@ public class DlgDiagnose extends DlgCustom {
         }
 
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOK;
@@ -523,10 +519,10 @@ public class DlgDiagnose extends DlgCustom {
                     icd = tm.getValueAt(lsm.getLeadSelectionIndex(), 0).toString();
                     text = tm.getValueAt(lsm.getLeadSelectionIndex(), 1).toString();
                     lblDiagnose.setText(icd + ": " + text);
-                //btnOK.setEnabled(true);
+                    //btnOK.setEnabled(true);
                 }
                 saveOK();
-            //if (ts.)
+                //if (ts.)
             }
 
         }
@@ -539,9 +535,8 @@ public class DlgDiagnose extends DlgCustom {
      * <li>Optiongroups: &lt;jn value="nein"&gt;</li>
      * <li>Textfelder: &lt;kontakt value="Nur Kontakt zu ihrer Schwester."&gt;</li>
      * </ul>
-     *
+     * <p/>
      * Neben dem einstellen der Widgets, wird ebenfalls die HashMap <code>antwort</code> entsprechend mit gepflegt.
-     *
      */
     private class HandlerDaten extends DefaultHandler {
 
@@ -565,7 +560,7 @@ public class DlgDiagnose extends DlgCustom {
                 cmbKoerper.setSelectedItem(koerperseite);
                 cmbSicherheit.setSelectedItem(diagnosesicherheit);
                 saveOK();
-            //btnOK.setEnabled(true);
+                //btnOK.setEnabled(true);
             }
 
         }

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,17 +26,17 @@
  */
 package op.care.bhp;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.swing.table.AbstractTableModel;
-import op.tools.DlgException;
 import op.OPDE;
+import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.swing.table.AbstractTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
- *
  * @author tloehr
  */
 public class TMBedarf
@@ -61,76 +61,76 @@ public class TMBedarf
         try {
             sql =
                     " SELECT v.DafID, v.VerID, p.BHPPID, v.MassID, ifnull(vor.Saldo,0) saldo, mp.Bezeichnung mptext, m.Bezeichnung mssntext, " +
-                    " s.Text sittext, p.MaxAnzahl, p.MaxEDosis, bisher.tagesdosis, d.Zusatz, f.Zubereitung, f.AnwText, f.AnwEinheit, f.PackEinheit, f.AnwEinheit," +
-                    " v.Bemerkung, bestand.APV APV, bestand.Summe bestsumme, ifnull(bestand.BestID, 0) BestID " +
-                    " FROM BHPVerordnung v " +
-                    " INNER JOIN Situationen s ON v.SitID = s.SitID " +
-                    " INNER JOIN BHPPlanung p ON v.VerID = p.VerID" +
-                    " INNER JOIN Massnahmen m ON v.MassID = m.MassID " +
-                    " LEFT OUTER JOIN MPDarreichung d ON v.DafID = d.DafID " +
-                    " LEFT OUTER JOIN MProdukte mp ON mp.MedPID = d.MedPID " +
-                    " LEFT OUTER JOIN MPFormen f ON d.FormID = f.FormID" +
-                    // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
-                    // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
-                    // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
-                    // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
-                    // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
-                    //                    " (" +
-                    //                    "       SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM (" +
-                    //                    "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
-                    //                    "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                    //                    "           GROUP BY VorID" +
-                    //                    "       ) a " +
-                    //                    "       INNER JOIN (" +
-                    //                    "           SELECT best.VorID, best.DafID FROM MPBestand best " +
-                    //                    "       ) b ON a.VorID = b.VorID " +
-                    //                    "       INNER JOIN MPVorrat vrr ON a.VorID = vrr.VorID " +
-                    //                    "       WHERE vrr.BWKennung=? AND vrr.Bis = '9999-12-31 23:59:59'" +
-                    //                    " ) vor ON vor.DafID = v.DafID " +
-                    " LEFT OUTER JOIN " +
-                    " ( " +
-                    "   SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
-                    "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
-                    "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                    "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
-                    "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
-                    "           GROUP BY VorID" +
-                    "   ) a  " +
-                    "   INNER JOIN (" +
-                    "       SELECT best.VorID, best.DafID FROM MPBestand best " +
-                    "   ) b ON a.VorID = b.VorID " +
-                    " ) vor ON vor.DafID = v.DafID " +
-                    //
-                    " LEFT OUTER JOIN" +
-                    " 	(" +
-                    "       SELECT b3.VerID, sum(b1.dosis) tagesdosis " +
-                    "       FROM BHP b1" +
-                    "       INNER JOIN BHPPlanung b2 ON b1.BHPPID = b2.BHPPID" +
-                    "       INNER JOIN BHPVerordnung b3 ON b3.VerID = b2.VerID" +
-                    "       WHERE b3.BWKennung=? AND b3.AbDatum = '9999-12-31 23:59:59'" +
-                    "       AND DATE(b1.Ist) = Date(now()) AND b1.Status = 1" +
-                    "       GROUP BY b3.VerID" +
-                    " 	) bisher ON bisher.VerID = v.VerID" +
-                    // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
-                    // ursprünglich verordneten abweichen.
-                    " LEFT OUTER JOIN( " +
-                    "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
-                    "       FROM MPBestand best1 " +
-                    "       INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
-                    "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
-                    "       GROUP BY best1.BestID" +
-                    " ) bestand ON bestand.VorID = vor.VorID " +
-                    " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
-                    " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
-                    //                    " LEFT OUTER JOIN" +
-                    //                    " ( " +
-                    //                    "   SELECT VorID, BestID, DafID, APV " +
-                    //                    "   FROM MPBestand " +
-                    //                    "   WHERE Aus = '9999-12-31 23:59:59' AND Anbruch < now() " +
-                    //                    " ) bestand ON bestand.VorID = vor.VorID " +
-                    //
-                    " WHERE v.BWKennung = ? AND v.AbDatum = '9999-12-31 23:59:59' " +
-                    " ORDER BY sittext";
+                            " s.Text sittext, p.MaxAnzahl, p.MaxEDosis, bisher.tagesdosis, d.Zusatz, f.Zubereitung, f.AnwText, f.AnwEinheit, f.PackEinheit, f.AnwEinheit," +
+                            " v.Bemerkung, bestand.APV APV, bestand.Summe bestsumme, ifnull(bestand.BestID, 0) BestID " +
+                            " FROM BHPVerordnung v " +
+                            " INNER JOIN Situationen s ON v.SitID = s.SitID " +
+                            " INNER JOIN BHPPlanung p ON v.VerID = p.VerID" +
+                            " INNER JOIN Massnahmen m ON v.MassID = m.MassID " +
+                            " LEFT OUTER JOIN MPDarreichung d ON v.DafID = d.DafID " +
+                            " LEFT OUTER JOIN MProdukte mp ON mp.MedPID = d.MedPID " +
+                            " LEFT OUTER JOIN MPFormen f ON d.FormID = f.FormID" +
+                            // Dieser Konstrukt bestimmt die VorrÃ¤te fÃ¼r einen Bewohner
+                            // Dabei wird berÃ¼cksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
+                            // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
+                            // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
+                            // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
+                            //                    " (" +
+                            //                    "       SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM (" +
+                            //                    "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+                            //                    "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                            //                    "           GROUP BY VorID" +
+                            //                    "       ) a " +
+                            //                    "       INNER JOIN (" +
+                            //                    "           SELECT best.VorID, best.DafID FROM MPBestand best " +
+                            //                    "       ) b ON a.VorID = b.VorID " +
+                            //                    "       INNER JOIN MPVorrat vrr ON a.VorID = vrr.VorID " +
+                            //                    "       WHERE vrr.BWKennung=? AND vrr.Bis = '9999-12-31 23:59:59'" +
+                            //                    " ) vor ON vor.DafID = v.DafID " +
+                            " LEFT OUTER JOIN " +
+                            " ( " +
+                            "   SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
+                            "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+                            "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                            "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+                            "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+                            "           GROUP BY VorID" +
+                            "   ) a  " +
+                            "   INNER JOIN (" +
+                            "       SELECT best.VorID, best.DafID FROM MPBestand best " +
+                            "   ) b ON a.VorID = b.VorID " +
+                            " ) vor ON vor.DafID = v.DafID " +
+                            //
+                            " LEFT OUTER JOIN" +
+                            " 	(" +
+                            "       SELECT b3.VerID, sum(b1.dosis) tagesdosis " +
+                            "       FROM BHP b1" +
+                            "       INNER JOIN BHPPlanung b2 ON b1.BHPPID = b2.BHPPID" +
+                            "       INNER JOIN BHPVerordnung b3 ON b3.VerID = b2.VerID" +
+                            "       WHERE b3.BWKennung=? AND b3.AbDatum = '9999-12-31 23:59:59'" +
+                            "       AND DATE(b1.Ist) = Date(now()) AND b1.Status = 1" +
+                            "       GROUP BY b3.VerID" +
+                            " 	) bisher ON bisher.VerID = v.VerID" +
+                            // Hier kommen jetzt die BestÃ¤nde im Anbruch dabei. Die Namen der Medikamente kÃ¶nnten ja vom
+                            // ursprÃ¼nglich verordneten abweichen.
+                            " LEFT OUTER JOIN( " +
+                            "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
+                            "       FROM MPBestand best1 " +
+                            "       INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
+                            "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+                            "       GROUP BY best1.BestID" +
+                            " ) bestand ON bestand.VorID = vor.VorID " +
+                            " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
+                            " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
+                            //                    " LEFT OUTER JOIN" +
+                            //                    " ( " +
+                            //                    "   SELECT VorID, BestID, DafID, APV " +
+                            //                    "   FROM MPBestand " +
+                            //                    "   WHERE Aus = '9999-12-31 23:59:59' AND Anbruch < now() " +
+                            //                    " ) bestand ON bestand.VorID = vor.VorID " +
+                            //
+                            " WHERE v.BWKennung = ? AND v.AbDatum = '9999-12-31 23:59:59' " +
+                            " ORDER BY sittext";
             stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             stmt.setString(2, bwkennung);
@@ -195,6 +195,7 @@ public class TMBedarf
         }
         return result;
     }
+
     // Dosis from Double
 //    private String dfd(double d) {
 //        String result;
@@ -260,16 +261,16 @@ public class TMBedarf
                     tmp += op.care.verordnung.DBRetrieve.getDosis(verid);
                     double tagesdosis = rs.getDouble("bisher.tagesdosis");
                     tmp += "Bisherige Tagesdosis: " + tagesdosis + "<br/>";
-                    if (rs.getLong("DafID") > 0) { // Gilt nur für Medikamente, sonst passt das nicht
+                    if (rs.getLong("DafID") > 0) { // Gilt nur fÃ¼r Medikamente, sonst passt das nicht
                         double maxanzahl = rs.getDouble("p.MaxAnzahl");
                         double edosis = rs.getDouble("p.MaxEDosis");
 
                         if (rs.getDouble("saldo") > 0) {
 
-                            // Wenn die Tagesdosis bei einer erneuten Gabe des Medikamentes überschritten würde,
+                            // Wenn die Tagesdosis bei einer erneuten Gabe des Medikamentes Ã¼berschritten wÃ¼rde,
                             // dann melden.
                             if (tagesdosis + edosis > maxanzahl * edosis) {
-                                tmp += "<b>Keine weitere Gabe des Medikamentes mehr möglich. Tagesdosis ist erreicht</b><br/>";
+                                tmp += "<b>Keine weitere Gabe des Medikamentes mehr mÃ¶glich. Tagesdosis ist erreicht</b><br/>";
                             }
 
                             tmp += "<u>Vorrat:</u> <font color=\"green\">" + rs.getDouble("saldo") + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] +
@@ -294,7 +295,7 @@ public class TMBedarf
                                     }
                                 }
                             } else {
-                                tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+                                tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht mÃ¶glich.</font></b>";
                             }
                         } else {
                             tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
@@ -333,7 +334,7 @@ public class TMBedarf
                     double tagesdosis = rs.getDouble("bisher.tagesdosis");
                     double maxanzahl = rs.getDouble("p.MaxAnzahl");
                     double edosis = rs.getDouble("p.MaxEDosis");
-                    // Wenn die Tagesdosis bei einer erneuten Gabe des Medikamentes überschritten würde,
+                    // Wenn die Tagesdosis bei einer erneuten Gabe des Medikamentes Ã¼berschritten wÃ¼rde,
                     // dann melden.
                     result = new Boolean(tagesdosis + edosis > maxanzahl * edosis);
                     break;

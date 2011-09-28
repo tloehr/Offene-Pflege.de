@@ -9,7 +9,7 @@ import java.util.EventListener;
 
 /**
  * Diese Klasse dient dazu, SplitPanes zu animieren, damit empfinde ich ein wenig die Bedienung
- * der Apple Ger‰te nach.
+ * der Apple Ger√§te nach.
  */
 public class SplitAnimator extends SwingWorker {
     protected int targetPositionOfDivider;
@@ -77,7 +77,7 @@ public class SplitAnimator extends SwingWorker {
         this.targetPositionOfDivider = targetPositionOfDivider;
         distance = Math.abs(targetPositionOfDivider - startPositionOfDivider);
         if (targetPositionOfDivider < currentPositionOfDivider) {
-            step *= -1; // Vorzeichenwechsel f¸r R¸ckw‰rts.
+            step *= -1; // Vorzeichenwechsel f√ºr R√ºckw√§rts.
         }
     }
 
@@ -87,7 +87,7 @@ public class SplitAnimator extends SwingWorker {
 
     /**
      * Diese Funktion "malt" genau genommen eine "Wanne" im Funktionsplot. Und trifft ziemlich
-     * gut die Beschleunigungswerte, die ich gerne h‰tte.
+     * gut die Beschleunigungswerte, die ich gerne h√§tte.
      *
      * @param x
      * @return
@@ -135,7 +135,7 @@ public class SplitAnimator extends SwingWorker {
         evt.getProps().put("message", "done()");
         fireEvent(evt);
 
-        // Aufr‰umen
+        // Aufr√§umen
         Object[] listeners = listenerList.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2011 Torsten Löhr
+ * Copyright (C) 2011 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
  *
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License,
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
@@ -25,82 +25,67 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "SYSFiles")
 @NamedQueries({
-    @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
-    @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
-    @NamedQuery(name = "SYSFiles.findByFilename", query = "SELECT s FROM SYSFiles s WHERE s.filename = :filename"),
-    @NamedQuery(name = "SYSFiles.findByMd5", query = "SELECT s FROM SYSFiles s WHERE s.md5 = :md5"),
-    @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
-    @NamedQuery(name = "SYSFiles.findByFilesize", query = "SELECT s FROM SYSFiles s WHERE s.filesize = :filesize"),
-    @NamedQuery(name = "SYSFiles.findByPit", query = "SELECT s FROM SYSFiles s WHERE s.pit = :pit"),
-    @NamedQuery(name = "SYSFiles.findByBWKennung2PB", query = ""
-    + " SELECT s"
-    + " FROM SYSFiles s "
-    + " JOIN s.pbAssignCollection sf "
-    + " JOIN sf.pflegebericht t "
-    + " WHERE t.bewohner = :bewohner "),
-    @NamedQuery(name = "SYSFiles.findByBWKennung", query = ""
-    + " SELECT s"
-    + " FROM SYSFiles s "
-    + " JOIN s.bwAssignCollection sf "
-    + " WHERE sf.bewohner = :bewohner "),
-    @NamedQuery(name = "SYSFiles.findByBWKennung2BWI", query = ""
-    + " SELECT s"
-    + " FROM SYSFiles s "
-    + " JOIN s.bwiAssignCollection sf "
-    + " JOIN sf.bwinfo t "
-    + " WHERE t.bewohner = :bewohner "),
-    @NamedQuery(name = "SYSFiles.findByBWKennung2VER", query = ""
-    + " SELECT s"
-    + " FROM SYSFiles s "
-    + " JOIN s.verAssignCollection sf "
-    + " JOIN sf.verordnung v "
-    + " WHERE v.bewohner = :bewohner "),
-    @NamedQuery(name = "SYSFiles.findByPB", query = ""
-    + " SELECT s, sf"
-    + " FROM SYSFiles s "
-    + " JOIN s.pbAssignCollection sf "
-    + " WHERE sf.pflegebericht = :pflegebericht "),
-    @NamedQuery(name = "SYSFiles.findByBWInfo", query = ""
-    + " SELECT s, sf"
-    + " FROM SYSFiles s "
-    + " JOIN s.bwiAssignCollection sf "
-    + " WHERE sf.bwinfo = :bwinfo "),
-    @NamedQuery(name = "SYSFiles.findByVerordnung", query = ""
-    + " SELECT s, sf"
-    + " FROM SYSFiles s "
-    + " JOIN s.verAssignCollection sf "
-    + " WHERE sf.verordnung = :verordnung "),
-    @NamedQuery(name = "SYSFiles.findByBWert", query = ""
-    + " SELECT s, sf"
-    + " FROM SYSFiles s "
-    + " JOIN s.bwerteAssignCollection sf "
-    + " WHERE sf.wert = :wert ")
+        @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
+        @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
+        @NamedQuery(name = "SYSFiles.findByFilename", query = "SELECT s FROM SYSFiles s WHERE s.filename = :filename"),
+        @NamedQuery(name = "SYSFiles.findByMd5", query = "SELECT s FROM SYSFiles s WHERE s.md5 = :md5"),
+        @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
+        @NamedQuery(name = "SYSFiles.findByFilesize", query = "SELECT s FROM SYSFiles s WHERE s.filesize = :filesize"),
+        @NamedQuery(name = "SYSFiles.findByPit", query = "SELECT s FROM SYSFiles s WHERE s.pit = :pit"),
+        @NamedQuery(name = "SYSFiles.findByBWKennung2PB", query = ""
+                + " SELECT s"
+                + " FROM SYSFiles s "
+                + " JOIN s.pbAssignCollection sf "
+                + " JOIN sf.pflegebericht t "
+                + " WHERE t.bewohner = :bewohner "),
+        @NamedQuery(name = "SYSFiles.findByBWKennung", query = ""
+                + " SELECT s"
+                + " FROM SYSFiles s "
+                + " JOIN s.bwAssignCollection sf "
+                + " WHERE sf.bewohner = :bewohner "),
+        @NamedQuery(name = "SYSFiles.findByBWKennung2BWI", query = ""
+                + " SELECT s"
+                + " FROM SYSFiles s "
+                + " JOIN s.bwiAssignCollection sf "
+                + " JOIN sf.bwinfo t "
+                + " WHERE t.bewohner = :bewohner "),
+        @NamedQuery(name = "SYSFiles.findByBWKennung2VER", query = ""
+                + " SELECT s"
+                + " FROM SYSFiles s "
+                + " JOIN s.verAssignCollection sf "
+                + " JOIN sf.verordnung v "
+                + " WHERE v.bewohner = :bewohner "),
+        @NamedQuery(name = "SYSFiles.findByPB", query = ""
+                + " SELECT s, sf"
+                + " FROM SYSFiles s "
+                + " JOIN s.pbAssignCollection sf "
+                + " WHERE sf.pflegebericht = :pflegebericht "),
+        @NamedQuery(name = "SYSFiles.findByBWInfo", query = ""
+                + " SELECT s, sf"
+                + " FROM SYSFiles s "
+                + " JOIN s.bwiAssignCollection sf "
+                + " WHERE sf.bwinfo = :bwinfo "),
+        @NamedQuery(name = "SYSFiles.findByVerordnung", query = ""
+                + " SELECT s, sf"
+                + " FROM SYSFiles s "
+                + " JOIN s.verAssignCollection sf "
+                + " WHERE sf.verordnung = :verordnung "),
+        @NamedQuery(name = "SYSFiles.findByBWert", query = ""
+                + " SELECT s, sf"
+                + " FROM SYSFiles s "
+                + " JOIN s.bwerteAssignCollection sf "
+                + " WHERE sf.wert = :wert ")
 })
 public class SYSFiles implements Serializable, Comparable {
 

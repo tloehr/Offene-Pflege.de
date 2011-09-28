@@ -4,7 +4,13 @@
  */
 package op.share.vorgang;
 
-import java.awt.Frame;
+import op.OPDE;
+import op.tools.DBRetrieve;
+import op.tools.DlgException;
+import op.tools.SYSTools;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigInteger;
@@ -19,26 +25,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import op.OPDE;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
 
-//    public static final int ART_PFLEGE = 1;
+    //    public static final int ART_PFLEGE = 1;
 //    public static final int ART_BHP = 2;
 //    public static final int ART_SOZIAL = 3;
 //    public static final int ART_VERWALTUNG = 4;
     public static final int MODE_ASSIGN = 0;
     public static final int MODE_REMOVE = 1;
-    // Die VBerichte enthalten neben einfachen Texteinträgen auch automatische Systemnachrichten,
+    // Die VBerichte enthalten neben einfachen TexteintrÃ¤gen auch automatische Systemnachrichten,
     // die den Entwicklungsverlauf eines Vorgangs wiederspiegeln. Alle VBerichte mit der Art > 0 sind
     // Systemberichte. Die man bei Bedarf wegfiltern kann.
     public static final int VBERICHT_ART_USER = 0;
@@ -50,17 +49,17 @@ public class DBHandling {
     public static final int VBERICHT_ART_REOPEN = 6;
     public static final int VBERICHT_ART_EDIT = 7;
     public static final int VBERICHT_ART_WV = 8;
-    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
+    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS EigentÃ¼mer geÃ¤ndert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geÃ¶ffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
 
     /**
-     * Erstellt eine Liste aktueller Vorgänge.
-     * @param bwkennung - bezieht auch die Vorgänge für einen bestimmten Bewohner ein. Kann auch "" oder null sein. Dann eben nur allgemeine Vorgänge.
-     * @return verschachtelte ArrayListe mit den Ergebnissen zuerst Allgemein, dann für Bewohner geordnet.
-     * [ ("Allgemein",{"Spaziergänge",5},{"Waffeln backen 2008",7}),("Muster, Marga",{"Einzelgespräche",8},{"Gehübungen",VorgangID}) ]
-     * 
+     * Erstellt eine Liste aktueller VorgÃ¤nge.
+     *
+     * @param bwkennung - bezieht auch die VorgÃ¤nge fÃ¼r einen bestimmten Bewohner ein. Kann auch "" oder null sein. Dann eben nur allgemeine VorgÃ¤nge.
+     * @return verschachtelte ArrayListe mit den Ergebnissen zuerst Allgemein, dann fÃ¼r Bewohner geordnet.
+     *         [ ("Allgemein",{"SpaziergÃ¤nge",5},{"Waffeln backen 2008",7}),("Muster, Marga",{"EinzelgesprÃ¤che",8},{"GehÃ¼bungen",VorgangID}) ]
      */
     public static ArrayList getVorgaenge(String bwkennung) {
-        ArrayList vorgaenge = new ArrayList(); // Äußere Liste
+        ArrayList vorgaenge = new ArrayList(); // Ã„uÃŸere Liste
         String sql = "" +
                 " SELECT DISTINCT v.VorgangID, v.Titel, v.BWKennung, if(b.Nachname IS NULL, '', CONCAT(b.Nachname, ', ', b.Vorname)) name FROM Vorgang v " +
                 " LEFT OUTER JOIN Bewohner b ON v.BWKennung = b.BWKennung" +
@@ -244,7 +243,7 @@ public class DBHandling {
 
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                             if (op.tools.DBHandling.deleteRecords("VorgangAssign", "VAID", vaid) > 0) {
-                                newVBericht(vorgangid, "Zuordnung wurde gelöscht. TableName: " + t + "   Key: " + f, VBERICHT_ART_REMOVE_ELEMENT);
+                                newVBericht(vorgangid, "Zuordnung wurde gelÃ¶scht. TableName: " + t + "   Key: " + f, VBERICHT_ART_REMOVE_ELEMENT);
                             }
                             f_al.actionPerformed(new ActionEvent(this, 0, "VorgangRemove"));
                         }
@@ -261,7 +260,7 @@ public class DBHandling {
     }
 
     public static JMenu getVorgangContextMenu(Frame parent, String tablename, long fk, String bwk, ActionListener al) {
-        JMenu menu = new JMenu("<html>Vorgänge <font color=\"red\">&#9679;</font></html>");
+        JMenu menu = new JMenu("<html>VorgÃ¤nge <font color=\"red\">&#9679;</font></html>");
         JMenuItem neu = new JMenuItem("Neu erstellen");
 
         final Frame p = parent;
@@ -310,6 +309,7 @@ public class DBHandling {
 
     /**
      * beendet den Vorgang
+     *
      * @param vorgangid
      */
     public static void endVorgang(long vorgangid) {
@@ -328,7 +328,7 @@ public class DBHandling {
             hm.put("Bis", "!NOW!");
 
             if (!op.tools.DBHandling.updateRecord("Vorgaenge", hm, "VorgangID", vorgangid)) {
-                throw new SQLException("Vorgang konnte nicht geändert werden.");
+                throw new SQLException("Vorgang konnte nicht geÃ¤ndert werden.");
             }
 
             if (DBHandling.newVBericht(vorgangid, "Vorgang abgeschlossen", DBHandling.VBERICHT_ART_CLOSE) < 0) {
@@ -355,7 +355,8 @@ public class DBHandling {
     }
 
     /**
-     * Trägt den aktuellen OCUser als Besitzer ein.
+     * TrÃ¤gt den aktuellen OCUser als Besitzer ein.
+     *
      * @param vorgangid
      */
     public static void takeVorgang(long vorgangid) {
@@ -374,10 +375,10 @@ public class DBHandling {
             hm.put("Besitzer", OPDE.getLogin().getUser().getUKennung());
 
             if (!op.tools.DBHandling.updateRecord("Vorgaenge", hm, "VorgangID", vorgangid)) {
-                throw new SQLException("Vorgang konnte nicht geändert werden.");
+                throw new SQLException("Vorgang konnte nicht geÃ¤ndert werden.");
             }
 
-            if (DBHandling.newVBericht(vorgangid, "Vorgang wurde zugewiesen an: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()) + " (Übernahme)", DBHandling.VBERICHT_ART_SET_OWNERSHIP) < 0) {
+            if (DBHandling.newVBericht(vorgangid, "Vorgang wurde zugewiesen an: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()) + " (Ãœbernahme)", DBHandling.VBERICHT_ART_SET_OWNERSHIP) < 0) {
                 throw new SQLException("Neuer VBericht konnte nicht erstellt werden.");
             }
 
@@ -410,6 +411,7 @@ public class DBHandling {
 
     /**
      * aktiviert den Vorgang wieder
+     *
      * @param vorgangid
      */
     public static void reopenVorgang(long vorgangid) {
@@ -428,10 +430,10 @@ public class DBHandling {
             hm.put("Bis", "!BAW!");
 
             if (!op.tools.DBHandling.updateRecord("Vorgaenge", hm, "VorgangID", vorgangid)) {
-                throw new SQLException("Vorgang konnte nicht geändert werden.");
+                throw new SQLException("Vorgang konnte nicht geÃ¤ndert werden.");
             }
 
-            if (DBHandling.newVBericht(vorgangid, "Vorgang wieder geöffnet", DBHandling.VBERICHT_ART_REOPEN) < 0) {
+            if (DBHandling.newVBericht(vorgangid, "Vorgang wieder geÃ¶ffnet", DBHandling.VBERICHT_ART_REOPEN) < 0) {
                 throw new SQLException("Neuer VBericht konnte nicht erstellt werden.");
             }
 
@@ -456,6 +458,7 @@ public class DBHandling {
 
     /**
      * Setzt das Wiedervorlage Datum
+     *
      * @param vorgangid
      * @param wv
      */
@@ -475,7 +478,7 @@ public class DBHandling {
             hm.put("WV", wv);
 
             if (!op.tools.DBHandling.updateRecord("Vorgaenge", hm, "VorgangID", vorgangid)) {
-                throw new SQLException("Vorgang konnte nicht geändert werden.");
+                throw new SQLException("Vorgang konnte nicht geÃ¤ndert werden.");
             }
 
             DateFormat df = DateFormat.getDateInstance();
@@ -504,6 +507,7 @@ public class DBHandling {
 
     /**
      * Entfernt einen Element aus dem Vorgang wieder.
+     *
      * @param tblidx
      * @param elementid
      */
@@ -527,20 +531,20 @@ public class DBHandling {
                 vorgangid = ((BigInteger) vbericht.get("VorgangID")).longValue();
                 int art = ((Integer) vbericht.get("Art")).intValue();
                 if (art > 0) {
-                    throw new SQLException("Systemberichte können nicht gelöscht werden.");
+                    throw new SQLException("Systemberichte kÃ¶nnen nicht gelÃ¶scht werden.");
                 }
                 if (op.tools.DBHandling.deleteRecords("VBericht", "VBID", elementid) < 0) {
-                    throw new SQLException("Element konnte nicht gelöscht werden.");
+                    throw new SQLException("Element konnte nicht gelÃ¶scht werden.");
                 }
                 SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
                 String ukennung = vbericht.get("UKennung").toString();
-                bericht = "Vorgangsbericht gelöscht. Text war: '" + vbericht.get("Text").toString() +
-                        "'<br/>Ursprünglich geschrieben von: " + DBRetrieve.getUsername(ukennung) +
+                bericht = "Vorgangsbericht gelÃ¶scht. Text war: '" + vbericht.get("Text").toString() +
+                        "'<br/>UrsprÃ¼nglich geschrieben von: " + DBRetrieve.getUsername(ukennung) +
                         "<br/>Am: " + sdf.format(vbericht.get("Datum"));
             } else {
                 HashMap va = DBRetrieve.getSingleRecord("VorgangAssign", "VAID", elementid);
                 if (op.tools.DBHandling.deleteRecords("VorgangAssign", "VAID", elementid) < 0) {
-                    throw new SQLException("Element konnte nicht gelöscht werden.");
+                    throw new SQLException("Element konnte nicht gelÃ¶scht werden.");
                 }
                 vorgangid = ((BigInteger) va.get("VorgangID")).longValue();
                 bericht = "Element entfernt. Tabelle: " + va.get("TableName").toString() + ". PK: " + va.get("ForeignKey").toString();

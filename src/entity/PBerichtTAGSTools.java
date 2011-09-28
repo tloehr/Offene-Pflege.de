@@ -4,36 +4,33 @@
  */
 package entity;
 
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.LayoutManager;
+import op.OPDE;
+
+import javax.persistence.Query;
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.persistence.Query;
-import javax.swing.JCheckBox;
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import op.OPDE;
 
 /**
- *
  * @author tloehr
  */
 public class PBerichtTAGSTools {
 
     /**
-     * Erstellt ein JMenu bestehend aus Checkboxen. Für jede aktive PBerichtTag jeweils eine.
-     * Wenn man die anklickt, wird eine Markierung zum Bericht hinzugefügt. Dieses Menü
-     * wird in PnlBerichte verwendet. Als Kontextmenü für die einzelnen Berichtszeilen.
-     * @param bericht Der Bericht, für den das Menü erzeugt werden soll.
-     * Je nachdem, welche Tags diesem Bericht schon zugewiesen sind, werden die Checkboxen bereits angeklickt oder auch nicht.
-     * Für das Menü wird ein Listener definiert, der weitere Tags setzt oder entfernt.
-     * @return das vorbereitete Menü
+     * Erstellt ein JMenu bestehend aus Checkboxen. FÃ¼r jede aktive PBerichtTag jeweils eine.
+     * Wenn man die anklickt, wird eine Markierung zum Bericht hinzugefÃ¼gt. Dieses MenÃ¼
+     * wird in PnlBerichte verwendet. Als KontextmenÃ¼ fÃ¼r die einzelnen Berichtszeilen.
+     *
+     * @param bericht Der Bericht, fÃ¼r den das MenÃ¼ erzeugt werden soll.
+     *                Je nachdem, welche Tags diesem Bericht schon zugewiesen sind, werden die Checkboxen bereits angeklickt oder auch nicht.
+     *                FÃ¼r das MenÃ¼ wird ein Listener definiert, der weitere Tags setzt oder entfernt.
+     * @return das vorbereitete MenÃ¼
      */
     public static JMenu createMenuForTags(Pflegeberichte bericht) {
         final Pflegeberichte finalbericht = bericht;
@@ -90,11 +87,11 @@ public class PBerichtTAGSTools {
 
 
     /**
-     * Erstellt eine JPanel, die mit Checkboxen gefüllt ist. Pro aktive PBerichtTag jeweils eine.
+     * Erstellt eine JPanel, die mit Checkboxen gefÃ¼llt ist. Pro aktive PBerichtTag jeweils eine.
      *
-     * @param listener Ein ItemListener, der sagt, was geschehen soll, wenn man auf die Checkboxen klickt.
+     * @param listener  Ein ItemListener, der sagt, was geschehen soll, wenn man auf die Checkboxen klickt.
      * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
-     * @param layout Ein Layoutmanager für das Panel.
+     * @param layout    Ein Layoutmanager fÃ¼r das Panel.
      * @return das Panel zur weiteren Verwendung.
      */
     public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect, LayoutManager layout) {
@@ -110,7 +107,7 @@ public class PBerichtTAGSTools {
                 cb.setFont(new Font("Lucida Grande", Font.BOLD, 13));
             }
             cb.putClientProperty("UserObject", tag);
-            
+
             cb.setSelected(preselect.contains(tag));
             cb.addItemListener(listener);
 
@@ -119,14 +116,15 @@ public class PBerichtTAGSTools {
         return panel;
 
     }
-    
+
     /**
      * Kleine Hilfsmethode, die ich brauche um festzustellen ob ein bestimmter bericht
      * ein Sozial Bericht ist.
+     *
      * @param collection
-     * @return 
+     * @return
      */
-    public static boolean isSozial(Pflegeberichte bericht){
+    public static boolean isSozial(Pflegeberichte bericht) {
         Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();
         boolean yes = false;
         while (!yes && itTags.hasNext()) {

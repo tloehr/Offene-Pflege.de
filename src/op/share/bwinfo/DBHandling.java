@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,6 +28,10 @@ package op.share.bwinfo;
 
 import entity.Bewohner;
 import entity.EinrichtungenTools;
+import op.OPDE;
+import op.tools.*;
+
+import javax.swing.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,26 +40,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import javax.swing.DefaultComboBoxModel;
-import op.OPDE;
-import op.tools.ListElement;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
 
     /**
-     * Diese Methode sammelt das aktuelleste, letzte Attribut, gemäß eines bwinftyp und einer BWKennung auf.
+     * Diese Methode sammelt das aktuelleste, letzte Attribut, gemÃ¤ÃŸ eines bwinftyp und einer BWKennung auf.
+     *
      * @param bwkennung - Kennung des Bewohners
-     * @param bwinftyp - Kennung des gewünschten Attributs
+     * @param bwinftyp  - Kennung des gewÃ¼nschten Attributs
      * @return Liste der Daten des letzten Attributes (XMLC, Von, Bis, BWINFOID, _creator, _editor, _cdate, _mdate). Datentypen
-     * (String, Date, Date, long, String, String, Timestamp, Timestamp)
+     *         (String, Date, Date, long, String, String, Timestamp, Timestamp)
      */
     public static ArrayList getLastBWInfo(String bwkennung, String bwinftyp) {
         //OPDE.getLogger().debug("DBRetrieve.getLastBWInfo() :: " + bwkennung + ", " + bwinftyp);
@@ -86,8 +83,7 @@ public class DBHandling {
     }
 
     /**
-     * Fügt eine neue Zeile in BWInfo ein. Immer ab sofort bis auf weiteres.
-     *
+     * FÃ¼gt eine neue Zeile in BWInfo ein. Immer ab sofort bis auf weiteres.
      *
      * @param bwinfoid
      * @param bwkennung
@@ -119,7 +115,7 @@ public class DBHandling {
      * Diese Methode berechnet zu einem PrimaryKey eines bekannten Zeitraums den Inhalt des vorhergehenden oder nachfolgenden Zeitraums aus der
      * BWInfo Tabelle.
      *
-     * @param pk des gegebenen Zeitraums.
+     * @param pk    des gegebenen Zeitraums.
      * @param true, wenn der vorhergehenden Zeitraum gesucht wird. false, wenn der nachfolgende gesucht wird.
      * @return Eine Liste mit den Daten des Zeitraums (long BWINFOID, Date von, Date bis, String xml). Null, wenn des keinen vorhergehenden Zeitraum gab oder bei Exception
      */
@@ -133,12 +129,12 @@ public class DBHandling {
         // mit MAX(PK) bzw. MIN(PK) gearbeitet wird. Bei unseren AutoIncrement Tabellen ist das aber kein Problem.
         String sql =
                 " SELECT BWINFOID, Von, Bis, XML FROM BWInfo WHERE BWINFOID = " +
-                "   (" +
-                "       SELECT " + op1 + "(BWINFOID) FROM BWInfo " +
-                "       WHERE BWKennung=(SELECT BWKennung FROM BWInfo B WHERE BWINFOID=?) " +
-                "       AND BWINFTYP=(SELECT BWINFTYP FROM BWInfo B WHERE BWINFOID=?) " +
-                "       AND Von " + op2 + " (SELECT Von FROM BWInfo B WHERE BWINFOID=?) " +
-                "   )";
+                        "   (" +
+                        "       SELECT " + op1 + "(BWINFOID) FROM BWInfo " +
+                        "       WHERE BWKennung=(SELECT BWKennung FROM BWInfo B WHERE BWINFOID=?) " +
+                        "       AND BWINFTYP=(SELECT BWINFTYP FROM BWInfo B WHERE BWINFOID=?) " +
+                        "       AND Von " + op2 + " (SELECT Von FROM BWInfo B WHERE BWINFOID=?) " +
+                        "   )";
         try {
             PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
             stmt.setLong(1, bwinfoid);
@@ -162,20 +158,20 @@ public class DBHandling {
     }
 
     /**
-     * Gibt eine kurze BWInfo zurück. Wir meistens für den BW Info Label verwendet.
+     * Gibt eine kurze BWInfo zurÃ¼ck. Wir meistens fÃ¼r den BW Info Label verwendet.
+     *
      * @param bwkennung
      * @return Die Informationen in dem Array sind: (aufenthalt, vonHauf, bisHauf, ausgezogen, verstorben)
-     * <ul>
-     * <li>aufenthalt. Boolean ob der BW zur Zeit in der Einrichtung wohnt.</li>
-     * <li>vonHauf. Date, seit wann der BW in der Einrichtung wohnt.</li>
-     * <li>bisHauf. Date, bis wann der BW in der Einrichtung wohnt.</li>
-     * <li>ausgezogen. boolean, true wenn ausgezogen.</li>
-     * <li>verstorben. boolean, true wenn verstorben.</li>
-     * </ul>
-     *
+     *         <ul>
+     *         <li>aufenthalt. Boolean ob der BW zur Zeit in der Einrichtung wohnt.</li>
+     *         <li>vonHauf. Date, seit wann der BW in der Einrichtung wohnt.</li>
+     *         <li>bisHauf. Date, bis wann der BW in der Einrichtung wohnt.</li>
+     *         <li>ausgezogen. boolean, true wenn ausgezogen.</li>
+     *         <li>verstorben. boolean, true wenn verstorben.</li>
+     *         </ul>
      */
     public static Object[] miniBWInfo(String bwkennung) {
-        // Gibt es einen aktuellen oder zurückliegenden Heimaufenthalt.
+        // Gibt es einen aktuellen oder zurÃ¼ckliegenden Heimaufenthalt.
         ArrayList lastHauf = getLastBWInfo(bwkennung, "hauf");
 
         boolean aufenthalt;
@@ -221,7 +217,7 @@ public class DBHandling {
                 sql += " WHERE KatArt IN (" + BWInfo.ART_VERWALTUNG + "," + BWInfo.ART_STAMMDATEN + ") ";
             } else if (katart != BWInfo.ART_ALLES) {
                 sql += " WHERE KatArt = ? ";
-            } // das letzte else kann man sich sparen. Da würde eh nur ein leerer String produziert.
+            } // das letzte else kann man sich sparen. Da wÃ¼rde eh nur ein leerer String produziert.
             sql += " ORDER BY Bezeichnung COLLATE latin1_german2_ci";
             stmt = OPDE.getDb().db.prepareStatement(sql);
             if (katart < BWInfo.ART_PFLEGE_STAMMDATEN) {
@@ -247,17 +243,18 @@ public class DBHandling {
     }
 
     /**
-     * Gibt einen String zurück, der eine HTML Darstellung der BWInformationen enthält.
-     * @param tmbwi - TableModel, dass die zu druckenden Daten enthält.
+     * Gibt einen String zurÃ¼ck, der eine HTML Darstellung der BWInformationen enthÃ¤lt.
+     *
+     * @param tmbwi     - TableModel, dass die zu druckenden Daten enthÃ¤lt.
      * @param bwkennung - Bewohner, um dessen Daten es geht
-     * @param sel - int array mit den ausgewählten Zeilen. wenn das NULL ist, dann wird alles gedruckt.
+     * @param sel       - int array mit den ausgewÃ¤hlten Zeilen. wenn das NULL ist, dann wird alles gedruckt.
      * @return
      */
     public static String bwInfo2HTML(TMBWInfo tmbwi, Bewohner bewohner, int[] sel) {
         if (sel != null) {
             Arrays.sort(sel);
         }
-        
+
         String result = "<h1>Bewohner-Informationen</h1>";
         result += "<h2>" + SYSTools.getBWLabel(bewohner) + "</h2>";
 

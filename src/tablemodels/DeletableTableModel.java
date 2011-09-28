@@ -6,8 +6,9 @@
 package tablemodels;
 
 /**
- * Dieses Interface wird gebraucht, damit der DelButtonEditor für alle TableModels benutzt werden kann,
+ * Dieses Interface wird gebraucht, damit der DelButtonEditor fÃ¼r alle TableModels benutzt werden kann,
  * die dieses Interface implementieren.
+ *
  * @author tloehr
  */
 public interface DeletableTableModel {

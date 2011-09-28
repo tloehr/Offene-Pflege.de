@@ -4,7 +4,6 @@ import op.OPDE;
 import op.events.DefaultEvent;
 import op.events.DefaultEventListener;
 
-import javax.persistence.Column;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.TableColumn;
@@ -40,10 +39,10 @@ public class TableColumnSizeAnimator extends SwingWorker {
 
         distance = Math.abs(targetWidth - startWidth);
         if (targetWidth < currentWidth) {
-            step *= -1; // Vorzeichenwechsel für Rückwärts.
+            step *= -1; // Vorzeichenwechsel fÃ¼r RÃ¼ckwÃ¤rts.
         }
 
-        OPDE.debug("width: "+width);
+        OPDE.debug("width: " + width);
 
     }
 
@@ -53,7 +52,7 @@ public class TableColumnSizeAnimator extends SwingWorker {
 
     /**
      * Diese Funktion "malt" genau genommen eine "Wanne" im Funktionsplot. Und trifft ziemlich
-     * gut die Beschleunigungswerte, die ich gerne hätte.
+     * gut die Beschleunigungswerte, die ich gerne hÃ¤tte.
      *
      * @param x
      * @return
@@ -103,7 +102,7 @@ public class TableColumnSizeAnimator extends SwingWorker {
         evt.getProps().put("message", "done()");
         fireEvent(evt);
 
-        // Aufräumen
+        // AufrÃ¤umen
         Object[] listeners = listenerList.getListenerList();
         // Each listener occupies two elements - the first is the listener class
         // and the second is the listener instance

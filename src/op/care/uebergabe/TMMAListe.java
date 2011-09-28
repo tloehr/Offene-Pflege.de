@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -27,16 +27,16 @@
 
 package op.care.uebergabe;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.GregorianCalendar;
-import javax.swing.table.AbstractTableModel;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
 
+import javax.swing.table.AbstractTableModel;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.GregorianCalendar;
+
 /**
- *
  * @author tloehr
  */
 public class TMMAListe
@@ -46,53 +46,70 @@ public class TMMAListe
     public static final int COL_STR_DatumUhrzeit = 1;
     public static final int COL_Datum = 2;
     public static final int COL_Uhrzeit = 3;
-    
-    /** Creates a new instance of TMMAListe */
+
+    /**
+     * Creates a new instance of TMMAListe
+     */
     public TMMAListe(ResultSet rs) {
         this.rs = rs;
-        try {            
+        try {
             rs.first();
         } catch (SQLException ex) {
             OPDE.getLogger().error(ex);
         }
     }
-    
+
     public int getRowCount() {
-        try{
+        try {
             rs.last();
             return rs.getRow();
-        } catch (SQLException se){
+        } catch (SQLException se) {
             OPDE.getLogger().error(se);
             return -1;
         }
     }
-    
+
     public int getColumnCount() {
         return 2;
     }
-    
-    public Class getColumnClass(int c){
+
+    public Class getColumnClass(int c) {
         return String.class;
     }
-    
+
     public Object getValueAt(int r, int c) {
         Object result;
-        try{
-            rs.absolute(r+1);
-            
+        try {
+            rs.absolute(r + 1);
+
             long ts = rs.getTimestamp("_cdate").getTime();
             GregorianCalendar gc = SYSCalendar.toGC(ts);
 //            Date date = new Date(gc.getTimeInMillis());
 //            Time time = new Time(gc.getTimeInMillis());
-            
-            switch (c+1){                
-                case 1 : {result = rs.getString("UKennung"); break;}
-                case 2 : {result = SYSCalendar.printGCGermanStyle(gc) + ", " + SYSCalendar.toGermanTime(gc); break;}
-                case 3 : {result = SYSCalendar.printGCGermanStyle(gc); break;}
-                case 4 : {result = SYSCalendar.toGermanTime(gc); break;}
-                default : {result = null; break;}
+
+            switch (c + 1) {
+                case 1: {
+                    result = rs.getString("UKennung");
+                    break;
+                }
+                case 2: {
+                    result = SYSCalendar.printGCGermanStyle(gc) + ", " + SYSCalendar.toGermanTime(gc);
+                    break;
+                }
+                case 3: {
+                    result = SYSCalendar.printGCGermanStyle(gc);
+                    break;
+                }
+                case 4: {
+                    result = SYSCalendar.toGermanTime(gc);
+                    break;
+                }
+                default: {
+                    result = null;
+                    break;
+                }
             }
-        } catch (SQLException se){
+        } catch (SQLException se) {
             new DlgException(se);
             result = "";
         }

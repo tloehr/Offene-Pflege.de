@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,17 +26,14 @@
  */
 package op.care.uebergabe;
 
-import entity.Einrichtungen;
-import entity.Pflegeberichte;
-import entity.PflegeberichteTools;
-import entity.Uebergabebuch;
-import entity.UebergabebuchTools;
-import java.util.ArrayList;
-import java.util.Date;
-import javax.persistence.Query;
-import javax.swing.table.AbstractTableModel;
+import entity.*;
 import op.OPDE;
 import op.tools.SYSCalendar;
+
+import javax.persistence.Query;
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author tloehr
@@ -87,7 +84,7 @@ public class TMUebergabe
         return 4;
     }
 
-    public ArrayList getBerichte(){
+    public ArrayList getBerichte() {
         return berichte;
     }
 
@@ -104,8 +101,8 @@ public class TMUebergabe
         OPDE.getLogger().debug(berichte);
         Object[] bericht = (Object[]) berichte.get(row);
         // Zur Info
-        // bericht[LIST_BERICHT] enth‰lt immer das Berichte Objekt (entweder Ubergabebuch oder Pflegeberichte)
-        // bericht[1] ist 1, wenn der aktuelle User den Bericht best‰tigt hat. 0 sonst.
+        // bericht[LIST_BERICHT] enth√§lt immer das Berichte Objekt (entweder Ubergabebuch oder Pflegeberichte)
+        // bericht[1] ist 1, wenn der aktuelle User den Bericht best√§tigt hat. 0 sonst.
 
         if (bericht[LIST_BERICHT] instanceof Uebergabebuch) {
             switch (col) {

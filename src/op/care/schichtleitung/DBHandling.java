@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,19 +26,19 @@
  */
 package op.care.schichtleitung;
 
+import op.OPDE;
+import op.tools.DlgException;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import op.OPDE;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 
 /**
- *
  * @author root
  */
 public class DBHandling {
@@ -232,8 +232,8 @@ public class DBHandling {
                 "           AND XML IN (" + f + ") " +
                 "           ) AS station ON bw.BWKennung = station.BWKennung " +
                 " LEFT OUTER JOIN ( " +
-                // Diese Subselect Kaskade (alles was zu Ausdruck a gehˆrt) dient der Beschleunigung. Dadurch wird der Suchraum der zwischen den Joins
-                // erheblich eingeschr‰nkt.
+                // Diese Subselect Kaskade (alles was zu Ausdruck a geh√∂rt) dient der Beschleunigung. Dadurch wird der Suchraum der zwischen den Joins
+                // erheblich eingeschr√§nkt.
                 "       SELECT DISTINCT a.VorID, vrr.BWKennung, b.DafID, a.bsaldo FROM ( " +
                 "           SELECT best.VorID, best.DafID, SUM(saldo) bsaldo FROM MPBestand best " +
                 "           INNER JOIN (" +
@@ -253,7 +253,7 @@ public class DBHandling {
         String s = "";
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
-        s += "<h2>BewohnerInnen / Verordnungen mit leeren Vorr‰ten per: " + sdf.format(SYSCalendar.today_date()) + "</h2" +
+        s += "<h2>BewohnerInnen / Verordnungen mit leeren Vorr√§ten per: " + sdf.format(SYSCalendar.today_date()) + "</h2" +
                 "<ul>";
 
         try {
@@ -277,7 +277,7 @@ public class DBHandling {
                 }
                 s += "</ul><br/>" + numrec + " BewohnerInnen";
             } else {
-                s += "<li>Keine leeren Vorr‰te gefunden...</li>";
+                s += "<li>Keine leeren Vorr√§te gefunden...</li>";
                 s += "</ul>";
             }
 

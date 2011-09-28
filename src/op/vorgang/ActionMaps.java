@@ -1,13 +1,5 @@
 package op.vorgang;
 
-import com.sun.rowset.internal.Row;
-import op.OPDE;
-import sun.text.normalizer.IntTrie;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-
 /**
  * Created by IntelliJ IDEA.
  * User: tloehr
@@ -34,7 +26,7 @@ public class ActionMaps {
 //                    OPDE.debug("Danke");
 //                    //tm.removeRow(row);
 //                } else {
-//                    OPDE.debug("Drück nochmal");
+//                    OPDE.debug("DrÃ¼ck nochmal");
 //                }
 //                pressedOnce = !pressedOnce;
 //            }

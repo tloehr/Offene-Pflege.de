@@ -4,51 +4,50 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.*;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "Uebergabebuch")
 @NamedQueries({
-    @NamedQuery(name = "Uebergabebuch.findAll", query = "SELECT u FROM Uebergabebuch u"),
-    @NamedQuery(name = "Uebergabebuch.findByUebid", query = "SELECT u FROM Uebergabebuch u WHERE u.uebid = :uebid"),
-    @NamedQuery(name = "Uebergabebuch.findByEinrichtungAndDatum", query = " "
-    + " SELECT u, count(ack) FROM Uebergabebuch u "
-    + " LEFT JOIN u.usersAcknowledged ack "
-    + " WHERE u.pit >= :von AND u.pit <= :bis AND u.einrichtung = :einrichtung AND ack.user = :user "
-    + " GROUP BY u "
-    + " ORDER BY u.pit DESC "),
-    @NamedQuery(name = "Uebergabebuch.findByPit", query = "SELECT u FROM Uebergabebuch u WHERE u.pit = :pit")
+        @NamedQuery(name = "Uebergabebuch.findAll", query = "SELECT u FROM Uebergabebuch u"),
+        @NamedQuery(name = "Uebergabebuch.findByUebid", query = "SELECT u FROM Uebergabebuch u WHERE u.uebid = :uebid"),
+        @NamedQuery(name = "Uebergabebuch.findByEinrichtungAndDatum", query = " "
+                + " SELECT u, count(ack) FROM Uebergabebuch u "
+                + " LEFT JOIN u.usersAcknowledged ack "
+                + " WHERE u.pit >= :von AND u.pit <= :bis AND u.einrichtung = :einrichtung AND ack.user = :user "
+                + " GROUP BY u "
+                + " ORDER BY u.pit DESC "),
+        @NamedQuery(name = "Uebergabebuch.findByPit", query = "SELECT u FROM Uebergabebuch u WHERE u.pit = :pit")
 })
 @SqlResultSetMappings({
-    @SqlResultSetMapping(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
-    @EntityResult(entityClass = Uebergabebuch.class), columns =
-    @ColumnResult(name = "num"))
+        @SqlResultSetMapping(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
+        @EntityResult(entityClass = Uebergabebuch.class), columns =
+        @ColumnResult(name = "num"))
 })
 @NamedNativeQueries({
-    /**
-     * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
-     * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Ubergabebuch Einträge mit einer
-     * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
-     * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
-     * Objekt ist immer der Uebergabebericht, das zweiter ist ein Long Wert, der das count Ergebnis
-     * des Joins enthält.
-     * 
-     */
-    @NamedNativeQuery(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUser", query = ""
-    + " SELECT u.*, ifnull(u2u.num, 0) num FROM Uebergabebuch u "
-    + " LEFT OUTER JOIN ( SELECT uebid, count(*) num FROM Uebergabe2User WHERE UKennung=? GROUP BY uebid, UKennung) as u2u ON u2u.UEBID = u.UEBID "
-    + " WHERE "
-    + "     u.EKennung = ? "
-    + "     AND u.PIT >= ? AND u.PIT <= ? "
-    + " GROUP BY u.UEBID "
-    + " ORDER BY u.PIT DESC", resultSetMapping = "Uebergabebuch.findByEinrichtungAndDatumAndAckUserResultMapping")
+        /**
+         * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
+         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Ubergabebuch EintrÃ¤ge mit einer
+         * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
+         * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
+         * Objekt ist immer der Uebergabebericht, das zweiter ist ein Long Wert, der das count Ergebnis
+         * des Joins enthÃ¤lt.
+         *
+         */
+        @NamedNativeQuery(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUser", query = ""
+                + " SELECT u.*, ifnull(u2u.num, 0) num FROM Uebergabebuch u "
+                + " LEFT OUTER JOIN ( SELECT uebid, count(*) num FROM Uebergabe2User WHERE UKennung=? GROUP BY uebid, UKennung) as u2u ON u2u.UEBID = u.UEBID "
+                + " WHERE "
+                + "     u.EKennung = ? "
+                + "     AND u.PIT >= ? AND u.PIT <= ? "
+                + " GROUP BY u.UEBID "
+                + " ORDER BY u.PIT DESC", resultSetMapping = "Uebergabebuch.findByEinrichtungAndDatumAndAckUserResultMapping")
 })
 public class Uebergabebuch implements Serializable {
 
@@ -83,7 +82,7 @@ public class Uebergabebuch implements Serializable {
         this.einrichtung = einrichtung;
         this.user = user;
     }
-    
+
     public Long getUebid() {
         return uebid;
     }

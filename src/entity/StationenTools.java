@@ -5,28 +5,27 @@
 
 package entity;
 
-import java.util.ArrayList;
-import java.util.Vector;
-import javax.persistence.Query;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import op.OPDE;
 
+import javax.persistence.Query;
+import javax.swing.*;
+import java.util.Vector;
+
 /**
- *
  * @author tloehr
  */
 public class StationenTools {
 
     /**
-     * Setzt eine ComboBox mit der Liste der Stationen. Wenn möglich wird direkt die gewünschte Standard Station eingestellt.
+     * Setzt eine ComboBox mit der Liste der Stationen. Wenn mÃ¶glich wird direkt die gewÃ¼nschte Standard Station eingestellt.
+     *
      * @param cmb
      */
-    public static void setComboBox(JComboBox cmb){
+    public static void setComboBox(JComboBox cmb) {
         Query query = OPDE.getEM().createNamedQuery("Stationen.findAllSorted");
         cmb.setModel(new DefaultComboBoxModel(new Vector<Stationen>(query.getResultList())));
 
-        //TODO: Kandidat für SYSProps
+        //TODO: Kandidat fÃ¼r SYSProps
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
 
         Query query2 = OPDE.getEM().createNamedQuery("Stationen.findByStatID");

@@ -5,7 +5,6 @@
 package op.tools;
 
 /**
- *
  * @author tloehr
  */
 public class HTMLTools {
@@ -16,7 +15,7 @@ public class HTMLTools {
             + "}</script>";
 
     /**
-     * Erzeugt Bruchdarstellung (für 0.5, 0.25, 0.75, 0.33) in HTML zu dem übergebenen Wert.
+     * Erzeugt Bruchdarstellung (fÃ¼r 0.5, 0.25, 0.75, 0.33) in HTML zu dem Ã¼bergebenen Wert.
      */
     public static String printDouble(double d) {
         String dbl = Double.toString(d);
@@ -38,7 +37,8 @@ public class HTMLTools {
 
     /**
      * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die
-     * der Methode übergeben wurden. Nur die Zeile inkl. der "tr" Tags.
+     * der Methode Ã¼bergeben wurden. Nur die Zeile inkl. der "tr" Tags.
+     *
      * @param objects
      * @return
      */
@@ -48,7 +48,8 @@ public class HTMLTools {
 
     /**
      * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die
-     * der Methode übergeben wurden. Nur die Zeile inkl. der "th" Tags.
+     * der Methode Ã¼bergeben wurden. Nur die Zeile inkl. der "th" Tags.
+     *
      * @param objects
      * @return
      */
@@ -58,7 +59,8 @@ public class HTMLTools {
 
     /**
      * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die
-     * der Methode übergeben wurden.
+     * der Methode Ã¼bergeben wurden.
+     *
      * @param objects
      * @return
      */
@@ -71,7 +73,8 @@ public class HTMLTools {
     }
 
     /**
-     * Fügt html Tags vor und hinter den Eingangsstring ein.
+     * FÃ¼gt html Tags vor und hinter den Eingangsstring ein.
+     *
      * @param in Eingangsstring
      * @return String mit HTML Erweiterungen.
      */

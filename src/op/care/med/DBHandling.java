@@ -26,35 +26,24 @@
  */
 package op.care.med;
 
+import op.OPDE;
+import op.tools.*;
+
+import javax.swing.*;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
-import op.OPDE;
-import op.tools.ListElement;
-import op.tools.Bool;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSConst;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
-    // Stati f¸r MPBuchung
+    // Stati fÂ¸r MPBuchung
 
     public static final int STATUS_AUSBUCHEN_NORMAL = 0;
     public static final int STATUS_EINBUCHEN_ANFANGSBESTAND = 1;
@@ -71,7 +60,7 @@ public class DBHandling {
     public static final int EINHEIT_MG = 4;
     public static final int EINHEIT_GRAMM = 5;
     public static final int EINHEIT_CM = 6;
-    public static final int EINHEIT_METER = 7;    // STATI f¸r MPFormen
+    public static final int EINHEIT_METER = 7;    // STATI fÂ¸r MPFormen
     public static final int FORMSTATUS_APV1 = 0;
     public static final int FORMSTATUS_APV_PER_DAF = 1;
     public static final int FORMSTATUS_APV_PER_BW = 2;
@@ -81,7 +70,7 @@ public class DBHandling {
         suchmuster = "%" + suchmuster + "%";
         String sql = " SELECT D.DafID, M.Bezeichnung, D.Zusatz, " +
                 " Concat(if(F.Zubereitung<>'', concat(F.Zubereitung, ' '), ''), " +
-                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'St¸ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
+                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'StÂ¸ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
                 " WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, F.AnwText)) zub " +
                 " FROM MProdukte M " +
                 " INNER JOIN MPDarreichung D ON M.MedPID = D.MedPID " +
@@ -100,7 +89,8 @@ public class DBHandling {
     }
 
     /**
-     * Setzt f¸r einen Bestand <b>alle</b> Buchungen zur¸ck, bis auf die Anfangsbuchung.
+     * Setzt fÂ¸r einen Bestand <b>alle</b> Buchungen zurÂ¸ck, bis auf die Anfangsbuchung.
+     *
      * @param bestid
      */
     public static void resetBestand(long bestid) {
@@ -118,7 +108,7 @@ public class DBHandling {
         DefaultComboBoxModel dlm = null;
         String sql = " SELECT D.DafID, M.Bezeichnung, D.Zusatz, " +
                 " Concat(if(F.Zubereitung<>'', concat(F.Zubereitung, ' '), ''), " +
-                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'St¸ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
+                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'StÂ¸ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
                 " WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, F.AnwText)) zub, H.Firma " +
                 " " +
                 " FROM MProdukte M " +
@@ -301,10 +291,11 @@ public class DBHandling {
      * Diese Methode liefert ein ResultSet. Dabei ist der Gedanke wie folgt. Wenn einem Vorrat einmal
      * ein Medizinprodukt zugeordnet wurde. Dann kann man ab diesem Moment nur noch Produkte zuordnen,
      * welche dieselbe Form haben (Einmal Tablette, immer Tablette).
-     * Wirkstoffe werden nicht gepr¸ft, da uns dazu keine verl?sslichen Tabellen vorliegen. Ist auch
+     * Wirkstoffe werden nicht geprÂ¸ft, da uns dazu keine verl?sslichen Tabellen vorliegen. Ist auch
      * die Verantwortung des Arztes, der Apotheke und des Examens.
-     *
+     * <p/>
      * Gibt es noch keine Zuordnung, dann kann man diesem Vorrat alles zuordnen.
+     *
      * @param vorid PK des Vorrats
      * @return ResultSet mit dem Ergebnis. NULL bei exception.
      */
@@ -347,14 +338,15 @@ public class DBHandling {
     /**
      * Dieses Methode wird vorwiegend bei den Verordnungen eingesetzt.
      * Der Gedanke ist wie folgt: Eine neue Verordnung eines Medikamentes wird immer
-     * einem aktiven Vorrat zugeordnet, wenn es bereits fr¸her mal eine Zuordnung zu einer
+     * einem aktiven Vorrat zugeordnet, wenn es bereits frÂ¸her mal eine Zuordnung zu einer
      * bestimmten DAF gab.
-     * Gibt es keine fr¸here Zuweisung, dann werden nur Vorr?te angezeigt, die zu der FormID der
+     * Gibt es keine frÂ¸here Zuweisung, dann werden nur Vorr?te angezeigt, die zu der FormID der
      * neuen DAF passen. Notfalls muss man einen Vorrat anlegen.
      * ?nderung durch #000028. Es werden Zuordnungen erlaubt, die aufgrund der ?quivalenzen zwischen
      * Formen bestehen. z.B. Tabletten zu Dragees zu Filmtabletten etc.
+     *
      * @param dafid PK der Darreichung
-     * @return ResultSet mit der gew¸nschten Liste.
+     * @return ResultSet mit der gewÂ¸nschten Liste.
      */
     public static ResultSet getVorrat2DAF(String bwkennung, long dafid, Bool foundMatch) {
         ResultSet result = null;
@@ -412,17 +404,15 @@ public class DBHandling {
 
     /**
      * Ermittelt eine Liste von Verordnungen, die sich auf einen bestimmten Vorrat beziehen.
-     *
-     *
      */
     public static ResultSet getVerordnungen2Vorrat(long vorid) {
         ResultSet result = null;
         String sql =
                 " SELECT DISTINCT ver.VerID " +
-                " FROM MPVorrat v " +
-                " INNER JOIN MPBestand b ON v.VorID = b.VorID " +
-                " INNER JOIN BHPVerordnung ver ON b.DafID = ver.DafID " +
-                " WHERE v.VorID = ? ";
+                        " FROM MPVorrat v " +
+                        " INNER JOIN MPBestand b ON v.VorID = b.VorID " +
+                        " INNER JOIN BHPVerordnung ver ON b.DafID = ver.DafID " +
+                        " WHERE v.VorID = ? ";
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, vorid);
@@ -434,11 +424,12 @@ public class DBHandling {
         return result;
     }
 
-    /** Ermittelt die Menge (in PackEinheit), die in einem Vorrat noch enthalten ist.
+    /**
+     * Ermittelt die Menge (in PackEinheit), die in einem Vorrat noch enthalten ist.
      *
      * @param vorid pk des betreffenden Vorrats
      * @return die Summe in der Packungs Einheit.
-     **/
+     */
     public static double getVorratSumme(long vorid) {
         double result = 0d;
         String sql = "SELECT IFNULL(SUM(b.Menge), 0) summe " +
@@ -494,11 +485,12 @@ public class DBHandling {
         return result;
     }
 
-    /** Ermittelt die Menge, die in einer Packung noch enthalten ist.
+    /**
+     * Ermittelt die Menge, die in einer Packung noch enthalten ist.
      *
      * @param bestid pk der betreffenden Packung
      * @return die Summe in der Packungs Einheit.
-     **/
+     */
     public static double getBestandSumme(long bestid) {
         double result = 0d;
         String sql = "SELECT IFNULL(SUM(b.Menge), 0) summe " +
@@ -600,6 +592,7 @@ public class DBHandling {
 
     /**
      * ermittelt ob ein Bestand im Anbruch ist oder nicht
+     *
      * @param bestid
      * @return true oder false
      */
@@ -662,7 +655,7 @@ public class DBHandling {
             hm.put("Status", status);
             hm.put("PIT", "!NOW!");
             if (op.tools.DBHandling.insertRecord("MPBuchung", hm) < 0) {
-                throw new SQLException("Fehler beim Einf¸gen der Buchung");
+                throw new SQLException("Fehler beim EinfÂ¸gen der Buchung");
             }
 
             hm.clear();
@@ -673,7 +666,7 @@ public class DBHandling {
             }
             hm.clear();
 
-            if (mitNeuberechnung) { // Wenn gew¸nscht wird bei Abschluss der Packung der APV neu berechnet.
+            if (mitNeuberechnung) { // Wenn gewÂ¸nscht wird bei Abschluss der Packung der APV neu berechnet.
                 long vorid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "VorID", "BestID", bestid)).longValue();
                 long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
                 OPDE.info("Neuberechnung von DafID:" + dafid);
@@ -728,7 +721,7 @@ public class DBHandling {
         boolean result = false;
         long vorid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "VorID", "BestID", bestid)).longValue();
         long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
-        // welchen APV m¸ssen nehmen (h?ngt vom Formstatus ab)
+        // welchen APV mÂ¸ssen nehmen (h?ngt vom Formstatus ab)
         int formstatus = getFormStatus(bestid);
         double apv;
         if (formstatus == FORMSTATUS_APV_PER_BW) {
@@ -803,13 +796,13 @@ public class DBHandling {
      * <li>wenn NextBest==0 &rarr; der Bestand trotzdem weiter gebucht. Bis ins Negative.</li>
      * <li>wenn NextBest > 0 &rarr; ein neuer Bestand wird angebrochen.</li>
      * </ul>
-     * Ist keine Packung im Anbruch, dann passiert gar nichts. Der R¸ckgabewert ist dann false.
-     * @param dafid pk der Darreichungsform
-     * @param menge gew¸nschte Entnahmemenge
-     * @param bhpid pk der BHP aufgrund dere dieser Buchungsvorgang erfolgt.
+     * Ist keine Packung im Anbruch, dann passiert gar nichts. Der RÂ¸ckgabewert ist dann false.
+     *
+     * @param dafid      pk der Darreichungsform
+     * @param menge      gewÂ¸nschte Entnahmemenge
+     * @param bhpid      pk der BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      * @param anweinheit true, dann wird in der anweinheit ausgebucht. false, in der packeinheit.
      * @return true, bei Erfolg; false, sonst
-     *
      */
     public static boolean entnahmeVorrat(long dafid, String bwkennung, double menge, boolean anweinheit, long bhpid) {
         if (dafid <= 0) {
@@ -841,12 +834,12 @@ public class DBHandling {
             long nextBest = ((Long) DBRetrieve.getSingleValue("MPBestand", "NextBest", "BestID", bestid)).longValue();
             double entnahme; // wieviel in diesem Durchgang tats?chlich entnommen wird.
             double restsumme = getBestandSumme(bestid); // wieviel der angebrochene Bestand noch hergibt.
-            entnahme = wunschmenge; // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
+            entnahme = wunschmenge; // normalerweise wird immer das hergegeben, was auch gewÂ¸nscht ist. Notfalls bis ins minus.
             if (nextBest > 0 && restsumme <= wunschmenge) { // sollte eine Packung aber schon als nachfolger bestimmt sein,
                 entnahme = restsumme; // dann wird erst diese hier leergebraucht
             } // und dann der Rest aus der n?chsten Packung genommen.
 
-            // Erstmal die Buchung f¸r diesen Durchgang
+            // Erstmal die Buchung fÂ¸r diesen Durchgang
             HashMap hm = new HashMap();
             hm.put("BestID", bestid);
             hm.put("BHPID", bhpid);
@@ -858,11 +851,11 @@ public class DBHandling {
 
             if (nextBest > 0) { // Jetzt gibt es direkt noch den Wunsch das n?chste P?ckchen anzubrechen.
 
-                if (restsumme <= wunschmenge) { // Es war mehr gew¸nscht, als die angebrochene Packung hergegeben hat.
-                    // Dann m¸ssen wird erstmal den alten Bestand abschlie?en.
+                if (restsumme <= wunschmenge) { // Es war mehr gewÂ¸nscht, als die angebrochene Packung hergegeben hat.
+                    // Dann mÂ¸ssen wird erstmal den alten Bestand abschlie?en.
                     try {
-                        // Es war mehr gew¸nscht, als die angebrochene Packung hergegeben hat.
-                        // Dann m¸ssen wird erstmal den alten Bestand abschlie?en.
+                        // Es war mehr gewÂ¸nscht, als die angebrochene Packung hergegeben hat.
+                        // Dann mÂ¸ssen wird erstmal den alten Bestand abschlie?en.
                         closeBestand(bestid, "Automatischer Abschluss bei leerer Packung", true, STATUS_KORREKTUR_AUTO_VORAB);
 
                         // dann den neuen Bestand anbrechen.
@@ -873,9 +866,9 @@ public class DBHandling {
                     }
                 }
 
-                if (wunschmenge > entnahme) { // Sind wir hier fertig, oder m¸ssen wir noch mehr ausbuchen.
+                if (wunschmenge > entnahme) { // Sind wir hier fertig, oder mÂ¸ssen wir noch mehr ausbuchen.
 //                    try {
-                    // Sind wir hier fertig, oder m¸ssen wir noch mehr ausbuchen.
+                    // Sind wir hier fertig, oder mÂ¸ssen wir noch mehr ausbuchen.
                     //Thread.sleep(1000); // Ohne diese Warteschleife verschlucken sich die Datenbankanfragen.
                     // und es kommt zur Exception. :-( Schrecklich !
                     result &= entnahmeVorrat(vorid, wunschmenge - entnahme, bhpid);
@@ -898,10 +891,10 @@ public class DBHandling {
 
     /**
      * Diese Methode bucht auf einen Bestand immer genau soviel drauf oder runter, damit er auf
-     * dem gew¸nschten soll landet.
+     * dem gewÂ¸nschten soll landet.
      *
      * @param bestid um die es geht.
-     * @param soll. gew¸nschter Endbestand. Muss >= 0 sein.
+     * @param soll.  gewÂ¸nschter Endbestand. Muss >= 0 sein.
      * @return PK der neuen Buchung.
      * @throws java.sql.SQLException
      */
@@ -939,25 +932,25 @@ public class DBHandling {
 
     /**
      * Die Berechnungsmethode unterscheidet verschiedene F?lle:
-     *
+     * <p/>
      * <ul>
      * <li>Die betroffene Packung hat die FormStatus = APV1. Das sind z.B. alle Tabletten oder Kapseln. Hier macht es
      * keinen Sinn, irgendwelche Verh?ltnisma?e neu zu rechnen. Wenn es eine Diskrepanz zwischen gerechnetem und realem Bestandswert
      * gibt, dann ist irgendeine Tablette runtergefallen und nicht ausgebucht worden. Deshalb wird der Bestand einfach korrgiert und dann
      * ist das eben so.
      * <ul><li>Die Packung ist <b>jetzt</b> leer. Egal, wie der Buchungsbestand war. Er wird jetzt <i>gewaltsam</i> auf 0 gebracht.
-     * Der Bestand abgeschlossen und (wenn gew¸nscht) der neue angebrochen.</li>
+     * Der Bestand abgeschlossen und (wenn gewÂ¸nscht) der neue angebrochen.</li>
      * </ul></li>
-     *
+     * <p/>
      * <li>Die Packung hat die Form Salben, Cremes. FORMSTATUS = APV_PER_BW. Hierbei passiert es h?ufig, dass die Menge, die bei einer Anwendung
      * verbraucht wird individuell vom Bewohner abh?ngt. Der eine braucht viel Salbe, der andere wenig. H?ngt auch vom Krankheitsverlauf ab.
      * Sagen wir mal eine Salbe gegen Schuppenflechte. Das kann an einem Tag wenig und an einem anderen Tag viel sein. Somit macht es keinen Sinn,
-     * hier einen Wert f¸r die Salbe zu speichern. H?chstens einen Mittelwert aus allen Bewohner APVs.
+     * hier einen Wert fÂ¸r die Salbe zu speichern. H?chstens einen Mittelwert aus allen Bewohner APVs.
      * <ul>
      * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Tabelle MPAPV eingetragen und zwar mit
      * mit der entsprechenden BWKennung.</li>
      * </ul></li>
-     *
+     * <p/>
      * <li>Die Packung hat die Form Tropfen, Sirup. FORMSTATUS = APV_PER_DAF. Hier macht es wiederum keinen Sinn einen APV pro BW zu speichern.
      * 5 Tropfen sind eben bei allen Bewohnern 5 Tropfen.
      * <ul>
@@ -965,11 +958,11 @@ public class DBHandling {
      * BWKennung = "".</li>
      * </ul></li>
      * </ul>
+     * <p/>
+     * Nach den Berechnungen wird immer (wenn gewÂ¸nscht) ein neuer Bestand angebrochen. Falls ein APV berechnet wurde, wird jeweils der neue Mittelwert
+     * Â¸ber alle APVs einer Darreichung als neuer Anfangs APV dieser Darreichung hinterlegt. Also MPDarreicung.APV = AVG(MPAPV.APV).
      *
-     * Nach den Berechnungen wird immer (wenn gew¸nscht) ein neuer Bestand angebrochen. Falls ein APV berechnet wurde, wird jeweils der neue Mittelwert
-     * ¸ber alle APVs einer Darreichung als neuer Anfangs APV dieser Darreichung hinterlegt. Also MPDarreicung.APV = AVG(MPAPV.APV).
-     *
-     * @param bestid des Bestandes, f¸r den das Verh?ltnis neu berechnet werden soll.
+     * @param bestid des Bestandes, fÂ¸r den das Verh?ltnis neu berechnet werden soll.
      */
     public static double berechneBuchungsWert(long bestid) {
 
@@ -1030,8 +1023,8 @@ public class DBHandling {
             rs.first();
             apv = rs.getBigDecimal(1).doubleValue();
             if (!bwkennung.equals("") && apv == 0d) {
-                // Es war ein bewohnerspezifischer APV gew¸nscht und den gab es nicht.
-                // Dann suchen wir den DAF spezifischen und geben den zur¸ck.
+                // Es war ein bewohnerspezifischer APV gewÂ¸nscht und den gab es nicht.
+                // Dann suchen wir den DAF spezifischen und geben den zurÂ¸ck.
                 rs.close();
                 stmt.setString(2, "");
                 rs = stmt.executeQuery();
@@ -1108,16 +1101,17 @@ public class DBHandling {
     }
 
     /**
-     * Die R¸ckgabe eines Vorrats bezieht sich auf eine BHPID f¸r die die Buchungen zur¸ckgerechnet werden
+     * Die RÂ¸ckgabe eines Vorrats bezieht sich auf eine BHPID fÂ¸r die die Buchungen zurÂ¸ckgerechnet werden
      * sollen.
      * <ol>
      * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
-     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
+     * <li>Gibt es mehr als eine, dann wurde fÂ¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die AusfÂ¸hrung abgelehnt.</li>
      * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
      * </ol>
+     *
      * @result true bei Erfolg, false sonst.
      */
-    public static boolean rückgabeVorrat(long bhpid) {
+    public static boolean rÃ¼ckgabeVorrat(long bhpid) {
         boolean result = false;
         String sql = "" +
                 " SELECT count(*) " +
@@ -1148,7 +1142,7 @@ public class DBHandling {
     }
 
     /**
-     * Erstellt einen neuen Vorrat f¸r einen Bewohner zu einer bestimmten DafID.
+     * Erstellt einen neuen Vorrat fÂ¸r einen Bewohner zu einer bestimmten DafID.
      *
      * @return pk des neuen Vorrats.
      */
@@ -1174,8 +1168,8 @@ public class DBHandling {
      * bucht ein Medikament in einen Vorrat ein. Aber nur dann, wenn es keinen anderen Vorrat gibt,
      * der mit seiner DafID schon passt.
      * Falls diese DafID noch den Dummy "Startbestand" hat, wird dieser zuerst gel?scht.
-     * @return true, bei Erfolg. false, sonst.
      *
+     * @return true, bei Erfolg. false, sonst.
      */
     public static long einbuchenVorrat(long vorid, long mpid, long dafid, String text, double menge)
             throws SQLException {
@@ -1258,12 +1252,13 @@ public class DBHandling {
 //        }
 //        return result;
 //    }
+
     /**
      * Rechnet eine bestimmte AnwMenge in die entsprechende wunschmenge eines Vorrats um. Je nach Formstatus
-     * wird der individuelle Faktor eines Bewohners ber¸cksichtigt.
+     * wird der individuelle Faktor eines Bewohners berÂ¸cksichtigt.
      *
-     * @param vorid, pk des Vorrats, ¸ber dessen DafID Zuordnung die Menge gerechnet wird.
-     * @param menge (Anwendungs Menge) die umgerechnet werden soll
+     * @param vorid, pk des Vorrats, Â¸ber dessen DafID Zuordnung die Menge gerechnet wird.
+     * @param menge  (Anwendungs Menge) die umgerechnet werden soll
      * @return Umgerechnete wunschmenge. 0d bei Fehler.
      */
     public static double getPackMenge(long vorid, double menge) {
@@ -1377,7 +1372,6 @@ public class DBHandling {
 
     /**
      * schlie?t einen Vorrat ab, in dem alles ausgebucht wird, was da drin war.
-     *
      */
     public static boolean closeVorrat(long vorid) {
         Connection db = OPDE.getDb().db;

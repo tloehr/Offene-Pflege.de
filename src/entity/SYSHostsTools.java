@@ -4,16 +4,16 @@
  */
 package entity;
 
-import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.List;
-import javax.persistence.Query;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
+import javax.persistence.Query;
+import java.net.InetAddress;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- *
  * @author tloehr
  */
 public class SYSHostsTools {
@@ -34,23 +34,23 @@ public class SYSHostsTools {
         boolean mainhost = SYSTools.catchNull(OPDE.getLocalProps().getProperty("mainhost")).equalsIgnoreCase("true");
 
         try {
-            // doppelte Hostkeys können nicht auftreten. Die sind unique.
+            // doppelte Hostkeys kÃ¶nnen nicht auftreten. Die sind unique.
             host = (SYSHosts) query.getSingleResult();
 
-            // Das bedeutet, dass der Host sich entweder korrekt abgemeldet hat oder sich mindestens 2 Minuten lang nicht gemeldet hat. Dann gehen wir davon aus, dass der Host abgestürzt ist.
-            // Der Host scheint noch zu leben. Dann können wir nich nochmal starten. Gäb sonst Durcheinander.
+            // Das bedeutet, dass der Host sich entweder korrekt abgemeldet hat oder sich mindestens 2 Minuten lang nicht gemeldet hat. Dann gehen wir davon aus, dass der Host abgestÃ¼rzt ist.
+            // Der Host scheint noch zu leben. Dann kÃ¶nnen wir nich nochmal starten. GÃ¤b sonst Durcheinander.
             if (host.getLpol() != null && SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
                 OPDE.fatal("Es gibt bereits einen aktiven Host mit demselben Hostkey.");
                 host = null;
             } else {
-                // ===================== REPARATUR DEFEKTER HOST EINTRÄGE ======================
-                // Ein frühere Sitzung ist zusammengebrochen und nicht sauber beendet worden.
-                // Da müssen wir erst aufräumen.
+                // ===================== REPARATUR DEFEKTER HOST EINTRÃ„GE ======================
+                // Ein frÃ¼here Sitzung ist zusammengebrochen und nicht sauber beendet worden.
+                // Da mÃ¼ssen wir erst aufrÃ¤umen.
                 if (host.getLpol() != null && !SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
                     OPDE.warn("Host wurde beim letzten mal nicht korrekt beendet. Wird jetzt behoben.");
                     OPDE.getEM().getTransaction().begin();
                     try {
-                        // Welche Logins hängen an diesem beschädigten Host ?
+                        // Welche Logins hÃ¤ngen an diesem beschÃ¤digten Host ?
                         Query queryLogin = OPDE.getEM().createNamedQuery("SYSLogin.findByHost");
                         queryLogin.setParameter("host", host);
                         List<SYSLogin> logins = queryLogin.getResultList();
@@ -75,7 +75,7 @@ public class SYSHostsTools {
                         OPDE.getEM().getTransaction().rollback();
                     }
 
-                    OPDE.getLogger().debug("Wir müssten eigentlcih aufräumen");
+                    OPDE.getLogger().debug("Wir mÃ¼ssten eigentlcih aufrÃ¤umen");
                 }
 
                 if (mainhost) {
@@ -85,7 +85,7 @@ public class SYSHostsTools {
                     if (!query2.getResultList().isEmpty()) {
                         SYSHosts alreadyRunningHost = (SYSHosts) query2.getResultList().get(0);
                         OPDE.warn("Es gibt bereits einen laufenden MainHost mit der Adresse: " + alreadyRunningHost.getIp());
-                        OPDE.warn("Unsere Maschine läuft entgegen des Wunsches nun als normaler Host. Bitte local.properties reparieren.");
+                        OPDE.warn("Unsere Maschine lÃ¤uft entgegen des Wunsches nun als normaler Host. Bitte local.properties reparieren.");
                         mainhost = false;
                     }
                 }
@@ -111,7 +111,8 @@ public class SYSHostsTools {
     }
 
     /**
-     * Meldet den übergebenen Host ab, indem das Last Proof of Life auf NULL gesetzt wird.
+     * Meldet den Ã¼bergebenen Host ab, indem das Last Proof of Life auf NULL gesetzt wird.
+     *
      * @param host
      */
     protected static void shutdown(SYSHosts host) {

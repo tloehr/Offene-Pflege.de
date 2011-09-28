@@ -4,44 +4,44 @@
  */
 package entity;
 
+import op.OPDE;
+
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.persistence.Query;
-import op.OPDE;
 
 /**
- *
  * @author tloehr
  */
 public class SYSRunningClassesTools {
 
     /**
      * Wenn man ein Modul starten will, dann stellt sich dabei immer die Frage, ob die Verwendung dieses Moduls
-     * zu einem Konflikt führen könnte. Sagen wir z.B. der User will eine Verordnung für einen bestimmten Bewohner
-     * ändern, während ein anderer User die BHPs für denselben Bewohner abhakt. Das soll verhindert werden.
-     *
-     * Außerdem soll es nicht möglich sein, dass der BHPImport läuft, wenn das PnlVerordnung oder PnlBHP für irgendeinen Bewohner offen ist.
-     *
-     * In der Datei <code>/internalclasses.xml</code> werden die Klassen markiert, die zueinander in Konflikt stehen könnten.
-     *
-     * In unserem Beispiel kollidieren die Klassen PnlVerordnung (nachfolgend A) und PnlBHP (B) dann, wenn sie für <u>denselben</u> Bewohner aufgerufen
+     * zu einem Konflikt fÃ¼hren kÃ¶nnte. Sagen wir z.B. der User will eine Verordnung fÃ¼r einen bestimmten Bewohner
+     * Ã¤ndern, wÃ¤hrend ein anderer User die BHPs fÃ¼r denselben Bewohner abhakt. Das soll verhindert werden.
+     * <p/>
+     * AuÃŸerdem soll es nicht mÃ¶glich sein, dass der BHPImport lÃ¤uft, wenn das PnlVerordnung oder PnlBHP fÃ¼r irgendeinen Bewohner offen ist.
+     * <p/>
+     * In der Datei <code>/internalclasses.xml</code> werden die Klassen markiert, die zueinander in Konflikt stehen kÃ¶nnten.
+     * <p/>
+     * In unserem Beispiel kollidieren die Klassen PnlVerordnung (nachfolgend A) und PnlBHP (B) dann, wenn sie fÃ¼r <u>denselben</u> Bewohner aufgerufen
      * werden (also dieselbe <b>Signatur</b> besitzen. PnlBHP (B), PnlVerordnung (A) und BHPImport (C) kollidieren dann wenn,
      * <ol>
-     *  <li>(C) starten will und bereits irgendeine Instanz von (A), (B) oder (C) läuft. Unabhängig von der Signatur.</li>
-     *  <li>(A) oder (B) starten wollen und (C) bereits läuft.</li>
+     * <li>(C) starten will und bereits irgendeine Instanz von (A), (B) oder (C) lÃ¤uft. UnabhÃ¤ngig von der Signatur.</li>
+     * <li>(A) oder (B) starten wollen und (C) bereits lÃ¤uft.</li>
      * </ol>
+     * <p/>
+     * Die Klasse (C) aus unserem Beispiel ist dann innerhalb der KollisionsdomÃ¤ne die MainClass. Eine MainClass startet nur, wenn keine andere Klasse
+     * (signaturunabhÃ¤ngig) aus derselben KollisionsdomÃ¤ne lÃ¤uft. Normale Klassen (also keine MainClass) laufen nur dann, wenn keine MainClass aus derselben
+     * KollisionsdomÃ¤ne lÃ¤uft.
+     * <p/>
+     * Die vorliegende Methode wird aufgerufen um die Verwendung einer bestimmten Klasse anzuzeigen. Sie prÃ¼ft mÃ¶gliche Konflikte und gibt eine Liste als Antwort zurÃ¼ck.
      *
-     * Die Klasse (C) aus unserem Beispiel ist dann innerhalb der Kollisionsdomäne die MainClass. Eine MainClass startet nur, wenn keine andere Klasse
-     * (signaturunabhängig) aus derselben Kollisionsdomäne läuft. Normale Klassen (also keine MainClass) laufen nur dann, wenn keine MainClass aus derselben
-     * Kollisionsdomäne läuft.
-     *
-     * Die vorliegende Methode wird aufgerufen um die Verwendung einer bestimmten Klasse anzuzeigen. Sie prüft mögliche Konflikte und gibt eine Liste als Antwort zurück.
-     *
-     * @return Das <b>erste</b> Objekt der Liste enthält das neu erstellte EntityObjekt, dass die Aktivität der gewünschten Klasse anzeigt. Sollte es nicht möglich sein, dass
-     * die Klasse starten darf, dann ist das erste Objekt <code>null</code>. Das zweite (und alle weiteren folgenden) Objekt(e) enthalten die SYSRunningClasses der Module, die
-     * die gewünschte Ausführung verhindert haben. Das kann bedeuten, dass (im Falle einer MainClass) die Ausführung generell verhindert wurde, oder, (bei signaturabhängigen) Konflikten,
-     * statt des gewünschten Schreibzugriffs (RW) nur ein Lesezugriff (RO) ermöglicht wurde. Welche Status möglich ist, steht im ersten Objekt.
+     * @return Das <b>erste</b> Objekt der Liste enthÃ¤lt das neu erstellte EntityObjekt, dass die AktivitÃ¤t der gewÃ¼nschten Klasse anzeigt. Sollte es nicht mÃ¶glich sein, dass
+     *         die Klasse starten darf, dann ist das erste Objekt <code>null</code>. Das zweite (und alle weiteren folgenden) Objekt(e) enthalten die SYSRunningClasses der Module, die
+     *         die gewÃ¼nschte AusfÃ¼hrung verhindert haben. Das kann bedeuten, dass (im Falle einer MainClass) die AusfÃ¼hrung generell verhindert wurde, oder, (bei signaturabhÃ¤ngigen) Konflikten,
+     *         statt des gewÃ¼nschten Schreibzugriffs (RW) nur ein Lesezugriff (RO) ermÃ¶glicht wurde. Welche Status mÃ¶glich ist, steht im ersten Objekt.
      */
     public static SYSRunningClasses[] moduleStarted(String internalClassID, Object signature, short status) {
         boolean signed = signature != null;
@@ -54,8 +54,8 @@ public class SYSRunningClassesTools {
         String classesWithUnsignedConflicts = OPDE.getInternalClasses().getClassesWithUnsignedCollisions(internalClassID);
 
         if (!classesWithUnsignedConflicts.equals("")) {
-            // Gibt es Klassen (signaturUNabhängig), die mit mir kollidieren, weil sie schon laufen ?
-            // Konflikte OHNE Signatur muss man immer prüfen. Egal ob eine signatur benutzt wurde oder nicht.
+            // Gibt es Klassen (signaturUNabhÃ¤ngig), die mit mir kollidieren, weil sie schon laufen ?
+            // Konflikte OHNE Signatur muss man immer prÃ¼fen. Egal ob eine signatur benutzt wurde oder nicht.
             String qWO = ""
                     + " SELECT s FROM SYSRunningClasses s "
                     + " WHERE s.classname IN (" + classesWithUnsignedConflicts + ") ";
@@ -63,7 +63,7 @@ public class SYSRunningClassesTools {
             unsignedConflicts = queryWO.getResultList();
         }
 
-        // Wenn bis hier KEINE Konflikte existieren UND eine signatur vorliegt, dann müssen wir weiter suchen.
+        // Wenn bis hier KEINE Konflikte existieren UND eine signatur vorliegt, dann mÃ¼ssen wir weiter suchen.
         if (unsignedConflicts.isEmpty()) {
             if (signed) {
                 String classesWithSignedConflicts = OPDE.getInternalClasses().getClassesWithSignedCollisions(internalClassID);

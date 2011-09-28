@@ -4,34 +4,23 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
 
 /**
- * Diese Entity verbindet Übergaberichte mit Usern. Damit kann man 
- * speichern, wer welchen Bericht im Übergabeprotokoll zur Kenntnis
+ * Diese Entity verbindet Ãœbergaberichte mit Usern. Damit kann man
+ * speichern, wer welchen Bericht im Ãœbergabeprotokoll zur Kenntnis
  * genommen hat.
+ *
  * @author tloehr
  */
 @Entity
 @Table(name = "Uebergabe2User")
 @NamedQueries({
-    @NamedQuery(name = "Uebergabe2User.findAll", query = "SELECT u FROM Uebergabe2User u"),
-    @NamedQuery(name = "Uebergabe2User.findByPkid", query = "SELECT u FROM Uebergabe2User u WHERE u.pkid = :pkid"),
-    @NamedQuery(name = "Uebergabe2User.findByPit", query = "SELECT u FROM Uebergabe2User u WHERE u.pit = :pit")})
+        @NamedQuery(name = "Uebergabe2User.findAll", query = "SELECT u FROM Uebergabe2User u"),
+        @NamedQuery(name = "Uebergabe2User.findByPkid", query = "SELECT u FROM Uebergabe2User u WHERE u.pkid = :pkid"),
+        @NamedQuery(name = "Uebergabe2User.findByPit", query = "SELECT u FROM Uebergabe2User u WHERE u.pit = :pit")})
 public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> {
 
     private static final long serialVersionUID = 1L;
@@ -84,7 +73,6 @@ public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> 
         return user;
     }
 
-    
 
     @Override
     public int hashCode() {

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -27,13 +27,16 @@
 package op.tools;
 
 import entity.Bewohner;
-import entity.SYSProps;
 import entity.SYSPropsTools;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Image;
+import op.OPDE;
+import op.share.bwinfo.BWInfo;
+import op.share.bwinfo.TMBWInfo;
+
+import javax.persistence.Query;
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,22 +49,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EventListener;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import javax.persistence.Query;
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import op.OPDE;
-import op.share.bwinfo.BWInfo;
-import op.share.bwinfo.TMBWInfo;
 
 public class SYSTools {
 
@@ -103,9 +92,8 @@ public class SYSTools {
     }
 
     /**
-     * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf
+     * lÃ¤uft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf
      * enabled.
-     *
      */
     public static void setXEnabled(JComponent container, boolean enabled) {
         // Bei einer Combobox muss die Rekursion ebenfalls enden.
@@ -126,7 +114,7 @@ public class SYSTools {
     }
 
     /**
-     * läuft rekursiv durch alle Kinder eines Containers und entfernt evtl. vorhandene Listener.
+     * lÃ¤uft rekursiv durch alle Kinder eines Containers und entfernt evtl. vorhandene Listener.
      */
     public static void unregisterListeners(JComponent container) {
         if (container == null) {
@@ -144,7 +132,7 @@ public class SYSTools {
     }
 
     /**
-     * läuft rekursiv durch alle Kinder eines JFrames und entfernt evtl. vorhandene Listener.
+     * lÃ¤uft rekursiv durch alle Kinder eines JFrames und entfernt evtl. vorhandene Listener.
      */
     public static void unregisterListeners(JDialog container) {
         if (container == null) {
@@ -161,7 +149,7 @@ public class SYSTools {
     }
 
     /**
-     * läuft rekursiv durch alle Kinder eines JFrames und entfernt evtl. vorhandene Listener.
+     * lÃ¤uft rekursiv durch alle Kinder eines JFrames und entfernt evtl. vorhandene Listener.
      */
     public static void unregisterListeners(JFrame container) {
         if (container == null) {
@@ -181,7 +169,7 @@ public class SYSTools {
      * Tauscht Zeichen in einem String in bester Textverarbeitungsmanier ;-)<br/>
      * <b>Beispiel:</b> replace("AABBCC", "BB", "DD") = "AADDCC"
      *
-     * @param str - Eingang
+     * @param str     - Eingang
      * @param pattern - Muster nach dem gesucht werden soll
      * @param replace - Ersatzzeichenkette
      * @return String mit Ersetzung
@@ -204,7 +192,6 @@ public class SYSTools {
      * see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4380536
      * Puh, das hier ist aus der Sun Bug Datenbank. Etwas krude... Ich hoffe
      * die lassen sich mal was besseres einfallen.
-     *
      */
     static private void removeListeners(Component comp) {
         Method[] methods = comp.getClass().getMethods();
@@ -259,7 +246,7 @@ public class SYSTools {
         String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
         result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
 
-        // Diese bwinfo5 ist für die besonderheiten bzgl. Vitalwerten. Da steht was über Allergien usw. drin.
+        // Diese bwinfo5 ist fÃ¼r die besonderheiten bzgl. Vitalwerten. Da steht was Ã¼ber Allergien usw. drin.
         BWInfo bwinfo5 = new BWInfo(currentBW, SYSCalendar.today_date(), BWInfo.ART_ALLES, 8, false);
 
         String tooltipvorab = "";
@@ -335,7 +322,7 @@ public class SYSTools {
 
         tooltip += tooltipvorab;
 
-        // ======================== Ärzte =======================
+        // ======================== Ã„rzte =======================
         if (bwinfo1.getAttribute().size() > 0) {
             TMBWInfo tmbwi1 = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
             tooltip += "<li>";
@@ -358,7 +345,7 @@ public class SYSTools {
             tooltip += "</li>";
         }
 
-        // ======================= Angehörige =====================
+        // ======================= AngehÃ¶rige =====================
         if (bwinfo4.getAttribute().size() > 0) {
             TMBWInfo tmbwi4 = new TMBWInfo(bwinfo4.getAttribute(), true, false, false);
             tooltip += "<li>";
@@ -373,7 +360,7 @@ public class SYSTools {
         bwinfo4.cleanup();
     }
 
-//    public static String anonymizeUser(String ukennung) {
+    //    public static String anonymizeUser(String ukennung) {
 //        String result = ukennung;
 //        if (OPDE.isAnonym()) {
 //            int len = ukennung.length();
@@ -414,7 +401,7 @@ public class SYSTools {
         Date result = in;
         if (OPDE.isAnonym()) {
             GregorianCalendar gc = SYSCalendar.toGC(in);
-            // Plus oder Minus. Wird zufällig entschieden.
+            // Plus oder Minus. Wird zufÃ¤llig entschieden.
             boolean plus = (gc.get(GregorianCalendar.DAY_OF_MONTH) % 2) == 0;
             GregorianCalendar gcnow = new GregorianCalendar();
 
@@ -446,6 +433,7 @@ public class SYSTools {
 
     /**
      * Erstellt eine ComboxBox mit den Namen der Benutzer.
+     *
      * @param status. Status = 1 aktive Benutzer. Status = 0 inaktive. Status = -1 alle
      * @return ComboBox aus ListElements mit den UKennungen in dem "Value" Attribut
      */
@@ -529,11 +517,8 @@ public class SYSTools {
     }
 
     /**
-     *
-     *
-     *
-     * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
-     **/
+     * @return die BWKennung des gewÃ¼nschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
+     */
     public static String findeBW(java.awt.Frame parent, String muster, boolean admin) {
         String result = "";
 
@@ -544,7 +529,7 @@ public class SYSTools {
         }
 
         result = (String) DBHandling.getSingleValue("Bewohner", "BWKennung", where); //"BWKennung",muster);
-        if (result == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
+        if (result == null) { // das Muster war kein gÃ¼ltiger Primary Key, dann suchen wir eben nach Namen.
             muster += "%"; // MySQL Wildcard
             HashMap where1 = new HashMap();
             where1.put("Nachname", new Object[]{muster, "like"});
@@ -555,7 +540,7 @@ public class SYSTools {
             ResultSet rs = DBHandling.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum", "BWKennung"}, where1);
             DefaultListModel dlm = rs2lst(rs);
             if (dlm.getSize() > 1) {
-                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
+                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wÃ¤hlen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere MÃ¶glichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
                 Object selection = dlg.getSelection();
                 if (selection != null) {
                     ListElement le = (ListElement) selection;
@@ -588,6 +573,7 @@ public class SYSTools {
         component.getActionMap().put(nextFocusAction.getValue(Action.NAME), nextFocusAction);
         component.getActionMap().put(prevFocusAction.getValue(Action.NAME), prevFocusAction);
     }
+
     // The actions
     public static Action nextFocusAction = new AbstractAction("Move Focus Forwards") {
 
@@ -611,8 +597,7 @@ public class SYSTools {
     }
 
     /**
-     * Die erste Spalte enthält immer den Primary Key.
-     *
+     * Die erste Spalte enthÃ¤lt immer den Primary Key.
      */
     public static DefaultListModel rs2lst(ResultSet rs, String[] prefix, boolean withEmptyFirstElement) {
         DefaultListModel dcbm = new DefaultListModel();
@@ -625,7 +610,7 @@ public class SYSTools {
                 int colcount = rsmd.getColumnCount();
                 int pktype = rsmd.getColumnType(1);
 
-                // hier stimmt was nicht. Es muss für jeden Col einen Prefix geben. Und wenn der auch leer ist.
+                // hier stimmt was nicht. Es muss fÃ¼r jeden Col einen Prefix geben. Und wenn der auch leer ist.
                 if (prefix != null && prefix.length != colcount) {
                     return dcbm;
                 }
@@ -679,6 +664,7 @@ public class SYSTools {
 
     /**
      * Erstellt aus einem Result Set ein ComboBox Modell. Wobei davon ausgegangen wird, dass in der ersten Spalte immer der PK steht.
+     *
      * @param rs
      * @return
      */
@@ -764,6 +750,7 @@ public class SYSTools {
     /**
      * Berechnet aus einer Datei die MD5 Signatur.
      * Teilweise auf http://rgagnon.com/javadetails/java-0596.html
+     *
      * @param file
      * @return
      * @throws Exception
@@ -795,13 +782,12 @@ public class SYSTools {
         return result.clone();
     }
 
-    /***
-     * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten PK aus. Wurde
-     * entwickelt für Comboboxen mit einem Modell aus der RS2CMB Methode.
+    /**
+     * WÃ¤hlt in einer ComboBox aus ListElements das Element mit einem bestimmten PK aus. Wurde
+     * entwickelt fÃ¼r Comboboxen mit einem Modell aus der RS2CMB Methode.
      *
      * @param JComboBox die gesetzt werden soll
-     * @param long gesuchter PK
-     *
+     * @param long      gesuchter PK
      */
     public static void selectInComboBox(JComboBox j, long pk) {
         ComboBoxModel cbm = (ComboBoxModel) j.getModel();
@@ -825,11 +811,8 @@ public class SYSTools {
         }
     }
 
-    /***
-     * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten String aus.
-     *
-     *
-     *
+    /**
+     * WÃ¤hlt in einer ComboBox aus ListElements das Element mit einem bestimmten String aus.
      */
     public static void selectInComboBox(JComboBox j, String pattern, boolean useValue) {
         ComboBoxModel cbm = (ComboBoxModel) j.getModel();
@@ -871,7 +854,8 @@ public class SYSTools {
 
     /**
      * Ermittelt die Zeichendarstellung eines Objekts (toString). Ist das Ergebnis null oder eine leere Zeichenkette, dann wird
-     * der String neutral zurück gegeben.
+     * der String neutral zurÃ¼ck gegeben.
+     *
      * @param in
      * @param neutral
      * @return
@@ -900,9 +884,7 @@ public class SYSTools {
     }
 
     /**
-     * Gibt eine einheitliche Titelzeile für alle Fenster zurück.
-     *
-     *
+     * Gibt eine einheitliche Titelzeile fÃ¼r alle Fenster zurÃ¼ck.
      */
     public static String getWindowTitle(String moduleName) {
         if (!moduleName.equals("")) {
@@ -1015,8 +997,8 @@ public class SYSTools {
     }
 
     /**
-     * Gibt den Teil eines Dateinamens zurück, der als Extension bezeichnet wird. Also html oder pdf etc.
-     * 
+     * Gibt den Teil eines Dateinamens zurÃ¼ck, der als Extension bezeichnet wird. Also html oder pdf etc.
+     *
      * @param name
      * @return
      */
@@ -1086,7 +1068,8 @@ public class SYSTools {
     }
 
     /**
-     * Fügt html Tags vor und hinter den Eingangsstring ein.
+     * FÃ¼gt html Tags vor und hinter den Eingangsstring ein.
+     *
      * @param in Eingangsstring
      * @return String mit HTML Erweiterungen.
      */
@@ -1099,10 +1082,11 @@ public class SYSTools {
     }
 
     /**
-     * Einfache Funktion, die einen Text mit einer HTML Dokumentenstruktur umschließt
+     * Einfache Funktion, die einen Text mit einer HTML Dokumentenstruktur umschlieÃŸt
      * und dadurch auch den Titel des Browsers setzt. Auf Wunsch wird auch direkt
-     * ein javascript hinzugefügt, dass die Browser Druckfunktion startet.
-     * @param in - Eingabetext
+     * ein javascript hinzugefÃ¼gt, dass die Browser Druckfunktion startet.
+     *
+     * @param in    - Eingabetext
      * @param title - Browsertitel
      * @param print - Drucken ?
      * @return HTML Dokument
@@ -1153,18 +1137,19 @@ public class SYSTools {
 
     /**
      * Tauscht in einem String alle Umlaute gegen den entsprechend HTML Tag aus.
+     *
      * @param in String
-     * @return geänderter String
+     * @return geÃ¤nderter String
      */
     public static String htmlUmlautConversion(String in) {
         String result = in;
-        result = SYSTools.replace(result, "Ä", "&Auml;");
-        result = SYSTools.replace(result, "ä", "&auml;");
-        result = SYSTools.replace(result, "Ö", "&Ouml;");
-        result = SYSTools.replace(result, "ö", "&ouml;");
-        result = SYSTools.replace(result, "Ü", "&Uuml;");
-        result = SYSTools.replace(result, "ü", "&uuml;");
-        result = SYSTools.replace(result, "ß", "&szlig;");
+        result = SYSTools.replace(result, "Ã„", "&Auml;");
+        result = SYSTools.replace(result, "Ã¤", "&auml;");
+        result = SYSTools.replace(result, "Ã–", "&Ouml;");
+        result = SYSTools.replace(result, "Ã¶", "&ouml;");
+        result = SYSTools.replace(result, "Ãœ", "&Uuml;");
+        result = SYSTools.replace(result, "Ã¼", "&uuml;");
+        result = SYSTools.replace(result, "ÃŸ", "&szlig;");
         return result;
     }
 
@@ -1249,7 +1234,7 @@ public class SYSTools {
      * Desktop API nicht funktionieren.
      *
      * @param filename
-     * @return String[] der das passende command array für den EXEC Aufruf erhält.
+     * @return String[] der das passende command array fÃ¼r den EXEC Aufruf erhÃ¤lt.
      */
     public static String[] getLocalDefinedApp(String filename) {
         String os = System.getProperty("os.name").toLowerCase();
@@ -1325,7 +1310,8 @@ public class SYSTools {
     }
 
     /**
-     * Erstellt ein Teil eines SQL Ausdrucks für "WHERE X IN (1, 2, 3, 4)" ähnliche Ausdrücke.
+     * Erstellt ein Teil eines SQL Ausdrucks fÃ¼r "WHERE X IN (1, 2, 3, 4)" Ã¤hnliche AusdrÃ¼cke.
+     *
      * @param ids ein Array aus longs, die jeweils in die Klammern geschrieben werdenb sollen.
      * @return der Klammerausdruck aus dem obigen Beispiel mit jeweils einem Leerzeichen davor und dahinter.
      */
@@ -1355,6 +1341,7 @@ public class SYSTools {
 
     /**
      * Habe ich von http://helpdesk.objects.com.au/java/how-can-i-merge-two-java-arrays-into-one-combined-array
+     *
      * @param <T>
      * @param arrays
      * @return
@@ -1438,11 +1425,12 @@ public class SYSTools {
     }
 
     /**
-     * Erstellt eine UKennung. Prüft aber <b>nicht</b> danach, ob die schon
+     * Erstellt eine UKennung. PrÃ¼ft aber <b>nicht</b> danach, ob die schon
      * vergeben ist.
+     *
      * @param nachname
      * @param vorname
-     * @return UKennung mit einer Länge von maximal 10 Zeichen.
+     * @return UKennung mit einer LÃ¤nge von maximal 10 Zeichen.
      */
     public static String generateUKennung(String nachname, String vorname) {
         String kennung = "";
@@ -1466,13 +1454,13 @@ public class SYSTools {
         int width = (int) (factor * image.getWidth(null));
         int height = (int) (factor * image.getHeight(null));
 
-        Image newImage  = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        Image newImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         ImageIcon newImageIcon = new ImageIcon(newImage);
 
         return newImageIcon;
     }
 
-    public static Color getTableCellBackgroundColor(boolean isSelected, int row){
+    public static Color getTableCellBackgroundColor(boolean isSelected, int row) {
         Color color;
         Color selectionBackground = (Color) UIManager.get("Table.selectionBackground");
 

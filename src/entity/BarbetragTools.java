@@ -4,6 +4,11 @@
  */
 package entity;
 
+import op.tools.DlgException;
+import op.tools.HTMLTools;
+import op.tools.SYSCalendar;
+import op.tools.SYSTools;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -11,13 +16,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import op.tools.DlgException;
-import op.tools.HTMLTools;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class BarbetragTools {
@@ -29,13 +29,13 @@ public class BarbetragTools {
         DecimalFormat currency = new DecimalFormat("######.00");
         double saldo = vortrag;
 
-        // TODO: Kandidat für SYSProps
+        // TODO: Kandidat fÃ¼r SYSProps
         int BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO = 30;
 
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = "Barbetragsübersicht für " + SYSTools.getBWLabel(bewohner);
+        String header = "BarbetragsÃ¼bersicht fÃ¼r " + SYSTools.getBWLabel(bewohner);
 
         String html = "<html>\n"
                 + "<head>\n"
@@ -66,16 +66,15 @@ public class BarbetragTools {
                 GregorianCalendar belegDatum = SYSCalendar.toGC(rs.getDate("BelegDatum"));
                 boolean monatsWechsel = monat != belegDatum.get(GregorianCalendar.MONTH);
 
-                
 
                 if (pagebreak || monatsWechsel) {
-                    // Falls zufällig ein weiterer Header (der 3 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-                    // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+                    // Falls zufÃ¤llig ein weiterer Header (der 3 Elemente hoch ist) einen Pagebreak auslÃ¶sen WÃœRDE
+                    // mÃ¼ssen wir hier schonmal vorsorglich den Seitenumbruch machen.
                     // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
                     // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines Monats-Wechsels durchlaufen wird.
                     pagebreak = (elementNumber + 3 + 2) > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
 
-                    // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+                    // AuÃŸer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
 
 
                     if (monat != -1) { // beim ersten mal nicht
@@ -83,7 +82,7 @@ public class BarbetragTools {
                         html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
                         html += "<td width=\"400\">" + (monatsWechsel ? "Saldo zum Monatsende" : "Zwischensumme") + "</td>";
                         html += "<td>&nbsp;</td>";
-                        html += "<td width=\"70\" align=\"right\"" + (monatsWechsel ? " id=\"fonth2\">" : ">" ) + "&euro; " + currency.format(saldo) + "</td>";
+                        html += "<td width=\"70\" align=\"right\"" + (monatsWechsel ? " id=\"fonth2\">" : ">") + "&euro; " + currency.format(saldo) + "</td>";
                         html += "</tr>\n";
                         html += "</table>\n";
                     }
@@ -97,7 +96,7 @@ public class BarbetragTools {
                     // Vortragszeile
                     html += "<tr id=\"fonttextgrau\">";
                     html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
-                    html += "<td width=\"400\">" + (pagebreak && !monatsWechsel ? "Übertrag von vorheriger Seite" : "Übertrag aus Vormonat") + "</td>";
+                    html += "<td width=\"400\">" + (pagebreak && !monatsWechsel ? "Ãœbertrag von vorheriger Seite" : "Ãœbertrag aus Vormonat") + "</td>";
                     html += "<td>&nbsp;</td>";
                     html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(saldo) + "</td>";
                     html += "</tr>\n";
@@ -119,16 +118,16 @@ public class BarbetragTools {
                 html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(saldo) + "</td>";
                 html += "</tr>\n";
                 elementNumber += 1;
-                
+
                 pagebreak = elementNumber > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
             }
 
             html += "<tr>";
-                        html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
-                        html += "<td width=\"400\">Saldo zum Monatsende</td>";
-                        html += "<td>&nbsp;</td>";
-                        html += "<td width=\"70\" align=\"right\" id=\"fonth2\">&euro; " + currency.format(saldo) + "</td>";
-                        html += "</tr>\n";
+            html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
+            html += "<td width=\"400\">Saldo zum Monatsende</td>";
+            html += "<td>&nbsp;</td>";
+            html += "<td width=\"70\" align=\"right\" id=\"fonth2\">&euro; " + currency.format(saldo) + "</td>";
+            html += "</tr>\n";
 
             html += "</table>\n"
                     + "</body>";

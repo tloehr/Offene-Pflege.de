@@ -4,12 +4,6 @@
  */
 package op.tools;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import javax.persistence.Query;
 import op.OPDE;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -18,21 +12,28 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.persistence.Query;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Die InternalClasses dient dazu Informationen bzgl. der Module innerhalb von OPDE
- * aus der Datei internalclasses.xml einzulesen und währen der Laufzeit
- * bereit zu halten. Die xml Datei befindet sich im JAR Archiv und wird 
- * nur währen der Entwicklungsphase bearbeitet.
- *
- * Diese Klasse implementiert ein Sicherheitskonzept für OPDE. Zu jeder Klasse
- * können 11 Rechte definiert werden, die dem jeweiligen Benutzer gewährt
+ * aus der Datei internalclasses.xml einzulesen und wÃ¤hren der Laufzeit
+ * bereit zu halten. Die xml Datei befindet sich im JAR Archiv und wird
+ * nur wÃ¤hren der Entwicklungsphase bearbeitet.
+ * <p/>
+ * Diese Klasse implementiert ein Sicherheitskonzept fÃ¼r OPDE. Zu jeder Klasse
+ * kÃ¶nnen 11 Rechte definiert werden, die dem jeweiligen Benutzer gewÃ¤hrt
  * oder verweigert werden.
- * Welche Rechte für eine betreffende Klasse von Bedeutung sind wird
+ * Welche Rechte fÃ¼r eine betreffende Klasse von Bedeutung sind wird
  * innerhalb der Applikation in besagter xml Datei festgelegt.
- * Da diese Informationen spezifisch für eine Programmversion sind
+ * Da diese Informationen spezifisch fÃ¼r eine Programmversion sind
  * sind sie hier als "quasi Konstanten" definiert werden.
- *
- * Außerdem 
+ * <p/>
+ * AuÃŸerdem
  *
  * @author tloehr
  */
@@ -44,7 +45,7 @@ public class InternalClasses {
     private HashMap<String, InternalClass> internalClasses;
     /*
      * Damit man nachher schnell suchen kann, welche Klassen "sich gegenseitig" ins Gehege kommen
-     * könnten, benötige ich diese beiden Listen.
+     * kÃ¶nnten, benÃ¶tige ich diese beiden Listen.
      */
     private HashMap<String, List<String>> signedCollisionByClass, unsignedCollisionByClass, classByUnsignedCollision, classBySignedCollision, mainClassByUnsignedCollision;
 
@@ -73,14 +74,14 @@ public class InternalClasses {
     }
 
     /**
-     * Diese Methode erzeugt eine Liste von Klassen, die mit der übergebenen Klasse kollidieren würden.
+     * Diese Methode erzeugt eine Liste von Klassen, die mit der Ã¼bergebenen Klasse kollidieren wÃ¼rden.
      * In diesem Fall geht es um die Kollisionen <b>ohne</b> Signaturen. Dabei wird der Fall unterschieden,
-     * ob die übergebene Klasse eine MainClass ist oder nicht. Demnach unterscheidet sich die zurückgegebene
+     * ob die Ã¼bergebene Klasse eine MainClass ist oder nicht. Demnach unterscheidet sich die zurÃ¼ckgegebene
      * Liste.
      *
      * @param internalClassName
      * @return Dies ist die Liste der kollidierenden Klassen. Die einzelnen Klassen sind durch Kommata getrennt. Dadurch kann man diesen
-     * String in eine JPQL Ausdruck einbauen. Also in der Art: <code>s.class IN ('A','B','C')</code>
+     *         String in eine JPQL Ausdruck einbauen. Also in der Art: <code>s.class IN ('A','B','C')</code>
      */
     public String getClassesWithUnsignedCollisions(String internalClassName) {
         String list = "";
@@ -95,11 +96,11 @@ public class InternalClasses {
             boolean mainClass = mainClassByUnsignedCollision.containsKey(internalClassName) && mainClassByUnsignedCollision.get(internalClassName).contains(collisionID);
 
             Iterator<String> conflicitingClasses = null;
-            // Wenn eine MainClass starten will, dann geht das nur, wenn KEIN anderer aus der CollisionDomain läuft.
-            // Daher enthält die Liste dann alle möglichen Konflikte
+            // Wenn eine MainClass starten will, dann geht das nur, wenn KEIN anderer aus der CollisionDomain lÃ¤uft.
+            // Daher enthÃ¤lt die Liste dann alle mÃ¶glichen Konflikte
             if (mainClass) {
                 conflicitingClasses = classByUnsignedCollision.get(collisionID).iterator();
-            } else { // Wenn eine normale Klasse starten will, dann geht das nur, wenn keine MainClass läuft.
+            } else { // Wenn eine normale Klasse starten will, dann geht das nur, wenn keine MainClass lÃ¤uft.
                 conflicitingClasses = mainClassByUnsignedCollision.get(collisionID).iterator();
             }
 
@@ -112,12 +113,12 @@ public class InternalClasses {
     }
 
     /**
-     * Diese Methode erzeugt eine Liste von Klassen, die mit der übergebenen Klasse kollidieren würden.
+     * Diese Methode erzeugt eine Liste von Klassen, die mit der Ã¼bergebenen Klasse kollidieren wÃ¼rden.
      * In diesem Fall geht es um die Kollisionen <b>mit</b> Signaturen.
      *
      * @param internalClassName
      * @return Dies ist die Liste der kollidierenden Klassen. Die einzelnen Klassen sind durch Kommata getrennt. Dadurch kann man diesen
-     * String in eine JPQL Ausdruck einbauen. Also in der Art: <code>s.class IN ('A','B','C')</code>
+     *         String in eine JPQL Ausdruck einbauen. Also in der Art: <code>s.class IN ('A','B','C')</code>
      */
     public String getClassesWithSignedCollisions(String internalClassName) {
         String list = "";
@@ -145,10 +146,10 @@ public class InternalClasses {
 
     /**
      * Diese Methode "kann man um Erlaubnis fragen". Sie sieht dann
-     * zu einer Klassenbezeichnung und einem gewünschten Zugriff
+     * zu einer Klassenbezeichnung und einem gewÃ¼nschten Zugriff
      * nach, ob das erlaubt ist oder nicht.
-     * Die DB Tabelle "ACL" enthält zuordnungen der jeweiligen ACLs zu Gruppen. Anhand dieser Einträge wird ermittelt, ob
-     * eine Operation erlaubt ist oder nicht. Natürlich darf ein Admin immer alles.
+     * Die DB Tabelle "ACL" enthÃ¤lt zuordnungen der jeweiligen ACLs zu Gruppen. Anhand dieser EintrÃ¤ge wird ermittelt, ob
+     * eine Operation erlaubt ist oder nicht. NatÃ¼rlich darf ein Admin immer alles.
      *
      * @param classname - Interne Klassenname, wie in appinfo.properties vereinbart. Nicht zu verwechseln mit den Java Klassennamen.
      * @param acl
@@ -213,7 +214,7 @@ public class InternalClasses {
                     boolean mainClass = SYSTools.catchNull(attributes.getValue("mainClass")).equalsIgnoreCase("true");
 
                     if (signed) {
-                        // Wenn nötig leere Listen erzeugen.
+                        // Wenn nÃ¶tig leere Listen erzeugen.
                         if (!signedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
                             signedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
                         }

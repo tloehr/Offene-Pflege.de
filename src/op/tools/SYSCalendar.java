@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -27,6 +27,9 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
+import op.OPDE;
+
+import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -34,13 +37,7 @@ import java.sql.Time;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import javax.swing.DefaultComboBoxModel;
-import op.OPDE;
+import java.util.*;
 
 public class SYSCalendar {
 
@@ -59,9 +56,10 @@ public class SYSCalendar {
     /**
      * Dasselbe wie die gleichnamige Methode, jedoch wird hier als Referenzzeitpunkt immer
      * die aktuelle Zeit genommen.
-     * @param time Zeitpunkt in der Vergangenheit, der geprüft werden soll.
-     * @param offset Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dürfen.
-     * @return true, wenn offset nicht überschritten wird. false, sonst.
+     *
+     * @param time   Zeitpunkt in der Vergangenheit, der geprÃ¼ft werden soll.
+     * @param offset Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dÃ¼rfen.
+     * @return true, wenn offset nicht Ã¼berschritten wird. false, sonst.
      */
     public static boolean earlyEnough(long time, int offset) {
         return earlyEnough(now(), time, offset);
@@ -74,7 +72,6 @@ public class SYSCalendar {
     /**
      * Generiert ein Array aus Uhrzeiten in der Form {"17:00","17:15"...}
      * Der verwendete Datentyp ist Time.
-     *
      */
     public static ArrayList fillUhrzeiten() {
         ArrayList list = new ArrayList();
@@ -87,11 +84,12 @@ public class SYSCalendar {
     }
 
     /**
-     * Ermittelt ob zwei Zeitpunkte nur höchstens eine bestimmte Anzahl von Minuten auseinanderliegen.
+     * Ermittelt ob zwei Zeitpunkte nur hÃ¶chstens eine bestimmte Anzahl von Minuten auseinanderliegen.
+     *
      * @param reftime Ausgangszeitpunkt. Wird meistens die aktuelle Zeit sein.
-     * @param time Zeitpunkt in der Vergangenheit, der geprüft werden soll.
-     * @param offset Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dürfen.
-     * @return true, wenn offset nicht überschritten wird. false, sonst.
+     * @param time    Zeitpunkt in der Vergangenheit, der geprÃ¼ft werden soll.
+     * @param offset  Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dÃ¼rfen.
+     * @return true, wenn offset nicht Ã¼berschritten wird. false, sonst.
      */
     public static boolean earlyEnough(long reftime, long time, int offset) {
         GregorianCalendar gcreftime = new GregorianCalendar();
@@ -101,7 +99,7 @@ public class SYSCalendar {
         gctime.add(GregorianCalendar.MINUTE, offset);
         return gctime.after(gcreftime);
     }
-    
+
     public static String printGCGermanStyle(GregorianCalendar gc) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         String result;
@@ -177,7 +175,7 @@ public class SYSCalendar {
         gc.setTimeInMillis(l);
         return gc;
     }
-    
+
 
     public static String toGermanTime(GregorianCalendar gc) {
         Date date = new Date(gc.getTimeInMillis());
@@ -197,7 +195,7 @@ public class SYSCalendar {
         formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(d);
     }
-    
+
 
     public static String MonatName(GregorianCalendar gc) {
         switch (gc.get(GregorianCalendar.MONTH)) {
@@ -208,7 +206,7 @@ public class SYSCalendar {
                 return "Februar";
             }
             case GregorianCalendar.MARCH: {
-                return "März";
+                return "MÃ¤rz";
             }
             case GregorianCalendar.APRIL: {
                 return "April";
@@ -277,15 +275,14 @@ public class SYSCalendar {
      * Calculates the number of days between two calendar days in a manner
      * which is independent of the Calendar type used.
      *
-     * @param d1    The first date.
-     * @param d2    The second date.
-     *
-     * @return      The number of days between the two dates.  Zero is
-     *              returned if the dates are the same, one if the dates are
-     *              adjacent, etc.  The order of the dates
-     *              does not matter, the value returned is always >= 0.
-     *              If Calendar types of d1 and d2
-     *              are different, the result may not be accurate.
+     * @param d1 The first date.
+     * @param d2 The second date.
+     * @return The number of days between the two dates.  Zero is
+     *         returned if the dates are the same, one if the dates are
+     *         adjacent, etc.  The order of the dates
+     *         does not matter, the value returned is always >= 0.
+     *         If Calendar types of d1 and d2
+     *         are different, the result may not be accurate.
      */
     public static int getDaysBetween(java.util.Calendar d1, java.util.Calendar d2) {
         if (d1.after(d2)) {  // swap dates so that d1 is start and d2 is end
@@ -311,17 +308,17 @@ public class SYSCalendar {
             throw new NumberFormatException("leere Eingabe");
         }
         if (input.indexOf(".") + input.indexOf(",") + input.indexOf("-") == -3) {
-            input += "."; // er war zu faul auch nur einen punkt anzuhängen.
+            input += "."; // er war zu faul auch nur einen punkt anzuhÃ¤ngen.
         }
         StringTokenizer st = new StringTokenizer(input, ",.-");
-        if (st.countTokens() == 1) { // Vielleicht fehlen ja nur die Monats- und Jahresangaben. Dann hängen wir sie einach an.
+        if (st.countTokens() == 1) { // Vielleicht fehlen ja nur die Monats- und Jahresangaben. Dann hÃ¤ngen wir sie einach an.
             input += (SYSCalendar.today().get(GregorianCalendar.MONTH) + 1) + "." + SYSCalendar.today().get(GregorianCalendar.YEAR);
             st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
         }
-        if (st.countTokens() == 2) { // Vielleicht fehlt ja nur die Jahresangabe. Dann hängen wir es einfach an.
+        if (st.countTokens() == 2) { // Vielleicht fehlt ja nur die Jahresangabe. Dann hÃ¤ngen wir es einfach an.
 
             if (!input.trim().substring(input.length() - 1).equals(".") && !input.trim().substring(input.length() - 1).equals(",")) {
-                input += "."; // er war zu faul den letzten Punkt anzuhängen.
+                input += "."; // er war zu faul den letzten Punkt anzuhÃ¤ngen.
             }
             input += SYSCalendar.today().get(GregorianCalendar.YEAR);
             st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
@@ -378,9 +375,10 @@ public class SYSCalendar {
     }
 
     /**
-     * gibt das heutige Datum zurück, allerdings um die Uhrzeitanteile bereinigt.
+     * gibt das heutige Datum zurÃ¼ck, allerdings um die Uhrzeitanteile bereinigt.
+     *
      * @return das ein um die Uhrzeit bereinigtes Datum.
-     **/
+     */
     public static GregorianCalendar today() {
         GregorianCalendar gc = new GregorianCalendar();
         gc.set(GregorianCalendar.HOUR, 0);
@@ -397,10 +395,10 @@ public class SYSCalendar {
     }
 
     /**
-     * Gibt den aktuellen Zeitstempel der Datenbank zurück, damit man von evtl. Uhr-Abweichungen
-     * des lokalen Maschine unabhängig ist.
-     * @return Zeitstempel
+     * Gibt den aktuellen Zeitstempel der Datenbank zurÃ¼ck, damit man von evtl. Uhr-Abweichungen
+     * des lokalen Maschine unabhÃ¤ngig ist.
      *
+     * @return Zeitstempel
      */
     public static long nowDB() {
         String sql = "SELECT now()";
@@ -417,8 +415,8 @@ public class SYSCalendar {
     }
 
     /**
-     * Gibt die aktuelle Zeit als Date zurück. Es wird die Zeit der Datenbank verwendet.
-     * 
+     * Gibt die aktuelle Zeit als Date zurÃ¼ck. Es wird die Zeit der Datenbank verwendet.
+     *
      * @return Zeitstempel
      */
     public static Date nowDBDate() {
@@ -427,7 +425,6 @@ public class SYSCalendar {
 
     /**
      * erkennt Uhrzeitn im Format HH:MM[:SS]
-     *
      */
     public static GregorianCalendar erkenneUhrzeit(String input) throws NumberFormatException {
         return erkenneUhrzeit(input, new GregorianCalendar());
@@ -435,7 +432,6 @@ public class SYSCalendar {
 
     /**
      * erkennt Uhrzeiten im Format HH:MM und erstellt einen GregorianCalendar basierend auf ref
-     *
      */
     public static GregorianCalendar erkenneUhrzeit(String input, GregorianCalendar gc)
             throws NumberFormatException {
@@ -450,7 +446,7 @@ public class SYSCalendar {
         String sMinute = st.nextToken();
         String sSekunde = "00";
 
-        if (st.countTokens() == 1) { // Noch genau einer übrig, kann nur Sekunde sein.
+        if (st.countTokens() == 1) { // Noch genau einer Ã¼brig, kann nur Sekunde sein.
             sSekunde = st.nextToken();
         }
 
@@ -493,9 +489,9 @@ public class SYSCalendar {
     }
 
     /**
-     * @param ts Ist ein TS mit der Uhrzeit, für die wir wissen möchten in welchem Bereich der Medikamenten Vergabe
-     * sie liegt. Früh morgens, morgens... etc. Das Datum in diesem TS ist egal. Es geht NUR um die Uhrzeit.
-     * @return Zeit-Konstante gemäß den Angaben in SYSConst.FM ... SYSConst.NA.
+     * @param ts Ist ein TS mit der Uhrzeit, fÃ¼r die wir wissen mÃ¶chten in welchem Bereich der Medikamenten Vergabe
+     *           sie liegt. FrÃ¼h morgens, morgens... etc. Das Datum in diesem TS ist egal. Es geht NUR um die Uhrzeit.
+     * @return Zeit-Konstante gemÃ¤ÃŸ den Angaben in SYSConst.FM ... SYSConst.NA.
      */
     public static int ermittleZeit(long ts) {
         int zeit;
@@ -533,6 +529,7 @@ public class SYSCalendar {
 
     /**
      * Ermittelt zu einer gegebenen Zeit die entsprechende Schicht.
+     *
      * @param ts - Die Uhrzeit in Millis.
      * @return - Antwort als int entsprechend der SYSConst Konstanten zu den Schichten.
      */
@@ -635,7 +632,7 @@ public class SYSCalendar {
     /**
      * EndOfMonth
      * Berechnet das Enddatum eines Monats, passend zum Parameter
-     * 
+     *
      * @param d Datum innerhalb des entsprechenden Monats.
      * @return Enddatum des Monats
      */
@@ -703,7 +700,7 @@ public class SYSCalendar {
     } // eom
 
     /**
-     * Entscheidet ob zwei Daten in der selben Woche liegen. Berücksichtigt dabei die Jahreszahlen, so dass KW 34/2006 != KW 34/2005.
+     * Entscheidet ob zwei Daten in der selben Woche liegen. BerÃ¼cksichtigt dabei die Jahreszahlen, so dass KW 34/2006 != KW 34/2005.
      */
     public static int sameWeek(GregorianCalendar a, GregorianCalendar b) {
         NumberFormat form = new java.text.DecimalFormat("00");
@@ -711,9 +708,9 @@ public class SYSCalendar {
         int aYear = a.get(GregorianCalendar.YEAR);
         int bYear = b.get(GregorianCalendar.YEAR);
 
-        // Die KW der letzten Tage eines Jahres gehören manchmal schon zum neuen Jahr. So gehörte der 29.12.2008 schon zur KW1 von 2009.
-        // Diese Zeilen berücksichtigen das. Sie erhöhen die Jahreszahl wenn der Monat Dezember ist und die KW trotzdem 1.
-        // Bug 0000016: Fehlende Einträge in der Behandlungspflege
+        // Die KW der letzten Tage eines Jahres gehÃ¶ren manchmal schon zum neuen Jahr. So gehÃ¶rte der 29.12.2008 schon zur KW1 von 2009.
+        // Diese Zeilen berÃ¼cksichtigen das. Sie erhÃ¶hen die Jahreszahl wenn der Monat Dezember ist und die KW trotzdem 1.
+        // Bug 0000016: Fehlende EintrÃ¤ge in der Behandlungspflege
         if (a.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && a.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
             aYear++;
         }
@@ -736,7 +733,7 @@ public class SYSCalendar {
     }
 
     /**
-     * Entscheidet ob zwei Daten im selben Monat liegen. Berücksichtigt dabei die Jahreszahlen, so dass Monat 12/2006 != Monat 12/2005.
+     * Entscheidet ob zwei Daten im selben Monat liegen. BerÃ¼cksichtigt dabei die Jahreszahlen, so dass Monat 12/2006 != Monat 12/2005.
      */
     public static int sameMonth(GregorianCalendar a, GregorianCalendar b) {
         NumberFormat form = new java.text.DecimalFormat("00");
@@ -756,6 +753,7 @@ public class SYSCalendar {
 
     /**
      * Entscheidet ob zwei Daten am selben Tag liegen.
+     *
      * @param a Datum a
      * @param b Datum b
      * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
@@ -778,6 +776,7 @@ public class SYSCalendar {
 
     /**
      * Entscheidet ob zwei Daten am selben Tag liegen.
+     *
      * @param a Datum a
      * @param b Datum b
      * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
@@ -801,7 +800,7 @@ public class SYSCalendar {
     public static void checkJDC(JDateChooser jdc) {
         if (jdc.getDate() == null) {
             jdc.setDate(new Date());
-        } // ungültiges Datum
+        } // ungÃ¼ltiges Datum
         if (jdc.getMaxSelectableDate().before(jdc.getDate())) {
             jdc.setDate(new Date());
         }
@@ -815,8 +814,9 @@ public class SYSCalendar {
 
     /**
      * Addiert (bzw. Subtrahiert) eine angebenene Anzahl von Tagen auf das (bzw. von dem)
-     * übergebenen Datum und gibt es dann zurück.
-     * @param date - Ausgangsdatum
+     * Ã¼bergebenen Datum und gibt es dann zurÃ¼ck.
+     *
+     * @param date    - Ausgangsdatum
      * @param numDays - Anzahl der Tage die addiert bzw. subtrahiert werdenn sollen.
      * @return neues Datum
      */
@@ -826,7 +826,7 @@ public class SYSCalendar {
         return new Date(gc.getTimeInMillis());
     }
 
-    // Das hier ist noch nicht ganz richtig. Vertut sich an den Rändern schon mal.
+    // Das hier ist noch nicht ganz richtig. Vertut sich an den RÃ¤ndern schon mal.
     public static Date addDate(Date date, int amount, Date min, Date max) {
         GregorianCalendar gc = toGC(date);
         gc.add(GregorianCalendar.DATE, amount);
@@ -864,7 +864,7 @@ public class SYSCalendar {
     }
 
     /*
-     * Erstellt ein ComboBox Modell, das eine Liste von Monaten mit Jahreszahlen enthält.
+     * Erstellt ein ComboBox Modell, das eine Liste von Monaten mit Jahreszahlen enthÃ¤lt.
      * "Januar 2007, Februar 2007, ...."
      *
      * @param start Beginn der Liste
@@ -891,9 +891,10 @@ public class SYSCalendar {
     }
 
     /**
-     * gibt das heutige Datum zurück, allerdings um die Uhrzeitanteile bereinigt.
+     * gibt das heutige Datum zurÃ¼ck, allerdings um die Uhrzeitanteile bereinigt.
+     *
      * @return das ein um die Uhrzeit bereinigtes Datum.
-     **/
+     */
     public static GregorianCalendar trimTime(GregorianCalendar gc) {
         gc.set(GregorianCalendar.HOUR, 0);
         gc.set(GregorianCalendar.MINUTE, 0);
@@ -904,7 +905,8 @@ public class SYSCalendar {
 
     /**
      * Bereinigt ein Datum um die Uhrzeitanteile, damit die Vergleichsoperatoren richtig funktionieren, wenn man sich nur auf das
-     * Datum beschränken will.
+     * Datum beschrÃ¤nken will.
+     *
      * @param Das zu bereinigende Datum
      * @return das bereinigte Datum
      */
@@ -952,8 +954,9 @@ public class SYSCalendar {
     /**
      * Setzt die Zeitkomponente eines GregorianCalendars. Das heisst ganz einfach,
      * wenn man ein Datum hat (in einem GC) und in einem anderen GC steht die Uhrzeit, dann
-     * fügt diese Methode die beiden Komponenten zu einem Datum und Uhrzeit Wert zusammen
-     * und gibt diesen zurück.
+     * fÃ¼gt diese Methode die beiden Komponenten zu einem Datum und Uhrzeit Wert zusammen
+     * und gibt diesen zurÃ¼ck.
+     *
      * @param date - Datumsanteil
      * @param time - Uhrzeitanzeil
      * @return Datum und Uhrzeit kombiniert.
@@ -976,11 +979,11 @@ public class SYSCalendar {
     /**
      * Diese Routine vergleicht Uhrzeiten, die in zwei longs hinterlegt sind.
      * Das Besondere dabei ist, dass das Datum ausser acht gelassen wird.
+     *
+     * @return int < 0, wenn time1 < time2; int == 0, wenn time1 = time2; int > 0, wenn time1 > time2
      * @time1
      * @time2
-     * @return int < 0, wenn time1 < time2; int == 0, wenn time1 = time2; int > 0, wenn time1 > time2
-     *
-     **/
+     */
     public static int compareTime(long time1, long time2) {
         // normalisierung des timestamps
         GregorianCalendar gc1 = new GregorianCalendar();
@@ -1004,7 +1007,8 @@ public class SYSCalendar {
     }
 
     /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 00:00:00
+     * nimmt das Ã¼bergebene Datum und Zeit die Uhrzeitkomponente auf 00:00:00
+     *
      * @param d
      * @return
      */
@@ -1019,7 +1023,8 @@ public class SYSCalendar {
     }
 
     /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 12:00:00
+     * nimmt das Ã¼bergebene Datum und Zeit die Uhrzeitkomponente auf 12:00:00
+     *
      * @param d
      * @return
      */
@@ -1034,7 +1039,8 @@ public class SYSCalendar {
     }
 
     /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 23:59:59
+     * nimmt das Ã¼bergebene Datum und Zeit die Uhrzeitkomponente auf 23:59:59
+     *
      * @param d
      * @return
      */
@@ -1049,14 +1055,15 @@ public class SYSCalendar {
     }
 
     /**
-     * Berechnet zu einem gegebenen Jahr den Ostersonntag. Dieser wird als GregorianCalendar zurückgegeben.
+     * Berechnet zu einem gegebenen Jahr den Ostersonntag. Dieser wird als GregorianCalendar zurÃ¼ckgegeben.
      * Der Algorhythmus wurde von der Internet-Seite www.th-o.de/kalender.htm entnommen.
      * Dort wurde er von Walter Irion beschrieben. Danke, Walter und Thomas.
-     * 
+     * <p/>
      * Ich habe leider nicht die geringste Ahnung, was hier passiert. ;-)
-     * @THO99
+     *
      * @param year
      * @return Das Datum des Ostersonntags in dem angegebene Jahr.
+     * @THO99
      */
     public static GregorianCalendar Ostersonntag(int year) {
         int a, b, c, d, e, f, g, h, i, k, l, m, n, p;
@@ -1150,8 +1157,9 @@ public class SYSCalendar {
 
     /**
      * Sucht alle Feiertage in einem Jahr zusammen.
-     * @param year	 
-     * @return Eine Hashmap, die je das Datum als Zeichenkette der Form "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
+     *
+     * @param year
+     * @return Eine Hashmap, die je das Datum als Zeichenkette der Form "jjjj-mm-tt" enthÃ¤lt und dazu die Bezeichnung des Feiertags.
      */
     public static HashMap getFeiertage(int year) {
 

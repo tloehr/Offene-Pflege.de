@@ -6,15 +6,15 @@
 package tablemodels;
 
 import entity.Users;
-import java.util.List;
-import javax.swing.table.DefaultTableModel;
 import op.tools.BeanTableModel;
 
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+
 /**
- *
  * @author tloehr
  */
-public class TMUser  extends DefaultTableModel  {
+public class TMUser extends DefaultTableModel {
 
     private BeanTableModel mymodel;
 
@@ -48,15 +48,15 @@ public class TMUser  extends DefaultTableModel  {
         return value;
     }
 
-    public Users getUserAt(int row){
+    public Users getUserAt(int row) {
         return (Users) mymodel.getRow(row);
     }
 
-    public void updateRow(int row){
+    public void updateRow(int row) {
         fireTableRowsUpdated(row, row);
     }
 
-    public void updateTable(){
+    public void updateTable() {
         fireTableDataChanged();
     }
 
@@ -102,7 +102,7 @@ public class TMUser  extends DefaultTableModel  {
                 break;
             }
 //            case 1: {
-//                name = "Di‰tkost";
+//                name = "Di√§tkost";
 //                break;
 //            }
 //            case 2: {

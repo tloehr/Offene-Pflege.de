@@ -1,13 +1,3 @@
 Manifest-Version: 1.0
-Class-Path: commons-cli-1.2.jar log4j-1.2.16.jar commons-net-2.2.jar c
- ommons-digester-2.1-javadoc.jar commons-digester-2.1-sources.jar comm
- ons-digester-2.1.jar commons-collections-3.2.1-javadoc.jar commons-co
- llections-3.2.1-sources.jar commons-collections-3.2.1.jar commons-col
- lections-testframework-3.2.1.jar looks-2.0.1.jar jcalendar-1.3.3.jar 
- swingx-beaninfo-1.6.2.jar swingx-core-1.6.2.jar commons-lang-2.6-java
- doc.jar commons-lang-2.6-sources.jar commons-lang-2.6.jar swing-layou
- t-1.0.4-doc.zip swing-layout-1.0.4-src.zip swing-layout-1.0.4.jar mys
- ql-connector-java-5.1.13-bin.jar eclipselink.jar javax.persistence_2.
- 0.1.v201006031150.jar
 Main-Class: op.OPDE
 

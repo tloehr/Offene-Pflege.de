@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2011 Torsten Löhr
+ * Copyright (C) 2011 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
  *
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License,
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
@@ -25,23 +25,19 @@
  */
 package tablemodels;
 
-import entity.SYSFiles;
-import entity.Sysbw2file;
-import entity.Sysbwi2file;
-import entity.Syspb2file;
-import entity.Sysver2file;
+import entity.*;
+import op.tools.BeanTableModel;
+import op.tools.HTMLTools;
+import op.tools.SYSTools;
+
+import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.table.DefaultTableModel;
-import op.tools.BeanTableModel;
-import op.tools.HTMLTools;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class TMSYSFiles extends DefaultTableModel {
@@ -132,7 +128,7 @@ public class TMSYSFiles extends DefaultTableModel {
                 break;
             }
             case 2: {
-                name = "Dateigröße";
+                name = "DateigrÃ¶ÃŸe";
                 break;
             }
             default: {
@@ -191,7 +187,7 @@ public class TMSYSFiles extends DefaultTableModel {
         while (it3.hasNext()) {
             if (start) {
                 start = false;
-                result += "<tr><th colspan=\"2\">Ärztliche Verordnungen</th></tr>";
+                result += "<tr><th colspan=\"2\">Ã„rztliche Verordnungen</th></tr>";
             }
             Sysver2file assign = it3.next();
             result += HTMLTools.getTableRow(assign.getBemerkung(), DateFormat.getDateTimeInstance().format(assign.getVerordnung().getAnDatum()));

@@ -1,13 +1,11 @@
 package tablerenderer;
 
-import op.OPDE;
 import op.threads.ComponentAlternatingFlash;
 
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
-import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
@@ -34,7 +32,7 @@ public class ButtonsEditor extends JPanel implements TableCellEditor {
         setOpaque(true);
         behaviourMap = new HashMap<JButton, TableButtonBehaviour>();
 
-        // Dadruch wird der Hintergrund der Zelle richtig eingef‰rbt.
+        // Dadruch wird der Hintergrund der Zelle richtig eingef√§rbt.
         MouseListener ml = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 setBackground((Color) UIManager.get("Table.selectionBackground"));
@@ -88,9 +86,9 @@ public class ButtonsEditor extends JPanel implements TableCellEditor {
     }
 
 
-    protected void setButtonsEnabled(JTable table, int row, int col){
+    protected void setButtonsEnabled(JTable table, int row, int col) {
         Iterator<JButton> it = behaviourMap.keySet().iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             JButton btn = it.next();
             btn.setEnabled(behaviourMap.get(btn).isEnabled(table, row, col));
         }

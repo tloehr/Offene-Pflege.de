@@ -4,15 +4,16 @@
  */
 package op.care.planung.massnahmen;
 
-import java.util.Vector;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import op.tools.ListElement;
 import op.tools.SYSTools;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import java.util.Vector;
 
 public class ParserMassnahmen extends DefaultHandler {
 
@@ -51,7 +52,7 @@ public class ParserMassnahmen extends DefaultHandler {
                 break;
             }
             case ParserMassnahmen.TYPE_DF: {
-                title = "Durchführung";
+                title = "DurchfÃ¼hrung";
                 break;
             }
             case ParserMassnahmen.TYPE_Teilschritt: {
@@ -139,19 +140,19 @@ public class ParserMassnahmen extends DefaultHandler {
         }
         /*
          * label des Tags
-         * beschreibung: nähere Beschreibung
-         * zeit in Minuten, die dieses Tag beisteuert, wenn es angewählt ist.
-         * Vector für die evtl. vorhandenen Modfaktoren
-         * Vector für die evtl. vorhandenen VBMaterialien
+         * beschreibung: nÃ¤here Beschreibung
+         * zeit in Minuten, die dieses Tag beisteuert, wenn es angewÃ¤hlt ist.
+         * Vector fÃ¼r die evtl. vorhandenen Modfaktoren
+         * Vector fÃ¼r die evtl. vorhandenen VBMaterialien
          * typ ist ein int code, der den Typ des Knotens angibt. Kann man den Konstanten dieser Klasse entnehmen.
-         * die letzte 0 wird später bei der Berechnung des Baums verwendet. Dort steht dann nämlich der aktuelle
-         * Zeitwert drin, den dieser Knoten und seine angewählten Kindknoten hat.
+         * die letzte 0 wird spÃ¤ter bei der Berechnung des Baums verwendet. Dort steht dann nÃ¤mlich der aktuelle
+         * Zeitwert drin, den dieser Knoten und seine angewÃ¤hlten Kindknoten hat.
          */
 
         // Dieses Objekt wird jedem Knoten mitgegeben. Und zwar in einem ListElement, damit der
         // Tree die toString() funktion verwenden kann.
 
-        // Ein normaler Knoten für den Baum wird erzeugt.
+        // Ein normaler Knoten fÃ¼r den Baum wird erzeugt.
         if (typ != TYPE_MODFAKTOR && typ != TYPE_VBMaterial) {
             Object[] o = new Object[]{beschreibung, zeit, new Vector(), new Vector(), typ, 0d};
             ListElement le = new ListElement(label, o);
@@ -162,7 +163,7 @@ public class ParserMassnahmen extends DefaultHandler {
                 tree = node;
             }
 
-            // für die preselection Pathes
+            // fÃ¼r die preselection Pathes
             if (selected) {
                 selection.add(new TreePath(node.getPath()));
             }
@@ -170,7 +171,7 @@ public class ParserMassnahmen extends DefaultHandler {
             // Solange dieser Tag nicht geschlossen wird, werden alle neuen unterhalb dieser Ebene einsortiert.
             parent = node;
         }
-    //OpenCare.logger.debug("STARTELEMENT: " + this.toString() + ": " + tagName + "    name: " + name);
+        //OpenCare.logger.debug("STARTELEMENT: " + this.toString() + ": " + tagName + "    name: " + name);
 
 
     }
@@ -208,7 +209,7 @@ public class ParserMassnahmen extends DefaultHandler {
     }
 
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        // sobald ein Element geschlossen wird, werden neue Elemente an das darüber liegende angeschlossen.
+        // sobald ein Element geschlossen wird, werden neue Elemente an das darÃ¼ber liegende angeschlossen.
         int typ = identifyTag(localName);
         if (typ != TYPE_VBMaterial && typ != TYPE_MODFAKTOR) {
             if (parent.getParent() != null) {

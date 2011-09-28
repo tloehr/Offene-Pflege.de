@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,13 +26,14 @@
  */
 package op.tools;
 
+import op.OPDE;
+
+import javax.swing.table.AbstractTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
-import javax.swing.table.AbstractTableModel;
-import op.OPDE;
 
 /**
  *
@@ -49,27 +50,20 @@ public class TMResultSet
     private HashMap cols;
 
     /**
-     *
-     *
      * So umstellen, dass man einen Filter eingeben kann, und dann nur die angezeigt werden, die man
      * haben will
-     *
      */
     public TMResultSet(ResultSet rs) {
         this(rs, null);
     }
 
     /**
-     * 
-     * 
-     * 
      * @param rs
-     * @param filter. Dies ist eine HashMap, die die vorhandenen Datenbank Spalte auf die anzuzeigende Tabellen Spalte abbildet. Haben wir 
-     * z.B. eine Tabelle mit den Spalten A,B,C mˆchten aber nur die Spalten B,C angezeigt bekommen, so enth‰lt die HashMap folgende Paare:
-     * [(1,2),(2,3),(ScreenTableCol, DBTableCol)]. Bei einem leeren Filter (oder null), wird 1:1 angezeigt.
-     * Die Spaltennummerierung f‰ngt immer bei 1 an.
-     * Unabh‰ngig vom Filter wird stets die erste Spalte geschlabbert, da wird der PK drin erwartet.
-     * 
+     * @param filter. Dies ist eine HashMap, die die vorhandenen Datenbank Spalte auf die anzuzeigende Tabellen Spalte abbildet. Haben wir
+     *                z.B. eine Tabelle mit den Spalten A,B,C m√∂chten aber nur die Spalten B,C angezeigt bekommen, so enth√§lt die HashMap folgende Paare:
+     *                [(1,2),(2,3),(ScreenTableCol, DBTableCol)]. Bei einem leeren Filter (oder null), wird 1:1 angezeigt.
+     *                Die Spaltennummerierung f√§ngt immer bei 1 an.
+     *                Unabh√§ngig vom Filter wird stets die erste Spalte geschlabbert, da wird der PK drin erwartet.
      */
     public TMResultSet(ResultSet rs, HashMap filter) {
         super();
@@ -184,9 +178,9 @@ public class TMResultSet
     }
 
     /**
-     * Verh‰lt sich genau wie getValueAt ignoriert nur jede Filterung. Damit man auch noch an alle Spalten rankommt, selbst
+     * Verh√§lt sich genau wie getValueAt ignoriert nur jede Filterung. Damit man auch noch an alle Spalten rankommt, selbst
      * wenn die eigentlich nicht angezeigt werden sollen.
-     * 
+     *
      * @param r
      * @param c
      * @return

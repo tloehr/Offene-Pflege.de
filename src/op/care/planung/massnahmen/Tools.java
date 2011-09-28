@@ -4,17 +4,17 @@
  */
 package op.care.planung.massnahmen;
 
-import java.util.Enumeration;
-import java.util.Vector;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 import op.tools.CheckTreeSelectionModel;
 import op.tools.ListElement;
 import op.tools.SYSTools;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import java.util.Enumeration;
+import java.util.Vector;
+
 /**
- *
  * @author tloehr
  */
 public class Tools {
@@ -32,15 +32,15 @@ public class Tools {
                 double childrenSum = 0d;
                 //double childrenPercent = 1d;
 
-                // Aufaddieren der Summen bzw. Prozente der evtl. vorhandenen Kinder. Aber nur wenn sie angewählt sind.
+                // Aufaddieren der Summen bzw. Prozente der evtl. vorhandenen Kinder. Aber nur wenn sie angewÃ¤hlt sind.
                 while (children.hasMoreElements()) {
                     DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
                     ListElement le = (ListElement) child.getUserObject();
                     if (sm.isPartiallySelected(new TreePath(child.getPath())) ||
                             sm.isPathSelected(new TreePath(child.getPath()), true)) {
                         childrenSum += (Double) ((Object[]) le.getObject())[ParserMassnahmen.O_SUMME];
-                    // Hier muss ich noch mal ran.
-                    //OPDE.getLogger().debug("Children: " + le.getValue() + childrenSum + " %" + childrenPercent);
+                        // Hier muss ich noch mal ran.
+                        //OPDE.getLogger().debug("Children: " + le.getValue() + childrenSum + " %" + childrenPercent);
                     } else {
                         ((Object[]) le.getObject())[ParserMassnahmen.O_SUMME] = 0d;
                     }
@@ -49,7 +49,7 @@ public class Tools {
                 double[] mf = calculateModfaktor(node);
                 //double prozent = 1 + ((Double) ((Object[]) le.getObject())[ParserMassnahmen.O_PROZENT] / 100d);
                 double mfzeit = mf[0];
-                // Die Prozente müssen erst in einen Dezimalbruch umgerechnet werden.
+                // Die Prozente mÃ¼ssen erst in einen Dezimalbruch umgerechnet werden.
                 double mfprozent = 1 + (mf[1] / 100);
                 //childrenPercent *= prozent;
 
@@ -64,14 +64,15 @@ public class Tools {
                 ((Object[]) le.getObject())[ParserMassnahmen.O_SUMME] = sum;
 
             }
-        //reloadTree();
+            //reloadTree();
         }
         return sum;
     }
 
     /**
-     * Wählt eine ModFaktor eines Teilschrittes an oder ab.
-     * @param num - Nummer der Modfaktors in der Liste
+     * WÃ¤hlt eine ModFaktor eines Teilschrittes an oder ab.
+     *
+     * @param num  - Nummer der Modfaktors in der Liste
      * @param path - Pfad des Knotens im Baum um den es geht
      */
     public static void selectModfaktor(int num, TreePath path) {
@@ -114,11 +115,11 @@ public class Tools {
     }
 
     /**
-     * erstellt eine XML Datei, die den Baum repräsentiert. Inclusive aller Selections.
+     * erstellt eine XML Datei, die den Baum reprÃ¤sentiert. Inclusive aller Selections.
      */
     public static String toXML(DefaultMutableTreeNode root, CheckTreeSelectionModel sm) {
         String result = "";
-        if (!root.isLeaf()) { // hat e überhaupt Kinder ?
+        if (!root.isLeaf()) { // hat e Ã¼berhaupt Kinder ?
             Enumeration e = root.children();
             String enclosedXML = "";
             while (e.hasMoreElements()) {
@@ -198,7 +199,7 @@ public class Tools {
                 enclosedXML += "/>";
             }
         }
-        // gilt für alle... SELECTED hinzufügen.
+        // gilt fÃ¼r alle... SELECTED hinzufÃ¼gen.
         result += selected;
         // Abschluss...
         if (enclosedXML.equals("")) { // Soll nichts eingeschlossen werden. Dann empty Tag.

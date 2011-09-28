@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,31 +28,28 @@ package op.care.verordnung;
 
 import entity.Bewohner;
 import entity.EinrichtungenTools;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.HashMap;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
+import java.math.BigInteger;
+import java.sql.*;
+import java.util.Arrays;
+import java.util.HashMap;
+
 /**
- *
  * @author root
  */
 public class DBHandling {
 
     /**
-     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
-     * @param verid welche Verordnung soll abgesetzt werden.
+     * Setzt eine Verordnung ab. Die zugehÃ¶rigen BHPs werden ab JETZT entfernt.
+     *
+     * @param verid   welche Verordnung soll abgesetzt werden.
      * @param abdatum Ab wann die Verordnung abgesetzt werden soll. <b>NULL bedeutet hier ab JETZT.</b>
-     * @param arztid welcher Arzt hat sie abgesetzt.
-     * @param khid welches KH hat sie abgesetzt
+     * @param arztid  welcher Arzt hat sie abgesetzt.
+     * @param khid    welches KH hat sie abgesetzt
      * @return erfolg
      */
     public static boolean absetzen(long verid, long arztid, long khid) {
@@ -100,11 +97,11 @@ public class DBHandling {
     }
 
     /**
-     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt. Sie wird mit sofortiger
+     * Setzt eine Verordnung ab. Die zugehÃ¶rigen BHPs werden ab JETZT entfernt. Sie wird mit sofortiger
      * Wirkung abgesetzt. Abgesetzt wird sie durch den ansetzen Arzt bzw. KH.
+     *
      * @param verid welche Verordnung soll abgesetzt werden.
      * @return erfolg
-     *
      */
     public static boolean absetzen(long verid) {
         boolean result = false;
@@ -116,7 +113,8 @@ public class DBHandling {
 
     /**
      * Setzt alle Verordnungen ab, die bis PackungsEnde laufen.
-     * @param vorid - Vorrat, die zu den Verordnungen gehören.
+     *
+     * @param vorid - Vorrat, die zu den Verordnungen gehÃ¶ren.
      */
     public static boolean absetzenBisPackEnde2Vorrat(long vorid) {
         // Das hier sucht alle Verordnungen zu einem bestimmten Vorrat raus,
@@ -216,10 +214,11 @@ public class DBHandling {
     }
 
     /**
-     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung ab einer bestimmten Tages-Zeit.
-     * @param ts ist ein bestimmter Zeitpunkt. Das gilt natürlich nur für den aktuellen Tag. Somit ist
-     * bei ts nur der Uhrzeit anteil relevant. Über diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
-     * die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> ts sind.
+     * LÃ¶scht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs fÃ¼r eine bestimmte Verordnung ab einer bestimmten Tages-Zeit.
+     *
+     * @param ts    ist ein bestimmter Zeitpunkt. Das gilt natÃ¼rlich nur fÃ¼r den aktuellen Tag. Somit ist
+     *              bei ts nur der Uhrzeit anteil relevant. Ãœber diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
+     *              die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelÃ¶scht, die <b>grÃ¶ÃŸer gleich</b> ts sind.
      * @param verid ist die Verordnung, um die es geht.
      */
     public static void cleanBHP(long verid, long ts)
@@ -245,7 +244,8 @@ public class DBHandling {
     }
 
     /**
-     * Löscht <u>alle</u> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung.
+     * LÃ¶scht <u>alle</u> nicht <b>abgehakten</b> BHPs fÃ¼r eine bestimmte Verordnung.
+     *
      * @param verid ist die Verordnung, um die es geht.
      */
     public static void cleanBHP(long verid)
@@ -259,7 +259,8 @@ public class DBHandling {
     }
 
     /**
-     * Löscht <u>alle</u> BHPs für eine bestimmte Verordnung.
+     * LÃ¶scht <u>alle</u> BHPs fÃ¼r eine bestimmte Verordnung.
+     *
      * @param verid ist die Verordnung, um die es geht.
      */
     public static void deleteBHP(long verid)
@@ -273,7 +274,8 @@ public class DBHandling {
     }
 
     /**
-     * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
+     * Gibt eine HTML Darstellung der Verordungen zurÃ¼ck, die in dem Ã¼bergebenen TableModel enthalten sind.
+     *
      * @param tmv - TableModel vom Typ TMVerordnungen
      * @return - HTML Darstellung als String
      */
@@ -283,9 +285,9 @@ public class DBHandling {
         int numVer = tmv.getRowCount();
         if (numVer > 0) {
             if (SYSTools.catchNull(bwkennung).equals("")) {
-                result += "<h2>Ärztliche Verordnungen</h2>";
+                result += "<h2>Ã„rztliche Verordnungen</h2>";
             } else {
-                result += "<h1>Ärztliche Verordnungen für " + SYSTools.getBWLabel(bewohner) + "</h1>";
+                result += "<h1>Ã„rztliche Verordnungen fÃ¼r " + SYSTools.getBWLabel(bewohner) + "</h1>";
                 if (bewohner.getStation() != null) {
                     result += EinrichtungenTools.getAsText(bewohner.getStation().getEinrichtung());
                 }
@@ -307,13 +309,14 @@ public class DBHandling {
 
             result += "</table>";
         } else {
-            result += "<h2>Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
+            result += "<h2>Ã„rztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
         }
         return result;
     }
 
     /**
-     * Löscht eine Verordnung und die zugehörigen BHPs .
+     * LÃ¶scht eine Verordnung und die zugehÃ¶rigen BHPs .
+     *
      * @param verid ist die Verordnung, um die es geht.
      */
     public static void deleteVerordnung(long verid) {

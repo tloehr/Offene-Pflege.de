@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
  *
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License,
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
@@ -26,6 +26,9 @@
  */
 package op.care.vital;
 
+import op.OPDE;
+import op.tools.*;
+
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,15 +36,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import op.OPDE;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
@@ -87,7 +83,7 @@ public class DBHandling {
         } else if (xml.indexOf("<RRDIA/>") >= 0) {
             result = "mmHg";
         } else if (xml.indexOf("<TEMP/>") >= 0) {
-            result = "°C";
+            result = "Â°C";
         } else if (xml.indexOf("<PULS/>") >= 0) {
             result = "s/m";
         } else if (xml.indexOf("<BZ/>") >= 0) {
@@ -217,8 +213,8 @@ public class DBHandling {
         String result = "";
         HashMap bwert1 = DBRetrieve.getSingleRecord("BWerte", "BWID", bwid);
         // Jetzt kann es sein, dass der eine BewohnerWert einen Blutdruck mit Puls darstellt. Dann brauchen wir noch die anderen beiden Werte.
-        // Das gilt nur für Records, deren Beziehung > 0 ist.
-        // Die Spalte Sortierung sorgt nur dafür, das Systole, Diastole und Puls immer in der richtigen Reihenfolge stehen.
+        // Das gilt nur fÃ¼r Records, deren Beziehung > 0 ist.
+        // Die Spalte Sortierung sorgt nur dafÃ¼r, das Systole, Diastole und Puls immer in der richtigen Reihenfolge stehen.
         String xml = bwert1.get("XML").toString();
         long beziehung = ((BigInteger) bwert1.get("Beziehung")).longValue();
 
@@ -252,7 +248,7 @@ public class DBHandling {
 
         String html = "";
 
-        html += "<h1>Bewohner-Werte für " + SYSTools.getBWLabel(bwkennung) + "</h1>";
+        html += "<h1>Bewohner-Werte fÃ¼r " + SYSTools.getBWLabel(bwkennung) + "</h1>";
 
         int num = tm.getRowCount();
         if (num > 0) {
@@ -282,6 +278,7 @@ public class DBHandling {
 
     /**
      * Ermittelt das Datum des ersten Bewohnerwertes den ein bestimmter Bewohner besitzt.
+     *
      * @param bwkennung
      * @return
      */
@@ -289,10 +286,10 @@ public class DBHandling {
         Date result;
         String sql =
                 " SELECT PIT " +
-                " FROM BWerte " +
-                " WHERE BWKennung = ? AND ReplacedBy = 0" +
-                " ORDER BY PIT " +
-                " LIMIT 0, 1 ";
+                        " FROM BWerte " +
+                        " WHERE BWKennung = ? AND ReplacedBy = 0" +
+                        " ORDER BY PIT " +
+                        " LIMIT 0, 1 ";
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
@@ -313,6 +310,7 @@ public class DBHandling {
 
     /**
      * Ermittelt das Datum des ersten Bewohnerwertes den ein bestimmter Bewohner besitzt.
+     *
      * @param bwkennung
      * @return
      */
@@ -320,10 +318,10 @@ public class DBHandling {
         Date result;
         String sql =
                 " SELECT PIT " +
-                " FROM BWerte " +
-                " WHERE BWKennung = ? AND ReplacedBy = 0 AND XML = ? " +
-                " ORDER BY PIT DESC" +
-                " LIMIT 0, 1 ";
+                        " FROM BWerte " +
+                        " WHERE BWKennung = ? AND ReplacedBy = 0 AND XML = ? " +
+                        " ORDER BY PIT DESC" +
+                        " LIMIT 0, 1 ";
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);

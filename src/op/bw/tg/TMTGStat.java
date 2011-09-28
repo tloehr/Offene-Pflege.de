@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,31 +28,30 @@
 package op.bw.tg;
 
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.NumberFormat;
-import javax.swing.table.AbstractTableModel;
 import op.OPDE;
 import op.tools.DlgException;
 
+import javax.swing.table.AbstractTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
- *
  * @author tloehr
  */
 public class TMTGStat extends AbstractTableModel {
     static final long serialVersionUID = 1;
     ResultSet rs;
     PreparedStatement stmt;
-    
-    
-    TMTGStat(boolean alle){
+
+
+    TMTGStat(boolean alle) {
         super();
-        
+
         String sql = "SELECT b.nachname, b.vorname, b.bwkennung, tg.summe stand FROM Bewohner b ";
         //
         if (!alle) {
-            sql +=  " INNER JOIN (" +
+            sql += " INNER JOIN (" +
                     " SELECT BWKennung, Von, Bis FROM BWInfo " +
                     " WHERE BWINFTYP = 'hauf' AND " +
                     " ((von <= now() AND bis >= now()) OR (von <= now() AND" +
@@ -62,69 +61,84 @@ public class TMTGStat extends AbstractTableModel {
         //
         sql += " LEFT OUTER JOIN (SELECT SUM(Betrag) summe, BWKennung FROM Taschengeld GROUP BY BWKennung) AS tg ON b.BWKennung = tg.BWKennung" +
                 " ORDER BY b.nachname, b.vorname, b.bwkennung";
-        
-        try{
+
+        try {
             stmt = OPDE.getDb().db.prepareStatement(sql);
             rs = stmt.executeQuery();
             rs.first();
         } // try
-        catch (SQLException se){
+        catch (SQLException se) {
             new DlgException(se);
             se.printStackTrace();
         } // catch
-        
+
     }
-    
+
     public int getRowCount() {
-        try{
+        try {
             rs.last();
             return rs.getRow();
-        } catch (SQLException se){
+        } catch (SQLException se) {
             new DlgException(se);
             se.printStackTrace();
             return -1;
         }
     }
-    
+
     public int getColumnCount() {
         return 4;
     }
-    
+
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
-    
-    public Class getColumnClass(int c){
-        if (c+1 >= 4) {
+
+    public Class getColumnClass(int c) {
+        if (c + 1 >= 4) {
             return Double.class;
         } else {
             return String.class;
         }
     }
-    
+
     public Object getValueAt(int r, int c) {
         Object result;
-        
-        try{
-            rs.absolute(r+1);
-            
-            switch (c+1){
-                case 1 : {result = rs.getString("b.nachname"); break;}
-                case 2 : {result = rs.getString("b.vorname"); break;}
-                case 3 : {result = rs.getString("b.bwkennung"); break;}
-                case 4 : {result = rs.getDouble("stand"); break;}
-                default : {result = ""; break;}
+
+        try {
+            rs.absolute(r + 1);
+
+            switch (c + 1) {
+                case 1: {
+                    result = rs.getString("b.nachname");
+                    break;
+                }
+                case 2: {
+                    result = rs.getString("b.vorname");
+                    break;
+                }
+                case 3: {
+                    result = rs.getString("b.bwkennung");
+                    break;
+                }
+                case 4: {
+                    result = rs.getDouble("stand");
+                    break;
+                }
+                default: {
+                    result = "";
+                    break;
+                }
             }
-        } catch (SQLException se){
+        } catch (SQLException se) {
             new DlgException(se);
             se.printStackTrace();
             result = "";
         }
-        
+
         return result;
     }
-    
-    public ResultSet getResultSet(){
+
+    public ResultSet getResultSet() {
         return this.rs;
     }
 } // BWTableModel

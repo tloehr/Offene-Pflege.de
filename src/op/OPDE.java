@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -25,40 +25,25 @@
  */
 package op;
 
-import entity.SYSHosts;
-import entity.SYSHostsTools;
-import entity.SYSLogin;
-import entity.SYSPropsTools;
-import entity.SyslogTools;
-import entity.UsersTools;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import entity.*;
+import op.care.BHPImport;
+import op.care.DFNImport;
+import op.threads.ProofOfLife;
+import op.tools.*;
+import org.apache.commons.cli.*;
+import org.apache.log4j.*;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
-import op.care.BHPImport;
-import op.care.DFNImport;
-import op.threads.ProofOfLife;
-import op.tools.SYSCalendar;
-import op.tools.Database;
-import op.tools.DlgException;
-import op.tools.InternalClasses;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
-import org.apache.commons.cli.*;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Properties;
 
 public class OPDE {
 
@@ -69,8 +54,8 @@ public class OPDE {
     //public static String UKennung; // Zuer Zeit angemeldeter Benutzer.
     //public static char[] UPW;
     public static OPMain ocmain;
-    public static String dbuser = ""; // Wird nur für den dfnimport gebraucht.
-    public static String dbpw = ""; // Wird nur für den dfnimport gebraucht.
+    public static String dbuser = ""; // Wird nur fÃ¼r den dfnimport gebraucht.
+    public static String dbpw = ""; // Wird nur fÃ¼r den dfnimport gebraucht.
     public static String url;
     //public static long ocloginid;
     protected static Properties props;
@@ -84,7 +69,7 @@ public class OPDE {
     //private static ArrayList groups;
     public static HashMap[] anonymize = null;
     // Diese listener List ist dazu da, dass wir immer
-    // wissen, welchen Fenstern wir bescheid sagen müssen, wenn
+    // wissen, welchen Fenstern wir bescheid sagen mÃ¼ssen, wenn
     // der User sich abmeldet.
     protected static EventListenerList listenerList = new EventListenerList();
     protected static HashMap<String, ActionListener> runningModules = new HashMap();
@@ -142,7 +127,7 @@ public class OPDE {
             listenerList.add(ActionListener.class, listener);
             runningModules.put(internalClassID, listener);
             success = true;
-            OPDE.getLogger().debug("Modul " + internalClassID + " hinzugefügt.");
+            OPDE.getLogger().debug("Modul " + internalClassID + " hinzugefÃ¼gt.");
         }
         return success;
     }
@@ -215,7 +200,7 @@ public class OPDE {
     public static void saveLocalProps() {
         try {
             FileOutputStream out = new FileOutputStream(new File(localProps.getProperty("opwd") + System.getProperty("file.separator") + "local.properties"));
-            localProps.store(out, "Lokale Einstellungen für Offene-Pflege.de");
+            localProps.store(out, "Lokale Einstellungen fÃ¼r Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {
             logger.fatal(ex);
@@ -244,12 +229,13 @@ public class OPDE {
     /**
      * Hier ist die main Methode von OPDE. In dieser Methode wird auch festgestellt, wie OPDE gestartet wurde.
      * <ul>
-     * <li>Im Standard Modus, das heisst mit graphischer Oberfläche. Das dürfte der häufigste Fall sein.</li>
-     * <li>Im DFNImport Modus. Der wird meist auf dem Datenbankserver gebraucht um Nachts die Durchführungsnachweise anhand der
-     *     DFNImport Tabelle zu generieren. Das alles gehört zu der Pflegeplanung.</li>
+     * <li>Im Standard Modus, das heisst mit graphischer OberflÃ¤che. Das dÃ¼rfte der hÃ¤ufigste Fall sein.</li>
+     * <li>Im DFNImport Modus. Der wird meist auf dem Datenbankserver gebraucht um Nachts die DurchfÃ¼hrungsnachweise anhand der
+     * DFNImport Tabelle zu generieren. Das alles gehÃ¶rt zu der Pflegeplanung.</li>
      * <li>Im BHPImport Modus. Auch dieser Modus wird auf dem DB-Server gebraucht um die Behandlungspflege Massnahmen
-     *     anhand der ärztlichen Verordnungen zu generieren.</li>
+     * anhand der Ã¤rztlichen Verordnungen zu generieren.</li>
      * </ul>
+     *
      * @param args Hier stehen die Kommandozeilen Parameter. Diese werden mit
      */
     public static void main(String[] args) {
@@ -258,7 +244,7 @@ public class OPDE {
         animationCache = new ArrayList(96);
         debug = true;
 
-        // Das hier fängt alle ungefangenen Exceptions auf.
+        // Das hier fÃ¤ngt alle ungefangenen Exceptions auf.
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
             @Override
@@ -318,10 +304,10 @@ public class OPDE {
         // AUSWERTUNG KOMMANDOZEILE-----------------------------------------------------------------------------
         // Hier erfolgt die Unterscheidung, in welchem Modus OPDE gestartet wurde.
         Options opts = new Options();
-        opts.addOption("h", "hilfe", false, "Gibt die Hilfeseite für OPDE aus.");
+        opts.addOption("h", "hilfe", false, "Gibt die Hilfeseite fÃ¼r OPDE aus.");
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
-        opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
-        opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
+        opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus fÃ¼r Schulungsmaterial zu erstellen.");
+        opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur wÃ¤hrend der Softwareentwicklung angezeigt werden.");
         opts.addOption("n", "noanimation", false, "Schaltet die Animation auf dem Login Dialog aus.");
 
         Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .op Verzeichnis befindet.").create("k");
@@ -329,16 +315,16 @@ public class OPDE {
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
                 .withLongOpt("dfnimport") //.hasOptionalArg()
-                .withDescription("Startet OPDE im DFNImport Modus für den aktuellen Tag.").create("d");
+                .withDescription("Startet OPDE im DFNImport Modus fÃ¼r den aktuellen Tag.").create("d");
 
         opts.addOption(dfnimport);
 
         Option bhpimport = null;
 
         if (debug) {
-            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
+            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus fÃ¼r den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
         } else {
-            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
+            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus fÃ¼r den aktuellen Tag.").create("b");
         }
 
 //        if (OCDEBUG.equalsIgnoreCase("true")){
@@ -375,7 +361,7 @@ public class OPDE {
             initProps(null);
         }
 
-        // Die Login Animation. Die könnte bei Terminal Servern störend sein.
+        // Die Login Animation. Die kÃ¶nnte bei Terminal Servern stÃ¶rend sein.
         animation = !cl.hasOption("n");
 
         if (cl.hasOption("a")) { // anonym Modus
@@ -433,7 +419,7 @@ public class OPDE {
         }
 
         Properties jpaProps = new Properties();
-        // Für JPA 2.0
+        // FÃ¼r JPA 2.0
         jpaProps.put("javax.persistence.jdbc.url", url);
         jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("dbuser"));
         jpaProps.put("javax.persistence.jdbc.password", localProps.getProperty("dbpw"));
@@ -516,7 +502,7 @@ public class OPDE {
             p.load(in);
             localProps.putAll(p);
             p.clear();
-            // damit das nicht von den local.properties überschrieben werden kann.
+            // damit das nicht von den local.properties Ã¼berschrieben werden kann.
             //localProps.put("debug", OCDEBUG);
 
             in.close();
@@ -566,7 +552,7 @@ public class OPDE {
         return UsersTools.isAdmin(login.getUser());
     }
 
-//    public static boolean isPDL() {
+    //    public static boolean isPDL() {
 //        return groups.contains("pdl");
 //    }
 //

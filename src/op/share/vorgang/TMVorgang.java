@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,24 +26,21 @@
  */
 package op.share.vorgang;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.table.AbstractTableModel;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.swing.table.AbstractTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 /**
- *
  * @author tloehr
  */
 public class TMVorgang extends AbstractTableModel {
@@ -92,23 +89,24 @@ public class TMVorgang extends AbstractTableModel {
 //    }
 
     /**
-     * TableModel für die Vorgänge.
-     * @param bwkennung. Filter um auf bestimmte BWkennungen einzuschränken. Kann auch "" übergeben werden.
-     * Dann werden <b>nur</b> die nicht zugeordneten ermittelt. Übergibt man NULL, dann wird alles zurück gegeben.
-     * @param archiv. Wenn TRUE, dann auch die noch abgesetzen.
-     * @param wv. ist die Anzahl Tage, innerhalb derer die Wiedervorlage erreicht werden muss. Oder früher. bei 0, egal.
-     * @param besitzer. filtert auf Eigentümer, in gleicher weise wie bei der BWKennung.
+     * TableModel fÃ¼r die VorgÃ¤nge.
+     *
+     * @param bwkennung. Filter um auf bestimmte BWkennungen einzuschrÃ¤nken. Kann auch "" Ã¼bergeben werden.
+     *                   Dann werden <b>nur</b> die nicht zugeordneten ermittelt. Ãœbergibt man NULL, dann wird alles zurÃ¼ck gegeben.
+     * @param archiv.    Wenn TRUE, dann auch die noch abgesetzen.
+     * @param wv.        ist die Anzahl Tage, innerhalb derer die Wiedervorlage erreicht werden muss. Oder frÃ¼her. bei 0, egal.
+     * @param besitzer.  filtert auf EigentÃ¼mer, in gleicher weise wie bei der BWKennung.
      */
     public TMVorgang(String bwkennung, boolean archiv, int wv, String besitzer) {
         this.bwkennung = bwkennung;
         wv = Math.max(0, wv);
         String sql =
                 " SELECT v.VorgangID, v.Titel, v.BWKennung, v.Von, v.WV, v.Bis, v.Ersteller, v.Besitzer, " +
-                " vk.Text, vk.Art, ocu1.Nachname, ocu1.Vorname, ocu2.Nachname, ocu2.Vorname, v.BWKennung " +
-                " FROM Vorgaenge v " +
-                " INNER JOIN OCUsers ocu1 ON ocu1.UKennung = v.Besitzer " +
-                " INNER JOIN OCUsers ocu2 ON ocu2.UKennung = v.Ersteller " +
-                " INNER JOIN VKat vk ON v.VKatID = vk.VKatID ";
+                        " vk.Text, vk.Art, ocu1.Nachname, ocu1.Vorname, ocu2.Nachname, ocu2.Vorname, v.BWKennung " +
+                        " FROM Vorgaenge v " +
+                        " INNER JOIN OCUsers ocu1 ON ocu1.UKennung = v.Besitzer " +
+                        " INNER JOIN OCUsers ocu2 ON ocu2.UKennung = v.Ersteller " +
+                        " INNER JOIN VKat vk ON v.VKatID = vk.VKatID ";
 
         String where = "";
         if (!archiv) {
@@ -203,21 +201,21 @@ public class TMVorgang extends AbstractTableModel {
                     if (cache.get(rs.getRow()) == null) {
                         String html = "";
                         html += "<h2>" + rs.getString("Titel") + "</h2>";
-                        // Es könnte sein, dass die Vorgänge nicht nur für einen bestimmten Bewohner waren.
+                        // Es kÃ¶nnte sein, dass die VorgÃ¤nge nicht nur fÃ¼r einen bestimmten Bewohner waren.
                         if (SYSTools.catchNull(bwkennung).equals("")) {
-                            // Für wen denn ?
+                            // FÃ¼r wen denn ?
                             String currbw = rs.getString("v.BWkennung");
                             if (currbw.equals("")) {
                                 html += "<br/>Allgemeiner Vorgang<br/>";
                             } else {
-                                html += "<br/>Vorgang gehört zu BewohnerIn: <b>" + SYSTools.getBWLabel(currbw)+"</b><br/>";
+                                html += "<br/>Vorgang gehÃ¶rt zu BewohnerIn: <b>" + SYSTools.getBWLabel(currbw) + "</b><br/>";
                             }
                         }
                         html += "<b>Von:</b> " + df.format(rs.getDate("v.Von"));
                         if (rs.getDate("v.Bis").before(SYSConst.DATE_BIS_AUF_WEITERES_WO_TIME)) {
                             html += "&nbsp;&nbsp;<b>Bis:</b> " + df.format(rs.getDate("v.Bis"));
                         }
-                        // Farb-Bestimmung für die Wiedervorlage.
+                        // Farb-Bestimmung fÃ¼r die Wiedervorlage.
                         if (SYSCalendar.isInFuture(rs.getDate("v.WV").getTime())) {
                             int daysdiff = SYSCalendar.getDaysBetween(SYSCalendar.toGC(SYSCalendar.nowDB()), SYSCalendar.toGC(rs.getDate("v.WV")));
                             if (daysdiff > 7) {

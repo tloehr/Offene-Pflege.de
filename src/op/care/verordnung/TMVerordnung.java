@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,6 +26,13 @@
  */
 package op.care.verordnung;
 
+import op.OPDE;
+import op.tools.DlgException;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
+
+import javax.swing.table.AbstractTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,15 +40,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.BitSet;
 import java.util.HashMap;
-import javax.swing.table.AbstractTableModel;
-import op.tools.DlgException;
-import op.OPDE;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class TMVerordnung
@@ -67,7 +67,7 @@ public class TMVerordnung
     public static final int COL_BESTID = 17;
     public static final int COL_NEXTBEST = 18;
     public final String[] debug = {"COL_MSSN", "COL_Dosis", "COL_Hinweis", "COL_AN", "COL_AB", "COL_INFO", "COL_DOK", "COL_VERID", "COL_BESTELLID",
-        "COL_ANARZTID", "COL_VORID", "COL_ABGESETZT", "COL_ABDATUM", "COL_SITID", "COL_ABARZTID", "COL_ANKHID", "COL_ABKHID"
+            "COL_ANARZTID", "COL_VORID", "COL_ABGESETZT", "COL_ABDATUM", "COL_SITID", "COL_ABARZTID", "COL_ANKHID", "COL_ABKHID"
     };
     ResultSet rs;
     PreparedStatement stmt;
@@ -98,8 +98,8 @@ public class TMVerordnung
                     " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID" +
                     " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID" +
                     " LEFT OUTER JOIN Situationen S ON v.SitID = S.SitID" +
-                    // Dieser Konstrukt bestimmt die Vorr‰te f¸r einen Bewohner
-                    // Dabei wird ber¸cksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
+                    // Dieser Konstrukt bestimmt die Vorr√§te f√ºr einen Bewohner
+                    // Dabei wird ber√ºcksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
                     // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
                     // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
                     // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
@@ -127,7 +127,7 @@ public class TMVerordnung
                     " 		) fa ON fa.VerID = f1.VerID" +
                     " 	WHERE f1.BWKennung=?" +
                     " ) fia ON fia.VerID = v.VerID " +
-                    // Hier die angehangenen Vorg‰nge
+                    // Hier die angehangenen Vorg√§nge
                     " INNER JOIN " +
                     " (" +
                     " 	SELECT DISTINCT f2.VerID, ifnull(anzahl,0) anzahl" +
@@ -139,8 +139,8 @@ public class TMVerordnung
                     " 		) va ON va.ForeignKey = f2.VerID" +
                     " 	WHERE f2.BWKennung=? " +
                     " ) vrg ON vrg.VerID = v.VerID " +
-                    // Hier kommen jetzt die Best‰nde im Anbruch dabei. Die Namen der Medikamente kˆnnten ja vom
-                    // urspr¸nglich verordneten abweichen.
+                    // Hier kommen jetzt die Best√§nde im Anbruch dabei. Die Namen der Medikamente k√∂nnten ja vom
+                    // urspr√ºnglich verordneten abweichen.
                     " LEFT OUTER JOIN( " +
                     "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
                     "       FROM MPBestand best1 " +
@@ -287,13 +287,13 @@ public class TMVerordnung
         if (rs.getLong("DafID") == 0) {
             result += rs.getString("mssntext");
         } else {
-            // Pr¸fen, was wirklich im Anbruch gegeben wird.
+            // Pr√ºfen, was wirklich im Anbruch gegeben wird.
             if (rs.getLong("bestandDafID") > 0 && rs.getLong("bestandDafID") != rs.getLong("v.DafID")) { // Nur bei Abweichung.
                 result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext1").replaceAll("-", "- ") +
                         SYSTools.catchNull(rs.getString("D1.Zusatz"), " ", "") + "</b></font>" +
                         SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
                         SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
-                result += " <i>(urspr¸nglich verordnet: " + rs.getString("mptext").replaceAll("-", "- ") +
+                result += " <i>(urspr√ºnglich verordnet: " + rs.getString("mptext").replaceAll("-", "- ") +
                         SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</i>";
             } else {
                 result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext").replaceAll("-", "- ") +
@@ -340,7 +340,7 @@ public class TMVerordnung
             }
             if (rs.getLong("v.AnArztID") > 0) {
                 if (rs.getLong("v.AnKHID") > 0) {
-                    result += " <i>best‰tigt durch:</i> ";
+                    result += " <i>best√§tigt durch:</i> ";
                 }
                 result += rs.getString("an.Titel") + " ";
                 if (OPDE.isAnonym()) {
@@ -373,7 +373,7 @@ public class TMVerordnung
                 }
                 if (rs.getLong("v.AbArztID") > 0) {
                     if (rs.getLong("v.AbKHID") > 0) {
-                        result += " <i>best‰tigt durch:</i> ";
+                        result += " <i>best√§tigt durch:</i> ";
                     }
                     result += rs.getString("ab.Titel");
                     if (OPDE.isAnonym()) {
@@ -399,12 +399,13 @@ public class TMVerordnung
     /**
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
+     *
      * @param verid
      * @return
      */
-    private String getDosis(long verid){
+    private String getDosis(long verid) {
         String result = "";
-        if (cache.containsKey(verid)){
+        if (cache.containsKey(verid)) {
             result = cache.get(verid).toString();
         } else {
             result = op.care.verordnung.DBRetrieve.getDosis(verid);
@@ -443,7 +444,7 @@ public class TMVerordnung
                     String tmp = "<html><body>";
                     tmp += getDosis(verid);
 
-                    if (rs.getLong("DafID") > 0) { // Gilt nur f¸r Medikamente, sonst passt das nicht
+                    if (rs.getLong("DafID") > 0) { // Gilt nur f√ºr Medikamente, sonst passt das nicht
                         if (rs.getBoolean("BisPackEnde")) {
                             tmp += "nur bis Packungs Ende<br/>";
                         }
@@ -470,7 +471,7 @@ public class TMVerordnung
                                         }
                                     }
                                 } else {
-                                    tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht mˆglich.</font></b>";
+                                    tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht m√∂glich.</font></b>";
                                 }
 //                                if (rs.getLong("BestellID") > 0){
 //                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";

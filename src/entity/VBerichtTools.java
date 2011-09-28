@@ -4,12 +4,12 @@
  */
 package entity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import op.OPDE;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 /**
- *
  * @author tloehr
  */
 public class VBerichtTools {
@@ -23,7 +23,7 @@ public class VBerichtTools {
     public static final short VBERICHT_ART_REOPEN = 6;
     public static final short VBERICHT_ART_EDIT = 7;
     public static final short VBERICHT_ART_WV = 8;
-    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
+    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS EigentÃ¼mer geÃ¤ndert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geÃ¶ffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
 
     public static String getBerichtAsHTML(VBericht bericht) {
         String html = "";
@@ -49,7 +49,7 @@ public class VBerichtTools {
         return html;
     }
 
-    public static void newBericht(Vorgaenge vorgang, String text, short art){
+    public static void newBericht(Vorgaenge vorgang, String text, short art) {
         OPDE.getEM().getTransaction().begin();
         VBericht vbericht = new VBericht(text, art, vorgang);
         OPDE.getEM().persist(vbericht);

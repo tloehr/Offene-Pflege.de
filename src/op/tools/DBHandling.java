@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -25,22 +25,14 @@
  */
 package op.tools;
 
-import java.math.BigInteger;
+import op.OPDE;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import javax.swing.DefaultComboBoxModel;
-import op.OPDE;
+import java.util.*;
 
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
@@ -100,9 +92,11 @@ public class DBHandling {
 //
 //        return dcbmMassnahmen;
 //    }
+
     /**
-     * Lädt alle Properties aus der Tabelle OCProps ein, die nicht an der aktuellen Userkennung hängen.
-     * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
+     * LÃ¤dt alle Properties aus der Tabelle OCProps ein, die nicht an der aktuellen Userkennung hÃ¤ngen.
+     * Passend zu einer IP bzw. IP='*', wenn die Properties fÃ¼r alle gedacht sind.
+     *
      * @param ip String mit der IP-Adresse oder '*'
      * @return Ergebnis in einem Properties Objekt.
      */
@@ -132,8 +126,8 @@ public class DBHandling {
 //    }
 
 //    /**
-//     * Lädt Properties aus der Tabelle OCProps ein.
-//     * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
+//     * LÃ¤dt Properties aus der Tabelle OCProps ein.
+//     * Passend zu einer IP bzw. IP='*', wenn die Properties fÃ¼r alle gedacht sind.
 //     * @param ip String mit der IP-Adresse oder '*'
 //     * @param only4me, true, dann werden nur die Properties geladen, die zu der aktuellen Userkennung passen. false, alle.
 //     * @return Ergebnis in einem Properties Objekt.
@@ -169,7 +163,6 @@ public class DBHandling {
 //
 //        return p;
 //    }
-
     public static HashMap getBW(String bwkennung) {
         HashMap hm = new HashMap();
 
@@ -214,7 +207,7 @@ public class DBHandling {
             hm.put("nachname", nachname);
             hm.put("bwkennung", bwkennung);
             hm.put("gebdatum", gebdatum);
-            hm.put("geschlecht", (rs.getInt("Geschlecht") == 2 ? "weiblich" : "männlich"));
+            hm.put("geschlecht", (rs.getInt("Geschlecht") == 2 ? "weiblich" : "mÃ¤nnlich"));
 
         } catch (SQLException ex) {
             new DlgException(ex);
@@ -231,9 +224,10 @@ public class DBHandling {
     }
 
     /**
-     * Fügt einen neuen Datensatz in eine Tabelle ein.
+     * FÃ¼gt einen neuen Datensatz in eine Tabelle ein.
+     *
      * @param table Name der Datenbanktabelle
-     * @param data HashMap mit Paaren aus Spaltenname und Spaltenwert, z.B. ("Nachname", "Löhr") oder ("PLZ", 53783) etc.
+     * @param data  HashMap mit Paaren aus Spaltenname und Spaltenwert, z.B. ("Nachname", "LÃ¶hr") oder ("PLZ", 53783) etc.
      * @return der PrimaryKey des neuen Records. Geht immer von einem Long als PK aus. -1, bei Exception.
      */
     public static long insertRecord(String table, HashMap data) {
@@ -252,17 +246,17 @@ public class DBHandling {
             String col = (String) entry.getKey();
             cols += col;
             Object o = entry.getValue();
-            if (o != null && o.toString().equalsIgnoreCase("!NOW!")) { // Sonderfall für mysql Datenbankfunktion now()
+            if (o != null && o.toString().equalsIgnoreCase("!NOW!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 values += "now()";
-            } else if (o != null && o.toString().equalsIgnoreCase("!BAW!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!BAW!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 values += SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES;
-            } else if (o != null && o.toString().equalsIgnoreCase("!VAA!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!VAA!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 values += SYSConst.MYSQL_DATETIME_VON_ANFANG_AN;
-            } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 values += "DATE_ADD(now(),INTERVAL 1 SECOND)";
             } else {
                 OPDE.getLogger().debug(l++ + ": " + col);
-                val.add(o); // value, für spätere setObject Schleife
+                val.add(o); // value, fÃ¼r spÃ¤tere setObject Schleife
                 values += "?";
             }
             if (it.hasNext()) {
@@ -282,7 +276,7 @@ public class DBHandling {
             for (int i = 0; i < val.size(); i++) {
                 OPDE.getLogger().debug(i);
                 stmt.setObject(i + 1, val.get(i));
-            //System.out.println(whereval.get(i));
+                //System.out.println(whereval.get(i));
             }
             stmt.executeUpdate();
             result = OPDE.getDb().getLastInsertedID();
@@ -295,10 +289,11 @@ public class DBHandling {
     }
 
     /**
-     * Ändert einen Datensatz
+     * Ã„ndert einen Datensatz
+     *
      * @param table Name der Datenbanktabelle
-     * @param data HashMap mit Paaren aus Spaltenname und Spaltenwert, z.B. ("Nachname", "Löhr") oder ("PLZ", 53783) etc.
-     * @param long Primärschlüssel des zu ändernden Datensatzes.
+     * @param data  HashMap mit Paaren aus Spaltenname und Spaltenwert, z.B. ("Nachname", "LÃ¶hr") oder ("PLZ", 53783) etc.
+     * @param long  PrimÃ¤rschlÃ¼ssel des zu Ã¤ndernden Datensatzes.
      * @return boolean, ob die Operation erfolgreich war.
      */
     public static boolean updateRecord(String table, HashMap data, String pkname, Object pk) {
@@ -315,16 +310,16 @@ public class DBHandling {
             String col = (String) entry.getKey();
             sql += col;
             Object o = entry.getValue();
-            if (o != null && o.toString().equalsIgnoreCase("!NOW!")) { // Sonderfall für mysql Datenbankfunktion now()
+            if (o != null && o.toString().equalsIgnoreCase("!NOW!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=now()";
-            } else if (o != null && o.toString().equalsIgnoreCase("!BAW!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!BAW!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=" + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES;
-            } else if (o != null && o.toString().equalsIgnoreCase("!VAA!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!VAA!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=" + SYSConst.MYSQL_DATETIME_VON_ANFANG_AN;
-            } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=DATE_ADD(now(),INTERVAL 1 SECOND)";
             } else {
-                val.add(o); // value, für spätere setObject Schleife
+                val.add(o); // value, fÃ¼r spÃ¤tere setObject Schleife
                 sql += "=?";
             }
             if (it.hasNext()) {
@@ -351,10 +346,11 @@ public class DBHandling {
     }
 
     /**
-     * Ändert einen Datensatz
+     * Ã„ndert einen Datensatz
+     *
      * @param table Name der Datenbanktabelle
-     * @param data HashMap mit Paaren aus Spaltenname und Spaltenwert, z.B. ("Nachname", "Löhr") oder ("PLZ", 53783) etc.
-     * @param long Primärschlüssel des zu ändernden Datensatzes.
+     * @param data  HashMap mit Paaren aus Spaltenname und Spaltenwert, z.B. ("Nachname", "LÃ¶hr") oder ("PLZ", 53783) etc.
+     * @param long  PrimÃ¤rschlÃ¼ssel des zu Ã¤ndernden Datensatzes.
      * @return boolean, ob die Operation erfolgreich war.
      */
     public static boolean updateRecord(String table, HashMap data, String pkname, long pk) {
@@ -371,16 +367,16 @@ public class DBHandling {
             String col = (String) entry.getKey();
             sql += col;
             Object o = entry.getValue();
-            if (o != null && o.toString().equalsIgnoreCase("!NOW!")) { // Sonderfall für mysql Datenbankfunktion now()
+            if (o != null && o.toString().equalsIgnoreCase("!NOW!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=now()";
-            } else if (o != null && o.toString().equalsIgnoreCase("!BAW!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!BAW!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=" + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES;
-            } else if (o != null && o.toString().equalsIgnoreCase("!VAA!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!VAA!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=" + SYSConst.MYSQL_DATETIME_VON_ANFANG_AN;
-            } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall für mysql Datenbankfunktion now()
+            } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall fÃ¼r mysql Datenbankfunktion now()
                 sql += "=DATE_ADD(now(),INTERVAL 1 SECOND)";
             } else {
-                val.add(o); // value, für spätere setObject Schleife
+                val.add(o); // value, fÃ¼r spÃ¤tere setObject Schleife
                 sql += "=?";
             }
 
@@ -414,9 +410,9 @@ public class DBHandling {
     }
 
     /**
-     * Löscht Records aus der Datenbank.
-     * @return anzahl der gelöschten Datensätze. -1 bei Fehler.
+     * LÃ¶scht Records aus der Datenbank.
      *
+     * @return anzahl der gelÃ¶schten DatensÃ¤tze. -1 bei Fehler.
      */
     public static int deleteRecords(String table, HashMap where) {
         PreparedStatement stmt;
@@ -433,7 +429,7 @@ public class DBHandling {
             String wherefield = (String) entry.getKey();
             Object[] os = (Object[]) entry.getValue();
             whereval.add(os[0]); // value
-            sql += wherefield + os[1] + "?"; // enthält den operator
+            sql += wherefield + os[1] + "?"; // enthÃ¤lt den operator
             if (it.hasNext()) {
                 sql += " AND ";
             }
@@ -444,7 +440,7 @@ public class DBHandling {
             //System.out.println(sql);
             for (int i = 0; i < whereval.size(); i++) {
                 stmt.setObject(i + 1, whereval.get(i));
-            //System.out.println(whereval.get(i));
+                //System.out.println(whereval.get(i));
             }
 
             deletedRows = stmt.executeUpdate();
@@ -471,7 +467,7 @@ public class DBHandling {
             String wherefield = (String) entry.getKey();
             Object[] os = (Object[]) entry.getValue();
             whereval.add(os[0]); // value
-            sql += wherefield + " " + os[1] + " ?"; // enthält den operator
+            sql += wherefield + " " + os[1] + " ?"; // enthÃ¤lt den operator
             if (it.hasNext()) {
                 sql += " AND ";
             }
@@ -482,7 +478,7 @@ public class DBHandling {
             //System.out.println(sql);
             for (int i = 0; i < whereval.size(); i++) {
                 stmt.setObject(i + 1, whereval.get(i));
-            //System.out.println(whereval.get(i));
+                //System.out.println(whereval.get(i));
             }
 
             ResultSet rs = stmt.executeQuery();
@@ -537,7 +533,7 @@ public class DBHandling {
                 Object[] os = (Object[]) entry.getValue();
                 //whereval.add(entry.getValue());
                 whereval.add(os[0]); // value
-                sql += wherefield + " " + os[1] + " ?"; // enthält den operator
+                sql += wherefield + " " + os[1] + " ?"; // enthÃ¤lt den operator
                 //sql += wherefield + " "+comparisonOperator+" ?";
                 if (it.hasNext()) {
                     sql += " AND ";
@@ -579,8 +575,9 @@ public class DBHandling {
     }
 
     /**
-     * Diese Methode liefert exact den SQL Ausdruck zurück, der in getResultSet verwendet wird um
+     * Diese Methode liefert exact den SQL Ausdruck zurÃ¼ck, der in getResultSet verwendet wird um
      * dort die Datenbank Anfrage zu formulieren.
+     *
      * @param table
      * @param fields
      * @param where
@@ -609,7 +606,7 @@ public class DBHandling {
                 String wherefield = (String) entry.getKey();
                 Object[] os = (Object[]) entry.getValue();
                 //whereval.add(entry.getValue());
-                sql += wherefield + " " + os[1] + " ?"; // enthält den operator
+                sql += wherefield + " " + os[1] + " ?"; // enthÃ¤lt den operator
                 //sql += wherefield + " "+comparisonOperator+" ?";
                 if (it.hasNext()) {
                     sql += " AND ";
@@ -633,7 +630,6 @@ public class DBHandling {
     }
 
     /**
-     * 
      * @param pattern
      * @return
      */
@@ -657,9 +653,10 @@ public class DBHandling {
 
     /**
      * Erstellt eine Liste der Bewohner zum angegebenen Zeitpunkt
-     * @param date - gewünschter Zeitraum
+     *
+     * @param date - gewÃ¼nschter Zeitraum
      * @return verschachtelte ArrayListe mit den Ergebnissen nach Station geordnet.
-     * (("Station1",("Mustermann, Max","MM4"),("Muster, Marga","MM5")),("Station2",("...","BA1")))
+     *         (("Station1",("Mustermann, Max","MM4"),("Muster, Marga","MM5")),("Station2",("...","BA1")))
      */
     public static ArrayList getBWList(Date date) {
         ArrayList result = new ArrayList();
@@ -689,7 +686,7 @@ public class DBHandling {
                 st1.nextToken(); // den ersten nicht.
                 station.add(st1.nextToken());
                 rs.beforeFirst();
-                while(rs.next()){
+                while (rs.next()) {
                     String currentXML = rs.getString("ba2.xml");
                     // Station hat gewechselt ?
                     if (!xml.equalsIgnoreCase(currentXML)) {  // JA!

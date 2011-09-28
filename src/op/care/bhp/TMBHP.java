@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,23 +26,22 @@
  */
 package op.care.bhp;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Vector;
-import javax.swing.table.AbstractTableModel;
-import op.tools.DlgException;
 import op.OPDE;
+import op.tools.DlgException;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.swing.table.AbstractTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Vector;
+
 /**
- *
  * @author tloehr
  */
 public class TMBHP
@@ -72,16 +71,14 @@ public class TMBHP
     ResultSet rs;
     PreparedStatement stmt;
     boolean withTime;
-    // #0000030: Dieser Vector ist zur Optimierung. Dadurch spare ich mir den st‰ndigen Reload dieses Monster SQL Ausdrucks.
-    // Die Datenbank wird zwar ge‰ndert, aber wenn in der entsprechenden Zeile dieses Vectors etwas anderes als NULL steht
-    // dann wird DAS anstatt des ResultSet Wertes zur¸ck gegeben.
+    // #0000030: Dieser Vector ist zur Optimierung. Dadurch spare ich mir den st√§ndigen Reload dieses Monster SQL Ausdrucks.
+    // Die Datenbank wird zwar ge√§ndert, aber wenn in der entsprechenden Zeile dieses Vectors etwas anderes als NULL steht
+    // dann wird DAS anstatt des ResultSet Wertes zur√ºck gegeben.
     Vector update = null;
 
     /**
      * @param schicht entsprechen OC_Const.ZEIT
-     *
-     *
-     **/
+     */
     public TMBHP(String currentBW, Date datum, boolean withTime, int schicht) {
         super();
         this.withTime = withTime;
@@ -130,8 +127,8 @@ public class TMBHP
                     //                    "       INNER JOIN MPVorrat vrr ON a.VorID = vrr.VorID " +
                     //                    "       WHERE vrr.BWKennung=? AND vrr.Bis = '9999-12-31 23:59:59'" +
                     " ) vor ON vor.DafID = v.DafID " +
-                    // Hier kommen jetzt die Best‰nde im Anbruch dabei. Die Namen der Medikamente kˆnnten ja vom
-                    // urspr¸nglich verordneten abweichen. Ausserdem steht hier noch die Summe der aktuellen Packung im Anbruch.
+                    // Hier kommen jetzt die Best√§nde im Anbruch dabei. Die Namen der Medikamente k√∂nnten ja vom
+                    // urspr√ºnglich verordneten abweichen. Ausserdem steht hier noch die Summe der aktuellen Packung im Anbruch.
                     " LEFT OUTER JOIN( " +
                     "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
                     "       FROM MPBestand best1 " +
@@ -343,7 +340,7 @@ public class TMBHP
                     if (result.equals("Uhrzeit")) {
                         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
                         result = formatter.format(rs.getTime("Soll")) + " Uhr";
-                    //result = rs.getTime("SUhrzeit");
+                        //result = rs.getTime("SUhrzeit");
                     }
                     break;
                 }
@@ -369,12 +366,12 @@ public class TMBHP
                 }
                 case COL_BEMPLAN: {
                     result = "";
-                    // Dieses Teil habe ich aus Gr¸nder der Performance wieder rausgenommen. Hat sich im Alltag
+                    // Dieses Teil habe ich aus Gr√ºnder der Performance wieder rausgenommen. Hat sich im Alltag
                     // eh keiner angesehen.
                     if (rs.getLong("BestID") > 0) {
                         result = "<i>Bestand im Anbruch Nr.: " + rs.getLong("BestID") + "</i><br/>";
                         if (rs.getLong("nextbest") > 0) {
-                            result = result.toString() + "<i>n‰chster anzubrechender Bestand Nr.: " + rs.getLong("nextbest") + "<i><br/>";
+                            result = result.toString() + "<i>n√§chster anzubrechender Bestand Nr.: " + rs.getLong("nextbest") + "<i><br/>";
                         }
                     }
                     if (!SYSTools.catchNull(rs.getString("vbemerkung")).equals("")) {

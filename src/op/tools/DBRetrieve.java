@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -25,25 +25,16 @@
  */
 package op.tools;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import javax.swing.DefaultComboBoxModel;
 import op.OPDE;
 
+import javax.swing.*;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
+
 /**
- * Diese Klasse enthält Methoden, die bestimmte Informationen aus der Datenbank herausziehen.
+ * Diese Klasse enthÃ¤lt Methoden, die bestimmte Informationen aus der Datenbank herausziehen.
  *
  * @author tloehr
  */
@@ -78,8 +69,8 @@ public class DBRetrieve {
 
     /**
      * Ermittelt, seit wann ein Bewohner abwesend war.
-     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
      *
+     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
      */
     public static Date getAbwesendSeit(String bwkennung) {
         PreparedStatement stmt;
@@ -131,8 +122,6 @@ public class DBRetrieve {
 
     /**
      * liest aus einer beliegigen Tabelle, genau einen Wert heraus.
-     *
-     *
      */
     public static Object getSingleValue(String table, String field, String wherefield, Object wherevalue) {
         HashMap where = new HashMap();
@@ -154,7 +143,7 @@ public class DBRetrieve {
             String wherefield = (String) entry.getKey();
             Object[] os = (Object[]) entry.getValue();
             whereval.add(os[0]); // value
-            sql += wherefield + " " + os[1] + " ?"; // enthält den operator
+            sql += wherefield + " " + os[1] + " ?"; // enthÃ¤lt den operator
             if (it.hasNext()) {
                 sql += " AND ";
             }
@@ -181,12 +170,11 @@ public class DBRetrieve {
     /**
      * Zieht eine Zeile aus der Datenbank. Sollte das Suchkriterium mehrere Treffer ergeben, dann gibts nur die erste Zeile.
      *
-     * @param table Name der Datenbanktabelle
-     * @param fields Ein Array mit den gewünschten Spalteninhalten der Tabelle
-     * @param pk Spaltenname, der in der WHERE Clause verwendet werden soll.
-     * @param pkval gewünschte Filterkriterium
+     * @param table  Name der Datenbanktabelle
+     * @param fields Ein Array mit den gewÃ¼nschten Spalteninhalten der Tabelle
+     * @param pk     Spaltenname, der in der WHERE Clause verwendet werden soll.
+     * @param pkval  gewÃ¼nschte Filterkriterium
      * @return Suchergebnis, null bei leerem Suchergebnis
-     *
      */
     public static HashMap getSingleRecord(String table, Object[] fields, String pk, Object pkval) {
         HashMap result = null;
@@ -209,12 +197,12 @@ public class DBRetrieve {
     }
 
     /**
-     * Diese Methode liest ein ResultSet ein und gibt es an die aufrufende Methode zurück.
+     * Diese Methode liest ein ResultSet ein und gibt es an die aufrufende Methode zurÃ¼ck.
      *
-     * @param table Name der Datenbanktabelle
-     * @param fields Ein Array mit den gewünschten Spalteninhalten der Tabelle
-     * @param wherefield Spaltenname, der in der WHERE Clause verwendet werden soll.
-     * @param wherevalue gewünschte Filterkriterium
+     * @param table              Name der Datenbanktabelle
+     * @param fields             Ein Array mit den gewÃ¼nschten Spalteninhalten der Tabelle
+     * @param wherefield         Spaltenname, der in der WHERE Clause verwendet werden soll.
+     * @param wherevalue         gewÃ¼nschte Filterkriterium
      * @param comparisonOperator Vergleichsoperator, der in der WHERE Clause benutzt wird
      * @return Suchergebnis, null bei leerem Suchergebnis
      */
@@ -405,7 +393,7 @@ public class DBRetrieve {
 
                     hm.put("ref", rs.getDate("dfn.LDatum"));
                     hm.put("bemerkung", rs.getString("dfn.Bemerkung"));
-                    hm.put("title", "Details für " + rs.getString("dfn.MassID") + "-" + rs.getString("mass.Bezeichnung"));
+                    hm.put("title", "Details fÃ¼r " + rs.getString("dfn.MassID") + "-" + rs.getString("mass.Bezeichnung"));
 
                 } catch (SQLException ex) {
                     new DlgException(ex);
@@ -421,10 +409,10 @@ public class DBRetrieve {
 
     /**
      * liest aus der Tabelle "BWerte" den jeweils letzten aktuell gemessenen Wert heraus.
-     * @param Kennung des Bewohners
-     * @param xml code des gewünschten Wertes
-     * @return Eine Liste mit zwei Elementen (Date datum, double wert)
      *
+     * @param Kennung des Bewohners
+     * @param xml     code des gewÃ¼nschten Wertes
+     * @return Eine Liste mit zwei Elementen (Date datum, double wert)
      */
     public static ArrayList getLetztenBWert(String bwkennung, String xml) {
         ArrayList result = new ArrayList();
@@ -451,11 +439,12 @@ public class DBRetrieve {
     }
 
     /**
-     * Diese Methode sammelt das aktuelleste, letzte Attribut, gemäß einer BWINFTYP und einer BWKennung auf.
+     * Diese Methode sammelt das aktuelleste, letzte Attribut, gemÃ¤ÃŸ einer BWINFTYP und einer BWKennung auf.
+     *
      * @param bwkennung - Kennung des Bewohners
-     * @param BWINFTYP - Kennung des gewünschten Attributs
+     * @param BWINFTYP  - Kennung des gewÃ¼nschten Attributs
      * @return Liste der Daten des letzten Attributes (XMLC, Von, Bis, BWINFOID, _creator, _editor, _cdate, _mdate). Datentypen
-     * (String, Date, Date, long, String, String, Timestamp, Timestamp)
+     *         (String, Date, Date, long, String, String, Timestamp, Timestamp)
      */
     public static ArrayList getLetztesBWAttribut(String bwkennung, String BWINFTYP) {
         OPDE.getLogger().debug("DBRetrieve.getLetztesBWAttribut() :: " + bwkennung + ", " + BWINFTYP);
@@ -486,18 +475,19 @@ public class DBRetrieve {
     }
 
     /**
-     * Diese Methode ermittelt die freien Zeiträume aus Tabellen mit historisierten Daten (in der Regel mit "Von","Bis" Spalten). Dabei werden die einzelnen Zeiträume
+     * Diese Methode ermittelt die freien ZeitrÃ¤ume aus Tabellen mit historisierten Daten (in der Regel mit "Von","Bis" Spalten). Dabei werden die einzelnen ZeitrÃ¤ume
      * der Reihe nach durchgegangen und jeweils nur dann ein freier Zeitraum dazwischen ermittelt, wenn mindestens ein
      * Tag <i>Platz</i> dazwischen ist.
      * <p/>
+     *
      * @param table Name der Datenbanktabelle
-     * @param from Name der Date Spalte, die die Information zum Beginn des Intervalls enthält.
-     * @param to Name der Date Spalte, die die Information zum Ende des Intervalls enthält.
-     * @param where String mit der Where Bedingung zur Filterung des Datensätze.
-     * @param mode hier kann man bestimmen, wie die Zeiträume ermittelt werden sollen. Es können die Konstanten MODE_INTERVAL_OVERLAP, MODE_INTERVAL_DISJUNCTIVE,
-     * MODE_INTERVAL_NOCONSTRAINTS verwendet werden. Bei Overlap überlappen die Zeiträume um genau einen Tag. Bei Disjunctive gibt es keine Überlappung, bei noConstraints ist der
-     * freie Zeitraum <b>immer</b> VAA - BAW.
-     * @return ArrayList mit den Lücken in den Zeiträumen. Die Zeiträumen beginnen mit SYSConst.VON_ANFANG_AN und enden mit SYSConst.BIS_AUF_WEITERES. NULL bei Fehler.
+     * @param from  Name der Date Spalte, die die Information zum Beginn des Intervalls enthÃ¤lt.
+     * @param to    Name der Date Spalte, die die Information zum Ende des Intervalls enthÃ¤lt.
+     * @param where String mit der Where Bedingung zur Filterung des DatensÃ¤tze.
+     * @param mode  hier kann man bestimmen, wie die ZeitrÃ¤ume ermittelt werden sollen. Es kÃ¶nnen die Konstanten MODE_INTERVAL_OVERLAP, MODE_INTERVAL_DISJUNCTIVE,
+     *              MODE_INTERVAL_NOCONSTRAINTS verwendet werden. Bei Overlap Ã¼berlappen die ZeitrÃ¤ume um genau einen Tag. Bei Disjunctive gibt es keine Ãœberlappung, bei noConstraints ist der
+     *              freie Zeitraum <b>immer</b> VAA - BAW.
+     * @return ArrayList mit den LÃ¼cken in den ZeitrÃ¤umen. Die ZeitrÃ¤umen beginnen mit SYSConst.VON_ANFANG_AN und enden mit SYSConst.BIS_AUF_WEITERES. NULL bei Fehler.
      */
     public static ArrayList getFreeIntervals(String table, String from, String to, String where, int mode) {
         ArrayList result = null;
@@ -524,17 +514,18 @@ public class DBRetrieve {
     }
 
     /**
-     * Diese Methode ermittelt die freien Zeiträume aus Tabellen mit historisierten Daten (in der Regel mit "Von","Bis" Spalten). 
-     * Diese Version der Routine ermittelt freie Zeiträume in Tabellen, bei denen die Von und Bis Spalten Datetimes sind. Also
-     * Datum und Uhrzeiten enthalten. 
+     * Diese Methode ermittelt die freien ZeitrÃ¤ume aus Tabellen mit historisierten Daten (in der Regel mit "Von","Bis" Spalten).
+     * Diese Version der Routine ermittelt freie ZeitrÃ¤ume in Tabellen, bei denen die Von und Bis Spalten Datetimes sind. Also
+     * Datum und Uhrzeiten enthalten.
      * <p/>
+     *
      * @param table Name der Datenbanktabelle
-     * @param from Name der Date Spalte, die die Information zum Beginn des Intervalls enthält.
-     * @param to Name der Date Spalte, die die Information zum Ende des Intervalls enthält.
-     * @param where String mit der Where Bedingung zur Filterung des Datensätze.
-     * @return ArrayList mit den Lücken in den Zeiträumen. Die Zeiträume beginnen mit SYSConst.DATE_VON_ANFANG_AN und 
-     * enden mit SYSConst.DATE_BIS_AUF_WEITERES. NULL bei Fehler. Somit stehen in der ArrayList immer Paare von java.util.Date.
-     * Beispiel: [(VAA),(2007-12-31 23:59:59),(2008-02-02 00:00:00),(BAW)]
+     * @param from  Name der Date Spalte, die die Information zum Beginn des Intervalls enthÃ¤lt.
+     * @param to    Name der Date Spalte, die die Information zum Ende des Intervalls enthÃ¤lt.
+     * @param where String mit der Where Bedingung zur Filterung des DatensÃ¤tze.
+     * @return ArrayList mit den LÃ¼cken in den ZeitrÃ¤umen. Die ZeitrÃ¤ume beginnen mit SYSConst.DATE_VON_ANFANG_AN und
+     *         enden mit SYSConst.DATE_BIS_AUF_WEITERES. NULL bei Fehler. Somit stehen in der ArrayList immer Paare von java.util.Date.
+     *         Beispiel: [(VAA),(2007-12-31 23:59:59),(2008-02-02 00:00:00),(BAW)]
      */
     public static ArrayList getFreeIntervals(String table, String from, String to, String where) {
         ArrayList result = new ArrayList();
@@ -551,30 +542,30 @@ public class DBRetrieve {
                     // Also unmittelbar nach "Bis".
                     von = SYSCalendar.addField(rs.getTimestamp(to), 1, GregorianCalendar.SECOND);
                 } else {
-                    // Wenn nicht, dann schieben wir den DB-Pointer wieder zurück,
+                    // Wenn nicht, dann schieben wir den DB-Pointer wieder zurÃ¼ck,
                     rs.beforeFirst();
                 }
 
                 while (rs.next()) {
                     Date bis = SYSCalendar.addField(rs.getTimestamp(from), -1, GregorianCalendar.SECOND);
                     if (bis.after(von)) {
-                        // Dieses if schließt aus, dass bei direkt aneinanderliegenden belegten Zeiträumen
+                        // Dieses if schlieÃŸt aus, dass bei direkt aneinanderliegenden belegten ZeitrÃ¤umen
                         // ein freier ermittelt wird, der gar nicht da ist.
                         Date[] date = {von, bis};
                         result.add(date);
                     }
 
-                    // Hier beginnt schon die Vorbereitung für den nächsten Datensatz.
+                    // Hier beginnt schon die Vorbereitung fÃ¼r den nÃ¤chsten Datensatz.
                     von = rs.getTimestamp(to);
                     if (von.before(SYSConst.DATE_BIS_AUF_WEITERES)) {
                         von = SYSCalendar.addField(von, +1, GregorianCalendar.SECOND);
                     }
                 }
 
-                // Massnahmen für das abschließende Intervall, dass evtl. mit BAW endet.
+                // Massnahmen fÃ¼r das abschlieÃŸende Intervall, dass evtl. mit BAW endet.
                 Date[] date = (Date[]) result.get(result.size() - 1); // Letzten Eintrag nochmal holen.
                 if (!date[1].equals(SYSConst.DATE_BIS_AUF_WEITERES)) {// Endet der mit BIS_AUF_WEITERES ??
-                    // Nicht, dann hängen wir noch das abschließende Intervall an
+                    // Nicht, dann hÃ¤ngen wir noch das abschlieÃŸende Intervall an
                     Date[] lastInterval = {von, SYSConst.DATE_BIS_AUF_WEITERES};
                     result.add(lastInterval);
                 }
@@ -599,15 +590,15 @@ public class DBRetrieve {
                 Date[] intervall = (Date[]) it.next();
                 Date fromInt = intervall[0];
                 Date toInt = intervall[1];
-                // Warum wird hier die Overlap Version genommen. Es könnte ja auch ein disjunctive Attribut sein ?
-                // Ganz einfach. Die zu prüfenden Zeiträume wurden gemäß der Interval Art ausgewählt. Das heisst,
+                // Warum wird hier die Overlap Version genommen. Es kÃ¶nnte ja auch ein disjunctive Attribut sein ?
+                // Ganz einfach. Die zu prÃ¼fenden ZeitrÃ¤ume wurden gemÃ¤ÃŸ der Interval Art ausgewÃ¤hlt. Das heisst,
                 // ob es ein disjunctive Attribut oder ein Overlap Attribut ist spielt keine Rolle. Die Liste der freien
-                // Zeiträume wurde entsprechend erstellt. Sie berücksichtigt also schon ob disjunctive oder overlap.
-                // Die Zeitraumkontrolle selbst muss immer die Ränder miteinbeziehen. Daher betweenOverlap().
+                // ZeitrÃ¤ume wurde entsprechend erstellt. Sie berÃ¼cksichtigt also schon ob disjunctive oder overlap.
+                // Die Zeitraumkontrolle selbst muss immer die RÃ¤nder miteinbeziehen. Daher betweenOverlap().
                 yes = SYSCalendar.betweenOverlap(fromInt, toInt, from, to);
             }
         }
-        // Leere freeIntervals führen immer zu einem TRUE als Rückgabewert.
+        // Leere freeIntervals fÃ¼hren immer zu einem TRUE als RÃ¼ckgabewert.
         return yes;
     }
 
@@ -626,14 +617,14 @@ public class DBRetrieve {
                     // Also einen Tag nach "to".
                     von = SYSCalendar.addDate(rs.getDate(to), +1);
                 } else {
-                    // Wenn nicht, dann schieben wir den Pointer wieder zurück,
+                    // Wenn nicht, dann schieben wir den Pointer wieder zurÃ¼ck,
                     rs.beforeFirst();
                 }
 
                 while (rs.next()) {
                     Date bis = SYSCalendar.addDate(rs.getDate(from), -1);
                     if (bis.after(von)) {
-                        // Dieses if schließt aus, dass bei direkt aneinanderliegenden belegten Zeiträumen
+                        // Dieses if schlieÃŸt aus, dass bei direkt aneinanderliegenden belegten ZeitrÃ¤umen
                         // ein freier ermittelt wird, der gar nicht da ist.
                         Date[] date = {von, bis};
                         result.add(date);
@@ -641,8 +632,8 @@ public class DBRetrieve {
                         OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(bis));
                     }
 
-                    // Hier beginnt schon die Vorbereitung für den nächsten Datensatz.
-                    // Sollten die Zeiträume noch nicht mit BAW enden, dann rechnen wir einen Tag drauf.
+                    // Hier beginnt schon die Vorbereitung fÃ¼r den nÃ¤chsten Datensatz.
+                    // Sollten die ZeitrÃ¤ume noch nicht mit BAW enden, dann rechnen wir einen Tag drauf.
                     // Da das ResultSet sortiert ist, kann das nur beim letzten Record auftreten.
                     von = rs.getDate(to);
                     if (von.before(SYSConst.DATE_BIS_AUF_WEITERES)) {
@@ -651,13 +642,13 @@ public class DBRetrieve {
                         // Ist das Ende nach hinten offen, dann beginnt der neue freie Zeitraum
                         // einen Tag nach dem Von des aktuell belegten Zeitraums
                         // also belegt: 4.5.2007 - baw
-                        // dann möglich zu belegen 5.5.2007 - baw
+                        // dann mÃ¶glich zu belegen 5.5.2007 - baw
                         von = SYSCalendar.addDate(rs.getDate(from), +1);
                     }
                 }
                 Date[] date = (Date[]) result.get(result.size() - 1); // Letzten Eintrag nochmal holen.
                 if (!date[1].equals(SYSConst.DATE_BIS_AUF_WEITERES)) {// Endet der mit BIS_AUF_WEITERES ??
-                    // Nicht, dann hängen wir noch das abschließende Intervall an
+                    // Nicht, dann hÃ¤ngen wir noch das abschlieÃŸende Intervall an
                     Date[] lastInterval = {von, SYSConst.DATE_BIS_AUF_WEITERES};
                     result.add(lastInterval);
                     OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(von));
@@ -692,14 +683,14 @@ public class DBRetrieve {
                     // Also einen Tag nach "to".
                     von = rs.getDate(to);
                 } else {
-                    // Wenn nicht, dann schieben wir den Pointer wieder zurück,
+                    // Wenn nicht, dann schieben wir den Pointer wieder zurÃ¼ck,
                     rs.beforeFirst();
                 }
 
                 while (rs.next()) {
                     Date bis = rs.getDate(from);
                     if (bis.after(von)) {
-                        // Dieses if schließt aus, dass bei direkt aneinanderliegenden belegten Zeiträumen
+                        // Dieses if schlieÃŸt aus, dass bei direkt aneinanderliegenden belegten ZeitrÃ¤umen
                         // ein freier ermittelt wird, der gar nicht da ist.
                         Date[] date = {von, bis};
                         result.add(date);
@@ -707,14 +698,14 @@ public class DBRetrieve {
                         OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(bis));
                     }
 
-                    // Hier beginnt schon die Vorbereitung für den nächsten Datensatz.
-                    // Sollten die Zeiträume noch nicht mit BAW enden, dann rechnen wir einen Tag drauf.
+                    // Hier beginnt schon die Vorbereitung fÃ¼r den nÃ¤chsten Datensatz.
+                    // Sollten die ZeitrÃ¤ume noch nicht mit BAW enden, dann rechnen wir einen Tag drauf.
                     // Da das ResultSet sortiert ist, kann das nur beim letzten Record auftreten.
                     if (SYSCalendar.sameDay(rs.getDate(to), SYSConst.DATE_BIS_AUF_WEITERES) == 0) {
                         // Ist das Ende nach hinten offen, dann beginnt der neue freie Zeitraum
                         // einen Tag nach dem Von des aktuell belegten Zeitraums
                         // also belegt: 4.5.2007 - baw
-                        // dann möglich zu belegen 5.5.2007 - baw
+                        // dann mÃ¶glich zu belegen 5.5.2007 - baw
                         von = SYSCalendar.addDate(rs.getDate(from), +1);
                     } else {
                         von = rs.getDate(to); // der potentielle neue Zeitraum beginnt mit dem Ende des bisherigen Zeitraums.
@@ -722,7 +713,7 @@ public class DBRetrieve {
                 }
                 Date[] date = (Date[]) result.get(result.size() - 1); // Letzten Eintrag nochmal holen.
                 if (SYSCalendar.sameDay(date[1], (SYSConst.DATE_BIS_AUF_WEITERES)) != 0) {// Endet der mit BIS_AUF_WEITERES ??
-                    // Nicht, dann hängen wir noch das abschließende Intervall an
+                    // Nicht, dann hÃ¤ngen wir noch das abschlieÃŸende Intervall an
                     Date[] lastInterval = {von, SYSConst.DATE_BIS_AUF_WEITERES};
                     result.add(lastInterval);
                     OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(von));
@@ -754,7 +745,7 @@ public class DBRetrieve {
      * Diese Methode berechnet zu einem PrimaryKey eines bekannten Zeitraums den Inhalt des vorhergehenden oder nachfolgenden Zeitraums aus der
      * BWInfo Tabelle.
      *
-     * @param pk des gegebenen Zeitraums.
+     * @param pk    des gegebenen Zeitraums.
      * @param true, wenn der vorhergehenden Zeitraum gesucht wird. false, wenn der nachfolgende gesucht wird.
      * @return Eine Liste mit den Daten des Zeitraums (long BWINFOID, Date von, Date bis, String xml). Null, wenn des keinen vorhergehenden Zeitraum gab oder bei Exception
      */
@@ -822,7 +813,6 @@ public class DBRetrieve {
 
     /**
      * @return Eine ArrayList mit folgendem Inhalt (Zubereitung, AnwEinheit, PackEinheit, AnwText)
-     *
      */
     public static ArrayList getMPForm(long formid) {
         ArrayList result = null;
@@ -887,6 +877,7 @@ public class DBRetrieve {
 
     /**
      * Ermittelt den echten Benutzernamen zu einer UKennung
+     *
      * @param ukennung
      * @return Realname
      */
@@ -908,7 +899,7 @@ public class DBRetrieve {
     }
 
     /**
-     * Gibt direkt eine HTML Beschreibung für eine bestimmte LoginID zurück.
+     * Gibt direkt eine HTML Beschreibung fÃ¼r eine bestimmte LoginID zurÃ¼ck.
      */
     public static String identifyUser(long OCLoginID) {
         String sql = " SELECT l.HOST, l.Login, p.V, l.UKennung " +

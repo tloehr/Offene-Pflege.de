@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,59 +26,35 @@
  */
 package op.care.planung;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Vector;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import op.OPDE;
+import op.care.planung.massnahmen.DlgNode;
+import op.care.planung.massnahmen.ParserMassnahmen;
+import op.care.planung.massnahmen.RNDMassTree;
+import op.care.planung.massnahmen.Tools;
+import op.tools.*;
+import op.tools.DBHandling;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import op.OPDE;
-import op.care.planung.massnahmen.DlgNode;
-import op.care.planung.massnahmen.ParserMassnahmen;
-import op.care.planung.massnahmen.RNDMassTree;
-import op.care.planung.massnahmen.Tools;
-import op.tools.CheckTreeManager;
-import op.tools.CheckTreeSelectionModel;
-import op.tools.ListElement;
-import op.tools.DBHandling;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.JDCPropertyChangeListener;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
- *
- * @author  tloehr
+ * @author tloehr
  */
 public class DlgTermin extends javax.swing.JDialog {
 
@@ -100,7 +76,7 @@ public class DlgTermin extends javax.swing.JDialog {
 
 
 //    /**
-//     * für Änderungen
+//     * fÃ¼r Ã„nderungen
 //     *
 //     */
 //    public DlgTermin(java.awt.Frame parent, ArrayList termid, long tmp, boolean group) {
@@ -145,7 +121,7 @@ public class DlgTermin extends javax.swing.JDialog {
         //long termid0 = ((Long) termid.get(0)).longValue();
         initData();
 
-        this.setTitle(SYSTools.getWindowTitle("Details für Massnahme(n)"));
+        this.setTitle(SYSTools.getWindowTitle("Details fÃ¼r Massnahme(n)"));
 
         int selectIndex = 0;
 
@@ -243,7 +219,7 @@ public class DlgTermin extends javax.swing.JDialog {
         jdcLDatum.getDateEditor().addPropertyChangeListener(jdcpcl);
 
         if (group) {
-            txtBemerkung.setText("Gruppenmassnahme. Keine Bemerkung möglich.");
+            txtBemerkung.setText("Gruppenmassnahme. Keine Bemerkung mÃ¶glich.");
         } else {
             String text = "";
             if (template.get("Bemerkung") != null) {
@@ -345,7 +321,8 @@ public class DlgTermin extends javax.swing.JDialog {
         }
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -425,12 +402,12 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 100, Short.MAX_VALUE)
+                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(0, 100, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 100, Short.MAX_VALUE)
+                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(0, 100, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -442,7 +419,7 @@ public class DlgTermin extends javax.swing.JDialog {
             }
         });
 
-        pnlRegular.setBorder(javax.swing.BorderFactory.createTitledBorder("Häufigkeit der Anwendung"));
+        pnlRegular.setBorder(javax.swing.BorderFactory.createTitledBorder("HÃ¤ufigkeit der Anwendung"));
 
         jLabel1.setForeground(new java.awt.Color(0, 0, 204));
         jLabel1.setText("Morgens:");
@@ -453,7 +430,7 @@ public class DlgTermin extends javax.swing.JDialog {
         jLabel3.setForeground(new java.awt.Color(255, 0, 51));
         jLabel3.setText("Abends:");
 
-        jLabel4.setText("Nacht, spät abends:");
+        jLabel4.setText("Nacht, spÃ¤t abends:");
 
         jLabel5.setText("Anzahl");
 
@@ -492,9 +469,9 @@ public class DlgTermin extends javax.swing.JDialog {
             }
         });
 
-        jLabel6.setText("Nachts, früh morgens:");
+        jLabel6.setText("Nachts, frÃ¼h morgens:");
 
-        cmbUhrzeit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "10:00", "10:15", "10:30", "10:45" }));
+        cmbUhrzeit.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"10:00", "10:15", "10:30", "10:45"}));
         cmbUhrzeit.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbUhrzeitItemStateChanged(evt);
@@ -544,90 +521,90 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout pnlRegularLayout = new org.jdesktop.layout.GroupLayout(pnlRegular);
         pnlRegular.setLayout(pnlRegularLayout);
         pnlRegularLayout.setHorizontalGroup(
-            pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlRegularLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pnlRegularLayout.createSequentialGroup()
-                        .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel1)
-                            .add(jLabel2)
-                            .add(jLabel6)
-                            .add(jLabel11)
-                            .add(jLabel3)
-                            .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                .add(org.jdesktop.layout.GroupLayout.LEADING, cmbUhrzeit, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .add(8, 8, 8)
-                        .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(spinUhrzeit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(spinNachtAb, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(spinAbends, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(spinNachmittags, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(spinMittags, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(spinMorgens, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(spinNachtMo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel5))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(lblEin2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(lblEin1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .add(cbErforderlich))
-                .addContainerGap())
+                pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(pnlRegularLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(pnlRegularLayout.createSequentialGroup()
+                                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(jLabel1)
+                                                        .add(jLabel2)
+                                                        .add(jLabel6)
+                                                        .add(jLabel11)
+                                                        .add(jLabel3)
+                                                        .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                                                .add(org.jdesktop.layout.GroupLayout.LEADING, cmbUhrzeit, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                                .add(8, 8, 8)
+                                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(spinUhrzeit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(spinNachtAb, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(spinAbends, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(spinNachmittags, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(spinMittags, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(spinMorgens, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(spinNachtMo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel5))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblEin4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .add(lblEin2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .add(lblEin1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .add(cbErforderlich))
+                                .addContainerGap())
         );
         pnlRegularLayout.setVerticalGroup(
-            pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlRegularLayout.createSequentialGroup()
-                .add(jLabel5)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel6)
-                    .add(spinNachtMo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin1))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(spinMorgens, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin2))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
-                    .add(spinMittags, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin3))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel11)
-                    .add(spinNachmittags, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin4))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(spinAbends, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin5))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel4)
-                    .add(spinNachtAb, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin6))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cmbUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(spinUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblEin7))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(cbErforderlich)
-                .addContainerGap(17, Short.MAX_VALUE))
+                pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(pnlRegularLayout.createSequentialGroup()
+                                .add(jLabel5)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel6)
+                                        .add(spinNachtMo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin1))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel1)
+                                        .add(spinMorgens, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin2))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel2)
+                                        .add(spinMittags, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin3))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel11)
+                                        .add(spinNachmittags, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin4))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel3)
+                                        .add(spinAbends, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin5))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel4)
+                                        .add(spinNachtAb, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin6))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(cmbUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(spinUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblEin7))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(cbErforderlich)
+                                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pnlWdh.setBorder(javax.swing.BorderFactory.createTitledBorder("Wiederholungen"));
 
         bgWdh.add(rbTag);
-        rbTag.setText("täglich alle");
+        rbTag.setText("tÃ¤glich alle");
         rbTag.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         rbTag.setMargin(new java.awt.Insets(0, 0, 0, 0));
         rbTag.addActionListener(new java.awt.event.ActionListener() {
@@ -637,7 +614,7 @@ public class DlgTermin extends javax.swing.JDialog {
         });
 
         bgWdh.add(rbWoche);
-        rbWoche.setText("wöchentlich alle");
+        rbWoche.setText("wÃ¶chentlich alle");
         rbWoche.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         rbWoche.setMargin(new java.awt.Insets(0, 0, 0, 0));
         rbWoche.addActionListener(new java.awt.event.ActionListener() {
@@ -747,7 +724,7 @@ public class DlgTermin extends javax.swing.JDialog {
             }
         });
 
-        cmbWTag.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" }));
+        cmbWTag.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"}));
         cmbWTag.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbWTagItemStateChanged(evt);
@@ -791,113 +768,113 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout pnlWdhLayout = new org.jdesktop.layout.GroupLayout(pnlWdh);
         pnlWdh.setLayout(pnlWdhLayout);
         pnlWdhLayout.setHorizontalGroup(
-            pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlWdhLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(sep1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
-                    .add(pnlWdhLayout.createSequentialGroup()
-                        .add(rbTag)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(spinTaeglich, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel7))
-                    .add(pnlWdhLayout.createSequentialGroup()
-                        .add(rbWoche)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(spinWoche, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel8))
-                    .add(pnlWdhLayout.createSequentialGroup()
-                        .add(17, 17, 17)
-                        .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(pnlWdhLayout.createSequentialGroup()
-                                .add(cbFre)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(cbSam)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(cbSon))
-                            .add(pnlWdhLayout.createSequentialGroup()
-                                .add(cbMon)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(cbDie)
-                                .add(16, 16, 16)
-                                .add(cbMit)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(cbDon))))
-                    .add(pnlWdhLayout.createSequentialGroup()
-                        .add(17, 17, 17)
-                        .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(pnlWdhLayout.createSequentialGroup()
-                                .add(rbMonatTag)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(spinMonatTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(pnlWdhLayout.createSequentialGroup()
-                                .add(rbMonatWTag)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(spinMonatWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .add(20, 20, 20)
-                        .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel10)
-                            .add(cmbWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(pnlWdhLayout.createSequentialGroup()
-                        .add(rbMonat)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(spinMonat, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel9))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlWdhLayout.createSequentialGroup()
-                        .add(lblLDatum)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jdcLDatum, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)))
-                .addContainerGap())
+                pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(pnlWdhLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(sep1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                .add(rbTag)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(spinTaeglich, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel7))
+                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                .add(rbWoche)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(spinWoche, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel8))
+                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                .add(17, 17, 17)
+                                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                                .add(cbFre)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(cbSam)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(cbSon))
+                                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                                .add(cbMon)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(cbDie)
+                                                                .add(16, 16, 16)
+                                                                .add(cbMit)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(cbDon))))
+                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                .add(17, 17, 17)
+                                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                                .add(rbMonatTag)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(spinMonatTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                                .add(rbMonatWTag)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(spinMonatWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                                .add(20, 20, 20)
+                                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(jLabel10)
+                                                        .add(cmbWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                        .add(pnlWdhLayout.createSequentialGroup()
+                                                .add(rbMonat)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(spinMonat, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel9))
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlWdhLayout.createSequentialGroup()
+                                                .add(lblLDatum)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jdcLDatum, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         pnlWdhLayout.setVerticalGroup(
-            pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlWdhLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(rbTag)
-                    .add(spinTaeglich, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel7))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(rbWoche)
-                    .add(spinWoche, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel8))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cbMon)
-                    .add(cbDie)
-                    .add(cbMit)
-                    .add(cbDon))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cbFre)
-                    .add(cbSam)
-                    .add(cbSon))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(rbMonat)
-                    .add(jLabel9)
-                    .add(spinMonat, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(rbMonatTag)
-                    .add(spinMonatTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel10))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(rbMonatWTag)
-                    .add(spinMonatWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(cmbWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sep1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 21, Short.MAX_VALUE)
-                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jdcLDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblLDatum))
-                .addContainerGap())
+                pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(pnlWdhLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(rbTag)
+                                        .add(spinTaeglich, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel7))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(rbWoche)
+                                        .add(spinWoche, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel8))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(cbMon)
+                                        .add(cbDie)
+                                        .add(cbMit)
+                                        .add(cbDon))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(cbFre)
+                                        .add(cbSam)
+                                        .add(cbSon))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(rbMonat)
+                                        .add(jLabel9)
+                                        .add(spinMonat, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(rbMonatTag)
+                                        .add(spinMonatTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel10))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(rbMonatWTag)
+                                        .add(spinMonatWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(cmbWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(sep1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 21, Short.MAX_VALUE)
+                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(jdcLDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(lblLDatum))
+                                .addContainerGap())
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Kommentar zur Anwendung (Erscheint im DFN)"));
@@ -909,46 +886,46 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel1Layout.createSequentialGroup()
+                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout pnlTerminLayout = new org.jdesktop.layout.GroupLayout(pnlTermin);
         pnlTermin.setLayout(pnlTerminLayout);
         pnlTerminLayout.setHorizontalGroup(
-            pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlTerminLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlTerminLayout.createSequentialGroup()
-                        .add(pnlRegular, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pnlWdh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(pnlTerminLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlTerminLayout.createSequentialGroup()
+                                                .add(pnlRegular, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(pnlWdh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap())
         );
         pnlTerminLayout.setVerticalGroup(
-            pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlTerminLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pnlWdh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(pnlRegular, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(9, 9, 9)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(pnlTerminLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(pnlTerminLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(pnlWdh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(pnlRegular, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .add(9, 9, 9)
+                                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
-        pnlRegular.getAccessibleContext().setAccessibleName("Häufigkeit");
+        pnlRegular.getAccessibleContext().setAccessibleName("HÃ¤ufigkeit");
 
         jtpMain.addTab("Termine", pnlTermin);
 
@@ -973,30 +950,30 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 651, Short.MAX_VALUE)
-                    .add(jPanel3Layout.createSequentialGroup()
-                        .add(jLabel12)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(txtDauer, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 178, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel13)))
-                .addContainerGap())
+                jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 651, Short.MAX_VALUE)
+                                        .add(jPanel3Layout.createSequentialGroup()
+                                                .add(jLabel12)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(txtDauer, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 178, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel13)))
+                                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel12)
-                    .add(txtDauer, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel13))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(jLabel12)
+                                        .add(txtDauer, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel13))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         jtpMain.addTab("Aufwand", jPanel3);
@@ -1020,22 +997,22 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(btnSave)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(btnDiscard)
-                .addContainerGap())
+                jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel4Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(btnSave)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(btnDiscard)
+                                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(btnDiscard)
-                    .add(btnSave))
-                .addContainerGap())
+                jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel4Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(btnDiscard)
+                                        .add(btnSave))
+                                .addContainerGap())
         );
 
         lblMassnahme.setFont(new java.awt.Font("Dialog", 1, 14));
@@ -1045,31 +1022,32 @@ public class DlgTermin extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jtpMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
-                            .add(lblMassnahme, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE))
-                        .add(12, 12, 12))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(layout.createSequentialGroup()
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                                        .add(jtpMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
+                                                        .add(lblMassnahme, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE))
+                                                .add(12, 12, 12))
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lblMassnahme)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jtpMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(lblMassnahme)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jtpMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-714)/2, (screenSize.height-633)/2, 714, 633);
+        setBounds((screenSize.width - 714) / 2, (screenSize.height - 633) / 2, 714, 633);
     }// </editor-fold>//GEN-END:initComponents
+
     private void spinNachtMoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_spinNachtMoFocusGained
         SYSTools.markAllTxt(((JSpinner.DefaultEditor) spinNachtMo.getEditor()).getTextField());
     }//GEN-LAST:event_spinNachtMoFocusGained
@@ -1150,7 +1128,7 @@ public class DlgTermin extends javax.swing.JDialog {
         spinAbends.setValue(0);
         spinNachtAb.setValue(0);
         if (cmbUhrzeit.getSelectedIndex() == -1) {
-            // cmbUhrzeit auf die nächste volle Stunde ab JETZT setzen.
+            // cmbUhrzeit auf die nÃ¤chste volle Stunde ab JETZT setzen.
             GregorianCalendar gc = new GregorianCalendar();
             gc.add(GregorianCalendar.HOUR, 1);
             gc.set(GregorianCalendar.MINUTE, 0);
@@ -1286,7 +1264,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1305,7 +1283,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1324,7 +1302,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1343,7 +1321,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1362,7 +1340,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1381,7 +1359,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1400,7 +1378,7 @@ public class DlgTermin extends javax.swing.JDialog {
         dummy.setSelected(true);
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            JOptionPane.showMessageDialog(this, "Sie müssen mindestens einen Wochentag angeben.");
+            JOptionPane.showMessageDialog(this, "Sie mÃ¼ssen mindestens einen Wochentag angeben.");
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -1419,7 +1397,7 @@ public class DlgTermin extends javax.swing.JDialog {
 
         if (!rbMonatWTag.isSelected()) {
             rbMonatWTag.doClick();
-        //spinMonatWTag.setValue(1);
+            //spinMonatWTag.setValue(1);
         }
     }//GEN-LAST:event_cmbWTagItemStateChanged
 
@@ -1686,33 +1664,33 @@ public class DlgTermin extends javax.swing.JDialog {
                 final int typ = (Integer) o[ParserMassnahmen.O_TYP];
 
 
-                // Aufbau Kontextmenü
+                // Aufbau KontextmenÃ¼
                 // ==================
                 // (1) Erschwernis / Erleichterung ->  Nummer 1
                 //                                     Nummer 2
                 // ------------------------------------------------------------
                 // Neu  ->  (2) Teilschritt (Nur Unterhalb Vorber... Nachber.. Durchf...)
-                //          (3) Durchführung (nur Unterhalb Root)
+                //          (3) DurchfÃ¼hrung (nur Unterhalb Root)
                 //          (4) Erschwernis / Erleichterung
                 // Bearbeiten -> (5) (je nachdem, was markiert ist, nicht bei ROOT)
                 //               (6)   Erschwernis / Erleichterung Nummer 1 (NUR WENN VORHANDEN)
                 //                                                 Nummer 2
-                // Löschen  ->  (7)(je nachdem, was markiert ist)
+                // LÃ¶schen  ->  (7)(je nachdem, was markiert ist)
                 //              (8)    Erschwernis / Erleichterung ->  Nummer 1
                 //                                                     Nummer 2
                 // --------------------------------------------------------------
-                // Baum aus Vorlage zurück setzen (9)
+                // Baum aus Vorlage zurÃ¼ck setzen (9)
                 // Ausschneiden (+ Unterknoten und Modfaktoren)
                 // Kopieren (+ Unterknoten und Modfaktoren)
-                // Einfügen (an markierte Stelle)
+                // EinfÃ¼gen (an markierte Stelle)
 
 
                 // ===
                 // (1)
                 // ===
                 if (mdfs.size() > 0) { // Es gibt also mindestens eine Erleichterung.
-                    // Dann müssen wir ein Untermenü erstellen, die eine Aufstellung aller
-                    // MODFAKTOREN enthält.
+                    // Dann mÃ¼ssen wir ein UntermenÃ¼ erstellen, die eine Aufstellung aller
+                    // MODFAKTOREN enthÃ¤lt.
                     JMenu menumod = new JMenu("Erschwernis/Erleichterung");
 
                     Enumeration e = mdfs.elements();
@@ -1749,7 +1727,7 @@ public class DlgTermin extends javax.swing.JDialog {
                 // (3)
                 // ===
                 if (typ == ParserMassnahmen.TYPE_ROOT) {
-                    JMenuItem item = new JMenuItem("Durchführung");
+                    JMenuItem item = new JMenuItem("DurchfÃ¼hrung");
 
                     final DefaultMutableTreeNode mynode = dmtn;
                     item.addActionListener(new java.awt.event.ActionListener() {
@@ -1761,7 +1739,7 @@ public class DlgTermin extends javax.swing.JDialog {
                                 Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
                                 ListElement le = new ListElement(data[1].toString(), o);
                                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
-                                // Jetzt soll der neue Knoten hinten an den Baum angefügt werden. Jedoch immer VOR der Nachbereitung.
+                                // Jetzt soll der neue Knoten hinten an den Baum angefÃ¼gt werden. Jedoch immer VOR der Nachbereitung.
                                 // Somit:
                                 ((DefaultMutableTreeNode) mynode.getRoot()).insert(node, mynode.getRoot().getChildCount() - 1);
                                 ((DefaultTreeModel) treeMass.getModel()).reload();
@@ -1916,7 +1894,7 @@ public class DlgTermin extends javax.swing.JDialog {
                 // ===
                 // (7)
                 // ===
-                JMenu menudel = new JMenu("Löschen");
+                JMenu menudel = new JMenu("LÃ¶schen");
 
                 final ListElement le4label = (ListElement) dmtn.getUserObject();
                 JMenuItem itemNode = new JMenuItem(le4label.getValue());
@@ -1925,8 +1903,8 @@ public class DlgTermin extends javax.swing.JDialog {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
                         if (mynode.isLeaf() ||
-                                JOptionPane.showConfirmDialog(parent, "Damit wird der ganze Teilbaum gelöscht.\n\nSind Sie sicher ?", le4label.getValue() + " entfernen ??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            // Drei Fälle
+                                JOptionPane.showConfirmDialog(parent, "Damit wird der ganze Teilbaum gelÃ¶scht.\n\nSind Sie sicher ?", le4label.getValue() + " entfernen ??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            // Drei FÃ¤lle
                             if (typ == ParserMassnahmen.TYPE_Teilschritt ||
                                     typ == ParserMassnahmen.TYPE_DF) {
                                 mynode.removeFromParent();
@@ -1979,11 +1957,11 @@ public class DlgTermin extends javax.swing.JDialog {
                 // (9)
                 // ===
                 menu.add(new JSeparator());
-                JMenuItem menurestore = new JMenuItem("Baum auf Ausgangszustand zurücksetzen");
+                JMenuItem menurestore = new JMenuItem("Baum auf Ausgangszustand zurÃ¼cksetzen");
                 menurestore.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Ausgangszustand zurücksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Ausgangszustand zurÃ¼cksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                             createTree(SYSTools.catchNull(template.get("XML")));
                         }
                     }
@@ -1993,11 +1971,11 @@ public class DlgTermin extends javax.swing.JDialog {
                 // ===
                 // (10)
                 // ===
-                JMenuItem menutemplate = new JMenuItem("Baum auf Vorlage zurücksetzen");
+                JMenuItem menutemplate = new JMenuItem("Baum auf Vorlage zurÃ¼cksetzen");
                 menutemplate.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Vorlage zurücksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Vorlage zurÃ¼cksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                             createTree(SYSTools.catchNull(DBRetrieve.getSingleValue("Massnahmen", "XMLT", "MassID", template.get("MassID"))));
                         }
                     }
@@ -2017,12 +1995,12 @@ public class DlgTermin extends javax.swing.JDialog {
                 item.setEnabled(treeMass.getModel().getRoot() == null);
             }
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
-        // Weiter gehts. Bring den Baum bei den Planungen zum laufen
+            // Weiter gehts. Bring den Baum bei den Planungen zum laufen
         }
     }//GEN-LAST:event_treeMassMousePressed
 
     private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
-}//GEN-LAST:event_jtpMainStateChanged
+    }//GEN-LAST:event_jtpMainStateChanged
 
     private void txtDauerCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtDauerCaretUpdate
         if (ignoreEvent) {
@@ -2038,10 +2016,11 @@ public class DlgTermin extends javax.swing.JDialog {
             Double.parseDouble(txtDauer.getText());
             zeitVorhanden = true;
         } catch (NumberFormatException numberFormatException) {
-        zeitVorhanden = false;
+            zeitVorhanden = false;
         }
         btnSave.setEnabled(zeitVorhanden);
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgMonat;
     private javax.swing.ButtonGroup bgWdh;

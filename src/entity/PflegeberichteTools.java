@@ -4,19 +4,19 @@
  */
 package entity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.persistence.Query;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.Query;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- *
  * @author tloehr
  */
 public class PflegeberichteTools {
@@ -54,7 +54,7 @@ public class PflegeberichteTools {
             // Dateien umbiegen
             Iterator<Syspb2file> files = oldBericht.getAttachedFiles().iterator();
             while (files.hasNext()) {
-                // Diesen Umweg muss ich wählen, dass Syspb2file eigentlich
+                // Diesen Umweg muss ich wÃ¤hlen, dass Syspb2file eigentlich
                 // die JOIN Relation einer M:N Rel ist.
                 Syspb2file oldAssignment = files.next();
                 SYSFiles file = oldAssignment.getSysfile();
@@ -87,7 +87,8 @@ public class PflegeberichteTools {
 
     /**
      * liefert eine Kopie eines Berichtes, die noch nicht persistiert wurde. * Somit ist PBID = 0
-     * Gilt nicht für die Mappings.
+     * Gilt nicht fÃ¼r die Mappings.
+     *
      * @param source
      * @return
      */
@@ -126,7 +127,8 @@ public class PflegeberichteTools {
     }
 
     /**
-     * Berichtdarstellung für die Vorgänge.
+     * Berichtdarstellung fÃ¼r die VorgÃ¤nge.
+     *
      * @param bericht
      * @param mitBWKennung
      * @return
@@ -136,7 +138,7 @@ public class PflegeberichteTools {
         String text = SYSTools.replace(bericht.getText(), "\n", "<br/>");
 
         if (mitBWKennung) {
-            html += "<b>Pflegebericht für " + SYSTools.getBWLabel(bericht.getBewohner()) + "</b>";
+            html += "<b>Pflegebericht fÃ¼r " + SYSTools.getBWLabel(bericht.getBewohner()) + "</b>";
         } else {
             html += "<b>Pflegebericht</b>";
         }
@@ -156,7 +158,7 @@ public class PflegeberichteTools {
 
         int num = berichte.size();
         if (num > 0) {
-            html += "<h1>Pflegeberichte für " + SYSTools.getBWLabel(berichte.get(0).getBewohner()) + "</h1>"; // Die Bewohner in dieser Liste sind alle dieselben.
+            html += "<h1>Pflegeberichte fÃ¼r " + SYSTools.getBWLabel(berichte.get(0).getBewohner()) + "</h1>"; // Die Bewohner in dieser Liste sind alle dieselben.
             html += "<table border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th></tr>";
             Iterator<Pflegeberichte> it = berichte.iterator();
@@ -217,7 +219,8 @@ public class PflegeberichteTools {
     }
 
     /**
-     * gibt eine HTML Darstellung des Berichtes zurück.
+     * gibt eine HTML Darstellung des Berichtes zurÃ¼ck.
+     *
      * @return
      */
     public static String getAsHTML(Pflegeberichte bericht) {
@@ -228,13 +231,13 @@ public class PflegeberichteTools {
         DateFormat df = DateFormat.getDateTimeInstance();
         //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
         if (bericht.isDeleted()) {
-            result += "<i>Gelöschter Eintrag. Gelöscht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname() + "</i><br/>";
+            result += "<i>GelÃ¶schter Eintrag. GelÃ¶scht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname() + "</i><br/>";
         }
         if (bericht.isReplacement()) {
             result += "<i>Dies ist ein Eintrag, der nachbearbeitet wurde.<br/>Am/um: " + df.format(bericht.getReplacementFor().getEditpit()) + "<br/>Der Originaleintrag hatte die Bericht-Nummer: " + +bericht.getReplacementFor().getPbid() + "</i><br/>";
         }
         if (bericht.isReplaced()) {
-            result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname() + " vorgenommen.";
+            result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungÃ¼ltig wurde. Bitte ignorieren.<br/>Ã„nderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname() + " vorgenommen.";
             result += "<br/>Der Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid() + "</i><br/>";
         }
         if (!bericht.getAttachedFiles().isEmpty()) {
@@ -256,7 +259,7 @@ public class PflegeberichteTools {
         String result = "";
         DateFormat df = DateFormat.getDateTimeInstance();
         if (bericht.isDeleted()) {
-            result += "Gelöschter Eintrag. Gelöscht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
+            result += "GelÃ¶schter Eintrag. GelÃ¶scht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
             result += "\n=========================\n\n";
         }
         if (bericht.isReplacement()) {
@@ -264,7 +267,7 @@ public class PflegeberichteTools {
             result += "\n=========================\n\n";
         }
         if (bericht.isReplaced()) {
-            result += "Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.\nÄnderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
+            result += "Dies ist ein Eintrag, der durch eine Nachbearbeitung ungÃ¼ltig wurde. Bitte ignorieren.\nÃ„nderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
             result += "\nDer Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid();
             result += "\n=========================\n\n";
         }

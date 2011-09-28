@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  *
- * Teilweise �bernommen aus O'Reilly Java Swing (2002)#
+ * Teilweise übernommen aus O'Reilly Java Swing (2002)#
  * http://www.offene-pflege.de/quellenverzeichnis#JSW2
  *
  *
@@ -187,16 +187,16 @@ public class PnlEditor extends JPanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addComponent(myToolbar, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                layout.createParallelGroup()
+                        .addComponent(myToolbar, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(myToolbar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                    .addGap(18, 18, 18)
-                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(myToolbar, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -259,7 +259,7 @@ public class PnlEditor extends JPanel {
         }
 
         // Query user for a filename and attempt to open and write the text
-        // component’s content to the file.
+        // componentâs content to the file.
         public void actionPerformed(ActionEvent ev) {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(pnl)

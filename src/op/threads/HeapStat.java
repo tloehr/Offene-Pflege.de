@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -27,13 +27,12 @@
 
 package op.threads;
 
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 import op.OPDE;
 import op.tools.SYSTools;
 
+import javax.swing.*;
+
 /**
- *
  * @author tloehr
  */
 public class HeapStat
@@ -41,8 +40,10 @@ public class HeapStat
     private boolean interrupted;
     private JProgressBar jp;
     private JLabel lb;
-    
-    /** Creates a new instance of HeapStat */
+
+    /**
+     * Creates a new instance of HeapStat
+     */
     public HeapStat(JProgressBar p, JLabel l) {
         super();
         this.setName("HeapStat");
@@ -50,32 +51,32 @@ public class HeapStat
         this.jp = p;
         this.lb = l;
     }
-    
+
     public void run() {
-        while (!interrupted){
+        while (!interrupted) {
             // Get current size of heap in bytes
             long heapSize = Runtime.getRuntime().totalMemory();
-            
-            
+
+
             // Get amount of free memory within the heap in bytes. This size will increase
             // after garbage collection and decrease as new objects are created.
             long heapFreeSize = Runtime.getRuntime().freeMemory();
-            long heapUsedSize = heapSize - heapFreeSize;            
+            long heapUsedSize = heapSize - heapFreeSize;
             double mbSize = SYSTools.roundScale2(((double) heapSize) / 1048576);
             double mbUsedSize = SYSTools.roundScale2(((double) heapUsedSize) / 1048576);
             double percentUsed = SYSTools.roundScale2(mbUsedSize / mbSize * 100);
-            String stat = mbUsedSize+"M/"+mbSize+"M ("+percentUsed+"%)";
+            String stat = mbUsedSize + "M/" + mbSize + "M (" + percentUsed + "%)";
             lb.setText(stat);
             jp.setValue((int) percentUsed);
             //OPDE.getLogger().debug("HeapStat running: "+stat);
-            
-            try{
+
+            try {
                 Thread.sleep(5000); // Millisekunden
-            } catch (InterruptedException ie){
+            } catch (InterruptedException ie) {
                 interrupted = true;
                 OPDE.getLogger().debug("HeapStat interrupted!");
             }
         }
     }
-    
+
 }

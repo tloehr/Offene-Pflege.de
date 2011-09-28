@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,19 +26,20 @@
 
 package op.tools;
 
-import entity.SYSHosts;
 import entity.SYSHostsTools;
 import entity.SYSLoginTools;
 import entity.SyslogTools;
 import op.OPDE;
 
 /**
- * 
- * @author  tloehr
+ * @author tloehr
  */
 public class DlgException extends javax.swing.JDialog {
     private Exception exc;
-    /** Creates new form DlgException */
+
+    /**
+     * Creates new form DlgException
+     */
     public DlgException(Exception ex) {
         super(new java.awt.Frame(), true);
         this.exc = ex;
@@ -51,7 +52,7 @@ public class DlgException extends javax.swing.JDialog {
         SyslogTools.error(txtException.getText());
         this.setVisible(true);
     }
-    
+
     /**
      * This method is called from within the constructor to
      * initialize the form.
@@ -84,7 +85,7 @@ public class DlgException extends javax.swing.JDialog {
         lblHeader.setForeground(new java.awt.Color(255, 0, 0));
         lblHeader.setText("Ausnahmezustand");
 
-        jLabel2.setText("Es ist ein Fehler aufgetreten. Bitte verständigen Sie den Administrator.");
+        jLabel2.setText("Es ist ein Fehler aufgetreten. Bitte verstÃ¤ndigen Sie den Administrator.");
 
         txtException.setContentType("text/html");
         txtException.setEditable(false);
@@ -109,45 +110,45 @@ public class DlgException extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, lblHeader, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(btnExit)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnPrint)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnClose)))
-                .addContainerGap())
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblHeader, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+                                        .add(layout.createSequentialGroup()
+                                                .add(btnExit)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnPrint)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnClose)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lblHeader)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(btnExit)
-                    .add(btnPrint)
-                    .add(btnClose))
-                .addContainerGap())
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(lblHeader)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel2)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(btnExit)
+                                        .add(btnPrint)
+                                        .add(btnClose))
+                                .addContainerGap())
         );
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-769)/2, (screenSize.height-490)/2, 769, 490);
+        setBounds((screenSize.width - 769) / 2, (screenSize.height - 490) / 2, 769, 490);
     }// </editor-fold>//GEN-END:initComponents
-    
+
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
         OPDE.fatal("Benutzer hat das Programm nach Exception beendet.");
         SYSHostsTools.shutdown();
@@ -155,18 +156,18 @@ public class DlgException extends javax.swing.JDialog {
         SYSLoginTools.logout();
         System.exit(1);
     }//GEN-LAST:event_btnExitActionPerformed
-    
+
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
 
         SYSPrint.print(this, txtException.getText(), true);
 
     }//GEN-LAST:event_btnPrintActionPerformed
-    
+
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnExit;
@@ -177,30 +178,30 @@ public class DlgException extends javax.swing.JDialog {
     private javax.swing.JLabel lblHeader;
     private javax.swing.JTextPane txtException;
     // End of variables declaration//GEN-END:variables
-    
-    
+
+
     private String getExceptionAsHTML() {
         String html = "";
         StackTraceElement[] stacktrace = exc.getStackTrace();
 
 
-            html += "<h1>Ausnahmezustand aufgetreten</h1>";
-            html += "<h2>"+exc.getClass().getName()+"</h2>";
-            html += "<p>"+exc.getMessage()+"</p>";
-            html += "<table border=\"1\" cellspacing=\"0\"><tr>"
-                    + "<th>Methode</th><th>Zeile</th><th>Klasse</th><th>Datei</th></tr>";
+        html += "<h1>Ausnahmezustand aufgetreten</h1>";
+        html += "<h2>" + exc.getClass().getName() + "</h2>";
+        html += "<p>" + exc.getMessage() + "</p>";
+        html += "<table border=\"1\" cellspacing=\"0\"><tr>"
+                + "<th>Methode</th><th>Zeile</th><th>Klasse</th><th>Datei</th></tr>";
 
 
-            for (int exception = 0; exception < stacktrace.length; exception++ ){
-                StackTraceElement element = stacktrace[exception];
-                html += "<tr>";
-                html += "<td>" + element.getMethodName() + "</td>";
-                html += "<td>" + element.getLineNumber() + "</td>";
-                html += "<td>" + element.getClassName() + "</td>";
-                html += "<td>" + element.getFileName() + "</td>";
-                html += "</tr>";
-            }
-            html += "</table>";
+        for (int exception = 0; exception < stacktrace.length; exception++) {
+            StackTraceElement element = stacktrace[exception];
+            html += "<tr>";
+            html += "<td>" + element.getMethodName() + "</td>";
+            html += "<td>" + element.getLineNumber() + "</td>";
+            html += "<td>" + element.getClassName() + "</td>";
+            html += "<td>" + element.getFileName() + "</td>";
+            html += "</tr>";
+        }
+        html += "</table>";
 
 
 //        html = "<html><head>"

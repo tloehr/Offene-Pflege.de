@@ -5,32 +5,31 @@ package tablerenderer;
 
 import op.tools.SYSConst;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * Diese Klasse implementiert einen Renderer für den JTable mit automatischer Anpassung der Zeilenhöhe.
- * Ich habe die Klasse im Internet gefunden und weitestgehend unverändert übernommen. Vielen Dank an den
- * ursprünglichen Autor.
+ * Diese Klasse implementiert einen Renderer fÃ¼r den JTable mit automatischer Anpassung der ZeilenhÃ¶he.
+ * Ich habe die Klasse im Internet gefunden und weitestgehend unverÃ¤ndert Ã¼bernommen. Vielen Dank an den
+ * ursprÃ¼nglichen Autor.
  * siehe http://www.roseindia.net/javatutorials/JTable_in_JDK.shtml
- * 
  */
 public class RNDTextArea extends JTextArea
         implements TableCellRenderer {
 
     private final DefaultTableCellRenderer adaptee =
             new DefaultTableCellRenderer();
-    /** map from table to map of rows to map of column heights */
+    /**
+     * map from table to map of rows to map of column heights
+     */
     private final Map cellSizes = new HashMap();
     private Color bgcolor;
 
@@ -71,7 +70,7 @@ public class RNDTextArea extends JTextArea
     }
 
     private void addSize(JTable table, int row, int column,
-            int height) {
+                         int height) {
         Map rows = (Map) cellSizes.get(table);
         if (rows == null) {
             cellSizes.put(table, rows = new HashMap());
@@ -114,7 +113,7 @@ public class RNDTextArea extends JTextArea
         }
         int maximum_height = 0;
         for (Iterator it = rowheights.entrySet().iterator();
-                it.hasNext();) {
+             it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             int cellHeight = ((Integer) entry.getValue()).intValue();
             maximum_height = Math.max(maximum_height, cellHeight);

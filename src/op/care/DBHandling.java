@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -29,15 +29,6 @@ package op.care;
 import entity.Bewohner;
 import entity.Einrichtungen;
 import entity.PflegeberichteTools;
-import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import javax.persistence.Query;
 import op.OPDE;
 import op.care.verordnung.TMVerordnung;
 import op.share.bwinfo.BWInfo;
@@ -53,15 +44,24 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.persistence.Query;
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
 /**
- *
  * @author root
  */
 public class DBHandling {
 
     public static String getUeberleitung(Bewohner bewohner, boolean print,
-            boolean mitEinrichtung, boolean medi, boolean bilanz, boolean bericht,
-            boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean bwi) {
+                                         boolean mitEinrichtung, boolean medi, boolean bilanz, boolean bericht,
+                                         boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean bwi) {
 
         String result = "<h1>Pflegeinformationen</h1>";
         String bwkennung = bewohner.getBWKennung();
@@ -76,14 +76,14 @@ public class DBHandling {
         }
 
         if (mitEinrichtung) {
-            if (bewohner.getStation() != null){
+            if (bewohner.getStation() != null) {
                 Einrichtungen einrichtung = bewohner.getStation().getEinrichtung();
                 result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + einrichtung.getBezeichnung() + ", " + einrichtung.getStrasse() + ", " + einrichtung.getPlz() + " " + einrichtung.getOrt() + ", Tel.: " + einrichtung.getTel() + ", Fax.: " + einrichtung.getFax() + "</b></td></tr>";
             }
         }
 
         ArrayList gewicht = op.tools.DBRetrieve.getLetztenBWert(bwkennung, "<GEWICHT/>");
-        result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
+        result += "<tr><td valign=\"top\">Zuletzt bestimmtes KÃ¶rpergewicht</td><td valign=\"top\"><b>";
         if (gewicht == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
@@ -93,9 +93,9 @@ public class DBHandling {
 
 
         ArrayList groesse = op.tools.DBRetrieve.getLetztenBWert(bwkennung, "<GROESSE/>");
-        result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
+        result += "<tr><td valign=\"top\">Zuletzt bestimmte KÃ¶rpergrÃ¶ÃŸe</td><td valign=\"top\"><b>";
         if (groesse == null) {
-            result += "Bisher wurde noch keine Körpergröße ermittelt.";
+            result += "Bisher wurde noch keine KÃ¶rpergrÃ¶ÃŸe ermittelt.";
         } else {
             result += groesse.get(1).toString() + " m (" + SYSCalendar.printGCGermanStyle(SYSCalendar.toGC((Date) groesse.get(0))) + ")";
         }
@@ -139,7 +139,7 @@ public class DBHandling {
                         result += "Die Trinkmenge sollte nicht <b><u>unter</u> " + trinkmin + " ml in 24h</b> liegen.<br/>";
                     }
                     if (maxkontrolle) {
-                        result += "Die Trinkmenge sollte nicht <b><u>über</u> " + trinkmax + " ml in 24h</b> liegen.";
+                        result += "Die Trinkmenge sollte nicht <b><u>Ã¼ber</u> " + trinkmax + " ml in 24h</b> liegen.";
                     }
                     result += "</td></tr>";
                 }
@@ -197,7 +197,7 @@ public class DBHandling {
         BWInfo bwinfo2 = new BWInfo(bwkennung, "ANGEH", SYSCalendar.nowDBDate());
         if (bwinfo2.getAttribute().size() > 0) {
             TMBWInfo tmbwi2 = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
-            result += "<tr><td valign=\"top\">Angehörige</td><td valign=\"top\">";
+            result += "<tr><td valign=\"top\">AngehÃ¶rige</td><td valign=\"top\">";
             result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi2.getValueAt(0, TMBWInfo.COL_HTML).toString()));
             result += "</td></tr>";
         }
@@ -222,7 +222,7 @@ public class DBHandling {
             query.setParameter("bewohner", bewohner);
             query.setParameter("von", SYSCalendar.addDate(new Date(), -7));
             query.setParameter("bis", new Date());
-            
+
             result += PflegeberichteTools.getBerichteAsHTML(query.getResultList());
 
         }
@@ -231,7 +231,7 @@ public class DBHandling {
             boolean hateinfuhren = hatEinfuhren(bwkennung);
             boolean hatausfuhren = hatAusfuhren(bwkennung);
             if (!(hatausfuhren || hateinfuhren)) {
-                result += "<h2>Bilanzierung / Trinkplan gewünscht aber keine Daten vorhanden !</h2>";
+                result += "<h2>Bilanzierung / Trinkplan gewÃ¼nscht aber keine Daten vorhanden !</h2>";
             } else {
                 if (hatAusfuhren(bwkennung)) {
                     try {
@@ -290,7 +290,6 @@ public class DBHandling {
                     } // catch
 
 
-
                 } else if (hatEinfuhren(bwkennung)) {
                     try {
                         result += "<h2>Einfuhrprotokoll</h2><table border=\"1\" cellspacing=\"0\"><tr>"
@@ -335,7 +334,7 @@ public class DBHandling {
             TMBWInfo tmbwi = new TMBWInfo(bwinfo.getAttribute(), true, false, false);
             int numBwi = tmbwi.getRowCount();
             if (numBwi > 0) {
-                result += "<h2>Körperpflege</h2>";
+                result += "<h2>KÃ¶rperpflege</h2>";
                 for (int v = 0; v < numBwi; v++) {
                     result += SYSTools.unHTML2(tmbwi.getValueAt(v, TMBWInfo.COL_HTML).toString());
                     result += "<br/><br/>";
@@ -461,7 +460,7 @@ public class DBHandling {
             result +=
                     "<table border=\"1\" cellspacing=\"0\">";
             result +=
-                    "<tr><th>ICD</th><th>Diagnose</th><th>Körperseite</th><th>Diagnose-Sicherheit</th></tr>";
+                    "<tr><th>ICD</th><th>Diagnose</th><th>KÃ¶rperseite</th><th>Diagnose-Sicherheit</th></tr>";
             for (int v = 0; v
                     < numBwi; v++) {
                 HashMap hm = (HashMap) bwinfo.getAttribute().get(v);
@@ -496,7 +495,7 @@ public class DBHandling {
         int numBwi2 = bwinfo2.getAttribute().size();
 
         if (numBwi1 + numBwi2 > 0) {
-            result += "<h2>Ärzte</h2>";
+            result += "<h2>Ã„rzte</h2>";
             if (numBwi1 > 0) {
                 TMBWInfo tmbwi = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
                 result +=
@@ -532,6 +531,7 @@ public class DBHandling {
         public String getSicherheit() {
             return sicherheit;
         }
+
         private String sicherheit;
         private String seite;
 

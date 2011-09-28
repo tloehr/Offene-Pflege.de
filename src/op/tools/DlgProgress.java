@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -27,16 +27,16 @@
 package op.tools;
 
 
-
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.beans.*;
-import java.util.Random;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class DlgProgress extends JPanel
-                                 implements ActionListener,
-                                            PropertyChangeListener {
+        implements ActionListener,
+        PropertyChangeListener {
 
     private ProgressMonitor progressMonitor;
     private JButton startButton;
@@ -45,7 +45,7 @@ public class DlgProgress extends JPanel
 
     class Task extends SwingWorker<Void, Void> {
         @Override
-        public Void doInBackground() {            
+        public Void doInBackground() {
             int progress = 0;
             setProgress(0);
             try {
@@ -54,7 +54,8 @@ public class DlgProgress extends JPanel
                     Thread.sleep(500);
                     setProgress(Math.min(progress, 100));
                 }
-            } catch (InterruptedException ignore) {}
+            } catch (InterruptedException ignore) {
+            }
             return null;
         }
 
@@ -75,7 +76,7 @@ public class DlgProgress extends JPanel
         startButton.addActionListener(this);
 
         taskOutput = new JTextArea(5, 20);
-        taskOutput.setMargin(new Insets(5,5,5,5));
+        taskOutput.setMargin(new Insets(5, 5, 5, 5));
         taskOutput.setEditable(false);
 
         add(startButton, BorderLayout.PAGE_START);
@@ -90,8 +91,8 @@ public class DlgProgress extends JPanel
      */
     public void actionPerformed(ActionEvent evt) {
         progressMonitor = new ProgressMonitor(DlgProgress.this,
-                                  "Running a Long Task",
-                                  "", 0, 100);
+                "Running a Long Task",
+                "", 0, 100);
         progressMonitor.setProgress(0);
         task = new Task();
         task.addPropertyChangeListener(this);
@@ -103,11 +104,11 @@ public class DlgProgress extends JPanel
      * Invoked when task's progress property changes.
      */
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("progress" == evt.getPropertyName() ) {
+        if ("progress" == evt.getPropertyName()) {
             int progress = (Integer) evt.getNewValue();
             progressMonitor.setProgress(progress);
             String message =
-                String.format("Completed %d%%.\n", progress);
+                    String.format("Completed %d%%.\n", progress);
             progressMonitor.setNote(message);
             taskOutput.append(message);
             if (progressMonitor.isCanceled() || task.isDone()) {

@@ -4,20 +4,20 @@
  */
 package entity;
 
-import java.util.Vector;
-import javax.persistence.Query;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import op.OPDE;
 
+import javax.persistence.Query;
+import javax.swing.*;
+import java.util.Vector;
+
 /**
- *
  * @author tloehr
  */
 public class EinrichtungenTools {
 
     /**
-     * Erstellt eine Textdarstellung der betreffenden Einrichtung. Kann man für Ausdrucke und so brauchen.
+     * Erstellt eine Textdarstellung der betreffenden Einrichtung. Kann man fÃ¼r Ausdrucke und so brauchen.
+     *
      * @param einrichtung
      * @return
      */
@@ -26,7 +26,8 @@ public class EinrichtungenTools {
     }
 
     /**
-     * Setzt eine ComboBox mit der Liste der Einrichtungen. Wenn möglich wird direkt die eigene Einrichtung (abhängig von der Standard-Station) eingestellt.
+     * Setzt eine ComboBox mit der Liste der Einrichtungen. Wenn mÃ¶glich wird direkt die eigene Einrichtung (abhÃ¤ngig von der Standard-Station) eingestellt.
+     *
      * @param cmb
      */
     public static void setComboBox(JComboBox cmb) {

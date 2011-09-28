@@ -4,30 +4,17 @@
  */
 package op.care.berichte;
 
-import entity.Bewohner;
-import entity.Pflegeberichte;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import javax.persistence.Query;
-import op.OPDE;
 import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
+import java.util.Date;
+import java.util.HashMap;
+
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
 
-    
-
- 
 
     public static String getBerichtAsHTML(long tbid) {
         HashMap hm = DBRetrieve.getSingleRecord("Tagesberichte", "TBID", tbid);
@@ -39,12 +26,12 @@ public class DBHandling {
         text = SYSTools.replace(text, "\n", "<br/>");
         if (ekennung.equals("")) {
             if (mitBWKennung) {
-                html += "<b>Pflegebericht für " + SYSTools.getBWLabel(bwkennung) + "</b>";
+                html += "<b>Pflegebericht fÃ¼r " + SYSTools.getBWLabel(bwkennung) + "</b>";
             } else {
                 html += "<b>Pflegebericht</b>";
             }
         } else {
-            html += "<b>Stationsbucheintrag für die Einrichtung '" + ekennung + "'</b>";
+            html += "<b>Stationsbucheintrag fÃ¼r die Einrichtung '" + ekennung + "'</b>";
         }
         String name = DBRetrieve.getUsername(ukennung);
         html += "<p>" + text + "</p>";
@@ -55,7 +42,7 @@ public class DBHandling {
 //    public static String getBerichteAsHTML(TMPflegeberichte tm, Bewohner bewohner, int[] sel) {
 //        String html = "";
 //
-//        html += "<h1>Pflegeberichte für " + SYSTools.getBWLabel(bewohner) + "</h1>";
+//        html += "<h1>Pflegeberichte fÃ¼r " + SYSTools.getBWLabel(bewohner) + "</h1>";
 //
 //        int num = tm.getRowCount();
 //        if (num > 0) {
@@ -88,7 +75,7 @@ public class DBHandling {
 //
 //        String html = "";
 //
-//        html += "<h1>Pflegeberichte für " + SYSTools.getBWLabel(bwkennung) + "</h1>";
+//        html += "<h1>Pflegeberichte fÃ¼r " + SYSTools.getBWLabel(bwkennung) + "</h1>";
 //
 //        int num = tm.getRowCount();
 //        if (num > 0) {

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -27,32 +27,33 @@
 
 package op.care.bhp;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import op.OPDE;
 import op.tools.DlgException;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
- *
  * @author root
  */
 public class DBHandling {
-    
+
     /**
-     * Ermittelt, ob es für eine bestimmte Verordnung heute schon Eintrüge in der BHP gibt.
+     * Ermittelt, ob es fÃ¼r eine bestimmte Verordnung heute schon EintrÃ¼ge in der BHP gibt.
+     *
      * @param VerID
      * @return true, wenn ja. False, wenn nicht.
      */
-    public static boolean isBHPToday(long verid){
+    public static boolean isBHPToday(long verid) {
         boolean result;
-        String sql = 
+        String sql =
                 " SELECT DISTINCT v.VerID " +
-                " FROM BHP p " +
-                " INNER JOIN BHPPlanung pp ON p.BHPPID = pp.BHPPID " +
-                " INNER JOIN BHPVerordnung v ON v.VerID = pp.VerID " +
-                " WHERE v.VerID = ?" +
-                " AND Date(Soll) = Date(now()) ";
+                        " FROM BHP p " +
+                        " INNER JOIN BHPPlanung pp ON p.BHPPID = pp.BHPPID " +
+                        " INNER JOIN BHPVerordnung v ON v.VerID = pp.VerID " +
+                        " WHERE v.VerID = ?" +
+                        " AND Date(Soll) = Date(now()) ";
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, verid);
@@ -62,8 +63,8 @@ public class DBHandling {
             new DlgException(ex);
             result = false;
         }
-        
+
         return result;
     }
-    
+
 }

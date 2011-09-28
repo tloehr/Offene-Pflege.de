@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,8 +28,16 @@
 
 package op.care.med;
 
-import java.awt.Color;
-import java.awt.Component;
+import op.OCSec;
+import op.OPDE;
+import op.care.med.vorrat.DlgBestand;
+import op.care.med.vorrat.DlgVorrat;
+import op.tools.DBHandling;
+import op.tools.*;
+
+import javax.swing.*;
+import javax.swing.tree.*;
+import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,40 +45,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
-import javax.swing.JTree;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreePath;
-import op.OCSec;
-import op.OPDE;
-import op.care.med.vorrat.DlgBestand;
-import op.care.med.vorrat.DlgVorrat;
-import op.tools.ListElement;
-import op.tools.DBHandling;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
- * @author  tloehr
+ * @author tloehr
  */
-public class FrmMed extends javax.swing.JFrame{
+public class FrmMed extends javax.swing.JFrame {
     private final int NODE_DAF = 0;
     private final int NODE_PACKUNG = 1;
     private final int NODE_PRODUKT = 2;
@@ -78,7 +57,7 @@ public class FrmMed extends javax.swing.JFrame{
     private final int NODE_HILFSSTOFF = 4;
     private final int NODE_ORDNER = 5;
     private final int NODE_SONSTSTOFF = 6;
-    
+
     private DefaultTreeModel tree;
     private long medpid;
     private String template;
@@ -86,23 +65,27 @@ public class FrmMed extends javax.swing.JFrame{
     private JPopupMenu menu;
     private JDialog parent;
     private OCSec ocs;
-    
-    /** Creates new form FrmMed */
+
+    /**
+     * Creates new form FrmMed
+     */
     public FrmMed() {
         this.parent = parent;
         this.template = "";
         initDialog();
     }
-    
-    /** Creates new form FrmMed */
+
+    /**
+     * Creates new form FrmMed
+     */
     public FrmMed(String template) {
         //super(parent, true);
         this.parent = parent;
         this.template = template;
         initDialog();
     }
-    
-    private void initDialog(){
+
+    private void initDialog() {
         initComponents();
         ocs = OPDE.getOCSec();
         this.setTitle(SYSTools.getWindowTitle("Medikamentenverwaltung"));
@@ -115,8 +98,9 @@ public class FrmMed extends javax.swing.JFrame{
         SYSTools.center(this);
         setVisible(true);
     }
-    
-    /** This method is called from within the constructor to
+
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -198,18 +182,18 @@ public class FrmMed extends javax.swing.JFrame{
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         jPanel2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -226,9 +210,15 @@ public class FrmMed extends javax.swing.JFrame{
         });
 
         lstPraep.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            String[] strings = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+
+            public int getSize() {
+                return strings.length;
+            }
+
+            public Object getElementAt(int i) {
+                return strings[i];
+            }
         });
         lstPraep.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         lstPraep.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -241,99 +231,99 @@ public class FrmMed extends javax.swing.JFrame{
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtSuche, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(txtSuche, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addContainerGap(678, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 856, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addContainerGap(678, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 856, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
         new DlgVorrat(this);
     }//GEN-LAST:event_btnVorratActionPerformed
-    
+
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
         new DlgBestand(this);
     }//GEN-LAST:event_btnBuchenActionPerformed
-    
+
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
-//String template = ( txtMed.getText().matches("^ß?\\d{7}") ? "" : txtMed.getText());
+//String template = ( txtMed.getText().matches("^ÃŸ?\\d{7}") ? "" : txtMed.getText());
         //new DlgMed(this, template);
         ArrayList result = new ArrayList();
         result.add(txtSuche.getText());
         new DlgMediAssistent(this, result);
-        if (result.size() > 0){
+        if (result.size() > 0) {
             ignoreCaret = true;
             txtSuche.setText(result.get(0).toString());
             ignoreCaret = false;
             txtSucheCaretUpdate(null);
         }
     }//GEN-LAST:event_btnMedActionPerformed
-    
+
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        if (!template.equals("")){
+        if (!template.equals("")) {
             btnNew.doClick();
         }
     }//GEN-LAST:event_formWindowOpened
-    
+
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
         AtomicLong pk = new AtomicLong(0);
         new DlgProdukt(this, pk, template);
         medpid = pk.longValue();
         createTree();
     }//GEN-LAST:event_btnNewActionPerformed
-    
+
     private void lstPraepValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstPraepValueChanged
-        if (!evt.getValueIsAdjusting() && lstPraep.getSelectedValue() != null){
+        if (!evt.getValueIsAdjusting() && lstPraep.getSelectedValue() != null) {
             medpid = ((ListElement) lstPraep.getSelectedValue()).getPk();
             createTree();
         }
     }//GEN-LAST:event_lstPraepValueChanged
-    
+
     private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
         if (ignoreCaret) return;
         treeMed.setCellRenderer(new DefaultTreeCellRenderer());
@@ -344,13 +334,13 @@ public class FrmMed extends javax.swing.JFrame{
         } else {
             HashMap where = new HashMap();
             where.put("Bezeichnung", new Object[]{"%" + txtSuche.getText() + "%", "like"});
-            ResultSet rs = DBRetrieve.getResultSet("MProdukte", new String[]{"MedPID","Bezeichnung"}, where, new String[]{"Bezeichnung"});
+            ResultSet rs = DBRetrieve.getResultSet("MProdukte", new String[]{"MedPID", "Bezeichnung"}, where, new String[]{"Bezeichnung"});
             lstPraep.setModel(SYSTools.rs2lst(rs));
         }
     }//GEN-LAST:event_txtSucheCaretUpdate
-    
+
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
-        if (lstPraep.getModel().getSize() > 0){
+        if (lstPraep.getModel().getSize() > 0) {
             ListElement le = (ListElement) lstPraep.getModel().getElementAt(0);
             if (le != null) {
                 medpid = le.getPk();
@@ -358,11 +348,11 @@ public class FrmMed extends javax.swing.JFrame{
             }
         }
     }//GEN-LAST:event_txtSucheActionPerformed
-    
+
     private void treeMedMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMedMousePressed
         if (medpid == -1) return;
-        if (evt.isPopupTrigger()){
-            // Dieses Popupmenu für den Table
+        if (evt.isPopupTrigger()) {
+            // Dieses Popupmenu fÃ¼r den Table
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
             JMenuItem itemdaf = new JMenuItem("Neue Darreichungsform");
@@ -372,8 +362,8 @@ public class FrmMed extends javax.swing.JFrame{
                 }
             });
             menu.add(itemdaf);
-            
-            if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1){
+
+            if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1) {
                 JMenuItem itemedit = null;
                 JMenuItem itemdelete = null;
                 JMenuItem itemnew = null;
@@ -383,8 +373,8 @@ public class FrmMed extends javax.swing.JFrame{
                 treeMed.setSelectionPath(curPath);
                 final ListElement le = (ListElement) dmtn.getUserObject();
                 int nodetype = ((Integer) le.getObject()).intValue();
-                
-                
+
+
                 if (nodetype == NODE_DAF) {
                     itemedit = new JMenuItem("Bearbeiten");
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
@@ -431,8 +421,9 @@ public class FrmMed extends javax.swing.JFrame{
                         }
                     });
                 }
-                
-                if (itemedit != null || itemdelete != null || itemnew != null) menu.add(new JSeparator(JSeparator.HORIZONTAL));
+
+                if (itemedit != null || itemdelete != null || itemnew != null)
+                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
                 if (itemnew != null) menu.add(itemnew);
                 if (itempack != null) menu.add(itempack);
                 if (itemedit != null) menu.add(itemedit);
@@ -441,36 +432,37 @@ public class FrmMed extends javax.swing.JFrame{
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }//GEN-LAST:event_treeMedMousePressed
-    
+
     private void btnNeuDAF(java.awt.event.ActionEvent evt) {
         DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) tree.getRoot();
         ListElement le = (ListElement) dmtn.getUserObject();
         new DlgDAF(this, le.toString(), le.getPk(), false);
         createTree();
     }
-    
-    
+
+
     private void btnEditDAF(ListElement le) {
         new DlgDAF(this, le.toString(), le.getPk(), true);
         createTree();
     }
-    
+
     private void btnDeleteDAF(ListElement le) {
-        if (JOptionPane.showConfirmDialog(this, "Damit werden auch alle Zuordnungen und Packungen gelöscht.\n\nSind Sie sicher ?", le.toString() +  " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        if (JOptionPane.showConfirmDialog(this, "Damit werden auch alle Zuordnungen und Packungen gelÃ¶scht.\n\nSind Sie sicher ?", le.toString() + " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+            return;
         try {
             // Hier beginnt eine Transaktion
             OPDE.getDb().db.setAutoCommit(false);
             OPDE.getDb().db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             OPDE.getDb().db.commit();
-            
+
             DBHandling.deleteRecords("MPackung", "DafID", le.getPk());
             DBHandling.deleteRecords("MPZusammensetzung", "DafID", le.getPk());
             DBHandling.deleteRecords("MPDarreichung", "DafID", le.getPk());
-            
+
             OPDE.getDb().db.commit();
             OPDE.getDb().db.setAutoCommit(true);
             createTree();
-            
+
         } catch (SQLException ex) {
             try {
                 OPDE.getDb().db.rollback();
@@ -482,38 +474,39 @@ public class FrmMed extends javax.swing.JFrame{
             new DlgException(ex);
             ex.printStackTrace();
         }
-        
+
     }
-    
+
     private void btnDeleteStoff(ListElement le) {
-        if (JOptionPane.showConfirmDialog(this, "Sind Sie sicher ?", le.toString() +  " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        if (JOptionPane.showConfirmDialog(this, "Sind Sie sicher ?", le.toString() + " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+            return;
         DBHandling.deleteRecords("MPZusammensetzung", "ZusID", le.getPk());
         createTree();
     }
-    
+
     private void btnNeuPack(ListElement le) {
         new DlgPack(this, le.toString(), le.getPk(), false);
         createTree();
     }
-    
+
     private void btnEditPack(ListElement le) {
         new DlgPack(this, le.toString(), le.getPk(), true);
         createTree();
     }
-    
+
     private void btnNeuStoff(ListElement le) {
         new DlgStoff(this, le.toString(), le.getPk());
         createTree();
     }
-    
+
     public void dispose() {
         SYSTools.unregisterListeners(menu);
         menu = null;
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
-    
-    private void createTree(){
+
+    private void createTree() {
         if (medpid <= 0) return;
         treeMed.setVisible(true);
         tree = new DefaultTreeModel(getRoot());
@@ -521,17 +514,17 @@ public class FrmMed extends javax.swing.JFrame{
         treeMed.setCellRenderer(new TreeRenderer());
         SYSTools.expandAll(treeMed);
     }
-    
-    private DefaultMutableTreeNode getRoot(){
+
+    private DefaultMutableTreeNode getRoot() {
         DefaultMutableTreeNode root = null;
         HashMap where = new HashMap();
         where.put("MedPID", new Object[]{medpid, "="});
-        ResultSet rs = DBRetrieve.getResultSet("MProdukte", new String[]{"Bezeichnung","MPHID"}, where);
+        ResultSet rs = DBRetrieve.getResultSet("MProdukte", new String[]{"Bezeichnung", "MPHID"}, where);
         try {
             rs.first();
             HashMap whereH = new HashMap();
             whereH.put("MPHID", new Object[]{rs.getLong("MPHID"), "="});
-            ResultSet rsH = DBRetrieve.getResultSet("MPHersteller", new String[]{"Firma","Ort"}, whereH);
+            ResultSet rsH = DBRetrieve.getResultSet("MPHersteller", new String[]{"Firma", "Ort"}, whereH);
             rsH.first();
             whereH.clear();
             ListElement leRoot = new ListElement(rs.getString("Bezeichnung") + " von " + rsH.getString("Firma") + ", " + rsH.getString("Ort"), medpid, NODE_PRODUKT);
@@ -545,10 +538,10 @@ public class FrmMed extends javax.swing.JFrame{
         where.clear();
         return root;
     }
-    
-    private ArrayList getDAF(){
+
+    private ArrayList getDAF() {
         ArrayList result = new ArrayList();
-        String sql =    "SELECT D.DafID, D.Zusatz, F.Zubereitung, F.AnwText, F.AnwEinheit, F.PackEinheit " +
+        String sql = "SELECT D.DafID, D.Zusatz, F.Zubereitung, F.AnwText, F.AnwEinheit, F.PackEinheit " +
                 "FROM MPDarreichung D INNER JOIN MPFormen F ON D.FormID = F.FormID " +
                 "WHERE D.MedPID = ? " +
                 "ORDER BY F.Zubereitung";
@@ -556,9 +549,9 @@ public class FrmMed extends javax.swing.JFrame{
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, medpid);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()){
+            if (rs.first()) {
                 rs.beforeFirst();
-                while (rs.next()){
+                while (rs.next()) {
                     long dafid = rs.getLong("DafID");
                     String zusatz = (rs.getString("Zusatz") == null || rs.getString("Zusatz").equals("") ? "" : " (" + rs.getString("Zusatz") + ")");
                     String text = "";
@@ -568,7 +561,7 @@ public class FrmMed extends javax.swing.JFrame{
                     if (SYSTools.catchNull(anw).equals("")) {
                         anw = SYSConst.EINHEIT[anwein];
                     }
-                    text = (SYSTools.catchNull(zub).equals("") ? anw : zub+", "+anw);
+                    text = (SYSTools.catchNull(zub).equals("") ? anw : zub + ", " + anw);
                     String line = text + zusatz;
                     ListElement leDaf = new ListElement(line, dafid, NODE_DAF);
                     DefaultMutableTreeNode daf = new DefaultMutableTreeNode(leDaf);
@@ -577,47 +570,47 @@ public class FrmMed extends javax.swing.JFrame{
                     result.add(daf);
                 }
             }
-            
+
         } catch (SQLException ex) {
             new DlgException(ex);
         }
-        
+
         return result;
     }
-    
-    private ArrayList getWirkstoffe(long dafid){
+
+    private ArrayList getWirkstoffe(long dafid) {
         ArrayList result = new ArrayList();
         int[] nodetyp = {NODE_WIRKSTOFF, NODE_HILFSSTOFF, NODE_SONSTSTOFF};
-        String sql =    "SELECT Z.ZusID, Z.Staerke, Z.Dimension, S.Bezeichnung, Z.Stofftyp " +
+        String sql = "SELECT Z.ZusID, Z.Staerke, Z.Dimension, S.Bezeichnung, Z.Stofftyp " +
                 "FROM MPZusammensetzung Z INNER JOIN MPStoffe S ON Z.StoffID = S.StoffID " +
                 "WHERE Z.DafID = ? " +
                 "ORDER BY Z.Stofftyp, S.Bezeichnung";
         // Stofftyp 0 = Wirkstoffe
-        
+
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, dafid);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()){
+            if (rs.first()) {
                 rs.beforeFirst();
-                while (rs.next()){
-                    String line = rs.getString("Bezeichnung") + " (" + rs.getDouble("Staerke") +" " + SYSConst.STAERKE[rs.getInt("Dimension")] + ")";
+                while (rs.next()) {
+                    String line = rs.getString("Bezeichnung") + " (" + rs.getDouble("Staerke") + " " + SYSConst.STAERKE[rs.getInt("Dimension")] + ")";
                     ListElement leZus = new ListElement(line, rs.getLong("ZusID"), nodetyp[rs.getInt("Stofftyp")]);
                     DefaultMutableTreeNode zus = new DefaultMutableTreeNode(leZus);
                     result.add(zus);
                 }
             }
-            
+
         } catch (SQLException ex) {
             new DlgException(ex);
         }
-        
+
         return result;
     }
-    
-    private ArrayList getPackung(long dafid){
+
+    private ArrayList getPackung(long dafid) {
         ArrayList result = new ArrayList();
-        String sql =    "SELECT P.MPID, P.PZN, P.Groesse, P.Inhalt, f.PackEinheit " +
+        String sql = "SELECT P.MPID, P.PZN, P.Groesse, P.Inhalt, f.PackEinheit " +
                 " FROM MPackung P " +
                 " INNER JOIN MPDarreichung daf ON P.DafID = daf.DafID" +
                 " INNER JOIN MPFormen f ON daf.FormID = f.FormID" +
@@ -627,24 +620,24 @@ public class FrmMed extends javax.swing.JFrame{
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, dafid);
             ResultSet rs = stmt.executeQuery();
-            if (rs.first()){
+            if (rs.first()) {
                 rs.beforeFirst();
-                while (rs.next()){
-                    String line = SYSConst.GROESSE[rs.getInt("Groesse")] + " (" + rs.getDouble("Inhalt") +" " + SYSConst.EINHEIT[rs.getInt("PackEinheit")] + ") PZN:[" + rs.getString("PZN") + "]";
+                while (rs.next()) {
+                    String line = SYSConst.GROESSE[rs.getInt("Groesse")] + " (" + rs.getDouble("Inhalt") + " " + SYSConst.EINHEIT[rs.getInt("PackEinheit")] + ") PZN:[" + rs.getString("PZN") + "]";
                     ListElement leZus = new ListElement(line, rs.getLong("MPID"), NODE_PACKUNG);
                     DefaultMutableTreeNode zus = new DefaultMutableTreeNode(leZus);
                     result.add(zus);
                 }
             }
-            
+
         } catch (SQLException ex) {
             new DlgException(ex);
         }
-        
+
         return result;
     }
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuchen;
     private javax.swing.JButton btnMed;
@@ -660,21 +653,21 @@ public class FrmMed extends javax.swing.JFrame{
     private javax.swing.JTree treeMed;
     private javax.swing.JTextField txtSuche;
     // End of variables declaration//GEN-END:variables
-    
+
     private class TreeRenderer extends JLabel implements TreeCellRenderer {
         Color bg, fg;
-        
-        TreeRenderer(){
+
+        TreeRenderer() {
             super();
         }
-        
+
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
             ListElement le = (ListElement) node.getUserObject();
             int nodetype = ((Integer) le.getObject()).intValue();
             setText(le.toString());
             setOpaque(selected);
-            
+
             if (selected) {
                 bg = Color.BLUE;
                 fg = Color.WHITE;
@@ -682,44 +675,44 @@ public class FrmMed extends javax.swing.JFrame{
                 fg = Color.BLACK;
                 bg = Color.WHITE;
             }
-            
+
             switch (nodetype) {
-                case NODE_PRODUKT : {
+                case NODE_PRODUKT: {
                     this.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
                     break;
                 }
-                case NODE_DAF : {
+                case NODE_DAF: {
                     this.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
                     break;
                 }
-                case NODE_WIRKSTOFF : {
+                case NODE_WIRKSTOFF: {
                     this.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/exec.png")));
                     break;
                 }
-                case NODE_HILFSSTOFF : {
+                case NODE_HILFSSTOFF: {
                     this.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/yellowled.png")));
                     break;
                 }
-                case NODE_PACKUNG : {
+                case NODE_PACKUNG: {
                     this.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
                     break;
                 }
-                default : {
+                default: {
                     this.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
                 }
             }
-            
+
             return this;
         }
-        
+
         public Color getBackground() {
             return bg;
         }
-        
+
         public Color getForeground() {
             return fg;
         }
-        
-        
+
+
     }
 }

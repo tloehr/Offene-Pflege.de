@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -25,6 +25,12 @@
  * 
  */
 package op.care.verordnung;
+
+import op.OPDE;
+import op.tools.DlgException;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,14 +40,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import op.OPDE;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class DBRetrieve {
@@ -76,7 +76,7 @@ public class DBRetrieve {
 //            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
 //            stmt.setLong(1, verid);
             ResultSet rsDosis = op.tools.DBRetrieve.getResultSet("BHPPlanung", where, new String[]{"Uhrzeit", "NachtMo", "Morgens",
-                        "Mittags", "Nachmittags", "Abends", "NachtAb"});
+                    "Mittags", "Nachmittags", "Abends", "NachtAb"});
             //ResultSet rsDosis = stmt.executeQuery();
             if (rsDosis.first()) {
                 rsDosis.beforeFirst();
@@ -101,7 +101,7 @@ public class DBRetrieve {
                     if (previousState > -1 && headerNeeded && previousState != MAXDOSIS) {
                         // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
                         // der erste Durchlauf, ein Wechsel stattgefunden hat und der
-                        // vorherige Zustand nicht MAXDOSIS war, das braucht n‰mlich keinen Footer.
+                        // vorherige Zustand nicht MAXDOSIS war, das braucht n√§mlich keinen Footer.
                         result += "</table>";
                     }
                     previousState = currentState;
@@ -131,7 +131,7 @@ public class DBRetrieve {
 //                        if (rsDosis.getLong("DafID") > 0){
 //                            result += "Maximale Tagesdosis: ";
 //                        } else {
-//                            result += "Maximale H‰ufigkeit: ";
+//                            result += "Maximale H√§ufigkeit: ";
 //                        }
                         result += "<b>Maximale Tagesdosis: ";
                         result += rsDosis.getInt("MaxAnzahl") + "x " + SYSTools.printDouble(rsDosis.getDouble("MaxEDosis"));
@@ -158,11 +158,11 @@ public class DBRetrieve {
                 if (previousState != MAXDOSIS) {
                     // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
                     // der erste Durchlauf, ein Wechsel stattgefunden hat und der
-                    // vorherige Zustand nicht MAXDOSIS war, das braucht n‰mlich keinen Footer.
+                    // vorherige Zustand nicht MAXDOSIS war, das braucht n√§mlich keinen Footer.
                     result += "</table>";
                 }
             } else {
-                result += "<i>Noch keine Dosierung / Anwendungsinformationen verf¸gbar</i><br/>";
+                result += "<i>Noch keine Dosierung / Anwendungsinformationen verf√ºgbar</i><br/>";
             }
 
         } catch (SQLException ex) {
@@ -181,7 +181,7 @@ public class DBRetrieve {
             where.put("tmp", new Object[]{0l, "="});
 
             ResultSet rsDosis = op.tools.DBRetrieve.getResultSet("BHPPlanung", where, new String[]{"Uhrzeit", "NachtMo", "Morgens",
-                        "Mittags", "Nachmittags", "Abends", "NachtAb", "LDatum"});
+                    "Mittags", "Nachmittags", "Abends", "NachtAb", "LDatum"});
             if (rsDosis.first()) {
                 rsDosis.last();
                 int num = rsDosis.getRow();
@@ -206,7 +206,7 @@ public class DBRetrieve {
                     }
 
                     if (currentState == ZEIT) {
-                        result += (rsDosis.getDouble("NachtMo") > 0 ? "fr¸h morgens " + rsDosis.getDouble("NachtMo") + " " + einheit + ", " : "") +
+                        result += (rsDosis.getDouble("NachtMo") > 0 ? "fr√ºh morgens " + rsDosis.getDouble("NachtMo") + " " + einheit + ", " : "") +
                                 (rsDosis.getDouble("Morgens") > 0 ? "morgens " + rsDosis.getDouble("Morgens") + " " + einheit + ", " : "") +
                                 (rsDosis.getDouble("Mittags") > 0 ? "mittags " + rsDosis.getDouble("Mittags") + " " + einheit + ", " : "") +
                                 (rsDosis.getDouble("Nachmittags") > 0 ? "nachmittags " + rsDosis.getDouble("Nachmittags") + " " + einheit + ", " : "") +
@@ -237,7 +237,7 @@ public class DBRetrieve {
                     }
                 }
             } else {
-                result += "<i>Noch keine Dosierung / Anwendungsinformationen verf¸gbar</i><br/>";
+                result += "<i>Noch keine Dosierung / Anwendungsinformationen verf√ºgbar</i><br/>";
             }
         } catch (SQLException ex) {
             new DlgException(ex);
@@ -333,7 +333,7 @@ public class DBRetrieve {
                 result = "";
             }
             Date ldatum = new Date(rswdh.getTimestamp("LDatum").getTime());
-            if (SYSCalendar.sameDay(ldatum, new Date()) > 0) { // Die erste Ausf¸hrung liegt in der Zukunft
+            if (SYSCalendar.sameDay(ldatum, new Date()) > 0) { // Die erste Ausf√ºhrung liegt in der Zukunft
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
                 result += "<br/>erst ab: " + sdf.format(ldatum);
             }
@@ -363,8 +363,8 @@ public class DBRetrieve {
 //
 //        s += anrede + "<br/>" +
 //                "<br/>" +
-//                "damit wir bei der ‹bernahme der ‰rztlichen Anordnungen keinen Fehler machen, haben wir Ihnen die Gesamtverordnung aufgelistet.<br/>" +
-//                "Es w‰re sehr schˆn, wenn Sie uns diese Verordnungen bei n‰chster Gelegenheit kurz gegenzeichnen kˆnnten.<br/>" +
+//                "damit wir bei der √úbernahme der √§rztlichen Anordnungen keinen Fehler machen, haben wir Ihnen die Gesamtverordnung aufgelistet.<br/>" +
+//                "Es w√§re sehr sch√∂n, wenn Sie uns diese Verordnungen bei n√§chster Gelegenheit kurz gegenzeichnen k√∂nnten.<br/>" +
 //                "<br/>" +
 //                "<b>" + sdf.format(SYSCalendar.today_date()) + "</b><br/>" +
 //                "Fax.: " + arzt.get("Anrede").toString() + " " + arzt.get("Titel").toString() + " " + arzt.get("Name").toString() + ", " + arzt.get("Fax").toString() + "<br/>";
@@ -433,7 +433,7 @@ public class DBRetrieve {
 //            ResultSet rs2 = stmt2.executeQuery();
 //            rs2.beforeFirst();
 //
-//            s += "<font size=\"18\"><b>Verordnungs‰nderung</b></font><br/>";
+//            s += "<font size=\"18\"><b>Verordnungs√§nderung</b></font><br/>";
 //            s += "<b>" + SYSTools.getBWLabel(bwkennung) + "</b><br/>" +
 //                    "<br/>" +
 //                    "<u>Absender:</u><br/>" +
@@ -447,10 +447,10 @@ public class DBRetrieve {
 //                    "<br/>" +
 //                    anrede + "<br/>" +
 //                    "<br/>" +
-//                    "damit wir bei der ‹bernahme der ‰rztlichen Anordnungen keinen Fehler machen, haben wir Ihnen die Gesamtverordnung aufgelistet.<br/>" +
+//                    "damit wir bei der √úbernahme der √§rztlichen Anordnungen keinen Fehler machen, haben wir Ihnen die Gesamtverordnung aufgelistet.<br/>" +
 //                    "<br/>";
 //            if (rs1.first()) {
-//                s += "Sie haben f¸r die/den obige(n) BewohnerIn folgendes angeordnet:<br/>";
+//                s += "Sie haben f√ºr die/den obige(n) BewohnerIn folgendes angeordnet:<br/>";
 //                s += makeItemList4Bestaetigung(rs1, -1); // Hier soll nichts fett gedruckt werden. Daher ArztID = -1;
 //                s += "<br/><br/>Somit ergibt sich die folgende Gesamt-Verordnung:<br/><br/>";
 //            } else {
@@ -459,7 +459,7 @@ public class DBRetrieve {
 //
 //            s += makeItemList4Bestaetigung(rs2, arztid);
 //            s += "<br/>" +
-//                    "Die <b>hervorgehobenen</b> Verordnungen sind neu. Es w‰re sehr schˆn, wenn Sie uns diese Verordnungen bei n‰chster Gelegenheit kurz gegenzeichnen kˆnnten.<br/>" +
+//                    "Die <b>hervorgehobenen</b> Verordnungen sind neu. Es w√§re sehr sch√∂n, wenn Sie uns diese Verordnungen bei n√§chster Gelegenheit kurz gegenzeichnen k√∂nnten.<br/>" +
 //                    "<br/>" +
 //                    "<br/>" +
 //                    "<br/>" +
@@ -491,7 +491,7 @@ public class DBRetrieve {
 //            s += "; (";
 //            if (!SYSTools.catchNull(rs1.getString("khname")).equals("")) {
 //                s += rs1.getString("khname") + ", " + rs1.getString("khort");
-//                s += (rs1.getLong("AnArztID") > 0 ? ", best‰tigt durch " : "");
+//                s += (rs1.getLong("AnArztID") > 0 ? ", best√§tigt durch " : "");
 //            }
 //            s += rs1.getString("Titel") + " " + rs1.getString("Name") + ", " + rs1.getString("Ort") + ")";
 //            s += (rs1.getInt("anzahl") == 0 && rs1.getLong("AnArztID") == arztid ? "</b>" : "");
@@ -525,7 +525,7 @@ public class DBRetrieve {
             ResultSet rs = stmt.executeQuery();
             rs.first();
 
-            result = "<b>ƒrztliche Verordnung</b><br/>";
+            result = "<b>√Ñrztliche Verordnung</b><br/>";
 
             if (rs.getLong("DafID") == 0) {
                 result += rs.getString("mssntext");
@@ -560,7 +560,7 @@ public class DBRetrieve {
             }
             if (rs.getLong("v.AnArztID") > 0) {
                 if (rs.getLong("v.AnKHID") > 0) {
-                    result += " <i>best‰tigt durch:</i> ";
+                    result += " <i>best√§tigt durch:</i> ";
                 }
                 result += rs.getString("an.Titel") + " ";
                 if (OPDE.isAnonym()) {
@@ -591,7 +591,7 @@ public class DBRetrieve {
                 }
                 if (rs.getLong("v.AbArztID") > 0) {
                     if (rs.getLong("v.AbKHID") > 0) {
-                        result += " <i>best‰tigt durch:</i> ";
+                        result += " <i>best√§tigt durch:</i> ";
                     }
                     result += rs.getString("ab.Titel");
                     if (OPDE.isAnonym()) {

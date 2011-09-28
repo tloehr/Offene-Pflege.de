@@ -7,11 +7,8 @@ package entity;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
-import org.jdesktop.swingx.JXTaskPane;
 
 import javax.persistence.Query;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -25,10 +22,10 @@ public class VorgaengeTools {
     public static final int PDCA_DO = 2;
     public static final int PDCA_CHECK = 3;
     public static final int PDCA_ACT = 4;
-    public static final String[] PDCA = new String[]{"ABGESCHALTET","Plan","Do","Check","Act"};
+    public static final String[] PDCA = new String[]{"ABGESCHALTET", "Plan", "Do", "Check", "Act"};
 
     /**
-     * Sucht alle Elemente für einen bestimmten Bewohner raus und gibt diesen als Set von SYSFiles zurück.
+     * Sucht alle Elemente fÃ¼r einen bestimmten Bewohner raus und gibt diesen als Set von SYSFiles zurÃ¼ck.
      *
      * @param vorgang
      * @return
@@ -60,7 +57,7 @@ public class VorgaengeTools {
         return elements;
     }
 
-    public static void deleteVorgang(Vorgaenge vorgang){
+    public static void deleteVorgang(Vorgaenge vorgang) {
         vorgang.setBis(new Date());
         OPDE.getEM().getTransaction().begin();
         try {
@@ -87,7 +84,7 @@ public class VorgaengeTools {
     }
 
     public static void reopenVorgang(Vorgaenge vorgang) {
-        VBericht systemBericht = new VBericht("Vorgang wieder geöffnet", VBerichtTools.VBERICHT_ART_REOPEN, vorgang);
+        VBericht systemBericht = new VBericht("Vorgang wieder geÃ¶ffnet", VBerichtTools.VBERICHT_ART_REOPEN, vorgang);
         vorgang.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
         OPDE.getEM().getTransaction().begin();
         try {
@@ -116,6 +113,7 @@ public class VorgaengeTools {
 
     /**
      * dreht den Kreislauf eine Stufe nach vorne.
+     *
      * @param pdca
      * @return
      */
@@ -128,7 +126,8 @@ public class VorgaengeTools {
     }
 
     /**
-     * dreht den Kreislauf eine Stufe zurück. Jedoch nicht weiter als PLAN.
+     * dreht den Kreislauf eine Stufe zurÃ¼ck. Jedoch nicht weiter als PLAN.
+     *
      * @param pdca
      * @return
      */
@@ -139,7 +138,6 @@ public class VorgaengeTools {
         }
         return pdca;
     }
-
 
 
 }

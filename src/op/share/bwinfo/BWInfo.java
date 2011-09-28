@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,22 +26,9 @@
  */
 package op.share.bwinfo;
 
-import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import javax.swing.tree.DefaultMutableTreeNode;
 import op.OPDE;
 import op.tools.DBHandling;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -49,14 +36,22 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
 /**
- * Diese Klasse dient dazu, die Informationen aus der Tabelle BWInfo in den Speicher zu laden und für spätere Zugriffe zu halten.
- * Dazu werden verschiedene Informationen über den Bewohner zur Verfügung gestellt.
+ * Diese Klasse dient dazu, die Informationen aus der Tabelle BWInfo in den Speicher zu laden und fÃ¼r spÃ¤tere Zugriffe zu halten.
+ * Dazu werden verschiedene Informationen Ã¼ber den Bewohner zur VerfÃ¼gung gestellt.
  * <ul>
- * <li><i>attribute</i> ist eine ArrayList, die alle Daten der Tabelle "BWInfo" bereit hält. Die Elemente der ArrayList sind HashMaps. 
- * Das ist eigentlich die wichtige <i>Errungenschaft</i> dieser Klasse. Denn diese ArrayList wird später auch für das Model der JTable verwendet.</li>
+ * <li><i>attribute</i> ist eine ArrayList, die alle Daten der Tabelle "BWInfo" bereit hÃ¤lt. Die Elemente der ArrayList sind HashMaps.
+ * Das ist eigentlich die wichtige <i>Errungenschaft</i> dieser Klasse. Denn diese ArrayList wird spÃ¤ter auch fÃ¼r das Model der JTable verwendet.</li>
  * <li><i>verstorben</i> boolean, ob der Bewohner verstorben ist oder nicht.
  * </ul>
+ *
  * @author tloehr
  */
 public class BWInfo {
@@ -72,26 +67,27 @@ public class BWInfo {
     public static final int MODE_INTERVAL_BYSECOND = 0;
     public static final int MODE_INTERVAL_BYDAY = 1;
     public static final int MODE_INTERVAL_NOCONSTRAINTS = 2;
-    public static final int MODE_INTERVAL_SINGLE_INCIDENTS = 3; // Das sind Ereignisse, bei denen von == bis gilt. Weitere Einschränkungen werden nicht gemacht.
+    public static final int MODE_INTERVAL_SINGLE_INCIDENTS = 3; // Das sind Ereignisse, bei denen von == bis gilt. Weitere EinschrÃ¤nkungen werden nicht gemacht.
     public static final int ART_PFLEGE = 0;
     public static final int ART_VERWALTUNG = 1;
     public static final int ART_STAMMDATEN = 2;
     public static final int ART_PFLEGE_STAMMDATEN = 100;
     public static final int ART_VERWALTUNG_STAMMDATEN = 101;
     public static final int ART_ALLES = 102;
-    private int katnum; // Einfach nur um die Kategorien durch zu nummerieren. Brauche ich für die einfärbung der Zebramuster.
+    private int katnum; // Einfach nur um die Kategorien durch zu nummerieren. Brauche ich fÃ¼r die einfÃ¤rbung der Zebramuster.
     private long currentkat; // ebenso
-    private double scalesum; // Wird nur bei Skalen benutzt. Enthält immer die Gesamtsumme einer Skala.
+    private double scalesum; // Wird nur bei Skalen benutzt. EnthÃ¤lt immer die Gesamtsumme einer Skala.
     private boolean scalemode; // anzeige, ob sich der parser innerhalb einer Scale Umgebung befindet.
     private ArrayList scaleriskmodel;
 
     /**
      * <p>
-     * BWInfo(String, Date) liest die AttributDaten an einem bestimmten Zeitpunkt und für einen bestimmten Bewohner ein.
+     * BWInfo(String, Date) liest die AttributDaten an einem bestimmten Zeitpunkt und fÃ¼r einen bestimmten Bewohner ein.
      * Details siehe BWInfo(String, Date, Date)
      * </p>
+     *
      * @param bwkennung Kennung des betreffenden Bewohners
-     * @param datum Datum des Zeitpunkts
+     * @param datum     Datum des Zeitpunkts
      */
     public BWInfo(String bwkennung, Date datum, boolean include_single_incidents) {
         this(bwkennung, datum, ART_ALLES, 0, include_single_incidents);
@@ -99,11 +95,12 @@ public class BWInfo {
 
     /**
      * <p>
-     * BWInfo(String) liest die <b>aktuellen</b> AttributDaten für einen bestimmten Bewohner ein.
+     * BWInfo(String) liest die <b>aktuellen</b> AttributDaten fÃ¼r einen bestimmten Bewohner ein.
      * Details siehe BWInfo(String, Date, Date, int)
      * </p>
+     *
      * @param bwkennung Kennung des betreffenden Bewohners
-     * @param datum Datum des Zeitpunkts
+     * @param datum     Datum des Zeitpunkts
      */
     public BWInfo(String bwkennung) {
         this(bwkennung, SYSCalendar.nowDBDate(), true);
@@ -111,11 +108,12 @@ public class BWInfo {
 
     /**
      * <p>
-     * BWInfo(String, Date) liest die <b>aktuellen</b> AttributDaten für einen bestimmten Bewohner ein.
+     * BWInfo(String, Date) liest die <b>aktuellen</b> AttributDaten fÃ¼r einen bestimmten Bewohner ein.
      * Details siehe BWInfo(String, Date, Date)
      * </p>
+     *
      * @param bwkennung Kennung des betreffenden Bewohners
-     * @param datum Datum des Zeitpunkts
+     * @param datum     Datum des Zeitpunkts
      */
     public BWInfo(String bwkennung, int art, boolean include_single_incidents) {
         this(bwkennung, SYSCalendar.nowDBDate(), art, 0, include_single_incidents);
@@ -123,36 +121,36 @@ public class BWInfo {
 
     /**
      * <p>
-     * BWInfo() liest die AttributDaten innerhalb eines bestimmten Zeitraums und für einen bestimmten Bewohner ein.
-     * Die Hauptaufgabe ist es, die ArrayList attribute zu füllen. Diese Liste besteht aus HashMaps, die zu jeder Zeile der 
+     * BWInfo() liest die AttributDaten innerhalb eines bestimmten Zeitraums und fÃ¼r einen bestimmten Bewohner ein.
+     * Die Hauptaufgabe ist es, die ArrayList attribute zu fÃ¼llen. Diese Liste besteht aus HashMaps, die zu jeder Zeile der
      * Tabelle "BWInfo" die Inhalte der einzelnen Zellen enthalten.
-     * Die Spalte XML wird dazu ebenfalls entschlüsselt. Wie mit der XML Spalte zu verfahren ist, entnimmt die Routine anhand der 
-     * Struktur XMLs in der korresponierenden Tabelle "BWInfoTyp". Kurz gesagt steht in BWInfoTyp, WIE die Daten zu 
+     * Die Spalte XML wird dazu ebenfalls entschlÃ¼sselt. Wie mit der XML Spalte zu verfahren ist, entnimmt die Routine anhand der
+     * Struktur XMLs in der korresponierenden Tabelle "BWInfoTyp". Kurz gesagt steht in BWInfoTyp, WIE die Daten zu
      * verstehen sind und in BWInfo stehen die Inhalte.
      * </p>
      * <p>
-     * Daten, die in dem bestimmten Zeitraum nicht gelten fehlen in der Liste. Bisher unbeantwortete Attribute stehen nicht 
+     * Daten, die in dem bestimmten Zeitraum nicht gelten fehlen in der Liste. Bisher unbeantwortete Attribute stehen nicht
      * in der Liste.
      * </p>
      * <p>
-     * Eine Besonderheit stellen die Attribute mit der Kennung "hauf" dar. Sie verwenden die XML Spalte nur in Ausnahmefällen. 
-     * Durch die Existenz der Datensätze wird der Aufenthalt abgebildet. Die XML Spalte enthält höchstens Angaben darüber 
+     * Eine Besonderheit stellen die Attribute mit der Kennung "hauf" dar. Sie verwenden die XML Spalte nur in AusnahmefÃ¤llen.
+     * Durch die Existenz der DatensÃ¤tze wird der Aufenthalt abgebildet. Die XML Spalte enthÃ¤lt hÃ¶chstens Angaben darÃ¼ber
      * warum ein Aufenthalt endete.
      * </p>
      * <p>
      * Dieser Konstruktor geht wie folgt vor:
      * <ol>
-     * <li>Zuerst wird ermittelt, ob der BW zum Stichtag bei uns wohnt(e). Wenn ja, dann wird eine HashMap mit den zugehörigen Daten erstellt. </li>
-     * <li>Wenn nicht, dann wird geprüft, ob der BW jemals bei uns gewohnt hat. Wenn ja, dann wird diese Information mit aufgenommen. </li>
+     * <li>Zuerst wird ermittelt, ob der BW zum Stichtag bei uns wohnt(e). Wenn ja, dann wird eine HashMap mit den zugehÃ¶rigen Daten erstellt. </li>
+     * <li>Wenn nicht, dann wird geprÃ¼ft, ob der BW jemals bei uns gewohnt hat. Wenn ja, dann wird diese Information mit aufgenommen. </li>
      * <li>Wenn er noch nie da war, dann wird eben dass in die attribute eingetragen.</li>
      * </ol>
      * </p>
-     * @param bwkennung Kennung des betreffenden Bewohners
-     * @param Datum Zeitpunkt, für die gewünschten Daten
-     * @param art Gibt an, welche Art von Fragen angezeigt werden soll. Welche möglich sind, steht in den ART_ Konstanten dieser Klasse.
-     * @param bwikid falls man alle Infos einer Klasse haben will. 0 sonst. Ist bwikid != 0, dann gilt das, was über <b>art</b> definiert wurde.
-     * @param include_single_incidents, true, wenn auch Einzelereignisse gewünscht sind (von==bis). false sonst.
-     * 
+     *
+     * @param bwkennung                 Kennung des betreffenden Bewohners
+     * @param Datum                     Zeitpunkt, fÃ¼r die gewÃ¼nschten Daten
+     * @param art                       Gibt an, welche Art von Fragen angezeigt werden soll. Welche mÃ¶glich sind, steht in den ART_ Konstanten dieser Klasse.
+     * @param bwikid                    falls man alle Infos einer Klasse haben will. 0 sonst. Ist bwikid != 0, dann gilt das, was Ã¼ber <b>art</b> definiert wurde.
+     * @param include_single_incidents, true, wenn auch Einzelereignisse gewÃ¼nscht sind (von==bis). false sonst.
      */
     public BWInfo(String bwkennung, Date datum, int art, long bwikid, boolean include_single_incidents) {
         attribute = new ArrayList(100);
@@ -160,12 +158,12 @@ public class BWInfo {
 
         try {
 
-            // wenn es EINE Klasse gibt, dann werden weitere Klassenfilter nicht benötigt. ART_ALLES entfernt die WHERE Klausel im SQL String.
+            // wenn es EINE Klasse gibt, dann werden weitere Klassenfilter nicht benÃ¶tigt. ART_ALLES entfernt die WHERE Klausel im SQL String.
             if (bwikid > 0) {
                 art = ART_ALLES;
             }
 
-            // Gibt es einen aktuellen oder zurückliegenden Heimaufenthalt.
+            // Gibt es einen aktuellen oder zurÃ¼ckliegenden Heimaufenthalt.
             ArrayList lastHauf = op.share.bwinfo.DBHandling.getLastBWInfo(bwkennung, "hauf");
 
             if (lastHauf != null) {
@@ -202,7 +200,7 @@ public class BWInfo {
                     " 		) fa ON fa.BWInfoID = f1.BWINFOID" +
                     " 	WHERE f1.BWKennung=?" +
                     " ) fia ON fia.BWINFOID = bi.BWINFOID " +
-                    // Hier die angehangenen Vorgänge
+                    // Hier die angehangenen VorgÃ¤nge
 //                    " INNER JOIN " +
 //                    " (" +
 //                    " 	SELECT DISTINCT f2.BWINFOID, ifnull(anzahl,0) anzahl" +
@@ -247,7 +245,7 @@ public class BWInfo {
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
                 rs.last();
-                //OPDE.getLogger().debug("BWInfo: Anzahl Datensätze: " + rs.getRow());
+                //OPDE.getLogger().debug("BWInfo: Anzahl DatensÃ¤tze: " + rs.getRow());
                 rs.beforeFirst();
 
                 while (rs.next()) {
@@ -263,21 +261,22 @@ public class BWInfo {
     }
 
     /**
-     * Dieser Konstruktor wird vor allem benutzt um die Grundinformationen für den Tooltip der Bewohner Labels zu setzen.
+     * Dieser Konstruktor wird vor allem benutzt um die Grundinformationen fÃ¼r den Tooltip der Bewohner Labels zu setzen.
+     *
      * @param bwkennung
      * @param bwinftyp
      * @param datum
      */
     public BWInfo(String bwkennung, String bwinftyp, Date datum) {
         super();
-        // #0000036: die folgende Zeile zur Sicherstellung, dass die Anzeige am Tag der Änderung korrekt ist.
+        // #0000036: die folgende Zeile zur Sicherstellung, dass die Anzeige am Tag der Ã„nderung korrekt ist.
         datum.setTime(SYSCalendar.endOfDay(datum));
         attribute = new ArrayList(100);
         katnum = 0;
 
         try {
 
-            // Gibt es einen aktuellen oder zurückliegenden Heimaufenthalt.
+            // Gibt es einen aktuellen oder zurÃ¼ckliegenden Heimaufenthalt.
             ArrayList lastHauf = op.share.bwinfo.DBHandling.getLastBWInfo(bwkennung, "hauf");
 
             if (lastHauf != null) {
@@ -316,7 +315,7 @@ public class BWInfo {
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
                 rs.last();
-                OPDE.getLogger().debug("BWInfo: Anzahl Datensätze: " + rs.getRow());
+                OPDE.getLogger().debug("BWInfo: Anzahl DatensÃ¤tze: " + rs.getRow());
                 rs.beforeFirst();
 
                 while (rs.next()) {
@@ -332,7 +331,8 @@ public class BWInfo {
 
     /**
      * Dieser Konstruktor wird gebraucht um die Daten aus genau einer Information anzuzeigen. Wird bei der Vorgangsverwaltung gebraucht.
-     * @param bwinfoid pk der Information, die gewünscht wird.
+     *
+     * @param bwinfoid pk der Information, die gewÃ¼nscht wird.
      */
     public BWInfo(long bwinfoid) {
         super();
@@ -341,7 +341,7 @@ public class BWInfo {
 
         try {
 
-            // Aktuelle oder zurückliegende Heimaufenthalt interessieren hier nicht.
+            // Aktuelle oder zurÃ¼ckliegende Heimaufenthalt interessieren hier nicht.
 
             this.aufenthalt = false;
             this.vonHauf = null;
@@ -410,7 +410,7 @@ public class BWInfo {
                             // Klartext zusammen basteln.
                             if (rs.first()) {
                                 Iterator it1 = colstruct.iterator();
-                                it1.next(); // wir überspringein einfach den PK.
+                                it1.next(); // wir Ã¼berspringein einfach den PK.
                                 String str = "";
                                 while (it1.hasNext()) {
                                     HashMap col = (HashMap) it1.next();
@@ -430,7 +430,7 @@ public class BWInfo {
                                     html += "<ul>";
                                 }
                             } else {
-                                html += "<li><b>keine gültige Zuordnung zu Tabelle: " + liststruct.get("table").toString() + "</b></li>";
+                                html += "<li><b>keine gÃ¼ltige Zuordnung zu Tabelle: " + liststruct.get("table").toString() + "</b></li>";
                             }
                             OPDE.getLogger().debug(html);
                         } catch (SQLException ex) {
@@ -468,7 +468,7 @@ public class BWInfo {
                 } else { // TABGROUPS, weil is kein Blatt
                     // nur anzeigen, wenn es mindestens eine angekreuzte Checkbox in dieser TABGROUP gibt.
                     if (treeHasTrueCheckboxes(node, antwort)) {
-//                        // Fals von der üblichen Zeichengröße abgewichen wird, rechne ich zwei Punkte noch runter, damit
+//                        // Fals von der Ã¼blichen ZeichengrÃ¶ÃŸe abgewichen wird, rechne ich zwei Punkte noch runter, damit
 //                        // es besser zur Bildschirmdarstellung in den HTML Listen passt.
 //                        int size = Integer.parseInt(SYSTools.catchNull(userObject[3], "12"));
 //                        size -= 4;
@@ -487,7 +487,7 @@ public class BWInfo {
         }
 
         if (scalemode) {
-            // nun noch die Einschätzung des Risikos
+            // nun noch die EinschÃ¤tzung des Risikos
             // Bezeichnung und Farbe
             Iterator it = scaleriskmodel.iterator();
             boolean found = false;
@@ -503,7 +503,7 @@ public class BWInfo {
                     risiko = o[2].toString();
                 }
             }
-            html += "<b><font color=\"" + color + "\">Risiko-Einschätzung: " + scalesum + " (" + risiko + ")</font></b><br/>";
+            html += "<b><font color=\"" + color + "\">Risiko-EinschÃ¤tzung: " + scalesum + " (" + risiko + ")</font></b><br/>";
         }
         OPDE.getLogger().debug(html);
         return html;
@@ -533,8 +533,8 @@ public class BWInfo {
     }
 
     private void parseXML(long bwinfoid, String bwinftyp, Date von, Date bis, String bemerkung, String anukennung, String abukennung,
-            String xmls, String xmlc, String bwinfokurz, int intervalmode, int katart, int dokanzahl, String katbez,
-            long bwikid, int vrganzahl) {
+                          String xmls, String xmlc, String bwinfokurz, int intervalmode, int katart, int dokanzahl, String katbez,
+                          long bwikid, int vrganzahl) {
         try {
             scalemode = false;
             scaleriskmodel = null;
@@ -624,7 +624,7 @@ public class BWInfo {
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
             if (!tagName.equalsIgnoreCase("xml")) {
                 OPDE.getLogger().debug(this.toString() + ":" + tagName);
-                if (tagName.equalsIgnoreCase("java")) { // eine Java Klasse sorgt selbst für ihre Darstellung. Da gibts hier nicht viel zu tun.
+                if (tagName.equalsIgnoreCase("java")) { // eine Java Klasse sorgt selbst fÃ¼r ihre Darstellung. Da gibts hier nicht viel zu tun.
                     String atr = attributes.getValue("html");
                     atr = atr.replaceAll("&lt;", "<");
                     atr = atr.replaceAll("&gt;", ">");
@@ -689,7 +689,7 @@ public class BWInfo {
                     listStruct.put("pk", attributes.getValue("pk"));
                     listStruct.put("table", attributes.getValue("table"));
                 } else {
-                    if (listStruct != null) { // wir müssen uns innerhalb einer List Struktur befinden.
+                    if (listStruct != null) { // wir mÃ¼ssen uns innerhalb einer List Struktur befinden.
                         if (tagName.equalsIgnoreCase("col")) {
                             HashMap hm = new HashMap();
                             hm.put("name", attributes.getValue("name"));
@@ -711,10 +711,10 @@ public class BWInfo {
                                 tabgroup = new DefaultMutableTreeNode(new Object[]{"tabgroup", name, label, SYSTools.catchNull(attributes.getValue("size"))});
                             } else {
                                 if (tabgroup != null) {
-                                    OPDE.getLogger().debug("Füge zur Tabgroup hinzu:" + ((Object[]) tabgroup.getUserObject())[1].toString() + "=>> " + tagName + "    " + name);
+                                    OPDE.getLogger().debug("FÃ¼ge zur Tabgroup hinzu:" + ((Object[]) tabgroup.getUserObject())[1].toString() + "=>> " + tagName + "    " + name);
                                     tabgroup.add(new DefaultMutableTreeNode(new Object[]{tagName, name, label}));
                                 } else {
-                                    OPDE.getLogger().debug("Füge zur STRUKTUR hinzu: =>> " + tagName + "    " + name);
+                                    OPDE.getLogger().debug("FÃ¼ge zur STRUKTUR hinzu: =>> " + tagName + "    " + name);
                                     if (scalemode && tagName.equalsIgnoreCase("option")) {
                                         double score = Double.parseDouble(attributes.getValue("score"));
                                         struktur.add(new DefaultMutableTreeNode(new Object[]{tagName, name, label, score}));

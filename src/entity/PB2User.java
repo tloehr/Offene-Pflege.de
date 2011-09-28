@@ -5,34 +5,23 @@
 
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
 
 /**
- * Diese Entity verbindet Pflegeberichte mit Usern. Damit kann man 
- * speichern, wer welchen Pflegebericht im Übergabeprotokoll zur Kenntnis
+ * Diese Entity verbindet Pflegeberichte mit Usern. Damit kann man
+ * speichern, wer welchen Pflegebericht im Ãœbergabeprotokoll zur Kenntnis
  * genommen hat.
+ *
  * @author tloehr
  */
 @Entity
 @Table(name = "PB2User")
 @NamedQueries({
-    @NamedQuery(name = "PB2User.findAll", query = "SELECT p FROM PB2User p"),
-    @NamedQuery(name = "PB2User.findByPkid", query = "SELECT p FROM PB2User p WHERE p.pkid = :pkid"),
-    @NamedQuery(name = "PB2User.findByPit", query = "SELECT p FROM PB2User p WHERE p.pit = :pit")})
+        @NamedQuery(name = "PB2User.findAll", query = "SELECT p FROM PB2User p"),
+        @NamedQuery(name = "PB2User.findByPkid", query = "SELECT p FROM PB2User p WHERE p.pkid = :pkid"),
+        @NamedQuery(name = "PB2User.findByPit", query = "SELECT p FROM PB2User p WHERE p.pit = :pit")})
 public class PB2User implements Serializable, Comparable<PB2User> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -72,7 +61,6 @@ public class PB2User implements Serializable, Comparable<PB2User> {
         return user;
     }
 
-    
 
     public Long getPkid() {
         return pkid;
@@ -119,7 +107,6 @@ public class PB2User implements Serializable, Comparable<PB2User> {
     public int compareTo(PB2User o) {
         return getUser().getNameUndVorname().compareTo(o.getUser().getNameUndVorname());
     }
-
 
 
 }

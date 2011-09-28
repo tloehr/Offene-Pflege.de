@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2011 Torsten Löhr
+ * Copyright (C) 2011 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
  *
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License,
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
@@ -25,18 +25,18 @@
  */
 package op.tools;
 
-import java.sql.*;
-import java.util.HashMap;
 import op.OPDE;
 
+import java.sql.*;
+
 public class Database {
-    
-    
+
+
     public Connection db;
-    
-    
+
+
     public Database(String url, String username, char[] passwort)
-    throws SQLException {
+            throws SQLException {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             this.db = DriverManager.getConnection(url, username, new String(passwort));
@@ -44,15 +44,15 @@ public class Database {
         } catch (ClassNotFoundException exCLASS) {
             new DlgException(exCLASS);
         }
-        
+
     } // Database()
-    
+
     /**
-     * Ermittelt die zuletzt den Primärschlüsser, des zuletzt eingefügten Datensatzes.
-     * @return neuer Primärschlüssel
+     * Ermittelt die zuletzt den PrimÃ¤rschlÃ¼sser, des zuletzt eingefÃ¼gten Datensatzes.
      *
+     * @return neuer PrimÃ¤rschlÃ¼ssel
      */
-    public long getLastInsertedID(){
+    public long getLastInsertedID() {
         long result = 0;
         try {
             Statement stmtPK = OPDE.getDb().db.createStatement();
@@ -64,7 +64,7 @@ public class Database {
         }
         return result;
     }
-    
+
 //    public void doLogout(){
 //        doLogout("");
 //    }
@@ -89,62 +89,62 @@ public class Database {
 //            System.exit(1);
 //        }
 //    }
-    
+
     /**
-     * Gibt eine eindeutige Nummer an den Aufrufer zurück. Die Nummer wird anhand der Datenbanktabelle UNIQUEID bestimmt.
-     * Da führt das System über die vergebenen IDs buch. Können für alles mögliche benutzt werden wo eben globale, eindeutige Schlüssel
-     * benöigt werden. Man kann auch einen prefix angeben. Dann führt die Methode in der Tabelle auch mehrere, getrennte Zähler.
-     *
-     * Der Standardzähler ist leer, also "".
+     * Gibt eine eindeutige Nummer an den Aufrufer zurÃ¼ck. Die Nummer wird anhand der Datenbanktabelle UNIQUEID bestimmt.
+     * Da fÃ¼hrt das System Ã¼ber die vergebenen IDs buch. KÃ¶nnen fÃ¼r alles mÃ¶gliche benutzt werden wo eben globale, eindeutige SchlÃ¼ssel
+     * benÃ¶igt werden. Man kann auch einen prefix angeben. Dann fÃ¼hrt die Methode in der Tabelle auch mehrere, getrennte ZÃ¤hler.
+     * <p/>
+     * Der StandardzÃ¤hler ist leer, also "".
      *
      * @return long   UID
      */
     public long getUID(String prefix) {
         long currentID = -1L;
         long newID = 0L;
-        
+
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        
+
         // Solange versuchen, bis es klappt.
         while (currentID == -1L) {
-            
-            try{
+
+            try {
                 stmt = db.prepareStatement("select max(UID) from UNIQUEID where prefix = ?");
                 stmt.setString(1, prefix);
                 rs = stmt.executeQuery();
                 rs.first();
-                
+
                 // Hier beginnt eine Transaktion
                 boolean wasAutoCommit = db.getAutoCommit();
                 db.setAutoCommit(false);
                 db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
                 db.commit();
                 currentID = rs.getLong(1);
-                
-                if (rs.getLong(1) == 0){ // für diesen prefix gibt es noch keinen Zähler. Es wird einer angelegt.
+
+                if (rs.getLong(1) == 0) { // fÃ¼r diesen prefix gibt es noch keinen ZÃ¤hler. Es wird einer angelegt.
                     newID = 1L;
-                } else{
+                } else {
                     newID = rs.getLong(1) + 1;
                 }
-                
+
                 stmt = db.prepareStatement("INSERT UNIQUEID (UID, PREFIX) VALUES (?, ?)");
                 stmt.setLong(1, newID);
                 stmt.setString(2, prefix);
                 stmt.executeUpdate();
-                
+
                 stmt = db.prepareStatement("DELETE FROM UNIQUEID WHERE UID=? AND PREFIX=?");
                 stmt.setLong(1, currentID);
                 stmt.setString(2, prefix);
                 stmt.executeUpdate();
-                
+
                 db.commit();
                 rs.close();
                 stmt.close();
-                
+
                 db.setAutoCommit(wasAutoCommit);
-                
-            } catch (SQLException exc){
+
+            } catch (SQLException exc) {
                 try {
                     db.rollback();
                 } catch (SQLException ex) {
@@ -156,6 +156,6 @@ public class Database {
         } // while()
         return newID;
     } // getUID()
-    
-    
+
+
 }

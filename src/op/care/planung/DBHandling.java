@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,35 +26,26 @@
  */
 package op.care.planung;
 
+import op.OPDE;
+import op.care.DFNImport;
+import op.tools.*;
+
+import javax.swing.*;
 import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.swing.DefaultComboBoxModel;
-import op.OPDE;
-import op.care.DFNImport;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
  * @author root
  */
 public class DBHandling {
 
-//    public static final int ART_PROBLEM = 0;
+    //    public static final int ART_PROBLEM = 0;
 //    public static final int ART_RESSOURCE = 1;
 //    public static final int ART_ZIEL = 2;
 //    public static final int ART_INFO = 3;
@@ -106,12 +97,12 @@ public class DBHandling {
     }
 
     /**
-     * copy2tmp erstellt eine temporäre Kopie der Pflegeplanung zur Bearbeitung.
+     * copy2tmp erstellt eine temporÃ¤re Kopie der Pflegeplanung zur Bearbeitung.
      * Die beteiligten Datenbanktabellen haben alle ein "tmp" Feld. Steht das auf 0
      * dann handelt es sich um die "echte" Planung.
-     * Die temporären Planungen haben in dieser Spalte die aktuelle LoginID
+     * Die temporÃ¤ren Planungen haben in dieser Spalte die aktuelle LoginID
      * des Anwenders, der die Bearbeitung vornimmt.
-     * 
+     *
      * @param planid, PK des Planes der kopiert werden soll.
      * @throws java.sql.SQLException
      */
@@ -155,7 +146,7 @@ public class DBHandling {
     }
 
     /**
-     * 
+     *
      */
     public static void copyPlanung(String sourceBW, String targetBW)
             throws SQLException {
@@ -187,7 +178,7 @@ public class DBHandling {
                 while (rs.next()) {
                     long altPlanid = rs.getLong("PlanID");
 
-                    // Daten für die NEUE Planung
+                    // Daten fÃ¼r die NEUE Planung
                     HashMap hm = new HashMap();
                     hm.put("BWKennung", targetBW);
                     hm.put("Stichwort", rs.getString("Stichwort"));
@@ -244,10 +235,9 @@ public class DBHandling {
 
 
     /**
-     * Löscht die Original Einträge und ändert die Temporären Records
-     * auf dauerhaft gültig (tmp = 0)
-     * 
-     * 
+     * LÃ¶scht die Original EintrÃ¤ge und Ã¤ndert die TemporÃ¤ren Records
+     * auf dauerhaft gÃ¼ltig (tmp = 0)
+     *
      * @param planid
      * @throws java.sql.SQLException
      */
@@ -326,7 +316,7 @@ public class DBHandling {
         PreparedStatement stmt;
         ResultSet rs;
 
-        OPDE.getLogger().debug("loadPlanung: planid:"+planid);
+        OPDE.getLogger().debug("loadPlanung: planid:" + planid);
 
         try {
             stmt = OPDE.db.db.prepareStatement(sql);
@@ -335,7 +325,7 @@ public class DBHandling {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                OPDE.getLogger().debug("loadPlanung: termid:"+rs.getLong("TermID"));
+                OPDE.getLogger().debug("loadPlanung: termid:" + rs.getLong("TermID"));
                 String termin = getTerminAsHTML(
                         rs.getTime("Uhrzeit"), rs.getInt("UhrzeitAnzahl"), rs.getInt("NachtMo"),
                         rs.getInt("Morgens"), rs.getInt("Mittags"), rs.getInt("Nachmittags"), rs.getInt("Abends"),
@@ -343,8 +333,8 @@ public class DBHandling {
                         rs.getInt("Fre"), rs.getInt("Sam"), rs.getInt("Son"), rs.getInt("Taeglich"), rs.getInt("Woechentlich"),
                         rs.getInt("Monatlich"), rs.getInt("TagNum"), rs.getDate("LDatum"), rs.getString("Bemerkung"),
                         rs.getBoolean("Erforderlich"));
-                
-                Object[] s = {ART_MASSNAHME, "<font size\"+1\"><b>" + rs.getString("Bezeichnung") + "</b> ("+rs.getDouble("t.Dauer")+" Minuten)</font>" + termin, rs.getLong("TermID")};
+
+                Object[] s = {ART_MASSNAHME, "<font size\"+1\"><b>" + rs.getString("Bezeichnung") + "</b> (" + rs.getDouble("t.Dauer") + " Minuten)</font>" + termin, rs.getLong("TermID")};
 
                 detail.add(s);
             }
@@ -393,7 +383,7 @@ public class DBHandling {
             PreparedStatement stmt;
             ResultSet rs;
 
-            // Fehler: Nur aktive und Pflege- und Sozial maßnahmen anzeigen.
+            // Fehler: Nur aktive und Pflege- und Sozial maÃŸnahmen anzeigen.
             sql = "" +
                     " SELECT m.MassID, m.Bezeichnung, m.Bezeichnung " +
                     " FROM Massnahmen m " +
@@ -425,19 +415,19 @@ public class DBHandling {
         String result = "";
         DateFormat df = DateFormat.getDateInstance();
         result += "<b>Kontrolle vom " + df.format(date) + "</b>";
-        result += "<p><b>Durchgeführt von:</b> " + op.ma.admin.DBHandling.getName2UKennung(ukennung) + "</p>";
+        result += "<p><b>DurchgefÃ¼hrt von:</b> " + op.ma.admin.DBHandling.getName2UKennung(ukennung) + "</p>";
         result += "<p><b>Ergebnis:</b> " + bemerkung + "</p>";
         if (abschluss) {
-            result += "<u>Die Pflegeplanung wurde mit dieser Kontrolle geändert bzw. abgeschlossen</u>";
+            result += "<u>Die Pflegeplanung wurde mit dieser Kontrolle geÃ¤ndert bzw. abgeschlossen</u>";
         }
 
         return result;
     }
 
     public static String getTerminAsHTML(Time Uhrzeit, int UhrzeitAnzahl, int NachtMo, int Morgens,
-            int Mittags, int Nachmittags, int Abends, int NachtAb, int Mon, int Die, int Mit, int Don, int Fre,
-            int Sam, int Son, int Taeglich, int Woechentlich, int Monatlich, int TagNum, Date LDatum, String kommentar,
-            boolean erforderlich) {
+                                         int Mittags, int Nachmittags, int Abends, int NachtAb, int Mon, int Die, int Mit, int Don, int Fre,
+                                         int Sam, int Son, int Taeglich, int Woechentlich, int Monatlich, int TagNum, Date LDatum, String kommentar,
+                                         boolean erforderlich) {
         String result = "";
 
 
@@ -458,7 +448,7 @@ public class DBHandling {
         if (previousState > -1 && headerNeeded) {
             // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
             // der erste Durchlauf, ein Wechsel stattgefunden hat und der
-            // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
+            // vorherige Zustand nicht MAXDOSIS war, das braucht nÃ¤mlich keinen Footer.
             result += "</table>";
         }
         previousState = currentState;
@@ -544,7 +534,7 @@ public class DBHandling {
 
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
-                html += "<h1>Pflegeplanungen für " + SYSTools.getBWLabel(bwkennung) + "</h1>";
+                html += "<h1>Pflegeplanungen fÃ¼r " + SYSTools.getBWLabel(bwkennung) + "</h1>";
                 rs.beforeFirst();
                 while (rs.next()) {
                     html += getPlanungAsHTML(rs.getLong("PlanID"));
@@ -565,7 +555,8 @@ public class DBHandling {
     }
 
     /**
-     * Gibt einen String zurück, der eine HTML Darstellung einer Pflegeplanung enthält.
+     * Gibt einen String zurÃ¼ck, der eine HTML Darstellung einer Pflegeplanung enthÃ¤lt.
+     *
      * @param planid
      * @return
      */
@@ -587,7 +578,7 @@ public class DBHandling {
 //            html += "<p><u>Bemerkung:</u> " + plandetails.get("Bemerkung") + "</b></p>";
 //        }
         DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT);
-        html += "<b>Prüfungstermin:</b> " + df.format((Date) plandetails.get("NKontrolle")) + "<br/>";
+        html += "<b>PrÃ¼fungstermin:</b> " + df.format((Date) plandetails.get("NKontrolle")) + "<br/>";
         html += "<b>Erstellt von:</b> " + op.ma.admin.DBHandling.getName2UKennung(plandetails.get("AnUKennung").toString()) + "  ";
         html += "<b>Am:</b> " + df.format((Date) plandetails.get("Von")) + "<br/>";
         if (((Date) plandetails.get("Bis")).before(SYSConst.DATE_BIS_AUF_WEITERES)) {
@@ -595,7 +586,7 @@ public class DBHandling {
             html += "<b>Am:</b> " + df.format((Date) plandetails.get("Bis")) + "<br/>";
         }
 
-        
+
         html += "<h3>Situation</h3>" + SYSTools.replace(plandetails.get("Situation").toString(), "\n", "<br/>");
         html += "<h3>Ziel(e):</h3>" + SYSTools.replace(plandetails.get("Ziel").toString(), "\n", "<br/>");
 
@@ -631,7 +622,7 @@ public class DBHandling {
                     default: {
                     }
                 } // switch
-            //html += "<ul>";
+                //html += "<ul>";
             } // Gruppenwechsel
             html += "<li>" + txt + "</li>";
         }
@@ -640,7 +631,7 @@ public class DBHandling {
     }
 
     public static String getWiederholung(int Mon, int Die, int Mit, int Don, int Fre,
-            int Sam, int Son, int Taeglich, int Woechentlich, int Monatlich, int TagNum, Date LDatum) {
+                                         int Sam, int Son, int Taeglich, int Woechentlich, int Monatlich, int TagNum, Date LDatum) {
         String result = "";
 
         if (Taeglich > 0) {
@@ -725,7 +716,7 @@ public class DBHandling {
             result = "";
         }
 
-        if (SYSCalendar.sameDay(LDatum, new Date()) > 0) { // Die erste Ausführung liegt in der Zukunft
+        if (SYSCalendar.sameDay(LDatum, new Date()) > 0) { // Die erste AusfÃ¼hrung liegt in der Zukunft
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
             result += "<br/>erst ab: " + sdf.format(LDatum);
         }
@@ -734,7 +725,6 @@ public class DBHandling {
     }
 
     /**
-     * 
      * @param massid
      * @param planid
      * @param tmp
@@ -759,7 +749,8 @@ public class DBHandling {
     }
 
     /**
-     * Löscht <u>alle</u> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung.
+     * LÃ¶scht <u>alle</u> nicht <b>abgehakten</b> BHPs fÃ¼r eine bestimmte Verordnung.
+     *
      * @param verid ist die Verordnung, um die es geht.
      */
     public static void deletePlanung(long planid) {
@@ -778,7 +769,8 @@ public class DBHandling {
     }
 
     /**
-     * Löscht alle DFNs für eine bestimmte Planung.
+     * LÃ¶scht alle DFNs fÃ¼r eine bestimmte Planung.
+     *
      * @param planid ist die Planung, um die es geht.
      */
     public static void cleanDFN(long planid)
@@ -794,10 +786,11 @@ public class DBHandling {
     }
 
     /**
-     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> DFNs für eine bestimmte Planung ab einer bestimmten Tages-Zeit.
-     * @param ts ist ein bestimmter Zeitpunkt. Das gilt natürlich nur für den aktuellen Tag. Somit ist
-     * bei ts nur der Uhrzeit anteil relevant. Über diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
-     * die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> ts sind.
+     * LÃ¶scht alle <b>heutigen</b> nicht <b>abgehakten</b> DFNs fÃ¼r eine bestimmte Planung ab einer bestimmten Tages-Zeit.
+     *
+     * @param ts    ist ein bestimmter Zeitpunkt. Das gilt natÃ¼rlich nur fÃ¼r den aktuellen Tag. Somit ist
+     *              bei ts nur der Uhrzeit anteil relevant. Ãœber diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
+     *              die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelÃ¶scht, die <b>grÃ¶ÃŸer gleich</b> ts sind.
      * @param verid ist die Verordnung, um die es geht.
      */
     public static void cleanDFN(long planid, long ts)
@@ -825,10 +818,11 @@ public class DBHandling {
     }
 
     /**
-     * Setzt eine Pflegeplanung ab. Die zugehörigen DFNs werden ab JETZT entfernt. Es wird automatisch
-     * eine Planungskontrolle eingefügt, zum selben Zeitpunkt. Als Kommentar enthält sie die Bemerkung.
-     * Sie ist als Abschlussprüfung markiert.
-     * @param planid welche Planung soll abgesetzt werden.
+     * Setzt eine Pflegeplanung ab. Die zugehÃ¶rigen DFNs werden ab JETZT entfernt. Es wird automatisch
+     * eine Planungskontrolle eingefÃ¼gt, zum selben Zeitpunkt. Als Kommentar enthÃ¤lt sie die Bemerkung.
+     * Sie ist als AbschlussprÃ¼fung markiert.
+     *
+     * @param planid    welche Planung soll abgesetzt werden.
      * @param bemerkung Bemerkung, die in den Planungskontrollen hinterlegt werden soll
      * @return erfolg
      */
@@ -854,7 +848,7 @@ public class DBHandling {
             }
 
             hm.clear();
-            // Letzte Kontrolle einfügen
+            // Letzte Kontrolle einfÃ¼gen
             hm.put("Datum", "!NOW!");
             hm.put("PlanID", planid);
             hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
@@ -908,6 +902,6 @@ public class DBHandling {
         }
         return result;
     }
-    
-    
+
+
 }

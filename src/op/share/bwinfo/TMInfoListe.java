@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,20 +26,20 @@
  */
 package op.share.bwinfo;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.swing.table.AbstractTableModel;
 import op.OPDE;
 import op.tools.DlgException;
 
+import javax.swing.table.AbstractTableModel;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
- *
  * @author tloehr
  */
 public class TMInfoListe extends AbstractTableModel {
 
-//    private ArrayList content;
+    //    private ArrayList content;
 //    private SimpleDateFormat sdf;
     private ResultSet rs;
     private boolean[] zebra = null;
@@ -54,10 +54,10 @@ public class TMInfoListe extends AbstractTableModel {
     TMInfoListe(int katart, String suche) {
         String sql =
                 " SELECT t.BWINFTYP, t.BWInfoKurz, t.IntervalMode, k.KatArt, k.Bezeichnung, k.BWIKID, k.Sortierung " +
-                " FROM BWInfoTyp t " +
-                " INNER JOIN BWInfoKat k ON t.BWIKID = k.BWIKID " +
-                " WHERE UPPER(t.BWINFTYP) <> 'HAUF' AND t.Sortierung >= 0 AND k.Sortierung >= 0 " +
-                (katart == BWInfo.ART_ALLES ? "" : (katart == BWInfo.ART_PFLEGE_STAMMDATEN ? " AND k.KatArt IN (" + BWInfo.ART_PFLEGE + "," + BWInfo.ART_STAMMDATEN + ") " : (katart == BWInfo.ART_VERWALTUNG_STAMMDATEN ? " AND k.KatArt IN (" + BWInfo.ART_VERWALTUNG + "," + BWInfo.ART_STAMMDATEN + ") " : " AND k.KatArt = ? ")));
+                        " FROM BWInfoTyp t " +
+                        " INNER JOIN BWInfoKat k ON t.BWIKID = k.BWIKID " +
+                        " WHERE UPPER(t.BWINFTYP) <> 'HAUF' AND t.Sortierung >= 0 AND k.Sortierung >= 0 " +
+                        (katart == BWInfo.ART_ALLES ? "" : (katart == BWInfo.ART_PFLEGE_STAMMDATEN ? " AND k.KatArt IN (" + BWInfo.ART_PFLEGE + "," + BWInfo.ART_STAMMDATEN + ") " : (katart == BWInfo.ART_VERWALTUNG_STAMMDATEN ? " AND k.KatArt IN (" + BWInfo.ART_VERWALTUNG + "," + BWInfo.ART_STAMMDATEN + ") " : " AND k.KatArt = ? ")));
         if (!suche.equals("")) {
             sql += " AND t.BWInfoKurz like ? ";
         }
@@ -87,11 +87,11 @@ public class TMInfoListe extends AbstractTableModel {
                 while (rs.next()) {
                     int current = rs.getInt("k.BWIKID");
                     //OPDE.getLogger().debug("#"+rs.getRow()+"   prev: "+prev + "    current: "+current + "     "+z+"  "+rs.getString("k.Bezeichnung"));                    
-                    if (prev != current){
+                    if (prev != current) {
                         prev = current;
                         z = !z;
-                    }                   
-                    zebra[rs.getRow()-1] = z;
+                    }
+                    zebra[rs.getRow() - 1] = z;
                 }
             }
 
@@ -124,7 +124,7 @@ public class TMInfoListe extends AbstractTableModel {
         Object result = "";
         try {
             rs.absolute(r + 1);
-            boolean katchange = (r == 0) || zebra[r-1] != zebra[r];
+            boolean katchange = (r == 0) || zebra[r - 1] != zebra[r];
 
             switch (c) {
                 case COL_KATEGORIE: {

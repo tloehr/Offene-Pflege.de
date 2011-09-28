@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2011 Torsten Löhr
+ * Copyright (C) 2011 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
  *
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License,
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
@@ -25,32 +25,18 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "SYSVER2FILE")
 @NamedQueries({
-    @NamedQuery(name = "Sysver2file.findAll", query = "SELECT s FROM Sysver2file s"),
-    @NamedQuery(name = "Sysver2file.findById", query = "SELECT s FROM Sysver2file s WHERE s.id = :id")})
+        @NamedQuery(name = "Sysver2file.findAll", query = "SELECT s FROM Sysver2file s"),
+        @NamedQuery(name = "Sysver2file.findById", query = "SELECT s FROM Sysver2file s WHERE s.id = :id")})
 public class Sysver2file implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -90,7 +76,6 @@ public class Sysver2file implements Serializable {
         this.user = user;
     }
 
-    
 
     public Date getPit() {
         return pit;
@@ -119,7 +104,7 @@ public class Sysver2file implements Serializable {
     public void setBemerkung(String bemerkung) {
         this.bemerkung = bemerkung;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

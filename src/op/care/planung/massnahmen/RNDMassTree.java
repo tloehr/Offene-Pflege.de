@@ -4,20 +4,16 @@
  */
 package op.care.planung.massnahmen;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.util.Enumeration;
-import java.util.Vector;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
 import op.tools.ListElement;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
+import java.awt.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class RNDMassTree implements TreeCellRenderer {
 
@@ -69,7 +65,7 @@ public class RNDMassTree implements TreeCellRenderer {
         }
         if (sum > 0 && sum.doubleValue() != zeit.doubleValue()) {
             label += " <font color=\"green\"><b>" + sum + " Min</b></font>";
-        //OPDE.getLogger().debug(label + zeit + " " + new Boolean(sum != zeit).toString());
+            //OPDE.getLogger().debug(label + zeit + " " + new Boolean(sum != zeit).toString());
         }
         lbl1.setText(SYSTools.toHTML(label + modfaktoren2html(mdfs)));
 
@@ -131,7 +127,7 @@ public class RNDMassTree implements TreeCellRenderer {
             Object[] o = (Object[]) e.nextElement();
             boolean selected = (Boolean) o[4];
             if (selected) {
-                if (result.equals("")) { // Noch leer, dann müssen wir erst die unsorted Umgebung beginnen.
+                if (result.equals("")) { // Noch leer, dann mÃ¼ssen wir erst die unsorted Umgebung beginnen.
                     result += "<ul>";
                 }
 

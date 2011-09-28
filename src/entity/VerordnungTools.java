@@ -4,21 +4,17 @@
  */
 package entity;
 
+import op.OPDE;
+import op.tools.*;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import op.OPDE;
-import op.tools.DlgException;
-import op.tools.HTMLTools;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
  * @author tloehr
  */
 public class VerordnungTools {
@@ -69,7 +65,7 @@ public class VerordnungTools {
                     + "       INNER JOIN MPBestand best ON vor.VorID = best.VorID "
                     + "       WHERE vor.Bis = '9999-12-31 23:59:59' AND best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59' "
                     + " ) bb ON aa.VorID = bb.VorID "
-                    + " WHERE aa.tmp = 0 " + // Falls noch alte Trümmer existieren, dann die nicht anzeigen.
+                    + " WHERE aa.tmp = 0 " + // Falls noch alte TrÃ¼mmer existieren, dann die nicht anzeigen.
                     " ORDER BY aa.StatID, aa.BWName, aa.DafID <> 0, aa.FStellplan, CONCAT(aa.mptext, aa.mssntext)";
             stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, einrichtung.getEKennung());
@@ -85,18 +81,18 @@ public class VerordnungTools {
     }
 
     /**
-     * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
-     * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
-     * Aufgrund der ungleichen HTML Standards (insbesonders der Druckdarstellung im CSS2.0 und später auch CSS2.1)
+     * Diese Methode erzeugt einen Stellplan fÃ¼r den aktuellen Tag im HTML Format.
+     * Eine Besonderheit bei der Implementierung muss ich hier erlÃ¤utern.
+     * Aufgrund der ungleichen HTML Standards (insbesonders der Druckdarstellung im CSS2.0 und spÃ¤ter auch CSS2.1)
      * muss ich hier einen Trick anwenden, damit das auf verschiedenen Browsern halbwegs gleich aussieht.
-     *
-     * Daher addiere ich jedes größere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1.
+     * <p/>
+     * Daher addiere ich jedes grÃ¶ÃŸere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1.
      * Nach einer bestimmten Anzahl von Elementen erzwinge ich einen Pagebreak.
-     *
+     * <p/>
      * Nach einem Pagebreak wird der Name des aktuellen Bewohner nocheinmal wiederholt.
-     *
+     * <p/>
      * Ein Mac OS Safari druckt mit diesen Werten sehr gut.
-     * Beim Firefox sollten die Ränder wie folgt eingestellt werden:
+     * Beim Firefox sollten die RÃ¤nder wie folgt eingestellt werden:
      * <ul>
      * <li>print.print_margin_bottom = 0.3</li>
      * <li>print.print_margin_left = 0.1</li>
@@ -108,18 +104,19 @@ public class VerordnungTools {
      * <li>print.print_unwriteable_margin_top = 25</li>
      * <li>Drucken des Hintergrundes einschalten</li>
      * <ul>
+     *
      * @param rs
      * @return
      */
     private static String getStellplan(ResultSet rs) {
 
-        // TODO: Kandidat für SYSProps
+        // TODO: Kandidat fÃ¼r SYSProps
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = 23;
 
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = "Stellplan für den " + DateFormat.getDateInstance().format(new Date());
+        String header = "Stellplan fÃ¼r den " + DateFormat.getDateInstance().format(new Date());
 
         String html = "<html>\n"
                 + "<head>\n"
@@ -144,40 +141,40 @@ public class VerordnungTools {
             rs.beforeFirst();
 
             while (rs.next()) {
-                
+
                 boolean stationsWechsel = statid != rs.getLong("aa.StatID");
 
-                // Wenn der Plan für eine ganze Einrichtung gedruckt wird, dann beginnt eine
+                // Wenn der Plan fÃ¼r eine ganze Einrichtung gedruckt wird, dann beginnt eine
                 // neue Station immer auf einer neuen Seite.
-                if (stationsWechsel){
+                if (stationsWechsel) {
                     elementNumber = 1;
                     // Beim ersten Mal nur ein H1 Header. Sonst mit Seitenwechsel.
-                    if (statid == 0){
+                    if (statid == 0) {
                         html += "<h1 align=\"center\" id=\"fonth1\">";
                     } else {
                         html += "</table>\n";
                         html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
                     }
                     html += header + " (" + rs.getString("aa.StatBezeichnung") + ")" + "</h1>\n";
-                    html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
+                    html += "<div align=\"center\" id=\"fontsmall\">StellplÃ¤ne <u>nur einen Tag</u> lang benutzen! Danach <u>mÃ¼ssen sie vernichtet</u> werden.</div>";
                     statid = rs.getLong("aa.StatID");
                 }
 
-                // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
+                // Alle Formen, die nicht abzÃ¤hlbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
                 boolean grau = rs.getInt("FStellplan") > 0;
 
-                // Wenn der Bewohnername sich in der Liste ändert, muss
-                // einmal die Überschrift drüber gesetzt werden.
+                // Wenn der Bewohnername sich in der Liste Ã¤ndert, muss
+                // einmal die Ãœberschrift drÃ¼ber gesetzt werden.
                 boolean bewohnerWechsel = !bwkennung.equals(rs.getString("bwkennung"));
-                
-                if (pagebreak || stationsWechsel || bewohnerWechsel){
-                    // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-                    // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+
+                if (pagebreak || stationsWechsel || bewohnerWechsel) {
+                    // Falls zufÃ¤llig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslÃ¶sen WÃœRDE
+                    // mÃ¼ssen wir hier schonmal vorsorglich den Seitenumbruch machen.
                     // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
                     // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
                     pagebreak = (elementNumber + 2 + 2) > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
 
-                    // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+                    // AuÃŸer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
                     if (pagebreak || !bwkennung.equals("")) {
                         html += "</table>\n";
                     }
@@ -185,7 +182,7 @@ public class VerordnungTools {
                     bwkennung = rs.getString("bwkennung");
                     html += "<h2 id=\"fonth2\" " + (pagebreak ? "style=\"page-break-before:always\">" : ">") + ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "") + rs.getString("bwname") + " [" + rs.getString("bwkennung") + "]</h2>\n";
                     html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">\n<tr>"
-                            + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>\n";
+                            + "<th>PrÃ¤parat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>\n";
                     elementNumber += 2;
 
                     if (pagebreak) {
@@ -224,12 +221,12 @@ public class VerordnungTools {
     }
 
     /**
-     * Erstellt den Text für die Massnahmenspalte beim Ausdruck mit dem Styled Text XML Tags
+     * Erstellt den Text fÃ¼r die Massnahmenspalte beim Ausdruck mit dem Styled Text XML Tags
      * von JasperReports.
      *
      * @param rs ResultSet der zugrundeliegenden Abfrage. Die Position des Sets wird durch
-     * die aufrufende JRDataSource bestimmt.
-     * @return XML Code für den Druck.
+     *           die aufrufende JRDataSource bestimmt.
+     * @return XML Code fÃ¼r den Druck.
      */
     private static String getMassnahme(ResultSet rs) throws SQLException {
         String result = "";
@@ -271,7 +268,7 @@ public class VerordnungTools {
 //            result += "<style isBold=\"true\" isUnderline=\"true\">Nur bei Bedarf:</style> <style isItalic=\"true\">" + rs.getString("sittext") + "</style>";
 //        }
         if (rs.getString("Bemerkung") != null && !rs.getString("Bemerkung").equals("")) {
-            if (!wiederholung.equals("")){
+            if (!wiederholung.equals("")) {
                 result += "<br/>";
             }
             result += "<b><u>Bemerkung:</u></b> " + rs.getString("Bemerkung");

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -44,7 +44,7 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
     private List<VorgangElement> mymodel;
     protected boolean showOperations = false;
 
-    // Enthält den Tabellennamen. Dieses Array passt zum Wert in der gleichnamigen Spalte
+    // EnthÃ¤lt den Tabellennamen. Dieses Array passt zum Wert in der gleichnamigen Spalte
     //public static final String[] tblidx = new String[]{"Tagesberichte", "Planung", "BHPVerordnung", "BWerte", "BWInfo"};
     public TMElement(List<VorgangElement> model) {
 
@@ -143,7 +143,7 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
     public int getColumnCount() {
         int colCount = 2;
 
-        if (this.showOperations){
+        if (this.showOperations) {
             colCount = 3;
         }
 
@@ -156,7 +156,8 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
     }
 
     /**
-     * Gibt das Element Objekt einer bestimmten Zeile zurück.
+     * Gibt das Element Objekt einer bestimmten Zeile zurÃ¼ck.
+     *
      * @param row
      * @return
      */
@@ -181,7 +182,7 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
 //    }
 
 //    public String getTableAsHTML() {
-//        String html = "<h2>Einträge zum Vorgang</h2>";
+//        String html = "<h2>EintrÃ¤ge zum Vorgang</h2>";
 //
 //        html += "<table border=\"1\" cellspacing=\"0\"><tr>"
 //                + "<th style=\"width:20%\">Info</th><th style=\"width:80%\">Eintrag</th></tr>";

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2011 Torsten Löhr
+ * Copyright (C) 2011 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
  *
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License,
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
@@ -25,25 +25,6 @@
  */
 package entity;
 
-import java.awt.Component;
-import java.awt.Desktop;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.persistence.Query;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import op.OPDE;
 import op.care.sysfiles.DlgNewFile;
 import op.tools.DlgException;
@@ -51,14 +32,26 @@ import op.tools.SYSTools;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
+import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
+
 /**
- *
  * @author tloehr
  */
 public class SYSFilesTools {
 
     /**
-     * Sucht alle Dateien für einen bestimmten Bewohner raus und gibt diesen als Set von SYSFiles zurück.
+     * Sucht alle Dateien fÃ¼r einen bestimmten Bewohner raus und gibt diesen als Set von SYSFiles zurÃ¼ck.
+     *
      * @param bewohner
      * @return
      */
@@ -90,13 +83,13 @@ public class SYSFilesTools {
      * <ol>
      * <li>Zuerst wird der MD5 der zu speichernden Datei berechnet.</li>
      * <li>Anhand dieser MD5 Signatur wird ermittelt, ob es schon einen entsprechenden Eintrag in der Datenbank gibt.
-     *      <ul>
-     *      <li>Wenn ja, dann wird einfach der PK zurückgegeben. Nochmal speichern braucht man das ja nicht. <b>RETURN</b></li>
-     *      <li>Wenn nicht, dann geht die Bearbeitung weiter.</li>
-     *      </ul>
+     * <ul>
+     * <li>Wenn ja, dann wird einfach der PK zurÃ¼ckgegeben. Nochmal speichern braucht man das ja nicht. <b>RETURN</b></li>
+     * <li>Wenn nicht, dann geht die Bearbeitung weiter.</li>
+     * </ul>
      * <li>Erstellen einer SYSFiles EB</li>
      * <li>Senden der Datei an den FTP Server</li>
-     * <li>Wenn die letzten beiden Schritte erfolgreich waren, dann wird die neue EB als Ergebnis zurück gegeben. null, bei Fehler.</li>
+     * <li>Wenn die letzten beiden Schritte erfolgreich waren, dann wird die neue EB als Ergebnis zurÃ¼ck gegeben. null, bei Fehler.</li>
      * </ol>
      *
      * @param file File Obkjekt der zu speichernden Datei
@@ -133,16 +126,16 @@ public class SYSFilesTools {
                     OPDE.fatal(e1);
                     /*
                      * Das ist etwas unelegant. Aber leider geht es nicht anders.
-                     * An sich hätte ich lieber mit der Transaction.rollback gearbeitet.
+                     * An sich hÃ¤tte ich lieber mit der Transaction.rollback gearbeitet.
                      * Ich brauche aber direkt nach dem Persist den primary key der entity.
                      * Und den krieg ich nur, wenn ich das persist committe.
-                     * Falls dann doch noch was schief geht, lösche ich die Entität wieder.
+                     * Falls dann doch noch was schief geht, lÃ¶sche ich die EntitÃ¤t wieder.
                      */
                     OPDE.getEM().getTransaction().begin();
                     OPDE.getEM().remove(sysfile);
                     OPDE.getEM().getTransaction().commit();
                 }
-            } else { // Ansonsten die bestehende Datei zurückgeben
+            } else { // Ansonsten die bestehende Datei zurÃ¼ckgeben
                 sysfile = (SYSFiles) query.getSingleResult();
             }
 
@@ -157,15 +150,15 @@ public class SYSFilesTools {
      * <code>getFile(SYSFiles file)</code> holt eine Datei vom FTP Server entsprechend der Angaben aus der EntityBean.
      * Die Methode geht dabei wie folgt vor:
      * <ol>
-     * <li>Es wird nachgeprüft, ob es einen passenden Eintrag in der DB-Tabelle <i>SYSFiles</i> gibt.</li>
+     * <li>Es wird nachgeprÃ¼ft, ob es einen passenden Eintrag in der DB-Tabelle <i>SYSFiles</i> gibt.</li>
      * <li>Gibt es die Datei schon und hat sie auch die korrekte MD5 Signatur ?
-     *      <ul>
-     *      <li>Wenn ja, dann wird einfach ein File auf die Datei zurückgegeben. <b>RETURN</b></li>
-     *      <li>Wenn nicht, dann geht die Bearbeitung weiter.</li>
-     *      </ul>
+     * <ul>
+     * <li>Wenn ja, dann wird einfach ein File auf die Datei zurÃ¼ckgegeben. <b>RETURN</b></li>
+     * <li>Wenn nicht, dann geht die Bearbeitung weiter.</li>
+     * </ul>
      * <li>Datei wird vom FTP Server geholt.</li>
      * <li>Der Timestamp des letzten Zugriffs wird wieder hergestellt.</li>
-     * <li>Wenn die letzten beiden Schritte erfolgreich waren, dann wird ein File als Ergebnis zurückgegeben. null, bei Fehler.</li>
+     * <li>Wenn die letzten beiden Schritte erfolgreich waren, dann wird ein File als Ergebnis zurÃ¼ckgegeben. null, bei Fehler.</li>
      * </ol>
      *
      * @param sysfile - Datei, die vom FTP Server geholt werden soll.
@@ -211,17 +204,17 @@ public class SYSFilesTools {
     }
 
     /**
-     * <code>updateFile(File, long)</code> aktualisiert eine bestehende Datei auf dem FTP Server gemäß des PK aus der DB-Tabelle <i>OCFiles</i>
-     * Der Dateiname wird nicht geändert.
+     * <code>updateFile(File, long)</code> aktualisiert eine bestehende Datei auf dem FTP Server gemÃ¤ÃŸ des PK aus der DB-Tabelle <i>OCFiles</i>
+     * Der Dateiname wird nicht geÃ¤ndert.
      * Die Methode geht dabei wie folgt vor:
      * <ol>
-     * <li>Es wird nachgeprüft, ob es einen passenden Eintrag in der DB-Tabelle <i>OCFiles</i> gibt.</li>
-     * <li>Dann wird die MD5 Summe der neuen Datei ermittelt. Stimmt sie mit der bestehenden überein, gibt es nichts zu tun.</li>
-     * <li>Wenn nicht, dann wird die Datei auf dem Server gelöscht und anschließend erneut raufgeladen.
+     * <li>Es wird nachgeprÃ¼ft, ob es einen passenden Eintrag in der DB-Tabelle <i>OCFiles</i> gibt.</li>
+     * <li>Dann wird die MD5 Summe der neuen Datei ermittelt. Stimmt sie mit der bestehenden Ã¼berein, gibt es nichts zu tun.</li>
+     * <li>Wenn nicht, dann wird die Datei auf dem Server gelÃ¶scht und anschlieÃŸend erneut raufgeladen.
      * <li>Eintrag in der DBTabelle <i>OCFiles</i> wird mit der neuen MD5 Summe und den neuen Dateidaten aktualisiert.</li>
      * </ol>
      *
-     * @param file File Objekt der neuen Datei.q
+     * @param file  File Objekt der neuen Datei.q
      * @param ocfid pk aus der DB-Tabelle <i>OCFiles</i>
      * @return true, wenn Austausch erfolgreich war. false, wenn nicht.
      */
@@ -230,7 +223,7 @@ public class SYSFilesTools {
         try {
             String newmd5 = SYSTools.getMD5Checksum(file);
             OPDE.getEM().getTransaction().begin();
-            // Ist überhaupt ein Austausch nötig ?
+            // Ist Ã¼berhaupt ein Austausch nÃ¶tig ?
             if (!sysfile.getMd5().equals(newmd5)) {
                 FTPClient ftp = new FTPClient();
                 ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
@@ -240,7 +233,7 @@ public class SYSFilesTools {
 
                 // neuen Timestamp bestimmen
                 long ts = file.lastModified();
-                // Löschen.................
+                // LÃ¶schen.................
                 String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
 
                 ftp.deleteFile(remoteFilename);
@@ -293,7 +286,7 @@ public class SYSFilesTools {
      * Desktop API nicht funktionieren.
      *
      * @param filename
-     * @return String[] der das passende command array für den EXEC Aufruf erhält.
+     * @return String[] der das passende command array fÃ¼r den EXEC Aufruf erhÃ¤lt.
      */
     public static String[] getLocalDefinedApp(String filename) {
         String os = System.getProperty("os.name").toLowerCase();
@@ -306,7 +299,7 @@ public class SYSFilesTools {
     }
 
     /**
-     * Gibt den Teil eines Dateinamens zurück, der als Extension bezeichnet wird. Also html oder pdf etc.
+     * Gibt den Teil eines Dateinamens zurÃ¼ck, der als Extension bezeichnet wird. Also html oder pdf etc.
      *
      * @param name
      * @return
@@ -317,8 +310,9 @@ public class SYSFilesTools {
     }
 
     /**
-     * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm.
+     * Diese Methode ermittelt zu einer gebenen Datei und einer gewÃ¼nschten Aktion das passende Anzeigeprogramm.
      * Falls die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
+     *
      * @param filename
      * @param action
      */
@@ -353,14 +347,15 @@ public class SYSFilesTools {
                             "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "JAVA Desktop UnterstÃ¼tzung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     /**
-     * Methode zum vereinfachten Anzeigen von Dateien, die nur über SYSFiles definiert wurden.
+     * Methode zum vereinfachten Anzeigen von Dateien, die nur Ã¼ber SYSFiles definiert wurden.
      * Sie holt sich die Datei selbst vom FTP Server.
+     *
      * @param sysfile
      * @param action
      */
@@ -369,7 +364,6 @@ public class SYSFilesTools {
     }
 
     /**
-     * 
      * @param parent
      * @param tablename
      * @param fk
@@ -391,8 +385,8 @@ public class SYSFilesTools {
         final Object ent = entity;
         ArrayList<Object[]> filesList = new ArrayList();
 
-        // Was für eine Art von Objekt wurde übergeben ?
-        // Je nachdem, muss eine unterschiedliche Abfrage ausgeführt werden
+        // Was fÃ¼r eine Art von Objekt wurde Ã¼bergeben ?
+        // Je nachdem, muss eine unterschiedliche Abfrage ausgefÃ¼hrt werden
         if (entity instanceof Pflegeberichte) {
             namedQuery = "SYSFiles.findByPB";
             queryParameter = "pflegebericht";
@@ -410,7 +404,7 @@ public class SYSFilesTools {
 
         // Wenn diese Methode weiss, wie sie mit
         // dem Objekt umgehen muss, dann gehts weiter. Ansonsten
-        // gibts kein Menü.
+        // gibts kein MenÃ¼.
         if (!namedQuery.equals("")) {
             Query query;
             query = OPDE.getEM().createNamedQuery(namedQuery, SYSFiles.class);
@@ -421,7 +415,7 @@ public class SYSFilesTools {
 
 
         // -------------------------------------------------
-        JMenuItem itemPopupAddDoc = new JMenuItem("Dokument hinzufügen");
+        JMenuItem itemPopupAddDoc = new JMenuItem("Dokument hinzufÃ¼gen");
         itemPopupAddDoc.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -454,7 +448,6 @@ public class SYSFilesTools {
     }
 
     /**
-     *
      * @param menuText
      * @param list
      * @return
@@ -490,8 +483,9 @@ public class SYSFilesTools {
     }
 
     /**
-     * Verarbeitet die übergebene Datei entsprechend der Desktop Action. Berücksichtigt dabei die
+     * Verarbeitet die Ã¼bergebene Datei entsprechend der Desktop Action. BerÃ¼cksichtigt dabei die
      * evtl. lokal definierten Applikationen.
+     *
      * @param parent
      * @param file
      * @param action
@@ -526,7 +520,7 @@ public class SYSFilesTools {
                             "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parent, "JAVA Desktop UnterstÃ¼tzung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -537,7 +531,7 @@ public class SYSFilesTools {
      * Desktop API nicht funktionieren.
      *
      * @param file betreffende Datei
-     * @return String[] der das passende command array für den EXEC Aufruf erhält.
+     * @return String[] der das passende command array fÃ¼r den EXEC Aufruf erhÃ¤lt.
      */
     public static String[] getLocalDefinedViewerApp(File file) {
         String os = System.getProperty("os.name").toLowerCase();

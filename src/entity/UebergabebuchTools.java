@@ -4,13 +4,13 @@
  */
 package entity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 /**
- *
  * @author tloehr
  */
 public class UebergabebuchTools {
@@ -30,7 +30,8 @@ public class UebergabebuchTools {
     }
 
     /**
-     * gibt eine HTML Darstellung des Berichtes zurück.
+     * gibt eine HTML Darstellung des Berichtes zurÃ¼ck.
+     *
      * @return
      */
     public static String getAsHTML(Uebergabebuch bericht) {
@@ -47,7 +48,8 @@ public class UebergabebuchTools {
     }
 
     /**
-     * gibt eine HTML Darstellung des Einrichtungsnamen zurück.
+     * gibt eine HTML Darstellung des Einrichtungsnamen zurÃ¼ck.
+     *
      * @return
      */
     public static String getEinrichtungAsHTML(Uebergabebuch bericht) {

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,57 +26,10 @@
  */
 package op.share.bwinfo;
 
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemListener;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import op.OPDE;
 import op.share.tools.DlgDBEdit;
-import op.tools.ListElement;
 import op.tools.DBHandling;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.DlgZeitpunkt;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -85,28 +38,42 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 import se.datadosen.component.RiverLayout;
 
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.util.*;
+
 /**
- * Dieser Dialog ist ein Standardfenster für alle Bewohnerdaten. Die Daten haben ganz unterschiedliche
+ * Dieser Dialog ist ein Standardfenster fÃ¼r alle Bewohnerdaten. Die Daten haben ganz unterschiedliche
  * Formen. Diesem Umstand wird alleine dadurch schon Rechnung getragen, dass diese Daten in einem
  * Textfeld (im XML Format) in der Datenbank gespeichert werden. Es gibt Daten die mittels Radiobuttons
- * eingegeben werden müssen, teilweise sind Textfields oder Checkboxes nötig. Damit man nun nicht
- * für jede evtl. benötigte Eingabeart einen eigenen Dialog erstellen muss, haben wir hier einen generischen
+ * eingegeben werden mÃ¼ssen, teilweise sind Textfields oder Checkboxes nÃ¶tig. Damit man nun nicht
+ * fÃ¼r jede evtl. benÃ¶tigte Eingabeart einen eigenen Dialog erstellen muss, haben wir hier einen generischen
  * Dialog entwickelt, der sich mittels zweier XML Dokumente jeweils auf das angeforderte Aussehen einstellt.
+ *
  * @param xmls In diesem XML Dokument steht die Struktur
  * @param xlmc Hier steht der Inhalt
- * @author  tloehr
- *
+ * @author tloehr
  */
 public class DlgBWInfo extends javax.swing.JDialog {
 
-    private int dlgMode; // Enthält die Angabe, in welchem Zustand sich der Dialog befindet.
+    private int dlgMode; // EnthÃ¤lt die Angabe, in welchem Zustand sich der Dialog befindet.
     public static final int MODE_EDIT = 0; // Ein bestehender Wert wird korrigiert (UPDATE)
-    public static final int MODE_CHANGE = 1; // Ein bestehender Wert verändert sich, der alte bleibt erhalten. (UPDATE, INSERT)
-    // Für die Textfelder, damit man dort Datentypen vorschreiben.
+    public static final int MODE_CHANGE = 1; // Ein bestehender Wert verÃ¤ndert sich, der alte bleibt erhalten. (UPDATE, INSERT)
+    // FÃ¼r die Textfelder, damit man dort Datentypen vorschreiben.
     private static final int TYPE_DONT_CARE = 0;
     private static final int TYPE_INT = 1;
     private static final int TYPE_DOUBLE = 2;
-    private final String[] titleText = {"Korrektur", "Veränderung", "Neueingabe"};
+    private final String[] titleText = {"Korrektur", "VerÃ¤nderung", "Neueingabe"};
     private HashMap antwort;
     private HashMap components;
     private boolean initPanel;
@@ -123,13 +90,13 @@ public class DlgBWInfo extends javax.swing.JDialog {
     private HashMap info;
     private ArrayList veto;
     private boolean formChanged;
-    // letzter gültiger Stand der Datums und Zeitpunkte. 
-    // wird zum Auslesen gebraucht und falls man auf das zuletzt gültige zurückkehren möchte.
+    // letzter gÃ¼ltiger Stand der Datums und Zeitpunkte. 
+    // wird zum Auslesen gebraucht und falls man auf das zuletzt gÃ¼ltige zurÃ¼ckkehren mÃ¶chte.
     private Date von;
     private Date bis;
     private boolean withTime; // Wird die Uhrzeit mit abgefragt ?
     private Frame parent;
-    private double scalesum; // Wird nur bei Skalen benutzt. Enthält immer die Gesamtsumme einer Skala.
+    private double scalesum; // Wird nur bei Skalen benutzt. EnthÃ¤lt immer die Gesamtsumme einer Skala.
     private boolean scalemode; // anzeige, ob sich der parser innerhalb einer Scale Umgebung befindet.
     private String scalelabel;
     //private String scalename;
@@ -139,11 +106,12 @@ public class DlgBWInfo extends javax.swing.JDialog {
 
     /**
      * DlgDaten
-     * @param parent Parentframe dieses Dialogs
+     *
+     * @param parent    Parentframe dieses Dialogs
      * @param bwkennung Kennung des Bewohners, um den es geht
-     * @param hm enthält die Angaben über das Attribut um das es geht, inklusive der XML Dokumente bzgl. Struktur und Inhalt der Information.
-     * Diese HashMap ist ein Element der ArrayList aus der Klasse BWInfo.
-     * @param mode teilt dem Dialog mit, wie er sich verhalten soll (MODE_NEW, MODE_CHANGE, MODE_EDIT)
+     * @param hm        enthÃ¤lt die Angaben Ã¼ber das Attribut um das es geht, inklusive der XML Dokumente bzgl. Struktur und Inhalt der Information.
+     *                  Diese HashMap ist ein Element der ArrayList aus der Klasse BWInfo.
+     * @param mode      teilt dem Dialog mit, wie er sich verhalten soll (MODE_NEW, MODE_CHANGE, MODE_EDIT)
      */
     public DlgBWInfo(Frame parent, String bwkennung, HashMap hm, int mode) {
         super(parent, true);
@@ -177,17 +145,17 @@ public class DlgBWInfo extends javax.swing.JDialog {
         // Korrigieren
         if (this.dlgMode == MODE_EDIT) {
             /**
-             * - Die Freien Intervalle werden ermittelt. Jedoch wird die zu ändernde Frage ignoriert,
-             *   so dass ihr Intervall als frei angesehen wird. Nur für den Fall, dass die Korrektur
+             * - Die Freien Intervalle werden ermittelt. Jedoch wird die zu Ã¤ndernde Frage ignoriert,
+             *   so dass ihr Intervall als frei angesehen wird. Nur fÃ¼r den Fall, dass die Korrektur
              *   bedeutet, dass sich das Interval ausdehnen soll.
              */
             if (katart == BWInfo.ART_VERWALTUNG) {
                 freeIntervals = DBRetrieve.getFreeIntervals("BWInfo", "Von", "Bis", "BWINFOID<>" + Long.toString(bwinfoid) + " AND BWKennung='" + bwkennung + "' AND BWINFTYP='" + bwinftyp + "'");
             }
-            // Hat sich geändert
+            // Hat sich geÃ¤ndert
         } else { //MODE_CHANGE
             /**
-             * - Änderungen finden immer ab JETZT statt (bzw. ab heute morgen 0h BYDAY).
+             * - Ã„nderungen finden immer ab JETZT statt (bzw. ab heute morgen 0h BYDAY).
              * - Bei Verwaltungsfragen kann man das Anfangsdatum nach vorne verschieben. Soweit, das es unmittelbar nach dem bisherigen VON
              *   bleibt.
              */
@@ -214,8 +182,8 @@ public class DlgBWInfo extends javax.swing.JDialog {
         }
 
 
-        // Zeitraumveränderung sind nur bei Verwaltungs und Stammdaten möglich
-        // Oder wenn man Admin ist. Oder wenn man zur Verwaltungsgruppe gehört.
+        // ZeitraumverÃ¤nderung sind nur bei Verwaltungs und Stammdaten mÃ¶glich
+        // Oder wenn man Admin ist. Oder wenn man zur Verwaltungsgruppe gehÃ¶rt.
         //boolean zeitraumEnabled = katart == BWInfo.ART_VERWALTUNG || katart == BWInfo.ART_STAMMDATEN || OPDE.isAdmin() || OPDE.getGroups().contains("verwaltung");
         boolean zeitraumEnabled = katart == BWInfo.ART_VERWALTUNG || katart == BWInfo.ART_STAMMDATEN || OPDE.isAdmin();
         btnVon.setEnabled(zeitraumEnabled);
@@ -244,7 +212,8 @@ public class DlgBWInfo extends javax.swing.JDialog {
         this.setVisible(true);
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -329,57 +298,57 @@ public class DlgBWInfo extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jspFrage, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, lblKurz, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(btnSave)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnCancel))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(cbUnbeantwortet)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(lbl1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnVon)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(lbl2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnBis)))
-                .addContainerGap())
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jspFrage, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblKurz, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                                        .add(layout.createSequentialGroup()
+                                                .add(btnSave)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnCancel))
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                                .add(cbUnbeantwortet)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                                .add(lbl1)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnVon)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(lbl2)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnBis)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lblKurz)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jspFrage, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
-                .add(6, 6, 6)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cbUnbeantwortet, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(btnVon)
-                    .add(lbl2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(lbl1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
-                    .add(btnBis))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 155, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(btnSave)
-                    .add(btnCancel))
-                .addContainerGap())
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(lblKurz)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jspFrage, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                                .add(6, 6, 6)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(cbUnbeantwortet, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 17, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(btnVon)
+                                        .add(lbl2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .add(lbl1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
+                                        .add(btnBis))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 155, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(18, 18, 18)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(btnSave)
+                                        .add(btnCancel))
+                                .addContainerGap())
         );
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-682)/2, (screenSize.height-553)/2, 682, 553);
+        setBounds((screenSize.width - 682) / 2, (screenSize.height - 553) / 2, 682, 553);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -394,10 +363,10 @@ public class DlgBWInfo extends javax.swing.JDialog {
     private void saveOK() {
         btnSave.setEnabled(veto.isEmpty() && formChanged && DBRetrieve.isInFreeIntervals(freeIntervals, von, bis));
         if (!DBRetrieve.isInFreeIntervals(freeIntervals, von, bis)) {
-            btnSave.setToolTipText("Der gewählte Zeitraum ist nicht frei.");
+            btnSave.setToolTipText("Der gewÃ¤hlte Zeitraum ist nicht frei.");
         }
         if (!formChanged) {
-            btnSave.setToolTipText("Es wurde nichts verändert, daher kann man nichts speichern.");
+            btnSave.setToolTipText("Es wurde nichts verÃ¤ndert, daher kann man nichts speichern.");
         }
     }
 
@@ -418,26 +387,26 @@ public class DlgBWInfo extends javax.swing.JDialog {
     }
 
     private void saveCHANGE() {
-        // Das muss innerhalb einer eigenen Transaktion ablaufen, da die beiden Operationen zusammenhängen.
+        // Das muss innerhalb einer eigenen Transaktion ablaufen, da die beiden Operationen zusammenhÃ¤ngen.
         try {
             OPDE.getDb().db.setAutoCommit(false);
             OPDE.getDb().db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             OPDE.getDb().db.commit();
 
-            // Zuerst den bestehenden kürzen
+            // Zuerst den bestehenden kÃ¼rzen
             OPDE.getLogger().debug(toXML());
             HashMap hm = new HashMap();
-            hm.put("Bis", SYSCalendar.addField(von, -1, GregorianCalendar.SECOND)); // Ist in beiden Fällen das gleiche.
-            // Die Intervalle sind eine künstliche Beschränkung. So dass die Wechsel jeweils um Mitternacht erfolgen.
-            // Somit muss das vorrausgehende Intervall um genau eine Sekunde gekürzt werden und nicht um einen Tag.
-            // Sonst wäre z.B. BIS = 31.08.2008 00:00:00 und VON' = 01.09.2008 00:00:00 (dazwischen liegen 24 Stunden)
+            hm.put("Bis", SYSCalendar.addField(von, -1, GregorianCalendar.SECOND)); // Ist in beiden FÃ¤llen das gleiche.
+            // Die Intervalle sind eine kÃ¼nstliche BeschrÃ¤nkung. So dass die Wechsel jeweils um Mitternacht erfolgen.
+            // Somit muss das vorrausgehende Intervall um genau eine Sekunde gekÃ¼rzt werden und nicht um einen Tag.
+            // Sonst wÃ¤re z.B. BIS = 31.08.2008 00:00:00 und VON' = 01.09.2008 00:00:00 (dazwischen liegen 24 Stunden)
             hm.put("AbUKennung", OPDE.getLogin().getUser().getUKennung());
             if (!DBHandling.updateRecord("BWInfo", hm, "BWINFOID", this.bwinfoid)) {
-                throw new SQLException("saveCHANGE(): updateRecord ist fehlgeschlagen·");
+                throw new SQLException("saveCHANGE(): updateRecord ist fehlgeschlagenÂ·");
             }
             hm.clear();
 
-            // Dann den neuen einfügen.
+            // Dann den neuen einfÃ¼gen.
             hm = new HashMap();
             hm.put("Von", von);
             hm.put("Bis", bis);
@@ -448,7 +417,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
             hm.put("Bemerkung", txtBemerkung.getText());
             long newbwinfoid = DBHandling.insertRecord("BWInfo", hm);
             if (newbwinfoid <= 0) {
-                throw new SQLException("saveCHANGE(): insertRecord ist fehlgeschlagen·");
+                throw new SQLException("saveCHANGE(): insertRecord ist fehlgeschlagenÂ·");
             }
 
             OPDE.getDb().db.commit();
@@ -487,7 +456,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
         }
         formChanged = true;
         saveOK();
-}//GEN-LAST:event_cbUnbeantwortetActionPerformed
+    }//GEN-LAST:event_cbUnbeantwortetActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.dispose();
@@ -558,10 +527,9 @@ public class DlgBWInfo extends javax.swing.JDialog {
     }
 
     /**
-     * createPanel erstellt anhand zweier XML Dokumente (eins für die Struktur, eins für den Inhalt) ein JPanel mit den passenden Eingabe Elementen.
-     * Die Struktur bestimmt, welche Swing Elemente verwendet werden. Der Inhalt setzt die Swing Widget entsprechend. Ob RadioButtons gedrückt sind,
-     * was in Textfeldern steht, welcher Listeneintrag ausgewählt wurde. etc...
-     *
+     * createPanel erstellt anhand zweier XML Dokumente (eins fÃ¼r die Struktur, eins fÃ¼r den Inhalt) ein JPanel mit den passenden Eingabe Elementen.
+     * Die Struktur bestimmt, welche Swing Elemente verwendet werden. Der Inhalt setzt die Swing Widget entsprechend. Ob RadioButtons gedrÃ¼ckt sind,
+     * was in Textfeldern steht, welcher Listeneintrag ausgewÃ¤hlt wurde. etc...
      */
     private JPanel createPanel(String structure, String content) {
         JPanel jp = new JPanel();
@@ -619,7 +587,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 }
             }
         }
-        // nun noch die Einschätzung des Risikos
+        // nun noch die EinschÃ¤tzung des Risikos
         // Bezeichnung und Farbe
         it = scaleriskmodel.iterator();
         boolean found = false;
@@ -651,11 +619,11 @@ public class DlgBWInfo extends javax.swing.JDialog {
         }
         return xml;
     } // toXML()
+
     /**
      * Setzt die Min Max Grenzen der "VON", "BIS" controls neu.
      * BIS kann nicht vor VON gesetzt werden und VON nicht nach BIS.
-     * Muss nach jeder Änderung von "VON" oder "BIS" aufgerufen werden.
-     *
+     * Muss nach jeder Ã„nderung von "VON" oder "BIS" aufgerufen werden.
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBis;
@@ -786,7 +754,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
     private class TextFieldFocusListener implements FocusListener {
 
         public void focusGained(FocusEvent e) {
-            // Alles markieren, wenn das Feld den Focus erhält.
+            // Alles markieren, wenn das Feld den Focus erhÃ¤lt.
             JTextField j = (JTextField) e.getSource();
             j.setSelectionStart(0);
             j.setSelectionEnd(j.getText().length());
@@ -831,25 +799,25 @@ public class DlgBWInfo extends javax.swing.JDialog {
     }
 
     /**
-     * Dieser Handler ist ein SaxParser Handler. Er durchläuft das Struktur XML Dokument und erstellt einen JPanel, der alle
-     * notwendigen Swing Komponenten enthält.
-     *
-     * Folgende XML Konstrukte können verwendet werden:
+     * Dieser Handler ist ein SaxParser Handler. Er durchlÃ¤uft das Struktur XML Dokument und erstellt einen JPanel, der alle
+     * notwendigen Swing Komponenten enthÃ¤lt.
+     * <p/>
+     * Folgende XML Konstrukte kÃ¶nnen verwendet werden:
      * <ol>
-     * <li><code>&lt;checkbox name=&quot;aengstlich&quot; label=&quot;ängstlich&quot;/&gt;</code> führt zu <img src="doc-files/checkbox.png">
+     * <li><code>&lt;checkbox name=&quot;aengstlich&quot; label=&quot;Ã¤ngstlich&quot;/&gt;</code> fÃ¼hrt zu <img src="doc-files/checkbox.png">
      * </li>
      * </ol>
-     *
-     * Die beschriebenen Konstrukte können nacheinander verwendet werden, so dass nach einer Optiongroup mehrere Checkboxes folgen.
+     * <p/>
+     * Die beschriebenen Konstrukte kÃ¶nnen nacheinander verwendet werden, so dass nach einer Optiongroup mehrere Checkboxes folgen.
      * Ein Konstrukt wird immer in eine eigene JPanel mit einem FlowLayout eingeschlossen (innerpanel).
-     * Die innerpanels werden dann alle der Reihe nach wieder in eine JPanel (untereinander, GridLayout) eingefügt (outerpanel).
+     * Die innerpanels werden dann alle der Reihe nach wieder in eine JPanel (untereinander, GridLayout) eingefÃ¼gt (outerpanel).
      * Diese outerpanel ist letztlich das Ergebnis.
-     * <p>
-     * Ausserdem schreibt der Handler in die beiden HashMaps <code>components</code> und <code>antwort</code>. <code>components</code> enthält die
-     * erstellten Widgets, der Zugriff erfolgt über das <code>name</code> Attribut aus der XML Struktur. So dass man, gemäß des obigen Beispiels unter 1.), über
-     * <code>component.get("aengstlich")</code> den Zugriff auf die entsprechend JCheckbox erhält.
-     * <p>
-     * <code>antwort</code> enthält den aktuellen Zustand des jeweiligen Widgets. Bei Checkboxes (wie im Beispiel beschrieben): ("aengstlich", "false"). Bei Optiongroups
+     * <p/>
+     * Ausserdem schreibt der Handler in die beiden HashMaps <code>components</code> und <code>antwort</code>. <code>components</code> enthÃ¤lt die
+     * erstellten Widgets, der Zugriff erfolgt Ã¼ber das <code>name</code> Attribut aus der XML Struktur. So dass man, gemÃ¤ÃŸ des obigen Beispiels unter 1.), Ã¼ber
+     * <code>component.get("aengstlich")</code> den Zugriff auf die entsprechend JCheckbox erhÃ¤lt.
+     * <p/>
+     * <code>antwort</code> enthÃ¤lt den aktuellen Zustand des jeweiligen Widgets. Bei Checkboxes (wie im Beispiel beschrieben): ("aengstlich", "false"). Bei Optiongroups
      * setzt sich der Name des einzelnen Radiobuttons aus gruppenname und optionname zusammen: ("hilfebedarf.uA", "true"). Textfelder enthalten den Eingabetext direkt:
      * ("vorname", "Torsten"). Listen enthalten den Primary Key der entsprechenden Tabellenzeile (meist ist das ein <code>long</code> Wert: ("zimm", 38).
      */
@@ -883,7 +851,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
             // ---------------------- OPTIONGROUPS --------------------------------
             if (tagName.equalsIgnoreCase("optiongroup") || tagName.equalsIgnoreCase("scalegroup")) {
                 groupname = attributes.getValue("name");
-                //Diese HashMap enthält alle Buttongroups zugeordnet zu den Gruppennamen
+                //Diese HashMap enthÃ¤lt alle Buttongroups zugeordnet zu den Gruppennamen
                 //ButtonGroup thisBG = new ButtonGroup();
                 components.put(groupname, new ButtonGroup()); // Jede neue Optiongroup braucht eine eigene Buttongroup.
                 if (scalemode) {
@@ -940,12 +908,12 @@ public class DlgBWInfo extends javax.swing.JDialog {
 
                 if (scalemode) {
                     j.addActionListener(new ScaleOptionActionListener());
-                    components.put(groupname + "." + compName, new Object[]{j, score}); // für den späteren Direktzugriff
+                    components.put(groupname + "." + compName, new Object[]{j, score}); // fÃ¼r den spÃ¤teren Direktzugriff
                 } else {
                     j.addActionListener(new RadioButtonActionListener());
-                    components.put(groupname + "." + compName, j); // für den späteren Direktzugriff
+                    components.put(groupname + "." + compName, j); // fÃ¼r den spÃ¤teren Direktzugriff
                 }
-                ((ButtonGroup) components.get(groupname)).add(j); // der Knopf wird zu der passenden ButtonGroup hinzugefügt.
+                ((ButtonGroup) components.get(groupname)).add(j); // der Knopf wird zu der passenden ButtonGroup hinzugefÃ¼gt.
 
                 if (SYSTools.catchNull(attributes.getValue("default")).equals("true")) {
                     j.setSelected(true);
@@ -964,7 +932,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 }
                 j.setName(groupname);
                 outerpanel.add(j);
-                components.put(groupname, j); // für den späteren Direktzugriff
+                components.put(groupname, j); // fÃ¼r den spÃ¤teren Direktzugriff
                 j.addActionListener(new CheckBoxActionListener());
                 if (tabgroup) {
                     outerpanel.add(layout, j);
@@ -980,7 +948,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
             if (tagName.equalsIgnoreCase("textfield")) {
                 groupname = attributes.getValue("name");
                 // Hiermit kann man den Datentyp des Textfeldes erzwingen.
-                // Der Caretlistener sorgt für den Rest.
+                // Der Caretlistener sorgt fÃ¼r den Rest.
                 int type = TYPE_DONT_CARE;
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("int")) {
                     type = TYPE_INT;
@@ -998,7 +966,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 outerpanel.add("p left", jl);
                 outerpanel.add("tab hfill", j);
-                components.put(groupname, j); // für den späteren Direktzugriff
+                components.put(groupname, j); // fÃ¼r den spÃ¤teren Direktzugriff
                 j.addFocusListener(new TextFieldFocusListener());
                 j.addCaretListener(new TextFieldCaretListener(type, notempty));
                 String defaultText = attributes.getValue("default");
@@ -1089,11 +1057,11 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 editButton.setBorder(null);
                 editButton.setOpaque(true);
                 editButton.setBackground(Color.LIGHT_GRAY);
-                editButton.setToolTipText("Drücken Sie hier um die nebenstehende Liste zu bearbeiten.");
+                editButton.setToolTipText("DrÃ¼cken Sie hier um die nebenstehende Liste zu bearbeiten.");
                 outerpanel.add("tab", editButton);
                 outerpanel.add("tab hfill", j);
-                components.put(groupname, j); // für den späteren Direktzugriff
-                //components.put(groupname + ":edit", editButton); // für den späteren Direktzugriff
+                components.put(groupname, j); // fÃ¼r den spÃ¤teren Direktzugriff
+                //components.put(groupname + ":edit", editButton); // fÃ¼r den spÃ¤teren Direktzugriff
                 j.addItemListener(new ComboBoxItemStateListener());
                 antwort.put(groupname, 0);
                 fields = new ArrayList();
@@ -1102,7 +1070,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 fieldsprefix = new ArrayList();
                 order = new ArrayList();
                 filter = new HashMap();
-                // Bearbeitungsmöglichkeit für die ComboBox
+                // BearbeitungsmÃ¶glichkeit fÃ¼r die ComboBox
                 editButton.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
@@ -1129,7 +1097,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                     fieldsprefix.add("");
                 }
                 if (SYSTools.catchNull(attributes.getValue("order")).equalsIgnoreCase("true")) {
-                    order.add(attributes.getValue("name")); // Hier wird der Spaltenname als Sortierkriterium hinzugefügt.
+                    order.add(attributes.getValue("name")); // Hier wird der Spaltenname als Sortierkriterium hinzugefÃ¼gt.
                 }
             }
             if (tagName.equalsIgnoreCase("filter")) {
@@ -1166,7 +1134,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 boxModel = null;
             }
             if (qName.equalsIgnoreCase("list")) {
-                // listDetails enthält alles, was nötig ist um die Datenbank für eine
+                // listDetails enthÃ¤lt alles, was nÃ¶tig ist um die Datenbank fÃ¼r eine
                 // ComboBox abzufragen. Diese wird dann ebenso in components eingetragen,
                 // wie die Referenz auf die ComboBox selbst. Der Name ist kanonisch, soll
                 // heissen, setzt sich aus listgroupname.details zusammen.
@@ -1191,9 +1159,8 @@ public class DlgBWInfo extends javax.swing.JDialog {
      * <li>Optiongroups: &lt;jn value="nein"&gt;</li>
      * <li>Textfelder: &lt;kontakt value="Nur Kontakt zu ihrer Schwester."&gt;</li>
      * </ul>
-     *
+     * <p/>
      * Neben dem einstellen der Widgets, wird ebenfalls die HashMap <code>antwort</code> entsprechend mit gepflegt.
-     *
      */
     private class HandlerDatenInhalt extends DefaultHandler {
 
@@ -1204,7 +1171,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 cbUnbeantwortet.setSelected(true);
                 //cbTNZ.doClick();
             } else {
-                if (components.containsKey(tagName + "." + value)) {// dass können nur Options oder Scales sein
+                if (components.containsKey(tagName + "." + value)) {// dass kÃ¶nnen nur Options oder Scales sein
                     JRadioButton jc;
                     if (scalemode) {
                         Object[] o = (Object[]) components.get(tagName + "." + value);
@@ -1213,7 +1180,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
                         jc = (JRadioButton) components.get(tagName + "." + value);
                     }
                     jc.setSelected(true);
-                } else { // Das können nur CheckBoxes, Listen oder Textfields sein.
+                } else { // Das kÃ¶nnen nur CheckBoxes, Listen oder Textfields sein.
                     JComponent jc = (JComponent) components.get(tagName);
                     if (jc instanceof JCheckBox) {
                         ((JCheckBox) jc).setSelected(value.equalsIgnoreCase("true"));

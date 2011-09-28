@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,8 +26,15 @@
  */
 package op.care.planung;
 
-import java.awt.Dimension;
-import java.awt.Point;
+import op.OPDE;
+import op.care.DFNImport;
+import op.share.bwinfo.BWInfo;
+import op.tools.*;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigInteger;
@@ -36,31 +43,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
-import op.OPDE;
-import op.care.DFNImport;
-import op.tools.ListElement;
-import op.share.bwinfo.BWInfo;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
 
 /**
- *
- * @author  root
+ * @author root
  */
 public class DlgPlanung extends javax.swing.JDialog {
 
     public static final int NEW_MODE = 1; // Neu
     public static final int EDIT_MODE = 2; // Korrigieren
-    public static final int CHANGE_MODE = 3; // Ändern
+    public static final int CHANGE_MODE = 3; // Ã„ndern
     public static final int TEMPLATE_MODE = 4; // Verwendung von Vorlagen
     private String bwkennung;
     private PropertyChangeListener myPropertyChangeListener;
@@ -68,12 +59,14 @@ public class DlgPlanung extends javax.swing.JDialog {
     private long planid;
     private long plankenn;
     private java.awt.Frame parent;
-    private boolean doDeleteTmp; // Sollen die TMPs nach dem Dispose gelöscht werden ?
+    private boolean doDeleteTmp; // Sollen die TMPs nach dem Dispose gelÃ¶scht werden ?
     private JPopupMenu menu;
     private String oldSituation = ""; // Situation, wie sie am Anfang der Bearbeitung war. Wird nur bei CHANGE gebraucht.
     private String oldZiele = ""; // Ziele, wie sie am Anfang der Bearbeitung waren. Wird nur bei CHANGE gebraucht.
 
-    /** Creates new form DlgPlanung */
+    /**
+     * Creates new form DlgPlanung
+     */
     public DlgPlanung(java.awt.Frame parent, String bwkennung, long planid, int mode) {
         super(parent, true);
         this.parent = parent;
@@ -121,10 +114,10 @@ public class DlgPlanung extends javax.swing.JDialog {
                 lblTitle.setText("Pflegeplanung (Neueingabe)");
                 txtSituation.setText("");
                 txtStichwort.setText("");
-                // Nächste Kontrolle einfach mal in 60 Tagen. Frühestens ab morgen.
+                // NÃ¤chste Kontrolle einfach mal in 60 Tagen. FrÃ¼hestens ab morgen.
                 jdcKontrolle.setDate(SYSCalendar.addDate(SYSCalendar.nowDBDate(), 60));
                 jdcKontrolle.setMinSelectableDate(SYSCalendar.addDate(SYSCalendar.nowDBDate(), 1));
-                // Keine Kategorie auswählen.
+                // Keine Kategorie auswÃ¤hlen.
                 cmbKategorie.setSelectedIndex(-1);
                 // Tabelle leeren
                 tblPlanung.setModel(new DefaultTableModel());
@@ -155,7 +148,7 @@ public class DlgPlanung extends javax.swing.JDialog {
                 txtSituation.setText(SYSTools.catchNull(planung.get("Situation").toString()));
                 txtZiele.setText(SYSTools.catchNull(planung.get("Ziel").toString()));
                 txtStichwort.setText(planung.get("Stichwort").toString());
-                // Nächste Kontrolle einfach mal in 60 Tagen. Frühestens ab morgen.
+                // NÃ¤chste Kontrolle einfach mal in 60 Tagen. FrÃ¼hestens ab morgen.
                 jdcKontrolle.setDate(SYSCalendar.addDate(SYSCalendar.nowDBDate(), 60));
                 jdcKontrolle.setMinSelectableDate(SYSCalendar.addDate(SYSCalendar.nowDBDate(), 1));
                 long bwikid = ((BigInteger) planung.get("BWIKID")).longValue();
@@ -164,7 +157,7 @@ public class DlgPlanung extends javax.swing.JDialog {
                 break;
             }
             case CHANGE_MODE: {
-                lblTitle.setText("Pflegeplanung (Veränderung der Situation)");
+                lblTitle.setText("Pflegeplanung (VerÃ¤nderung der Situation)");
                 DBHandling.copy2tmp(planid);
                 HashMap planung = DBRetrieve.getSingleRecord("Planung", "PlanID", planid);
                 plankenn = ((BigInteger) planung.get("PlanKennung")).longValue();
@@ -176,7 +169,7 @@ public class DlgPlanung extends javax.swing.JDialog {
                 jdcKontrolle.setDate(SYSCalendar.addDate(SYSCalendar.nowDBDate(), 60));
                 jdcKontrolle.setMinSelectableDate(SYSCalendar.addDate(SYSCalendar.nowDBDate(), 1));
                 long bwikid = ((BigInteger) planung.get("BWIKID")).longValue();
-                // Kategorie kann man nicht mehr ändern                
+                // Kategorie kann man nicht mehr Ã¤ndern                
                 SYSTools.selectInComboBox(cmbKategorie, bwikid);
                 cmbKategorie.setEnabled(false);
                 reloadMeinePlanung();
@@ -223,12 +216,12 @@ public class DlgPlanung extends javax.swing.JDialog {
         //tblBib.getColumnModel().getColumn(0).setCellRenderer(new RNDPlanung());
         tblBib.getColumnModel().getColumn(0).setCellRenderer(new RNDPlanung());
 
-    //btnAdd.setEnabled(!txtSuche.equals("") && tblBib.getModel().getRowCount() == 0);
+        //btnAdd.setEnabled(!txtSuche.equals("") && tblBib.getModel().getRowCount() == 0);
 
     }
 
     private void saveOK() {
-        // Gründe, warum man nicht speichern kann.
+        // GrÃ¼nde, warum man nicht speichern kann.
         boolean stichwortXX = txtStichwort.getText().trim().equals("");
         boolean datumXX = jdcKontrolle.getDate() == null;
         boolean kategorieXX = cmbKategorie.getSelectedIndex() < 0;
@@ -239,14 +232,14 @@ public class DlgPlanung extends javax.swing.JDialog {
         btnSave.setEnabled(!(stichwortXX || datumXX || kategorieXX)); //|| situationXX1 || situationXX2 || zieleXX1 || zieleXX2));
 
         if (!btnSave.isEnabled()) {
-            String ursache = "<html><body>Sie können auf dem / den folgenden Grund/Gründen nicht speichern:<ul>";
-            ursache += (stichwortXX ? "<li>Sie <b>müssen</b> ein Stichwort angeben.</li>" : "");
-            ursache += (datumXX ? "<li>Sie haben ein falsches datum für die nächste Kontrolle angegeben.</li>" : "");
-            ursache += (kategorieXX ? "<li>Sie haben keine Kategorie für die Planung ausgewählt.</li>" : "");
-//            ursache += (situationXX1 ? "<li>Sie haben keinen Text zur Situationsbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += (situationXX2 ? "<li>Sie haben den Text zur Situationsbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += (zieleXX1 ? "<li>Sie haben keinen Text zur Zielbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += (zieleXX2 ? "<li>Sie haben den Text zur Zielbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
+            String ursache = "<html><body>Sie kÃ¶nnen auf dem / den folgenden Grund/GrÃ¼nden nicht speichern:<ul>";
+            ursache += (stichwortXX ? "<li>Sie <b>mÃ¼ssen</b> ein Stichwort angeben.</li>" : "");
+            ursache += (datumXX ? "<li>Sie haben ein falsches datum fÃ¼r die nÃ¤chste Kontrolle angegeben.</li>" : "");
+            ursache += (kategorieXX ? "<li>Sie haben keine Kategorie fÃ¼r die Planung ausgewÃ¤hlt.</li>" : "");
+//            ursache += (situationXX1 ? "<li>Sie haben keinen Text zur Situationsbeschreibung eingegeben. Bei einer PlanungsÃ¤nderung ist das Pflicht.</li>" : "");
+//            ursache += (situationXX2 ? "<li>Sie haben den Text zur Situationsbeschreibung nicht verÃ¤ndert. Bei einer PlanungsÃ¤nderung ist das Pflicht.</li>" : "");
+//            ursache += (zieleXX1 ? "<li>Sie haben keinen Text zur Zielbeschreibung eingegeben. Bei einer PlanungsÃ¤nderung ist das Pflicht.</li>" : "");
+//            ursache += (zieleXX2 ? "<li>Sie haben den Text zur Zielbeschreibung nicht verÃ¤ndert. Bei einer PlanungsÃ¤nderung ist das Pflicht.</li>" : "");
             ursache += "</ul></body></html>";
             btnSave.setToolTipText(ursache);
         } else {
@@ -255,7 +248,8 @@ public class DlgPlanung extends javax.swing.JDialog {
 
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -324,22 +318,22 @@ public class DlgPlanung extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblBW))
-                .addContainerGap(272, Short.MAX_VALUE))
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblBW))
+                                .addContainerGap(272, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblBW)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblTitle)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblBW)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jSplitPane1.setDividerLocation(700);
@@ -356,15 +350,15 @@ public class DlgPlanung extends javax.swing.JDialog {
         });
 
         tblPlanung.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         tblPlanung.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -394,7 +388,7 @@ public class DlgPlanung extends javax.swing.JDialog {
         jLabel5.setFont(new java.awt.Font("Dialog", 1, 11));
         jLabel5.setText("Kategorie:");
 
-        cmbKategorie.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbKategorie.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
         cmbKategorie.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbKategorieItemStateChanged(evt);
@@ -435,58 +429,58 @@ public class DlgPlanung extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(cmbKategorie, 0, 0, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jdcKontrolle, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(txtStichwort, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE))))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel5)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(jLabel3)
+                                                        .addComponent(jLabel8))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
+                                                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                                                .addComponent(cmbKategorie, 0, 0, Short.MAX_VALUE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jLabel7)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jdcKontrolle, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(txtStichwort, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
+                                                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE))))
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addGap(14, 14, 14)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(txtStichwort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel7)
-                                .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel5))
-                            .addComponent(jdcKontrolle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel4))
-                .addGap(6, 6, 6)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
-                    .addComponent(jLabel8))
-                .addContainerGap())
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel2)
+                                .addGap(14, 14, 14)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                                .addComponent(txtStichwort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(jLabel7)
+                                                                .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jLabel5))
+                                                        .addComponent(jdcKontrolle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jLabel4))
+                                .addGap(6, 6, 6)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                                        .addComponent(jLabel3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
+                                        .addComponent(jLabel8))
+                                .addContainerGap())
         );
 
         jSplitPane2.setTopComponent(jPanel5);
@@ -494,19 +488,19 @@ public class DlgPlanung extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel2);
 
         jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        txtSuche.setToolTipText("Geben Sie % ein, wenn Sie alles angezeigt bekommen möchten.");
+        txtSuche.setToolTipText("Geben Sie % ein, wenn Sie alles angezeigt bekommen mÃ¶chten.");
         txtSuche.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
                 txtSucheCaretUpdate(evt);
@@ -528,21 +522,22 @@ public class DlgPlanung extends javax.swing.JDialog {
         });
 
         tblBib.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         tblBib.setDragEnabled(true);
         tblBib.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblBibMouseClicked(evt);
             }
+
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tblBibMousePressed(evt);
             }
@@ -555,30 +550,30 @@ public class DlgPlanung extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jspBib, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)))
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jspBib, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel1)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jspBib, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspBib, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         jSplitPane1.setRightComponent(jPanel1);
@@ -586,34 +581,35 @@ public class DlgPlanung extends javax.swing.JDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnSave)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancel)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
+                                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(btnSave)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnCancel)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnCancel)
-                    .addComponent(btnSave))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(btnCancel)
+                                        .addComponent(btnSave))
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
         reloadBibliothek();
     }//GEN-LAST:event_txtSucheCaretUpdate
@@ -682,8 +678,8 @@ public class DlgPlanung extends javax.swing.JDialog {
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                if (JOptionPane.showConfirmDialog(parent, "Sollen die markierten Einträge wirklich entfernt werden ?",
-                        "Einträge entfernen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                if (JOptionPane.showConfirmDialog(parent, "Sollen die markierten EintrÃ¤ge wirklich entfernt werden ?",
+                        "EintrÃ¤ge entfernen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     removeFromPlan();
                     reloadMeinePlanung();
                     reloadBibliothek();
@@ -725,7 +721,7 @@ public class DlgPlanung extends javax.swing.JDialog {
         menu = new JPopupMenu();
 
         // -------------------------------------------------
-        JMenuItem itemPopupAdd = new JMenuItem("Zur Planung hinzufügen");
+        JMenuItem itemPopupAdd = new JMenuItem("Zur Planung hinzufÃ¼gen");
         itemPopupAdd.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -864,7 +860,7 @@ public class DlgPlanung extends javax.swing.JDialog {
     }
 
     private void saveCHANGE() {
-        // Daten für die NEUE Planung
+        // Daten fÃ¼r die NEUE Planung
         HashMap hm = new HashMap();
         hm.put("BWKennung", bwkennung);
         hm.put("Stichwort", txtStichwort.getText());
@@ -1015,7 +1011,6 @@ public class DlgPlanung extends javax.swing.JDialog {
 
     /**
      * Kopiert die markierten Zeilen der Bibliothek in den Plan.
-     * 
      */
     private void bib2plan() {
         if (!tblBib.getSelectionModel().isSelectionEmpty()) {
@@ -1079,6 +1074,7 @@ public class DlgPlanung extends javax.swing.JDialog {
             }
         }
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSave;

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -29,7 +29,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
- *
  * @author tloehr
  */
 public class ListElement implements Comparable<ListElement> {
@@ -97,7 +96,7 @@ public class ListElement implements Comparable<ListElement> {
             result = EQUAL;
         } else {
             result = this.toString().compareTo(that.toString());
-//            if (this.pk != 0) { // entweder über den PK
+//            if (this.pk != 0) { // entweder Ã¼ber den PK
 //                result = EQUAL;
 //                if (this.pk < that.pk) {
 //                    result = BEFORE;
@@ -105,7 +104,7 @@ public class ListElement implements Comparable<ListElement> {
 //                if (this.pk > that.pk) {
 //                    result = AFTER;
 //                }
-//            } else { // oder über data
+//            } else { // oder Ã¼ber data
 //                result = this.data.compareTo(that.data);
 //            }
         }

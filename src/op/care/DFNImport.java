@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -28,18 +28,13 @@ package op.care;
 
 import entity.SYSRunningClasses;
 import entity.SYSRunningClassesTools;
+import op.OPDE;
+import op.tools.*;
+
 import java.sql.*;
 import java.util.GregorianCalendar;
-import op.OPDE;
-import op.tools.DBRetrieve;
-import op.tools.SYSCalendar;
-import op.tools.Database;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- *
- *
  * @author tloehr
  */
 public class DFNImport {
@@ -47,7 +42,7 @@ public class DFNImport {
     public static final String internalClassID = "nursingrecords.dfnimport";
     private static SYSRunningClasses runningClass, blockingClass;
 
-//    public static void importBHP(int offset)
+    //    public static void importBHP(int offset)
 //    throws SQLException{
 //        importBHP(0,0,offset);
 //    }
@@ -62,12 +57,11 @@ public class DFNImport {
     }
 
     /**
-     * @param planid Die ID der Verordnung, auf den sich der Import Vorgang beschränken soll.
-     * Steht hier eine 0, dann wird der DFN für alle erstellt.
-     * Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
-     * Es wird noch geprüft, ob es abgehakte DFNs in dieser Schicht gibt. Wenn ja, wird alles erst ab der nächsten
-     * Schicht eingetragen.
-     *
+     * @param planid Die ID der Verordnung, auf den sich der Import Vorgang beschrÃ¤nken soll.
+     *               Steht hier eine 0, dann wird der DFN fÃ¼r alle erstellt.
+     *               Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
+     *               Es wird noch geprÃ¼ft, ob es abgehakte DFNs in dieser Schicht gibt. Wenn ja, wird alles erst ab der nÃ¤chsten
+     *               Schicht eingetragen.
      */
     public static void importDFN(long planid, long zeit, int daysoffset)
             throws SQLException {
@@ -103,7 +97,7 @@ public class DFNImport {
         }
         Connection db = OPDE.getDb().db;
 
-        // Zugriffskonflikt auflösen.
+        // Zugriffskonflikt auflÃ¶sen.
         String pk = null;
         if (planid > 0) {
             pk = (String) DBRetrieve.getSingleValue("Planung", "BWKennung", "PlanID", planid);
@@ -155,14 +149,14 @@ public class DFNImport {
                         + " INNER JOIN Planung p ON t.PlanID = p.PlanID "
                         + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
                         + " INNER JOIN Massnahmen mass ON t.MassID = mass.MassID "
-                        + // nur die Verordnungen, die überhaupt gültig sind
-                        // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
+                        + // nur die Verordnungen, die Ã¼berhaupt gÃ¼ltig sind
+                        // das sind die mit GÃ¼ltigkeit BAW oder GÃ¼ltigkeit endet irgendwann in der Zukunft.
                         " WHERE date(p.Von) <= date(DATE_ADD(NOW(), INTERVAL ? DAY)) AND date(p.Bis) >= date(DATE_ADD(NOW(), INTERVAL ? DAY)) "
-                        + // Einschränkung auf bestimmte Verordnung0en, wenn gewünscht
+                        + // EinschrÃ¤nkung auf bestimmte Verordnung0en, wenn gewÃ¼nscht
                         (planid > 0 ? " AND p.PlanID = ? " : "")
-                        + // und nur die Planungen, die überhaupt auf den Stichtag passen könnten.
+                        + // und nur die Planungen, die Ã¼berhaupt auf den Stichtag passen kÃ¶nnten.
                         // Hier werden bereits die falschen Wochentage rausgefiltert. Brauchen
-                        // wir uns nachher nicht mehr drum zu kümmern.
+                        // wir uns nachher nicht mehr drum zu kÃ¼mmern.
                         " AND ( "
                         + "       (Taeglich > 0) "
                         + "   OR "
@@ -208,7 +202,7 @@ public class DFNImport {
                     stmtSource.setInt(5, wtagnum); // wtag (z.B. "der x.Donnerstag im Monat")
                     stmtSource.setInt(6, daysoffset);
 //            if (!bwkennung.equalsIgnoreCase("")){
-//                stmtSource.setString(4, bwkennung); // Nur wenn nötig.
+//                stmtSource.setString(4, bwkennung); // Nur wenn nÃ¶tig.
 //            }
                 } else {
                     stmtSource.setInt(1, daysoffset);
@@ -217,7 +211,7 @@ public class DFNImport {
                     stmtSource.setInt(4, wtagnum); // wtag (z.B. "der x.Donnerstag im Monat")
                     stmtSource.setInt(5, daysoffset);
 //            if (!bwkennung.equalsIgnoreCase("")){
-//                stmtSource.setString(3, bwkennung); // Nur wenn nötig.
+//                stmtSource.setString(3, bwkennung); // Nur wenn nÃ¶tig.
 //            }
                 }
                 rs = stmtSource.executeQuery();
@@ -226,7 +220,7 @@ public class DFNImport {
                 rs.first();
 
 
-                // Erstmal alle Einträge, die täglich oder wöchentlich nötig sind.
+                // Erstmal alle EintrÃ¤ge, die tÃ¤glich oder wÃ¶chentlich nÃ¶tig sind.
                 while (maxrows > 0 && !rs.isAfterLast()) {
 
 
@@ -277,7 +271,7 @@ public class DFNImport {
                             } while (!(SYSCalendar.sameWeek(ref, gcStichtag) >= 0));
                         }
                         // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
-                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
+                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage Ã¼berhaupt zugelassen wurden, muss das somit der richtige sein.
                         treffer = (ref.equals(gcStichtag)) || (SYSCalendar.sameWeek(ref, gcStichtag) == 0);
                     }
 
@@ -289,18 +283,18 @@ public class DFNImport {
                             } while (!(SYSCalendar.sameMonth(ref, gcStichtag) >= 0));
                         }
                         // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest im selben Monat desselben Jahres liegt.
-                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat überhaupt zugelassen wurden, muss das somit der richtige sein.
+                        // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat Ã¼berhaupt zugelassen wurden, muss das somit der richtige sein.
                         treffer = (ref.equals(gcStichtag)) || (SYSCalendar.sameMonth(ref, gcStichtag) == 0);
                     }
 
-                    // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
+                    // Es wird immer erst eine Schicht spÃ¤ter eingetragen. Damit man nicht mit bereits
                     boolean erstAbFM = (zeit == 0) || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.FM;
                     boolean erstAbMO = (zeit == 0) || erstAbFM || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.MO;
                     boolean erstAbMI = (zeit == 0) || erstAbMO || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.MI;
                     boolean erstAbNM = (zeit == 0) || erstAbMI || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.NM;
                     boolean erstAbAB = (zeit == 0) || erstAbNM || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.AB;
                     boolean erstAbNA = (zeit == 0) || erstAbAB || SYSCalendar.ermittleZeit(zeit) + schichtOffset == SYSConst.NA;
-                    // X07: DEBUG: klappt das mit Uhrzeiten für denselben Tag ?
+                    // X07: DEBUG: klappt das mit Uhrzeiten fÃ¼r denselben Tag ?
                     boolean uhrzeitOK = (zeit == 0) || (uhrzeit != null && SYSCalendar.compareTime(uhrzeit.getTime(), zeit) > 0);
 
                     long insertTS = gcStichtag.getTimeInMillis();
@@ -374,14 +368,14 @@ public class DFNImport {
 
                     } // if (treffer)
                     //////////////////////////////////////////////////////////////
-                    rs.next(); // Nächster
+                    rs.next(); // NÃ¤chster
 
                 } // while(!rs.isAfterLast()){
-                // Die nicht beachteten zu erzwingenden müssen noch auf das heutige Datum umgetragen werden.
-                // Das erfolgt unabhängig von dem eingegebenen Stichtag.
-                // Nur bei uneingeschränkten Imports.
+                // Die nicht beachteten zu erzwingenden mÃ¼ssen noch auf das heutige Datum umgetragen werden.
+                // Das erfolgt unabhÃ¤ngig von dem eingegebenen Stichtag.
+                // Nur bei uneingeschrÃ¤nkten Imports.
                 if (planid == 0) {
-                    OPDE.info("Notwendige Massnahmen werden übertragen...");
+                    OPDE.info("Notwendige Massnahmen werden Ã¼bertragen...");
                     stmtForced.executeUpdate();
                 }
                 if (doCommit) {

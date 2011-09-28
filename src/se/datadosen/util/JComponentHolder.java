@@ -9,8 +9,8 @@
  * You can reach me by mail or phone (although email is preferred):
  * Datadosen
  * David Ekholm
- * Mantalsv‰gen 33
- * s-175 50 J‰rf‰lla
+ * Mantalsv√§gen 33
+ * s-175 50 J√§rf√§lla
  * Sweden
  * Phone: +46 8 580 15668. Mobile: +46 70 486 77 38 
  */

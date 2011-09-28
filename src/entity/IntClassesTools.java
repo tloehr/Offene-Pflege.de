@@ -4,21 +4,16 @@
  */
 package entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import op.OPDE;
 import op.tools.CheckTreeSelectionModel;
 import op.tools.InternalClass;
 import op.tools.InternalClassACL;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import java.util.*;
+
 /**
- *
  * @author tloehr
  */
 public class IntClassesTools {
@@ -27,31 +22,32 @@ public class IntClassesTools {
     public static final int SELECTION = 1;
 
     /**
-     * Diese Klasse erzeugt eine Baumstruktur. Sie enthält alle übergebenen Klassen.
+     * Diese Klasse erzeugt eine Baumstruktur. Sie enthÃ¤lt alle Ã¼bergebenen Klassen.
      * Anhand der InternalClasses (nicht zu verwechseln mit IntClasses) bestimmt sie
-     * die erlaubten ACLs. Die übergebene Collection der EntityBeans (das sind jetzt
-     * IntClasses) enthält, welche Rechte für die entsprechende Gruppe gesetzt
+     * die erlaubten ACLs. Die Ã¼bergebene Collection der EntityBeans (das sind jetzt
+     * IntClasses) enthÃ¤lt, welche Rechte fÃ¼r die entsprechende Gruppe gesetzt
      * wurden. So werden die vorselektierten Pfade gesetzt.
      * Der Baum hat die Tiefe 3. Die Klassen der einzelnen Ebenen sind festgelegt: (String GKennung, InternalClass, InternalClassACL)
-     * @param Gruppe, für die die Klassen in Baumform benötigt werden.
-     * @return eine Liste mit zwei Einträgen (MutableTreeNode root, TreePath[] selection).
+     *
+     * @param Gruppe, fÃ¼r die die Klassen in Baumform benÃ¶tigt werden.
+     * @return eine Liste mit zwei EintrÃ¤gen (MutableTreeNode root, TreePath[] selection).
      */
     public static ArrayList getIntClassesAsTree(Groups group) {
         HashMap<String, IntClasses> dbClasses = getDBLookupTable(group);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(group);
 
-        // Alle bekannten Classen und deren möglichen Rechte (anhand internalclasses.xml) ermitteln.
+        // Alle bekannten Classen und deren mÃ¶glichen Rechte (anhand internalclasses.xml) ermitteln.
         ArrayList<InternalClass> classset = new ArrayList(OPDE.getInternalClasses().getInternalClasses().values());
         Collections.sort(classset);
         Iterator<InternalClass> itClasses = classset.iterator();
 
         ArrayList<TreePath> selection = new ArrayList();
-        while (itClasses.hasNext()) { // Klasse als Knoten einfügen
+        while (itClasses.hasNext()) { // Klasse als Knoten einfÃ¼gen
             InternalClass currentClass = itClasses.next();
 
-            // Nur solche Klassen hinzufügen,
+            // Nur solche Klassen hinzufÃ¼gen,
             // die auch ACLs besitzen. Es gibt auch
-            // Klassendefinitionen, die nur für die Kollisionsdefinition
+            // Klassendefinitionen, die nur fÃ¼r die Kollisionsdefinition
             // da sind. Die brauchen manchmaln gar keine ACLs. (z.B. BHPImport)
             if (!currentClass.getAcls().isEmpty()) {
 
@@ -79,8 +75,8 @@ public class IntClassesTools {
                     if (group.getGkennung().equalsIgnoreCase("admin")) {
                         selection.add(new TreePath(new Object[]{root, classnode, node}));
                     } else {
-                        // Ist bei der übergebenen Gruppe dieses Recht auch dabei ?
-                        // Falls ja, Selection Pfad hinzufügen.
+                        // Ist bei der Ã¼bergebenen Gruppe dieses Recht auch dabei ?
+                        // Falls ja, Selection Pfad hinzufÃ¼gen.
                         if (dbClasses.containsKey(classname)) {
                             Acl[] acls = dbClasses.get(classname).getAclCollection().toArray(new Acl[]{});
                             for (int i = 0; i < acls.length; i++) {
@@ -111,7 +107,7 @@ public class IntClassesTools {
         if (node.getUserObject() instanceof Groups) { // Root
             boolean rootWasSelected = selmodel.isPathSelected(new TreePath(node.getPath()));
             OPDE.getLogger().debug("saveTree: speichere Gruppe: " + ((Groups) node.getUserObject()).getGkennung());
-            OPDE.getLogger().debug("saveTree: Gruppe war " + (rootWasSelected ? "" : "NICHT") + " ausgewählt.");
+            OPDE.getLogger().debug("saveTree: Gruppe war " + (rootWasSelected ? "" : "NICHT") + " ausgewÃ¤hlt.");
             Enumeration<DefaultMutableTreeNode> enumInternalClasses = node.children();
             while (enumInternalClasses.hasMoreElements()) {
                 saveTree(enumInternalClasses.nextElement(), selmodel, rootWasSelected);
@@ -131,10 +127,10 @@ public class IntClassesTools {
                 OPDE.getLogger().debug("       saveTree: speichere EntityBean IntClass: " + myInternalClass.getInternalClassname());
             } else {
                 OPDE.getLogger().debug("       saveTree: hat schon EntityBean: " + myInternalClass.getIntClass().getClassname());
-                OPDE.getLogger().debug("       saveTree: und zwar für die Gruppe: " + myInternalClass.getIntClass().getGroups().getGkennung());
+                OPDE.getLogger().debug("       saveTree: und zwar fÃ¼r die Gruppe: " + myInternalClass.getIntClass().getGroups().getGkennung());
 
             }
-            OPDE.getLogger().debug("       saveTree: sie war " + (selmodel.isPathSelected(new TreePath(node.getPath())) ? "" : "NICHT") + " ausgewählt.");
+            OPDE.getLogger().debug("       saveTree: sie war " + (selmodel.isPathSelected(new TreePath(node.getPath())) ? "" : "NICHT") + " ausgewÃ¤hlt.");
 
             Enumeration<DefaultMutableTreeNode> enumInternalClasses = node.children();
             while (enumInternalClasses.hasMoreElements()) {
@@ -150,23 +146,23 @@ public class IntClassesTools {
             boolean shouldBeSelected = parentWasSelected || selmodel.isPathSelected(new TreePath(node.getPath()));
 
 
-            if (shouldBeSelected) { // ACL gewähren
+            if (shouldBeSelected) { // ACL gewÃ¤hren
                 OPDE.getLogger().debug("              saveTree: SPEICHERE ACL " + InternalClassACL.strACLS[myACL.getAcl()]);
                 OPDE.getLogger().debug("              saveTree: " + InternalClassACL.strACLS[myACL.getAcl()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
-                if (!myACL.hasAclEntity()) { // Nur hinzufügen, wenn nötig.
+                if (!myACL.hasAclEntity()) { // Nur hinzufÃ¼gen, wenn nÃ¶tig.
                     OPDE.getLogger().debug("              saveTree: erstelle neue EntityBean");
                     Acl acl = new Acl(myACL.getAcl(), myClass.getIntClass());
                     OPDE.getEM().persist(acl);
                 } else {
-                    OPDE.getLogger().debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
+                    OPDE.getLogger().debug("              saveTree: fÃ¼r die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
                 }
             } else { // ACL entziehen
-                OPDE.getLogger().debug("              saveTree: LÖSCHE ACL " + InternalClassACL.strACLS[myACL.getAcl()]);
+                OPDE.getLogger().debug("              saveTree: LÃ–SCHE ACL " + InternalClassACL.strACLS[myACL.getAcl()]);
                 OPDE.getLogger().debug("              saveTree: " + InternalClassACL.strACLS[myACL.getAcl()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
-                if (myACL.hasAclEntity()) { // Nur löschen, wenn nötig.
-                    OPDE.getLogger().debug("              saveTree: lösche jetzt die EntityBean");
+                if (myACL.hasAclEntity()) { // Nur lÃ¶schen, wenn nÃ¶tig.
+                    OPDE.getLogger().debug("              saveTree: lÃ¶sche jetzt die EntityBean");
                     OPDE.getEM().remove(myACL.getAclEntity());
-                    OPDE.getLogger().debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
+                    OPDE.getLogger().debug("              saveTree: fÃ¼r die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
                 }
             }
             myACL.setAclEntity(null);
@@ -210,11 +206,11 @@ public class IntClassesTools {
 //        List<InternalClass> alleKlassen = new ArrayList(OPDE.internalClasses.getInternalClasses().values());
 //        HashMap<String, IntClasses> dblookup = getDBLookupTable(group);
 //
-//        // Für jede mögliche Klasse, alle möglichen ACLs, je nach der Variable "add" setzen oder löschen.
+//        // FÃ¼r jede mÃ¶gliche Klasse, alle mÃ¶glichen ACLs, je nach der Variable "add" setzen oder lÃ¶schen.
 //        for (int i = 0; i < alleKlassen.size(); i++) {
 //            if (!dblookup.containsKey(alleKlassen.get(i).getInternalClassname())) {
 //                // Bisher war der Gruppe diese Klasse nicht zugeordnet.
-//                // Müssen wir eine erstellen.
+//                // MÃ¼ssen wir eine erstellen.
 //                dblookup.put(alleKlassen.get(i).getInternalClassname(), new IntClasses(alleKlassen.get(i).getInternalClassname(), group));
 //            }
 //            setAcl(dblookup.get(alleKlassen.get(i).getInternalClassname()), add, toBeDeleted);
@@ -237,7 +233,7 @@ public class IntClassesTools {
 //        // Suche die betreffende ACL
 //        boolean found = false;
 //        Iterator<Acl> aclList = dbclass.getAclCollection().iterator();
-//        if (add) { // ACL soll hinzugefügt werden
+//        if (add) { // ACL soll hinzugefÃ¼gt werden
 //            while (!found && aclList.hasNext()) {
 //                Acl thisAcl = aclList.next();
 //                if (thisAcl.getAcl() == acl) { // Eintrag gefunden
@@ -247,16 +243,16 @@ public class IntClassesTools {
 //                }
 //            }
 //            if (!found) { // Am Ende und war nicht dabei ?
-//                // Dann hinzufügen.
+//                // Dann hinzufÃ¼gen.
 //                dbclass.getAclCollection().add(new Acl(acl, dbclass));
-//                OPDE.getLogger().debug("++ Gruppe " + dbclass.getGroups().getGkennung() + " erhält das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getClassname());
+//                OPDE.getLogger().debug("++ Gruppe " + dbclass.getGroups().getGkennung() + " erhÃ¤lt das Recht " + InternalClassACL.strACLS[acl] + " fÃ¼r die Klasse " + dbclass.getClassname());
 //            }
 //        } else { // ACL soll entfernt werden
 //            while (!found && aclList.hasNext()) {
 //                Acl thisAcl = aclList.next();
 //                if (thisAcl.getAcl() == acl) { // Eintrag gefunden
 //                    toBeDeleted.add(thisAcl);
-//                    OPDE.getLogger().debug("-- Gruppe " + dbclass.getGroups().getGkennung() + " verliert das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getClassname());
+//                    OPDE.getLogger().debug("-- Gruppe " + dbclass.getGroups().getGkennung() + " verliert das Recht " + InternalClassACL.strACLS[acl] + " fÃ¼r die Klasse " + dbclass.getClassname());
 //                    found = true;
 //                }
 //            }

@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,40 +26,26 @@
  */
 package op.controlling;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 import op.OPDE;
 import op.care.vital.DlgVital;
 import op.share.bwinfo.BWInfo;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.ListElement;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.tools.*;
+
+import javax.swing.*;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
 
 /**
- *
  * @author tloehr
  */
 public class DBHandling {
 
     /**
-     * Erstellt einen HTML Abschnitt, die die BV Aktivitäten in den angegebenen Grenzen ausliest.
+     * Erstellt einen HTML Abschnitt, die die BV AktivitÃ¤ten in den angegebenen Grenzen ausliest.
+     *
      * @param bwkennung
      * @param ukennung
      * @param headertiefe - ist einfach die Zahl, die hinter das HTML HeaderTag gesetzt werden soll.
@@ -101,7 +87,7 @@ public class DBHandling {
             DateFormat df = DateFormat.getDateInstance();
             if (rs.first()) {
                 html.append("<h" + headertiefe + ">");
-                html.append("Berichte der BV-Tätigkeiten");
+                html.append("Berichte der BV-TÃ¤tigkeiten");
                 html.append("</h" + headertiefe + ">");
                 html.append("<table border=\"1\"><tr>" +
                         "<th>BewohnerIn</th><th>Datum</th><th>Text</th><th>UKennung</th><th>BV</th></tr>");
@@ -116,7 +102,7 @@ public class DBHandling {
                     html.append("<td>" + name + "</td>");
                     if (SYSTools.catchNull(uk).equals("")) {
                         html.append("<td align=\"center\">--</td>");
-                        html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
+                        html.append("<td><b>Keine BV AktivitÃ¤ten gefunden.</b></td>");
                         html.append("<td align=\"center\">--</td>");
                     } else {
                         html.append("<td>" + df.format(datum) + "</td>");
@@ -142,6 +128,7 @@ public class DBHandling {
 
     /**
      * Durchsucht die Pflegeberichte nach einem oder mehreren Suchbegriffen
+     *
      * @param suche
      * @param headertiefe - ist einfach die Zahl, die hinter das HTML HeaderTag gesetzt werden soll.
      * @param monate
@@ -155,7 +142,7 @@ public class DBHandling {
 
         if (suche.equals("") && tag.getData().equals("")) {
             html.append("<h" + headertiefe + ">");
-            html.append("Berichtsuche nicht möglich.");
+            html.append("Berichtsuche nicht mÃ¶glich.");
             html.append("</h" + headertiefe + ">");
         } else {
 
@@ -281,7 +268,7 @@ public class DBHandling {
                 html.append("Zeitraum: " + monate + " Monate");
                 html.append("</h" + (headertiefe + 1) + ">");
                 html.append("<table border=\"1\"><tr>" +
-                        "<th>Monat</th><th>Station</th><th>Anzahl Stürze</th></tr>");
+                        "<th>Monat</th><th>Station</th><th>Anzahl StÃ¼rze</th></tr>");
                 rs.beforeFirst();
                 while (rs.next()) {
                     html.append("<tr>");
@@ -358,7 +345,7 @@ public class DBHandling {
 
                         if (!bwkennung.equals("")) { // nicht der erste Durchgang.
                             html.append("</table>");
-                            html.append("<h" + (headertiefe + 3) + ">Anzahl der Stürze im betrachteten Zeitraum: " + stuerze + "</h" + (headertiefe + 3) + ">");
+                            html.append("<h" + (headertiefe + 3) + ">Anzahl der StÃ¼rze im betrachteten Zeitraum: " + stuerze + "</h" + (headertiefe + 3) + ">");
                         }
 
                         bwkennung = rs.getString("bwi.BWKennung");
@@ -389,7 +376,7 @@ public class DBHandling {
 
                 if (rs.first()) { // war das Resultset nicht leer ?
                     html.append("</table>");
-                    html.append("<h" + (headertiefe + 3) + ">Anzahl der Stürze im betrachteten Zeitraum: " + stuerze + "</h" + (headertiefe + 3) + ">");
+                    html.append("<h" + (headertiefe + 3) + ">Anzahl der StÃ¼rze im betrachteten Zeitraum: " + stuerze + "</h" + (headertiefe + 3) + ">");
                 }
 
             }
@@ -404,7 +391,7 @@ public class DBHandling {
         StringBuilder html = new StringBuilder(1000);
         String sql = "" +
                 " SELECT bw.nachname, bw.vorname, bw.geschlecht, bw.bwkennung, prod.Bezeichnung, daf.Zusatz, form.Zubereitung, form.AnwText, " +
-                " (CASE form.PackEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END) Bestandsmenge, " +
+                " (CASE form.PackEinheit WHEN 1 THEN 'StÃ¼ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END) Bestandsmenge, " +
                 " best.BestID, best.Anbruch " +
                 " FROM Bewohner bw " +
                 " INNER JOIN BWInfo ba ON bw.BWKennung = ba.BWKennung " +
@@ -430,14 +417,14 @@ public class DBHandling {
                 html.append("</h" + (headertiefe + 1) + ">");
                 html.append("#1 - Medikament abgelaufen<br/>");
                 html.append("#2 - Packung nicht beschriftet<br/>");
-                html.append("#3 - Packung beschädigt<br/>");
+                html.append("#3 - Packung beschÃ¤digt<br/>");
                 html.append("#4 - Anbruchsdatum nicht vermerkt<br/>");
                 html.append("#5 - Medikament ist nicht verordnet<br/>");
                 html.append("#6 - Mehr als 1 Blister im Anbruch<br/>");
                 html.append("#7 - Mehr als 1 Tablette geteilt<br/><br/>");
 
                 html.append("<table border=\"1\"><tr>" +
-                        "<th>BewohnerIn</th><th>BestNr</th><th>Präparat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th></tr>");
+                        "<th>BewohnerIn</th><th>BestNr</th><th>PrÃ¤parat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th></tr>");
                 rs.beforeFirst();
                 while (rs.next()) {
                     html.append("<tr>");
@@ -498,7 +485,7 @@ public class DBHandling {
             DateFormat df = DateFormat.getDateInstance();
             if (rs.first()) {
                 html.append("<h" + headertiefe + ">");
-                html.append("Aktivitäten des Sozialen Dienstes");
+                html.append("AktivitÃ¤ten des Sozialen Dienstes");
                 html.append("</h" + headertiefe + ">");
                 rs.beforeFirst();
                 String prevBW = "";
@@ -526,7 +513,7 @@ public class DBHandling {
                     html.append("<tr>");
                     if (SYSTools.catchNull(uk).equals("")) {
                         html.append("<td align=\"center\">--</td>");
-                        html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
+                        html.append("<td><b>Keine BV AktivitÃ¤ten gefunden.</b></td>");
                         html.append("<td align=\"center\">--</td>");
                         html.append("<td align=\"center\">--</td>");
                     } else {
@@ -635,7 +622,7 @@ public class DBHandling {
                             startGewicht = rs.getDouble("Wert");
                             if (groesse == null) {
                                 gr = -1d;
-                                s += "<b>Körpergröße wurde bisher nicht eingetragen. Somit kann kein BMI berechnet werden.</b>";
+                                s += "<b>KÃ¶rpergrÃ¶ÃŸe wurde bisher nicht eingetragen. Somit kann kein BMI berechnet werden.</b>";
                                 startBMI = -1d;
                                 bmiPlusMinus = -1d;
                                 //bmiProzent = -1d;
@@ -796,8 +783,8 @@ public class DBHandling {
 
                 html.append(SYSTools.rs2html(rs, true));
 
-                html.append("<p><b>PEA:</b> Personen mit erheblich eingeschränkter Alltagskompetenz (gemäß §87b SGB XI)." +
-                        " Der hier errechnete Wert ist der <b>Anteil</b> für die PEA Leistungen, die in den allgemeinen Sozialzeiten" +
+                html.append("<p><b>PEA:</b> Personen mit erheblich eingeschrÃ¤nkter Alltagskompetenz (gemÃ¤ÃŸ Â§87b SGB XI)." +
+                        " Der hier errechnete Wert ist der <b>Anteil</b> fÃ¼r die PEA Leistungen, die in den allgemeinen Sozialzeiten" +
                         " mit enthalten sind.</p>");
 
             }
@@ -831,7 +818,7 @@ public class DBHandling {
             //DateFormat df = DateFormat.getDateInstance();
             if (rs.first()) {
                 html.append("<h" + headertiefe + ">");
-                html.append("Aktive Vorräte ohne Bestand im Anbruch");
+                html.append("Aktive VorrÃ¤te ohne Bestand im Anbruch");
                 html.append("</h" + headertiefe + ">");
 
                 html.append(SYSTools.rs2html(rs, true));
@@ -1154,9 +1141,9 @@ public class DBHandling {
         String sql = "" +
                 " SELECT DISTINCT CONCAT(bw.nachname,', ',bw.vorname) Name, v.BWKennung, M.Bezeichnung Praeparat, " +
                 " D.Zusatz, F.Zubereitung, " +
-                " CASE F.PackEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Packungseinheit, " +
+                " CASE F.PackEinheit WHEN 1 THEN 'StÃ¼ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Packungseinheit, " +
                 " F.AnwText Anwendungstext, " +
-                " CASE F.AnwEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Anwendungseinheit, " +
+                " CASE F.AnwEinheit WHEN 1 THEN 'StÃ¼ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Anwendungseinheit, " +
                 " ifnull(vor.saldo,0) Bestand, " +
                 " ROUND(if(vor.saldo IS NULL OR vor.saldo <= 0, 0, saldo/ifnull(vor.anfang,0) * 100)) 'Restquote%', " +
                 " ifnull(vor.BestID, '<b>OHNE ANBRUCH</b>') anbruchnr " +
@@ -1194,7 +1181,7 @@ public class DBHandling {
             //DateFormat df = DateFormat.getDateInstance();
             if (rs.first()) {
                 html.append("<h" + headertiefe + ">");
-                html.append("Vorräte ohne Anbruch / mit einem Rest-Bestand unter " + percent + "%");
+                html.append("VorrÃ¤te ohne Anbruch / mit einem Rest-Bestand unter " + percent + "%");
                 html.append("</h" + headertiefe + ">");
 
                 html.append(SYSTools.rs2html(rs, false));
@@ -1208,9 +1195,10 @@ public class DBHandling {
     }
 
     /**
-     * Ermittelt eine Liste aller Medikamente die nicht länger reichen als in reichweite festgelegt.
+     * Ermittelt eine Liste aller Medikamente die nicht lÃ¤nger reichen als in reichweite festgelegt.
+     *
      * @param headertiefe
-     * @param reichweite in Tagen
+     * @param reichweite  in Tagen
      * @param o
      * @return
      */
@@ -1226,9 +1214,9 @@ public class DBHandling {
         }
         String sql = "" +
                 " SELECT DISTINCT CONCAT(bw.nachname,', ',bw.vorname) Name, v.BWKennung, M.Bezeichnung Praeparat, D.Zusatz, F.Zubereitung, " +
-                " CASE F.PackEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Packungseinheit, " +
+                " CASE F.PackEinheit WHEN 1 THEN 'StÃ¼ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Packungseinheit, " +
                 " F.AnwText Anwendungstext, " +
-                " CASE F.AnwEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Anwendungseinheit, " +
+                " CASE F.AnwEinheit WHEN 1 THEN 'StÃ¼ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END Anwendungseinheit, " +
                 " ifnull(vor.saldo,0) Bestand, (bedarf.tw / vor.APV) * ? bdf, (ifnull(vor.saldo,0) / bedarf.tw) reichweite, " +
                 " ifnull(vor.BestID, '<b>OHNE ANBRUCH</b>') anbruchnr " +
                 " FROM BHPVerordnung v " +
@@ -1281,7 +1269,7 @@ public class DBHandling {
             //DateFormat df = DateFormat.getDateInstance();
             if (rs.first()) {
                 html.append("<h" + headertiefe + ">");
-                html.append("Vorräte mit einer Reichweite von geschätzt unter " + reichweite + " Tagen");
+                html.append("VorrÃ¤te mit einer Reichweite von geschÃ¤tzt unter " + reichweite + " Tagen");
                 html.append("</h" + headertiefe + ">");
 
                 html.append(SYSTools.rs2html(rs, false));
@@ -1333,7 +1321,7 @@ public class DBHandling {
 
             if (rs.first()) {
                 html.append("<h" + headertiefe + ">");
-                html.append("Aufstellung über Wunden");
+                html.append("Aufstellung Ã¼ber Wunden");
                 html.append("</h" + headertiefe + ">");
 
                 rs.beforeFirst();
@@ -1417,7 +1405,7 @@ public class DBHandling {
 
             if (rs.first()) {
                 html.append("<h2>");
-                html.append("Geburtstage in den nächsten " + tage + " Tagen");
+                html.append("Geburtstage in den nÃ¤chsten " + tage + " Tagen");
                 html.append("</h2>");
 
                 rs.beforeFirst();
@@ -1441,7 +1429,7 @@ public class DBHandling {
                 html.append("</table>");
             } else {
                 html.append("<h2>");
-                html.append("<u>Keine</u> Geburtstage in den nächsten " + tage + " Tagen");
+                html.append("<u>Keine</u> Geburtstage in den nÃ¤chsten " + tage + " Tagen");
                 html.append("</h2>");
 
             }
@@ -1513,7 +1501,7 @@ public class DBHandling {
 
                 html.append("</table>");
             } else {
-                html.append("<br/>keine Einträge gefunden...");
+                html.append("<br/>keine EintrÃ¤ge gefunden...");
             }
         } catch (SQLException sQLException) {
             new DlgException(sQLException);
@@ -1524,7 +1512,7 @@ public class DBHandling {
     public static String getAlarmStuhl(int headertiefe) {
         StringBuilder html = new StringBuilder(1000);
 
-        // Für wen soll die Ausfuhr überwacht werden ?
+        // FÃ¼r wen soll die Ausfuhr Ã¼berwacht werden ?
 
         String sql = "" +
                 " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM BWInfo bi " +
@@ -1584,7 +1572,7 @@ public class DBHandling {
     public static String getAlarmEinfuhr(int headertiefe) {
         StringBuilder html = new StringBuilder(1000);
 
-        // Für wen soll die Ausfuhr überwacht werden ?
+        // FÃ¼r wen soll die Ausfuhr Ã¼berwacht werden ?
 
         String sql = "" +
                 " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM BWInfo bi " +
@@ -1619,7 +1607,7 @@ public class DBHandling {
                         minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
                     }
                     if (!maxkontrolle) {
-                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
+                        maxmenge = 1000000; // GroÃŸ genug um im SQL Ausdruck ignoriert zu werden.
                     }
 
                     String s = " SELECT * FROM (" +
@@ -1671,12 +1659,13 @@ public class DBHandling {
     /**
      * Erstellt ein HTML Dokument mit dem folgenden Inhalt:
      * <ul>
-     * <li>Aufstellung über Häufigkeit der Beschwerden auf Monate verteilt</li>
-     * <li>Aufstellung über Häufigkeit der Beschwerden auf Mitarbeiter verteilt</li>
-     * <li>Aufstellung über Häufigkeit der Beschwerden auf Bewohner verteilt</li>
-     * <li>Aufstellung über die Zeit zwischen öffnen und schließen in Tagen</li>
+     * <li>Aufstellung Ã¼ber HÃ¤ufigkeit der Beschwerden auf Monate verteilt</li>
+     * <li>Aufstellung Ã¼ber HÃ¤ufigkeit der Beschwerden auf Mitarbeiter verteilt</li>
+     * <li>Aufstellung Ã¼ber HÃ¤ufigkeit der Beschwerden auf Bewohner verteilt</li>
+     * <li>Aufstellung Ã¼ber die Zeit zwischen Ã¶ffnen und schlieÃŸen in Tagen</li>
      * <li>Auflistung aller Beschwerden in einem bestimmten Zeitraum</li>
      * </ul>
+     *
      * @param headertiefe
      * @param monate
      * @return
@@ -1745,21 +1734,21 @@ public class DBHandling {
 
             if (rs1.first()) { // wenn rs1 nicht leer ist, dann sind es die anderen auch nicht.
                 html.append("<h" + headertiefe + ">");
-                html.append("Auswertungen über Beschwerden der letzten " + monate + " Monate");
+                html.append("Auswertungen Ã¼ber Beschwerden der letzten " + monate + " Monate");
                 html.append("</h" + headertiefe + ">");
 
                 html.append("<h" + (headertiefe + 1) + ">");
-                html.append("Häufigkeit nach Monaten");
+                html.append("HÃ¤ufigkeit nach Monaten");
                 html.append("</h" + (headertiefe + 1) + ">");
                 html.append(SYSTools.rs2html(rs1, true));
 
                 html.append("<h" + (headertiefe + 1) + ">");
-                html.append("Häufigkeit nach Mitarbeitern");
+                html.append("HÃ¤ufigkeit nach Mitarbeitern");
                 html.append("</h" + (headertiefe + 1) + ">");
                 html.append(SYSTools.rs2html(rs2, true));
 
                 html.append("<h" + (headertiefe + 1) + ">");
-                html.append("Häufigkeit nach BewohnerInnen");
+                html.append("HÃ¤ufigkeit nach BewohnerInnen");
                 html.append("</h" + (headertiefe + 1) + ">");
                 html.append(SYSTools.rs2html(rs3, true));
 

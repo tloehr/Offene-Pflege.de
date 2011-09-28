@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,24 +26,19 @@
  */
 package op.care.vital;
 
-import java.awt.Toolkit;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import javax.swing.JTextField;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
+import javax.swing.*;
+import java.awt.*;
+import java.sql.*;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+
 /**
- *
- * @author  tloehr
+ * @author tloehr
  */
 public class DlgVital extends javax.swing.JDialog {
 
@@ -72,7 +67,9 @@ public class DlgVital extends javax.swing.JDialog {
 //        this(parent, mode, false, "", "", "", null, null, "");
 //    }
 
-    /** Creates new form dlgVital */
+    /**
+     * Creates new form dlgVital
+     */
     public DlgVital(java.awt.Frame parent, Object[] obj) {
         super(parent, true);
         initComponents();
@@ -174,7 +171,7 @@ public class DlgVital extends javax.swing.JDialog {
 
                 lblVital.setText("Atemfrequenz");
                 lblWert2.setText("Frequenz:");
-                lblEinheit2.setText("Atemzüge / min");
+                lblEinheit2.setText("AtemzÃ¼ge / min");
 
                 txtWert2.requestFocus();
                 this.pack();
@@ -194,7 +191,7 @@ public class DlgVital extends javax.swing.JDialog {
                 max2 = 250;
                 norm2 = 70.0d;
 
-                lblVital.setText("Körpergewicht");
+                lblVital.setText("KÃ¶rpergewicht");
                 lblWert2.setText("Gewicht:");
                 lblEinheit2.setText("kg");
 
@@ -216,8 +213,8 @@ public class DlgVital extends javax.swing.JDialog {
                 max2 = 2.5d;
                 norm2 = 1.7d;
 
-                lblVital.setText("Körpergröße");
-                lblWert2.setText("Größe:");
+                lblVital.setText("KÃ¶rpergrÃ¶ÃŸe");
+                lblWert2.setText("GrÃ¶ÃŸe:");
                 lblEinheit2.setText("m");
 
                 txtWert2.requestFocus();
@@ -282,9 +279,9 @@ public class DlgVital extends javax.swing.JDialog {
                 max2 = 43.0d;
                 norm2 = 37.0d;
 
-                lblVital.setText("Körpertemperatur");
+                lblVital.setText("KÃ¶rpertemperatur");
                 lblWert2.setText("Temperatur:");
-                lblEinheit2.setText("°C");
+                lblEinheit2.setText("Â°C");
 
                 txtWert2.requestFocus();
                 this.pack();
@@ -304,7 +301,7 @@ public class DlgVital extends javax.swing.JDialog {
                 max2 = 3000.0d;
                 norm2 = 200.0d;
 
-                lblVital.setText("Flüssigkeitszufuhr");
+                lblVital.setText("FlÃ¼ssigkeitszufuhr");
                 lblWert2.setText("Menge:");
                 lblEinheit2.setText("ml");
 
@@ -378,7 +375,8 @@ public class DlgVital extends javax.swing.JDialog {
         setVisible(true);
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -431,6 +429,7 @@ public class DlgVital extends javax.swing.JDialog {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtWert1FocusGained(evt);
             }
+
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtWert1FocusLost(evt);
             }
@@ -446,6 +445,7 @@ public class DlgVital extends javax.swing.JDialog {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtWert2FocusGained(evt);
             }
+
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtWert2FocusLost(evt);
             }
@@ -461,6 +461,7 @@ public class DlgVital extends javax.swing.JDialog {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtWert3FocusGained(evt);
             }
+
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtWert3FocusLost(evt);
             }
@@ -502,12 +503,12 @@ public class DlgVital extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(lblStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
+                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(lblStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(lblStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(lblStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -519,6 +520,7 @@ public class DlgVital extends javax.swing.JDialog {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtDatumFocusGained(evt);
             }
+
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtDatumFocusLost(evt);
             }
@@ -529,6 +531,7 @@ public class DlgVital extends javax.swing.JDialog {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtUhrzeitFocusGained(evt);
             }
+
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtUhrzeitFocusLost(evt);
             }
@@ -539,103 +542,103 @@ public class DlgVital extends javax.swing.JDialog {
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(txtDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(273, Short.MAX_VALUE))
+                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jLabel2)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(txtDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel1)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(273, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1)
-                    .add(txtDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel2))
-                .addContainerGap())
+                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                        .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel1)
+                                        .add(txtDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(jLabel2))
+                                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(btnSave)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnDiscard))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                .add(lblWert3)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtWert3))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                .add(lblWert2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtWert2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                .add(lblWert1)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtWert1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(lblEinheit1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-                            .add(lblEinheit2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-                            .add(lblEinheit3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
-                    .add(lblVital, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
-                    .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                                .add(btnSave)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnDiscard))
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                                                .add(lblWert3)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(txtWert3))
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                                                .add(lblWert2)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(txtWert2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                                                .add(lblWert1)
+                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                                .add(txtWert1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                                        .add(lblEinheit1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                                                        .add(lblEinheit2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                                                        .add(lblEinheit3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+                                        .add(lblVital, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
+                                        .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lblVital)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(btnDiscard)
-                            .add(btnSave)))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lblWert1)
-                            .add(txtWert1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(lblEinheit1))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lblWert2)
-                            .add(txtWert2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(lblEinheit2))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lblWert3)
-                            .add(txtWert3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(lblEinheit3))))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(lblVital)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                                        .add(btnDiscard)
+                                                        .add(btnSave)))
+                                        .add(layout.createSequentialGroup()
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                                        .add(lblWert1)
+                                                        .add(txtWert1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                        .add(lblEinheit1))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                                        .add(lblWert2)
+                                                        .add(txtWert2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                        .add(lblEinheit2))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                                        .add(lblWert3)
+                                                        .add(txtWert3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                        .add(lblEinheit3))))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-576)/2, (screenSize.height-323)/2, 576, 323);
+        setBounds((screenSize.width - 576) / 2, (screenSize.height - 323) / 2, 576, 323);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtWert3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtWert3FocusLost
@@ -656,13 +659,13 @@ public class DlgVital extends javax.swing.JDialog {
         try {
             double v = Double.parseDouble(jtf.getText());
             if (v < min || max < v) {
-                notify("Der Wert liegt außerhalb des erlaubten Bereiches. Min: " + Double.toString(min) + " Max: " + Double.toString(max));
+                notify("Der Wert liegt auÃŸerhalb des erlaubten Bereiches. Min: " + Double.toString(min) + " Max: " + Double.toString(max));
                 jtf.setText(Double.toString(norm));
                 jtf.requestFocus();
             }
         } catch (NumberFormatException ex) {
             jtf.setText(Double.toString(norm));
-            notify("Der Wert ist keine gültige Zahl.");
+            notify("Der Wert ist keine gÃ¼ltige Zahl.");
             jtf.requestFocus();
         }
     }
@@ -702,7 +705,7 @@ public class DlgVital extends javax.swing.JDialog {
             }
         }
 
-        if (this.activeControls == 0) { // Für den Stuhlgang oder das Erbrechen
+        if (this.activeControls == 0) { // FÃ¼r den Stuhlgang oder das Erbrechen
             werte = new double[]{0d};
             xmls = new String[]{DBHandling.getBWertXML(mode)};
             if (edit) {
@@ -748,7 +751,7 @@ public class DlgVital extends javax.swing.JDialog {
 
                 if (edit) {
                     if (newbwid > 0) { // weitere Verarbeitung nur dann, wenn Insert funktioniert hat.
-                        // alten Eintrag ändern und verstecken
+                        // alten Eintrag Ã¤ndern und verstecken
                         HashMap oldrecord = new HashMap();
                         oldrecord.put("_mdate", "!NOW!");
                         oldrecord.put("EditBy", OPDE.getLogin().getUser().getUKennung());
@@ -760,7 +763,7 @@ public class DlgVital extends javax.swing.JDialog {
                         throw new SQLException("insert");
                     }
 
-                    // Vorgänge umbiegen
+                    // VorgÃ¤nge umbiegen
                     String sql1 = "UPDATE VorgangAssign SET ForeignKey = ? WHERE ForeignKey = ? AND TableName = 'BWerte'";
                     PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
                     stmt1.setLong(1, newbwid);

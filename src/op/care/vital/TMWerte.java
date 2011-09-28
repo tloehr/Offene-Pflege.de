@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,6 +26,13 @@
  */
 package op.care.vital;
 
+import op.OPDE;
+import op.tools.DlgException;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
+
+import javax.swing.table.AbstractTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,16 +40,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import javax.swing.table.AbstractTableModel;
-import op.OPDE;
-import op.tools.SYSCalendar;
-import op.tools.DlgException;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 /**
- * Diese Klasse ist das TableModel für die Vitalwerte
- *
+ * Diese Klasse ist das TableModel fÃ¼r die Vitalwerte
  */
 public class TMWerte
         extends AbstractTableModel {
@@ -98,37 +98,37 @@ public class TMWerte
             //stmt = OPDE.db.db.createStatement();
             String s =
                     " SELECT bw.BWID, bw.PIT, bw.UKennung, bw.Wert, bw.XML, bw.Bemerkung, bw.Beziehung, bw.Sortierung, bw._cdate, bw._mdate, bw.ReplacedBy, bw.ReplacementFor," +
-                    "       bw.EditBy, fia.anzahl, vrg.anzahl, ocu.Vorname, ocu.Nachname " +
-                    " FROM BWerte bw" +
-                    " INNER JOIN OCUsers ocu ON ocu.UKennung = bw.UKennung " +
-                    // Hier kommen die angehangen Dokumente hinzu
-                    " INNER JOIN " +
-                    " (" +
-                    " 	SELECT DISTINCT f1.BWID, ifnull(anzahl,0) anzahl" +
-                    " 	FROM BWerte f1" +
-                    " 	LEFT OUTER JOIN (" +
-                    " 		SELECT BWID, count(*) anzahl FROM SYSBWERTE2FILE" +
-                    " 		GROUP BY BWID" +
-                    " 		) fa ON fa.BWID = f1.BWID" +
-                    " 	WHERE f1.BWKennung=? AND f1.PIT >= ? AND f1.PIT <= ? " +
-                    " ) fia ON fia.BWID = bw.BWID" +
-                    // Hier die angehangenen Vorgänge
-                    " INNER JOIN " +
-                    " (" +
-                    " 	SELECT DISTINCT f2.BWID, ifnull(anzahl,0) anzahl" +
-                    " 	FROM BWerte f2" +
-                    " 	LEFT OUTER JOIN (" +
-                    " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
-                    " 		WHERE TableName='BWerte'" +
-                    " 		GROUP BY ForeignKey" +
-                    " 		) va ON va.ForeignKey = f2.BWID" +
-                    " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
-                    " ) vrg ON vrg.BWID = bw.BWID " +
-                    " WHERE bw.BWKennung = ? AND bw.PIT >= ? AND bw.PIT <= ? " +
-                    (showedits ? "" : " AND bw.ReplacedBy = 0 ");
+                            "       bw.EditBy, fia.anzahl, vrg.anzahl, ocu.Vorname, ocu.Nachname " +
+                            " FROM BWerte bw" +
+                            " INNER JOIN OCUsers ocu ON ocu.UKennung = bw.UKennung " +
+                            // Hier kommen die angehangen Dokumente hinzu
+                            " INNER JOIN " +
+                            " (" +
+                            " 	SELECT DISTINCT f1.BWID, ifnull(anzahl,0) anzahl" +
+                            " 	FROM BWerte f1" +
+                            " 	LEFT OUTER JOIN (" +
+                            " 		SELECT BWID, count(*) anzahl FROM SYSBWERTE2FILE" +
+                            " 		GROUP BY BWID" +
+                            " 		) fa ON fa.BWID = f1.BWID" +
+                            " 	WHERE f1.BWKennung=? AND f1.PIT >= ? AND f1.PIT <= ? " +
+                            " ) fia ON fia.BWID = bw.BWID" +
+                            // Hier die angehangenen VorgÃ¤nge
+                            " INNER JOIN " +
+                            " (" +
+                            " 	SELECT DISTINCT f2.BWID, ifnull(anzahl,0) anzahl" +
+                            " 	FROM BWerte f2" +
+                            " 	LEFT OUTER JOIN (" +
+                            " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
+                            " 		WHERE TableName='BWerte'" +
+                            " 		GROUP BY ForeignKey" +
+                            " 		) va ON va.ForeignKey = f2.BWID" +
+                            " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
+                            " ) vrg ON vrg.BWID = bw.BWID " +
+                            " WHERE bw.BWKennung = ? AND bw.PIT >= ? AND bw.PIT <= ? " +
+                            (showedits ? "" : " AND bw.ReplacedBy = 0 ");
             //"ORDER BY Beziehung, Datum, Uhrzeit";
 
-            // alle ist nur dann false, wenn keines der Häkchen gesetzt ist. Dann soll er AUCH alle anzeigen
+            // alle ist nur dann false, wenn keines der HÃ¤kchen gesetzt ist. Dann soll er AUCH alle anzeigen
             boolean alle = false;
             for (int i = 0; i < filter.length; i++) {
                 alle = alle | filter[i];
@@ -138,9 +138,9 @@ public class TMWerte
             String f = "";
             if (!alle) {
                 f += "AND (";
-                // Beziehung > 0 können nur Blutdruckwerte sein.
+                // Beziehung > 0 kÃ¶nnen nur Blutdruckwerte sein.
                 f += (filter[PnlVitalwerte.RR] ? "Beziehung > 0 OR " : "") +
-                        // Nur Pulswerte, die nicht zu einer Blutdruck 3er Beziehung gehören.
+                        // Nur Pulswerte, die nicht zu einer Blutdruck 3er Beziehung gehÃ¶ren.
                         (filter[PnlVitalwerte.PULS] ? "(XML like '%<PULS/>%' AND Beziehung = 0) OR " : "") +
                         (filter[PnlVitalwerte.BZ] ? "XML like '%<BZ/>%' OR " : "") +
                         (filter[PnlVitalwerte.TEMP] ? "XML like '%<TEMP/>%' OR " : "") +
@@ -155,13 +155,13 @@ public class TMWerte
                 f = f.substring(0, f.length() - 4); // Hier wird das letzt " OR " abgeschnitten.
                 f += ") ";
             }
-            // Hier wird der ursprüngliche SQL Ausdruck mit einem evtl. Filter und der Sortierung zusammengefasst.
+            // Hier wird der ursprÃ¼ngliche SQL Ausdruck mit einem evtl. Filter und der Sortierung zusammengefasst.
             s += f + " ORDER BY PIT desc, Beziehung, Sortierung ";
             stmt = OPDE.getDb().db.prepareStatement(s);
 
-            // Dieses doppelt und dreifach übergeben der Zeiträume an den
-            // SQL Ausdruck führt dazu, dass die Ausführung der Abfrage beschleunigt
-            // wird. Nämlich dadurch das der Suchraum frühzeitig eingeschränkt wird
+            // Dieses doppelt und dreifach Ã¼bergeben der ZeitrÃ¤ume an den
+            // SQL Ausdruck fÃ¼hrt dazu, dass die AusfÃ¼hrung der Abfrage beschleunigt
+            // wird. NÃ¤mlich dadurch das der Suchraum frÃ¼hzeitig eingeschrÃ¤nkt wird
             // und nicht erst beim JOIN.
             stmt.setString(1, currentBW);
             stmt.setTimestamp(2, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
@@ -186,43 +186,43 @@ public class TMWerte
                 while (rs.next()) {
                     Object[] o;
                     /*
-                     * Diese Unterscheidung ist nötig, da es Werte wie den Blutdruck gibt, wo drei Datenbank
-                     * Zeilen zu einer Tabellenzeile zusammengefasst werden müssen.
+                     * Diese Unterscheidung ist nÃ¶tig, da es Werte wie den Blutdruck gibt, wo drei Datenbank
+                     * Zeilen zu einer Tabellenzeile zusammengefasst werden mÃ¼ssen.
                      */
                     if (rs.getInt("Beziehung") > 0) { // Hier ist der Start einer RRSYS, RRDIA, PULS Beziehung
-                        OPDE.info("Beziehung:"+rs.getInt("Beziehung"));
+                        OPDE.info("Beziehung:" + rs.getInt("Beziehung"));
                         // Durch die Sortierung des ResultSets nach Beziehung und dann erst nach Datum und Uhrzeit
                         // ist sichergestellt, dass die RR Werte immer in der richtigen Reihenfolge zusammen stehen.
                         int sys = (int) rs.getDouble("Wert");
                         long sysbwid = rs.getLong("BWID");
-                        OPDE.info("sysbwid:"+sysbwid);
+                        OPDE.info("sysbwid:" + sysbwid);
                         rs.next();
                         int dia = (int) rs.getDouble("Wert");
                         long diabwid = rs.getLong("BWID");
-                        OPDE.info("diabwid:"+diabwid);
+                        OPDE.info("diabwid:" + diabwid);
                         rs.next();
                         int puls = (int) rs.getDouble("Wert");
                         long pulsbwid = rs.getLong("BWID");
-                        OPDE.info("pulsbwid:"+pulsbwid);
+                        OPDE.info("pulsbwid:" + pulsbwid);
                         String rrline = sys + "/" + dia + " P" + puls;
                         // Die nachfolgenden Abfragen sind sowieso bei allen 3 Zeilen gleich, deswegen kann man
                         // auch ruhig die Datum, etc. Werte aus der letzten Zeile des RR 3er Gespanns nehmen.
                         o = new Object[]{
-                                    rs.getTimestamp("PIT"), currentBW, "Blutdruck und Puls",
-                                    rrline, rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
-                                    rs.getLong("BWID"), "<RR/>", sys, dia, puls, sysbwid, diabwid, pulsbwid, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                    rs.getLong("ReplacementFor"), rs.getString("EditBy"), rs.getInt("vrg.anzahl"), rs.getInt("fia.anzahl"), "mmHg, S/m",
-                                    rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
-                                };
+                                rs.getTimestamp("PIT"), currentBW, "Blutdruck und Puls",
+                                rrline, rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
+                                rs.getLong("BWID"), "<RR/>", sys, dia, puls, sysbwid, diabwid, pulsbwid, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
+                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), rs.getInt("vrg.anzahl"), rs.getInt("fia.anzahl"), "mmHg, S/m",
+                                rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
+                        };
                     } else {
                         o = new Object[]{
-                                    rs.getTimestamp("PIT"), currentBW, DBHandling.getBWertArt(rs.getString("XML")),
-                                    (rs.getDouble("Wert") == 0d ? "siehe Bemerkung" : new Double(rs.getDouble("Wert")).toString()),
-                                    rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
-                                    rs.getLong("BWID"), rs.getString("XML"), rs.getDouble("Wert"), 0d, 0d, 0L, 0L, 0L, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                    rs.getLong("ReplacementFor"), rs.getString("EditBy"), rs.getInt("vrg.anzahl"), rs.getInt("fia.anzahl"), DBHandling.getBWertEinheit(rs.getString("XML")),
-                                    rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
-                                };
+                                rs.getTimestamp("PIT"), currentBW, DBHandling.getBWertArt(rs.getString("XML")),
+                                (rs.getDouble("Wert") == 0d ? "siehe Bemerkung" : new Double(rs.getDouble("Wert")).toString()),
+                                rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
+                                rs.getLong("BWID"), rs.getString("XML"), rs.getDouble("Wert"), 0d, 0d, 0L, 0L, 0L, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
+                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), rs.getInt("vrg.anzahl"), rs.getInt("fia.anzahl"), DBHandling.getBWertEinheit(rs.getString("XML")),
+                                rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
+                        };
 
                     }
                     content.add(o);
@@ -298,13 +298,13 @@ public class TMWerte
             case TBL_HTML: {
                 DateFormat df = DateFormat.getDateTimeInstance();
                 if (replacedby == bwid) {
-                    result += "<i>Gelöschter Eintrag. Gelöscht am/um: " + df.format((Date) o[COL_MDATE]) + " von " + o[COL_EDITBY].toString() + "</i><br/>";
+                    result += "<i>GelÃ¶schter Eintrag. GelÃ¶scht am/um: " + df.format((Date) o[COL_MDATE]) + " von " + o[COL_EDITBY].toString() + "</i><br/>";
                 }
                 if (replacement4 > 0 && replacement4 != bwid) {
                     result += "<i>Dies ist ein Eintrag, der nachbearbeitet wurde.<br/>Am/um: " + df.format((Date) o[COL_CDATE]) + "<br/>Der Originaleintrag hatte die Nummer: " + replacement4 + "</i><br/>";
                 }
                 if (replacedby > 0 && replacedby != bwid) {
-                    result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format((Date) o[COL_CDATE]) + " von " + o[COL_EDITBY].toString() + " vorgenommen.";
+                    result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungÃ¼ltig wurde. Bitte ignorieren.<br/>Ã„nderung wurde am/um: " + df.format((Date) o[COL_CDATE]) + " von " + o[COL_EDITBY].toString() + " vorgenommen.";
                     result += "<br/>Der Korrektureintrag hat die Nummer: " + replacedby + "</i><br/>";
                 }
                 result += "<b>" + o[COL_WERT].toString() + " " + o[COL_EINHEIT].toString() + "</b> (" + o[COL_ART].toString() + ")";

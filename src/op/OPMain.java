@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Lˆhr
+ * Copyright (C) 2008 Torsten L√∂hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie ‹bersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie kˆnnen es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation verˆffentlicht, weitergeben und/oder modifizieren, gem‰ﬂ Version 2 der Lizenz.
+ * Auf deutsch (freie √úbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie k√∂nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation ver√∂ffentlicht, weitergeben und/oder modifizieren, gem√§√ü Version 2 der Lizenz.
  *
- * Die Verˆffentlichung dieses Programms erfolgt in der Hoffnung, daﬂ es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F‹R EINEN 
+ * Die Ver√∂ffentlichung dieses Programms erfolgt in der Hoffnung, da√ü es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT F√úR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -25,54 +25,31 @@
  */
 package op;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
-import javax.swing.border.*;
-
 import entity.SYSHostsTools;
 import entity.SYSLoginTools;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ToolTipManager;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 import op.share.tools.PnlEditor;
 import op.share.vorgang.TMVorgang;
 import op.tools.DlgException;
 import op.tools.DlgLogin;
-import tablerenderer.RNDHTML;
 import op.tools.SYSTools;
+import tablerenderer.RNDHTML;
+
+import javax.swing.*;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /**
- *
- * @author  __USER__
+ * @author __USER__
  */
 public class OPMain extends javax.swing.JFrame {
 
-    
 
     public static final String internalClassID = "opmain";
     private final Frame parent = this;
@@ -87,17 +64,16 @@ public class OPMain extends javax.swing.JFrame {
         initComponents();
 
 
-
         menuStructure = new ArrayList();
         menuStructure.add(new String[]{"Pflege/Pflegeakte", "op.care.FrmPflege", "pflegeakte.png"});
         menuStructure.add(new String[]{"Pflege/Medikamente", "op.care.med.FrmMed", "agt_virussafe.png"});
         menuStructure.add(new String[]{"Pflege/Massnahmen", "op.care.planung.massnahmen.FrmMassnahmen", "work.png"});
         menuStructure.add(new String[]{"Bewohner/Bewohnerdaten", "op.bw.admin.FrmBWAttr", "groupevent.png"});
-        menuStructure.add(new String[]{"Bewohner/Barbetr‰ge", "op.bw.tg.FrmTG", "coins.png"});
+        menuStructure.add(new String[]{"Bewohner/Barbetr√§ge", "op.bw.tg.FrmTG", "coins.png"});
         menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});
         menuStructure.add(new String[]{"System/Datei-Manager", "op.sysfiles.FrmFilesManager", "kfm.png"});
         menuStructure.add(new String[]{"Controlling/Controlling", "op.controlling.FrmCtrlMonitor", "kfind.png"});
-        menuStructure.add(new String[]{"Controlling/Vorg‰nge", "op.vorgang.FrmVorgang", "utilities-file-archiver.png"});
+        menuStructure.add(new String[]{"Controlling/Vorg√§nge", "op.vorgang.FrmVorgang", "utilities-file-archiver.png"});
 
         frames = new HashMap();
         //this.setTitle(OPDE.getLocalProps().getProperty("program.PROGNAME") + ", Version " + OPDE.getLocalProps().getProperty("program.VERSION") +
@@ -119,7 +95,8 @@ public class OPMain extends javax.swing.JFrame {
         //new NewJDialog(this, false).setVisible(true);
     }
 
-    /** This method is called from within the constructor to
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -151,6 +128,7 @@ public class OPMain extends javax.swing.JFrame {
             public void windowClosing(WindowEvent e) {
                 formWindowClosing(e);
             }
+
             @Override
             public void windowDeiconified(WindowEvent e) {
                 formWindowDeiconified(e);
@@ -169,12 +147,12 @@ public class OPMain extends javax.swing.JFrame {
             GroupLayout pnlStatusLayout = new GroupLayout(pnlStatus);
             pnlStatus.setLayout(pnlStatusLayout);
             pnlStatusLayout.setHorizontalGroup(
-                pnlStatusLayout.createParallelGroup()
-                    .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
+                    pnlStatusLayout.createParallelGroup()
+                            .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
             );
             pnlStatusLayout.setVerticalGroup(
-                pnlStatusLayout.createParallelGroup()
-                    .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    pnlStatusLayout.createParallelGroup()
+                            .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             );
         }
 
@@ -199,19 +177,20 @@ public class OPMain extends javax.swing.JFrame {
 
             //---- tblVorgang ----
             tblVorgang.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ) {
-                Class<?>[] columnTypes = new Class<?>[] {
-                    Object.class, Object.class, Object.class, Object.class
+                Class<?>[] columnTypes = new Class<?>[]{
+                        Object.class, Object.class, Object.class, Object.class
                 };
+
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     return columnTypes[columnIndex];
@@ -246,38 +225,38 @@ public class OPMain extends javax.swing.JFrame {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspVorgang, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
-                    .addGap(10, 10, 10)
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(btnLogout, GroupLayout.Alignment.TRAILING)
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)))
-                    .addContainerGap())
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspMainButtons, GroupLayout.DEFAULT_SIZE, 908, Short.MAX_VALUE)
-                    .addContainerGap())
+                contentPaneLayout.createParallelGroup()
+                        .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jspVorgang, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                                .addGap(10, 10, 10)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(btnLogout, GroupLayout.Alignment.TRAILING)
+                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                                .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)))
+                                .addContainerGap())
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jspMainButtons, GroupLayout.DEFAULT_SIZE, 908, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(btnLogout)
-                    .addGap(18, 18, 18)
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
-                        .addComponent(jspVorgang, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspMainButtons, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(btnLogout)
+                                .addGap(18, 18, 18)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                                        .addComponent(jspVorgang, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspMainButtons, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -310,7 +289,7 @@ public class OPMain extends javax.swing.JFrame {
 
     private void newFrame(String classname) {
         OPDE.getLogger().debug("NewFrame with Classname: " + classname);
-        // Key f¸r die InnerClass
+        // Key f√ºr die InnerClass
         final String key = classname;
         if (!frames.containsKey(classname)) {
             Class c = null;
@@ -359,7 +338,7 @@ public class OPMain extends javax.swing.JFrame {
     private void jspVorgangComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVorgangComponentResized
         if (tblVorgang.getModel().getColumnCount() > 0) {
             TableColumnModel tcm1 = tblVorgang.getColumnModel();
-            tcm1.getColumn(0).setHeaderValue(SYSTools.toHTML("<b>Vorg‰nge, die Ihnen zugeordnet sind.</b>"));
+            tcm1.getColumn(0).setHeaderValue(SYSTools.toHTML("<b>Vorg√§nge, die Ihnen zugeordnet sind.</b>"));
         }
     }//GEN-LAST:event_jspVorgangComponentResized
 
@@ -387,7 +366,7 @@ public class OPMain extends javax.swing.JFrame {
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
 
-            JMenuItem itemPopupEnd = new JMenuItem("Vorg‰nge bearbeiten");
+            JMenuItem itemPopupEnd = new JMenuItem("Vorg√§nge bearbeiten");
             itemPopupEnd.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -460,10 +439,10 @@ public class OPMain extends javax.swing.JFrame {
         disposeFrame("op.care.FrmPflege");
         OPDE.notifyAboutLogout();
         if (frames.size() == 0) {
-            // Men¸s aufr‰umen
+            // Men√ºs aufr√§umen
             SYSTools.unregisterListeners(jmbMain);
             jmbMain.removeAll();
-            // MainButtons aufr‰umen
+            // MainButtons aufr√§umen
             jspMainButtons.remove(pnlMainButtons);
             SYSTools.unregisterListeners(pnlMainButtons);
             pnlMainButtons.removeAll();
@@ -495,7 +474,7 @@ public class OPMain extends javax.swing.JFrame {
             //this.paintComponents(this.getGraphics());
             initOC(message);
         } else {
-            JOptionPane.showMessageDialog(this, "Es sind noch " + frames.size() + " offene Fenster vorhanden. Bitte schlieﬂen Sie diese erst.", "Abmeldung nicht mˆglich", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Es sind noch " + frames.size() + " offene Fenster vorhanden. Bitte schlie√üen Sie diese erst.", "Abmeldung nicht m√∂glich", JOptionPane.INFORMATION_MESSAGE);
         }
 
     }
@@ -507,7 +486,7 @@ public class OPMain extends javax.swing.JFrame {
     public void initOC(String preMessage) {
         btnLogout.setEnabled(false);
         SYSTools.unregisterListeners(menu);
-        
+
         tblVorgang.setModel(new DefaultTableModel());
         tblVorgang.setVisible(false);
         new DlgLogin(this, preMessage);
@@ -559,7 +538,7 @@ public class OPMain extends javax.swing.JFrame {
         datei.add(logout);
         datei.add(quit);
         jmbMain.add(datei);
-        // Ein neues Panel f¸r die Buttons erstellen.
+        // Ein neues Panel f√ºr die Buttons erstellen.
         pnlMainButtons = new JPanel(new FlowLayout(FlowLayout.LEADING));
         jspMainButtons.setViewportView(pnlMainButtons);
         // Jetzt beginnt der dynamische Teil.
@@ -570,13 +549,13 @@ public class OPMain extends javax.swing.JFrame {
         for (int item = 0; item
                 < menuStructure.size(); item++) {
             String[] menuItem = (String[]) menuStructure.get(item);
-            // Nur erstellen, wenn der User auch die passenden Rechte daf¸r hat.
+            // Nur erstellen, wenn der User auch die passenden Rechte daf√ºr hat.
             if (ocs.isExecutable(classname, menuItem[1])) {
                 StringTokenizer st = new StringTokenizer(menuItem[0], "/");
                 final String frameName = menuItem[1];
                 String rootName = st.nextToken();
                 if (currentRoot == null || !currentRoot.getText().equals(rootName)) {
-                    if (currentRoot != null) { // F¸gt den vorhergehenden Men¸strang hinzu.
+                    if (currentRoot != null) { // F√ºgt den vorhergehenden Men√ºstrang hinzu.
                         jmbMain.add(currentRoot);
                     }
 
@@ -614,7 +593,7 @@ public class OPMain extends javax.swing.JFrame {
                 } // while
             }
         }
-        jmbMain.add(currentRoot); // F¸gt das letzte Men¸ hinzu.
+        jmbMain.add(currentRoot); // F√ºgt das letzte Men√º hinzu.
         this.pack();
 //        this.paintComponents(this.getGraphics());
 //        this.paintAll(this.getGraphics());

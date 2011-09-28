@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2008 Torsten LÃ¶hr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -12,12 +12,12 @@
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
  * ------------------------ 
- * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
- * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ * Auf deutsch (freie Ãœbersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation verÃ¶ffentlicht, weitergeben und/oder modifizieren, gemÃ¤ÃŸ Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN 
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
@@ -26,14 +26,13 @@
  */
 package op.tools;
 
-import java.awt.Color;
+import java.awt.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 /**
- *
  * @author tloehr
  */
 public class SYSConst {
@@ -109,11 +108,11 @@ public class SYSConst {
     public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(BIS_AUF_WEITERES.getTimeInMillis());
     public static final String MYSQL_DATETIME_VON_ANFANG_AN = "'1000-01-01 00:00:00'";
     public static final String MYSQL_DATETIME_BIS_AUF_WEITERES = "'9999-12-31 23:59:59'";
-    public static final int GESCHLECHT_MÄNNLICH = 1;
+    public static final int GESCHLECHT_MÃ„NNLICH = 1;
     public static final int GESCHLECHT_WEIBLICH = 2;
-    public static final String GESCHLECHT[] = {"", "männlich", "weiblich"};
-    public static final String STAERKE[] = {"g", "mg", "µg", "E", "mcm", "TSD E", "MIO E", "mmol", "ml"}; // Für Medikamente
-    public static final String EINHEIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
+    public static final String GESCHLECHT[] = {"", "mÃ¤nnlich", "weiblich"};
+    public static final String STAERKE[] = {"g", "mg", "Âµg", "E", "mcm", "TSD E", "MIO E", "mmol", "ml"}; // FÃ¼r Medikamente
+    public static final String EINHEIT[] = {"", "StÃ¼ck", "ml", "l", "mg", "g", "cm", "m"}; // FÃ¼r AnwEinheit, PackEinheit, Dimension
     public static final String STOFFTYP[] = {"Wirkstoff", "Hilfsstoff", "Sonstiger Stoff"};
     public static final String GROESSE[] = {"N1", "N2", "N3", "AP", "OP"};
     public static final int UZ = 0; // Solluhrzeit
@@ -123,7 +122,7 @@ public class SYSConst {
     public static final int NM = 4; // Nachmittags
     public static final int AB = 5; // Abends
     public static final int NA = 6; // Nacht Abends
-//    public static final int SCHICHT_FRUEH = 0;
+    //    public static final int SCHICHT_FRUEH = 0;
 //    public static final int SCHICHT_SPAET = 1;
 //    public static final int SCHICHT_NACHT = 2;
 //    public static final int SCHICHT_SONST = 3;
@@ -132,32 +131,32 @@ public class SYSConst {
     public static final int ZEIT_FRUEH = 1;
     public static final int ZEIT_SPAET = 2;
     public static final int ZEIT_NACHT_AB = 3;
-    public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
+    public static final String ZEIT[] = {"Alles", "Nacht, morgens", "FrÃ¼h", "SpÃ¤t", "Nacht, abends"};
     public static final int BMI_UNTERGEWICHT = 0;
     public static final int BMI_NORMAL = 1;
-    public static final int BMI_ÜBERGEWICHT = 2;
+    public static final int BMI_ÃœBERGEWICHT = 2;
 
     public static HashMap getNachnamenAnonym() {
         HashMap hm = new HashMap();
         hm.put("a", new String[]{"Anders", "Ackerman", "Acord", "Adams", "Addison"});
-        hm.put("b", new String[]{"Baesman", "Bahden", "Bailie", "Bäke", "Baker"});
+        hm.put("b", new String[]{"Baesman", "Bahden", "Bailie", "BÃ¤ke", "Baker"});
         hm.put("c", new String[]{"Clefisch", "Cleimann", "Clemann", "Clever", "Cleverdon"});
-        hm.put("d", new String[]{"Dammann", "Dammer", "Dammermann", "Damschröder", "Dankel"});
+        hm.put("d", new String[]{"Dammann", "Dammer", "Dammermann", "DamschrÃ¶der", "Dankel"});
         hm.put("e", new String[]{"Ellebracht", "Ellerbrock", "Ellerkamp", "Ellermann", "Ellinghaus"});
         hm.put("f", new String[]{"Fehring", "Feickert", "Feistkorn", "Feldhus", "Feldmann"});
         hm.put("g", new String[]{"Gaunert", "Gausebrink", "Gausmann", "Geck", "Gehl"});
-        hm.put("h", new String[]{"Habighorst", "Hackemüller", "Hackemöller", "Hackmann", "Hackstedt"});
+        hm.put("h", new String[]{"Habighorst", "HackemÃ¼ller", "HackemÃ¶ller", "Hackmann", "Hackstedt"});
         hm.put("i", new String[]{"Imbusch", "Imeyer", "Imholz", "Irmer", "Irmscher"});
         hm.put("j", new String[]{"Jensen", "Jobstvogt", "Jobusch", "Joeckle", "Joesting"});
         hm.put("k", new String[]{"Kalmey", "Kalthof", "Kamlage", "Kammerer", "Kamp"});
-        hm.put("l", new String[]{"Lohfener", "Löhr", "Lohrbach", "Lohse", "Long"});
-        hm.put("m", new String[]{"Magna", "Mailänder", "Malasse", "Mandrella", "Mann"});
+        hm.put("l", new String[]{"Lohfener", "LÃ¶hr", "Lohrbach", "Lohse", "Long"});
+        hm.put("m", new String[]{"Magna", "MailÃ¤nder", "Malasse", "Mandrella", "Mann"});
         hm.put("n", new String[]{"Nehring", "Nelson", "Nelz", "Nendel", "Nentrup"});
-        hm.put("o", new String[]{"Obermeyer", "Obermüller", "Oberniehaus", "Ostmann", "Oberwahrenbrock"});
-        hm.put("p", new String[]{"Papenburg", "Pardieck", "Parr", "Pörsch", "Partzsch"});
+        hm.put("o", new String[]{"Obermeyer", "ObermÃ¼ller", "Oberniehaus", "Ostmann", "Oberwahrenbrock"});
+        hm.put("p", new String[]{"Papenburg", "Pardieck", "Parr", "PÃ¶rsch", "Partzsch"});
         hm.put("q", new String[]{"Quam", "Quark", "Quast", "Quest", "Quench"});
         hm.put("r", new String[]{"Ramms", "Randall", "Rappold", "Raschack", "Rathert"});
-        hm.put("s", new String[]{"Sandkühler", "Sandner", "Sandy", "Sarner", "Sarvela"});
+        hm.put("s", new String[]{"SandkÃ¼hler", "Sandner", "Sandy", "Sarner", "Sarvela"});
         hm.put("t", new String[]{"Tegeder", "Teigeler", "Tellmann", "Temme", "Tessmann"});
         hm.put("u", new String[]{"Ulbricht", "Ullmann", "Ullrich", "Unland", "Unnerstall"});
         hm.put("v", new String[]{"Vegesack", "Vehling", "Vehring", "Vemmer", "Venckhaus"});
@@ -165,9 +164,9 @@ public class SYSConst {
         hm.put("x", new String[]{"Xaver", "Xanderin", "Xanders", "Xandri", "Xanking"});
         hm.put("y", new String[]{"Yanker", "Yareck", "Yaritz", "Yark", "Yarletts"});
         hm.put("z", new String[]{"Zeiser", "Zeretzki", "Ziebart", "Ziegemeier", "Zieger"});
-        hm.put("ä", new String[]{"Anders", "Ackerman", "Acord", "Adams", "Addison"});
-        hm.put("ö", new String[]{"Obermeyer", "Obermüller", "Oberniehaus", "Ostmann", "Oberwahrenbrock"});
-        hm.put("ü", new String[]{"Ulbricht", "Ullmann", "Ullrich", "Unland", "Unnerstall"});
+        hm.put("Ã¤", new String[]{"Anders", "Ackerman", "Acord", "Adams", "Addison"});
+        hm.put("Ã¶", new String[]{"Obermeyer", "ObermÃ¼ller", "Oberniehaus", "Ostmann", "Oberwahrenbrock"});
+        hm.put("Ã¼", new String[]{"Ulbricht", "Ullmann", "Ullrich", "Unland", "Unnerstall"});
         return hm;
     }
 
@@ -198,10 +197,10 @@ public class SYSConst {
         hm.put("w", new String[]{"Wally", "Walli", "Waltheide", "Waltraud", "Wanda"});
         hm.put("x", new String[]{"Xandra", "Xaveria", "Xynthia", "Xaviera", "Xenia"});
         hm.put("y", new String[]{"Yvonne", "Yasmin", "Yana", "Yola", "Yuki"});
-        hm.put("z", new String[]{"Zatiye", "Zäzilie", "Zdenka", "Zelda", "Zia"});
-        hm.put("ä", new String[]{"Adrina", "Agnes", "Alexandra", "Alina", "Amelie"});
-        hm.put("ö", new String[]{"Olga", "Oliana", "Olisa", "Olivia", "Ottilie"});
-        hm.put("ü", new String[]{"Ute", "Ursula", "Uschi", "Ulrike", "Ursa"});
+        hm.put("z", new String[]{"Zatiye", "ZÃ¤zilie", "Zdenka", "Zelda", "Zia"});
+        hm.put("Ã¤", new String[]{"Adrina", "Agnes", "Alexandra", "Alina", "Amelie"});
+        hm.put("Ã¶", new String[]{"Olga", "Oliana", "Olisa", "Olivia", "Ottilie"});
+        hm.put("Ã¼", new String[]{"Ute", "Ursula", "Uschi", "Ulrike", "Ursa"});
         return hm;
     }
 
@@ -213,7 +212,7 @@ public class SYSConst {
         hm.put("d", new String[]{"Daniel", "David", "Dennis", "Detlef", "Dieter"});
         hm.put("e", new String[]{"Elias", "Emil", "Erik", "Ernst", "Erich"});
         hm.put("f", new String[]{"Fabian", "Felix", "Ferdinand", "Florian", "Frank"});
-        hm.put("g", new String[]{"Georg", "Gerd", "Gerhard", "Gustav", "Günther"});
+        hm.put("g", new String[]{"Georg", "Gerd", "Gerhard", "Gustav", "GÃ¼nther"});
         hm.put("h", new String[]{"Hagen", "Hannes", "Hartmut", "Hans", "Harald"});
         hm.put("i", new String[]{"Ingo", "Ingobald", "Ingolf", "Ingram", "Ingwar"});
         hm.put("j", new String[]{"Jakob", "Jan", "Jens", "Joachim", "Josef"});
@@ -224,7 +223,7 @@ public class SYSConst {
         hm.put("o", new String[]{"Olaf", "Ole", "Oliver", "Oskar", "Otto"});
         hm.put("p", new String[]{"Pascal", "Patrick", "Paul", "Peter", "Philipp"});
         hm.put("q", new String[]{"Quentin", "Quico", "Quillan", "Quinlan", "Quinn"});
-        hm.put("r", new String[]{"Ralf", "René", "Richard", "Robert", "Rudolf"});
+        hm.put("r", new String[]{"Ralf", "RenÃ©", "Richard", "Robert", "Rudolf"});
         hm.put("s", new String[]{"Sebastian", "Simon", "Stefan", "Steffen", "Sven"});
         hm.put("t", new String[]{"Thomas", "Timotheus", "Tobias", "Torsten", "Tarek"});
         hm.put("u", new String[]{"Uberto", "Ulrich", "Uwe", "Udo", "Ulf"});
@@ -233,10 +232,10 @@ public class SYSConst {
         hm.put("x", new String[]{"Xaver", "Xander", "Xaverius", "Xavier", "Xerxes"});
         hm.put("y", new String[]{"Yanick", "Yann", "Yannis", "Yash", "Yashodhan"});
         hm.put("z", new String[]{"Zacharias", "Zaki", "Zafer", "Zadok", "Zenobius"});
-        hm.put("ä", new String[]{"Aaron", "Adrian", "Albert", "Alexander", "Alfred"});
-        hm.put("ö", new String[]{"Olaf", "Ole", "Oliver", "Oskar", "Otto"});
-        hm.put("ü", new String[]{"Uberto", "Ulrich", "Uwe", "Udo", "Ulf"});
+        hm.put("Ã¤", new String[]{"Aaron", "Adrian", "Albert", "Alexander", "Alfred"});
+        hm.put("Ã¶", new String[]{"Olaf", "Ole", "Oliver", "Oskar", "Otto"});
+        hm.put("Ã¼", new String[]{"Uberto", "Ulrich", "Uwe", "Udo", "Ulf"});
         return hm;
     }
-    
+
 }
