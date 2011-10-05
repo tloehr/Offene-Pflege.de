@@ -52,7 +52,7 @@ public class DBRetrieve {
 
         try {
             String sql = "SELECT K, V FROM OCProps WHERE IP = ?";
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, ip);
             rs = stmt.executeQuery();
 
@@ -81,7 +81,7 @@ public class DBRetrieve {
                     " SELECT Von " +
                     " FROM BWInfo " +
                     " WHERE BWINFTYP = 'abwe' AND BWKennung = ? AND von <= NOW() AND bis >= NOW()";
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             rs = stmt.executeQuery();
             if (rs.first()) {
@@ -103,7 +103,7 @@ public class DBRetrieve {
         // Bewohnernamen in den Label schreiben.
         try {
             String sql = "SELECT b.nachname, b.vorname, b.GebDatum FROM Bewohner b WHERE BWKennung = ?";
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             ResultSet rs = stmt.executeQuery();
             rs.first();
@@ -152,7 +152,7 @@ public class DBRetrieve {
         OPDE.getLogger().debug("getSingleValue/3: " + sql);
 
         try {
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
             for (int i = 0; i < whereval.size(); i++) {
                 stmt.setObject(i + 1, whereval.get(i));
             }
@@ -309,7 +309,7 @@ public class DBRetrieve {
 
         try {
             OPDE.getLogger().debug("getResultSet: " + sql);
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
 
             // FILTER------------
             if (where != null) {
@@ -330,7 +330,7 @@ public class DBRetrieve {
         String sql = "SELECT * FROM " + tablename + " LIMIT 0,1";
         ArrayList result = new ArrayList();
         try {
-            Statement stmt = OPDE.db.db.createStatement();
+            Statement stmt = OPDE.getDb().db.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             ResultSetMetaData rsmd = rs.getMetaData();
             for (int col = 1; col <= rsmd.getColumnCount(); col++) {
@@ -350,7 +350,7 @@ public class DBRetrieve {
                 "FROM oc.DFNPlanung dfn INNER JOIN oc.Massnahmen mass ON dfn.MassID = mass.MassID " +
                 "WHERE dfn.DFNPID = ?";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, dfnpid);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -420,7 +420,7 @@ public class DBRetrieve {
         String sql = "SELECT PIT, WERT FROM BWerte WHERE BWKennung = ? AND XML = ? " +
                 " ORDER BY PIT DESC LIMIT 0,1 ";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             //stmt.setString(3, bwkennung);
             stmt.setString(2, xml);
@@ -453,7 +453,7 @@ public class DBRetrieve {
                 " WHERE BWKennung=? AND BWINFTYP=? " +
                 " AND Von IN (SELECT MAX(Von) FROM BWInfo WHERE BWKennung=? AND BWINFTYP=?)";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             stmt.setString(3, bwkennung);
             stmt.setString(2, BWINFTYP);
@@ -532,7 +532,7 @@ public class DBRetrieve {
 
         String sql = "SELECT " + from + ", " + to + " FROM " + table + " WHERE " + where + " ORDER BY " + from;
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.first()) {
@@ -607,7 +607,7 @@ public class DBRetrieve {
 
         String sql = "SELECT " + from + ", " + to + " FROM " + table + " WHERE " + where + " ORDER BY " + from;
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.first()) {
@@ -673,7 +673,7 @@ public class DBRetrieve {
 
         String sql = "SELECT " + from + ", " + to + " FROM " + table + " WHERE " + where + " ORDER BY " + from;
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.first()) {
@@ -764,7 +764,7 @@ public class DBRetrieve {
                 " AND Von " + op2 + " (SELECT Von FROM BWInfo B WHERE BWINFOID=?)" +
                 " )";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, BWINFOID);
             stmt.setLong(2, BWINFOID);
             stmt.setLong(3, BWINFOID);
@@ -820,7 +820,7 @@ public class DBRetrieve {
                 "FROM MPFormen F  " +
                 "WHERE F.FormID = ?";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, formid);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -849,7 +849,7 @@ public class DBRetrieve {
             String sql = "SELECT F.FormID, F.Zubereitung, F.AnwText, F.AnwEinheit, F.PackEinheit " +
                     "FROM MPFormen F  " +
                     "ORDER BY CONCAT(F.Zubereitung, F.AnwText)";
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -908,7 +908,7 @@ public class DBRetrieve {
                 " WHERE l.OCLoginID = ?";
         String result = "Fehler";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, OCLoginID);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {

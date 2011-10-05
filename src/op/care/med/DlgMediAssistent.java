@@ -1150,7 +1150,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                     " THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, AnwText))) text FROM MPDarreichung D " +
                                     " INNER JOIN MPFormen F ON F.FormID = D.FormID " +
                                     " WHERE D.MedPID = ? AND D.FormID = ? AND D.Zusatz like ? ";
-                    stmt = OPDE.db.db.prepareStatement(sql);
+                    stmt = OPDE.getDb().db.prepareStatement(sql);
                     stmt.setLong(1, leMedPID.getPk());
                     stmt.setLong(2, leFormID.getPk());
                     stmt.setString(3, zusatz);

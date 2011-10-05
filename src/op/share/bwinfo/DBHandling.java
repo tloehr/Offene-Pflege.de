@@ -63,7 +63,7 @@ public class DBHandling {
                 " LIMIT 0,1 ";
 
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             stmt.setString(2, bwinftyp);
             ResultSet rs = stmt.executeQuery();
@@ -136,7 +136,7 @@ public class DBHandling {
                         "       AND Von " + op2 + " (SELECT Von FROM BWInfo B WHERE BWINFOID=?) " +
                         "   )";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, bwinfoid);
             stmt.setLong(2, bwinfoid);
             stmt.setLong(3, bwinfoid);

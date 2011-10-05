@@ -40,6 +40,7 @@ import javax.swing.event.EventListenerList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,18 +50,18 @@ public class OPDE {
 
     //public static final String OCDEBUG = "true";
     public static long uptime;
-    public static Database db;
+    protected static Database db;
     //OPDE.getLogin().getUser().getUKennung()
     //public static String UKennung; // Zuer Zeit angemeldeter Benutzer.
     //public static char[] UPW;
     public static OPMain ocmain;
-    public static String dbuser = ""; // Wird nur für den dfnimport gebraucht.
-    public static String dbpw = ""; // Wird nur für den dfnimport gebraucht.
-    public static String url;
+    protected static String dbuser = ""; // Wird nur für den dfnimport gebraucht.
+    protected static String dbpw = ""; // Wird nur für den dfnimport gebraucht.
+    protected static String url;
     //public static long ocloginid;
     protected static Properties props;
     protected static boolean anonym;
-    protected static Properties localProps;
+    protected static SortedProperties localProps;
     protected static Properties appinfo;
     //private static boolean admin;
     //public static Properties ocgroups;
@@ -109,6 +110,10 @@ public class OPDE {
     public static void setProp(String key, String value) {
         props.put(key, value);
 
+    }
+
+    public static String getUrl() {
+        return url;
     }
 
     public static void initProps() {
@@ -161,9 +166,20 @@ public class OPDE {
         return logger;
     }
 
+    public static void initDB() throws SQLException {
+        if (db != null) return;
+        db = new Database(url, dbuser, dbpw.toCharArray());
+
+    }
+
     public static void warn(Object message) {
         logger.warn(message);
         SyslogTools.warn(message.toString());
+    }
+
+    public static void closeDB() throws SQLException {
+        db.db.close();
+        db = null;
     }
 
     public static void info(Object message) {
@@ -242,7 +258,7 @@ public class OPDE {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
         animationCache = new ArrayList(96);
-        debug = true;
+        //debug = true;
 
         // Das hier fängt alle ungefangenen Exceptions auf.
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -255,8 +271,9 @@ public class OPDE {
             }
         });
 
-        localProps = new Properties();
+        localProps = new SortedProperties();
         appinfo = new Properties();
+        props = new Properties();
 
         try {
             // Lade Build Informationen
@@ -319,13 +336,15 @@ public class OPDE {
 
         opts.addOption(dfnimport);
 
-        Option bhpimport = null;
+        //Option bhpimport = null;
+//
+//        if (debug) {
+//            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
+//        } else {
+//
+//        }
 
-        if (debug) {
-            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
-        } else {
-            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-        }
+        Option bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
 
 //        if (OCDEBUG.equalsIgnoreCase("true")){
 //            bhpimport.setOptionalArg(true);
@@ -354,11 +373,13 @@ public class OPDE {
             System.exit(0);
         }
 
+        // Alternatives Arbeitsverzeichnis setzen
         if (cl.hasOption("k")) {
             String homedir = cl.getOptionValue("k");
-            initProps(homedir);
+            localProps.put("opwd", homedir + System.getProperty("file.separator") + ".op");
         } else {
-            initProps(null);
+            localProps.put("opwd", System.getProperty("user.home") + System.getProperty("file.separator") + ".op");
+            localProps.put("opcache", localProps.getProperty("opwd") + System.getProperty("file.separator") + "cache");
         }
 
         // Die Login Animation. Die könnte bei Terminal Servern störend sein.
@@ -407,8 +428,10 @@ public class OPDE {
         logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
 
         if (cl.hasOption("l") || localProps.getProperty("debug").equalsIgnoreCase("true")) {
+            debug = true;
             logger.setLevel(Level.ALL);
         } else {
+            debug = false;
             logger.setLevel(Level.INFO);
         }
 
@@ -459,15 +482,15 @@ public class OPDE {
         if (cl.hasOption("b")) {
             try {
                 int offset = 0;
-                if (debug) {
-                    String sOffset = cl.getOptionValue("b");
-                    OPDE.getLogger().debug(cl.getOptionValue("b"));
-                    try {
-                        offset = Integer.parseInt(sOffset);
-                    } catch (NumberFormatException ex) {
-                        offset = 0;
-                    }
-                }
+//                if (isDebug()) {
+//                    String sOffset = cl.getOptionValue("b");
+//                    OPDE.getLogger().debug(cl.getOptionValue("b"));
+//                    try {
+//                        offset = Integer.parseInt(sOffset);
+//                    } catch (NumberFormatException ex) {
+//                        offset = 0;
+//                    }
+//                }
                 BHPImport.importBHP(0, 0, offset);
             } catch (Exception ex) {
                 logger.fatal("Exception beim BHPImport", ex);
@@ -524,18 +547,6 @@ public class OPDE {
         }
     }
 
-    private static void initProps(String homedir) {
-        String sep = System.getProperty("file.separator");
-        if (homedir == null || homedir.equals("")) {
-            homedir = System.getProperty("user.home");
-        }
-        props = new Properties();
-        localProps.put("opwd", homedir + sep + ".op"); // working dir
-//        localProps.put("ocreports", localProps.getProperty("ocwd") + sep + "reports"); // working dir
-        localProps.put("opcache", localProps.getProperty("opwd") + sep + "cache"); // public download dir - OCFiles
-//        localProps.put("ocdownload", localProps.getProperty("ocwd") + sep + "download"); // private download dir - OCFiles
-
-    }
 
     public static Database getDb() {
         return db;

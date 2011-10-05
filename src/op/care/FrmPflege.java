@@ -105,7 +105,7 @@ public class FrmPflege extends javax.swing.JFrame {
         this.setVisible(true);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        lblServer.setText(OPDE.url);
+        lblServer.setText(OPDE.getUrl());
         lblUser.setText("Benutzer: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()));
 
         StationenTools.setComboBox(cmbStation);

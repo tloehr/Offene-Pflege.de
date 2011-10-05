@@ -91,10 +91,9 @@ public class DFNImport {
         int schichtOffset = 0;
         boolean doCommit = false;
 
-        if (OPDE.getDb() == null) {
-            OPDE.db = new Database(OPDE.url, OPDE.dbuser, OPDE.dbpw.toCharArray());
-            //OPDE.getLogin().getUser().getUKennung() = "root";
-        }
+
+        OPDE.initDB();
+
         Connection db = OPDE.getDb().db;
 
         // Zugriffskonflikt auflösen.
@@ -187,7 +186,7 @@ public class DFNImport {
                 stmtForced = OPDE.getDb().db.prepareStatement(forcedSQL);
 
                 OPDE.info(SYSTools.getWindowTitle("DFNImport"));
-                OPDE.info("Schreibe nach: " + OPDE.url);
+                OPDE.info("Schreibe nach: " + OPDE.getUrl());
 
                 OPDE.getLogger().debug(selectSQL);
                 OPDE.getLogger().debug(updateSQL);

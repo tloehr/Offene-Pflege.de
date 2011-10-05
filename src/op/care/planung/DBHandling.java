@@ -82,7 +82,7 @@ public class DBHandling {
                         (mode == MSSN_MODE_NUR_PFLEGE ? " AND MassArt = 1 " : "") +
                         " ORDER BY Bezeichnung ";
             }
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
             if (!suche.equals("")) {
                 suche = "%" + suche + "%";
                 stmt.setString(1, suche);
@@ -319,7 +319,7 @@ public class DBHandling {
         OPDE.getLogger().debug("loadPlanung: planid:" + planid);
 
         try {
-            stmt = OPDE.db.db.prepareStatement(sql);
+            stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setLong(1, planid);
             stmt.setLong(2, tmp);
             rs = stmt.executeQuery();
@@ -353,7 +353,7 @@ public class DBHandling {
                     " WHERE PlanID = ? " +
                     " ORDER BY Datum ";
             try {
-                stmt = OPDE.db.db.prepareStatement(sql);
+                stmt = OPDE.getDb().db.prepareStatement(sql);
                 stmt.setLong(1, planid);
                 rs = stmt.executeQuery();
                 //SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
@@ -391,7 +391,7 @@ public class DBHandling {
                     " ORDER BY m.Bezeichnung";
 
             try {
-                stmt = OPDE.db.db.prepareStatement(sql);
+                stmt = OPDE.getDb().db.prepareStatement(sql);
                 stmt.setString(1, suche);
 
                 rs = stmt.executeQuery();
@@ -523,7 +523,7 @@ public class DBHandling {
                 " ORDER BY PlanKennung, von, Stichwort ";
         String html = "";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, bwkennung);
             stmt.setTimestamp(2, new java.sql.Timestamp(von.getTime()));
             stmt.setTimestamp(3, new java.sql.Timestamp(von.getTime()));

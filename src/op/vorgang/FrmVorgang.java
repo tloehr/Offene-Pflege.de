@@ -848,6 +848,7 @@ public class FrmVorgang extends javax.swing.JFrame {
             {
                 splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
                 splitPane4.setDividerLocation(300);
+                splitPane4.setDividerSize(0);
                 splitPane4.setEnabled(false);
                 splitPane4.addComponentListener(new ComponentAdapter() {
                     @Override
@@ -867,20 +868,19 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ) {
-                        Class<?>[] columnTypes = new Class<?>[]{
-                                Object.class, Object.class, Object.class, Object.class
+                        Class<?>[] columnTypes = new Class<?>[] {
+                            Object.class, Object.class, Object.class, Object.class
                         };
-
                         @Override
                         public Class<?> getColumnClass(int columnIndex) {
                             return columnTypes[columnIndex];
@@ -1098,91 +1098,91 @@ public class FrmVorgang extends javax.swing.JFrame {
                     GroupLayout pnlDetailsLayout = new GroupLayout(pnlDetails);
                     pnlDetails.setLayout(pnlDetailsLayout);
                     pnlDetailsLayout.setHorizontalGroup(
-                            pnlDetailsLayout.createParallelGroup()
-                                    .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
-                                            .addContainerGap()
-                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                    .addComponent(vSpacer1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
-                                                    .addComponent(splitPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
-                                                    .addGroup(GroupLayout.Alignment.LEADING, pnlDetailsLayout.createSequentialGroup()
-                                                            .addComponent(cbPDCA)
-                                                            .addGap(18, 18, 18)
-                                                            .addComponent(lblPDCA)
-                                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                            .addComponent(btnPDCAPlus))
-                                                    .addGroup(GroupLayout.Alignment.LEADING, pnlDetailsLayout.createSequentialGroup()
-                                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                                    .addComponent(label3, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-                                                                    .addGroup(pnlDetailsLayout.createParallelGroup()
-                                                                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createParallelGroup()
-                                                                                    .addComponent(label1, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-                                                                                    .addComponent(label2, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
-                                                                                    .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                                                            .addComponent(label5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                                            .addComponent(label4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                                                            .addComponent(label6)))
-                                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                            .addGroup(pnlDetailsLayout.createParallelGroup()
-                                                                    .addComponent(lblBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                                                    .addComponent(lblStart, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                                                    .addComponent(lblEnde, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                                                    .addComponent(jdcWV, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                                                    .addComponent(txtTitel, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                                                    .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
-                                                                            .addComponent(lblOwner, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
-                                                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                            .addComponent(btnTakeOver)
-                                                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                            .addComponent(btnAssign))
-                                                                    .addComponent(lblCreator, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))))
-                                            .addContainerGap())
+                        pnlDetailsLayout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(vSpacer1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+                                    .addComponent(splitPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+                                    .addGroup(GroupLayout.Alignment.LEADING, pnlDetailsLayout.createSequentialGroup()
+                                        .addComponent(cbPDCA)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(lblPDCA)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnPDCAPlus))
+                                    .addGroup(GroupLayout.Alignment.LEADING, pnlDetailsLayout.createSequentialGroup()
+                                        .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                            .addComponent(label3, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                                            .addGroup(pnlDetailsLayout.createParallelGroup()
+                                                .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createParallelGroup()
+                                                    .addComponent(label1, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(label2, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
+                                                    .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                        .addComponent(label5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(label4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                                .addComponent(label6)))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlDetailsLayout.createParallelGroup()
+                                            .addComponent(lblBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                                            .addComponent(lblStart, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                                            .addComponent(lblEnde, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                                            .addComponent(jdcWV, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                                            .addComponent(txtTitel, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
+                                                .addComponent(lblOwner, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnTakeOver)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnAssign))
+                                            .addComponent(lblCreator, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))))
+                                .addContainerGap())
                     );
-                    pnlDetailsLayout.linkSize(SwingConstants.HORIZONTAL, new Component[]{label1, label2, label3, label4, label5, label6});
+                    pnlDetailsLayout.linkSize(SwingConstants.HORIZONTAL, new Component[] {label1, label2, label3, label4, label5, label6});
                     pnlDetailsLayout.setVerticalGroup(
-                            pnlDetailsLayout.createParallelGroup()
-                                    .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
-                                            .addContainerGap()
-                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(label1)
-                                                    .addComponent(txtTitel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(lblBW)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(label2)
-                                                    .addComponent(lblStart))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                                    .addComponent(label3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(jdcWV, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(label4)
-                                                    .addComponent(lblEnde))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(label5)
-                                                    .addComponent(lblCreator))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup()
-                                                    .addComponent(btnAssign, GroupLayout.Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
-                                                    .addComponent(btnTakeOver, GroupLayout.Alignment.TRAILING)
-                                                    .addComponent(lblOwner, GroupLayout.Alignment.TRAILING)
-                                                    .addComponent(label6, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(splitPane3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                            .addGap(18, 18, 18)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup()
-                                                    .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                            .addComponent(cbPDCA, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                                                            .addComponent(lblPDCA, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
-                                                    .addComponent(btnPDCAPlus, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(vSpacer1, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-                                            .addGap(20, 20, 20))
+                        pnlDetailsLayout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(label1)
+                                    .addComponent(txtTitel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblBW)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(label2)
+                                    .addComponent(lblStart))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(label3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jdcWV, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(label4)
+                                    .addComponent(lblEnde))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(label5)
+                                    .addComponent(lblCreator))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlDetailsLayout.createParallelGroup()
+                                    .addComponent(btnAssign, GroupLayout.Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
+                                    .addComponent(btnTakeOver, GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblOwner, GroupLayout.Alignment.TRAILING)
+                                    .addComponent(label6, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(splitPane3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(pnlDetailsLayout.createParallelGroup()
+                                    .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cbPDCA, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblPDCA, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(btnPDCAPlus, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(vSpacer1, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+                                .addGap(20, 20, 20))
                     );
-                    pnlDetailsLayout.linkSize(SwingConstants.VERTICAL, new Component[]{btnPDCAPlus, cbPDCA, lblPDCA});
-                    pnlDetailsLayout.linkSize(SwingConstants.VERTICAL, new Component[]{btnAssign, btnTakeOver, label6, lblOwner});
+                    pnlDetailsLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnPDCAPlus, cbPDCA, lblPDCA});
+                    pnlDetailsLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnAssign, btnTakeOver, label6, lblOwner});
                 }
                 splitPane2.setLeftComponent(pnlDetails);
 
@@ -1298,66 +1298,66 @@ public class FrmVorgang extends javax.swing.JFrame {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addGroup(contentPaneLayout.createParallelGroup()
                         .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addGap(20, 20, 20)
-                                                .addComponent(btnAddVorgang))
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(scrollPane2, GroupLayout.PREFERRED_SIZE, 296, GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addComponent(btnAddBericht)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnDetails)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnDelElement)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnSystemInfo)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnPrint)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnEndReactivate)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnDelete)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel1)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblMessage, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnApply)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel))
-                                        .addComponent(splitPane1, GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE))
-                                .addContainerGap())
+                            .addGap(20, 20, 20)
+                            .addComponent(btnAddVorgang))
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(scrollPane2, GroupLayout.PREFERRED_SIZE, 296, GroupLayout.PREFERRED_SIZE)))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnAddBericht)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnDetails)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnDelElement)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnSystemInfo)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnPrint)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnEndReactivate)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnDelete)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel1)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblMessage, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnApply)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel))
+                        .addComponent(splitPane1, GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE))
+                    .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(scrollPane2, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE)
-                                        .addComponent(splitPane1, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE))
-                                .addGap(11, 11, 11)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(lblMessage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnDelElement, 0, 0, Short.MAX_VALUE)
-                                        .addComponent(btnAddVorgang, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnCancel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnApply, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnAddBericht, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnDetails, 0, 0, Short.MAX_VALUE)
-                                        .addComponent(btnPrint, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnEndReactivate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnDelete, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnCancel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnSystemInfo, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
-                                .addGap(13, 13, 13))
+            contentPaneLayout.createParallelGroup()
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(scrollPane2, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE)
+                        .addComponent(splitPane1, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE))
+                    .addGap(11, 11, 11)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(lblMessage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnDelElement, 0, 0, Short.MAX_VALUE)
+                        .addComponent(btnAddVorgang, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCancel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnApply, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAddBericht, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnDetails, 0, 0, Short.MAX_VALUE)
+                        .addComponent(btnPrint, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEndReactivate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnDelete, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCancel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSystemInfo, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
+                    .addGap(13, 13, 13))
         );
-        contentPaneLayout.linkSize(SwingConstants.VERTICAL, new Component[]{btnAddBericht, btnAddVorgang, btnApply, btnCancel, btnCancel1, btnDelElement, btnDelete, btnDetails, btnEndReactivate, btnPrint, btnSystemInfo, lblMessage});
+        contentPaneLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnAddBericht, btnAddVorgang, btnApply, btnCancel, btnCancel1, btnDelElement, btnDelete, btnDetails, btnEndReactivate, btnPrint, btnSystemInfo, lblMessage});
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents

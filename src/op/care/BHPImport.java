@@ -76,10 +76,8 @@ public class BHPImport {
         int schichtOffset = 0;
         boolean doCommit = false;
 
-        if (OPDE.getDb() == null) {
-            OPDE.db = new Database(OPDE.url, OPDE.dbuser, OPDE.dbpw.toCharArray());
-            //OPDE.getLogin().getUser().getUKennung() = "root";
-        }
+        OPDE.initDB();
+
         Connection db = OPDE.getDb().db;
 
         // Zugriffskonflikt auflösen.
@@ -170,7 +168,7 @@ public class BHPImport {
                 stmtSource = OPDE.getDb().db.prepareStatement(selectSQL);
 
                 OPDE.info(SYSTools.getWindowTitle("BHPImport"));
-                OPDE.info("Schreibe nach: " + OPDE.url);
+                OPDE.info("Schreibe nach: " + OPDE.getUrl());
 
                 if (verid > 0) {
                     stmtSource.setInt(1, daysoffset);

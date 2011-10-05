@@ -333,7 +333,7 @@ public class DlgLogin extends javax.swing.JDialog {
 
         try {
 
-            OPDE.db = new Database(OPDE.url, OPDE.dbuser, OPDE.dbpw.toCharArray());
+            OPDE.initDB();
 
             // Hier wird erst geprüft, ob Username und Passwort stimmen.
             registerLogin();

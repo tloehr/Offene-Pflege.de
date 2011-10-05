@@ -27,6 +27,9 @@
 
 package op.care.med.vorrat;
 
+import java.awt.event.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 import op.OPDE;
 import op.care.med.DBHandling;
 import op.care.med.DlgMediAssistent;
@@ -151,264 +154,311 @@ public class DlgBestand extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        lblFrage = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        txtMedSuche = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        cmbMProdukt = new javax.swing.JComboBox();
-        btnMed = new javax.swing.JButton();
-        lblVorrat = new javax.swing.JLabel();
-        cmbVorrat = new javax.swing.JComboBox();
-        jLabel4 = new javax.swing.JLabel();
-        txtBWSuche = new javax.swing.JTextField();
-        cmbBW = new javax.swing.JComboBox();
-        jLabel5 = new javax.swing.JLabel();
-        txtMenge = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        cmbPackung = new javax.swing.JComboBox();
-        jSeparator2 = new javax.swing.JSeparator();
-        jLabel7 = new javax.swing.JLabel();
-        btnClose = new javax.swing.JButton();
-        btnApply = new javax.swing.JButton();
-        txtBemerkung = new javax.swing.JTextField();
-        cbDruck = new javax.swing.JCheckBox();
-        jLabel12 = new javax.swing.JLabel();
+        lblFrage = new JLabel();
+        jSeparator1 = new JSeparator();
+        txtMedSuche = new JTextField();
+        jLabel1 = new JLabel();
+        jLabel3 = new JLabel();
+        cmbMProdukt = new JComboBox();
+        btnMed = new JButton();
+        lblVorrat = new JLabel();
+        cmbVorrat = new JComboBox();
+        jLabel4 = new JLabel();
+        txtBWSuche = new JTextField();
+        cmbBW = new JComboBox();
+        jLabel5 = new JLabel();
+        txtMenge = new JTextField();
+        jLabel6 = new JLabel();
+        cmbPackung = new JComboBox();
+        jSeparator2 = new JSeparator();
+        jLabel7 = new JLabel();
+        btnClose = new JButton();
+        btnApply = new JButton();
+        txtBemerkung = new JTextField();
+        cbDruck = new JCheckBox();
+        jLabel12 = new JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        lblFrage.setFont(new java.awt.Font("Dialog", 1, 24));
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
+
+        //---- lblFrage ----
+        lblFrage.setFont(new Font("Dialog", Font.BOLD, 24));
         lblFrage.setText("Med.-Best\u00e4nde buchen");
 
-        txtMedSuche.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtMedSucheCaretUpdate(evt);
+        //---- txtMedSuche ----
+        txtMedSuche.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtMedSucheCaretUpdate(e);
             }
         });
-        txtMedSuche.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtMedSucheFocusGained(evt);
+        txtMedSuche.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtMedSucheFocusGained(e);
             }
         });
 
+        //---- jLabel1 ----
         jLabel1.setText("PZN oder Suchbegriff:");
 
+        //---- jLabel3 ----
         jLabel3.setText("Produkt:");
 
-        cmbMProdukt.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbMProduktItemStateChanged(evt);
+        //---- cmbMProdukt ----
+        cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
+
+        }));
+        cmbMProdukt.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbMProduktItemStateChanged(e);
             }
         });
 
-        btnMed.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
+        //---- btnMed ----
+        btnMed.setBackground(Color.white);
+        btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
         btnMed.setToolTipText("Medikamente bearbeiten");
         btnMed.setBorder(null);
-        btnMed.setOpaque(false);
-        btnMed.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMedActionPerformed(evt);
+        btnMed.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnMedActionPerformed(e);
             }
         });
 
+        //---- lblVorrat ----
         lblVorrat.setText("vorhandene Vorr\u00e4te:");
 
-        cmbVorrat.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                cmbVorratMouseEntered(evt);
+        //---- cmbVorrat ----
+        cmbVorrat.setModel(new DefaultComboBoxModel(new String[] {
+
+        }));
+        cmbVorrat.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                cmbVorratMouseEntered(e);
             }
         });
 
+        //---- jLabel4 ----
         jLabel4.setText("Zuordnung zu Bewohner:");
 
-        txtBWSuche.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtBWSucheCaretUpdate(evt);
+        //---- txtBWSuche ----
+        txtBWSuche.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtBWSucheCaretUpdate(e);
             }
         });
 
-        cmbBW.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbBWItemStateChanged(evt);
+        //---- cmbBW ----
+        cmbBW.setModel(new DefaultComboBoxModel(new String[] {
+
+        }));
+        cmbBW.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbBWItemStateChanged(e);
             }
         });
 
+        //---- jLabel5 ----
         jLabel5.setText("Buchungsmenge:");
 
-        txtMenge.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtMengeCaretUpdate(evt);
+        //---- txtMenge ----
+        txtMenge.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtMengeCaretUpdate(e);
             }
         });
-        txtMenge.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtMengeFocusGained(evt);
+        txtMenge.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtMengeFocusGained(e);
             }
         });
 
+        //---- jLabel6 ----
         jLabel6.setText("Packung:");
 
-        cmbPackung.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbPackungItemStateChanged(evt);
+        //---- cmbPackung ----
+        cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
+
+        }));
+        cmbPackung.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbPackungItemStateChanged(e);
             }
         });
 
+        //---- jLabel7 ----
         jLabel7.setText("Bemerkung:");
 
-        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+        //---- btnClose ----
+        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
         btnClose.setText("Schlie\u00dfen");
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCloseActionPerformed(e);
             }
         });
 
-        btnApply.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+        //---- btnApply ----
+        btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
         btnApply.setText("Buchen");
         btnApply.setEnabled(false);
-        btnApply.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnApplyActionPerformed(evt);
+        btnApply.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnApplyActionPerformed(e);
             }
         });
 
-        txtBemerkung.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtBemerkungCaretUpdate(evt);
+        //---- txtBemerkung ----
+        txtBemerkung.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtBemerkungCaretUpdate(e);
             }
         });
 
+        //---- cbDruck ----
         cbDruck.setText("Belegdruck");
-        cbDruck.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbDruck.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbDruck.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cbDruckItemStateChanged(evt);
+        cbDruck.setBorder(BorderFactory.createEmptyBorder());
+        cbDruck.setMargin(new Insets(0, 0, 0, 0));
+        cbDruck.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cbDruckItemStateChanged(e);
             }
         });
 
+        //---- jLabel12 ----
         jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
-                                                        .addComponent(lblFrage, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(42, 42, 42)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                        .addComponent(jLabel3)
-                                                                        .addComponent(jLabel1)
-                                                                        .addComponent(jLabel6))
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addGroup(layout.createSequentialGroup()
-                                                                                .addComponent(txtMedSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(btnMed))
-                                                                        .addComponent(cmbMProdukt, 0, 293, Short.MAX_VALUE)
-                                                                        .addComponent(cmbPackung, 0, 293, Short.MAX_VALUE)))))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addGap(31, 31, 31)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(51, 51, 51)
-                                                                .addComponent(jLabel5)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(txtMenge, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(32, 32, 32)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                        .addComponent(lblVorrat)
-                                                                        .addComponent(jLabel7))
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addComponent(cmbVorrat, 0, 293, Short.MAX_VALUE)
-                                                                        .addComponent(txtBemerkung, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)))
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                .addComponent(jLabel4)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(txtBWSuche, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(cmbBW, 0, 202, Short.MAX_VALUE))))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addContainerGap(263, Short.MAX_VALUE)
-                                                .addComponent(btnApply)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnClose))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(jLabel12)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
-                                                .addComponent(cbDruck)))
-                                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblFrage)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1)
-                                        .addComponent(btnMed)
-                                        .addComponent(txtMedSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
+                                .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addGap(42, 42, 42)
+                                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(jLabel3)
-                                        .addComponent(cmbMProdukt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel6)
-                                        .addComponent(cmbPackung, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel5)
-                                        .addComponent(txtMenge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblVorrat, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cmbVorrat))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(txtBemerkung, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel6))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                            .addComponent(txtMedSuche, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(btnMed))
+                                        .addComponent(cmbMProdukt, 0, 440, Short.MAX_VALUE)
+                                        .addComponent(cmbPackung, 0, 440, Short.MAX_VALUE)))))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addGap(31, 31, 31)
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addGap(51, 51, 51)
+                                    .addComponent(jLabel5)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtMenge, GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addGap(32, 32, 32)
+                                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addComponent(lblVorrat)
                                         .addComponent(jLabel7))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel4)
-                                        .addComponent(txtBWSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cmbBW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(cbDruck)
-                                        .addComponent(jLabel12))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnClose)
-                                        .addComponent(btnApply))
-                                .addContainerGap())
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(cmbVorrat, 0, 436, Short.MAX_VALUE)
+                                        .addComponent(txtBemerkung, GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)))
+                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                    .addComponent(jLabel4)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtBWSuche, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cmbBW, 0, 353, Short.MAX_VALUE))))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addContainerGap(420, Short.MAX_VALUE)
+                            .addComponent(btnApply)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnClose))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 218, Short.MAX_VALUE)
+                            .addComponent(cbDruck)))
+                    .addContainerGap())
         );
-
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{btnMed, txtMedSuche});
-
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{cmbVorrat, txtMenge});
-
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{cmbBW, txtBWSuche, txtBemerkung});
-
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblFrage)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(btnMed)
+                        .addComponent(txtMedSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(cmbMProdukt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(cmbPackung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(txtMenge, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblVorrat, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmbVorrat, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtBemerkung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel7))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(txtBWSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmbBW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addGap(18, 18, 18)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(cbDruck)
+                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnClose)
+                        .addComponent(btnApply))
+                    .addContainerGap())
+        );
+        contentPaneLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnMed, txtMedSuche});
+        contentPaneLayout.linkSize(SwingConstants.VERTICAL, new Component[] {cmbVorrat, txtMenge});
+        contentPaneLayout.linkSize(SwingConstants.VERTICAL, new Component[] {cmbBW, txtBWSuche, txtBemerkung});
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtMengeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMengeFocusGained
@@ -713,29 +763,29 @@ public class DlgBestand extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private javax.swing.JButton btnApply;
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnMed;
-    private javax.swing.JCheckBox cbDruck;
-    private javax.swing.JComboBox cmbBW;
-    private javax.swing.JComboBox cmbMProdukt;
-    private javax.swing.JComboBox cmbPackung;
-    private javax.swing.JComboBox cmbVorrat;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JLabel lblFrage;
-    private javax.swing.JLabel lblVorrat;
-    private javax.swing.JTextField txtBWSuche;
-    private javax.swing.JTextField txtBemerkung;
-    private javax.swing.JTextField txtMedSuche;
-    private javax.swing.JTextField txtMenge;
+    private JLabel lblFrage;
+    private JSeparator jSeparator1;
+    private JTextField txtMedSuche;
+    private JLabel jLabel1;
+    private JLabel jLabel3;
+    private JComboBox cmbMProdukt;
+    private JButton btnMed;
+    private JLabel lblVorrat;
+    private JComboBox cmbVorrat;
+    private JLabel jLabel4;
+    private JTextField txtBWSuche;
+    private JComboBox cmbBW;
+    private JLabel jLabel5;
+    private JTextField txtMenge;
+    private JLabel jLabel6;
+    private JComboBox cmbPackung;
+    private JSeparator jSeparator2;
+    private JLabel jLabel7;
+    private JButton btnClose;
+    private JButton btnApply;
+    private JTextField txtBemerkung;
+    private JCheckBox cbDruck;
+    private JLabel jLabel12;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

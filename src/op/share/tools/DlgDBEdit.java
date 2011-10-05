@@ -82,7 +82,7 @@ public class DlgDBEdit extends javax.swing.JDialog {
 
     private void reloadResultSet() {
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             rs = stmt.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
             table = rsmd.getTableName(1);

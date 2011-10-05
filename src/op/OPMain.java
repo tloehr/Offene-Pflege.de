@@ -456,9 +456,7 @@ public class OPMain extends javax.swing.JFrame {
             txtAlarm.setText(SYSTools.toHTML("Keine Alarmmeldungen gefunden"));
 
             try {
-                //OPDE.getDb().doLogout(message);
-                OPDE.getDb().db.close();
-                OPDE.db = null;
+                OPDE.closeDB();
             } catch (SQLException ex) {
                 new DlgException(ex);
                 ex.printStackTrace();

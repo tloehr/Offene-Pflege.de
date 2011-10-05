@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @author tloehr
  */
 public class DBHandling {
-    // Stati f¸r MPBuchung
+    // Stati für MPBuchung
 
     public static final int STATUS_AUSBUCHEN_NORMAL = 0;
     public static final int STATUS_EINBUCHEN_ANFANGSBESTAND = 1;
@@ -60,7 +60,7 @@ public class DBHandling {
     public static final int EINHEIT_MG = 4;
     public static final int EINHEIT_GRAMM = 5;
     public static final int EINHEIT_CM = 6;
-    public static final int EINHEIT_METER = 7;    // STATI f¸r MPFormen
+    public static final int EINHEIT_METER = 7;    // STATI für MPFormen
     public static final int FORMSTATUS_APV1 = 0;
     public static final int FORMSTATUS_APV_PER_DAF = 1;
     public static final int FORMSTATUS_APV_PER_BW = 2;
@@ -70,7 +70,7 @@ public class DBHandling {
         suchmuster = "%" + suchmuster + "%";
         String sql = " SELECT D.DafID, M.Bezeichnung, D.Zusatz, " +
                 " Concat(if(F.Zubereitung<>'', concat(F.Zubereitung, ' '), ''), " +
-                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'St¸ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
+                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
                 " WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, F.AnwText)) zub " +
                 " FROM MProdukte M " +
                 " INNER JOIN MPDarreichung D ON M.MedPID = D.MedPID " +
@@ -89,7 +89,7 @@ public class DBHandling {
     }
 
     /**
-     * Setzt f¸r einen Bestand <b>alle</b> Buchungen zur¸ck, bis auf die Anfangsbuchung.
+     * Setzt für einen Bestand <b>alle</b> Buchungen zur¸ck, bis auf die Anfangsbuchung.
      *
      * @param bestid
      */
@@ -108,7 +108,7 @@ public class DBHandling {
         DefaultComboBoxModel dlm = null;
         String sql = " SELECT D.DafID, M.Bezeichnung, D.Zusatz, " +
                 " Concat(if(F.Zubereitung<>'', concat(F.Zubereitung, ' '), ''), " +
-                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'St¸ck' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
+                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
                 " WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, F.AnwText)) zub, H.Firma " +
                 " " +
                 " FROM MProdukte M " +

@@ -67,7 +67,7 @@ public class DBHandling {
                 " AND (v.Von <= now() AND v.Bis >= now())  " +
                 " ORDER BY v.BWKennung, v.Titel ";
         try {
-            PreparedStatement stmt = OPDE.db.db.prepareStatement(sql);
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             if (!SYSTools.catchNull(bwkennung).equals("")) {
                 stmt.setString(1, bwkennung);
             }

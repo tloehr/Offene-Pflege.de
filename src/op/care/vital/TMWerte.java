@@ -95,7 +95,7 @@ public class TMWerte
         this.showids = showids;
         this.showedits = showedits;
         try {
-            //stmt = OPDE.db.db.createStatement();
+            //stmt = OPDE.getDb().db.createStatement();
             String s =
                     " SELECT bw.BWID, bw.PIT, bw.UKennung, bw.Wert, bw.XML, bw.Bemerkung, bw.Beziehung, bw.Sortierung, bw._cdate, bw._mdate, bw.ReplacedBy, bw.ReplacementFor," +
                             "       bw.EditBy, fia.anzahl, vrg.anzahl, ocu.Vorname, ocu.Nachname " +
