@@ -36,10 +36,10 @@
     <class>entity.VKat</class>
     <class>entity.Planung</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://grmpf:3306/opde"/>
-      <property name="javax.persistence.jdbc.password" value=""/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
+      <property name="javax.persistence.jdbc.password" value="7t3rrw"/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.user" value="root"/>
+      <property name="javax.persistence.jdbc.user" value="opdeuser"/>
       <!-- <property name="eclipselink.logging.level" value="FINER"/> -->
       <!-- http://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging#Log_Levels -->
     </properties>

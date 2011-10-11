@@ -80,7 +80,7 @@ public class OPDE {
     protected static SYSHosts host;
     protected static ProofOfLife pol;
     protected static ArrayList<ImageIcon> animationCache;
-    protected static boolean animation;
+    protected static boolean animation = false;
     protected static boolean debug;
 
     public static ArrayList<ImageIcon> getAnimationCache() {
@@ -325,7 +325,6 @@ public class OPDE {
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
-        opts.addOption("n", "noanimation", false, "Schaltet die Animation auf dem Login Dialog aus.");
 
         Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .op Verzeichnis befindet.").create("k");
         opts.addOption(konfigdir);
@@ -382,9 +381,6 @@ public class OPDE {
             localProps.put("opcache", localProps.getProperty("opwd") + System.getProperty("file.separator") + "cache");
         }
 
-        // Die Login Animation. Die könnte bei Terminal Servern störend sein.
-        animation = !cl.hasOption("n");
-
         if (cl.hasOption("a")) { // anonym Modus
             //localProps.put("anonym", "true");
             anonym = true;
@@ -424,6 +420,8 @@ public class OPDE {
         }
 
         loadLocalProperties();
+
+        animation = localProps.contains("animation") && localProps.getProperty("animation").equals("true");
 
         logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
 

@@ -10,16 +10,12 @@
  */
 package op.vorgang;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import op.OPDE;
-import op.events.DefaultEvent;
-import op.events.DefaultEventListener;
 import op.share.tools.PnlEditor;
-import op.threads.ComponentAlternatingFlash;
-import op.threads.SplitAnimator;
-import op.threads.TableColumnSizeAnimator;
-import op.threads.TextFlash;
 import op.tools.InternalClassACL;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -27,7 +23,7 @@ import op.tools.SYSTools;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import tablemodels.TMElement;
-import tablerenderer.*;
+import tablerenderer.RNDHTML;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -52,15 +48,16 @@ import java.util.List;
 public class FrmVorgang extends javax.swing.JFrame {
 
     public static final String internalClassID = "opde.tickets";
+    private static int speedSlow = 700;
+    private static int speedFast = 500;
 
     protected Vorgaenge aktuellerVorgang;
     protected JPopupMenu menu;
     protected JFrame myFrame;
-    protected int split1Percent, split2Percent, split3Percent, split4Percent;
+    protected double splitTDPercent, splitDOPercent, splitTEPercent;
     protected JXTaskPane pnlMyVorgaenge, pnlAlleVorgaenge, pnlVorgaengeRunningOut, pnlVorgaengeByBW, pnlVorgaengeByMA;
     protected boolean savePressedOnce = false, detailsChanged = false, ignoreEvents = false;
     //protected IconFlash iconflasher;
-    protected ComponentAlternatingFlash alternatingFlash;
     protected JComboBox cmbBW, cmbMA;
     protected TableColumn delColumn;
     protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
@@ -80,29 +77,24 @@ public class FrmVorgang extends javax.swing.JFrame {
         listOwner.setModel(SYSTools.newListModel("Users.findByStatusSorted", new Object[]{"status", 1}));
         cmbKat.setModel(SYSTools.newComboboxModel("VKat.findAllSorted"));
 
-        splitPane1.setDividerLocation(splitPane1.getWidth());
-        splitPane2.setDividerLocation(splitPane2.getWidth());
-        splitPane3.setDividerLocation(splitPane3.getWidth());
-        splitPane4.setDividerLocation(splitPane4.getWidth());
-        split1Percent = 100;
-        split2Percent = 100;
-        split3Percent = 100;
-        split4Percent = 100;
+        splitTDPercent = SYSTools.showSide(splitTableDetails, SYSTools.LEFT_UPPER_SIDE);
+        splitDOPercent = SYSTools.showSide(splitDetailsOwner, SYSTools.LEFT_UPPER_SIDE);
+        splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
+
         myFrame = this;
         aktuellerVorgang = null;
-        btnCancel1.setVisible(false);
 
 
-        // TODO: Hier müssen noch Rechte rein
-
-        cmbBW = new JComboBox(SYSTools.newComboboxModel("Bewohner.findAllActiveSorted"));
-        cmbBW.setSelectedIndex(-1);
-        cmbBW.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                getVorgaengeFuerBW();
-            }
-        });
+//        // TODO: Hier müssen noch Rechte rein
+//
+//        cmbBW = new JComboBox(SYSTools.newComboboxModel("Bewohner.findAllActiveSorted"));
+//        cmbBW.setSelectedIndex(-1);
+//        cmbBW.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//               // getVorgaengeFuerBW();
+//            }
+//        });
         cmbMA = new JComboBox(SYSTools.newComboboxModel("Users.findByStatusSorted", new Object[]{"status", 1}));
         cmbMA.setSelectedIndex(-1);
         cmbMA.addItemListener(new ItemListener() {
@@ -113,10 +105,14 @@ public class FrmVorgang extends javax.swing.JFrame {
         });
 
         addMyVorgaenge();
-        addAlleVorgaenge();
+        //addAlleVorgaenge();
         addVorgaengeFuerBW();
-        addVorgaengeFuerMA();
-        addAblaufendeVorgaenge();
+
+        if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+            addVorgaengeFuerMA();
+        }
+
+        //addAblaufendeVorgaenge();
 
         //TableColumn column = tblElements.getColumnModel().getColumn(1);
 
@@ -172,63 +168,64 @@ public class FrmVorgang extends javax.swing.JFrame {
 
 
     protected void addVorgaengeFuerBW() {
-        pnlVorgaengeByBW = new JXTaskPane("Vorgänge nach BewohnerInnen");
-        //pnlVorgaengeByBW.setSpecial(true);
-        pnlVorgaengeByBW.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/edit_group.png")));
-        pnlVorgaengeByBW.setCollapsed(true);
-        //pnlVorgaengeByBW.setLayout(new BoxLayout(pnlVorgaengeByBW, BoxLayout.Y_AXIS));
-        pnlVorgaengeByBW.add(cmbBW);
-        ((Container) taskContainer).add(pnlVorgaengeByBW);
-    }
+        //((Container) taskContainer).add(new JLabel("Bewohner"));
 
-    protected void getVorgaengeFuerBW() {
-        pnlVorgaengeByBW.removeAll();
-        pnlVorgaengeByBW.add(cmbBW);
-        pnlVorgaengeByBW.add(new JSeparator());
-        Bewohner selectedBW = (Bewohner) cmbBW.getSelectedItem();
-        if (selectedBW != null) {
+        List<Bewohner> bewohner = OPDE.getEM().createNamedQuery("Bewohner.findAllActiveSorted").getResultList();
+
+        JXTaskPane allbwpanel = new JXTaskPane("nach BewohnerInnen");
+        allbwpanel.setCollapsed(true);
+
+        for (Bewohner bw : bewohner) {
+
             Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBW");
-            query.setParameter("bewohner", selectedBW);
+            query.setParameter("bewohner", bw);
             List<Vorgaenge> listVorgaenge = query.getResultList();
             Iterator<Vorgaenge> it = listVorgaenge.iterator();
 
-            while (it.hasNext()) {
-                final Vorgaenge innervorgang = it.next();
-                pnlVorgaengeByBW.add(new AbstractAction() {
+            if (!listVorgaenge.isEmpty()) {
+                JXTaskPane bwpanel = new JXTaskPane(bw.getNachname() + ", " + bw.getVorname());
+                bwpanel.setCollapsed(true);
 
-                    {
-                        putValue(Action.NAME, innervorgang.getTitel());
-                        //putValue(Action.SHORT_DESCRIPTION, null);
-                    }
+                while (it.hasNext()) {
+                    final Vorgaenge innervorgang = it.next();
+                    bwpanel.add(new AbstractAction() {
+                        {
+                            putValue(Action.NAME, innervorgang.getTitel());
+                        }
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        loadTable(innervorgang);
-                        if (btnDetails.isSelected()) {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            loadTable(innervorgang);
                             loadDetails(innervorgang);
                         }
-                    }
-                });
+                    });
+                }
+
+                allbwpanel.add(bwpanel);
             }
+
         }
+
+        ((Container) taskContainer).add(allbwpanel);
     }
 
-    protected Object[] getTableButtons() {
-        return new Object[]{new JButton(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/edit_remove.png"))),
-                new TableButtonBehaviour() {
-                    @Override
-                    public void actionPerformed(TableButtonActionEvent e) {
-                        ((TMElement) tblElements.getModel()).removeRow(e.getTable().getSelectedRow());
-                    }
 
-                    @Override
-                    public boolean isEnabled(JTable table, int row, int col) {
-                        VorgangElement element = ((TMElement) tblElements.getModel()).getElement(row);
-                        boolean systemBericht = (element instanceof VBericht) && ((VBericht) element).isSystem();
-                        return !systemBericht;
-                    }
-                }};
-    }
+//    protected Object[] getTableButtons() {
+//        return new Object[]{new JButton(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/edit_remove.png"))),
+//                new TableButtonBehaviour() {
+//                    @Override
+//                    public void actionPerformed(TableButtonActionEvent e) {
+//                        ((TMElement) tblElements.getModel()).removeRow(e.getTable().getSelectedRow());
+//                    }
+//
+//                    @Override
+//                    public boolean isEnabled(JTable table, int row, int col) {
+//                        VorgangElement element = ((TMElement) tblElements.getModel()).getElement(row);
+//                        boolean systemBericht = (element instanceof VBericht) && ((VBericht) element).isSystem();
+//                        return !systemBericht;
+//                    }
+//                }};
+//    }
 
     protected void getVorgaengeFuerMA() {
         pnlVorgaengeByMA.removeAll();
@@ -262,13 +259,47 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     protected void addVorgaengeFuerMA() {
-        pnlVorgaengeByMA = new JXTaskPane("Vorgänge nach BewohnerInnen");
-        pnlVorgaengeByMA.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/edit_group.png")));
-        pnlVorgaengeByMA.setCollapsed(true);
-        //pnlVorgaengeByMA.setLayout(new BoxLayout(pnlVorgaengeByMA, BoxLayout.Y_AXIS));
+        List<Users> listeUser = OPDE.getEM().createNamedQuery("Users.findByStatusSorted").setParameter("status", 1).getResultList();
 
-        pnlVorgaengeByMA.add(cmbMA);
-        ((Container) taskContainer).add(pnlVorgaengeByMA);
+        JXTaskPane allmapanel = new JXTaskPane("nach MitarbeiterInnen");
+        allmapanel.setCollapsed(true);
+
+        for (Users user : listeUser) {
+
+            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBesitzer");
+            query.setParameter("besitzer", user);
+            List<Vorgaenge> listVorgaenge = query.getResultList();
+            Iterator<Vorgaenge> it = listVorgaenge.iterator();
+
+            if (!listVorgaenge.isEmpty()) {
+                JXTaskPane mapanel = new JXTaskPane(user.getNachname() + ", " + user.getVorname());
+                mapanel.setCollapsed(true);
+
+                while (it.hasNext()) {
+                    final Vorgaenge innervorgang = it.next();
+                    OPDE.debug(innervorgang);
+                    mapanel.add(new AbstractAction() {
+                        {
+                            String titel = innervorgang.getTitel();
+                            if (innervorgang.getBewohner() != null) {
+                                titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
+                            }
+                            putValue(Action.NAME, titel);
+                        }
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            loadTable(innervorgang);
+                            loadDetails(innervorgang);
+                        }
+                    });
+                }
+                allmapanel.add(mapanel);
+            }
+
+        }
+
+        ((Container) taskContainer).add(allmapanel);
 
     }
 
@@ -289,16 +320,17 @@ public class FrmVorgang extends javax.swing.JFrame {
             pnlMyVorgaenge.add(new AbstractAction() {
 
                 {
-                    putValue(Action.NAME, innervorgang.getTitel());
-                    putValue(Action.SHORT_DESCRIPTION, innervorgang.getBewohner().getNachname());
+                    String titel = innervorgang.getTitel();
+                    if (innervorgang.getBewohner() != null) {
+                        titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
+                    }
+                    putValue(Action.NAME, titel);
                 }
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     loadTable(innervorgang);
-                    if (btnDetails.isSelected()) {
-                        loadDetails(innervorgang);
-                    }
+                    loadDetails(innervorgang);
                 }
             });
 
@@ -372,113 +404,70 @@ public class FrmVorgang extends javax.swing.JFrame {
     @Override
     public void dispose() {
         super.dispose();
-        if (alternatingFlash != null) {
-            alternatingFlash.stop();
-        }
     }
 
     protected void loadDetails(Vorgaenge vorgang) {
-        ignoreEvents = true;
-        txtTitel.setText(vorgang.getTitel());
-        lblBW.setText(vorgang.getBewohner() == null ? "Allgemeiner Vorgang" : BewohnerTools.getBWLabel(vorgang.getBewohner()));
-        lblStart.setText(DateFormat.getDateInstance().format(vorgang.getVon()));
-        jdcWV.setDate(vorgang.getWv());
-        lblEnde.setText(vorgang.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "noch nicht abgeschlossen" : DateFormat.getDateInstance().format(vorgang.getBis()));
-        lblCreator.setText(vorgang.getErsteller().getNameUndVorname());
-        lblOwner.setText(vorgang.getBesitzer().getNameUndVorname());
-        cmbKat.setSelectedItem(vorgang.getKategorie());
-        enable(btnNewKat);
-        lblPDCA.setText(VorgaengeTools.PDCA[vorgang.getPdca()]);
-        cbPDCA.setSelected(vorgang.getPdca() != VorgaengeTools.PDCA_OFF);
-        btnPDCAPlus.setEnabled(cbPDCA.isSelected());
-        listOwner.setSelectedValue(vorgang.getBesitzer(), true);
+        lblVorgang.setText(vorgang.getTitel() + " [" + (vorgang.getBewohner() == null ? "allgemein" : vorgang.getBewohner().getBWKennung()) + "]");
+        if (btnDetails.isSelected()) {
+            ignoreEvents = true;
+            txtTitel.setText(vorgang.getTitel());
+            lblBW.setText(vorgang.getBewohner() == null ? "Allgemeiner Vorgang" : BewohnerTools.getBWLabel(vorgang.getBewohner()));
+            lblStart.setText(DateFormat.getDateInstance().format(vorgang.getVon()));
+            jdcWV.setDate(vorgang.getWv());
+            lblEnde.setText(vorgang.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "noch nicht abgeschlossen" : DateFormat.getDateInstance().format(vorgang.getBis()));
+            lblCreator.setText(vorgang.getErsteller().getNameUndVorname());
+            lblOwner.setText(vorgang.getBesitzer().getNameUndVorname());
+            cmbKat.setSelectedItem(vorgang.getKategorie());
+            lblPDCA.setText(VorgaengeTools.PDCA[vorgang.getPdca()]);
+            cbPDCA.setSelected(vorgang.getPdca() != VorgaengeTools.PDCA_OFF);
+            btnPDCAPlus.setEnabled(cbPDCA.isSelected());
+            listOwner.setSelectedValue(vorgang.getBesitzer(), true);
 
-        // ACLs
-        txtTitel.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
-        ignoreEvents = false;
+            // ACLs
+            txtTitel.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+            ignoreEvents = false;
+        }
+
     }
 
     private void btnAssignItemStateChanged(ItemEvent e) {
-        if (btnAssign.isSelected()) {
-            listOwner.setEnabled(true);
-
-            split2Percent = 65;
-            SplitAnimator splitAnimator = new SplitAnimator(splitPane2, split2Percent);
-            splitAnimator.addThreadDoneListener(new DefaultEventListener() {
-                @Override
-                public void eventHappened(DefaultEvent evt) {
-                    OPDE.debug("Erledigt");
-                }
-            });
-            splitAnimator.execute();
-        } else {
-            split2Percent = 100;
-            new SplitAnimator(splitPane2, split2Percent).execute();
-        }
+        double percent = btnAssign.isSelected() ? 0.65d : 1.0d;
+        SYSTools.showSide(splitDetailsOwner, percent, speedSlow);
     }
 
     private void btnDetailsItemStateChanged(ItemEvent e) {
-        if (btnDetails.isSelected()) {
-            SYSTools.setXEnabled(taskContainer, false);
-            split1Percent = 40;
-            loadDetails(aktuellerVorgang);
-            new SplitAnimator(splitPane1, split1Percent).execute();
-        } else {
-            split1Percent = 100;
-            new SplitAnimator(splitPane1, split1Percent).execute();
-            SYSTools.setXEnabled(taskContainer, true);
-        }
+        splitTDPercent = btnDetails.isSelected() ? 0.4d : 1.0d;
+        SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow);
+
         btnEndReactivate.setEnabled(!btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
-        btnDelete.setEnabled(!btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
-    }
-
-    private void splitPane1ComponentResized(ComponentEvent e) {
-        splitPane1.setDividerLocation(SplitAnimator.getDividerInAbsolutePosition(splitPane1, split1Percent));
-    }
-
-    private void splitPane2ComponentResized(ComponentEvent e) {
-        splitPane2.setDividerLocation(SplitAnimator.getDividerInAbsolutePosition(splitPane2, split2Percent));
-    }
-
-    private void btnAcceptKatActionPerformed(ActionEvent e) {
-        VKat vkat = VKatTools.addKat(txtKat.getText());
-        cmbKat.setModel(SYSTools.newComboboxModel("VKat.findAllSorted"));
-        cmbKat.setSelectedItem(vkat);
-        split3Percent = 100;
-        new SplitAnimator(splitPane3, split3Percent).execute();
-        enable(btnNewKat);
-    }
-
-    private void txtKatCaretUpdate(CaretEvent e) {
-        btnAcceptKat.setEnabled(!txtKat.getText().isEmpty());
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        if (savePressedOnce) {
-            btnApply.setText(null);
-            alternatingFlash.stop();
-            alternatingFlash = null;
-            EntityTools.store(aktuellerVorgang);
-
-            setDetailsChanged(false);
-        } else {
-            btnApply.setText("WIRKLICH ?");
-            alternatingFlash = new ComponentAlternatingFlash(btnApply, btnCancel, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-            alternatingFlash.execute();
-        }
-        savePressedOnce = !savePressedOnce;
+//        if (savePressedOnce) {
+//            btnApply.setText(null);
+//            alternatingFlash.stop();
+//            alternatingFlash = null;
+//            EntityTools.store(aktuellerVorgang);
+//
+//            setDetailsChanged(false);
+//        } else {
+//            btnApply.setText("WIRKLICH ?");
+//            alternatingFlash = new ComponentAlternatingFlash(btnApply, btnCancel, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
+//            alternatingFlash.execute();
+//        }
+//        savePressedOnce = !savePressedOnce;
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
-        if (savePressedOnce) {
-            btnApply.setText(null);
-            alternatingFlash.stop();
-            alternatingFlash = null;
-        }
-
-        loadDetails(aktuellerVorgang);
-        setDetailsChanged(false);
-        savePressedOnce = false;
+//        if (savePressedOnce) {
+//            btnApply.setText(null);
+//            alternatingFlash.stop();
+//            alternatingFlash = null;
+//        }
+//
+//        loadDetails(aktuellerVorgang);
+//        setDetailsChanged(false);
+//        savePressedOnce = false;
     }
 
     private void listOwnerValueChanged(ListSelectionEvent e) {
@@ -554,78 +543,35 @@ public class FrmVorgang extends javax.swing.JFrame {
         comp.setEnabled(answer);
     }
 
-    private void splitPane3ComponentResized(ComponentEvent e) {
-        splitPane3.setDividerLocation(SplitAnimator.getDividerInAbsolutePosition(splitPane3, split3Percent));
-    }
-
-    private void btnNewKatActionPerformed(ActionEvent e) {
-        split3Percent = 30;
-        new SplitAnimator(splitPane3, split3Percent).execute();
-        txtKat.requestFocus();
-        btnNewKat.setEnabled(false);
-    }
-
-    private void cmbKatFocusGained(FocusEvent e) {
-        if (split3Percent < 100) {
-            split3Percent = 100;
-            new SplitAnimator(splitPane3, split3Percent).execute();
-        }
-        enable(btnNewKat);
-    }
-
     private void btnEndReactivateActionPerformed(ActionEvent e) {
-        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
-            alternatingFlash.stop();
-            ((JButton) alternatingFlash.getComp1()).setText(null);
-            alternatingFlash = null;
-            btnCancel1.setVisible(false);
-
-            if (aktuellerVorgang.isAbgeschlossen()) {
-                VorgaengeTools.reopenVorgang(aktuellerVorgang);
-                new TextFlash(lblMessage, "Vorgang wieder geöffnet", true, false, 600).execute();
-                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
-                btnEndReactivate.setToolTipText("Vorgang abschließen");
-            } else {
-                VorgaengeTools.endVorgang(aktuellerVorgang);
-                new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 600).execute();
-                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
-                btnEndReactivate.setToolTipText("Vorgang wieder öffnen");
-            }
-        } else {
-            btnCancel1.setVisible(true);
-            btnEndReactivate.setText("WIRKLICH ?");
-            alternatingFlash = new ComponentAlternatingFlash(btnEndReactivate, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-            alternatingFlash.execute();
-        }
-
-        setLowerMiddleButtons(savePressedOnce);
-        btnEndReactivate.setEnabled(!savePressedOnce);
-
-        savePressedOnce = !savePressedOnce;
+//        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
+//            alternatingFlash.stop();
+//            ((JButton) alternatingFlash.getComp1()).setText(null);
+//            alternatingFlash = null;
+//
+//            if (aktuellerVorgang.isAbgeschlossen()) {
+//                VorgaengeTools.reopenVorgang(aktuellerVorgang);
+//                new TextFlash(lblMessage, "Vorgang wieder geöffnet", true, false, 600).execute();
+//                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
+//                btnEndReactivate.setToolTipText("Vorgang abschließen");
+//            } else {
+//                VorgaengeTools.endVorgang(aktuellerVorgang);
+//                new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 600).execute();
+//                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
+//                btnEndReactivate.setToolTipText("Vorgang wieder öffnen");
+//            }
+//        } else {
+//            btnEndReactivate.setText("WIRKLICH ?");
+//            alternatingFlash = new ComponentAlternatingFlash(btnEndReactivate, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
+//            alternatingFlash.execute();
+//        }
+//
+//        setLowerMiddleButtons(savePressedOnce);
+//        btnEndReactivate.setEnabled(!savePressedOnce);
+//
+//        savePressedOnce = !savePressedOnce;
     }
 
-    private void btnCancel1ActionPerformed(ActionEvent e) {
-        if (alternatingFlash != null) {
-            alternatingFlash.stop();
-            ((JButton) alternatingFlash.getComp1()).setText(null);
-
-            if (alternatingFlash.getComp1().equals(btnAddBericht)) {
-                split4Percent = 100;
-                new SplitAnimator(splitPane4, split4Percent).execute();
-            }
-
-            alternatingFlash = null;
-        }
-        savePressedOnce = false;
-        btnCancel1.setVisible(false);
-
-        setLowerMiddleButtons(true);
-
-    }
-
-    private void splitPane4ComponentResized(ComponentEvent e) {
-        splitPane4.setDividerLocation(SplitAnimator.getDividerInAbsolutePosition(splitPane4, split4Percent));
-    }
 
     private void btnTakeOverActionPerformed(ActionEvent e) {
         aktuellerVorgang.setBesitzer(OPDE.getLogin().getUser());
@@ -633,34 +579,27 @@ public class FrmVorgang extends javax.swing.JFrame {
         setDetailsChanged(true);
     }
 
-    private void btnDeleteActionPerformed(ActionEvent e) {
-        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
-            alternatingFlash.stop();
-            btnDelete.setText(null);
-            alternatingFlash = null;
-            btnCancel1.setVisible(false);
-            VorgaengeTools.deleteVorgang(aktuellerVorgang);
-            btnDetails.setSelected(false);
-            loadTable(null);
-        } else {
-            btnCancel1.setVisible(true);
-            btnDelete.setText("WIRKLICH ?");
-            alternatingFlash = new ComponentAlternatingFlash(btnDelete, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-            alternatingFlash.execute();
-        }
-
-        setLowerMiddleButtons(savePressedOnce);
-        btnDelElement.setEnabled(!savePressedOnce);
-
-        savePressedOnce = !savePressedOnce;
-    }
-
-    private void btnCancelKatActionPerformed(ActionEvent e) {
-        txtKat.setText("");
-        split3Percent = 100;
-        new SplitAnimator(splitPane3, split3Percent).execute();
-        enable(btnNewKat);
-    }
+//    private void btnDeleteActionPerformed(ActionEvent e) {
+//        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
+//            alternatingFlash.stop();
+//            btnDelete.setText(null);
+//            alternatingFlash = null;
+//            btnCancel1.setVisible(false);
+//            VorgaengeTools.deleteVorgang(aktuellerVorgang);
+//            btnDetails.setSelected(false);
+//            loadTable(null);
+//        } else {
+//            btnCancel1.setVisible(true);
+//            btnDelete.setText("WIRKLICH ?");
+//            alternatingFlash = new ComponentAlternatingFlash(btnDelete, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
+//            alternatingFlash.execute();
+//        }
+//
+//        setLowerMiddleButtons(savePressedOnce);
+//        btnDelElement.setEnabled(!savePressedOnce);
+//
+//        savePressedOnce = !savePressedOnce;
+//    }
 
     private void btnSystemInfoItemStateChanged(ItemEvent e) {
         loadTable(aktuellerVorgang);
@@ -671,7 +610,54 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     private void btnAddVorgangActionPerformed(ActionEvent e) {
-        new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 1000).execute();
+        //new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 1000).execute();
+    }
+
+
+    private void cmbKatFocusGained(FocusEvent e) {
+        // TODO add your code here
+    }
+
+    private void tblElementsMousePressed(MouseEvent e) {
+        Point p = e.getPoint();
+        final int col = tblElements.columnAtPoint(p);
+        final int row = tblElements.rowAtPoint(p);
+        ListSelectionModel lsm = tblElements.getSelectionModel();
+        lsm.setSelectionInterval(row, row);
+
+
+        // wenn es ein Medikament ist und der Status offen, dann nur änderbar, wenn es einen angebrochenen Bestand gibt.
+        // Etwas umständlich, aus Optimierungsgründen
+        // Nun noch Menüeinträge
+        if (e.isPopupTrigger()) {
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+
+
+            JMenuItem itemPopupDelete = new JMenuItem("Eintrag löschen");
+            itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                }
+            });
+            menu.add(itemPopupDelete);
+            itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+
+            menu.add(new JSeparator());
+        }
+
+        menu.show(e.getComponent(), (int) p.getX(), (int) p.getY());
+    }
+
+    private void thisComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitTableDetails, splitTDPercent);
+
+        SYSTools.showSide(splitTableEditor, splitTEPercent);
+    }
+
+    private void splitDetailsOwnerComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitDetailsOwner, splitDOPercent);
     }
 
 
@@ -692,24 +678,24 @@ public class FrmVorgang extends javax.swing.JFrame {
             tblElements.getColumnModel().getColumn(TMElement.COL_PIT).setHeaderValue("Datum / MA");
             tblElements.getColumnModel().getColumn(TMElement.COL_CONTENT).setHeaderValue("Inhalt");
 
-            if (btnDelElement.isSelected()) {
-                // ButtonsRenderer und ButtonsEditor sind dafür da, damit man in den Tabellen Spalten Knöpfe einfügen kann
-                // Es gibt immer einen Cancel Button und einen Menge von Funktionsknöpfe. Was diese Funktionsknöpfe
-                // machen sollen, steht in den Actionlistenern, die man mit übergibt.
-                tblElements.addColumn(new TableColumn(TMElement.COL_OPERATIONS, 0,
-                        //
-                        new ButtonsRenderer(new JButton(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"))),
-                                getTableButtons()),
-                        //
-                        new ButtonsEditor(tblElements, new JButton(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"))),
-                                getTableButtons()
-                        )
-                )
-                );
-                tblElements.getColumnModel().getColumn(TMElement.COL_OPERATIONS).setHeaderValue("--");
-                new TableColumnSizeAnimator(jspElements, tblElements.getColumnModel().getColumn(TMElement.COL_OPERATIONS), 150).execute();
-                //OPDE.debug(tblElements.getColumnCount());
-            }
+//            if (btnDelElement.isSelected()) {
+//                // ButtonsRenderer und ButtonsEditor sind dafür da, damit man in den Tabellen Spalten Knöpfe einfügen kann
+//                // Es gibt immer einen Cancel Button und einen Menge von Funktionsknöpfe. Was diese Funktionsknöpfe
+//                // machen sollen, steht in den Actionlistenern, die man mit übergibt.
+//                tblElements.addColumn(new TableColumn(TMElement.COL_OPERATIONS, 0,
+//                        //
+//                        new ButtonsRenderer(new JButton(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"))),
+//                                getTableButtons()),
+//                        //
+//                        new ButtonsEditor(tblElements, new JButton(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"))),
+//                                getTableButtons()
+//                        )
+//                )
+//                );
+//                tblElements.getColumnModel().getColumn(TMElement.COL_OPERATIONS).setHeaderValue("--");
+//                new TableColumnSizeAnimator(jspElements, tblElements.getColumnModel().getColumn(TMElement.COL_OPERATIONS), 150).execute();
+//                //OPDE.debug(tblElements.getColumnCount());
+//            }
 
             jspElements.dispatchEvent(new ComponentEvent(jspElements, ComponentEvent.COMPONENT_RESIZED));
 
@@ -723,11 +709,11 @@ public class FrmVorgang extends javax.swing.JFrame {
         }
 
         btnEndReactivate.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
-        btnDelete.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+        //btnDelete.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
         btnAddBericht.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
         btnSystemInfo.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
-        btnDelElement.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+        //btnDelElement.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
         btnDetails.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
         btnPrint.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
 
@@ -744,18 +730,16 @@ public class FrmVorgang extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        btnAddBericht = new JButton();
-        btnDetails = new JToggleButton();
-        btnAddVorgang = new JButton();
-        splitPane1 = new JSplitPane();
-        splitPane4 = new JSplitPane();
+        scrollPane2 = new JScrollPane();
+        taskContainer = new JXTaskPaneContainer();
+        lblVorgang = new JLabel();
+        splitTableDetails = new JSplitPane();
+        splitTableEditor = new JSplitPane();
         jspElements = new JScrollPane();
         tblElements = new JTable();
         pnlEditor = new PnlEditor();
-        splitPane2 = new JSplitPane();
+        splitDetailsOwner = new JSplitPane();
         pnlDetails = new JPanel();
-        btnTakeOver = new JButton();
-        btnAssign = new JToggleButton();
         label1 = new JLabel();
         lblBW = new JLabel();
         label2 = new JLabel();
@@ -763,99 +747,75 @@ public class FrmVorgang extends javax.swing.JFrame {
         label4 = new JLabel();
         label5 = new JLabel();
         label6 = new JLabel();
-        splitPane3 = new JSplitPane();
-        panel1 = new JPanel();
-        cmbKat = new JComboBox();
-        btnNewKat = new JButton();
-        panel2 = new JPanel();
-        txtKat = new JTextField();
-        btnAcceptKat = new JButton();
-        btnCancelKat = new JButton();
         cbPDCA = new JCheckBox();
         txtTitel = new JTextField();
         lblStart = new JLabel();
         lblEnde = new JLabel();
         lblCreator = new JLabel();
         lblOwner = new JLabel();
-        vSpacer1 = new JPanel(null);
+        jdcWV = new JDateChooser();
+        btnTakeOver = new JButton();
+        btnAssign = new JToggleButton();
+        cmbKat = new JComboBox();
         lblPDCA = new JLabel();
         btnPDCAPlus = new JButton();
-        jdcWV = new JDateChooser();
         scrollPane1 = new JScrollPane();
         listOwner = new JList();
+        pnlButtonsLeft = new JPanel();
+        btnAddVorgang = new JButton();
+        splitButtonsCenter = new JSplitPane();
+        panel5 = new JPanel();
+        btnAddBericht = new JButton();
+        btnDetails = new JToggleButton();
         btnPrint = new JButton();
-        scrollPane2 = new JScrollPane();
-        taskContainer = new JXTaskPaneContainer();
-        btnCancel = new JButton();
-        btnApply = new JButton();
         btnEndReactivate = new JButton();
-        btnDelete = new JButton();
-        btnCancel1 = new JButton();
         btnSystemInfo = new JToggleButton();
-        btnDelElement = new JToggleButton();
+        pnlButtonsRight = new JPanel();
+        btnApply = new JButton();
+        hSpacer1 = new JPanel(null);
         lblMessage = new JLabel();
+        hSpacer2 = new JPanel(null);
+        btnCancel = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                thisComponentResized(e);
+            }
+        });
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "$rgap, 0dlu, 117dlu, $lcgap, 316dlu:grow, 0dlu, $rgap",
+            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, default, 0dlu"));
 
-        //---- btnAddBericht ----
-        btnAddBericht.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
-        btnAddBericht.setToolTipText("Neuen Bericht schreiben");
-        btnAddBericht.setEnabled(false);
-        btnAddBericht.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddBerichtActionPerformed(e);
-            }
-        });
-
-        //---- btnDetails ----
-        btnDetails.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/graphic-design.png")));
-        btnDetails.setToolTipText("Details anzeigen / \u00e4ndern");
-        btnDetails.setEnabled(false);
-        btnDetails.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnDetailsItemStateChanged(e);
-            }
-        });
-
-        //---- btnAddVorgang ----
-        btnAddVorgang.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
-        btnAddVorgang.setToolTipText("Neuen Vorgang erstellen (nicht Bewohnerbezogen)");
-        btnAddVorgang.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddVorgangActionPerformed(e);
-            }
-        });
-
-        //======== splitPane1 ========
+        //======== scrollPane2 ========
         {
-            splitPane1.setDividerLocation(300);
-            splitPane1.setEnabled(false);
-            splitPane1.setDividerSize(5);
-            splitPane1.setDoubleBuffered(true);
-            splitPane1.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    splitPane1ComponentResized(e);
-                }
-            });
+            scrollPane2.setViewportView(taskContainer);
+        }
+        contentPane.add(scrollPane2, CC.xywh(3, 3, 2, 4));
 
-            //======== splitPane4 ========
+        //---- lblVorgang ----
+        lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
+        lblVorgang.setForeground(Color.blue);
+        lblVorgang.setHorizontalAlignment(SwingConstants.CENTER);
+        lblVorgang.setText(" ");
+        contentPane.add(lblVorgang, CC.xy(5, 3));
+
+        //======== splitTableDetails ========
+        {
+            splitTableDetails.setDividerLocation(300);
+            splitTableDetails.setEnabled(false);
+            splitTableDetails.setDividerSize(0);
+            splitTableDetails.setDoubleBuffered(true);
+
+            //======== splitTableEditor ========
             {
-                splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
-                splitPane4.setDividerLocation(300);
-                splitPane4.setDividerSize(0);
-                splitPane4.setEnabled(false);
-                splitPane4.addComponentListener(new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        splitPane4ComponentResized(e);
-                    }
-                });
+                splitTableEditor.setOrientation(JSplitPane.VERTICAL_SPLIT);
+                splitTableEditor.setDividerLocation(300);
+                splitTableEditor.setDividerSize(0);
+                splitTableEditor.setEnabled(false);
 
                 //======== jspElements ========
                 {
@@ -887,26 +847,116 @@ public class FrmVorgang extends javax.swing.JFrame {
                         }
                     });
                     tblElements.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                    tblElements.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            tblElementsMousePressed(e);
+                        }
+                    });
                     jspElements.setViewportView(tblElements);
                 }
-                splitPane4.setTopComponent(jspElements);
-                splitPane4.setBottomComponent(pnlEditor);
+                splitTableEditor.setTopComponent(jspElements);
+                splitTableEditor.setBottomComponent(pnlEditor);
             }
-            splitPane1.setLeftComponent(splitPane4);
+            splitTableDetails.setLeftComponent(splitTableEditor);
 
-            //======== splitPane2 ========
+            //======== splitDetailsOwner ========
             {
-                splitPane2.setDividerSize(5);
-                splitPane2.setDividerLocation(500);
-                splitPane2.addComponentListener(new ComponentAdapter() {
+                splitDetailsOwner.setDividerSize(0);
+                splitDetailsOwner.setDividerLocation(600);
+                splitDetailsOwner.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
-                        splitPane2ComponentResized(e);
+                        splitDetailsOwnerComponentResized(e);
                     }
                 });
 
                 //======== pnlDetails ========
                 {
+                    pnlDetails.setLayout(new FormLayout(
+                        "70dlu, $lcgap, default:grow, 2*($lcgap, default)",
+                        "8*(fill:default, $lgap), fill:default"));
+
+                    //---- label1 ----
+                    label1.setText("Titel");
+                    pnlDetails.add(label1, CC.xywh(1, 1, 2, 1));
+
+                    //---- lblBW ----
+                    lblBW.setText("Allgemeiner Vorgang");
+                    lblBW.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    lblBW.setForeground(Color.blue);
+                    pnlDetails.add(lblBW, CC.xywh(3, 3, 5, 1));
+
+                    //---- label2 ----
+                    label2.setText("Erstellt am");
+                    pnlDetails.add(label2, CC.xywh(1, 5, 2, 1));
+
+                    //---- label3 ----
+                    label3.setText("Wiedervorlage");
+                    pnlDetails.add(label3, CC.xywh(1, 7, 2, 1));
+
+                    //---- label4 ----
+                    label4.setText("Abgeschlossen am");
+                    pnlDetails.add(label4, CC.xywh(1, 9, 2, 1));
+
+                    //---- label5 ----
+                    label5.setText("Erstellt von");
+                    pnlDetails.add(label5, CC.xywh(1, 11, 2, 1));
+
+                    //---- label6 ----
+                    label6.setText("Wird bearbeitet von");
+                    pnlDetails.add(label6, CC.xywh(1, 13, 2, 1));
+
+                    //---- cbPDCA ----
+                    cbPDCA.setText("PDCA Zyklus");
+                    cbPDCA.setEnabled(false);
+                    cbPDCA.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent e) {
+                            cbPDCAItemStateChanged(e);
+                        }
+                    });
+                    pnlDetails.add(cbPDCA, CC.xy(1, 17));
+
+                    //---- txtTitel ----
+                    txtTitel.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    txtTitel.addCaretListener(new CaretListener() {
+                        @Override
+                        public void caretUpdate(CaretEvent e) {
+                            txtTitelCaretUpdate(e);
+                        }
+                    });
+                    pnlDetails.add(txtTitel, CC.xywh(3, 1, 5, 1));
+
+                    //---- lblStart ----
+                    lblStart.setText("15.05.2011");
+                    lblStart.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlDetails.add(lblStart, CC.xywh(3, 5, 5, 1));
+
+                    //---- lblEnde ----
+                    lblEnde.setText("noch nicht abgeschlossen");
+                    lblEnde.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlDetails.add(lblEnde, CC.xywh(3, 9, 5, 1));
+
+                    //---- lblCreator ----
+                    lblCreator.setText("text");
+                    lblCreator.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlDetails.add(lblCreator, CC.xywh(3, 11, 5, 1));
+
+                    //---- lblOwner ----
+                    lblOwner.setText("text");
+                    lblOwner.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlDetails.add(lblOwner, CC.xy(3, 13));
+
+                    //---- jdcWV ----
+                    jdcWV.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    jdcWV.addPropertyChangeListener(new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent e) {
+                            jdcWVPropertyChange(e);
+                        }
+                    });
+                    pnlDetails.add(jdcWV, CC.xywh(3, 7, 5, 1));
 
                     //---- btnTakeOver ----
                     btnTakeOver.setFont(new Font("Lucida Grande", Font.BOLD, 14));
@@ -918,6 +968,7 @@ public class FrmVorgang extends javax.swing.JFrame {
                             btnTakeOverActionPerformed(e);
                         }
                     });
+                    pnlDetails.add(btnTakeOver, CC.xy(5, 13));
 
                     //---- btnAssign ----
                     btnAssign.setFont(new Font("Lucida Grande", Font.BOLD, 14));
@@ -930,151 +981,29 @@ public class FrmVorgang extends javax.swing.JFrame {
                             btnAssignItemStateChanged(e);
                         }
                     });
+                    pnlDetails.add(btnAssign, CC.xy(7, 13));
 
-                    //---- label1 ----
-                    label1.setText("Titel");
-
-                    //---- lblBW ----
-                    lblBW.setText("Allgemeiner Vorgang");
-                    lblBW.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    lblBW.setForeground(Color.blue);
-
-                    //---- label2 ----
-                    label2.setText("Erstellt am");
-
-                    //---- label3 ----
-                    label3.setText("Wiedervorlage");
-
-                    //---- label4 ----
-                    label4.setText("Abgeschlossen am");
-
-                    //---- label5 ----
-                    label5.setText("Erstellt von");
-
-                    //---- label6 ----
-                    label6.setText("Wird bearbeitet von");
-
-                    //======== splitPane3 ========
-                    {
-                        splitPane3.setEnabled(false);
-                        splitPane3.addComponentListener(new ComponentAdapter() {
-                            @Override
-                            public void componentResized(ComponentEvent e) {
-                                splitPane3ComponentResized(e);
-                            }
-                        });
-
-                        //======== panel1 ========
-                        {
-                            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-
-                            //---- cmbKat ----
-                            cmbKat.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-                            cmbKat.setToolTipText("Kategorie des Vorgangs");
-                            cmbKat.addItemListener(new ItemListener() {
-                                @Override
-                                public void itemStateChanged(ItemEvent e) {
-                                    cmbKatItemStateChanged(e);
-                                }
-                            });
-                            cmbKat.addFocusListener(new FocusAdapter() {
-                                @Override
-                                public void focusGained(FocusEvent e) {
-                                    cmbKatFocusGained(e);
-                                }
-                            });
-                            panel1.add(cmbKat);
-
-                            //---- btnNewKat ----
-                            btnNewKat.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/edit_add.png")));
-                            btnNewKat.setToolTipText("Neue Kategorie hinzuf\u00fcgen");
-                            btnNewKat.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    btnNewKatActionPerformed(e);
-                                }
-                            });
-                            panel1.add(btnNewKat);
-                        }
-                        splitPane3.setLeftComponent(panel1);
-
-                        //======== panel2 ========
-                        {
-                            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-
-                            //---- txtKat ----
-                            txtKat.setToolTipText("Name der neuen Kategorie");
-                            txtKat.addCaretListener(new CaretListener() {
-                                @Override
-                                public void caretUpdate(CaretEvent e) {
-                                    txtKatCaretUpdate(e);
-                                }
-                            });
-                            panel2.add(txtKat);
-
-                            //---- btnAcceptKat ----
-                            btnAcceptKat.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
-                            btnAcceptKat.setToolTipText("Kategorie \u00fcbernehmen");
-                            btnAcceptKat.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    btnAcceptKatActionPerformed(e);
-                                }
-                            });
-                            panel2.add(btnAcceptKat);
-
-                            //---- btnCancelKat ----
-                            btnCancelKat.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
-                            btnCancelKat.setToolTipText("Eingabe abbrechen");
-                            btnCancelKat.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    btnCancelKatActionPerformed(e);
-                                }
-                            });
-                            panel2.add(btnCancelKat);
-                        }
-                        splitPane3.setRightComponent(panel2);
-                    }
-
-                    //---- cbPDCA ----
-                    cbPDCA.setText("PDCA Zyklus");
-                    cbPDCA.setEnabled(false);
-                    cbPDCA.addItemListener(new ItemListener() {
+                    //---- cmbKat ----
+                    cmbKat.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                    cmbKat.setToolTipText("Kategorie des Vorgangs");
+                    cmbKat.addItemListener(new ItemListener() {
                         @Override
                         public void itemStateChanged(ItemEvent e) {
-                            cbPDCAItemStateChanged(e);
+                            cmbKatItemStateChanged(e);
                         }
                     });
-
-                    //---- txtTitel ----
-                    txtTitel.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    txtTitel.addCaretListener(new CaretListener() {
+                    cmbKat.addFocusListener(new FocusAdapter() {
                         @Override
-                        public void caretUpdate(CaretEvent e) {
-                            txtTitelCaretUpdate(e);
+                        public void focusGained(FocusEvent e) {
+                            cmbKatFocusGained(e);
                         }
                     });
-
-                    //---- lblStart ----
-                    lblStart.setText("15.05.2011");
-                    lblStart.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-
-                    //---- lblEnde ----
-                    lblEnde.setText("noch nicht abgeschlossen");
-                    lblEnde.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-
-                    //---- lblCreator ----
-                    lblCreator.setText("text");
-                    lblCreator.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-
-                    //---- lblOwner ----
-                    lblOwner.setText("text");
-                    lblOwner.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlDetails.add(cmbKat, CC.xywh(3, 15, 5, 1));
 
                     //---- lblPDCA ----
                     lblPDCA.setText("Plan");
                     lblPDCA.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlDetails.add(lblPDCA, CC.xywh(3, 17, 3, 1));
 
                     //---- btnPDCAPlus ----
                     btnPDCAPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/addgreanbuble.png")));
@@ -1085,106 +1014,9 @@ public class FrmVorgang extends javax.swing.JFrame {
                             btnPDCAPlusActionPerformed(e);
                         }
                     });
-
-                    //---- jdcWV ----
-                    jdcWV.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    jdcWV.addPropertyChangeListener(new PropertyChangeListener() {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent e) {
-                            jdcWVPropertyChange(e);
-                        }
-                    });
-
-                    GroupLayout pnlDetailsLayout = new GroupLayout(pnlDetails);
-                    pnlDetails.setLayout(pnlDetailsLayout);
-                    pnlDetailsLayout.setHorizontalGroup(
-                        pnlDetailsLayout.createParallelGroup()
-                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(vSpacer1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
-                                    .addComponent(splitPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
-                                    .addGroup(GroupLayout.Alignment.LEADING, pnlDetailsLayout.createSequentialGroup()
-                                        .addComponent(cbPDCA)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(lblPDCA)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnPDCAPlus))
-                                    .addGroup(GroupLayout.Alignment.LEADING, pnlDetailsLayout.createSequentialGroup()
-                                        .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                            .addComponent(label3, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-                                            .addGroup(pnlDetailsLayout.createParallelGroup()
-                                                .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createParallelGroup()
-                                                    .addComponent(label1, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-                                                    .addComponent(label2, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
-                                                    .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                        .addComponent(label5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(label4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                                .addComponent(label6)))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(pnlDetailsLayout.createParallelGroup()
-                                            .addComponent(lblBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                            .addComponent(lblStart, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                            .addComponent(lblEnde, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                            .addComponent(jdcWV, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                            .addComponent(txtTitel, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
-                                                .addComponent(lblOwner, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnTakeOver)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnAssign))
-                                            .addComponent(lblCreator, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))))
-                                .addContainerGap())
-                    );
-                    pnlDetailsLayout.linkSize(SwingConstants.HORIZONTAL, new Component[] {label1, label2, label3, label4, label5, label6});
-                    pnlDetailsLayout.setVerticalGroup(
-                        pnlDetailsLayout.createParallelGroup()
-                            .addGroup(GroupLayout.Alignment.TRAILING, pnlDetailsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label1)
-                                    .addComponent(txtTitel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label2)
-                                    .addComponent(lblStart))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(label3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jdcWV, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label4)
-                                    .addComponent(lblEnde))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label5)
-                                    .addComponent(lblCreator))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlDetailsLayout.createParallelGroup()
-                                    .addComponent(btnAssign, GroupLayout.Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
-                                    .addComponent(btnTakeOver, GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblOwner, GroupLayout.Alignment.TRAILING)
-                                    .addComponent(label6, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(splitPane3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(pnlDetailsLayout.createParallelGroup()
-                                    .addGroup(pnlDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbPDCA, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(lblPDCA, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(btnPDCAPlus, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(vSpacer1, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-                                .addGap(20, 20, 20))
-                    );
-                    pnlDetailsLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnPDCAPlus, cbPDCA, lblPDCA});
-                    pnlDetailsLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnAssign, btnTakeOver, label6, lblOwner});
+                    pnlDetails.add(btnPDCAPlus, CC.xy(7, 17));
                 }
-                splitPane2.setLeftComponent(pnlDetails);
+                splitDetailsOwner.setLeftComponent(pnlDetails);
 
                 //======== scrollPane1 ========
                 {
@@ -1198,166 +1030,137 @@ public class FrmVorgang extends javax.swing.JFrame {
                     });
                     scrollPane1.setViewportView(listOwner);
                 }
-                splitPane2.setRightComponent(scrollPane1);
+                splitDetailsOwner.setRightComponent(scrollPane1);
             }
-            splitPane1.setRightComponent(splitPane2);
+            splitTableDetails.setRightComponent(splitDetailsOwner);
         }
+        contentPane.add(splitTableDetails, CC.xy(5, 5));
 
-        //---- btnPrint ----
-        btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer1.png")));
-        btnPrint.setEnabled(false);
-        btnPrint.setToolTipText("Vorgang drucken");
-
-        //======== scrollPane2 ========
+        //======== pnlButtonsLeft ========
         {
-            scrollPane2.setViewportView(taskContainer);
+            pnlButtonsLeft.setLayout(new BoxLayout(pnlButtonsLeft, BoxLayout.X_AXIS));
+
+            //---- btnAddVorgang ----
+            btnAddVorgang.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
+            btnAddVorgang.setToolTipText("Neuen Vorgang erstellen (nicht Bewohnerbezogen)");
+            btnAddVorgang.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnAddVorgangActionPerformed(e);
+                }
+            });
+            pnlButtonsLeft.add(btnAddVorgang);
         }
+        contentPane.add(pnlButtonsLeft, CC.xy(3, 7));
 
-        //---- btnCancel ----
-        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnCancel.setEnabled(false);
-        btnCancel.setToolTipText("\u00c4nderungen verwerfen");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancelActionPerformed(e);
+        //======== splitButtonsCenter ========
+        {
+            splitButtonsCenter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+            splitButtonsCenter.setDividerSize(0);
+            splitButtonsCenter.setDividerLocation(30);
+
+            //======== panel5 ========
+            {
+                panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
+
+                //---- btnAddBericht ----
+                btnAddBericht.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
+                btnAddBericht.setToolTipText("Neuen Bericht schreiben");
+                btnAddBericht.setEnabled(false);
+                btnAddBericht.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAddBerichtActionPerformed(e);
+                    }
+                });
+                panel5.add(btnAddBericht);
+
+                //---- btnDetails ----
+                btnDetails.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/graphic-design.png")));
+                btnDetails.setToolTipText("Details anzeigen / \u00e4ndern");
+                btnDetails.setEnabled(false);
+                btnDetails.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        btnDetailsItemStateChanged(e);
+                    }
+                });
+                panel5.add(btnDetails);
+
+                //---- btnPrint ----
+                btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer1.png")));
+                btnPrint.setEnabled(false);
+                btnPrint.setToolTipText("Vorgang drucken");
+                panel5.add(btnPrint);
+
+                //---- btnEndReactivate ----
+                btnEndReactivate.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                btnEndReactivate.setToolTipText("Vorgang abschlie\u00dfen");
+                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
+                btnEndReactivate.setEnabled(false);
+                btnEndReactivate.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnEndReactivateActionPerformed(e);
+                    }
+                });
+                panel5.add(btnEndReactivate);
+
+                //---- btnSystemInfo ----
+                btnSystemInfo.setToolTipText("System Berichte anzeigen / verbergen");
+                btnSystemInfo.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/info.png")));
+                btnSystemInfo.setEnabled(false);
+                btnSystemInfo.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        btnSystemInfoItemStateChanged(e);
+                    }
+                });
+                panel5.add(btnSystemInfo);
             }
-        });
+            splitButtonsCenter.setTopComponent(panel5);
 
-        //---- btnApply ----
-        btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnApply.setEnabled(false);
-        btnApply.setToolTipText("\u00c4nderungen sichern");
-        btnApply.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-        btnApply.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnApplyActionPerformed(e);
-                btnApplyActionPerformed(e);
+            //======== pnlButtonsRight ========
+            {
+                pnlButtonsRight.setLayout(new BoxLayout(pnlButtonsRight, BoxLayout.X_AXIS));
+
+                //---- btnApply ----
+                btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                btnApply.setEnabled(false);
+                btnApply.setToolTipText("\u00c4nderungen sichern");
+                btnApply.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                btnApply.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnApplyActionPerformed(e);
+                        btnApplyActionPerformed(e);
+                    }
+                });
+                pnlButtonsRight.add(btnApply);
+                pnlButtonsRight.add(hSpacer1);
+
+                //---- lblMessage ----
+                lblMessage.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
+                lblMessage.setText("My Message");
+                pnlButtonsRight.add(lblMessage);
+                pnlButtonsRight.add(hSpacer2);
+
+                //---- btnCancel ----
+                btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+                btnCancel.setEnabled(false);
+                btnCancel.setToolTipText("\u00c4nderungen verwerfen");
+                btnCancel.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnCancelActionPerformed(e);
+                    }
+                });
+                pnlButtonsRight.add(btnCancel);
             }
-        });
-
-        //---- btnEndReactivate ----
-        btnEndReactivate.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-        btnEndReactivate.setToolTipText("Vorgang abschlie\u00dfen");
-        btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
-        btnEndReactivate.setEnabled(false);
-        btnEndReactivate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnEndReactivateActionPerformed(e);
-            }
-        });
-
-        //---- btnDelete ----
-        btnDelete.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-        btnDelete.setToolTipText("Vorgang l\u00f6schen");
-        btnDelete.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/deleteall.png")));
-        btnDelete.setEnabled(false);
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnDeleteActionPerformed(e);
-            }
-        });
-
-        //---- btnCancel1 ----
-        btnCancel1.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnCancel1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancel1ActionPerformed(e);
-            }
-        });
-
-        //---- btnSystemInfo ----
-        btnSystemInfo.setToolTipText("System Berichte anzeigen / verbergen");
-        btnSystemInfo.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/info.png")));
-        btnSystemInfo.setEnabled(false);
-        btnSystemInfo.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnSystemInfoItemStateChanged(e);
-            }
-        });
-
-        //---- btnDelElement ----
-        btnDelElement.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_remove.png")));
-        btnDelElement.setEnabled(false);
-        btnDelElement.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnDelElementItemStateChanged(e);
-            }
-        });
-
-        //---- lblMessage ----
-        lblMessage.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-        lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addGap(20, 20, 20)
-                            .addComponent(btnAddVorgang))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(scrollPane2, GroupLayout.PREFERRED_SIZE, 296, GroupLayout.PREFERRED_SIZE)))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(btnAddBericht)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnDetails)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnDelElement)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnSystemInfo)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnPrint)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnEndReactivate)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnDelete)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnCancel1)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(lblMessage, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnApply)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnCancel))
-                        .addComponent(splitPane1, GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE))
-                    .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(scrollPane2, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE)
-                        .addComponent(splitPane1, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE))
-                    .addGap(11, 11, 11)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(lblMessage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnDelElement, 0, 0, Short.MAX_VALUE)
-                        .addComponent(btnAddVorgang, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCancel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnApply, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnAddBericht, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnDetails, 0, 0, Short.MAX_VALUE)
-                        .addComponent(btnPrint, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEndReactivate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnDelete, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCancel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSystemInfo, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
-                    .addGap(13, 13, 13))
-        );
-        contentPaneLayout.linkSize(SwingConstants.VERTICAL, new Component[] {btnAddBericht, btnAddVorgang, btnApply, btnCancel, btnCancel1, btnDelElement, btnDelete, btnDetails, btnEndReactivate, btnPrint, btnSystemInfo, lblMessage});
+            splitButtonsCenter.setBottomComponent(pnlButtonsRight);
+        }
+        contentPane.add(splitButtonsCenter, CC.xy(5, 7));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -1386,43 +1189,40 @@ public class FrmVorgang extends javax.swing.JFrame {
     protected void setLowerMiddleButtons(boolean enabled) {
         btnAddVorgang.setEnabled(enabled);
         btnAddBericht.setEnabled(enabled);
-        btnDelElement.setEnabled(enabled);
         btnSystemInfo.setEnabled(enabled);
         btnDetails.setEnabled(enabled);
         btnPrint.setEnabled(enabled);
         btnEndReactivate.setEnabled(enabled);
-        btnDelete.setEnabled(enabled);
     }
 
     private void btnAddBerichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBerichtActionPerformed
 
-        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
-            alternatingFlash.stop();
-            btnAddBericht.setText(null);
-            alternatingFlash = null;
-            btnCancel1.setVisible(false);
-            VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
-            EntityTools.store(vbericht);
-            split4Percent = 100;
-            new SplitAnimator(splitPane4, split4Percent).execute();
-            //btnDetails.setSelected(false);
-            loadTable(aktuellerVorgang);
-        } else {
 
-            pnlEditor.setHTML(null);
-            split4Percent = 50;
-            new SplitAnimator(splitPane4, split4Percent).execute();
-            btnAddBericht.setText("Bericht speichern");
-
-            btnCancel1.setVisible(true);
-            alternatingFlash = new ComponentAlternatingFlash(btnAddBericht, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-            alternatingFlash.execute();
-        }
-
-        setLowerMiddleButtons(savePressedOnce);
-        btnAddBericht.setEnabled(true);
-
-        savePressedOnce = !savePressedOnce;
+//        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
+//            alternatingFlash.stop();
+//            btnAddBericht.setText(null);
+//            alternatingFlash = null;
+//            VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
+//            EntityTools.store(vbericht);
+//            splitTEPercent = 100;
+//            new SplitAnimator(splitTableEditor, splitTEPercent).execute();
+//            //btnDetails.setSelected(false);
+//            loadTable(aktuellerVorgang);
+//        } else {
+//
+//            pnlEditor.setHTML(null);
+//            splitTEPercent = 50;
+//            new SplitAnimator(splitTableEditor, splitTEPercent).execute();
+//            btnAddBericht.setText("Bericht speichern");
+//
+//            alternatingFlash = new ComponentAlternatingFlash(btnAddBericht, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
+//            alternatingFlash.execute();
+//        }
+//
+//        setLowerMiddleButtons(savePressedOnce);
+//        btnAddBericht.setEnabled(true);
+//
+//        savePressedOnce = !savePressedOnce;
 
     }//GEN-LAST:event_btnAddBerichtActionPerformed
 
@@ -1434,25 +1234,23 @@ public class FrmVorgang extends javax.swing.JFrame {
          * btnNewKat ist der Knopf der neue Kategorien hinzufügt.
          * Man muss mindestens Manager sein um den drücken zu können.
          */
-        authorizationMap.put(btnNewKat, new ArrayList());
-        authorizationMap.get(btnNewKat).add(InternalClassACL.MANAGER);
+        //authorizationMap.put(btnNewKat, new ArrayList());
+        //authorizationMap.get(btnNewKat).add(InternalClassACL.MANAGER);
 
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JButton btnAddBericht;
-    private JToggleButton btnDetails;
-    private JButton btnAddVorgang;
-    private JSplitPane splitPane1;
-    private JSplitPane splitPane4;
+    private JScrollPane scrollPane2;
+    private JXTaskPaneContainer taskContainer;
+    private JLabel lblVorgang;
+    private JSplitPane splitTableDetails;
+    private JSplitPane splitTableEditor;
     private JScrollPane jspElements;
     private JTable tblElements;
     private PnlEditor pnlEditor;
-    private JSplitPane splitPane2;
+    private JSplitPane splitDetailsOwner;
     private JPanel pnlDetails;
-    private JButton btnTakeOver;
-    private JToggleButton btnAssign;
     private JLabel label1;
     private JLabel lblBW;
     private JLabel label2;
@@ -1460,36 +1258,34 @@ public class FrmVorgang extends javax.swing.JFrame {
     private JLabel label4;
     private JLabel label5;
     private JLabel label6;
-    private JSplitPane splitPane3;
-    private JPanel panel1;
-    private JComboBox cmbKat;
-    private JButton btnNewKat;
-    private JPanel panel2;
-    private JTextField txtKat;
-    private JButton btnAcceptKat;
-    private JButton btnCancelKat;
     private JCheckBox cbPDCA;
     private JTextField txtTitel;
     private JLabel lblStart;
     private JLabel lblEnde;
     private JLabel lblCreator;
     private JLabel lblOwner;
-    private JPanel vSpacer1;
+    private JDateChooser jdcWV;
+    private JButton btnTakeOver;
+    private JToggleButton btnAssign;
+    private JComboBox cmbKat;
     private JLabel lblPDCA;
     private JButton btnPDCAPlus;
-    private JDateChooser jdcWV;
     private JScrollPane scrollPane1;
     private JList listOwner;
+    private JPanel pnlButtonsLeft;
+    private JButton btnAddVorgang;
+    private JSplitPane splitButtonsCenter;
+    private JPanel panel5;
+    private JButton btnAddBericht;
+    private JToggleButton btnDetails;
     private JButton btnPrint;
-    private JScrollPane scrollPane2;
-    private JXTaskPaneContainer taskContainer;
-    private JButton btnCancel;
-    private JButton btnApply;
     private JButton btnEndReactivate;
-    private JButton btnDelete;
-    private JButton btnCancel1;
     private JToggleButton btnSystemInfo;
-    private JToggleButton btnDelElement;
+    private JPanel pnlButtonsRight;
+    private JButton btnApply;
+    private JPanel hSpacer1;
     private JLabel lblMessage;
+    private JPanel hSpacer2;
+    private JButton btnCancel;
     // End of variables declaration//GEN-END:variables
 }

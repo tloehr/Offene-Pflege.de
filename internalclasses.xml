@@ -46,4 +46,8 @@
     <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         <collideswith id="1" signature="false" mainClass="true"/>
     </class>
+        <class name="opde.tickets" short="Vorgangsverwaltung" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen.">
+        <manager doc="Man darf auf die Vorgänge anderer Mitarbeiter zugreifen."/>
+        <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+    </class>
 </classes>

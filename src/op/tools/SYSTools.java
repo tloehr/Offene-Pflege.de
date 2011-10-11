@@ -31,6 +31,9 @@ import entity.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
+import org.pushingpixels.trident.Timeline;
+import org.pushingpixels.trident.callback.TimelineCallback;
+import org.pushingpixels.trident.ease.Spline;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -57,6 +60,9 @@ public class SYSTools {
     public static final int INDEX_NACHNAME = 0;
     public static final int INDEX_VORNAME_FRAU = 1;
     public static final int INDEX_VORNAME_MANN = 2;
+
+    public static final boolean LEFT_UPPER_SIDE = false;
+    public static final boolean RIGHT_LOWER_SIDE = true;
 
     /**
      *
@@ -434,7 +440,7 @@ public class SYSTools {
     /**
      * Erstellt eine ComboxBox mit den Namen der Benutzer.
      *
-     * @param status. Status = 1 aktive Benutzer. Status = 0 inaktive. Status = -1 alle
+     * @param status Status = 1 aktive Benutzer. Status = 0 inaktive. Status = -1 alle
      * @return ComboBox aus ListElements mit den UKennungen in dem "Value" Attribut
      */
     public static DefaultComboBoxModel getUserList(int status) {
@@ -786,8 +792,8 @@ public class SYSTools {
      * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten PK aus. Wurde
      * entwickelt für Comboboxen mit einem Modell aus der RS2CMB Methode.
      *
-     * @param JComboBox die gesetzt werden soll
-     * @param long      gesuchter PK
+     * @param j die gesetzt werden soll
+     * @param pk      gesuchter PK
      */
     public static void selectInComboBox(JComboBox j, long pk) {
         ComboBoxModel cbm = (ComboBoxModel) j.getModel();
@@ -1475,4 +1481,219 @@ public class SYSTools {
         }
         return color;
     }
+
+
+    public static double showSide(JSplitPane split, boolean leftUpper) {
+        return showSide(split, leftUpper, 0);
+    }
+
+    public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis) {
+        double stop = leftUpper ? 0.0d : 1.0d;
+        return showSide(split, stop, speedInMillis);
+    }
+
+    public static double showSide(JSplitPane split, double pos) {
+        return showSide(split, pos, 0);
+    }
+
+    /**
+     * Setzt eine Split Pane (animiert oder nicht animiert) auf eine entsprechende Position (Prozentual zwischen 0 und 1)
+     * @param split
+     * @param pos
+     * @param speedInMillis
+     * @return Die neue, relative Position (zwischen 0 und 1)
+     */
+    public static double showSide(JSplitPane split, double pos, int speedInMillis) {
+
+        if (OPDE.isAnimation() && speedInMillis > 0) {
+            OPDE.debug("ShowSide double-version");
+            Object start;
+            Object stop;
+
+            if (isMac() || isWindows()) {
+                start = split.getDividerLocation();
+                stop = getDividerInAbsolutePosition(split, pos);
+            } else {
+                OPDE.debug("*nix running");
+                start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
+                stop = pos;
+            }
+
+            OPDE.debug(start.getClass().toString());
+            OPDE.debug(stop.getClass().toString());
+
+            final Timeline timeline1 = new Timeline(split);
+            timeline1.setEase(new Spline(0.9f));
+            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
+            timeline1.setDuration(speedInMillis);
+            timeline1.play();
+        } else {
+            split.setDividerLocation(pos);
+        }
+        return pos;
+    }
+
+    public static double showSide(JSplitPane split, int pos) {
+        return showSide(split, pos, 0);
+    }
+
+    public static double showSide(JSplitPane split, int pos, int speedInMillis) {
+
+        if (OPDE.isAnimation() && speedInMillis > 0) {
+            OPDE.debug("ShowSide int-version");
+            Object start;
+            Object stop;
+
+            if (isMac() || isWindows()) {
+                start = split.getDividerLocation();
+                stop = pos;
+            } else {
+                OPDE.debug("*nix running");
+                start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
+                stop = getDividerInRelativePosition(split, pos);
+            }
+            OPDE.debug(start.getClass().toString());
+            OPDE.debug(stop.getClass().toString());
+
+            final Timeline timeline1 = new Timeline(split);
+            timeline1.setEase(new Spline(0.9f));
+            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
+            timeline1.setDuration(speedInMillis);
+            timeline1.play();
+        } else {
+            split.setDividerLocation(pos);
+        }
+        return pos;
+    }
+
+//    public static double showSide(JSplitPane split, int pos, int speedInMillis) {
+//
+//        int start = split.getDividerLocation();
+//        int stop = pos;
+//
+//        if (Main.isAnimation()) {
+//            final Timeline timeline1 = new Timeline(split);
+//            timeline1.setEase(new Spline(0.9f));
+//            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
+//            timeline1.setDuration(speedInMillis);
+//            timeline1.play();
+//        } else {
+//            split.setDividerLocation(stop);
+//        }
+//
+//        return new Double(stop) / new Double(split.getWidth());
+//
+//    }
+
+    public static int getDividerInAbsolutePosition(JSplitPane mysplit, double pos) {
+        int max;
+        if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+            max = mysplit.getWidth();
+        } else {
+            max = mysplit.getHeight();
+        }
+        return new Double(max * pos).intValue();
+    }
+
+    public static double getDividerInRelativePosition(JSplitPane mysplit, int pos) {
+        int max;
+        if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+            max = mysplit.getWidth();
+        } else {
+            max = mysplit.getHeight();
+        }
+        return new Double(max) / new Double(pos);
+    }
+
+
+    // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+    public static boolean isWindows() {
+
+        String os = System.getProperty("os.name").toLowerCase();
+        //windows
+        return (os.indexOf("win") >= 0);
+
+    }
+
+    // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+    public static boolean isMac() {
+
+        String os = System.getProperty("os.name").toLowerCase();
+        //Mac
+        return (os.indexOf("mac") >= 0);
+
+    }
+
+    // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+    public static boolean isUnix() {
+
+        String os = System.getProperty("os.name").toLowerCase();
+        //linux or unix
+        return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0);
+
+    }
+
+    public static void fadeout(JLabel lbl) {
+        //lbl.setIcon(null);
+        final JLabel lbl1 = lbl;
+        final Color foreground = lbl.getForeground();
+        Timeline timeline1 = new Timeline(lbl);
+        timeline1.addPropertyToInterpolate("foreground", lbl.getForeground(), lbl.getBackground());
+        timeline1.setDuration(500);
+        timeline1.addCallback(new TimelineCallback() {
+            @Override
+            public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+                if (timelineState1 == Timeline.TimelineState.DONE) {
+                    lbl1.setText("");
+                    lbl1.setForeground(foreground);
+                    lbl1.setIcon(null);
+                }
+            }
+
+            @Override
+            public void onTimelinePulse(float v, float v1) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
+        timeline1.play();
+    }
+
+    public static void fadein(JLabel lbl, String text) {
+        final JLabel lbl1 = lbl;
+        final Color foreground = Color.black;
+        lbl1.setForeground(lbl1.getBackground());
+        lbl1.setText(text);
+        Timeline timeline1 = new Timeline(lbl1);
+        timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
+        timeline1.setDuration(500);
+        timeline1.play();
+    }
+
+    public static void fadeinout(JLabel lbl, String text) {
+        final JLabel lbl1 = lbl;
+        final Color foreground = Color.black;
+        final Color background = lbl.getBackground();
+        lbl.setForeground(lbl.getBackground());
+        lbl.setText(text);
+        Timeline timeline1 = new Timeline(lbl);
+        timeline1.addPropertyToInterpolate("foreground", background, foreground);
+        timeline1.setDuration(400);
+        timeline1.addCallback(new TimelineCallback() {
+            @Override
+            public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+                if (timelineState1 == Timeline.TimelineState.DONE) {
+                    lbl1.setText("");
+                    lbl1.setForeground(foreground);
+                    lbl1.setIcon(null);
+                }
+            }
+
+            @Override
+            public void onTimelinePulse(float v, float v1) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
+        timeline1.playLoop(2, Timeline.RepeatBehavior.REVERSE);
+    }
+
 }

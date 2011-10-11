@@ -8,6 +8,7 @@ import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.persistence.Query;
+import java.util.List;
 
 /**
  *
@@ -23,4 +24,5 @@ public class BewohnerTools {
     public static String getBWLabel(Bewohner bewohner) {
         return SYSTools.getBWLabel(bewohner.getBWKennung());
     }
+
 }
