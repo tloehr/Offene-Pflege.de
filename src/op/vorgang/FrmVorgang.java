@@ -22,6 +22,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
+import org.pushingpixels.trident.Timeline;
 import tablemodels.TMElement;
 import tablerenderer.RNDHTML;
 
@@ -51,6 +52,14 @@ public class FrmVorgang extends javax.swing.JFrame {
     private static int speedSlow = 700;
     private static int speedFast = 500;
 
+    private final int LAUFENDE_OPERATION_NICHTS = 0;
+    private final int LAUFENDE_OPERATION_BERICHT_EINGABE = 1;
+    private final int LAUFENDE_OPERATION_BERICHT_LOESCHEN = 2;
+    private final int LAUFENDE_OPERATION_ELEMENT_ENTFERNEN = 3;
+    private final int LAUFENDE_OPERATION_VORGANG_BEARBEITEN = 4;
+
+    private int laufendeOperation;
+
     protected Vorgaenge aktuellerVorgang;
     protected JPopupMenu menu;
     protected JFrame myFrame;
@@ -62,6 +71,8 @@ public class FrmVorgang extends javax.swing.JFrame {
     protected TableColumn delColumn;
     protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
 
+    private Timeline textmessageTL;
+
 
     /**
      * Creates new form FrmVorgang
@@ -71,8 +82,10 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     public FrmVorgang(Vorgaenge vorgang) {
+        ignoreEvents = true;
         initComponents();
         initAuthorizationMap();
+        laufendeOperation = LAUFENDE_OPERATION_NICHTS;
 
         listOwner.setModel(SYSTools.newListModel("Users.findByStatusSorted", new Object[]{"status", 1}));
         cmbKat.setModel(SYSTools.newComboboxModel("VKat.findAllSorted"));
@@ -80,6 +93,7 @@ public class FrmVorgang extends javax.swing.JFrame {
         splitTDPercent = SYSTools.showSide(splitTableDetails, SYSTools.LEFT_UPPER_SIDE);
         splitDOPercent = SYSTools.showSide(splitDetailsOwner, SYSTools.LEFT_UPPER_SIDE);
         splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
+        SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
 
         myFrame = this;
         aktuellerVorgang = null;
@@ -127,26 +141,27 @@ public class FrmVorgang extends javax.swing.JFrame {
         });
 
         loadTable(null);
+        ignoreEvents = false;
     }
 
-    protected void addAblaufendeVorgaenge() {
-        pnlVorgaengeRunningOut = new JXTaskPane("Vorgänge, die bald ablaufen");
-        pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
-        pnlVorgaengeRunningOut.setCollapsed(true);
-
-        pnlVorgaengeRunningOut.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!(Boolean) evt.getNewValue()) {
-                    loadVorgaengeRunningOut();
-                } else {
-                    pnlVorgaengeRunningOut.removeAll();
-                }
-            }
-        });
-        ((Container) taskContainer).add(pnlVorgaengeRunningOut);
-
-    }
+//    protected void addAblaufendeVorgaenge() {
+//        pnlVorgaengeRunningOut = new JXTaskPane("Vorgänge, die bald ablaufen");
+//        pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+//        pnlVorgaengeRunningOut.setCollapsed(true);
+//
+//        pnlVorgaengeRunningOut.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                if (!(Boolean) evt.getNewValue()) {
+//                    loadVorgaengeRunningOut();
+//                } else {
+//                    pnlVorgaengeRunningOut.removeAll();
+//                }
+//            }
+//        });
+//        ((Container) taskContainer).add(pnlVorgaengeRunningOut);
+//
+//    }
 
     protected void addAlleVorgaenge() {
         pnlAlleVorgaenge = new JXTaskPane("Alle aktiven Vorgänge");
@@ -408,6 +423,14 @@ public class FrmVorgang extends javax.swing.JFrame {
 
     protected void loadDetails(Vorgaenge vorgang) {
         lblVorgang.setText(vorgang.getTitel() + " [" + (vorgang.getBewohner() == null ? "allgemein" : vorgang.getBewohner().getBWKennung()) + "]");
+
+        // Wenn nötig, laufende Operation abbrechen und obere Knopfreihe anzeigen.
+        if (laufendeOperation != LAUFENDE_OPERATION_NICHTS) {
+            laufendeOperation = LAUFENDE_OPERATION_NICHTS;
+            lblMessage.setText(null);
+            SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedSlow);
+        }
+
         if (btnDetails.isSelected()) {
             ignoreEvents = true;
             txtTitel.setText(vorgang.getTitel());
@@ -443,6 +466,26 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
+
+        switch (laufendeOperation) {
+            case LAUFENDE_OPERATION_BERICHT_EINGABE: {
+                VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
+                EntityTools.store(vbericht);
+                ((TMElement) tblElements.getModel()).addVBericht(vbericht);
+                splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
+                break;
+            }
+            default: {
+
+            }
+        }
+
+        lblMessage.setText(null);
+        textmessageTL.cancel();
+        SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
+        laufendeOperation = LAUFENDE_OPERATION_NICHTS;
+
+
 //        if (savePressedOnce) {
 //            btnApply.setText(null);
 //            alternatingFlash.stop();
@@ -468,44 +511,63 @@ public class FrmVorgang extends javax.swing.JFrame {
 //        loadDetails(aktuellerVorgang);
 //        setDetailsChanged(false);
 //        savePressedOnce = false;
+        switch (laufendeOperation) {
+            case LAUFENDE_OPERATION_BERICHT_EINGABE: {
+                splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
+                break;
+            }
+            default: {
+
+            }
+        }
+        lblMessage.setText(null);
+        textmessageTL.cancel();
+        SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
+        laufendeOperation = LAUFENDE_OPERATION_NICHTS;
     }
 
     private void listOwnerValueChanged(ListSelectionEvent e) {
         if (ignoreEvents) return;
+        setCenterButtons2Edit("Änderungen speichern ?");
+        laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         aktuellerVorgang.setBesitzer((Users) listOwner.getSelectedValue());
         lblEnde.setText(aktuellerVorgang.getBesitzer().getNameUndVorname());
         btnAssign.setSelected(false);
 //        split2Percent = 100;
 //        new SplitAnimator(splitPane2, split2Percent).execute();
-        setDetailsChanged(true);
+
     }
 
-    protected void setDetailsChanged(boolean changed) {
-        btnApply.setEnabled(changed);
-        btnCancel.setEnabled(changed);
-    }
 
     private void cmbKatItemStateChanged(ItemEvent e) {
         if (ignoreEvents) return;
+        setCenterButtons2Edit("Änderungen speichern ?");
+        laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         aktuellerVorgang.setKategorie((VKat) cmbKat.getSelectedItem());
-        setDetailsChanged(true);
+
     }
 
     private void jdcWVPropertyChange(PropertyChangeEvent e) {
         if (ignoreEvents) return;
+        setCenterButtons2Edit("Änderungen speichern ?");
+        laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         if (e.getPropertyName().equals("date")) {
             aktuellerVorgang.setWv(jdcWV.getDate());
-            setDetailsChanged(true);
+
         }
     }
 
     private void txtTitelCaretUpdate(CaretEvent e) {
         if (ignoreEvents) return;
+        setCenterButtons2Edit("Änderungen speichern ?");
+        laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         aktuellerVorgang.setTitel(txtTitel.getText());
-        setDetailsChanged(true);
+        lblVorgang.setText(aktuellerVorgang.getTitel());
     }
 
     private void btnPDCAPlusActionPerformed(ActionEvent e) {
+        setCenterButtons2Edit("Änderungen speichern ?");
+        laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         aktuellerVorgang.setPdca(VorgaengeTools.incPDCA(aktuellerVorgang.getPdca()));
         btnPDCAPlus.setEnabled(false);
     }
@@ -517,7 +579,7 @@ public class FrmVorgang extends javax.swing.JFrame {
         } else {
             aktuellerVorgang.setPdca(VorgaengeTools.PDCA_OFF);
         }
-        setDetailsChanged(true);
+
     }
 
     /**
@@ -576,7 +638,7 @@ public class FrmVorgang extends javax.swing.JFrame {
     private void btnTakeOverActionPerformed(ActionEvent e) {
         aktuellerVorgang.setBesitzer(OPDE.getLogin().getUser());
         lblEnde.setText(aktuellerVorgang.getBesitzer().getNameUndVorname());
-        setDetailsChanged(true);
+
     }
 
 //    private void btnDeleteActionPerformed(ActionEvent e) {
@@ -645,19 +707,28 @@ public class FrmVorgang extends javax.swing.JFrame {
             itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
 
             menu.add(new JSeparator());
-        }
 
-        menu.show(e.getComponent(), (int) p.getX(), (int) p.getY());
+            menu.show(e.getComponent(), (int) p.getX(), (int) p.getY());
+
+        }
     }
 
     private void thisComponentResized(ComponentEvent e) {
-        SYSTools.showSide(splitTableDetails, splitTDPercent);
-
-        SYSTools.showSide(splitTableEditor, splitTEPercent);
+//        splitTableEditorComponentResized(e);
+//        splitDetailsOwnerComponentResized(e);
+//        splitTableDetailsComponentResized(e);
     }
 
     private void splitDetailsOwnerComponentResized(ComponentEvent e) {
         SYSTools.showSide(splitDetailsOwner, splitDOPercent);
+    }
+
+    private void splitTableEditorComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitTableEditor, splitTEPercent);
+    }
+
+    private void splitTableDetailsComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitTableDetails, splitTDPercent);
     }
 
 
@@ -787,14 +858,14 @@ public class FrmVorgang extends javax.swing.JFrame {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, 0dlu, 117dlu, $lcgap, 316dlu:grow, 0dlu, $rgap",
-            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, default, 0dlu"));
+                "$rgap, 0dlu, 117dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, default, 0dlu, $lgap, 0dlu"));
 
         //======== scrollPane2 ========
         {
             scrollPane2.setViewportView(taskContainer);
         }
-        contentPane.add(scrollPane2, CC.xywh(3, 3, 2, 4));
+        contentPane.add(scrollPane2, CC.xywh(3, 3, 1, 4));
 
         //---- lblVorgang ----
         lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
@@ -809,6 +880,12 @@ public class FrmVorgang extends javax.swing.JFrame {
             splitTableDetails.setEnabled(false);
             splitTableDetails.setDividerSize(0);
             splitTableDetails.setDoubleBuffered(true);
+            splitTableDetails.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    splitTableDetailsComponentResized(e);
+                }
+            });
 
             //======== splitTableEditor ========
             {
@@ -816,6 +893,12 @@ public class FrmVorgang extends javax.swing.JFrame {
                 splitTableEditor.setDividerLocation(300);
                 splitTableEditor.setDividerSize(0);
                 splitTableEditor.setEnabled(false);
+                splitTableEditor.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        splitTableEditorComponentResized(e);
+                    }
+                });
 
                 //======== jspElements ========
                 {
@@ -828,19 +911,20 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ) {
-                        Class<?>[] columnTypes = new Class<?>[] {
-                            Object.class, Object.class, Object.class, Object.class
+                        Class<?>[] columnTypes = new Class<?>[]{
+                                Object.class, Object.class, Object.class, Object.class
                         };
+
                         @Override
                         public Class<?> getColumnClass(int columnIndex) {
                             return columnTypes[columnIndex];
@@ -874,38 +958,38 @@ public class FrmVorgang extends javax.swing.JFrame {
                 //======== pnlDetails ========
                 {
                     pnlDetails.setLayout(new FormLayout(
-                        "70dlu, $lcgap, default:grow, 2*($lcgap, default)",
-                        "8*(fill:default, $lgap), fill:default"));
+                            "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
+                            "0dlu, 9*($lgap, fill:default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");
-                    pnlDetails.add(label1, CC.xywh(1, 1, 2, 1));
+                    pnlDetails.add(label1, CC.xywh(3, 3, 2, 1));
 
                     //---- lblBW ----
                     lblBW.setText("Allgemeiner Vorgang");
                     lblBW.setFont(new Font("Lucida Grande", Font.BOLD, 16));
                     lblBW.setForeground(Color.blue);
-                    pnlDetails.add(lblBW, CC.xywh(3, 3, 5, 1));
+                    pnlDetails.add(lblBW, CC.xywh(5, 5, 5, 1));
 
                     //---- label2 ----
                     label2.setText("Erstellt am");
-                    pnlDetails.add(label2, CC.xywh(1, 5, 2, 1));
+                    pnlDetails.add(label2, CC.xywh(3, 7, 2, 1));
 
                     //---- label3 ----
                     label3.setText("Wiedervorlage");
-                    pnlDetails.add(label3, CC.xywh(1, 7, 2, 1));
+                    pnlDetails.add(label3, CC.xywh(3, 9, 2, 1));
 
                     //---- label4 ----
                     label4.setText("Abgeschlossen am");
-                    pnlDetails.add(label4, CC.xywh(1, 9, 2, 1));
+                    pnlDetails.add(label4, CC.xywh(3, 11, 2, 1));
 
                     //---- label5 ----
                     label5.setText("Erstellt von");
-                    pnlDetails.add(label5, CC.xywh(1, 11, 2, 1));
+                    pnlDetails.add(label5, CC.xywh(3, 13, 2, 1));
 
                     //---- label6 ----
                     label6.setText("Wird bearbeitet von");
-                    pnlDetails.add(label6, CC.xywh(1, 13, 2, 1));
+                    pnlDetails.add(label6, CC.xywh(3, 15, 2, 1));
 
                     //---- cbPDCA ----
                     cbPDCA.setText("PDCA Zyklus");
@@ -916,7 +1000,7 @@ public class FrmVorgang extends javax.swing.JFrame {
                             cbPDCAItemStateChanged(e);
                         }
                     });
-                    pnlDetails.add(cbPDCA, CC.xy(1, 17));
+                    pnlDetails.add(cbPDCA, CC.xy(3, 19));
 
                     //---- txtTitel ----
                     txtTitel.setFont(new Font("Lucida Grande", Font.BOLD, 16));
@@ -926,27 +1010,27 @@ public class FrmVorgang extends javax.swing.JFrame {
                             txtTitelCaretUpdate(e);
                         }
                     });
-                    pnlDetails.add(txtTitel, CC.xywh(3, 1, 5, 1));
+                    pnlDetails.add(txtTitel, CC.xywh(5, 3, 5, 1));
 
                     //---- lblStart ----
                     lblStart.setText("15.05.2011");
                     lblStart.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblStart, CC.xywh(3, 5, 5, 1));
+                    pnlDetails.add(lblStart, CC.xywh(5, 7, 5, 1));
 
                     //---- lblEnde ----
                     lblEnde.setText("noch nicht abgeschlossen");
                     lblEnde.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblEnde, CC.xywh(3, 9, 5, 1));
+                    pnlDetails.add(lblEnde, CC.xywh(5, 11, 5, 1));
 
                     //---- lblCreator ----
                     lblCreator.setText("text");
                     lblCreator.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblCreator, CC.xywh(3, 11, 5, 1));
+                    pnlDetails.add(lblCreator, CC.xywh(5, 13, 5, 1));
 
                     //---- lblOwner ----
                     lblOwner.setText("text");
                     lblOwner.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblOwner, CC.xy(3, 13));
+                    pnlDetails.add(lblOwner, CC.xy(5, 15));
 
                     //---- jdcWV ----
                     jdcWV.setFont(new Font("Lucida Grande", Font.BOLD, 16));
@@ -956,7 +1040,7 @@ public class FrmVorgang extends javax.swing.JFrame {
                             jdcWVPropertyChange(e);
                         }
                     });
-                    pnlDetails.add(jdcWV, CC.xywh(3, 7, 5, 1));
+                    pnlDetails.add(jdcWV, CC.xywh(5, 9, 5, 1));
 
                     //---- btnTakeOver ----
                     btnTakeOver.setFont(new Font("Lucida Grande", Font.BOLD, 14));
@@ -968,7 +1052,7 @@ public class FrmVorgang extends javax.swing.JFrame {
                             btnTakeOverActionPerformed(e);
                         }
                     });
-                    pnlDetails.add(btnTakeOver, CC.xy(5, 13));
+                    pnlDetails.add(btnTakeOver, CC.xy(7, 15));
 
                     //---- btnAssign ----
                     btnAssign.setFont(new Font("Lucida Grande", Font.BOLD, 14));
@@ -981,7 +1065,7 @@ public class FrmVorgang extends javax.swing.JFrame {
                             btnAssignItemStateChanged(e);
                         }
                     });
-                    pnlDetails.add(btnAssign, CC.xy(7, 13));
+                    pnlDetails.add(btnAssign, CC.xy(9, 15));
 
                     //---- cmbKat ----
                     cmbKat.setFont(new Font("Lucida Grande", Font.BOLD, 14));
@@ -998,12 +1082,12 @@ public class FrmVorgang extends javax.swing.JFrame {
                             cmbKatFocusGained(e);
                         }
                     });
-                    pnlDetails.add(cmbKat, CC.xywh(3, 15, 5, 1));
+                    pnlDetails.add(cmbKat, CC.xywh(5, 17, 5, 1));
 
                     //---- lblPDCA ----
                     lblPDCA.setText("Plan");
                     lblPDCA.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblPDCA, CC.xywh(3, 17, 3, 1));
+                    pnlDetails.add(lblPDCA, CC.xywh(5, 19, 3, 1));
 
                     //---- btnPDCAPlus ----
                     btnPDCAPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/addgreanbuble.png")));
@@ -1014,7 +1098,7 @@ public class FrmVorgang extends javax.swing.JFrame {
                             btnPDCAPlusActionPerformed(e);
                         }
                     });
-                    pnlDetails.add(btnPDCAPlus, CC.xy(7, 17));
+                    pnlDetails.add(btnPDCAPlus, CC.xy(9, 19));
                 }
                 splitDetailsOwner.setLeftComponent(pnlDetails);
 
@@ -1126,13 +1210,11 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                 //---- btnApply ----
                 btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                btnApply.setEnabled(false);
                 btnApply.setToolTipText("\u00c4nderungen sichern");
                 btnApply.setFont(new Font("Lucida Grande", Font.BOLD, 14));
                 btnApply.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        btnApplyActionPerformed(e);
                         btnApplyActionPerformed(e);
                     }
                 });
@@ -1148,7 +1230,6 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                 //---- btnCancel ----
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                btnCancel.setEnabled(false);
                 btnCancel.setToolTipText("\u00c4nderungen verwerfen");
                 btnCancel.addActionListener(new ActionListener() {
                     @Override
@@ -1196,33 +1277,18 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     private void btnAddBerichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBerichtActionPerformed
+        laufendeOperation = LAUFENDE_OPERATION_BERICHT_EINGABE;
+        pnlEditor.setHTML(null);
 
+        if (splitTDPercent < 1.0d) {
+            splitTDPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedFast);
+        }
 
-//        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
-//            alternatingFlash.stop();
-//            btnAddBericht.setText(null);
-//            alternatingFlash = null;
-//            VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
-//            EntityTools.store(vbericht);
-//            splitTEPercent = 100;
-//            new SplitAnimator(splitTableEditor, splitTEPercent).execute();
-//            //btnDetails.setSelected(false);
-//            loadTable(aktuellerVorgang);
-//        } else {
-//
-//            pnlEditor.setHTML(null);
-//            splitTEPercent = 50;
-//            new SplitAnimator(splitTableEditor, splitTEPercent).execute();
-//            btnAddBericht.setText("Bericht speichern");
-//
-//            alternatingFlash = new ComponentAlternatingFlash(btnAddBericht, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-//            alternatingFlash.execute();
-//        }
-//
-//        setLowerMiddleButtons(savePressedOnce);
-//        btnAddBericht.setEnabled(true);
-//
-//        savePressedOnce = !savePressedOnce;
+        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.5d, speedSlow);
+        textmessageTL = SYSTools.flashLabel(lblMessage, "Bericht speichern ?");
+        SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
+
+        pnlEditor.requestFocus();
 
     }//GEN-LAST:event_btnAddBerichtActionPerformed
 
@@ -1239,6 +1305,12 @@ public class FrmVorgang extends javax.swing.JFrame {
 
     }
 
+    protected void setCenterButtons2Edit(String text) {
+        if (laufendeOperation == LAUFENDE_OPERATION_NICHTS) {
+            textmessageTL = SYSTools.flashLabel(lblMessage, text);
+            SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane scrollPane2;

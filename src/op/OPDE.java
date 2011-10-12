@@ -329,6 +329,9 @@ public class OPDE {
         Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .op Verzeichnis befindet.").create("k");
         opts.addOption(konfigdir);
 
+
+        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription("Setzt eine alternative URL zur Datenbank fest. Ersetzt die Angaben in der local.properties.").create("j"));
+
         Option dfnimport = OptionBuilder //.withArgName("datum")
                 .withLongOpt("dfnimport") //.hasOptionalArg()
                 .withDescription("Startet OPDE im DFNImport Modus für den aktuellen Tag.").create("d");
@@ -421,7 +424,7 @@ public class OPDE {
 
         loadLocalProperties();
 
-        animation = localProps.contains("animation") && localProps.getProperty("animation").equals("true");
+        animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
         logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
 
@@ -433,20 +436,21 @@ public class OPDE {
             logger.setLevel(Level.INFO);
         }
 
-        if (isDebug()) {
-            url = "jdbc:mysql://" + localProps.getProperty("devdbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbdevcat");
-        } else {
-            url = "jdbc:mysql://" + localProps.getProperty("dbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbcat");
-        }
+//        if (isDebug()) {
+//            url = "jdbc:mysql://" + localProps.getProperty("devdbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbdevcat");
+//        } else {
+//            url = "jdbc:mysql://" + localProps.getProperty("dbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbcat");
+//        }
 
         Properties jpaProps = new Properties();
-        // Für JPA 2.0
+        jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
+        jpaProps.put("javax.persistence.jdbc.password", localProps.getProperty("javax.persistence.jdbc.password"));
+        jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
+        url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
         jpaProps.put("javax.persistence.jdbc.url", url);
-        jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("dbuser"));
-        jpaProps.put("javax.persistence.jdbc.password", localProps.getProperty("dbpw"));
-        jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("jdbcdriver"));
 
         em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
+
         host = SYSHostsTools.getHost(OPDE.getLocalProps().getProperty("hostkey"));
 
         if (host == null) {

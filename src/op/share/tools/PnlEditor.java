@@ -50,6 +50,12 @@ public class PnlEditor extends JPanel {
         setHTML(html);
     }
 
+    @Override
+    public void requestFocus() {
+        super.requestFocus();
+        textComp.requestFocus();
+    }
+
     protected void createButtons() {
         //myToolbar.add(openAction);
         //myToolbar.add(saveAction);

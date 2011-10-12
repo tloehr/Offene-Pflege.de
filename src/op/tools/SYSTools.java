@@ -792,8 +792,8 @@ public class SYSTools {
      * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten PK aus. Wurde
      * entwickelt für Comboboxen mit einem Modell aus der RS2CMB Methode.
      *
-     * @param j die gesetzt werden soll
-     * @param pk      gesuchter PK
+     * @param j  die gesetzt werden soll
+     * @param pk gesuchter PK
      */
     public static void selectInComboBox(JComboBox j, long pk) {
         ComboBoxModel cbm = (ComboBoxModel) j.getModel();
@@ -1498,6 +1498,7 @@ public class SYSTools {
 
     /**
      * Setzt eine Split Pane (animiert oder nicht animiert) auf eine entsprechende Position (Prozentual zwischen 0 und 1)
+     *
      * @param split
      * @param pos
      * @param speedInMillis
@@ -1667,6 +1668,15 @@ public class SYSTools {
         timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
         timeline1.setDuration(500);
         timeline1.play();
+    }
+
+    public static Timeline flashLabel(JLabel lbl, String text) {
+        lbl.setText(text);
+        Timeline textmessageTL = new Timeline(lbl);
+        textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), Color.red);
+        textmessageTL.setDuration(600);
+        textmessageTL.playLoop(Timeline.RepeatBehavior.REVERSE);
+        return textmessageTL;
     }
 
     public static void fadeinout(JLabel lbl, String text) {

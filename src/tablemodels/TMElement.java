@@ -124,6 +124,11 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
         }
     }
 
+    public void addVBericht(VBericht vbericht){
+        mymodel.add(vbericht);
+        fireTableRowsInserted(mymodel.size()-1, mymodel.size());
+    }
+
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == COL_OPERATIONS;
