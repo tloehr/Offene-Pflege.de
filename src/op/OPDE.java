@@ -55,8 +55,6 @@ public class OPDE {
     //public static String UKennung; // Zuer Zeit angemeldeter Benutzer.
     //public static char[] UPW;
     public static OPMain ocmain;
-    protected static String dbuser = ""; // Wird nur für den dfnimport gebraucht.
-    protected static String dbpw = ""; // Wird nur für den dfnimport gebraucht.
     protected static String url;
     //public static long ocloginid;
     protected static Properties props;
@@ -166,10 +164,15 @@ public class OPDE {
         return logger;
     }
 
+    /**
+     * Diese initDB() Methode wird verschwinden, sobald ich ganz auf JPA umgestellt habe.
+     * @throws SQLException
+     */
     public static void initDB() throws SQLException {
         if (db != null) return;
+        String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
+        String dbpw = localProps.getProperty("javax.persistence.jdbc.password");
         db = new Database(url, dbuser, dbpw.toCharArray());
-
     }
 
     public static void warn(Object message) {
@@ -531,14 +534,6 @@ public class OPDE {
             //localProps.put("debug", OCDEBUG);
 
             in.close();
-
-            if (localProps.getProperty("dbuser") != null) {
-                dbuser = localProps.getProperty("dbuser");
-            }
-            if (localProps.getProperty("dbpw") != null) {
-                dbpw = localProps.getProperty("dbpw");
-            }
-
         } catch (FileNotFoundException ex) {
             // Keine local.properties. Nicht gut....
             logger.fatal(localProps.getProperty("opwd") + sep + "local.properties existiert nicht. Bitte legen Sie diese Datei an.");

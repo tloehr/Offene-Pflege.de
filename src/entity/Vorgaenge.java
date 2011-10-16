@@ -15,13 +15,14 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "vorgaenge")
+@Table(name = "Vorgaenge")
 @NamedQueries({
         @NamedQuery(name = "Vorgaenge.findAll", query = "SELECT v FROM Vorgaenge v "),
         @NamedQuery(name = "Vorgaenge.findAllActiveSorted", query = "SELECT v FROM Vorgaenge v WHERE v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
         @NamedQuery(name = "Vorgaenge.findByVorgangID", query = "SELECT v FROM Vorgaenge v WHERE v.vorgangID = :vorgangID"),
         @NamedQuery(name = "Vorgaenge.findByTitel", query = "SELECT v FROM Vorgaenge v WHERE v.titel = :titel"),
         @NamedQuery(name = "Vorgaenge.findActiveByBesitzer", query = "SELECT v FROM Vorgaenge v WHERE v.besitzer = :besitzer AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
+        @NamedQuery(name = "Vorgaenge.findInactiveByBesitzer", query = "SELECT v FROM Vorgaenge v WHERE v.besitzer = :besitzer AND v.bis < '9999-12-31 23:59:59' ORDER BY v.titel"),
         @NamedQuery(name = "Vorgaenge.findActiveByBW", query = "SELECT v FROM Vorgaenge v WHERE v.bewohner = :bewohner AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
         @NamedQuery(name = "Vorgaenge.findActiveRunningOut", query = "SELECT v FROM Vorgaenge v WHERE v.bis = '9999-12-31 23:59:59' AND v.wv <= :wv ORDER BY v.wv"),
         @NamedQuery(name = "Vorgaenge.findByVon", query = "SELECT v FROM Vorgaenge v WHERE v.von = :von"),
@@ -53,7 +54,7 @@ public class Vorgaenge implements Serializable {
     private Date bis;
     @Basic(optional = false)
     @Column(name = "PDCA")
-    private int pdca;
+    private short pdca;
     @JoinColumn(name = "Ersteller", referencedColumnName = "UKennung")
     @ManyToOne
     private Users ersteller;
@@ -144,11 +145,11 @@ public class Vorgaenge implements Serializable {
         this.bis = bis;
     }
 
-    public int getPdca() {
+    public short getPdca() {
         return pdca;
     }
 
-    public void setPdca(int pdca) {
+    public void setPdca(short pdca) {
         this.pdca = pdca;
     }
 

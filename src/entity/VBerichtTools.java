@@ -23,7 +23,8 @@ public class VBerichtTools {
     public static final short VBERICHT_ART_REOPEN = 6;
     public static final short VBERICHT_ART_EDIT = 7;
     public static final short VBERICHT_ART_WV = 8;
-    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
+    public static final short VBERICHT_ART_PDCA = 9;
+    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt", "SYS PDCA Stufe erhöht"};
 
     public static String getBerichtAsHTML(VBericht bericht) {
         String html = "";
@@ -42,7 +43,7 @@ public class VBerichtTools {
         if (bericht.getArt() != VBERICHT_ART_USER) {
             html += "<font color=\"blue\">";
         }
-        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
+        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname() + " ["+VorgaengeTools.PDCA[bericht.getPdca()]+"]";
         if (bericht.getArt() != VBERICHT_ART_USER) {
             html += "</font>";
         }

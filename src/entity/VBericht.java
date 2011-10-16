@@ -15,7 +15,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "vbericht")
+@Table(name = "VBericht")
 @NamedQueries({
         @NamedQuery(name = "VBericht.findAll", query = "SELECT v FROM VBericht v"),
         @NamedQuery(name = "VBericht.findByVbid", query = "SELECT v FROM VBericht v WHERE v.vbid = :vbid"),

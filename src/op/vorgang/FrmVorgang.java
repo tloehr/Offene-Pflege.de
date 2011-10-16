@@ -64,8 +64,8 @@ public class FrmVorgang extends javax.swing.JFrame {
     protected JPopupMenu menu;
     protected JFrame myFrame;
     protected double splitTDPercent, splitDOPercent, splitTEPercent;
-    protected JXTaskPane pnlMyVorgaenge, pnlAlleVorgaenge, pnlVorgaengeRunningOut, pnlVorgaengeByBW, pnlVorgaengeByMA;
-    protected boolean savePressedOnce = false, detailsChanged = false, ignoreEvents = false;
+    protected JXTaskPane pnlMyVorgaenge, pnlMeineAltenVorgaenge, pnlAlleVorgaenge, pnlVorgaengeRunningOut, pnlVorgaengeByBW, pnlVorgaengeByMA;
+    protected boolean pdcaChanged = false, ignoreEvents = false;
     //protected IconFlash iconflasher;
     protected JComboBox cmbBW, cmbMA;
     protected TableColumn delColumn;
@@ -118,7 +118,8 @@ public class FrmVorgang extends javax.swing.JFrame {
             }
         });
 
-        addMyVorgaenge();
+        addMeineVorgaenge();
+        addMeineAbgelaufenenVorgaenge();
         //addAlleVorgaenge();
         addVorgaengeFuerBW();
 
@@ -144,24 +145,45 @@ public class FrmVorgang extends javax.swing.JFrame {
         ignoreEvents = false;
     }
 
-//    protected void addAblaufendeVorgaenge() {
-//        pnlVorgaengeRunningOut = new JXTaskPane("Vorgänge, die bald ablaufen");
-//        pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
-//        pnlVorgaengeRunningOut.setCollapsed(true);
-//
-//        pnlVorgaengeRunningOut.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
-//            @Override
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                if (!(Boolean) evt.getNewValue()) {
-//                    loadVorgaengeRunningOut();
-//                } else {
-//                    pnlVorgaengeRunningOut.removeAll();
-//                }
-//            }
-//        });
-//        ((Container) taskContainer).add(pnlVorgaengeRunningOut);
-//
-//    }
+    protected void addAblaufendeVorgaenge() {
+        pnlVorgaengeRunningOut = new JXTaskPane("Vorgänge, die bald ablaufen");
+        pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+        pnlVorgaengeRunningOut.setCollapsed(true);
+
+        pnlVorgaengeRunningOut.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(Boolean) evt.getNewValue()) {
+                    loadVorgaengeRunningOut();
+                } else {
+                    pnlVorgaengeRunningOut.removeAll();
+                }
+            }
+        });
+        ((Container) taskContainer).add(pnlVorgaengeRunningOut);
+
+    }
+
+
+    protected void addMeineAbgelaufenenVorgaenge() {
+        pnlMeineAltenVorgaenge = new JXTaskPane("Meine alten Vorgänge");
+        //pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+        pnlMeineAltenVorgaenge.setCollapsed(true);
+
+        pnlMeineAltenVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(Boolean) evt.getNewValue()) {
+                    loadMeineInaktivenVorgaenge();
+                } else {
+                    pnlMeineAltenVorgaenge.removeAll();
+                }
+            }
+        });
+        ((Container) taskContainer).add(pnlMeineAltenVorgaenge);
+
+    }
+
 
     protected void addAlleVorgaenge() {
         pnlAlleVorgaenge = new JXTaskPane("Alle aktiven Vorgänge");
@@ -318,41 +340,27 @@ public class FrmVorgang extends javax.swing.JFrame {
 
     }
 
-    protected void addMyVorgaenge() {
-        pnlMyVorgaenge = new JXTaskPane();
+    protected void addMeineVorgaenge() {
+        pnlMyVorgaenge = new JXTaskPane("Meine alten Vorgänge");
         pnlMyVorgaenge.setSpecial(true);
         pnlMyVorgaenge.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/identity.png")));
-        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBesitzer");
-        query.setParameter("besitzer", OPDE.getLogin().getUser());
-        ArrayList<Vorgaenge> byBesitzer = new ArrayList(query.getResultList());
+        //pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+        pnlMyVorgaenge.setCollapsed(false);
+        loadMeineVorgaenge();
 
-        Iterator<Vorgaenge> it = byBesitzer.iterator();
-
-        while (it.hasNext()) {
-
-            final Vorgaenge innervorgang = it.next();
-
-            pnlMyVorgaenge.add(new AbstractAction() {
-
-                {
-                    String titel = innervorgang.getTitel();
-                    if (innervorgang.getBewohner() != null) {
-                        titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
-                    }
-                    putValue(Action.NAME, titel);
+        pnlMyVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(Boolean) evt.getNewValue()) {
+                    loadMeineVorgaenge();
+                } else {
+                    pnlMyVorgaenge.removeAll();
                 }
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    loadTable(innervorgang);
-                    loadDetails(innervorgang);
-                }
-            });
-
-        }
-        pnlMyVorgaenge.setTitle("Meine Vorgänge (" + byBesitzer.size() + ")");
+            }
+        });
         ((Container) taskContainer).add(pnlMyVorgaenge);
     }
+
 
     protected void loadAllVorgaenge() {
 
@@ -416,6 +424,74 @@ public class FrmVorgang extends javax.swing.JFrame {
         }
     }
 
+    protected void loadMeineVorgaenge() {
+
+        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBesitzer");
+        query.setParameter("besitzer", OPDE.getLogin().getUser());
+        ArrayList<Vorgaenge> byBesitzer = new ArrayList(query.getResultList());
+
+        Iterator<Vorgaenge> it = byBesitzer.iterator();
+
+        while (it.hasNext()) {
+
+            final Vorgaenge innervorgang = it.next();
+
+            pnlMyVorgaenge.add(new AbstractAction() {
+
+                {
+                    String titel = innervorgang.getTitel();
+                    if (innervorgang.getBewohner() != null) {
+                        titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
+                    }
+                    putValue(Action.NAME, titel);
+                    putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    loadTable(innervorgang);
+                    if (btnDetails.isSelected()) {
+                        loadDetails(innervorgang);
+                    }
+                }
+            });
+
+        }
+        pnlMyVorgaenge.setTitle("Meine Vorgänge (" + byBesitzer.size() + ")");
+    }
+
+    protected void loadMeineInaktivenVorgaenge() {
+
+        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findInactiveByBesitzer");
+        query.setParameter("besitzer", OPDE.getLogin().getUser());
+
+        ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
+
+        Iterator<Vorgaenge> it = vorgaenge.iterator();
+
+        while (it.hasNext()) {
+            final Vorgaenge innervorgang = it.next();
+            pnlMeineAltenVorgaenge.add(new AbstractAction() {
+                {
+                    putValue(Action.NAME, innervorgang.getTitel());
+                    putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    loadTable(innervorgang);
+                    if (btnDetails.isSelected()) {
+                        loadDetails(innervorgang);
+                    }
+                }
+            });
+
+        }
+
+        pnlMeineAltenVorgaenge.setTitle("Meine alten Vorgänge (" + vorgaenge.size() + ")");
+
+    }
+
     @Override
     public void dispose() {
         super.dispose();
@@ -442,8 +518,6 @@ public class FrmVorgang extends javax.swing.JFrame {
             lblOwner.setText(vorgang.getBesitzer().getNameUndVorname());
             cmbKat.setSelectedItem(vorgang.getKategorie());
             lblPDCA.setText(VorgaengeTools.PDCA[vorgang.getPdca()]);
-            cbPDCA.setSelected(vorgang.getPdca() != VorgaengeTools.PDCA_OFF);
-            btnPDCAPlus.setEnabled(cbPDCA.isSelected());
             listOwner.setSelectedValue(vorgang.getBesitzer(), true);
 
             // ACLs
@@ -473,6 +547,27 @@ public class FrmVorgang extends javax.swing.JFrame {
                 EntityTools.store(vbericht);
                 ((TMElement) tblElements.getModel()).addVBericht(vbericht);
                 splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
+                break;
+            }
+            case LAUFENDE_OPERATION_VORGANG_BEARBEITEN: {
+
+                try {
+                    OPDE.getEM().getTransaction().begin();
+                    if (pdcaChanged) {
+                        VBericht vbericht = new VBericht("PDCA Stufe erhöht auf: " + VorgaengeTools.PDCA[aktuellerVorgang.getPdca()], VBerichtTools.VBERICHT_ART_PDCA, aktuellerVorgang);
+                        vbericht.setPdca(aktuellerVorgang.getPdca());
+                        OPDE.getEM().persist(vbericht);
+                    }
+                    OPDE.getEM().merge(aktuellerVorgang);
+                    OPDE.getEM().getTransaction().commit();
+                } catch (Exception exc) {
+                    OPDE.fatal(exc.getMessage());
+                    OPDE.getEM().getTransaction().rollback();
+                }
+
+                pdcaChanged = false;
+                btnPDCAPlus.setEnabled(true);
+
                 break;
             }
             default: {
@@ -514,6 +609,12 @@ public class FrmVorgang extends javax.swing.JFrame {
         switch (laufendeOperation) {
             case LAUFENDE_OPERATION_BERICHT_EINGABE: {
                 splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
+                break;
+            }
+            case LAUFENDE_OPERATION_VORGANG_BEARBEITEN: {
+                btnPDCAPlus.setEnabled(true);
+                OPDE.getEM().refresh(aktuellerVorgang);
+                loadDetails(aktuellerVorgang);
                 break;
             }
             default: {
@@ -570,16 +671,7 @@ public class FrmVorgang extends javax.swing.JFrame {
         laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         aktuellerVorgang.setPdca(VorgaengeTools.incPDCA(aktuellerVorgang.getPdca()));
         btnPDCAPlus.setEnabled(false);
-    }
-
-    private void cbPDCAItemStateChanged(ItemEvent e) {
-        if (ignoreEvents) return;
-        if (cbPDCA.isSelected()) {
-            aktuellerVorgang.setPdca(VorgaengeTools.PDCA_PLAN);
-        } else {
-            aktuellerVorgang.setPdca(VorgaengeTools.PDCA_OFF);
-        }
-
+        pdcaChanged = true;
     }
 
     /**
@@ -606,32 +698,31 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     private void btnEndReactivateActionPerformed(ActionEvent e) {
-//        if (savePressedOnce) { // Wurde bereits einmal gedrückt. Also ist das hier die Bestätigung.
-//            alternatingFlash.stop();
-//            ((JButton) alternatingFlash.getComp1()).setText(null);
-//            alternatingFlash = null;
-//
-//            if (aktuellerVorgang.isAbgeschlossen()) {
-//                VorgaengeTools.reopenVorgang(aktuellerVorgang);
-//                new TextFlash(lblMessage, "Vorgang wieder geöffnet", true, false, 600).execute();
-//                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
-//                btnEndReactivate.setToolTipText("Vorgang abschließen");
-//            } else {
-//                VorgaengeTools.endVorgang(aktuellerVorgang);
-//                new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 600).execute();
-//                btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
-//                btnEndReactivate.setToolTipText("Vorgang wieder öffnen");
-//            }
-//        } else {
-//            btnEndReactivate.setText("WIRKLICH ?");
-//            alternatingFlash = new ComponentAlternatingFlash(btnEndReactivate, btnCancel1, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-//            alternatingFlash.execute();
-//        }
-//
-//        setLowerMiddleButtons(savePressedOnce);
-//        btnEndReactivate.setEnabled(!savePressedOnce);
-//
-//        savePressedOnce = !savePressedOnce;
+        if (aktuellerVorgang.isAbgeschlossen()) {
+            VorgaengeTools.reopenVorgang(aktuellerVorgang);
+            //new TextFlash(lblMessage, "Vorgang wieder geöffnet", true, false, 600).execute();
+            btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
+            btnEndReactivate.setToolTipText("Vorgang abschließen");
+
+        } else {
+            VorgaengeTools.endVorgang(aktuellerVorgang);
+            //new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 600).execute();
+            btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
+            btnEndReactivate.setToolTipText("Vorgang wieder aktivieren");
+
+        }
+
+        if (!pnlMyVorgaenge.isCollapsed()) {
+            pnlMyVorgaenge.removeAll();
+            loadMeineVorgaenge();
+        }
+
+        if (!pnlMeineAltenVorgaenge.isCollapsed()) {
+            pnlMeineAltenVorgaenge.removeAll();
+            loadMeineInaktivenVorgaenge();
+        }
+
+
     }
 
 
@@ -739,6 +830,8 @@ public class FrmVorgang extends javax.swing.JFrame {
             tblElements.setModel(new DefaultTableModel());
         } else {
 
+            lblVorgang.setText(vorgang.getTitel() + " [" + (vorgang.getBewohner() == null ? "allgemein" : vorgang.getBewohner().getBWKennung()) + "]");
+
             List<VorgangElement> elements = new ArrayList<VorgangElement>(VorgaengeTools.findElementeByVorgang(vorgang, btnSystemInfo.isSelected()));
 
             tblElements.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -772,8 +865,10 @@ public class FrmVorgang extends javax.swing.JFrame {
 
             if (aktuellerVorgang.isAbgeschlossen()) {
                 btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
+                btnEndReactivate.setToolTipText("Vorgang wieder aktivieren");
             } else {
                 btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
+                btnEndReactivate.setToolTipText("Vorgang abschließen");
             }
 
 
@@ -818,7 +913,6 @@ public class FrmVorgang extends javax.swing.JFrame {
         label4 = new JLabel();
         label5 = new JLabel();
         label6 = new JLabel();
-        cbPDCA = new JCheckBox();
         txtTitel = new JTextField();
         lblStart = new JLabel();
         lblEnde = new JLabel();
@@ -827,7 +921,9 @@ public class FrmVorgang extends javax.swing.JFrame {
         jdcWV = new JDateChooser();
         btnTakeOver = new JButton();
         btnAssign = new JToggleButton();
+        label7 = new JLabel();
         cmbKat = new JComboBox();
+        label8 = new JLabel();
         lblPDCA = new JLabel();
         btnPDCAPlus = new JButton();
         scrollPane1 = new JScrollPane();
@@ -858,14 +954,14 @@ public class FrmVorgang extends javax.swing.JFrame {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "$rgap, 0dlu, 117dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
-                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, default, 0dlu, $lgap, 0dlu"));
+            "$rgap, 0dlu, 148dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
 
         //======== scrollPane2 ========
         {
             scrollPane2.setViewportView(taskContainer);
         }
-        contentPane.add(scrollPane2, CC.xywh(3, 3, 1, 4));
+        contentPane.add(scrollPane2, CC.xywh(3, 3, 1, 3));
 
         //---- lblVorgang ----
         lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
@@ -911,20 +1007,19 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ) {
-                        Class<?>[] columnTypes = new Class<?>[]{
-                                Object.class, Object.class, Object.class, Object.class
+                        Class<?>[] columnTypes = new Class<?>[] {
+                            Object.class, Object.class, Object.class, Object.class
                         };
-
                         @Override
                         public Class<?> getColumnClass(int columnIndex) {
                             return columnTypes[columnIndex];
@@ -958,8 +1053,8 @@ public class FrmVorgang extends javax.swing.JFrame {
                 //======== pnlDetails ========
                 {
                     pnlDetails.setLayout(new FormLayout(
-                            "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
-                            "0dlu, 9*($lgap, fill:default)"));
+                        "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
+                        "0dlu, 9*($lgap, fill:default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");
@@ -990,17 +1085,6 @@ public class FrmVorgang extends javax.swing.JFrame {
                     //---- label6 ----
                     label6.setText("Wird bearbeitet von");
                     pnlDetails.add(label6, CC.xywh(3, 15, 2, 1));
-
-                    //---- cbPDCA ----
-                    cbPDCA.setText("PDCA Zyklus");
-                    cbPDCA.setEnabled(false);
-                    cbPDCA.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            cbPDCAItemStateChanged(e);
-                        }
-                    });
-                    pnlDetails.add(cbPDCA, CC.xy(3, 19));
 
                     //---- txtTitel ----
                     txtTitel.setFont(new Font("Lucida Grande", Font.BOLD, 16));
@@ -1067,6 +1151,10 @@ public class FrmVorgang extends javax.swing.JFrame {
                     });
                     pnlDetails.add(btnAssign, CC.xy(9, 15));
 
+                    //---- label7 ----
+                    label7.setText("Geh\u00f6rt zu:");
+                    pnlDetails.add(label7, CC.xy(3, 17));
+
                     //---- cmbKat ----
                     cmbKat.setFont(new Font("Lucida Grande", Font.BOLD, 14));
                     cmbKat.setToolTipText("Kategorie des Vorgangs");
@@ -1083,6 +1171,10 @@ public class FrmVorgang extends javax.swing.JFrame {
                         }
                     });
                     pnlDetails.add(cmbKat, CC.xywh(5, 17, 5, 1));
+
+                    //---- label8 ----
+                    label8.setText("PDCA Zyklus");
+                    pnlDetails.add(label8, CC.xy(3, 19));
 
                     //---- lblPDCA ----
                     lblPDCA.setText("Plan");
@@ -1141,7 +1233,7 @@ public class FrmVorgang extends javax.swing.JFrame {
         {
             splitButtonsCenter.setOrientation(JSplitPane.VERTICAL_SPLIT);
             splitButtonsCenter.setDividerSize(0);
-            splitButtonsCenter.setDividerLocation(30);
+            splitButtonsCenter.setDividerLocation(35);
 
             //======== panel5 ========
             {
@@ -1330,7 +1422,6 @@ public class FrmVorgang extends javax.swing.JFrame {
     private JLabel label4;
     private JLabel label5;
     private JLabel label6;
-    private JCheckBox cbPDCA;
     private JTextField txtTitel;
     private JLabel lblStart;
     private JLabel lblEnde;
@@ -1339,7 +1430,9 @@ public class FrmVorgang extends javax.swing.JFrame {
     private JDateChooser jdcWV;
     private JButton btnTakeOver;
     private JToggleButton btnAssign;
+    private JLabel label7;
     private JComboBox cmbKat;
+    private JLabel label8;
     private JLabel lblPDCA;
     private JButton btnPDCAPlus;
     private JScrollPane scrollPane1;

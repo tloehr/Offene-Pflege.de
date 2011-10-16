@@ -33,6 +33,7 @@ import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
+import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import org.pushingpixels.trident.ease.Spline;
 
 import javax.persistence.Query;
@@ -1670,12 +1671,34 @@ public class SYSTools {
         timeline1.play();
     }
 
-    public static Timeline flashLabel(JLabel lbl, String text) {
+    public static Timeline flashLabel(JLabel lbl1, String text) {
+        return flashLabel(lbl1, text, 0);
+    }
+
+    public static Timeline flashLabel(JLabel lbl1, String text, int times) {
+        final JLabel lbl = lbl1;
         lbl.setText(text);
         Timeline textmessageTL = new Timeline(lbl);
         textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), Color.red);
         textmessageTL.setDuration(600);
-        textmessageTL.playLoop(Timeline.RepeatBehavior.REVERSE);
+
+        textmessageTL.addCallback(new TimelineCallbackAdapter() {
+            @Override
+            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+                if (newState == Timeline.TimelineState.CANCELLED) {
+                    lbl.setForeground(Color.black);
+                    //OPDE.debug("textmessageTL cancelled. Label foreground set to black.");
+                }
+            }
+        });
+
+
+        if (times == 0) {
+            textmessageTL.playLoop(Timeline.RepeatBehavior.REVERSE);
+        } else {
+            textmessageTL.playLoop(times, Timeline.RepeatBehavior.REVERSE);
+        }
+
         return textmessageTL;
     }
 

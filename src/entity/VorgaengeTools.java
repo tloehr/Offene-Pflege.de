@@ -117,7 +117,7 @@ public class VorgaengeTools {
      * @param pdca
      * @return
      */
-    public static int incPDCA(int pdca) {
+    public static short incPDCA(short pdca) {
         pdca++;
         if (pdca > PDCA_ACT) {
             pdca = PDCA_PLAN;
@@ -131,7 +131,7 @@ public class VorgaengeTools {
      * @param pdca
      * @return
      */
-    public static int decPDCA(int pdca) {
+    public static short decPDCA(short pdca) {
         pdca--;
         if (pdca < PDCA_PLAN) {
             pdca = PDCA_PLAN;
