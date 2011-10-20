@@ -33,7 +33,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -68,7 +67,6 @@ public class FrmVorgang extends javax.swing.JFrame {
     protected boolean pdcaChanged = false, ignoreEvents = false;
     //protected IconFlash iconflasher;
     protected JComboBox cmbBW, cmbMA;
-    protected TableColumn delColumn;
     protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
 
     private Timeline textmessageTL;
@@ -545,7 +543,8 @@ public class FrmVorgang extends javax.swing.JFrame {
             case LAUFENDE_OPERATION_BERICHT_EINGABE: {
                 VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
                 EntityTools.store(vbericht);
-                ((TMElement) tblElements.getModel()).addVBericht(vbericht);
+                //((TMElement) tblElements.getModel()).addVBericht(vbericht);
+                loadTable(aktuellerVorgang);
                 splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
                 break;
             }
@@ -838,8 +837,10 @@ public class FrmVorgang extends javax.swing.JFrame {
 
             tblElements.setModel(new TMElement(elements));
             tblElements.getColumnModel().getColumn(TMElement.COL_PIT).setCellRenderer(new RNDHTML());
+            tblElements.getColumnModel().getColumn(TMElement.COL_PDCA).setCellRenderer(new RNDHTML());
             tblElements.getColumnModel().getColumn(TMElement.COL_CONTENT).setCellRenderer(new RNDHTML());
             tblElements.getColumnModel().getColumn(TMElement.COL_PIT).setHeaderValue("Datum / MA");
+            tblElements.getColumnModel().getColumn(TMElement.COL_PDCA).setHeaderValue("PDCA");
             tblElements.getColumnModel().getColumn(TMElement.COL_CONTENT).setHeaderValue("Inhalt");
 
 //            if (btnDelElement.isSelected()) {
@@ -954,8 +955,8 @@ public class FrmVorgang extends javax.swing.JFrame {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, 0dlu, 148dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
-            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
+                "$rgap, 0dlu, 148dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
 
         //======== scrollPane2 ========
         {
@@ -1007,19 +1008,20 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ) {
-                        Class<?>[] columnTypes = new Class<?>[] {
-                            Object.class, Object.class, Object.class, Object.class
+                        Class<?>[] columnTypes = new Class<?>[]{
+                                Object.class, Object.class, Object.class, Object.class
                         };
+
                         @Override
                         public Class<?> getColumnClass(int columnIndex) {
                             return columnTypes[columnIndex];
@@ -1053,8 +1055,8 @@ public class FrmVorgang extends javax.swing.JFrame {
                 //======== pnlDetails ========
                 {
                     pnlDetails.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
-                        "0dlu, 9*($lgap, fill:default)"));
+                            "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
+                            "0dlu, 9*($lgap, fill:default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");
@@ -1339,21 +1341,20 @@ public class FrmVorgang extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspElementsComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspElementsComponentResized
+        if (tblElements.getModel().getColumnCount() < 3) return;
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
+
+        //SYSTools.packTable(tblElements, 5);
+
         // Größe der Text Spalten im DFN ändern.
         // Summe der fixen Spalten + ein bisschen)
-        int textWidth = dim.width - 200;
+        int textWidth = dim.width - 260;
         TableColumnModel tcm = tblElements.getColumnModel();
-        if (tcm.getColumnCount() == 2) {
-            tcm.getColumn(TMElement.COL_PIT).setPreferredWidth(180);
-            tcm.getColumn(TMElement.COL_CONTENT).setPreferredWidth(textWidth);
-        } else if (tcm.getColumnCount() == 3) { // mit Operations Spalte
-            textWidth -= tcm.getColumn(TMElement.COL_OPERATIONS).getWidth();
-            tcm.getColumn(TMElement.COL_PIT).setPreferredWidth(180);
-            tcm.getColumn(TMElement.COL_CONTENT).setPreferredWidth(textWidth);
-            tcm.getColumn(TMElement.COL_OPERATIONS).setPreferredWidth(tcm.getColumn(TMElement.COL_OPERATIONS).getWidth());
-        }
+        tcm.getColumn(TMElement.COL_PIT).setPreferredWidth(180);
+        tcm.getColumn(TMElement.COL_PDCA).setPreferredWidth(70);
+        tcm.getColumn(TMElement.COL_CONTENT).setPreferredWidth(textWidth);
+
     }//GEN-LAST:event_jspElementsComponentResized
 
     private void pnlMyVorgaengeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMyVorgaengeMousePressed

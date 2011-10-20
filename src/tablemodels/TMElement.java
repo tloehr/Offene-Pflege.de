@@ -26,30 +26,30 @@
  */
 package tablemodels;
 
-import entity.VBericht;
-import entity.VorgangElement;
+import entity.*;
 import op.OPDE;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author tloehr
  */
-public class TMElement extends AbstractTableModel implements DeletableTableModel {
+public class TMElement extends AbstractTableModel {
 
-    public static final int COL_CONTENT = 1;
+    public static final int COL_CONTENT = 2;
+    public static final int COL_PDCA = 1;
     public static final int COL_PIT = 0;
     public static final int COL_OPERATIONS = 2;
-    private List<VorgangElement> mymodel;
-    protected boolean showOperations = false;
+    private List mymodel;
 
     // Enthält den Tabellennamen. Dieses Array passt zum Wert in der gleichnamigen Spalte
     //public static final String[] tblidx = new String[]{"Tagesberichte", "Planung", "BHPVerordnung", "BWerte", "BWInfo"};
-    public TMElement(List<VorgangElement> model) {
+    public TMElement(List model) {
 
+        this.mymodel = model;
 
-        mymodel = model;
 
 //            String sql1 =
 //                    " SELECT * FROM " +
@@ -102,36 +102,33 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
 
     }
 
-    @Override
-    public void removeRow(int row) {
-
-        Object element = mymodel.get(row);
-
-        OPDE.getEM().getTransaction().begin();
-        try {
-            if (element instanceof VBericht) {
-                mymodel.remove(element);
-                OPDE.getEM().remove(element);
-                fireTableRowsDeleted(row, row);
-            } else {
-                OPDE.debug("nothing to delete... yet");
-            }
-            OPDE.getEM().getTransaction().commit();
-
-        } catch (Exception e) {
-            OPDE.fatal(e);
-            OPDE.getEM().getTransaction().rollback();
-        }
-    }
-
-    public void addVBericht(VBericht vbericht){
-        mymodel.add(vbericht);
-        fireTableRowsInserted(mymodel.size()-1, mymodel.size());
-    }
+//    @Override
+//    public void removeRow(int row) {
+//
+//        Object element = mymodel.get(row);
+//
+//        OPDE.getEM().getTransaction().begin();
+//        try {
+//            if (element instanceof VBericht) {
+//                sourcemodel.remove(element);
+//                mymodel.remove(element);
+//                pdca.remove(row);
+//                OPDE.getEM().remove(element);
+//                fireTableRowsDeleted(row, row);
+//            } else {
+//                OPDE.debug("nothing to delete... yet");
+//            }
+//            OPDE.getEM().getTransaction().commit();
+//
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//            OPDE.getEM().getTransaction().rollback();
+//        }
+//    }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == COL_OPERATIONS;
+        return false;
     }
 
     @Override
@@ -146,13 +143,7 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
 
     @Override
     public int getColumnCount() {
-        int colCount = 2;
-
-        if (this.showOperations) {
-            colCount = 3;
-        }
-
-        return colCount;
+        return 3;
     }
 
     @Override
@@ -166,9 +157,10 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
      * @param row
      * @return
      */
-    public VorgangElement getElement(int row) {
-        return mymodel.get(row);
-    }
+//    public VorgangElement getElement(int row) {
+//        return mymodel.get(row);
+//    }
+
 
 //    private String getBWInfo(long bwinfoid) {
 //        BWInfo bwinfo = new BWInfo(bwinfoid);
@@ -207,7 +199,17 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
     @Override
     public Object getValueAt(int r, int c) {
         Object result = "";
-        VorgangElement element = mymodel.get(r);
+        VorgangElement element = null;
+        short pdca = VorgaengeTools.PDCA_OFF;
+
+        if (mymodel.get(r) instanceof Object[]){
+            element = (VorgangElement) ((Object[]) mymodel.get(r))[0];
+            pdca = (Short) ((Object[]) mymodel.get(r))[1];
+        } else if (mymodel.get(r) instanceof VBericht){
+            element = (VorgangElement) mymodel.get(r);
+            pdca = ((VBericht) element).getPdca();
+        }
+
         switch (c) {
             case COL_CONTENT: {
                 result = element.getContentAsHTML();
@@ -215,6 +217,10 @@ public class TMElement extends AbstractTableModel implements DeletableTableModel
             }
             case COL_PIT: {
                 result = element.getPITAsHTML();
+                break;
+            }
+            case COL_PDCA: {
+                result = VorgaengeTools.PDCA[pdca];
                 break;
             }
             default: {

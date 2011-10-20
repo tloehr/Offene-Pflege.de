@@ -43,7 +43,7 @@ public class VBerichtTools {
         if (bericht.getArt() != VBERICHT_ART_USER) {
             html += "<font color=\"blue\">";
         }
-        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname() + " ["+VorgaengeTools.PDCA[bericht.getPdca()]+"]";
+        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
         if (bericht.getArt() != VBERICHT_ART_USER) {
             html += "</font>";
         }

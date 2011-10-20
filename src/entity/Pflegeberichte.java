@@ -79,8 +79,9 @@ import java.util.Date;
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
         @NamedQuery(name = "Pflegeberichte.findByVorgang", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " JOIN p.vorgaenge v"
+                + " SELECT p, av.pdca FROM Pflegeberichte p "
+                + " JOIN p.attachedVorgaenge av"
+                + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
         /**
          * Ermittelt Pflegeberichte eines Bewohner innerhalb eines bestimmten Zeitraums. Diesmal aber ohne
@@ -178,6 +179,9 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     private Collection<Syspb2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
     private Collection<PB2User> usersAcknowledged;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pflegebericht")
+    private Collection<SYSPB2VORGANG> attachedVorgaenge;
+
     // ==
     // M:N Relationen
     // ==
@@ -186,11 +190,12 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     @JoinColumn(name = "PBID"), inverseJoinColumns =
     @JoinColumn(name = "PBTAGID"))
     private Collection<PBerichtTAGS> tags;
-    @ManyToMany
-    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
-    @JoinColumn(name = "PBID"), inverseJoinColumns =
-    @JoinColumn(name = "VorgangID"))
-    private Collection<Vorgaenge> vorgaenge;
+//    @ManyToMany
+//    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
+//    @JoinColumn(name = "PBID"), inverseJoinColumns =
+//    @JoinColumn(name = "VorgangID"))
+//    private Collection<Vorgaenge> vorgaenge;
+
 
     public Pflegeberichte() {
     }
@@ -353,8 +358,8 @@ public class Pflegeberichte implements Serializable, VorgangElement {
         this.user = user;
     }
 
-    public Collection<Vorgaenge> getVorgaenge() {
-        return vorgaenge;
+    public Collection<SYSPB2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
     }
 
     @Override

@@ -66,7 +66,7 @@
 
     -->
 	<!-- Custom Target for AppInfo.java -->
-	<target name="-pre-jar">
+	<target name="buildnum">
 	<buildnumber file="buildnumber.properties"/>
 	<propertyfile file="appinfo.properties" comment="Everything can be manually updated except buildnum and builddate.">
 	<entry key="program.PROGNAME" default="${main.class}" />
@@ -78,8 +78,8 @@
 	<entry key="program.BUILDNUM" value="${build.number}" />
 	<entry key="program.BUILDDATE" type="date" value="now" pattern="yyyyMMDDHHmmss" />
 	</propertyfile>
-	<copy file="appinfo.properties" todir="${build.classes.dir}"/>
-        <copy file="internalclasses.xml" todir="${build.classes.dir}"/>
+	<!-- <copy file="appinfo.properties" todir="${build.classes.dir}"/>
+        <copy file="internalclasses.xml" todir="${build.classes.dir}"/> -->
 	</target>
 	
 </project>

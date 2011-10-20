@@ -30,13 +30,27 @@ public class VorgaengeTools {
      * @param vorgang
      * @return
      */
-    public static List<VorgangElement> findElementeByVorgang(Vorgaenge vorgang, boolean mitSystem) {
+    public static List findElementeByVorgang(Vorgaenge vorgang, boolean mitSystem) {
 
-        Comparator<VorgangElement> elementsComparator = new Comparator() {
+        Comparator<Object> elementsComparator = new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
-                long l1 = ((VorgangElement) o1).getPITInMillis();
-                long l2 = ((VorgangElement) o2).getPITInMillis();
+
+                long l1;
+                if (o1 instanceof Object[]){
+                    l1 = ((VorgangElement) ((Object[]) o1)[0]).getPITInMillis();
+                } else {
+                    l1 = ((VorgangElement) o1).getPITInMillis();
+                }
+
+
+                long l2;
+                if (o2 instanceof Object[]){
+                    l2 = ((VorgangElement) ((Object[]) o2)[0]).getPITInMillis();
+                } else {
+                    l2 = ((VorgangElement) o2).getPITInMillis();
+                }
+
                 return new Long(l1).compareTo(l2);
             }
         };

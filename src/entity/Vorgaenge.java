@@ -73,14 +73,18 @@ public class Vorgaenge implements Serializable {
     //cascade={CascadeType.PERSIST, CascadeType.REMOVE}
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<VBericht> vorgangsBerichte;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    private Collection<SYSPB2VORGANG> attachedPflegeberichte;
+
     // ==
     // M:N Relationen
     // ==
-    @ManyToMany
-    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
-    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-    @JoinColumn(name = "PBID"))
-    private Collection<Pflegeberichte> pflegeberichte;
+//    @ManyToMany
+//    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
+//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
+//    @JoinColumn(name = "PBID"))
+//    private Collection<Pflegeberichte> pflegeberichte;
     @ManyToMany
     @JoinTable(name = "SYSBWI2VORGANG", joinColumns =
     @JoinColumn(name = "VorgangID"), inverseJoinColumns =
@@ -191,10 +195,6 @@ public class Vorgaenge implements Serializable {
 
     public Collection<BWInfo> getBwinfos() {
         return bwinfos;
-    }
-
-    public Collection<Pflegeberichte> getPflegeberichte() {
-        return pflegeberichte;
     }
 
     public Collection<Planung> getPlanungen() {
