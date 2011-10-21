@@ -212,7 +212,7 @@ public class FrmVorgang extends javax.swing.JFrame {
 
         for (Bewohner bw : bewohner) {
 
-            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBW");
+            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBewohner");
             query.setParameter("bewohner", bw);
             List<Vorgaenge> listVorgaenge = query.getResultList();
             Iterator<Vorgaenge> it = listVorgaenge.iterator();

@@ -36,10 +36,7 @@ import entity.*;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
-import op.tools.InternalClassACL;
-import op.tools.SYSCalendar;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
+import op.tools.*;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -654,6 +651,10 @@ public class PnlBerichte extends CleanablePanel {
                 menu.add(new JSeparator());
                 menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bericht, fileActionListener));
             }
+
+            menu.add(new JSeparator());
+            menu.add(VorgaengeTools.getVorgangContextMenu(parent, bericht, bewohner));
+
 //            if (!singleRowSelected){
 //                int[] sel = tblTB.getSelectedRows();
 //                long[] ids = (long[])Array.newInstance(long.class, 2);

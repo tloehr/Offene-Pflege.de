@@ -55,4 +55,18 @@ public class EntityTools {
         }
         return success;
     }
+
+    public static boolean delete(Object entity) {
+        boolean success = false;
+
+        try {
+            OPDE.getEM().getTransaction().begin();
+            OPDE.getEM().remove(entity);
+            OPDE.getEM().getTransaction().commit();
+            success = true;
+        } catch (Exception e) {
+            OPDE.getEM().getTransaction().rollback();
+        }
+        return success;
+    }
 }

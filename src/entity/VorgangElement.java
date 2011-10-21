@@ -8,7 +8,8 @@ package entity;
  * Dieses Interface dient dazu, dass ich mit den Elementen eines Vorgangs
  * in den Hilfsklassen einheitlich umgehen kann. Ich definiere
  * hier einfach alle Methoden und Eigenschaften, welche diese
- * Klasse gemeinsam haben.
+ * Klasse gemeinsam haben. Somit können alle Entitäten, die ein VorgangElement sind
+ * an bestehende Vorgänge angehangen werden.
  *
  * @author tloehr
  */
@@ -35,4 +36,11 @@ public interface VorgangElement {
      * @return
      */
     public String getPITAsHTML();
+
+    /**
+     * Gibt eine ID des Objektes zurück. Das ist der Primary Key aus der Datenbank.
+     *
+     * @return
+     */
+    public long getID();
 }

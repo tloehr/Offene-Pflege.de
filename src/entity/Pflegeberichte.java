@@ -239,10 +239,10 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     /**
      * Dieses Date ist aus technischen Gründen vorhanden. Es gibt mehrere Möglichkeiten, wie diese PIT zu verstehen ist:
      * <ul>
-     * <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Lösung drin.</li>
-     * <li> Wurde dieser Eintrag durch einen anderen ersetzt, steht hier drin wann das passiert ist.</li>
-     * <li> Ist dies ein Eintrag, der einen anderen ersetzt hat dann steht hier <code>null</code>.</li>
-     * <li> Wurde der Eintrag nicht geändert, dann steht hier ebenfalls <code>null</code>.</li>
+     *      <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Lösung drin.</li>
+     *      <li> Wurde dieser Eintrag durch einen anderen ersetzt, steht hier drin wann das passiert ist.</li>
+     *      <li> Ist dies ein Eintrag, der einen anderen ersetzt hat dann steht hier <code>null</code>.</li>
+     *      <li> Wurde der Eintrag nicht geändert, dann steht hier ebenfalls <code>null</code>.</li>
      * <ul>
      *
      * @return
@@ -377,6 +377,11 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     @Override
     public String getPITAsHTML() {
         return PflegeberichteTools.getPITAsHTML(this);
+    }
+
+    @Override
+    public long getID() {
+        return pbid;
     }
 
     @Override

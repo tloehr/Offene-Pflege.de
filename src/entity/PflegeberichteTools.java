@@ -271,7 +271,6 @@ public class PflegeberichteTools {
             result += "\nDer Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid();
             result += "\n=========================\n\n";
         }
-        //result += (flags.equals("") ? "" : "<b>" + flags + "</b>");
         result += bericht.getText();
         return result;
     }

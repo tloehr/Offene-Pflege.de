@@ -142,6 +142,11 @@ public class VBericht implements Serializable, VorgangElement {
     }
 
     @Override
+    public long getID() {
+        return vbid;
+    }
+
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (vbid != null ? vbid.hashCode() : 0);

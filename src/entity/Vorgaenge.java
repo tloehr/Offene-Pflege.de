@@ -4,6 +4,8 @@
  */
 package entity;
 
+import op.OPDE;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 
 import javax.persistence.*;
@@ -23,7 +25,7 @@ import java.util.Date;
         @NamedQuery(name = "Vorgaenge.findByTitel", query = "SELECT v FROM Vorgaenge v WHERE v.titel = :titel"),
         @NamedQuery(name = "Vorgaenge.findActiveByBesitzer", query = "SELECT v FROM Vorgaenge v WHERE v.besitzer = :besitzer AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
         @NamedQuery(name = "Vorgaenge.findInactiveByBesitzer", query = "SELECT v FROM Vorgaenge v WHERE v.besitzer = :besitzer AND v.bis < '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveByBW", query = "SELECT v FROM Vorgaenge v WHERE v.bewohner = :bewohner AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
+        @NamedQuery(name = "Vorgaenge.findActiveByBewohner", query = "SELECT v FROM Vorgaenge v WHERE v.bewohner = :bewohner AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
         @NamedQuery(name = "Vorgaenge.findActiveRunningOut", query = "SELECT v FROM Vorgaenge v WHERE v.bis = '9999-12-31 23:59:59' AND v.wv <= :wv ORDER BY v.wv"),
         @NamedQuery(name = "Vorgaenge.findByVon", query = "SELECT v FROM Vorgaenge v WHERE v.von = :von"),
         @NamedQuery(name = "Vorgaenge.findByWv", query = "SELECT v FROM Vorgaenge v WHERE v.wv = :wv"),
@@ -108,6 +110,18 @@ public class Vorgaenge implements Serializable {
 
     public Vorgaenge() {
     }
+
+    public Vorgaenge(String titel, Bewohner bewohner, VKat kategorie) {
+        this.titel = titel;
+        this.von = new Date();
+        this.wv = SYSCalendar.addDate(new Date(), 7);
+        this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.ersteller = OPDE.getLogin().getUser();
+        this.besitzer = OPDE.getLogin().getUser();
+        this.bewohner = bewohner;
+        this.kategorie = kategorie;
+    }
+
 
     public Long getVorgangID() {
         return vorgangID;
