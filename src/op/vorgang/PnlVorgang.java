@@ -4,7 +4,7 @@
  */
 
 /*
- * FrmVorgang.java
+ * PnlVorgang.java
  *
  * Created on 03.06.2011, 16:38:35
  */
@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class FrmVorgang extends javax.swing.JFrame {
+public class PnlVorgang extends JPanel {
 
     public static final String internalClassID = "opde.tickets";
     private static int speedSlow = 700;
@@ -73,13 +73,13 @@ public class FrmVorgang extends javax.swing.JFrame {
 
 
     /**
-     * Creates new form FrmVorgang
+     * Creates new form PnlVorgang
      */
-    public FrmVorgang() {
+    public PnlVorgang() {
         this(null);
     }
 
-    public FrmVorgang(Vorgaenge vorgang) {
+    public PnlVorgang(Vorgaenge vorgang) {
         ignoreEvents = true;
         initComponents();
         initAuthorizationMap();
@@ -93,7 +93,7 @@ public class FrmVorgang extends javax.swing.JFrame {
         splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
         SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
 
-        myFrame = this;
+        //myFrame = this;
         aktuellerVorgang = null;
 
 
@@ -490,10 +490,6 @@ public class FrmVorgang extends javax.swing.JFrame {
 
     }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-    }
 
     protected void loadDetails(Vorgaenge vorgang) {
         lblVorgang.setText(vorgang.getTitel() + " [" + (vorgang.getBewohner() == null ? "allgemein" : vorgang.getBewohner().getBWKennung()) + "]");
@@ -519,7 +515,7 @@ public class FrmVorgang extends javax.swing.JFrame {
             listOwner.setSelectedValue(vorgang.getBesitzer(), true);
 
             // ACLs
-            txtTitel.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+            txtTitel.setEditable(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
             ignoreEvents = false;
         }
 
@@ -533,7 +529,7 @@ public class FrmVorgang extends javax.swing.JFrame {
     private void btnDetailsItemStateChanged(ItemEvent e) {
         splitTDPercent = btnDetails.isSelected() ? 0.4d : 1.0d;
         SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow);
-
+        loadDetails(aktuellerVorgang);
         btnEndReactivate.setEnabled(!btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
     }
 
@@ -946,30 +942,28 @@ public class FrmVorgang extends javax.swing.JFrame {
         btnCancel = new JButton();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 thisComponentResized(e);
             }
         });
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-                "$rgap, 0dlu, 148dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
-                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
+        setLayout(new FormLayout(
+            "$rgap, 0dlu, 148dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
 
         //======== scrollPane2 ========
         {
             scrollPane2.setViewportView(taskContainer);
         }
-        contentPane.add(scrollPane2, CC.xywh(3, 3, 1, 3));
+        add(scrollPane2, CC.xywh(3, 3, 1, 3));
 
         //---- lblVorgang ----
         lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
         lblVorgang.setForeground(Color.blue);
         lblVorgang.setHorizontalAlignment(SwingConstants.CENTER);
         lblVorgang.setText(" ");
-        contentPane.add(lblVorgang, CC.xy(5, 3));
+        add(lblVorgang, CC.xy(5, 3));
 
         //======== splitTableDetails ========
         {
@@ -1008,20 +1002,19 @@ public class FrmVorgang extends javax.swing.JFrame {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ) {
-                        Class<?>[] columnTypes = new Class<?>[]{
-                                Object.class, Object.class, Object.class, Object.class
+                        Class<?>[] columnTypes = new Class<?>[] {
+                            Object.class, Object.class, Object.class, Object.class
                         };
-
                         @Override
                         public Class<?> getColumnClass(int columnIndex) {
                             return columnTypes[columnIndex];
@@ -1055,8 +1048,8 @@ public class FrmVorgang extends javax.swing.JFrame {
                 //======== pnlDetails ========
                 {
                     pnlDetails.setLayout(new FormLayout(
-                            "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
-                            "0dlu, 9*($lgap, fill:default)"));
+                        "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
+                        "0dlu, 9*($lgap, fill:default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");
@@ -1212,7 +1205,7 @@ public class FrmVorgang extends javax.swing.JFrame {
             }
             splitTableDetails.setRightComponent(splitDetailsOwner);
         }
-        contentPane.add(splitTableDetails, CC.xy(5, 5));
+        add(splitTableDetails, CC.xy(5, 5));
 
         //======== pnlButtonsLeft ========
         {
@@ -1229,7 +1222,7 @@ public class FrmVorgang extends javax.swing.JFrame {
             });
             pnlButtonsLeft.add(btnAddVorgang);
         }
-        contentPane.add(pnlButtonsLeft, CC.xy(3, 7));
+        add(pnlButtonsLeft, CC.xy(3, 7));
 
         //======== splitButtonsCenter ========
         {
@@ -1335,9 +1328,7 @@ public class FrmVorgang extends javax.swing.JFrame {
             }
             splitButtonsCenter.setBottomComponent(pnlButtonsRight);
         }
-        contentPane.add(splitButtonsCenter, CC.xy(5, 7));
-        pack();
-        setLocationRelativeTo(getOwner());
+        add(splitButtonsCenter, CC.xy(5, 7));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspElementsComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspElementsComponentResized

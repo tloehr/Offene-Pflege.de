@@ -46,7 +46,7 @@ public class FrmVorgang extends javax.swing.JFrame {
     }
 
     /**
-     * Creates new form FrmVorgang
+     * Creates new form PnlVorgang
      */
     public FrmVorgang(String bwkennung, String besitzer) {
         initComponents();

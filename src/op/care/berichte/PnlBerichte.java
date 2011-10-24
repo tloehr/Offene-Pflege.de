@@ -37,6 +37,7 @@ import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.tools.*;
+import tablemodels.TMPflegeberichte;
 
 import javax.persistence.Query;
 import javax.swing.*;

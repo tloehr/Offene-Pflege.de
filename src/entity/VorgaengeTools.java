@@ -385,7 +385,7 @@ public class VorgaengeTools {
 
 
     public static JMenu getVorgangContextMenu(Frame parent, VorgangElement element, Bewohner bewohner) {
-        JMenu menu = new JMenu("<html>Vorgänge <font color=\\\"red\\\">&#9679;</font></html>");
+        JMenu menu = new JMenu("<html>Vorgänge <font color=\"red\">&#9679;</font></html>");
 
         // Neuer Vorgang Menü
         menu.add(getNeuMenu(element, bewohner));

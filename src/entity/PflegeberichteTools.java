@@ -21,12 +21,38 @@ import java.util.List;
  */
 public class PflegeberichteTools {
 
+    /**
+     * setzt einen Pflegebericht auf "gelöscht". Das heisst, er ist dann inaktiv. Es werden auch Datei und Vorgangs
+     * Zuordnungen entfernt.
+     *
+     * @param bericht
+     * @return
+     */
     public static boolean deleteBericht(Pflegeberichte bericht) {
         boolean success = false;
         OPDE.getEM().getTransaction().begin();
         try {
+
             bericht.setEditedBy(OPDE.getLogin().getUser());
             bericht.setEditpit(new Date());
+
+            // Datei Zuordnungen entfernen
+            Iterator<Syspb2file> files = bericht.getAttachedFiles().iterator();
+            while (files.hasNext()) {
+                Syspb2file oldAssignment = files.next();
+                OPDE.getEM().remove(oldAssignment);
+            }
+            bericht.getAttachedFiles().clear();
+
+            // Vorgangszuordnungen entfernen
+            Iterator<SYSPB2VORGANG> vorgaenge = bericht.getAttachedVorgaenge().iterator();
+            while (vorgaenge.hasNext()) {
+                // gleichfalls
+                SYSPB2VORGANG oldAssignment = vorgaenge.next();
+                OPDE.getEM().remove(oldAssignment);
+            }
+            bericht.getAttachedVorgaenge().clear();
+
             OPDE.getEM().merge(bericht);
             OPDE.getEM().getTransaction().commit();
             success = true;
@@ -46,6 +72,16 @@ public class PflegeberichteTools {
         return (Pflegeberichte) query.getSingleResult();
     }
 
+
+    /**
+     * Führt die notwendigen Änderungen an den Entities durch, wenn ein Bericht geändert wurde. Dazu gehört auch die Dateien
+     * und Vorgänge umzubiegen. Der alte Bericht verliert seine Dateien und Vorgänge. Es werden auch die
+     * notwendigen Querverweise zwischen dem alten und dem neuen Bericht erstellt.
+     *
+     * @param oldBericht
+     * @param newBericht
+     * @return Erfolg oder nicht
+     */
     public static boolean changeBericht(Pflegeberichte oldBericht, Pflegeberichte newBericht) {
         boolean success = false;
         OPDE.getEM().getTransaction().begin();
@@ -63,9 +99,21 @@ public class PflegeberichteTools {
                 OPDE.getEM().remove(oldAssignment);
             }
 
+            // Vorgänge umbiegen
+            Iterator<SYSPB2VORGANG> vorgaenge = oldBericht.getAttachedVorgaenge().iterator();
+            while (vorgaenge.hasNext()) {
+                // gleichfalls
+                SYSPB2VORGANG oldAssignment = vorgaenge.next();
+                Vorgaenge vorgang = oldAssignment.getVorgang();
+                SYSPB2VORGANG newAssignment = new SYSPB2VORGANG(vorgang, newBericht);
+                newBericht.getAttachedVorgaenge().add(newAssignment);
+                OPDE.getEM().remove(oldAssignment);
+            }
+
             OPDE.getEM().persist(newBericht);
 
             oldBericht.getAttachedFiles().clear();
+            oldBericht.getAttachedVorgaenge().clear();
             oldBericht.setEditedBy(OPDE.getLogin().getUser());
             oldBericht.setEditpit(new Date());
             oldBericht.setReplacedBy(newBericht);
@@ -73,13 +121,9 @@ public class PflegeberichteTools {
 
             OPDE.getEM().getTransaction().commit();
 
-            //OPDE.getLogger().debug("Neuer Bericht ID: " + newBericht);
-
-            //((JpaCache) OPDE.getEM().getEntityManagerFactory().getCache()).print();
-//            OPDE.getEM().getEntityManagerFactory().getCache().evict(Pflegeberichte.class, newBericht);
             success = true;
         } catch (Exception e) {
-            OPDE.getLogger().error(e.getMessage(), e);
+            OPDE.error(e.getMessage());
             OPDE.getEM().getTransaction().rollback();
         }
         return success;
@@ -241,15 +285,11 @@ public class PflegeberichteTools {
             result += "<br/>Der Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid() + "</i><br/>";
         }
         if (!bericht.getAttachedFiles().isEmpty()) {
-            //URL url = this.getClass().getResource("/artwork/16x16/attach.png");
-            //System.out.println(url.getPath());
             result += "<font color=\"green\">&#9679;</font>";
         }
-
-//                if (vrganzahl > 0) {
-//                    result += "<font color=\"red\">&#9679;</font>";
-//                }
-
+        if (!bericht.getAttachedVorgaenge().isEmpty()) {
+            result += "<font color=\"red\">&#9679;</font>";
+        }
         result += SYSTools.replace(bericht.getText(), "\n", "<br/>");
         result = fonthead + result + "</font>";
         return result;
