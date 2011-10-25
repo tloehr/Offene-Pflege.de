@@ -27,6 +27,7 @@
 package op.care.verordnung;
 
 import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.EinrichtungenTools;
 import op.OPDE;
 import op.tools.DlgException;
@@ -287,7 +288,7 @@ public class DBHandling {
             if (SYSTools.catchNull(bwkennung).equals("")) {
                 result += "<h2>Ärztliche Verordnungen</h2>";
             } else {
-                result += "<h1>Ärztliche Verordnungen für " + SYSTools.getBWLabel(bewohner) + "</h1>";
+                result += "<h1>Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(bewohner) + "</h1>";
                 if (bewohner.getStation() != null) {
                     result += EinrichtungenTools.getAsText(bewohner.getStation().getEinrichtung());
                 }

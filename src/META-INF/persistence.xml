@@ -1,48 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-  <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>entity.SYSFiles</class>
-    <class>entity.Sysver2file</class>
-    <class>entity.Sysbwi2file</class>
-    <class>entity.Syspb2file</class>
-    <class>entity.SYSPB2VORGANG</class>
-    <class>entity.Bewohner</class>
-    <class>entity.Sysbw2file</class>
-    <class>entity.BWInfoKat</class>
-    <class>entity.BWInfoTyp</class>
-    <class>entity.BWInfo</class>
-    <class>entity.Verordnung</class>
-    <class>entity.Groups</class>
-    <class>entity.Users</class>
-    <class>entity.Acl</class>
-    <class>entity.IntClasses</class>
-    <class>entity.Pflegeberichte</class>
-    <class>entity.PBerichtTAGS</class>
-    <class>entity.Uebergabebuch</class>
-    <class>entity.Raeume</class>
-    <class>entity.Stationen</class>
-    <class>entity.Einrichtungen</class>
-    <class>entity.PB2User</class>
-    <class>entity.Uebergabe2User</class>
-    <class>entity.SYSHosts</class>
-    <class>entity.SYSRunningClasses</class>
-    <class>entity.SYSLogin</class>
-    <class>entity.BWerte</class>
-    <class>entity.Sysbwerte2file</class>
-    <class>entity.SYSProps</class>
-    <class>entity.Syslog</class>
-    <class>entity.Vorgaenge</class>
-    <class>entity.VBericht</class>
-    <class>entity.VKat</class>
-    <class>entity.Planung</class>
-    <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
-      <property name="javax.persistence.jdbc.password" value="7t3rrw"/>
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.user" value="opdeuser"/>
-      <!-- <property name="eclipselink.logging.level" value="FINER"/> -->
-      <!-- http://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging#Log_Levels -->
-    </properties>
-  </persistence-unit>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+    <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>entity.SYSFiles</class>
+        <class>entity.Sysver2file</class>
+        <class>entity.Sysbwi2file</class>
+        <class>entity.Syspb2file</class>
+        <class>entity.SYSPB2VORGANG</class>
+        <class>entity.Bewohner</class>
+        <class>entity.Sysbw2file</class>
+        <class>entity.BWInfoKat</class>
+        <class>entity.BWInfoTyp</class>
+        <class>entity.BWInfo</class>
+        <class>entity.Verordnung</class>
+        <class>entity.Groups</class>
+        <class>entity.Users</class>
+        <class>entity.Acl</class>
+        <class>entity.IntClasses</class>
+        <class>entity.Pflegeberichte</class>
+        <class>entity.PBerichtTAGS</class>
+        <class>entity.Uebergabebuch</class>
+        <class>entity.Raeume</class>
+        <class>entity.Stationen</class>
+        <class>entity.Einrichtungen</class>
+        <class>entity.PB2User</class>
+        <class>entity.Uebergabe2User</class>
+        <class>entity.SYSHosts</class>
+        <class>entity.SYSRunningClasses</class>
+        <class>entity.SYSLogin</class>
+        <class>entity.BWerte</class>
+        <class>entity.Sysbwerte2file</class>
+        <class>entity.SYSProps</class>
+        <class>entity.Syslog</class>
+        <class>entity.Vorgaenge</class>
+        <class>entity.VBericht</class>
+        <class>entity.VKat</class>
+        <class>entity.Planung</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
+            <property name="javax.persistence.jdbc.password" value="7t3rrw"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="opdeuser"/>
+            <!--<property name="eclipselink.weaving" value="static"/>
+            <property name="eclipselink.logging.level.sql" value="FINEST"/>
+            <property name="eclipselink.logging.level" value="FINEST"/>
+            <property name="eclipselink.logging.level.cache" value="FINEST"/>-->
+            <!-- http://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging#Log_Levels -->
+        </properties>
+    </persistence-unit>
 </persistence>

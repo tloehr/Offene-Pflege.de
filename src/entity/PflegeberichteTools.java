@@ -182,7 +182,7 @@ public class PflegeberichteTools {
         String text = SYSTools.replace(bericht.getText(), "\n", "<br/>");
 
         if (mitBWKennung) {
-            html += "<b>Pflegebericht für " + SYSTools.getBWLabel(bericht.getBewohner()) + "</b>";
+            html += "<b>Pflegebericht für " + BewohnerTools.getBWLabelText(bericht.getBewohner()) + "</b>";
         } else {
             html += "<b>Pflegebericht</b>";
         }
@@ -202,7 +202,7 @@ public class PflegeberichteTools {
 
         int num = berichte.size();
         if (num > 0) {
-            html += "<h1>Pflegeberichte für " + SYSTools.getBWLabel(berichte.get(0).getBewohner()) + "</h1>"; // Die Bewohner in dieser Liste sind alle dieselben.
+            html += "<h1>Pflegeberichte für " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) + "</h1>"; // Die Bewohner in dieser Liste sind alle dieselben.
             html += "<table border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th></tr>";
             Iterator<Pflegeberichte> it = berichte.iterator();

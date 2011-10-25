@@ -26,7 +26,12 @@
  */
 package op.care;
 
+import java.awt.event.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
 import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
 import op.OPDE;
@@ -43,6 +48,9 @@ import op.threads.HeapStat;
 import op.tools.DBRetrieve;
 import op.tools.InternalClassACL;
 import op.tools.SYSTools;
+import op.vorgang.PnlVorgang;
+import org.jdesktop.swingx.HorizontalLayout;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -133,368 +141,464 @@ public class FrmPflege extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        pnlStatus = new JPanel();
+        lblServer = new JLabel();
+        lblUser = new JLabel();
+        pbHeap = new JProgressBar();
+        lblHeap = new JLabel();
+        jtpMain = new JTabbedPane();
+        jtpUebersicht = new JTabbedPane();
+        pnlUebergabe = new JPanel();
+        pnlSchichtleitung = new JPanel();
+        jsplBW = new JSplitPane();
+        jtpPflegeakte = new JTabbedPane();
+        pnlUeber = new JPanel();
+        pnlTB = new JPanel();
+        pnlDFN = new JPanel();
+        pnlBHP = new JPanel();
+        pnlVitalDummy = new JPanel();
+        pnlVer = new JPanel();
+        pnlInfo = new JPanel();
+        pnlPPlanung = new JPanel();
+        pnlVorgang = new JPanel();
+        pnlFiles = new JPanel();
+        pnlBW = new JPanel();
+        cmbStation = new JComboBox();
+        jspBW = new JScrollPane();
+        tblBW = new JTable();
+        cbArchiv = new JCheckBox();
+        btnRefresh = new JButton();
+        jToolBar1 = new JToolBar();
+        btnVerlegung = new JButton();
 
-        bgDFN = new javax.swing.ButtonGroup();
-        bgKorrekturen = new javax.swing.ButtonGroup();
-        pnlStatus = new javax.swing.JPanel();
-        lblServer = new javax.swing.JLabel();
-        lblUser = new javax.swing.JLabel();
-        pbHeap = new javax.swing.JProgressBar();
-        lblHeap = new javax.swing.JLabel();
-        jtpMain = new javax.swing.JTabbedPane();
-        jtpUebersicht = new javax.swing.JTabbedPane();
-        pnlUebergabe = new javax.swing.JPanel();
-        pnlSchichtleitung = new javax.swing.JPanel();
-        jsplBW = new javax.swing.JSplitPane();
-        jtpPflegeakte = new javax.swing.JTabbedPane();
-        pnlUeber = new javax.swing.JPanel();
-        pnlTB = new javax.swing.JPanel();
-        pnlDFN = new javax.swing.JPanel();
-        pnlBHP = new javax.swing.JPanel();
-        pnlVitalDummy = new javax.swing.JPanel();
-        pnlVer = new javax.swing.JPanel();
-        pnlInfo = new javax.swing.JPanel();
-        pnlPPlanung = new javax.swing.JPanel();
-        pnlVorgang = new javax.swing.JPanel();
-        pnlFiles = new javax.swing.JPanel();
-        pnlBW = new javax.swing.JPanel();
-        cmbStation = new javax.swing.JComboBox();
-        jspBW = new javax.swing.JScrollPane();
-        tblBW = new javax.swing.JTable();
-        cbArchiv = new javax.swing.JCheckBox();
-        btnRefresh = new javax.swing.JButton();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnVerlegung = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("OpenCare Prototype C");
+        Container contentPane = getContentPane();
 
-        pnlStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        //======== pnlStatus ========
+        {
+            pnlStatus.setBorder(new EtchedBorder());
 
-        lblServer.setText("jLabel6");
+            //---- lblServer ----
+            lblServer.setText("jLabel6");
 
-        lblUser.setText("jLabel6");
+            //---- lblUser ----
+            lblUser.setText("jLabel6");
 
-        lblHeap.setText("jLabel1");
+            //---- lblHeap ----
+            lblHeap.setText("jLabel1");
 
-        org.jdesktop.layout.GroupLayout pnlStatusLayout = new org.jdesktop.layout.GroupLayout(pnlStatus);
-        pnlStatus.setLayout(pnlStatusLayout);
-        pnlStatusLayout.setHorizontalGroup(
-                pnlStatusLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlStatusLayout.createSequentialGroup()
-                                .add(lblServer)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(pbHeap, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(lblHeap)
-                                .add(18, 18, 18)
-                                .add(lblUser, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-        pnlStatusLayout.setVerticalGroup(
-                pnlStatusLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlStatusLayout.createSequentialGroup()
-                                .add(pnlStatusLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(lblServer)
-                                        .add(lblHeap)
-                                        .add(lblUser))
-                                .addContainerGap())
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, pbHeap, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-        );
+            GroupLayout pnlStatusLayout = new GroupLayout(pnlStatus);
+            pnlStatus.setLayout(pnlStatusLayout);
+            pnlStatusLayout.setHorizontalGroup(
+                pnlStatusLayout.createParallelGroup()
+                    .addGroup(pnlStatusLayout.createSequentialGroup()
+                        .addComponent(lblServer)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pbHeap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblHeap)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblUser, GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+            pnlStatusLayout.setVerticalGroup(
+                pnlStatusLayout.createParallelGroup()
+                    .addGroup(pnlStatusLayout.createSequentialGroup()
+                        .addGroup(pnlStatusLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblServer)
+                            .addComponent(lblHeap)
+                            .addComponent(lblUser))
+                        .addContainerGap())
+                    .addComponent(pbHeap, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+            );
+        }
 
-        jtpMain.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jtpMainStateChanged(evt);
-            }
-        });
-
-        jtpUebersicht.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
-        jtpUebersicht.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jtpUebersichtStateChanged(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout pnlUebergabeLayout = new org.jdesktop.layout.GroupLayout(pnlUebergabe);
-        pnlUebergabe.setLayout(pnlUebergabeLayout);
-        pnlUebergabeLayout.setHorizontalGroup(
-                pnlUebergabeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 809, Short.MAX_VALUE)
-        );
-        pnlUebergabeLayout.setVerticalGroup(
-                pnlUebergabeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 469, Short.MAX_VALUE)
-        );
-
-        jtpUebersicht.addTab("Übergabe", pnlUebergabe);
-
-        org.jdesktop.layout.GroupLayout pnlSchichtleitungLayout = new org.jdesktop.layout.GroupLayout(pnlSchichtleitung);
-        pnlSchichtleitung.setLayout(pnlSchichtleitungLayout);
-        pnlSchichtleitungLayout.setHorizontalGroup(
-                pnlSchichtleitungLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 809, Short.MAX_VALUE)
-        );
-        pnlSchichtleitungLayout.setVerticalGroup(
-                pnlSchichtleitungLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 469, Short.MAX_VALUE)
-        );
-
-        jtpUebersicht.addTab("Schichtleitung", pnlSchichtleitung);
-
-        jtpMain.addTab("Übersicht", jtpUebersicht);
-
-        jsplBW.setDividerLocation(250);
-
-        jtpPflegeakte.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
-        jtpPflegeakte.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jtpPflegeakteStateChanged(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout pnlUeberLayout = new org.jdesktop.layout.GroupLayout(pnlUeber);
-        pnlUeber.setLayout(pnlUeberLayout);
-        pnlUeberLayout.setHorizontalGroup(
-                pnlUeberLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlUeberLayout.setVerticalGroup(
-                pnlUeberLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Übersicht", pnlUeber);
-
-        org.jdesktop.layout.GroupLayout pnlTBLayout = new org.jdesktop.layout.GroupLayout(pnlTB);
-        pnlTB.setLayout(pnlTBLayout);
-        pnlTBLayout.setHorizontalGroup(
-                pnlTBLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlTBLayout.setVerticalGroup(
-                pnlTBLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Pflegeberichte", pnlTB);
-        pnlTB.getAccessibleContext().setAccessibleParent(jtpPflegeakte);
-
-        org.jdesktop.layout.GroupLayout pnlDFNLayout = new org.jdesktop.layout.GroupLayout(pnlDFN);
-        pnlDFN.setLayout(pnlDFNLayout);
-        pnlDFNLayout.setHorizontalGroup(
-                pnlDFNLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlDFNLayout.setVerticalGroup(
-                pnlDFNLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("DFN", pnlDFN);
-
-        org.jdesktop.layout.GroupLayout pnlBHPLayout = new org.jdesktop.layout.GroupLayout(pnlBHP);
-        pnlBHP.setLayout(pnlBHPLayout);
-        pnlBHPLayout.setHorizontalGroup(
-                pnlBHPLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlBHPLayout.setVerticalGroup(
-                pnlBHPLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("BHP", pnlBHP);
-
-        org.jdesktop.layout.GroupLayout pnlVitalDummyLayout = new org.jdesktop.layout.GroupLayout(pnlVitalDummy);
-        pnlVitalDummy.setLayout(pnlVitalDummyLayout);
-        pnlVitalDummyLayout.setHorizontalGroup(
-                pnlVitalDummyLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlVitalDummyLayout.setVerticalGroup(
-                pnlVitalDummyLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Werte", pnlVitalDummy);
-
-        org.jdesktop.layout.GroupLayout pnlVerLayout = new org.jdesktop.layout.GroupLayout(pnlVer);
-        pnlVer.setLayout(pnlVerLayout);
-        pnlVerLayout.setHorizontalGroup(
-                pnlVerLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlVerLayout.setVerticalGroup(
-                pnlVerLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Verordnungen", pnlVer);
-
-        org.jdesktop.layout.GroupLayout pnlInfoLayout = new org.jdesktop.layout.GroupLayout(pnlInfo);
-        pnlInfo.setLayout(pnlInfoLayout);
-        pnlInfoLayout.setHorizontalGroup(
-                pnlInfoLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlInfoLayout.setVerticalGroup(
-                pnlInfoLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Informationen", pnlInfo);
-
-        org.jdesktop.layout.GroupLayout pnlPPlanungLayout = new org.jdesktop.layout.GroupLayout(pnlPPlanung);
-        pnlPPlanung.setLayout(pnlPPlanungLayout);
-        pnlPPlanungLayout.setHorizontalGroup(
-                pnlPPlanungLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlPPlanungLayout.setVerticalGroup(
-                pnlPPlanungLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Planung", pnlPPlanung);
-
-        org.jdesktop.layout.GroupLayout pnlVorgangLayout = new org.jdesktop.layout.GroupLayout(pnlVorgang);
-        pnlVorgang.setLayout(pnlVorgangLayout);
-        pnlVorgangLayout.setHorizontalGroup(
-                pnlVorgangLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlVorgangLayout.setVerticalGroup(
-                pnlVorgangLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Vorgänge", pnlVorgang);
-
-        org.jdesktop.layout.GroupLayout pnlFilesLayout = new org.jdesktop.layout.GroupLayout(pnlFiles);
-        pnlFiles.setLayout(pnlFilesLayout);
-        pnlFilesLayout.setHorizontalGroup(
-                pnlFilesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 548, Short.MAX_VALUE)
-        );
-        pnlFilesLayout.setVerticalGroup(
-                pnlFilesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(0, 465, Short.MAX_VALUE)
-        );
-
-        jtpPflegeakte.addTab("Dokumente", pnlFiles);
-
-        jsplBW.setRightComponent(jtpPflegeakte);
-
-        cmbStation.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Alle", "Station 1", "Station 2", "Herchen"}));
-        cmbStation.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbStationItemStateChanged(evt);
-            }
-        });
-
-        jspBW.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspBWComponentResized(evt);
-            }
-        });
-
-        tblBW.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+        //======== jtpMain ========
+        {
+            jtpMain.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    jtpMainStateChanged(e);
                 }
-        ));
-        jspBW.setViewportView(tblBW);
+            });
 
-        cbArchiv.setText("Archiv");
-        cbArchiv.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbArchiv.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbArchivActionPerformed(evt);
+            //======== jtpUebersicht ========
+            {
+                jtpUebersicht.setTabPlacement(SwingConstants.BOTTOM);
+                jtpUebersicht.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        jtpUebersichtStateChanged(e);
+                    }
+                });
+
+                //======== pnlUebergabe ========
+                {
+
+                    GroupLayout pnlUebergabeLayout = new GroupLayout(pnlUebergabe);
+                    pnlUebergabe.setLayout(pnlUebergabeLayout);
+                    pnlUebergabeLayout.setHorizontalGroup(
+                        pnlUebergabeLayout.createParallelGroup()
+                            .addGap(0, 809, Short.MAX_VALUE)
+                    );
+                    pnlUebergabeLayout.setVerticalGroup(
+                        pnlUebergabeLayout.createParallelGroup()
+                            .addGap(0, 469, Short.MAX_VALUE)
+                    );
+                }
+                jtpUebersicht.addTab("\u00dcbergabe", pnlUebergabe);
+
+
+                //======== pnlSchichtleitung ========
+                {
+
+                    GroupLayout pnlSchichtleitungLayout = new GroupLayout(pnlSchichtleitung);
+                    pnlSchichtleitung.setLayout(pnlSchichtleitungLayout);
+                    pnlSchichtleitungLayout.setHorizontalGroup(
+                        pnlSchichtleitungLayout.createParallelGroup()
+                            .addGap(0, 809, Short.MAX_VALUE)
+                    );
+                    pnlSchichtleitungLayout.setVerticalGroup(
+                        pnlSchichtleitungLayout.createParallelGroup()
+                            .addGap(0, 469, Short.MAX_VALUE)
+                    );
+                }
+                jtpUebersicht.addTab("Schichtleitung", pnlSchichtleitung);
+
             }
-        });
+            jtpMain.addTab("\u00dcbersicht", jtpUebersicht);
 
-        btnRefresh.setBackground(java.awt.Color.white);
-        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/reload.png"))); // NOI18N
-        btnRefresh.setBorder(null);
-        btnRefresh.setBorderPainted(false);
-        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRefreshActionPerformed(evt);
-            }
-        });
 
-        jToolBar1.setFloatable(false);
-        jToolBar1.setRollover(true);
+            //======== jsplBW ========
+            {
+                jsplBW.setDividerLocation(250);
 
-        btnVerlegung.setForeground(new java.awt.Color(255, 51, 0));
-        btnVerlegung.setText("Verlegungsbericht");
-        btnVerlegung.setToolTipText("");
-        btnVerlegung.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnVerlegungActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnVerlegung);
+                //======== jtpPflegeakte ========
+                {
+                    jtpPflegeakte.setTabPlacement(SwingConstants.BOTTOM);
+                    jtpPflegeakte.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            jtpPflegeakteStateChanged(e);
+                        }
+                    });
 
-        org.jdesktop.layout.GroupLayout pnlBWLayout = new org.jdesktop.layout.GroupLayout(pnlBW);
-        pnlBW.setLayout(pnlBWLayout);
-        pnlBWLayout.setHorizontalGroup(
-                pnlBWLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlBWLayout.createSequentialGroup()
+                    //======== pnlUeber ========
+                    {
+
+                        GroupLayout pnlUeberLayout = new GroupLayout(pnlUeber);
+                        pnlUeber.setLayout(pnlUeberLayout);
+                        pnlUeberLayout.setHorizontalGroup(
+                            pnlUeberLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlUeberLayout.setVerticalGroup(
+                            pnlUeberLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("\u00dcbersicht", pnlUeber);
+
+
+                    //======== pnlTB ========
+                    {
+
+                        GroupLayout pnlTBLayout = new GroupLayout(pnlTB);
+                        pnlTB.setLayout(pnlTBLayout);
+                        pnlTBLayout.setHorizontalGroup(
+                            pnlTBLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlTBLayout.setVerticalGroup(
+                            pnlTBLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Pflegeberichte", pnlTB);
+
+
+                    //======== pnlDFN ========
+                    {
+
+                        GroupLayout pnlDFNLayout = new GroupLayout(pnlDFN);
+                        pnlDFN.setLayout(pnlDFNLayout);
+                        pnlDFNLayout.setHorizontalGroup(
+                            pnlDFNLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlDFNLayout.setVerticalGroup(
+                            pnlDFNLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("DFN", pnlDFN);
+
+
+                    //======== pnlBHP ========
+                    {
+
+                        GroupLayout pnlBHPLayout = new GroupLayout(pnlBHP);
+                        pnlBHP.setLayout(pnlBHPLayout);
+                        pnlBHPLayout.setHorizontalGroup(
+                            pnlBHPLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlBHPLayout.setVerticalGroup(
+                            pnlBHPLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("BHP", pnlBHP);
+
+
+                    //======== pnlVitalDummy ========
+                    {
+
+                        GroupLayout pnlVitalDummyLayout = new GroupLayout(pnlVitalDummy);
+                        pnlVitalDummy.setLayout(pnlVitalDummyLayout);
+                        pnlVitalDummyLayout.setHorizontalGroup(
+                            pnlVitalDummyLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlVitalDummyLayout.setVerticalGroup(
+                            pnlVitalDummyLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Werte", pnlVitalDummy);
+
+
+                    //======== pnlVer ========
+                    {
+
+                        GroupLayout pnlVerLayout = new GroupLayout(pnlVer);
+                        pnlVer.setLayout(pnlVerLayout);
+                        pnlVerLayout.setHorizontalGroup(
+                            pnlVerLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlVerLayout.setVerticalGroup(
+                            pnlVerLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Verordnungen", pnlVer);
+
+
+                    //======== pnlInfo ========
+                    {
+
+                        GroupLayout pnlInfoLayout = new GroupLayout(pnlInfo);
+                        pnlInfo.setLayout(pnlInfoLayout);
+                        pnlInfoLayout.setHorizontalGroup(
+                            pnlInfoLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlInfoLayout.setVerticalGroup(
+                            pnlInfoLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Informationen", pnlInfo);
+
+
+                    //======== pnlPPlanung ========
+                    {
+
+                        GroupLayout pnlPPlanungLayout = new GroupLayout(pnlPPlanung);
+                        pnlPPlanung.setLayout(pnlPPlanungLayout);
+                        pnlPPlanungLayout.setHorizontalGroup(
+                            pnlPPlanungLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlPPlanungLayout.setVerticalGroup(
+                            pnlPPlanungLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Planung", pnlPPlanung);
+
+
+                    //======== pnlVorgang ========
+                    {
+
+                        GroupLayout pnlVorgangLayout = new GroupLayout(pnlVorgang);
+                        pnlVorgang.setLayout(pnlVorgangLayout);
+                        pnlVorgangLayout.setHorizontalGroup(
+                            pnlVorgangLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlVorgangLayout.setVerticalGroup(
+                            pnlVorgangLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Vorg\u00e4nge", pnlVorgang);
+
+
+                    //======== pnlFiles ========
+                    {
+
+                        GroupLayout pnlFilesLayout = new GroupLayout(pnlFiles);
+                        pnlFiles.setLayout(pnlFilesLayout);
+                        pnlFilesLayout.setHorizontalGroup(
+                            pnlFilesLayout.createParallelGroup()
+                                .addGap(0, 548, Short.MAX_VALUE)
+                        );
+                        pnlFilesLayout.setVerticalGroup(
+                            pnlFilesLayout.createParallelGroup()
+                                .addGap(0, 465, Short.MAX_VALUE)
+                        );
+                    }
+                    jtpPflegeakte.addTab("Dokumente", pnlFiles);
+
+                }
+                jsplBW.setRightComponent(jtpPflegeakte);
+
+                //======== pnlBW ========
+                {
+
+                    //---- cmbStation ----
+                    cmbStation.setModel(new DefaultComboBoxModel(new String[] {
+                        "Alle",
+                        "Station 1",
+                        "Station 2",
+                        "Herchen"
+                    }));
+                    cmbStation.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent e) {
+                            cmbStationItemStateChanged(e);
+                        }
+                    });
+
+                    //======== jspBW ========
+                    {
+                        jspBW.addComponentListener(new ComponentAdapter() {
+                            @Override
+                            public void componentResized(ComponentEvent e) {
+                                jspBWComponentResized(e);
+                            }
+                        });
+
+                        //---- tblBW ----
+                        tblBW.setModel(new DefaultTableModel(
+                            new Object[][] {
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                            },
+                            new String[] {
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
+                        ) {
+                            Class<?>[] columnTypes = new Class<?>[] {
+                                Object.class, Object.class, Object.class, Object.class
+                            };
+                            @Override
+                            public Class<?> getColumnClass(int columnIndex) {
+                                return columnTypes[columnIndex];
+                            }
+                        });
+                        jspBW.setViewportView(tblBW);
+                    }
+
+                    //---- cbArchiv ----
+                    cbArchiv.setText("Archiv");
+                    cbArchiv.setBorder(BorderFactory.createEmptyBorder());
+                    cbArchiv.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            cbArchivActionPerformed(e);
+                        }
+                    });
+
+                    //---- btnRefresh ----
+                    btnRefresh.setBackground(Color.white);
+                    btnRefresh.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/reload.png")));
+                    btnRefresh.setBorder(null);
+                    btnRefresh.setBorderPainted(false);
+                    btnRefresh.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnRefreshActionPerformed(e);
+                        }
+                    });
+
+                    //======== jToolBar1 ========
+                    {
+                        jToolBar1.setFloatable(false);
+                        jToolBar1.setRollover(true);
+
+                        //---- btnVerlegung ----
+                        btnVerlegung.setForeground(new Color(255, 51, 0));
+                        btnVerlegung.setText("Verlegungsbericht");
+                        btnVerlegung.setToolTipText("");
+                        btnVerlegung.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                btnVerlegungActionPerformed(e);
+                            }
+                        });
+                        jToolBar1.add(btnVerlegung);
+                    }
+
+                    GroupLayout pnlBWLayout = new GroupLayout(pnlBW);
+                    pnlBW.setLayout(pnlBWLayout);
+                    pnlBWLayout.setHorizontalGroup(
+                        pnlBWLayout.createParallelGroup()
+                            .addGroup(pnlBWLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(cbArchiv)
+                                .addComponent(cbArchiv)
                                 .addContainerGap(167, Short.MAX_VALUE))
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlBWLayout.createSequentialGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, pnlBWLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(cmbStation, 0, 202, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnRefresh)
+                                .addComponent(cmbStation, 0, 202, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnRefresh)
                                 .addContainerGap())
-                        .add(jToolBar1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jspBW, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                            .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                            .addComponent(jspBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                    );
+                    pnlBWLayout.setVerticalGroup(
+                        pnlBWLayout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, pnlBWLayout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspBW, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlBWLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(btnRefresh)
+                                    .addComponent(cmbStation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addGap(8, 8, 8)
+                                .addComponent(cbArchiv))
+                    );
+                }
+                jsplBW.setLeftComponent(pnlBW);
+            }
+            jtpMain.addTab("Pflegeakte", jsplBW);
+
+        }
+
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 851, Short.MAX_VALUE)
         );
-        pnlBWLayout.setVerticalGroup(
-                pnlBWLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlBWLayout.createSequentialGroup()
-                                .add(jToolBar1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jspBW, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlBWLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                        .add(btnRefresh)
-                                        .add(cmbStation, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(8, 8, 8)
-                                .add(cbArchiv))
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
-
-        jsplBW.setLeftComponent(pnlBW);
-
-        jtpMain.addTab("Pflegeakte", jsplBW);
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(jtpMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 851, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(jtpMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlStatus, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-
-        jtpMain.getAccessibleContext().setAccessibleName("Übergabe");
-
-        setSize(new java.awt.Dimension(851, 623));
+        setSize(851, 623);
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
@@ -688,7 +792,18 @@ public class FrmPflege extends javax.swing.JFrame {
                             break;
                         }
                         case TAB_VORGANG: {
-                            jtpPflegeakte.setComponentAt(TAB_VORGANG, new PnlBWVorgang(this));
+                            final PnlVorgang pnlVorgang = new PnlVorgang(this, bewohner);
+                            CleanablePanel cp = new CleanablePanel() {
+                                @Override
+                                public void cleanup() {
+                                    pnlVorgang.cleanup();
+                                }
+                            };
+                            cp.setLayout(new VerticalLayout(10));
+                            cp.add(BewohnerTools.getBWLabel(bewohner));
+                            cp.add(pnlVorgang);
+
+                            jtpPflegeakte.setComponentAt(TAB_VORGANG, cp);
                             jtpPflegeakte.setTitleAt(TAB_VORGANG, "Vorgänge");
                             break;
                         }
@@ -739,37 +854,35 @@ public class FrmPflege extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgDFN;
-    private javax.swing.ButtonGroup bgKorrekturen;
-    private javax.swing.JButton btnRefresh;
-    private javax.swing.JButton btnVerlegung;
-    private javax.swing.JCheckBox cbArchiv;
-    private javax.swing.JComboBox cmbStation;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JScrollPane jspBW;
-    private javax.swing.JSplitPane jsplBW;
-    private javax.swing.JTabbedPane jtpMain;
-    private javax.swing.JTabbedPane jtpPflegeakte;
-    private javax.swing.JTabbedPane jtpUebersicht;
-    private javax.swing.JLabel lblHeap;
-    private javax.swing.JLabel lblServer;
-    private javax.swing.JLabel lblUser;
-    private javax.swing.JProgressBar pbHeap;
-    private javax.swing.JPanel pnlBHP;
-    private javax.swing.JPanel pnlBW;
-    private javax.swing.JPanel pnlDFN;
-    private javax.swing.JPanel pnlFiles;
-    private javax.swing.JPanel pnlInfo;
-    private javax.swing.JPanel pnlPPlanung;
-    private javax.swing.JPanel pnlSchichtleitung;
-    private javax.swing.JPanel pnlStatus;
-    private javax.swing.JPanel pnlTB;
-    private javax.swing.JPanel pnlUeber;
-    private javax.swing.JPanel pnlUebergabe;
-    private javax.swing.JPanel pnlVer;
-    private javax.swing.JPanel pnlVitalDummy;
-    private javax.swing.JPanel pnlVorgang;
-    private javax.swing.JTable tblBW;
+    private JPanel pnlStatus;
+    private JLabel lblServer;
+    private JLabel lblUser;
+    private JProgressBar pbHeap;
+    private JLabel lblHeap;
+    private JTabbedPane jtpMain;
+    private JTabbedPane jtpUebersicht;
+    private JPanel pnlUebergabe;
+    private JPanel pnlSchichtleitung;
+    private JSplitPane jsplBW;
+    private JTabbedPane jtpPflegeakte;
+    private JPanel pnlUeber;
+    private JPanel pnlTB;
+    private JPanel pnlDFN;
+    private JPanel pnlBHP;
+    private JPanel pnlVitalDummy;
+    private JPanel pnlVer;
+    private JPanel pnlInfo;
+    private JPanel pnlPPlanung;
+    private JPanel pnlVorgang;
+    private JPanel pnlFiles;
+    private JPanel pnlBW;
+    private JComboBox cmbStation;
+    private JScrollPane jspBW;
+    private JTable tblBW;
+    private JCheckBox cbArchiv;
+    private JButton btnRefresh;
+    private JToolBar jToolBar1;
+    private JButton btnVerlegung;
     // End of variables declaration//GEN-END:variables
 
     class HandleBWSelections

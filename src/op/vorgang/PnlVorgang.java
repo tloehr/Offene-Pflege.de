@@ -10,11 +10,13 @@
  */
 package op.vorgang;
 
+import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import op.OPDE;
+import op.care.CleanablePanel;
 import op.share.tools.PnlEditor;
 import op.tools.InternalClassACL;
 import op.tools.SYSCalendar;
@@ -45,7 +47,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class PnlVorgang extends JPanel {
+public class PnlVorgang extends CleanablePanel {
 
     public static final String internalClassID = "opde.tickets";
     private static int speedSlow = 700;
@@ -60,9 +62,10 @@ public class PnlVorgang extends JPanel {
     private int laufendeOperation;
 
     protected Vorgaenge aktuellerVorgang;
+    protected Bewohner aktuellerBewohner;
     protected JPopupMenu menu;
     protected JFrame myFrame;
-    protected double splitTDPercent, splitDOPercent, splitTEPercent;
+    protected double splitTDPercent, splitDOPercent, splitTEPercent, splitBCPercent;
     protected JXTaskPane pnlMyVorgaenge, pnlMeineAltenVorgaenge, pnlAlleVorgaenge, pnlVorgaengeRunningOut, pnlVorgaengeByBW, pnlVorgaengeByMA;
     protected boolean pdcaChanged = false, ignoreEvents = false;
     //protected IconFlash iconflasher;
@@ -75,11 +78,18 @@ public class PnlVorgang extends JPanel {
     /**
      * Creates new form PnlVorgang
      */
-    public PnlVorgang() {
-        this(null);
+    public PnlVorgang(JFrame parent) {
+        this(null, null, parent);
     }
 
-    public PnlVorgang(Vorgaenge vorgang) {
+    /**
+     * Creates new form PnlVorgang
+     */
+    public PnlVorgang(JFrame parent, Bewohner bewohner) {
+        this(null, bewohner, parent);
+    }
+
+    public PnlVorgang(Vorgaenge vorgang, Bewohner bewohner, JFrame parent) {
         ignoreEvents = true;
         initComponents();
         initAuthorizationMap();
@@ -91,10 +101,11 @@ public class PnlVorgang extends JPanel {
         splitTDPercent = SYSTools.showSide(splitTableDetails, SYSTools.LEFT_UPPER_SIDE);
         splitDOPercent = SYSTools.showSide(splitDetailsOwner, SYSTools.LEFT_UPPER_SIDE);
         splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
-        SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
+        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
 
-        //myFrame = this;
-        aktuellerVorgang = null;
+        myFrame = parent;
+        this.aktuellerVorgang = vorgang;
+        this.aktuellerBewohner = bewohner;
 
 
 //        // TODO: Hier müssen noch Rechte rein
@@ -116,16 +127,21 @@ public class PnlVorgang extends JPanel {
             }
         });
 
-        addMeineVorgaenge();
-        addMeineAbgelaufenenVorgaenge();
-        //addAlleVorgaenge();
-        addVorgaengeFuerBW();
-
-        if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-            addVorgaengeFuerMA();
+        if (aktuellerBewohner != null) {
+            addVorgaengeFuerBW(aktuellerBewohner);
+        } else {
+            addMeineVorgaenge();
+            addMeineAbgelaufenenVorgaenge();
+            //addAlleVorgaenge();
+            addVorgaengeFuerBW();
+            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+                addVorgaengeFuerMA();
+                addAblaufendeVorgaenge();
+            }
         }
 
-        //addAblaufendeVorgaenge();
+
+        //
 
         //TableColumn column = tblElements.getColumnModel().getColumn(1);
 
@@ -199,6 +215,34 @@ public class PnlVorgang extends JPanel {
             }
         });
         ((Container) taskContainer).add(pnlAlleVorgaenge);
+    }
+
+    protected void addVorgaengeFuerBW(Bewohner bewohner) {
+        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBewohner");
+        query.setParameter("bewohner", bewohner);
+        List<Vorgaenge> listVorgaenge = query.getResultList();
+        Iterator<Vorgaenge> it = listVorgaenge.iterator();
+
+        JXTaskPane bwpanel = new JXTaskPane(bewohner.getNachname() + ", " + bewohner.getVorname());
+        bwpanel.setCollapsed(false);
+
+        if (!listVorgaenge.isEmpty()) {
+            while (it.hasNext()) {
+                final Vorgaenge innervorgang = it.next();
+                bwpanel.add(new AbstractAction() {
+                    {
+                        putValue(Action.NAME, innervorgang.getTitel());
+                    }
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        loadTable(innervorgang);
+                        loadDetails(innervorgang);
+                    }
+                });
+            }
+        }
+        ((Container) taskContainer).add(bwpanel);
     }
 
 
@@ -504,7 +548,7 @@ public class PnlVorgang extends JPanel {
         if (btnDetails.isSelected()) {
             ignoreEvents = true;
             txtTitel.setText(vorgang.getTitel());
-            lblBW.setText(vorgang.getBewohner() == null ? "Allgemeiner Vorgang" : BewohnerTools.getBWLabel(vorgang.getBewohner()));
+            lblBW.setText(vorgang.getBewohner() == null ? "Allgemeiner Vorgang" : BewohnerTools.getBWLabelText(vorgang.getBewohner()));
             lblStart.setText(DateFormat.getDateInstance().format(vorgang.getVon()));
             jdcWV.setDate(vorgang.getWv());
             lblEnde.setText(vorgang.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "noch nicht abgeschlossen" : DateFormat.getDateInstance().format(vorgang.getBis()));
@@ -575,20 +619,6 @@ public class PnlVorgang extends JPanel {
         SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
         laufendeOperation = LAUFENDE_OPERATION_NICHTS;
 
-
-//        if (savePressedOnce) {
-//            btnApply.setText(null);
-//            alternatingFlash.stop();
-//            alternatingFlash = null;
-//            EntityTools.store(aktuellerVorgang);
-//
-//            setDetailsChanged(false);
-//        } else {
-//            btnApply.setText("WIRKLICH ?");
-//            alternatingFlash = new ComponentAlternatingFlash(btnApply, btnCancel, new ImageIcon(getClass().getResource("/artwork/22x22/help3.png")));
-//            alternatingFlash.execute();
-//        }
-//        savePressedOnce = !savePressedOnce;
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -645,11 +675,10 @@ public class PnlVorgang extends JPanel {
 
     private void jdcWVPropertyChange(PropertyChangeEvent e) {
         if (ignoreEvents) return;
-        setCenterButtons2Edit("Änderungen speichern ?");
-        laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
         if (e.getPropertyName().equals("date")) {
+            setCenterButtons2Edit("Änderungen speichern ?");
+            laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
             aktuellerVorgang.setWv(jdcWV.getDate());
-
         }
     }
 
@@ -817,6 +846,10 @@ public class PnlVorgang extends JPanel {
         SYSTools.showSide(splitTableDetails, splitTDPercent);
     }
 
+    private void splitButtonsCenterComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitButtonsCenter, splitBCPercent);
+    }
+
 
     protected void loadTable(Vorgaenge vorgang) {
         aktuellerVorgang = vorgang;
@@ -942,6 +975,7 @@ public class PnlVorgang extends JPanel {
         btnCancel = new JButton();
 
         //======== this ========
+        setBorder(new LineBorder(Color.black, 1, true));
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -1229,6 +1263,13 @@ public class PnlVorgang extends JPanel {
             splitButtonsCenter.setOrientation(JSplitPane.VERTICAL_SPLIT);
             splitButtonsCenter.setDividerSize(0);
             splitButtonsCenter.setDividerLocation(35);
+            splitButtonsCenter.setBorder(null);
+            splitButtonsCenter.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    splitButtonsCenterComponentResized(e);
+                }
+            });
 
             //======== panel5 ========
             {
@@ -1358,6 +1399,11 @@ public class PnlVorgang extends JPanel {
         btnDetails.setEnabled(enabled);
         btnPrint.setEnabled(enabled);
         btnEndReactivate.setEnabled(enabled);
+    }
+
+    @Override
+    public void cleanup() {
+
     }
 
     private void btnAddBerichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBerichtActionPerformed

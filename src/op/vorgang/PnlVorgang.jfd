@@ -20,6 +20,14 @@
         <string>relgap, 0dlu, default, linegap, fill:default:grow, linegap, 22dlu, 0dlu, linegap, 1dlu</string> 
        </void> 
       </object> 
+      <void method="setProperty"> 
+       <string>border</string> 
+       <object class="javax.swing.border.LineBorder"> 
+        <object class="java.awt.Color" field="black"/> 
+        <int>1</int> 
+        <boolean>true</boolean> 
+       </object> 
+      </void> 
       <void method="addEvent"> 
        <object class="com.jformdesigner.model.FormEvent"> 
         <string>java.awt.event.ComponentListener</string> 
@@ -1223,6 +1231,18 @@
         <void method="setProperty"> 
          <string>dividerLocation</string> 
          <int>35</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>border</string> 
+         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ComponentListener</string> 
+          <string>componentResized</string> 
+          <string>splitButtonsCenterComponentResized</string> 
+          <boolean>true</boolean> 
+         </object> 
         </void> 
         <void property="name"> 
          <string>splitButtonsCenter</string> 

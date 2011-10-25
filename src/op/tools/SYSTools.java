@@ -27,6 +27,7 @@
 package op.tools;
 
 import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
@@ -56,6 +57,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -499,9 +501,7 @@ public class SYSTools {
         return result;
     }
 
-    public static String getBWLabel(Bewohner bewohner) {
-        return getBWLabel(bewohner.getBWKennung());
-    }
+
 
     public static String getBWLabel(String currentBW) {
         HashMap bw = DBHandling.getBW(currentBW);

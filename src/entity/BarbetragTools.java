@@ -35,7 +35,7 @@ public class BarbetragTools {
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = "Barbetragsübersicht für " + SYSTools.getBWLabel(bewohner);
+        String header = "Barbetragsübersicht für " + BewohnerTools.getBWLabelText(bewohner);
 
         String html = "<html>\n"
                 + "<head>\n"

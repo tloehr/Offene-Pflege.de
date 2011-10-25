@@ -27,6 +27,7 @@
 package op.share.bwinfo;
 
 import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.EinrichtungenTools;
 import op.OPDE;
 import op.tools.*;
@@ -256,7 +257,7 @@ public class DBHandling {
         }
 
         String result = "<h1>Bewohner-Informationen</h1>";
-        result += "<h2>" + SYSTools.getBWLabel(bewohner) + "</h2>";
+        result += "<h2>" + BewohnerTools.getBWLabelText(bewohner) + "</h2>";
 
         result += "<table border=\"1\" cellspacing=\"0\">";
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);

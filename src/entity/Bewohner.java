@@ -81,6 +81,7 @@ public class Bewohner implements Serializable {
     private boolean adminonly;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
     private Collection<Sysbw2file> bwFilesCollection;
+
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<Pflegeberichte> pflegeberichteCollection;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")

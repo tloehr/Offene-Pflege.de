@@ -40,6 +40,7 @@ import java.util.Date;
         @NamedQuery(name = "BWInfo.findAll", query = "SELECT b FROM BWInfo b"),
         @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM BWInfo b WHERE b.bwinfoid = :bwinfoid"),
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
+        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis"),
         @NamedQuery(name = "BWInfo.findByReiter", query = "SELECT b FROM BWInfo b WHERE b.reiter = :reiter")})
 public class BWInfo implements Serializable {
@@ -69,7 +70,7 @@ public class BWInfo implements Serializable {
     // ==
     // N:1 Relationen
     // ==
-    @JoinColumn(name = "BWInfTyp", referencedColumnName = "BWInfTyp")
+    @JoinColumn(name = "BWINFTYP", referencedColumnName = "BWINFTYP")
     @ManyToOne
     private BWInfoTyp bwinfotyp;
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
@@ -84,11 +85,12 @@ public class BWInfo implements Serializable {
     // ==
     // M:N Relationen
     // ==
-    @ManyToMany
-    @JoinTable(name = "SYSBWINFO2VORGANG", joinColumns =
-    @JoinColumn(name = "BWInfoID"), inverseJoinColumns =
-    @JoinColumn(name = "VorgangID"))
-    private Collection<Vorgaenge> vorgaenge;
+//    @ManyToMany
+//    @JoinTable(name = "SYSBWINFO2VORGANG", joinColumns =
+//    @JoinColumn(name = "BWInfoID"), inverseJoinColumns =
+//    @JoinColumn(name = "VorgangID"))
+//    private Collection<Vorgaenge> vorgaenge;
+
 
     public BWInfo() {
     }
@@ -151,10 +153,6 @@ public class BWInfo implements Serializable {
 
     public void setReiter(BigInteger reiter) {
         this.reiter = reiter;
-    }
-
-    public Collection<Vorgaenge> getVorgaenge() {
-        return vorgaenge;
     }
 
     public Users getAbgesetztDurch() {

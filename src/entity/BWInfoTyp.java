@@ -25,6 +25,8 @@
  */
 package entity;
 
+import op.OPDE;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
@@ -65,6 +67,8 @@ public class BWInfoTyp implements Serializable {
     private Integer sortierung;
     @Column(name = "IntervalMode")
     private Short intervalMode;
+
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfotyp")
     private Collection<BWInfo> bwInfoCollection;
 
@@ -153,6 +157,7 @@ public class BWInfoTyp implements Serializable {
         }
         BWInfoTyp other = (BWInfoTyp) object;
         if ((this.bwinftyp == null && other.bwinftyp != null) || (this.bwinftyp != null && !this.bwinftyp.equals(other.bwinftyp))) {
+            OPDE.debug(this.bwinftyp + " != " + other.bwinftyp);
             return false;
         }
         return true;

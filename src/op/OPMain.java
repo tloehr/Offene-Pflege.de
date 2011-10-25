@@ -73,7 +73,7 @@ public class OPMain extends javax.swing.JFrame {
         menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});
         menuStructure.add(new String[]{"System/Datei-Manager", "op.sysfiles.FrmFilesManager", "kfm.png"});
         menuStructure.add(new String[]{"Controlling/Controlling", "op.controlling.FrmCtrlMonitor", "kfind.png"});
-        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.vorgang.PnlVorgang", "utilities-file-archiver.png"});
+        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.vorgang.FrmVorgang", "utilities-file-archiver.png"});
 
         frames = new HashMap();
         //this.setTitle(OPDE.getLocalProps().getProperty("program.PROGNAME") + ", Version " + OPDE.getLocalProps().getProperty("program.VERSION") +
