@@ -26,24 +26,34 @@
  */
 package op.care.berichte;
 
-import java.beans.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 import entity.*;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
-import op.tools.*;
+import op.tools.InternalClassACL;
+import op.tools.SYSCalendar;
+import op.tools.SYSPrint;
+import op.tools.SYSTools;
+import org.jdesktop.swingx.*;
+import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.JXTitledPanel;
 import tablemodels.TMPflegeberichte;
 
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -59,6 +69,20 @@ import java.util.Iterator;
 public class PnlBerichte extends CleanablePanel {
 
     public static final String internalClassID = "nursingrecords.reports";
+
+    private static int speedSlow = 700;
+    private static int speedFast = 500;
+
+    private final int LAUFENDE_OPERATION_NICHTS = 0;
+    private final int LAUFENDE_OPERATION_BERICHT_EINGABE = 1;
+    private final int LAUFENDE_OPERATION_BERICHT_LOESCHEN = 2;
+    private final int LAUFENDE_OPERATION_ELEMENT_ENTFERNEN = 3;
+    private final int LAUFENDE_OPERATION_VORGANG_BEARBEITEN = 4;
+
+    private int laufendeOperation;
+
+    private Date von, bis;
+
     private Bewohner bewohner;
     private JPopupMenu menu;
     private boolean initPhase;
@@ -84,20 +108,15 @@ public class PnlBerichte extends CleanablePanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(FrmPflege pflege) {
+    public PnlBerichte(FrmPflege pflege, Bewohner bewohner) {
         this.initPhase = true;
-        bewohner = pflege.getBewohner();
+        this.bewohner = bewohner;
         this.parent = pflege;
         this.bericht = null;
 
         initComponents();
-        if (pflege.bwlabel == null) {
-            SYSTools.setBWLabel(lblBW, bewohner);
-            pflege.bwlabel = lblBW;
-        } else {
-            lblBW.setText(pflege.bwlabel.getText());
-            lblBW.setToolTipText(pflege.bwlabel.getToolTipText());
-        }
+        BewohnerTools.setBWLabel(lblBW, bewohner);
+
         //TODO: die RestoreStates müssen nach JPA gewandelt werden.
         SYSTools.restoreState(this.getClass().getName() + ":cbShowEdits", cbShowEdits);
         SYSTools.restoreState(this.getClass().getName() + ":cbTBIDS", cbTBIDS);
@@ -128,22 +147,7 @@ public class PnlBerichte extends CleanablePanel {
         };
 
         tagFilter = new ArrayList<PBerichtTAGS>();
-        jspFilter.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cb = (JCheckBox) e.getSource();
-                // Ich benutze hier die ClientProperty Map um die Entities dem Listener mitzugeben.
-                // Das war wohl nicht so gedacht. Aber es geht trotzdem.
-                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    tagFilter.remove(tag);
-                } else {
-                    tagFilter.add(tag);
-                }
-                reloadTable();
-            }
-        }, new ArrayList<PBerichtTAGS>(), new GridLayout(3, 4)));
+        prepareSearchArea();
 
         btnNew.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
@@ -197,8 +201,16 @@ public class PnlBerichte extends CleanablePanel {
         btnSearch = new JButton();
         jPanel6 = new JPanel();
         jspFilter = new JScrollPane();
+        scrollPane2 = new JScrollPane();
+        taskSearch = new JXTaskPaneContainer();
+        splitButtonsCenter = new JSplitPane();
+        panel1 = new JPanel();
+        panel2 = new JPanel();
 
         //======== this ========
+        setLayout(new FormLayout(
+            "$rgap, pref, $lcgap, default:grow, 0dlu, $rgap",
+            "4*(fill:default, $lgap), 20dlu, $lgap, default"));
 
         //======== jToolBar2 ========
         {
@@ -259,11 +271,13 @@ public class PnlBerichte extends CleanablePanel {
             });
             jToolBar2.add(cbTBIDS);
         }
+        add(jToolBar2, CC.xy(4, 1));
 
         //---- lblBW ----
         lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
         lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("jLabel3");
+        add(lblBW, CC.xy(4, 3));
 
         //======== jspTblTB ========
         {
@@ -302,6 +316,7 @@ public class PnlBerichte extends CleanablePanel {
             });
             jspTblTB.setViewportView(tblTB);
         }
+        add(jspTblTB, CC.xy(4, 7));
 
         //======== pnlFilter ========
         {
@@ -384,7 +399,7 @@ public class PnlBerichte extends CleanablePanel {
                             .addComponent(btn4Wochen)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(btnVonAnfangAn)
-                            .addContainerGap(159, Short.MAX_VALUE))
+                            .addContainerGap(246, Short.MAX_VALUE))
                 );
                 jPanel4Layout.setVerticalGroup(
                     jPanel4Layout.createParallelGroup()
@@ -436,7 +451,7 @@ public class PnlBerichte extends CleanablePanel {
                     jPanel5Layout.createParallelGroup()
                         .addGroup(GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(txtSuche, GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
+                            .addComponent(txtSuche, GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(btnSearch)
                             .addContainerGap())
@@ -446,8 +461,8 @@ public class PnlBerichte extends CleanablePanel {
                         .addGroup(jPanel5Layout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(jPanel5Layout.createParallelGroup()
-                                .addComponent(txtSuche, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
-                                .addComponent(btnSearch, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE))
+                                .addComponent(txtSuche, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
+                                .addComponent(btnSearch, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
                             .addContainerGap())
                 );
             }
@@ -461,47 +476,42 @@ public class PnlBerichte extends CleanablePanel {
                 jPanel6.setLayout(jPanel6Layout);
                 jPanel6Layout.setHorizontalGroup(
                     jPanel6Layout.createParallelGroup()
-                        .addComponent(jspFilter, GroupLayout.DEFAULT_SIZE, 936, Short.MAX_VALUE)
+                        .addComponent(jspFilter, GroupLayout.DEFAULT_SIZE, 1023, Short.MAX_VALUE)
                 );
                 jPanel6Layout.setVerticalGroup(
                     jPanel6Layout.createParallelGroup()
-                        .addComponent(jspFilter, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                        .addComponent(jspFilter, GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
                 );
             }
             pnlFilter.addTab("Markierung", jPanel6);
 
         }
+        add(pnlFilter, CC.xy(4, 5));
 
-        GroupLayout layout = new GroupLayout(this);
-        setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jspTblTB, GroupLayout.DEFAULT_SIZE, 950, Short.MAX_VALUE))
-                        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(pnlFilter, GroupLayout.DEFAULT_SIZE, 957, Short.MAX_VALUE))
-                        .addComponent(jToolBar2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 970, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addGap(12, 12, 12)
-                            .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 958, Short.MAX_VALUE)))
-                    .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(pnlFilter, GroupLayout.PREFERRED_SIZE, 151, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspTblTB, GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
+        //======== scrollPane2 ========
+        {
+            scrollPane2.setViewportView(taskSearch);
+        }
+        add(scrollPane2, CC.xywh(2, 5, 1, 3));
+
+        //======== splitButtonsCenter ========
+        {
+            splitButtonsCenter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+            splitButtonsCenter.setDividerSize(0);
+
+            //======== panel1 ========
+            {
+                panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+            }
+            splitButtonsCenter.setTopComponent(panel1);
+
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+            }
+            splitButtonsCenter.setBottomComponent(panel2);
+        }
+        add(splitButtonsCenter, CC.xy(4, 9));
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
@@ -728,6 +738,121 @@ public class PnlBerichte extends CleanablePanel {
         jdcVon.setDate(SYSCalendar.addField(new Date(), -4, GregorianCalendar.WEEK_OF_MONTH));
     }//GEN-LAST:event_btn4WochenActionPerformed
 
+    protected void prepareSearchArea() {
+
+        addByTime();
+        addByTags();
+    }
+
+
+    private void addByTags() {
+        JXTaskPane panel = new JXTaskPane("nach Markierung");
+        PBerichtTAGSTools.addCheckBoxPanelForTags(panel, new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox cb = (JCheckBox) e.getSource();
+                // Ich benutze hier die ClientProperty Map um die Entities dem Listener mitzugeben.
+                // Das war wohl nicht so gedacht. Aber es geht trotzdem.
+                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    tagFilter.remove(tag);
+                } else {
+                    tagFilter.add(tag);
+                }
+                reloadTable();
+            }
+        }, new ArrayList<PBerichtTAGS>());
+
+        panel.setCollapsed(true);
+        taskSearch.add((JPanel) panel);
+
+    }
+
+    private void addByTime() {
+
+        JXTaskPane panel = new JXTaskPane("nach Zeit");
+        final JDateChooser jdcVon = new JDateChooser(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
+        jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (initPhase) {
+                    return;
+                }
+                if (!evt.getPropertyName().equals("date")) {
+                    return;
+                }
+                reloadTable();
+            }
+        });
+        panel.add(new JXTitledSeparator("Von"));
+        panel.add(jdcVon);
+        panel.add(new AbstractAction() {
+            {
+                putValue(Action.NAME, "vor 2 Wochen");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jdcVon.setDate(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
+            }
+        });
+
+        panel.add(new AbstractAction() {
+            {
+                putValue(Action.NAME, "vor 4 Wochen");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jdcVon.setDate(SYSCalendar.addField(new Date(), -4, GregorianCalendar.WEEK_OF_MONTH));
+            }
+        });
+
+
+        panel.add(new AbstractAction() {
+            {
+                putValue(Action.NAME, "von Anfang an");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jdcVon.setDate(PflegeberichteTools.firstBericht(bewohner).getPit());
+            }
+        });
+
+        final JDateChooser jdcBis = new JDateChooser(new Date());
+        jdcBis.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (initPhase) {
+                    return;
+                }
+                if (!evt.getPropertyName().equals("date")) {
+                    return;
+                }
+                bis = jdcBis.getDate();
+                reloadTable();
+            }
+        });
+        panel.add(new JLabel(" "));
+        panel.add(new JXTitledSeparator("Bis"));
+        panel.add(jdcBis);
+        panel.add(new AbstractAction() {
+            {
+                putValue(Action.NAME, "heute");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jdcVon.setDate(new Date());
+            }
+        });
+
+
+        taskSearch.add((JPanel) panel);
+    }
+
     private void reloadTable() {
         if (initPhase) {
             return;
@@ -735,44 +860,31 @@ public class PnlBerichte extends CleanablePanel {
 
         Query query = null;
 
-        switch (pnlFilter.getSelectedIndex()) {
-            case TAB_DATE: {
-                query = cbShowEdits.isSelected() ? OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerWithinPeriod") : OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerWithinPeriodWithoutEdits");
-                query.setParameter("von", new Date(SYSCalendar.startOfDay(jdcVon.getDate())));
-                query.setParameter("bis", new Date(SYSCalendar.endOfDay(jdcBis.getDate())));
-                query.setParameter("bewohner", bewohner);
-                break;
-            }
-            case TAB_SEARCH: {
-                query = cbShowEdits.isSelected() ? OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerAndSearchText") : OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerAndSearchTextWithoutEdits");
-                query.setParameter("search", "%" + txtSuche.getText() + "%");
-                query.setParameter("bewohner", bewohner);
-                break;
-            }
-            case TAB_TAGS: {
-                String tags = "";
-                Iterator<PBerichtTAGS> it = tagFilter.iterator();
-                while (it.hasNext()) {
-                    tags += Long.toString(it.next().getPbtagid());
-                    tags += (it.hasNext() ? "," : "");
-                }
-                if (!tags.isEmpty()) {
-                    query = OPDE.getEM().createQuery(" "
-                            + " SELECT p FROM Pflegeberichte p "
-                            + " JOIN p.tags t "
-                            + " WHERE p.bewohner = :bewohner "
-                            + " AND t.pbtagid IN (" + tags + ")"
-                            + (cbShowEdits.isSelected() ? "" : " AND p.editedBy is null ")
-                            + " ORDER BY p.pit DESC ");
-                    query.setParameter("bewohner", bewohner);
-                }
-                break;
-            }
-            default: {
-                break;
-            }
+        String tags = "";
+        Iterator<PBerichtTAGS> it = tagFilter.iterator();
+        while (it.hasNext()) {
+            tags += Long.toString(it.next().getPbtagid());
+            tags += (it.hasNext() ? "," : "");
         }
 
+        String search = txtSuche.getText().trim();
+
+        query = OPDE.getEM().createQuery(" "
+                + " SELECT p FROM Pflegeberichte p "
+                + (tags.isEmpty() ? "" : " JOIN p.tags t ")
+                + " WHERE p.bewohner = :bewohner "
+                + " AND p.pit >= :von AND p.pit <= :bis "
+                + (search.isEmpty() ? "" : " p.text like :search ")
+                + (tags.isEmpty() ? "" : " AND t.pbtagid IN (" + tags + ")")
+                + (cbShowEdits.isSelected() ? "" : " AND p.editedBy is null ")
+                + " ORDER BY p.pit DESC ");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("von", von);
+        query.setParameter("bis", bis);
+
+        if (!search.isEmpty()) {
+            query.setParameter("search", "%" + search + "%");
+        }
         tblTB.setModel(new TMPflegeberichte(query, cbTBIDS.isSelected()));
 
         btnPrint.setEnabled(tblTB.getModel().getRowCount() > 0 && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
@@ -810,5 +922,10 @@ public class PnlBerichte extends CleanablePanel {
     private JButton btnSearch;
     private JPanel jPanel6;
     private JScrollPane jspFilter;
+    private JScrollPane scrollPane2;
+    private JXTaskPaneContainer taskSearch;
+    private JSplitPane splitButtonsCenter;
+    private JPanel panel1;
+    private JPanel panel2;
     // End of variables declaration//GEN-END:variables
 }

@@ -27,6 +27,7 @@
 
 package op.care.bwinfo;
 
+import entity.Bewohner;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.share.bwinfo.BWInfo;
@@ -44,9 +45,9 @@ public class PnlInfo extends CleanablePanel {
     /**
      * Creates new form PnlInfo
      */
-    public PnlInfo(Frame parent, String bwkennung) {
+    public PnlInfo(Frame parent, Bewohner bewohner) {
         initComponents();
-        pnlMain = new PnlBWInfo(parent, BWInfo.ART_PFLEGE_STAMMDATEN, bwkennung, "");
+        pnlMain = new PnlBWInfo(parent, BWInfo.ART_PFLEGE_STAMMDATEN, bewohner.getBWKennung(), "");
         jspMain.setViewportView(pnlMain);
     }
 

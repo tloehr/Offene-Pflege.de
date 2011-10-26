@@ -56,7 +56,6 @@ public class TMPflegeberichte
         } else {
             pflegeberichte = new ArrayList<Pflegeberichte>(query.getResultList());
         }
-
     }
 
     @Override

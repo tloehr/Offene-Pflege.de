@@ -10,14 +10,14 @@
      <object class="com.jformdesigner.model.FormContainer"> 
       <string>op.care.CleanablePanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>org.jdesktop.layout.GroupLayout</class> 
+       <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
-        <string>$horizontalGroup</string> 
-        <string>par l {seq t {par t {seq l {space :::p, comp jspTblTB::::950:x:2}, seq l {space :::p, comp pnlFilter::::957:x}, comp jToolBar2::l::970:x:2, seq l:::1 {space :p:12:p, comp lblBW::::958:x}}, space :::p}}</string> 
+        <string>$columnSpecs</string> 
+        <string>relgap, pref, labelcompgap, default:grow, 0dlu, relgap</string> 
        </void> 
        <void method="setProperty"> 
-        <string>$verticalGroup</string> 
-        <string>par l {seq l {comp jToolBar2:::p::p, space :::p, comp lblBW:::p::p, space :::p, comp pnlFilter:::p:151:p, space :::p, comp jspTblTB::::276:x, space :::p}}</string> 
+        <string>$rowSpecs</string> 
+        <string>fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, 20dlu, linegap, default</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -166,6 +166,17 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>4</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>1</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
@@ -193,6 +204,17 @@
         </void> 
         <void property="name"> 
          <string>lblBW</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>4</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -357,6 +379,17 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>4</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>7</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
@@ -382,7 +415,7 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq {space :::p, par l {comp jLabel1:::p::p, comp jLabel2:::p::p}, space :::p, par t:::p {comp jdcBis::l:::x:1, comp jdcVon::l::167:x:1}, space :::p, comp btn2Wochen:::p::p, space :::p, comp btn4Wochen:::p::p, space :::p, comp btnVonAnfangAn:::p::p, space ::159:x}}</string> 
+            <string>par l {seq {space :::p, par l {comp jLabel1:::p::p, comp jLabel2:::p::p}, space :::p, par t:::p {comp jdcBis::l:::x:1, comp jdcVon::l::167:x:1}, space :::p, comp btn2Wochen:::p::p, space :::p, comp btn4Wochen:::p::p, space :::p, comp btnVonAnfangAn:::p::p, space ::246:x}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
@@ -534,11 +567,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq t {space :::p, comp txtSuche::::785:x:1, space :::p, comp btnSearch:::p::p, space :::p}}</string> 
+            <string>par l {seq t {space :::p, comp txtSuche::::872:x:1, space :::p, comp btnSearch:::p::p, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq l {space :::p, par l {comp txtSuche::t::65:x, comp btnSearch::t::65:x}, space :::p}}</string> 
+            <string>par l {seq l {space :::p, par l {comp txtSuche::t::72:x, comp btnSearch::t::72:x}, space :::p}}</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -604,11 +637,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {comp jspFilter::l::936:x}</string> 
+            <string>par l {comp jspFilter::l::1023:x}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {comp jspFilter::l::105:x}</string> 
+            <string>par l {comp jspFilter::l::112:x}</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -635,6 +668,120 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>4</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>5</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormContainer"> 
+        <string>javax.swing.JScrollPane</string> 
+        <object class="com.jformdesigner.model.FormLayoutManager"> 
+         <class>javax.swing.JScrollPane</class> 
+        </object> 
+        <void property="name"> 
+         <string>scrollPane2</string> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>org.jdesktop.swingx.JXTaskPaneContainer</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>com.jformdesigner.runtime.GenericIndexLayout</class> 
+          </object> 
+          <void property="name"> 
+           <string>taskSearch</string> 
+          </void> 
+         </object> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>2</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridHeight</string> 
+         <int>3</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormContainer"> 
+        <string>javax.swing.JSplitPane</string> 
+        <object class="com.jformdesigner.model.FormLayoutManager"> 
+         <class>javax.swing.JSplitPane</class> 
+        </object> 
+        <void method="setProperty"> 
+         <string>orientation</string> 
+         <int>0</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>dividerSize</string> 
+         <int>0</int> 
+        </void> 
+        <void property="name"> 
+         <string>splitButtonsCenter</string> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JPanel</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.BoxLayout</class> 
+          </object> 
+          <void property="name"> 
+           <string>panel1</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>java.lang.String</class> 
+          <void method="setProperty"> 
+           <string>value</string> 
+           <string>left</string> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JPanel</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.BoxLayout</class> 
+          </object> 
+          <void property="name"> 
+           <string>panel2</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>java.lang.String</class> 
+          <void method="setProperty"> 
+           <string>value</string> 
+           <string>right</string> 
+          </void> 
+         </object> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>4</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>9</int> 
+        </void> 
+       </object> 
       </void> 
      </object> 
      <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -642,7 +789,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>990</int> 
+        <int>1090</int> 
         <int>510</int> 
        </object> 
       </void> 

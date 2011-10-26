@@ -1083,7 +1083,7 @@ public class PnlVorgang extends CleanablePanel {
                 {
                     pnlDetails.setLayout(new FormLayout(
                         "0dlu, $lcgap, 70dlu, $lcgap, default:grow, 2*($lcgap, default), $lcgap, 0dlu",
-                        "0dlu, 9*($lgap, fill:default)"));
+                        "0dlu, 9*($lgap, fill:default), 4*($lgap, default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");

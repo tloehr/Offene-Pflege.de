@@ -27,6 +27,8 @@
 package op.care.vital;
 
 import com.toedter.calendar.JDateChooser;
+import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.SYSFilesTools;
 import op.OCSec;
 import op.OPDE;
@@ -71,8 +73,6 @@ public class PnlVitalwerte extends CleanablePanel {
     public static final int STUHLGANG = 10;
     public static final int ERBRECHEN = 11;
     public String currentBW;
-    public JTabbedPane jtpPflege;
-    public JTable tblBW;
     public boolean editMode = false;
     public boolean newMode = false;
     private boolean[] filter = {false, false, false, false, false, false, false, false, false, false, false, false};
@@ -86,21 +86,13 @@ public class PnlVitalwerte extends CleanablePanel {
     /**
      * Creates new form pnlVitalwerte
      */
-    public PnlVitalwerte(String currentBW, FrmPflege parent, JTabbedPane jtpPflege, JTable tblBW) {
+    public PnlVitalwerte(FrmPflege parent, Bewohner bewohner) {
         initPhase = true;
-        this.currentBW = currentBW;
-        this.jtpPflege = jtpPflege;
-        this.tblBW = tblBW;
+        this.currentBW = bewohner.getBWKennung();
         this.parent = parent;
         ocs = OPDE.getOCSec();
         initComponents();
-        if (parent.bwlabel == null) {
-            SYSTools.setBWLabel(lblBW, currentBW);
-            parent.bwlabel = lblBW;
-        } else {
-            lblBW.setText(parent.bwlabel.getText());
-            lblBW.setToolTipText(parent.bwlabel.getToolTipText());
-        }
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         jdcVon.setDate(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.WEEK_OF_MONTH));
         jdcBis.setDate(SYSCalendar.today_date());

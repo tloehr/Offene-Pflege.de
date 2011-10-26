@@ -71,18 +71,18 @@ public class DlgBericht extends javax.swing.JDialog {
 
         initComponents();
 
-        pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cb = (JCheckBox) e.getSource();
-                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    editBericht.getTags().remove(tag);
-                } else {
-                    editBericht.getTags().add(tag);
-                }
-            }
-        }, bericht.getTags(), new GridLayout(0, 1)));
+//        pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                JCheckBox cb = (JCheckBox) e.getSource();
+//                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
+//                if (e.getStateChange() == ItemEvent.DESELECTED) {
+//                    editBericht.getTags().remove(tag);
+//                } else {
+//                    editBericht.getTags().add(tag);
+//                }
+//            }
+//        }, bericht.getTags(), new GridLayout(0, 1)));
 
         setTitle(SYSTools.getWindowTitle("Pflegebericht"));
         int dauer = 3;

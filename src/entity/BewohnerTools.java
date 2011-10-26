@@ -16,6 +16,11 @@ import java.util.Date;
  * @author tloehr
  */
 public class BewohnerTools {
+
+    public static final int GESCHLECHT_MAENNLICH = 1;
+    public static final int GESCHLECHT_WEIBLICH = 2;
+    public static final String GESCHLECHT[] = {"", "männlich", "weiblich"};
+
     public static Bewohner findByBWKennung(String bwkennung) {
         Query query = OPDE.getEM().createNamedQuery("Bewohner.findByBWKennung");
         query.setParameter("bWKennung", bwkennung);
@@ -24,11 +29,19 @@ public class BewohnerTools {
 
     public static JLabel getBWLabel(Bewohner bewohner) {
         JLabel lblBW = new JLabel();
+        setBWLabel(lblBW, bewohner);
+        return lblBW;
+    }
+
+    public static void setBWLabel(JLabel lblBW, Bewohner bewohner) {
         lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
         lblBW.setHorizontalAlignment(SwingConstants.LEADING);
         lblBW.setForeground(new java.awt.Color(255, 51, 0));
         lblBW.setText(getBWLabelText(bewohner));
-        return lblBW;
+    }
+
+    public static boolean isWeiblich(Bewohner bewohner) {
+        return bewohner.getGeschlecht() == GESCHLECHT_WEIBLICH;
     }
 
     public static String getBWLabelText(Bewohner bewohner) {

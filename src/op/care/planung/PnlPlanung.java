@@ -26,6 +26,8 @@
  */
 package op.care.planung;
 
+import entity.Bewohner;
+import entity.BewohnerTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -59,6 +61,7 @@ public class PnlPlanung extends CleanablePanel {
     //private int mode;
     private FrmPflege parent;
     private String bwkennung;
+    private Bewohner bewohner;
     private ListSelectionListener lsl;
     private OCSec ocs;
     private ActionListener fileActionListener;
@@ -66,9 +69,10 @@ public class PnlPlanung extends CleanablePanel {
     /**
      * Creates new form PnlPlanung
      */
-    public PnlPlanung(FrmPflege parent, String bwkennung) {
+    public PnlPlanung(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
-        this.bwkennung = bwkennung;
+        this.bwkennung = bewohner.getBWKennung();
+        this.bewohner = bewohner;
         ocs = OPDE.getOCSec();
         initComponents();
         initPanel();
@@ -76,13 +80,7 @@ public class PnlPlanung extends CleanablePanel {
 
     private void initPanel() {
         //SYSTools.setBWLabel(lblBW, bwkennung);
-        if (parent.bwlabel == null) {
-            SYSTools.setBWLabel(lblBW, this.bwkennung);
-            parent.bwlabel = lblBW;
-        } else {
-            lblBW.setText(parent.bwlabel.getText());
-            lblBW.setToolTipText(parent.bwlabel.getToolTipText());
-        }
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         fileActionListener = new ActionListener() {
 

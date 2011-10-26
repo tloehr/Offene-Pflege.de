@@ -26,10 +26,7 @@
  */
 package op.care.verordnung;
 
-import entity.SYSFilesTools;
-import entity.SYSRunningClasses;
-import entity.SYSRunningClassesTools;
-import entity.VerordnungTools;
+import entity.*;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -68,6 +65,7 @@ public class PnlVerordnung extends CleanablePanel {
 
     public static final String internalClassID = "nursingrecords.prescription";
     private String bwkennung;
+    private Bewohner bewohner;
     private FrmPflege parent;
     private ListSelectionListener lsl;
     private long currentVerID = 0;
@@ -94,16 +92,17 @@ public class PnlVerordnung extends CleanablePanel {
     /**
      * Creates new form PnlVerordnung
      */
-    public PnlVerordnung(FrmPflege parent, String bwkennung) {
+    public PnlVerordnung(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
         ocs = OPDE.getOCSec();
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
+        this.bwkennung = bewohner.getBWKennung();
         initComponents();
         initPanel();
     }
 
     private void initPanel() {
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, parent.getBewohner().getBWKennung(), SYSRunningClasses.STATUS_RW);
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
         runningClass = result[0];
 
         if (!runningClass.isRW()) {
@@ -117,13 +116,7 @@ public class PnlVerordnung extends CleanablePanel {
             btnLock.setToolTipText(null);
         }
 
-        if (parent.bwlabel == null) {
-            SYSTools.setBWLabel(lblBW, this.bwkennung);
-            parent.bwlabel = lblBW;
-        } else {
-            lblBW.setText(parent.bwlabel.getText());
-            lblBW.setToolTipText(parent.bwlabel.getToolTipText());
-        }
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         // SYSTools.setBWLabel(lblBW, bwkennung);
 
@@ -450,7 +443,7 @@ public class PnlVerordnung extends CleanablePanel {
                     cbOhneMedi.isSelected(), cbBedarf.isSelected(), cbRegel.isSelected(), false);
             //TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
 
-            String html = SYSTools.htmlUmlautConversion(op.care.verordnung.DBHandling.getVerordnungenAsHTML(tm, parent.getBewohner(), sel));
+            String html = SYSTools.htmlUmlautConversion(op.care.verordnung.DBHandling.getVerordnungenAsHTML(tm, bewohner, sel));
 
             out.write(SYSTools.addHTMLTitle(html, SYSTools.getBWLabel(bwkennung), true));
 
@@ -473,7 +466,7 @@ public class PnlVerordnung extends CleanablePanel {
 
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getStellplanAsHTML(parent.getBewohner().getStation().getEinrichtung()));
+            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getStellplanAsHTML(bewohner.getStation().getEinrichtung()));
 
             out.write(html);
 

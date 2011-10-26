@@ -27,6 +27,7 @@
 package op.care;
 
 import entity.Bewohner;
+import entity.BewohnerTools;
 import op.OPDE;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
@@ -43,19 +44,11 @@ public class PnlBWUebersicht extends CleanablePanel {
     /**
      * Creates new form PnlBWUebersicht
      */
-    public PnlBWUebersicht(FrmPflege pflege) {
-        bewohner = pflege.getBewohner();
+    public PnlBWUebersicht(FrmPflege pflege, Bewohner bewohner) {
+        this.bewohner = bewohner;
         initComponents();
         txtUebersicht.setContentType("text/html");
-
-        if (pflege.bwlabel == null) {
-            SYSTools.setBWLabel(lblBW, bewohner);
-            pflege.bwlabel = lblBW;
-        } else {
-            lblBW.setText(pflege.bwlabel.getText());
-            lblBW.setToolTipText(pflege.bwlabel.getToolTipText());
-        }
-
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         reloadDisplay();
     }

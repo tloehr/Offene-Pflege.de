@@ -27,6 +27,8 @@
 package op.care.dfn;
 
 import com.toedter.calendar.JDateChooser;
+import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.SYSRunningClasses;
 import entity.SYSRunningClassesTools;
 import op.OCSec;
@@ -54,6 +56,7 @@ public class PnlDFN extends CleanablePanel {
     public static final String internalClassID = "nursingrecords.dfn";
 
     String bwkennung;
+    Bewohner bewohner;
     JPopupMenu menu;
     private FrmPflege parent;
     //private String classname;
@@ -66,9 +69,10 @@ public class PnlDFN extends CleanablePanel {
     /**
      * Creates new form PnlDFN
      */
-    public PnlDFN(FrmPflege parent, String bwkennung) {
+    public PnlDFN(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
+        this.bwkennung = bewohner.getBWKennung();
         ocs = OPDE.getOCSec();
         initComponents();
         initPanel();
@@ -82,7 +86,7 @@ public class PnlDFN extends CleanablePanel {
 
     private void initPanel() {
 
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, parent.getBewohner().getBWKennung(), SYSRunningClasses.STATUS_RW);
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
         runningClass = result[0];
         abwesend = DBRetrieve.getAbwesendSeit(bwkennung) != null;
 
@@ -106,13 +110,7 @@ public class PnlDFN extends CleanablePanel {
         ArrayList hauf = DBRetrieve.getHauf(bwkennung);
         Date[] d = (Date[]) hauf.get(0);
         jdcDatum.setMinSelectableDate(d[0]);
-        if (parent.bwlabel == null) {
-            SYSTools.setBWLabel(lblBW, this.bwkennung);
-            parent.bwlabel = lblBW;
-        } else {
-            lblBW.setText(parent.bwlabel.getText());
-            lblBW.setToolTipText(parent.bwlabel.getToolTipText());
-        }
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         ignoreJDCEvent = false;
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);

@@ -9,6 +9,9 @@ import op.OPDE;
 
 import javax.persistence.Query;
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -33,5 +36,16 @@ public class StationenTools {
         Stationen station = (Stationen) query2.getSingleResult();
         cmb.setSelectedItem(station);
     }
+
+
+
+    public static Stationen getStation4ThisHost(){
+        long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
+        Query query = OPDE.getEM().createNamedQuery("Stationen.findByStatID");
+        query.setParameter("statID", statid);
+        return (Stationen) query.getSingleResult();
+    }
+
+
 
 }

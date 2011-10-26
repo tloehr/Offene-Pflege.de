@@ -10,6 +10,7 @@
  */
 package op.care;
 
+import entity.Bewohner;
 import op.OPDE;
 import op.share.vorgang.PnlVorgang;
 
@@ -22,13 +23,15 @@ import java.awt.*;
 public class PnlBWVorgang extends CleanablePanel {
 
     private JPanel pnlMain;
+    private Bewohner bewohner;
 
     /**
      * Creates new form PnlBWVorgang
      */
-    public PnlBWVorgang(FrmPflege parent) {
+    public PnlBWVorgang(FrmPflege parent, Bewohner bewohner) {
         initComponents();
-        pnlMain = new PnlVorgang((Frame) parent, PnlVorgang.MODE_CALLED_FROM_PFLEGE, parent.getCurrentBW(), cbArchiv.isSelected(), null, 0, parent);
+        this.bewohner = bewohner;
+        pnlMain = new PnlVorgang((Frame) parent, PnlVorgang.MODE_CALLED_FROM_PFLEGE, bewohner.getBWKennung(), cbArchiv.isSelected(), null, 0, parent);
         jspMain.setViewportView(pnlMain);
     }
 

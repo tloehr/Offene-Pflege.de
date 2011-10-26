@@ -5,6 +5,7 @@
 package entity;
 
 import op.OPDE;
+import org.jdesktop.swingx.JXTaskPane;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -87,17 +88,16 @@ public class PBerichtTAGSTools {
 
 
     /**
-     * Erstellt eine JPanel, die mit Checkboxen gefüllt ist. Pro aktive PBerichtTag jeweils eine.
+     * Erstellt eine JXTaskPane, der mit Checkboxen gefüllt ist. Pro aktive PBerichtTag jeweils eine.
      *
      * @param listener  Ein ItemListener, der sagt, was geschehen soll, wenn man auf die Checkboxen klickt.
      * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
      * @param layout    Ein Layoutmanager für das Panel.
      * @return das Panel zur weiteren Verwendung.
      */
-    public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect, LayoutManager layout) {
+    public static void addCheckBoxPanelForTags(JXTaskPane panel, ItemListener listener, Collection<PBerichtTAGS> preselect) {
         Query query = OPDE.getEM().createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
-        JPanel panel = new JPanel(layout);
         Iterator<PBerichtTAGS> itTags = tags.iterator();
         while (itTags.hasNext()) {
             PBerichtTAGS tag = itTags.next();
@@ -113,16 +113,11 @@ public class PBerichtTAGSTools {
 
             panel.add(cb);
         }
-        return panel;
-
     }
 
     /**
      * Kleine Hilfsmethode, die ich brauche um festzustellen ob ein bestimmter bericht
      * ein Sozial Bericht ist.
-     *
-     * @param collection
-     * @return
      */
     public static boolean isSozial(Pflegeberichte bericht) {
         Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();

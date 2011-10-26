@@ -296,7 +296,7 @@ public class PnlBWInfo extends CleanablePanel {
         tblBWInfo.getColumnModel().getColumn(1).setCellRenderer(new RNDBWI());
         tblBWInfo.getColumnModel().getColumn(2).setCellRenderer(new RNDBWI());
         tblBWInfo.getColumnModel().getColumn(3).setCellRenderer(new RNDBWI());
-        SYSTools.setBWLabel(lblBW, bwkennung);
+        BewohnerTools.setBWLabel(lblBW, bewohner);
     }
 
     private void tblBWInfoMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBWInfoMousePressed

@@ -26,10 +26,8 @@
  */
 package op.care;
 
-import java.awt.event.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
@@ -49,22 +47,27 @@ import op.tools.DBRetrieve;
 import op.tools.InternalClassACL;
 import op.tools.SYSTools;
 import op.vorgang.PnlVorgang;
-import org.jdesktop.swingx.HorizontalLayout;
+import org.jdesktop.swingx.*;
+import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * @author __USER__
@@ -88,7 +91,7 @@ public class FrmPflege extends javax.swing.JFrame {
     public static final int TAB_FILES = 9;
     public static final int SOZ_BERICHTE = 0;
     public static final int SOZ_NY = 1;
-    private String currentBW = "";
+    //private String currentBW = "";
     private Bewohner bewohner = null;
     public String currentTBDatum;
     public String currentTBUhrzeit;
@@ -97,7 +100,7 @@ public class FrmPflege extends javax.swing.JFrame {
     public HashMap hmC;
     public HashMap fragen;
     public HashMap dfnplanung;
-    private HandleBWSelections lslBW;
+
     private boolean initPhase;
     private HeapStat hs;
     public JLabel bwlabel;
@@ -116,13 +119,11 @@ public class FrmPflege extends javax.swing.JFrame {
         lblServer.setText(OPDE.getUrl());
         lblUser.setText("Benutzer: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()));
 
-        StationenTools.setComboBox(cmbStation);
-
-        applySecurity();
+        createBewohnerListe();
 
         hs = new HeapStat(pbHeap, lblHeap);
         hs.start();
-        reloadTable();
+
         initPhase = false;
         jtpMain.setSelectedIndex(MAINTAB_BW);
         jtpPflegeakte.setSelectedIndex(TAB_UEBERSICHT);
@@ -130,7 +131,7 @@ public class FrmPflege extends javax.swing.JFrame {
         // Zugriffe
         jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getInternalClasses().userHasAccessLevelForThisClass(PnlBerichte.internalClassID, InternalClassACL.EXECUTE));
         jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getInternalClasses().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
-
+        reloadDisplay();
     }
 
     /**
@@ -143,14 +144,21 @@ public class FrmPflege extends javax.swing.JFrame {
     private void initComponents() {
         pnlStatus = new JPanel();
         lblServer = new JLabel();
-        lblUser = new JLabel();
+        hSpacer1 = new JPanel(null);
         pbHeap = new JProgressBar();
+        hSpacer2 = new JPanel(null);
         lblHeap = new JLabel();
+        hSpacer3 = new JPanel(null);
+        lblUser = new JLabel();
         jtpMain = new JTabbedPane();
         jtpUebersicht = new JTabbedPane();
         pnlUebergabe = new JPanel();
         pnlSchichtleitung = new JPanel();
-        jsplBW = new JSplitPane();
+        pnlPflegeakte = new JPanel();
+        pnlBW = new JPanel();
+        btnVerlegung = new JButton();
+        jspBW = new JScrollPane();
+        taskBWContainer = new JXTaskPaneContainer();
         jtpPflegeakte = new JTabbedPane();
         pnlUeber = new JPanel();
         pnlTB = new JPanel();
@@ -162,14 +170,6 @@ public class FrmPflege extends javax.swing.JFrame {
         pnlPPlanung = new JPanel();
         pnlVorgang = new JPanel();
         pnlFiles = new JPanel();
-        pnlBW = new JPanel();
-        cmbStation = new JComboBox();
-        jspBW = new JScrollPane();
-        tblBW = new JTable();
-        cbArchiv = new JCheckBox();
-        btnRefresh = new JButton();
-        jToolBar1 = new JToolBar();
-        btnVerlegung = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -179,40 +179,23 @@ public class FrmPflege extends javax.swing.JFrame {
         //======== pnlStatus ========
         {
             pnlStatus.setBorder(new EtchedBorder());
+            pnlStatus.setLayout(new BoxLayout(pnlStatus, BoxLayout.LINE_AXIS));
 
             //---- lblServer ----
             lblServer.setText("jLabel6");
-
-            //---- lblUser ----
-            lblUser.setText("jLabel6");
+            pnlStatus.add(lblServer);
+            pnlStatus.add(hSpacer1);
+            pnlStatus.add(pbHeap);
+            pnlStatus.add(hSpacer2);
 
             //---- lblHeap ----
             lblHeap.setText("jLabel1");
+            pnlStatus.add(lblHeap);
+            pnlStatus.add(hSpacer3);
 
-            GroupLayout pnlStatusLayout = new GroupLayout(pnlStatus);
-            pnlStatus.setLayout(pnlStatusLayout);
-            pnlStatusLayout.setHorizontalGroup(
-                pnlStatusLayout.createParallelGroup()
-                    .addGroup(pnlStatusLayout.createSequentialGroup()
-                        .addComponent(lblServer)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(pbHeap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblHeap)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblUser, GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
-                        .addContainerGap())
-            );
-            pnlStatusLayout.setVerticalGroup(
-                pnlStatusLayout.createParallelGroup()
-                    .addGroup(pnlStatusLayout.createSequentialGroup()
-                        .addGroup(pnlStatusLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblServer)
-                            .addComponent(lblHeap)
-                            .addComponent(lblUser))
-                        .addContainerGap())
-                    .addComponent(pbHeap, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-            );
+            //---- lblUser ----
+            lblUser.setText("jLabel6");
+            pnlStatus.add(lblUser);
         }
 
         //======== jtpMain ========
@@ -241,11 +224,11 @@ public class FrmPflege extends javax.swing.JFrame {
                     pnlUebergabe.setLayout(pnlUebergabeLayout);
                     pnlUebergabeLayout.setHorizontalGroup(
                         pnlUebergabeLayout.createParallelGroup()
-                            .addGap(0, 809, Short.MAX_VALUE)
+                            .addGap(0, 807, Short.MAX_VALUE)
                     );
                     pnlUebergabeLayout.setVerticalGroup(
                         pnlUebergabeLayout.createParallelGroup()
-                            .addGap(0, 469, Short.MAX_VALUE)
+                            .addGap(0, 483, Short.MAX_VALUE)
                     );
                 }
                 jtpUebersicht.addTab("\u00dcbergabe", pnlUebergabe);
@@ -258,11 +241,11 @@ public class FrmPflege extends javax.swing.JFrame {
                     pnlSchichtleitung.setLayout(pnlSchichtleitungLayout);
                     pnlSchichtleitungLayout.setHorizontalGroup(
                         pnlSchichtleitungLayout.createParallelGroup()
-                            .addGap(0, 809, Short.MAX_VALUE)
+                            .addGap(0, 807, Short.MAX_VALUE)
                     );
                     pnlSchichtleitungLayout.setVerticalGroup(
                         pnlSchichtleitungLayout.createParallelGroup()
-                            .addGap(0, 469, Short.MAX_VALUE)
+                            .addGap(0, 483, Short.MAX_VALUE)
                     );
                 }
                 jtpUebersicht.addTab("Schichtleitung", pnlSchichtleitung);
@@ -271,9 +254,43 @@ public class FrmPflege extends javax.swing.JFrame {
             jtpMain.addTab("\u00dcbersicht", jtpUebersicht);
 
 
-            //======== jsplBW ========
+            //======== pnlPflegeakte ========
             {
-                jsplBW.setDividerLocation(250);
+                pnlPflegeakte.setLayout(new FormLayout(
+                    "pref, $lcgap, default:grow",
+                    "default:grow"));
+
+                //======== pnlBW ========
+                {
+                    pnlBW.setLayout(new FormLayout(
+                        "left:default:grow",
+                        "fill:default, $rgap, default:grow"));
+
+                    //---- btnVerlegung ----
+                    btnVerlegung.setForeground(new Color(255, 51, 0));
+                    btnVerlegung.setText("Verlegungsbericht");
+                    btnVerlegung.setToolTipText("");
+                    btnVerlegung.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnVerlegungActionPerformed(e);
+                        }
+                    });
+                    pnlBW.add(btnVerlegung, CC.xy(1, 1, CC.FILL, CC.FILL));
+
+                    //======== jspBW ========
+                    {
+                        jspBW.addComponentListener(new ComponentAdapter() {
+                            @Override
+                            public void componentResized(ComponentEvent e) {
+                                jspBWComponentResized(e);
+                            }
+                        });
+                        jspBW.setViewportView(taskBWContainer);
+                    }
+                    pnlBW.add(jspBW, CC.xy(1, 3, CC.FILL, CC.FILL));
+                }
+                pnlPflegeakte.add(pnlBW, CC.xy(1, 1, CC.FILL, CC.FILL));
 
                 //======== jtpPflegeakte ========
                 {
@@ -292,11 +309,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlUeber.setLayout(pnlUeberLayout);
                         pnlUeberLayout.setHorizontalGroup(
                             pnlUeberLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlUeberLayout.setVerticalGroup(
                             pnlUeberLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("\u00dcbersicht", pnlUeber);
@@ -309,11 +326,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlTB.setLayout(pnlTBLayout);
                         pnlTBLayout.setHorizontalGroup(
                             pnlTBLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlTBLayout.setVerticalGroup(
                             pnlTBLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Pflegeberichte", pnlTB);
@@ -326,11 +343,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlDFN.setLayout(pnlDFNLayout);
                         pnlDFNLayout.setHorizontalGroup(
                             pnlDFNLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlDFNLayout.setVerticalGroup(
                             pnlDFNLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("DFN", pnlDFN);
@@ -343,11 +360,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlBHP.setLayout(pnlBHPLayout);
                         pnlBHPLayout.setHorizontalGroup(
                             pnlBHPLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlBHPLayout.setVerticalGroup(
                             pnlBHPLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("BHP", pnlBHP);
@@ -360,11 +377,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlVitalDummy.setLayout(pnlVitalDummyLayout);
                         pnlVitalDummyLayout.setHorizontalGroup(
                             pnlVitalDummyLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlVitalDummyLayout.setVerticalGroup(
                             pnlVitalDummyLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Werte", pnlVitalDummy);
@@ -377,11 +394,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlVer.setLayout(pnlVerLayout);
                         pnlVerLayout.setHorizontalGroup(
                             pnlVerLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlVerLayout.setVerticalGroup(
                             pnlVerLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Verordnungen", pnlVer);
@@ -394,11 +411,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlInfo.setLayout(pnlInfoLayout);
                         pnlInfoLayout.setHorizontalGroup(
                             pnlInfoLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlInfoLayout.setVerticalGroup(
                             pnlInfoLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Informationen", pnlInfo);
@@ -411,11 +428,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlPPlanung.setLayout(pnlPPlanungLayout);
                         pnlPPlanungLayout.setHorizontalGroup(
                             pnlPPlanungLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlPPlanungLayout.setVerticalGroup(
                             pnlPPlanungLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Planung", pnlPPlanung);
@@ -428,11 +445,11 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlVorgang.setLayout(pnlVorgangLayout);
                         pnlVorgangLayout.setHorizontalGroup(
                             pnlVorgangLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlVorgangLayout.setVerticalGroup(
                             pnlVorgangLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Vorg\u00e4nge", pnlVorgang);
@@ -445,141 +462,19 @@ public class FrmPflege extends javax.swing.JFrame {
                         pnlFiles.setLayout(pnlFilesLayout);
                         pnlFilesLayout.setHorizontalGroup(
                             pnlFilesLayout.createParallelGroup()
-                                .addGap(0, 548, Short.MAX_VALUE)
+                                .addGap(0, 643, Short.MAX_VALUE)
                         );
                         pnlFilesLayout.setVerticalGroup(
                             pnlFilesLayout.createParallelGroup()
-                                .addGap(0, 465, Short.MAX_VALUE)
+                                .addGap(0, 483, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Dokumente", pnlFiles);
 
                 }
-                jsplBW.setRightComponent(jtpPflegeakte);
-
-                //======== pnlBW ========
-                {
-
-                    //---- cmbStation ----
-                    cmbStation.setModel(new DefaultComboBoxModel(new String[] {
-                        "Alle",
-                        "Station 1",
-                        "Station 2",
-                        "Herchen"
-                    }));
-                    cmbStation.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            cmbStationItemStateChanged(e);
-                        }
-                    });
-
-                    //======== jspBW ========
-                    {
-                        jspBW.addComponentListener(new ComponentAdapter() {
-                            @Override
-                            public void componentResized(ComponentEvent e) {
-                                jspBWComponentResized(e);
-                            }
-                        });
-
-                        //---- tblBW ----
-                        tblBW.setModel(new DefaultTableModel(
-                            new Object[][] {
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                            },
-                            new String[] {
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
-                        ) {
-                            Class<?>[] columnTypes = new Class<?>[] {
-                                Object.class, Object.class, Object.class, Object.class
-                            };
-                            @Override
-                            public Class<?> getColumnClass(int columnIndex) {
-                                return columnTypes[columnIndex];
-                            }
-                        });
-                        jspBW.setViewportView(tblBW);
-                    }
-
-                    //---- cbArchiv ----
-                    cbArchiv.setText("Archiv");
-                    cbArchiv.setBorder(BorderFactory.createEmptyBorder());
-                    cbArchiv.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbArchivActionPerformed(e);
-                        }
-                    });
-
-                    //---- btnRefresh ----
-                    btnRefresh.setBackground(Color.white);
-                    btnRefresh.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/reload.png")));
-                    btnRefresh.setBorder(null);
-                    btnRefresh.setBorderPainted(false);
-                    btnRefresh.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnRefreshActionPerformed(e);
-                        }
-                    });
-
-                    //======== jToolBar1 ========
-                    {
-                        jToolBar1.setFloatable(false);
-                        jToolBar1.setRollover(true);
-
-                        //---- btnVerlegung ----
-                        btnVerlegung.setForeground(new Color(255, 51, 0));
-                        btnVerlegung.setText("Verlegungsbericht");
-                        btnVerlegung.setToolTipText("");
-                        btnVerlegung.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnVerlegungActionPerformed(e);
-                            }
-                        });
-                        jToolBar1.add(btnVerlegung);
-                    }
-
-                    GroupLayout pnlBWLayout = new GroupLayout(pnlBW);
-                    pnlBW.setLayout(pnlBWLayout);
-                    pnlBWLayout.setHorizontalGroup(
-                        pnlBWLayout.createParallelGroup()
-                            .addGroup(pnlBWLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(cbArchiv)
-                                .addContainerGap(167, Short.MAX_VALUE))
-                            .addGroup(GroupLayout.Alignment.TRAILING, pnlBWLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(cmbStation, 0, 202, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnRefresh)
-                                .addContainerGap())
-                            .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
-                            .addComponent(jspBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
-                    );
-                    pnlBWLayout.setVerticalGroup(
-                        pnlBWLayout.createParallelGroup()
-                            .addGroup(GroupLayout.Alignment.TRAILING, pnlBWLayout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspBW, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlBWLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(btnRefresh)
-                                    .addComponent(cmbStation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addGap(8, 8, 8)
-                                .addComponent(cbArchiv))
-                    );
-                }
-                jsplBW.setLeftComponent(pnlBW);
+                pnlPflegeakte.add(jtpPflegeakte, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
             }
-            jtpMain.addTab("Pflegeakte", jsplBW);
+            jtpMain.addTab("Pflegeakte", pnlPflegeakte);
 
         }
 
@@ -587,13 +482,13 @@ public class FrmPflege extends javax.swing.JFrame {
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
             contentPaneLayout.createParallelGroup()
-                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 851, Short.MAX_VALUE)
+                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, 849, Short.MAX_VALUE)
+                .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 849, Short.MAX_VALUE)
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
@@ -606,31 +501,13 @@ public class FrmPflege extends javax.swing.JFrame {
     }//GEN-LAST:event_jtpMainStateChanged
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
+        if (bewohner == null) return;
         print(op.care.DBHandling.getUeberleitung(bewohner, true, true, true, false, false, true, true, true, true, false));
     }//GEN-LAST:event_btnVerlegungActionPerformed
 
-    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        reloadTable();
-    }//GEN-LAST:event_btnRefreshActionPerformed
-
-    private void cbArchivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbArchivActionPerformed
-        if (!initPhase) {
-            reloadTable();
-        }
-    }//GEN-LAST:event_cbArchivActionPerformed
-
     private void jspBWComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBWComponentResized
-        formatBWTable();
+        //formatBWTable();
     }//GEN-LAST:event_jspBWComponentResized
-
-    private void cmbStationItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbStationItemStateChanged
-        if (!initPhase) {
-            initPhase = true;
-            cbArchiv.setSelected(false);
-            initPhase = false;
-            reloadTable();
-        }
-    }//GEN-LAST:event_cmbStationItemStateChanged
 
     private void jtpPflegeakteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpPflegeakteStateChanged
         reloadDisplay();
@@ -639,20 +516,6 @@ public class FrmPflege extends javax.swing.JFrame {
     private void jtpUebersichtStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpUebersichtStateChanged
         reloadDisplay();
     }//GEN-LAST:event_jtpUebersichtStateChanged
-
-    public void applySecurity() {
-        if (OPDE.isAdmin()) {
-            cbArchiv.setEnabled(true);
-            cmbStation.setEnabled(true);
-            // Admins dürfen alles sehen.
-            //DefaultComboBoxModel d = (DefaultComboBoxModel) cmbStation.getModel();
-            //d.addElement("Alle");
-            //cmbStation.setModel(d);
-        } else {
-            cbArchiv.setEnabled(false);
-            cmbStation.setEnabled(true);
-        }
-    }
 
     private void print(String html) {
         try {
@@ -672,40 +535,69 @@ public class FrmPflege extends javax.swing.JFrame {
         }
     }
 
+    private void createBewohnerListe() {
+        Query query = OPDE.getEM().createNamedQuery("Bewohner.findAllActiveSortedByStationen");
+        Iterator<Bewohner> it = query.getResultList().iterator();
+
+        Stationen station = null;
+        Stationen meineStation = StationenTools.getStation4ThisHost();
+        JXTaskPane currentStationsPane = null;
+
+        while (it.hasNext()) {
+            final Bewohner innerbewohner = it.next();
+            if (station != innerbewohner.getStation()) {
+                station = innerbewohner.getStation();
+                currentStationsPane = new JXTaskPane(station.getBezeichnung());
+                currentStationsPane.setSpecial(station.equals(meineStation));
+                currentStationsPane.setCollapsed(!currentStationsPane.isSpecial());
+                taskBWContainer.add((JPanel) currentStationsPane);
+            }
+
+            currentStationsPane.add(new AbstractAction() {
+                {
+                    String titel = innerbewohner.getNachname() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getBWKennung() + "]";
+                    putValue(Action.NAME, "<html><font color=\""+ (BewohnerTools.isWeiblich(innerbewohner) ? "red" : "blue") +"\">"+titel+"</font></html>");
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    bewohner = innerbewohner;
+                    reloadDisplay();
+                }
+            });
+        }
+    }
+
     public void dispose() {
         hs.interrupt();
         cleanup();
         super.dispose();
     }
 
-    public Bewohner getBewohner() {
-        return bewohner;
-    }
-
-    private void formatBWTable() {
-        JViewport jv = (JViewport) tblBW.getParent();
-        JScrollPane jsp = (JScrollPane) jv.getParent();
-        Dimension dim = jsp.getSize();
-        // Größe der Massnahmen Spalten ändern.
-        int width = dim.width;
-        TableColumnModel tcm1 = tblBW.getColumnModel();
-
-//        // Zu Beginn der Applikation steht noch ein standardmodell drin.
-//        // das hat nur 4 Spalten. solange braucht sich dieser handler nicht
-//        // damit zu befassen.
-//        if (tcm1.getColumnCount() != ) {
-//            return;
-//        }
-
-        tcm1.getColumn(0).setPreferredWidth(width);
-        //tcm1.getColumn(1).setPreferredWidth(70);
-
-        tcm1.getColumn(0).setHeaderValue("Name");
-        //tcm1.getColumn(1).setHeaderValue("Info");
-
-        tcm1.getColumn(0).setCellRenderer(new RNDBW());
-        //tcm1.getColumn(1).setCellRenderer(new RNDBW());
-    }
+//    private void formatBWTable() {
+//        JViewport jv = (JViewport) tblBW.getParent();
+//        JScrollPane jsp = (JScrollPane) jv.getParent();
+//        Dimension dim = jsp.getSize();
+//        // Größe der Massnahmen Spalten ändern.
+//        int width = dim.width;
+//        TableColumnModel tcm1 = tblBW.getColumnModel();
+//
+////        // Zu Beginn der Applikation steht noch ein standardmodell drin.
+////        // das hat nur 4 Spalten. solange braucht sich dieser handler nicht
+////        // damit zu befassen.
+////        if (tcm1.getColumnCount() != ) {
+////            return;
+////        }
+//
+//        tcm1.getColumn(0).setPreferredWidth(width);
+//        //tcm1.getColumn(1).setPreferredWidth(70);
+//
+//        tcm1.getColumn(0).setHeaderValue("Name");
+//        //tcm1.getColumn(1).setHeaderValue("Info");
+//
+//        tcm1.getColumn(0).setCellRenderer(new RNDBW());
+//        //tcm1.getColumn(1).setCellRenderer(new RNDBW());
+//    }
 
     public void cleanup() {
         // Aufräumen
@@ -752,42 +644,42 @@ public class FrmPflege extends javax.swing.JFrame {
                 if (bewohner != null) {
                     switch (jtpPflegeakte.getSelectedIndex()) {
                         case TAB_UEBERSICHT: {
-                            jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(this));
+                            jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                             break;
                         }
                         case TAB_PB: {
-                            jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(this));
+                            jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_PB, "Pflegeberichte");
                             break;
                         }
                         case TAB_DFN: {
-                            jtpPflegeakte.setComponentAt(TAB_DFN, new PnlDFN(this, currentBW));
+                            jtpPflegeakte.setComponentAt(TAB_DFN, new PnlDFN(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_DFN, "DFN");
                             break;
                         }
                         case TAB_VITAL: {
-                            jtpPflegeakte.setComponentAt(TAB_VITAL, new PnlVitalwerte(currentBW, this, jtpPflegeakte, tblBW));
+                            jtpPflegeakte.setComponentAt(TAB_VITAL, new PnlVitalwerte(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_VITAL, "Werte");
                             break;
                         }
                         case TAB_INFO: {
-                            jtpPflegeakte.setComponentAt(TAB_INFO, new op.care.bwinfo.PnlInfo(this, currentBW));
+                            jtpPflegeakte.setComponentAt(TAB_INFO, new op.care.bwinfo.PnlInfo(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_INFO, "Informationen");
                             break;
                         }
                         case TAB_BHP: {
-                            jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(this, currentBW));
+                            jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_BHP, "BHP");
                             break;
                         }
                         case TAB_PPLANUNG: {
-                            jtpPflegeakte.setComponentAt(TAB_PPLANUNG, new PnlPlanung(this, currentBW));
+                            jtpPflegeakte.setComponentAt(TAB_PPLANUNG, new PnlPlanung(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_PPLANUNG, "Planung");
                             break;
                         }
                         case TAB_VERORDNUNG: {
-                            jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, new PnlVerordnung(this, currentBW));
+                            jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, new PnlVerordnung(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_VERORDNUNG, "Verordnungen");
                             break;
                         }
@@ -808,7 +700,7 @@ public class FrmPflege extends javax.swing.JFrame {
                             break;
                         }
                         case TAB_FILES: {
-                            jtpPflegeakte.setComponentAt(TAB_FILES, new PnlFiles(this));
+                            jtpPflegeakte.setComponentAt(TAB_FILES, new PnlFiles(this, bewohner));
                             jtpPflegeakte.setTitleAt(TAB_FILES, "Dokumente");
                             break;
                         }
@@ -816,6 +708,10 @@ public class FrmPflege extends javax.swing.JFrame {
                         }
                     }
                     break;
+                } else {
+                    // Kein Bewohner gewählt
+                    jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new JPanel());
+                    jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 }
             }
 
@@ -824,46 +720,48 @@ public class FrmPflege extends javax.swing.JFrame {
         }
     }
 
-    private void reloadTable() {
-        // Bewohner-Liste
-        ListSelectionModel lsmbw = tblBW.getSelectionModel();
-        if (lslBW != null) {
-            lsmbw.removeListSelectionListener(lslBW);
-        }
-        lslBW = new HandleBWSelections();
-
-        if (cbArchiv.isSelected()) { // Archivmodus gewünscht.
-            tblBW.setModel(new TMBW());
-            initPhase = true;
-            //cmbStation.setSelectedItem("Alle");
-            cmbStation.setEnabled(false);
-            initPhase = false;
-        } else {
-            tblBW.setModel(new TMBW((Stationen) cmbStation.getSelectedItem()));
-        }
-
-        tblBW.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        lsmbw.addListSelectionListener(lslBW);
-        if (tblBW.getModel().getRowCount() > 0) {
-            tblBW.setRowSelectionInterval(0, 0);
-        }
-        TableColumnModel tcm1 = tblBW.getColumnModel();
-//        tcm1.getColumn(0).setHeaderValue("Name");
-//        tcm1.getColumn(1).setHeaderValue("Info");
-        jspBW.dispatchEvent(new ComponentEvent(jspBW, ComponentEvent.COMPONENT_RESIZED));
-    }
+//    private void reloadTable(Bewohner bewohner) {
+//        // Bewohner-Liste
+//
+//        if (cbArchiv.isSelected()) { // Archivmodus gewünscht.
+//            tblBW.setModel(new TMBW());
+//            initPhase = true;
+//            //cmbStation.setSelectedItem("Alle");
+//            cmbStation.setEnabled(false);
+//            initPhase = false;
+//        } else {
+//            tblBW.setModel(new TMBW((Stationen) cmbStation.getSelectedItem()));
+//        }
+//
+//        tblBW.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+//        lsmbw.addListSelectionListener(lslBW);
+//        if (tblBW.getModel().getRowCount() > 0) {
+//            tblBW.setRowSelectionInterval(0, 0);
+//        }
+//        TableColumnModel tcm1 = tblBW.getColumnModel();
+////        tcm1.getColumn(0).setHeaderValue("Name");
+////        tcm1.getColumn(1).setHeaderValue("Info");
+//        jspBW.dispatchEvent(new ComponentEvent(jspBW, ComponentEvent.COMPONENT_RESIZED));
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlStatus;
     private JLabel lblServer;
-    private JLabel lblUser;
+    private JPanel hSpacer1;
     private JProgressBar pbHeap;
+    private JPanel hSpacer2;
     private JLabel lblHeap;
+    private JPanel hSpacer3;
+    private JLabel lblUser;
     private JTabbedPane jtpMain;
     private JTabbedPane jtpUebersicht;
     private JPanel pnlUebergabe;
     private JPanel pnlSchichtleitung;
-    private JSplitPane jsplBW;
+    private JPanel pnlPflegeakte;
+    private JPanel pnlBW;
+    private JButton btnVerlegung;
+    private JScrollPane jspBW;
+    private JXTaskPaneContainer taskBWContainer;
     private JTabbedPane jtpPflegeakte;
     private JPanel pnlUeber;
     private JPanel pnlTB;
@@ -875,47 +773,11 @@ public class FrmPflege extends javax.swing.JFrame {
     private JPanel pnlPPlanung;
     private JPanel pnlVorgang;
     private JPanel pnlFiles;
-    private JPanel pnlBW;
-    private JComboBox cmbStation;
-    private JScrollPane jspBW;
-    private JTable tblBW;
-    private JCheckBox cbArchiv;
-    private JButton btnRefresh;
-    private JToolBar jToolBar1;
-    private JButton btnVerlegung;
     // End of variables declaration//GEN-END:variables
 
-    class HandleBWSelections
-            implements ListSelectionListener {
-
-        public void valueChanged(ListSelectionEvent lse) {
-            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-            if (!lse.getValueIsAdjusting()) {
-                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-                TableModel tm = getTblBW().getModel();
-                currentBW = ((String) tm.getValueAt(lsm.getLeadSelectionIndex(), TMBW.COL_BWKENNUNG)).trim();
-                Query query = OPDE.getEM().createNamedQuery("Bewohner.findByBWKennung");
-                query.setParameter("bWKennung", currentBW);
-                bewohner = (Bewohner) query.getSingleResult();
-                // Bewohnernamen auf das Fenster schreiben.
-                //String bwname = ((String) tm.getValueAt(lsm.getLeadSelectionIndex(), 0)).trim() + ", " + ((String) tm.getValueAt(lsm.getLeadSelectionIndex(), 1)).trim();
-                bwlabel = null;
-                reloadDisplay();
-
-            } // if (!lse.getValueIsAdjusting()){
-
-        } // public void valueChanged(ListSelectionEvent lse) {
-    } // class HandleBWSelections
-
-    public String getCurrentBW() {
-        return currentBW;
-    }
 
     public javax.swing.JTabbedPane getjtpPflegeakte() {
         return jtpPflegeakte;
     }
 
-    public javax.swing.JTable getTblBW() {
-        return tblBW;
-    }
 }

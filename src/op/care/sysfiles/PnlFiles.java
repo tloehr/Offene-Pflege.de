@@ -26,6 +26,7 @@
 package op.care.sysfiles;
 
 import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.SYSFiles;
 import entity.SYSFilesTools;
 import op.OPDE;
@@ -59,12 +60,12 @@ public class PnlFiles extends CleanablePanel {
     /**
      * Creates new form PnlFiles
      */
-    public PnlFiles(FrmPflege pflege) {
+    public PnlFiles(FrmPflege pflege, Bewohner bewohner) {
         initComponents();
-
-        bewohner = OPDE.getEM().find(Bewohner.class, pflege.getCurrentBW());
+        this.bewohner = bewohner;
+        bewohner = OPDE.getEM().find(Bewohner.class, bewohner);
         this.parent = pflege;
-        SYSTools.setBWLabel(lblBW, bewohner.getBWKennung());
+        BewohnerTools.setBWLabel(lblBW, bewohner);
         tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         btnNew.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
