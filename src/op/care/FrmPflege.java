@@ -131,6 +131,7 @@ public class FrmPflege extends javax.swing.JFrame {
         // Zugriffe
         jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getInternalClasses().userHasAccessLevelForThisClass(PnlBerichte.internalClassID, InternalClassACL.EXECUTE));
         jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getInternalClasses().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
+
         reloadDisplay();
     }
 
@@ -574,31 +575,6 @@ public class FrmPflege extends javax.swing.JFrame {
         super.dispose();
     }
 
-//    private void formatBWTable() {
-//        JViewport jv = (JViewport) tblBW.getParent();
-//        JScrollPane jsp = (JScrollPane) jv.getParent();
-//        Dimension dim = jsp.getSize();
-//        // Größe der Massnahmen Spalten ändern.
-//        int width = dim.width;
-//        TableColumnModel tcm1 = tblBW.getColumnModel();
-//
-////        // Zu Beginn der Applikation steht noch ein standardmodell drin.
-////        // das hat nur 4 Spalten. solange braucht sich dieser handler nicht
-////        // damit zu befassen.
-////        if (tcm1.getColumnCount() != ) {
-////            return;
-////        }
-//
-//        tcm1.getColumn(0).setPreferredWidth(width);
-//        //tcm1.getColumn(1).setPreferredWidth(70);
-//
-//        tcm1.getColumn(0).setHeaderValue("Name");
-//        //tcm1.getColumn(1).setHeaderValue("Info");
-//
-//        tcm1.getColumn(0).setCellRenderer(new RNDBW());
-//        //tcm1.getColumn(1).setCellRenderer(new RNDBW());
-//    }
-
     public void cleanup() {
         // Aufräumen
         for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
@@ -710,7 +686,16 @@ public class FrmPflege extends javax.swing.JFrame {
                     break;
                 } else {
                     // Kein Bewohner gewählt
-                    jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new JPanel());
+                    JLabel lbl = new JLabel("Bitte wählen Sie eine(n) BewohnerIn aus.");
+                    lbl.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/agt_back.png")));
+                    lbl.setFont(new java.awt.Font("Lucida Grande", 1, 42));
+                    lbl.setHorizontalAlignment(SwingConstants.CENTER);
+                    lbl.setForeground(Color.blue);
+                    JPanel pnl = new JPanel();
+                    pnl.setLayout(new BorderLayout());
+                    pnl.add(lbl, BorderLayout.CENTER);
+
+                    jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, pnl);
                     jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 }
             }

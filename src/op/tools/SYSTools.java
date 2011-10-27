@@ -1679,18 +1679,25 @@ public class SYSTools {
     }
 
     public static Timeline flashLabel(JLabel lbl1, String text, int times) {
+        return flashLabel(lbl1, text, times, Color.red);
+    }
+
+    public static Timeline flashLabel(JLabel lbl1, String text, int times, Color flashColor) {
         final JLabel lbl = lbl1;
+        final Color oldColor = lbl1.getForeground();
+        final String oldText = lbl1.getText();
         lbl.setText(text);
         Timeline textmessageTL = new Timeline(lbl);
-        textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), Color.red);
+        textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), flashColor);
         textmessageTL.setDuration(600);
 
         textmessageTL.addCallback(new TimelineCallbackAdapter() {
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                if (newState == Timeline.TimelineState.CANCELLED) {
-                    lbl.setForeground(Color.black);
-                    //OPDE.debug("textmessageTL cancelled. Label foreground set to black.");
+                if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
+                    lbl.setText(oldText);
+                    lbl.setForeground(oldColor);
+                    OPDE.debug("textmessageTL cancelled or done. Label set to: " + oldText);
                 }
             }
         });

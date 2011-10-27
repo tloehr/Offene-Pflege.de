@@ -86,6 +86,37 @@ public class PBerichtTAGSTools {
         return menu;
     }
 
+    /**
+     * Erstellt eine JPanel, die mit Checkboxen gefüllt ist. Pro aktive PBerichtTag jeweils eine.
+     *
+     * @param listener  Ein ItemListener, der sagt, was geschehen soll, wenn man auf die Checkboxen klickt.
+     * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
+     * @param layout    Ein Layoutmanager für das Panel.
+     * @return das Panel zur weiteren Verwendung.
+     */
+    public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect, LayoutManager layout) {
+        Query query = OPDE.getEM().createNamedQuery("PBerichtTAGS.findAllActive");
+        ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
+        JPanel panel = new JPanel(layout);
+        Iterator<PBerichtTAGS> itTags = tags.iterator();
+        while (itTags.hasNext()) {
+            PBerichtTAGS tag = itTags.next();
+            JCheckBox cb = new JCheckBox(tag.getBezeichnung());
+            cb.setForeground(tag.getColor());
+            if (tag.isBesonders()) {
+                cb.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+            }
+            cb.putClientProperty("UserObject", tag);
+
+            cb.setSelected(preselect.contains(tag));
+            cb.addItemListener(listener);
+
+            panel.add(cb);
+        }
+        return panel;
+
+    }
+
 
     /**
      * Erstellt eine JXTaskPane, der mit Checkboxen gefüllt ist. Pro aktive PBerichtTag jeweils eine.
