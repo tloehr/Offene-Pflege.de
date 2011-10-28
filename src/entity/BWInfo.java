@@ -43,7 +43,7 @@ import java.util.Date;
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis"),
         @NamedQuery(name = "BWInfo.findByReiter", query = "SELECT b FROM BWInfo b WHERE b.reiter = :reiter")})
-public class BWInfo implements Serializable {
+public class BWInfo implements Serializable, VorgangElement {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -169,6 +169,28 @@ public class BWInfo implements Serializable {
 
     public void setAngesetztDurch(Users angesetztDurch) {
         this.angesetztDurch = angesetztDurch;
+    }
+
+    @Override
+    public long getPITInMillis() {
+        return von.getTime();
+    }
+
+    @Override
+    public String getContentAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public String getPITAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public long getID() {
+        return bwinfoid;
     }
 
     @Override

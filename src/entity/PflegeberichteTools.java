@@ -78,8 +78,8 @@ public class PflegeberichteTools {
      * und Vorgänge umzubiegen. Der alte Bericht verliert seine Dateien und Vorgänge. Es werden auch die
      * notwendigen Querverweise zwischen dem alten und dem neuen Bericht erstellt.
      *
-     * @param oldBericht
-     * @param newBericht
+     * @param oldBericht der Bericht, der durch den <code>newBericht</code> ersetzt werden soll.
+     * @param newBericht siehe oben
      * @return Erfolg oder nicht
      */
     public static boolean changeBericht(Pflegeberichte oldBericht, Pflegeberichte newBericht) {
@@ -131,7 +131,7 @@ public class PflegeberichteTools {
 
     /**
      * liefert eine Kopie eines Berichtes, die noch nicht persistiert wurde. * Somit ist PBID = 0
-     * Gilt nicht für die Mappings.
+     * Gilt nicht für die Mappings (Dateien oder Vorgänge). Die werden erst bei changeBericht() geändert.
      *
      * @param source
      * @return

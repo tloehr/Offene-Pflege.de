@@ -25,6 +25,8 @@
  */
 package op.care.sysfiles;
 
+import java.awt.event.*;
+import javax.swing.table.*;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.SYSFiles;
@@ -98,89 +100,112 @@ public class PnlFiles extends CleanablePanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnNew = new JButton();
+        btnLogout = new JButton();
+        lblBW = new JLabel();
+        jspFiles = new JScrollPane();
+        tblFiles = new JTable();
 
-        jToolBar1 = new javax.swing.JToolBar();
-        btnNew = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        lblBW = new javax.swing.JLabel();
-        jspFiles = new javax.swing.JScrollPane();
-        tblFiles = new javax.swing.JTable();
+        //======== this ========
 
-        jToolBar1.setFloatable(false);
-        jToolBar1.setRollover(true);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
+            jToolBar1.setRollover(true);
 
-        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filenew.png"))); // NOI18N
-        btnNew.setText("Neu / Upload");
-        btnNew.setFocusable(false);
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnNew);
+            //---- btnNew ----
+            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
+            btnNew.setText("Neu / Upload");
+            btnNew.setFocusable(false);
+            btnNew.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNewActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnNew);
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.setFocusable(false);
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutbtnLogoutHandler(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
+            //---- btnLogout ----
+            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
+            btnLogout.setText("Abmelden");
+            btnLogout.setFocusable(false);
+            btnLogout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnLogoutbtnLogoutHandler(e);
+                }
+            });
+            jToolBar1.add(btnLogout);
+        }
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("jLabel3");
 
-        jspFiles.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspFilesComponentResized(evt);
-            }
-        });
-
-        tblFiles.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+        //======== jspFiles ========
+        {
+            jspFiles.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    jspFilesComponentResized(e);
                 }
-        ));
-        tblFiles.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        tblFiles.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblFilesMousePressed(evt);
-            }
-        });
-        jspFiles.setViewportView(tblFiles);
+            });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
+            //---- tblFiles ----
+            tblFiles.setModel(new DefaultTableModel(
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
+            ) {
+                Class<?>[] columnTypes = new Class<?>[] {
+                    Object.class, Object.class, Object.class, Object.class
+                };
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    return columnTypes[columnIndex];
+                }
+            });
+            tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            tblFiles.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblFilesMousePressed(e);
+                }
+            });
+            jspFiles.setViewportView(tblFiles);
+        }
+
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(lblBW, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jToolBar1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jspFiles, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(12, 12, 12)
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addComponent(jToolBar1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspFiles, GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .add(jToolBar1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(lblBW, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jspFiles, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblBW, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspFiles, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -259,11 +284,11 @@ public class PnlFiles extends CleanablePanel {
     }//GEN-LAST:event_jspFilesComponentResized
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnNew;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JScrollPane jspFiles;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JTable tblFiles;
+    private JToolBar jToolBar1;
+    private JButton btnNew;
+    private JButton btnLogout;
+    private JLabel lblBW;
+    private JScrollPane jspFiles;
+    private JTable tblFiles;
     // End of variables declaration//GEN-END:variables
 }

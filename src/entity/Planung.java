@@ -38,7 +38,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM Planung p WHERE p.bis = :bis"),
     @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM Planung p WHERE p.planKennung = :planKennung"),
     @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM Planung p WHERE p.nKontrolle = :nKontrolle")})
-public class Planung implements Serializable {
+public class Planung implements Serializable, VorgangElement {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -200,6 +200,28 @@ public class Planung implements Serializable {
 
     public void setKategorie(BWInfoKat kategorie) {
         this.kategorie = kategorie;
+    }
+
+    @Override
+    public long getPITInMillis() {
+        return von.getTime();
+    }
+
+    @Override
+    public String getContentAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public String getPITAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public long getID() {
+        return planID;
     }
     
     @Override

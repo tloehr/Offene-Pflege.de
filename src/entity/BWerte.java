@@ -44,7 +44,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "BWerte.findByEditBy", query = "SELECT b FROM BWerte b WHERE b.editBy = :editBy"),
     @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM BWerte b WHERE b.cdate = :cdate"),
     @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM BWerte b WHERE b.mdate = :mdate")})
-public class BWerte implements Serializable {
+public class BWerte implements Serializable, VorgangElement {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -221,7 +221,28 @@ public class BWerte implements Serializable {
     public void setUser(Users user) {
         this.user = user;
     }
-    
+
+    @Override
+    public long getPITInMillis() {
+        return pit.getTime();
+    }
+
+    @Override
+    public String getContentAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public String getPITAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public long getID() {
+        return bwid;
+    }
 
     @Override
     public int hashCode() {

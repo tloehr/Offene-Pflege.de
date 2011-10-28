@@ -226,7 +226,6 @@ public class VorgaengeTools {
         }
     }
 
-
     public static void setWVVorgang(Vorgaenge vorgang, Date wv) {
         VBericht systemBericht = new VBericht("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), VBerichtTools.VBERICHT_ART_WV, vorgang);
         vorgang.setWv(wv);
@@ -304,10 +303,10 @@ public class VorgaengeTools {
      * @param bewohner
      * @return
      */
-    private static JMenu getVorgaenge2Assign(VorgangElement element, Bewohner bewohner) {
+    private static JMenu getVorgaenge2Assign(VorgangElement element, Bewohner bewohner, ActionListener callback) {
         JMenu result = new JMenu("Zuordnen zu");
 
-        //final ActionListener f_al = al;
+        final ActionListener cb = callback;
 
         final VorgangElement finalElement = element;
 
@@ -338,7 +337,7 @@ public class VorgaengeTools {
             mi.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     add(finalElement, vorgang);
-                    //f_al.actionPerformed(new ActionEvent(this, 0, "VorgangAssign"));
+                    cb.actionPerformed(new ActionEvent(this, 0, "VorgangAssign"));
                 }
             });
             result.add(mi);
@@ -347,11 +346,11 @@ public class VorgaengeTools {
         return result;
     }
 
-    private static JMenu getVorgaenge2Remove(VorgangElement element) {
+    private static JMenu getVorgaenge2Remove(VorgangElement element, ActionListener callback) {
 
         JMenu result = new JMenu("Entfernen von");
 
-        //final ActionListener f_al = al;
+        final ActionListener cb = callback;
 
         final VorgangElement finalElement = element;
 
@@ -375,7 +374,7 @@ public class VorgaengeTools {
             mi.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     remove(finalElement, vorgang);
-                    //f_al.actionPerformed(new ActionEvent(this, 0, "VorgangAssign"));
+                    cb.actionPerformed(new ActionEvent(this, 0, "VorgangRemove"));
                 }
             });
             result.add(mi);
@@ -384,7 +383,7 @@ public class VorgaengeTools {
     }
 
 
-    public static JMenu getVorgangContextMenu(Frame parent, VorgangElement element, Bewohner bewohner) {
+    public static JMenu getVorgangContextMenu(Frame parent, VorgangElement element, Bewohner bewohner, ActionListener callback) {
         JMenu menu = new JMenu("<html>Vorgänge <font color=\"red\">&#9679;</font></html>");
 
         // Neuer Vorgang Menü
@@ -392,11 +391,11 @@ public class VorgaengeTools {
 
         // Untermenü mit vorhandenen Vorgängen einblenden.
         // Aber nur, wenn die nicht leer sind.
-        JMenu addMenu = getVorgaenge2Assign(element, bewohner);
+        JMenu addMenu = getVorgaenge2Assign(element, bewohner, callback);
         if (addMenu.getMenuComponentCount() > 0) {
             menu.add(addMenu);
         }
-        JMenu delMenu = getVorgaenge2Remove(element);
+        JMenu delMenu = getVorgaenge2Remove(element, callback);
         if (delMenu.getMenuComponentCount() > 0) {
             menu.add(delMenu);
         }

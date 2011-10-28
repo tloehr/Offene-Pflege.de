@@ -26,6 +26,8 @@
  */
 package op.care.vital;
 
+import java.awt.event.*;
+import javax.swing.border.*;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
@@ -383,262 +385,300 @@ public class DlgVital extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        lblVital = new JLabel();
+        lblWert1 = new JLabel();
+        lblWert2 = new JLabel();
+        lblWert3 = new JLabel();
+        txtWert1 = new JTextField();
+        txtWert2 = new JTextField();
+        txtWert3 = new JTextField();
+        lblEinheit1 = new JLabel();
+        lblEinheit2 = new JLabel();
+        lblEinheit3 = new JLabel();
+        btnDiscard = new JButton();
+        btnSave = new JButton();
+        jScrollPane1 = new JScrollPane();
+        txtBemerkung = new JTextArea();
+        jPanel1 = new JPanel();
+        lblStatus = new JLabel();
+        jPanel2 = new JPanel();
+        jLabel2 = new JLabel();
+        txtDatum = new JTextField();
+        txtUhrzeit = new JTextField();
+        jLabel1 = new JLabel();
 
-        lblVital = new javax.swing.JLabel();
-        lblWert1 = new javax.swing.JLabel();
-        lblWert2 = new javax.swing.JLabel();
-        lblWert3 = new javax.swing.JLabel();
-        txtWert1 = new javax.swing.JTextField();
-        txtWert2 = new javax.swing.JTextField();
-        txtWert3 = new javax.swing.JTextField();
-        lblEinheit1 = new javax.swing.JLabel();
-        lblEinheit2 = new javax.swing.JLabel();
-        lblEinheit3 = new javax.swing.JLabel();
-        btnDiscard = new javax.swing.JButton();
-        btnSave = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtBemerkung = new javax.swing.JTextArea();
-        jPanel1 = new javax.swing.JPanel();
-        lblStatus = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        txtDatum = new javax.swing.JTextField();
-        txtUhrzeit = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setModal(true);
+        Container contentPane = getContentPane();
 
-        lblVital.setFont(new java.awt.Font("Dialog", 1, 18));
+        //---- lblVital ----
+        lblVital.setFont(new Font("Dialog", Font.BOLD, 18));
         lblVital.setText("jLabel1");
 
+        //---- lblWert1 ----
         lblWert1.setText("jLabel1");
 
+        //---- lblWert2 ----
         lblWert2.setText("jLabel1");
 
+        //---- lblWert3 ----
         lblWert3.setText("jLabel1");
 
+        //---- txtWert1 ----
         txtWert1.setText("jTextField1");
         txtWert1.setFocusCycleRoot(true);
-        txtWert1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtWert1ActionPerformed(evt);
+        txtWert1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtWert1ActionPerformed(e);
             }
         });
-        txtWert1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtWert1FocusGained(evt);
+        txtWert1.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtWert1FocusGained(e);
             }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtWert1FocusLost(evt);
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWert1FocusLost(e);
             }
         });
 
+        //---- txtWert2 ----
         txtWert2.setText("jTextField1");
-        txtWert2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtWert2ActionPerformed(evt);
+        txtWert2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtWert2ActionPerformed(e);
             }
         });
-        txtWert2.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtWert2FocusGained(evt);
+        txtWert2.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtWert2FocusGained(e);
             }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtWert2FocusLost(evt);
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWert2FocusLost(e);
             }
         });
 
+        //---- txtWert3 ----
         txtWert3.setText("jTextField1");
-        txtWert3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtWert3ActionPerformed(evt);
+        txtWert3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtWert3ActionPerformed(e);
             }
         });
-        txtWert3.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtWert3FocusGained(evt);
+        txtWert3.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtWert3FocusGained(e);
             }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtWert3FocusLost(evt);
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWert3FocusLost(e);
             }
         });
 
+        //---- lblEinheit1 ----
         lblEinheit1.setText("jLabel1");
 
+        //---- lblEinheit2 ----
         lblEinheit2.setText("jLabel1");
 
+        //---- lblEinheit3 ----
         lblEinheit3.setText("jLabel1");
 
+        //---- btnDiscard ----
         btnDiscard.setText("Verwerfen");
-        btnDiscard.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDiscardActionPerformed(evt);
+        btnDiscard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnDiscardActionPerformed(e);
             }
         });
 
+        //---- btnSave ----
         btnSave.setText("Speichern");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSaveActionPerformed(e);
             }
         });
 
-        txtBemerkung.setColumns(20);
-        txtBemerkung.setLineWrap(true);
-        txtBemerkung.setRows(5);
-        txtBemerkung.setToolTipText("Tragen Sie hier Bemerkungen ein.");
-        txtBemerkung.setWrapStyleWord(true);
-        jScrollPane1.setViewportView(txtBemerkung);
+        //======== jScrollPane1 ========
+        {
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+            //---- txtBemerkung ----
+            txtBemerkung.setColumns(20);
+            txtBemerkung.setLineWrap(true);
+            txtBemerkung.setRows(5);
+            txtBemerkung.setToolTipText("Tragen Sie hier Bemerkungen ein.");
+            txtBemerkung.setWrapStyleWord(true);
+            jScrollPane1.setViewportView(txtBemerkung);
+        }
 
-        lblStatus.setForeground(new java.awt.Color(255, 0, 0));
-        lblStatus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblStatus.setText("jLabel3");
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(lblStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
+            //---- lblStatus ----
+            lblStatus.setForeground(Color.red);
+            lblStatus.setHorizontalAlignment(SwingConstants.RIGHT);
+            lblStatus.setText("jLabel3");
+
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addComponent(lblStatus, GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addComponent(lblStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            );
+        }
+
+        //======== jPanel2 ========
+        {
+            jPanel2.setBorder(new EtchedBorder());
+
+            //---- jLabel2 ----
+            jLabel2.setText("Datum:");
+
+            //---- txtDatum ----
+            txtDatum.setText("jTextField2");
+            txtDatum.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtDatumFocusGained(e);
+                }
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtDatumFocusLost(e);
+                }
+            });
+
+            //---- txtUhrzeit ----
+            txtUhrzeit.setText("jTextField1");
+            txtUhrzeit.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtUhrzeitFocusGained(e);
+                }
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtUhrzeitFocusLost(e);
+                }
+            });
+
+            //---- jLabel1 ----
+            jLabel1.setText("Uhrzeit:");
+
+            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+            jPanel2.setLayout(jPanel2Layout);
+            jPanel2Layout.setHorizontalGroup(
+                jPanel2Layout.createParallelGroup()
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(273, Short.MAX_VALUE))
+            );
+            jPanel2Layout.setVerticalGroup(
+                jPanel2Layout.createParallelGroup()
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1)
+                            .addComponent(txtDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
+                        .addContainerGap())
+            );
+        }
+
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnSave)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnDiscard))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(GroupLayout.Alignment.LEADING, contentPaneLayout.createSequentialGroup()
+                                    .addComponent(lblWert3)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtWert3))
+                                .addGroup(GroupLayout.Alignment.LEADING, contentPaneLayout.createSequentialGroup()
+                                    .addComponent(lblWert2)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtWert2, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+                                .addGroup(GroupLayout.Alignment.LEADING, contentPaneLayout.createSequentialGroup()
+                                    .addComponent(lblWert1)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtWert1, GroupLayout.PREFERRED_SIZE, 120, GroupLayout.PREFERRED_SIZE)))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(lblEinheit1, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                                .addComponent(lblEinheit2, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                                .addComponent(lblEinheit3, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+                        .addComponent(lblVital, GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
+                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(lblStatus, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblVital)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnDiscard)
+                                .addComponent(btnSave)))
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblWert1)
+                                .addComponent(txtWert1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblEinheit1))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblWert2)
+                                .addComponent(txtWert2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblEinheit2))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblWert3)
+                                .addComponent(txtWert3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblEinheit3))))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel2.setText("Datum:");
-
-        txtDatum.setText("jTextField2");
-        txtDatum.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtDatumFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtDatumFocusLost(evt);
-            }
-        });
-
-        txtUhrzeit.setText("jTextField1");
-        txtUhrzeit.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtUhrzeitFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtUhrzeitFocusLost(evt);
-            }
-        });
-
-        jLabel1.setText("Uhrzeit:");
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jLabel1)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(273, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel1)
-                                        .add(txtDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel2))
-                                .addContainerGap())
-        );
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                                .add(btnSave)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(btnDiscard))
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                                                .add(lblWert3)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(txtWert3))
-                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                                                .add(lblWert2)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(txtWert2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
-                                                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                                                .add(lblWert1)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(txtWert1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                                        .add(lblEinheit1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-                                                        .add(lblEinheit2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-                                                        .add(lblEinheit3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
-                                        .add(lblVital, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
-                                        .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(lblVital)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(btnDiscard)
-                                                        .add(btnSave)))
-                                        .add(layout.createSequentialGroup()
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(lblWert1)
-                                                        .add(txtWert1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                        .add(lblEinheit1))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(lblWert2)
-                                                        .add(txtWert2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                        .add(lblEinheit2))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(lblWert3)
-                                                        .add(txtWert3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                        .add(lblEinheit3))))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 576) / 2, (screenSize.height - 323) / 2, 576, 323);
+        setSize(576, 323);
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtWert3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtWert3FocusLost
@@ -867,27 +907,27 @@ public class DlgVital extends javax.swing.JDialog {
     }//GEN-LAST:event_txtWert1FocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDiscard;
-    private javax.swing.JButton btnSave;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblEinheit1;
-    private javax.swing.JLabel lblEinheit2;
-    private javax.swing.JLabel lblEinheit3;
-    private javax.swing.JLabel lblStatus;
-    private javax.swing.JLabel lblVital;
-    private javax.swing.JLabel lblWert1;
-    private javax.swing.JLabel lblWert2;
-    private javax.swing.JLabel lblWert3;
-    private javax.swing.JTextArea txtBemerkung;
-    private javax.swing.JTextField txtDatum;
-    private javax.swing.JTextField txtUhrzeit;
-    private javax.swing.JTextField txtWert1;
-    private javax.swing.JTextField txtWert2;
-    private javax.swing.JTextField txtWert3;
+    private JLabel lblVital;
+    private JLabel lblWert1;
+    private JLabel lblWert2;
+    private JLabel lblWert3;
+    private JTextField txtWert1;
+    private JTextField txtWert2;
+    private JTextField txtWert3;
+    private JLabel lblEinheit1;
+    private JLabel lblEinheit2;
+    private JLabel lblEinheit3;
+    private JButton btnDiscard;
+    private JButton btnSave;
+    private JScrollPane jScrollPane1;
+    private JTextArea txtBemerkung;
+    private JPanel jPanel1;
+    private JLabel lblStatus;
+    private JPanel jPanel2;
+    private JLabel jLabel2;
+    private JTextField txtDatum;
+    private JTextField txtUhrzeit;
+    private JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
     private void setActiveControls(int num) {

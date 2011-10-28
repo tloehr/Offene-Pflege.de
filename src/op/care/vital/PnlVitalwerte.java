@@ -27,27 +27,27 @@
 package op.care.vital;
 
 import com.toedter.calendar.JDateChooser;
-import entity.Bewohner;
-import entity.BewohnerTools;
-import entity.SYSFilesTools;
+import entity.*;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.care.berichte.RNDBerichte;
+import op.tools.InternalClassACL;
 import op.tools.SYSCalendar;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
-import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -73,6 +73,7 @@ public class PnlVitalwerte extends CleanablePanel {
     public static final int STUHLGANG = 10;
     public static final int ERBRECHEN = 11;
     public String currentBW;
+    private Bewohner bewohner;
     public boolean editMode = false;
     public boolean newMode = false;
     private boolean[] filter = {false, false, false, false, false, false, false, false, false, false, false, false};
@@ -81,7 +82,8 @@ public class PnlVitalwerte extends CleanablePanel {
     private boolean initPhase;
     private JPopupMenu menu;
     private OCSec ocs;
-    private ActionListener fileActionListener;
+    private ActionListener standardActionListener;
+    public static final String internalClassID = "nursingrecords.vitalparameters";
 
     /**
      * Creates new form pnlVitalwerte
@@ -89,6 +91,7 @@ public class PnlVitalwerte extends CleanablePanel {
     public PnlVitalwerte(FrmPflege parent, Bewohner bewohner) {
         initPhase = true;
         this.currentBW = bewohner.getBWKennung();
+        this.bewohner = bewohner;
         this.parent = parent;
         ocs = OPDE.getOCSec();
         initComponents();
@@ -106,7 +109,7 @@ public class PnlVitalwerte extends CleanablePanel {
 //        };
 //
 //        jdcDatum.getDateEditor().getUiComponent().addFocusListener(fa);
-        fileActionListener = new ActionListener() {
+        standardActionListener = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 reloadTable();
@@ -131,384 +134,452 @@ public class PnlVitalwerte extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jspTblVW = new JScrollPane();
+        tblVital = new JTable();
+        jToolBar1 = new JToolBar();
+        btnPrint = new JButton();
+        btnLogout = new JButton();
+        lblBW = new JLabel();
+        jPanel1 = new JPanel();
+        cbRR = new JCheckBox();
+        cbPuls = new JCheckBox();
+        cbBZ = new JCheckBox();
+        cbTemp = new JCheckBox();
+        cbGewicht = new JCheckBox();
+        cbAtem = new JCheckBox();
+        cbGroesse = new JCheckBox();
+        cbBilanz = new JCheckBox();
+        cbStuhlgang = new JCheckBox();
+        cbQuick = new JCheckBox();
+        cbIDS = new JCheckBox();
+        cbShowEdits = new JCheckBox();
+        cbErbrochen = new JCheckBox();
+        jPanel2 = new JPanel();
+        jLabel2 = new JLabel();
+        jdcVon = new JDateChooser();
+        btnHA = new JButton();
+        btnToday1 = new JButton();
+        jLabel1 = new JLabel();
+        jdcBis = new JDateChooser();
+        btnToday2 = new JButton();
 
-        jspTblVW = new javax.swing.JScrollPane();
-        tblVital = new javax.swing.JTable();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnPrint = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        lblBW = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        cbRR = new javax.swing.JCheckBox();
-        cbPuls = new javax.swing.JCheckBox();
-        cbBZ = new javax.swing.JCheckBox();
-        cbTemp = new javax.swing.JCheckBox();
-        cbGewicht = new javax.swing.JCheckBox();
-        cbAtem = new javax.swing.JCheckBox();
-        cbGroesse = new javax.swing.JCheckBox();
-        cbBilanz = new javax.swing.JCheckBox();
-        cbStuhlgang = new javax.swing.JCheckBox();
-        cbQuick = new javax.swing.JCheckBox();
-        cbIDS = new javax.swing.JCheckBox();
-        cbShowEdits = new javax.swing.JCheckBox();
-        cbErbrochen = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jdcVon = new com.toedter.calendar.JDateChooser();
-        btnHA = new javax.swing.JButton();
-        btnToday1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jdcBis = new com.toedter.calendar.JDateChooser();
-        btnToday2 = new javax.swing.JButton();
+        //======== this ========
 
-        jspTblVW.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jspTblVWMousePressed(evt);
-            }
-        });
-        jspTblVW.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspTblVWComponentResized(evt);
-            }
-        });
-
-        tblVital.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+        //======== jspTblVW ========
+        {
+            jspTblVW.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    jspTblVWMousePressed(e);
                 }
-        ));
-        tblVital.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblVitalMousePressed(evt);
-            }
-        });
-        jspTblVW.setViewportView(tblVital);
+            });
+            jspTblVW.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    jspTblVWComponentResized(e);
+                }
+            });
 
-        jToolBar1.setFloatable(false);
+            //---- tblVital ----
+            tblVital.setModel(new DefaultTableModel(
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+            ) {
+                Class<?>[] columnTypes = new Class<?>[]{
+                        Object.class, Object.class, Object.class, Object.class
+                };
 
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png"))); // NOI18N
-        btnPrint.setText("Drucken");
-        btnPrint.setEnabled(false);
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnPrint);
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    return columnTypes[columnIndex];
+                }
+            });
+            tblVital.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblVitalMousePressed(e);
+                }
+            });
+            jspTblVW.setViewportView(tblVital);
+        }
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+            //---- btnPrint ----
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
+            btnPrint.setText("Drucken");
+            btnPrint.setEnabled(false);
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnPrintActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnPrint);
+
+            //---- btnLogout ----
+            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
+            btnLogout.setText("Abmelden");
+            btnLogout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnLogoutActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnLogout);
+        }
+
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("jLabel3");
 
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        cbRR.setText("Blutdruck / Puls");
-        cbRR.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbRR.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbRR.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbRRActionPerformed(evt);
-            }
-        });
+            //---- cbRR ----
+            cbRR.setText("Blutdruck / Puls");
+            cbRR.setBorder(BorderFactory.createEmptyBorder());
+            cbRR.setMargin(new Insets(0, 0, 0, 0));
+            cbRR.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbRRActionPerformed(e);
+                }
+            });
 
-        cbPuls.setText("Puls");
-        cbPuls.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbPuls.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbPuls.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbPulsActionPerformed(evt);
-            }
-        });
+            //---- cbPuls ----
+            cbPuls.setText("Puls");
+            cbPuls.setBorder(BorderFactory.createEmptyBorder());
+            cbPuls.setMargin(new Insets(0, 0, 0, 0));
+            cbPuls.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbPulsActionPerformed(e);
+                }
+            });
 
-        cbBZ.setText("Blutzucker");
-        cbBZ.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbBZ.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbBZ.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBZActionPerformed(evt);
-            }
-        });
+            //---- cbBZ ----
+            cbBZ.setText("Blutzucker");
+            cbBZ.setBorder(BorderFactory.createEmptyBorder());
+            cbBZ.setMargin(new Insets(0, 0, 0, 0));
+            cbBZ.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbBZActionPerformed(e);
+                }
+            });
 
-        cbTemp.setText("Temperatur");
-        cbTemp.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbTemp.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbTemp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbTempActionPerformed(evt);
-            }
-        });
+            //---- cbTemp ----
+            cbTemp.setText("Temperatur");
+            cbTemp.setBorder(BorderFactory.createEmptyBorder());
+            cbTemp.setMargin(new Insets(0, 0, 0, 0));
+            cbTemp.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbTempActionPerformed(e);
+                }
+            });
 
-        cbGewicht.setText("Gewicht");
-        cbGewicht.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbGewicht.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbGewicht.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbGewichtActionPerformed(evt);
-            }
-        });
+            //---- cbGewicht ----
+            cbGewicht.setText("Gewicht");
+            cbGewicht.setBorder(BorderFactory.createEmptyBorder());
+            cbGewicht.setMargin(new Insets(0, 0, 0, 0));
+            cbGewicht.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbGewichtActionPerformed(e);
+                }
+            });
 
-        cbAtem.setText("Atemfrequenz");
-        cbAtem.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbAtem.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbAtem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbAtemActionPerformed(evt);
-            }
-        });
+            //---- cbAtem ----
+            cbAtem.setText("Atemfrequenz");
+            cbAtem.setBorder(BorderFactory.createEmptyBorder());
+            cbAtem.setMargin(new Insets(0, 0, 0, 0));
+            cbAtem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbAtemActionPerformed(e);
+                }
+            });
 
-        cbGroesse.setText("Größe");
-        cbGroesse.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbGroesse.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbGroesse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbGroesseActionPerformed(evt);
-            }
-        });
+            //---- cbGroesse ----
+            cbGroesse.setText("Gr\u00f6\u00dfe");
+            cbGroesse.setBorder(BorderFactory.createEmptyBorder());
+            cbGroesse.setMargin(new Insets(0, 0, 0, 0));
+            cbGroesse.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbGroesseActionPerformed(e);
+                }
+            });
 
-        cbBilanz.setText("Ein-/Ausfuhr");
-        cbBilanz.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbBilanz.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbBilanz.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBilanzActionPerformed(evt);
-            }
-        });
+            //---- cbBilanz ----
+            cbBilanz.setText("Ein-/Ausfuhr");
+            cbBilanz.setBorder(BorderFactory.createEmptyBorder());
+            cbBilanz.setMargin(new Insets(0, 0, 0, 0));
+            cbBilanz.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbBilanzActionPerformed(e);
+                }
+            });
 
-        cbStuhlgang.setText("Stuhlgang");
-        cbStuhlgang.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbStuhlgang.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbStuhlgang.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbStuhlgangActionPerformed(evt);
-            }
-        });
+            //---- cbStuhlgang ----
+            cbStuhlgang.setText("Stuhlgang");
+            cbStuhlgang.setBorder(BorderFactory.createEmptyBorder());
+            cbStuhlgang.setMargin(new Insets(0, 0, 0, 0));
+            cbStuhlgang.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbStuhlgangActionPerformed(e);
+                }
+            });
 
-        cbQuick.setText("Quick");
-        cbQuick.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbQuick.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbQuick.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbQuickActionPerformed(evt);
-            }
-        });
+            //---- cbQuick ----
+            cbQuick.setText("Quick");
+            cbQuick.setBorder(BorderFactory.createEmptyBorder());
+            cbQuick.setMargin(new Insets(0, 0, 0, 0));
+            cbQuick.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbQuickActionPerformed(e);
+                }
+            });
 
-        cbIDS.setText("Werte-Nr. anzeigen");
-        cbIDS.setToolTipText("<html>Jeder Bericht hat immer eine eindeutige Nummer.<br/>Diese Nummern werden im Alltag nicht benötigt.<br/>Sollten Sie diese Nummern dennoch sehen wollen<br/>dann schalten Sie diese hier ein.</html>");
-        cbIDS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbIDSActionPerformed(evt);
-            }
-        });
+            //---- cbIDS ----
+            cbIDS.setText("Werte-Nr. anzeigen");
+            cbIDS.setToolTipText("<html>Jeder Bericht hat immer eine eindeutige Nummer.<br/>Diese Nummern werden im Alltag nicht ben\u00f6tigt.<br/>Sollten Sie diese Nummern dennoch sehen wollen<br/>dann schalten Sie diese hier ein.</html>");
+            cbIDS.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbIDSActionPerformed(e);
+                }
+            });
 
-        cbShowEdits.setText("Änderungen anzeigen");
-        cbShowEdits.setToolTipText("<html>Damit Änderungen und Löschungen trotzdem nachvollziehbar bleiben<br/>werden sie nur ausgeblendet. Mit diesem Schalter werden diese Änderungen wieder angezeigt.</html>");
-        cbShowEdits.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbShowEditsActionPerformed(evt);
-            }
-        });
+            //---- cbShowEdits ----
+            cbShowEdits.setText("\u00c4nderungen anzeigen");
+            cbShowEdits.setToolTipText("<html>Damit \u00c4nderungen und L\u00f6schungen trotzdem nachvollziehbar bleiben<br/>werden sie nur ausgeblendet. Mit diesem Schalter werden diese \u00c4nderungen wieder angezeigt.</html>");
+            cbShowEdits.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbShowEditsActionPerformed(e);
+                }
+            });
 
-        cbErbrochen.setText("Erbrochen");
-        cbErbrochen.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbErbrochen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbErbrochenActionPerformed(evt);
-            }
-        });
+            //---- cbErbrochen ----
+            cbErbrochen.setText("Erbrochen");
+            cbErbrochen.setBorder(new EmptyBorder(1, 1, 1, 1));
+            cbErbrochen.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbErbrochenActionPerformed(e);
+                }
+            });
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(cbRR)
-                                        .add(cbBZ)
-                                        .add(cbPuls))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(cbAtem)
-                                        .add(cbGewicht)
-                                        .add(cbTemp))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jPanel1Layout.createSequentialGroup()
-                                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(cbBilanz)
-                                                        .add(cbGroesse))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(cbErbrochen)
-                                                        .add(cbQuick)))
-                                        .add(cbStuhlgang))
-                                .add(18, 18, 18)
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(cbIDS)
-                                        .add(cbShowEdits))
-                                .add(39, 39, 39))
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(cbRR)
-                                        .add(cbGroesse)
-                                        .add(cbTemp)
-                                        .add(cbQuick)
-                                        .add(cbIDS))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jPanel1Layout.createSequentialGroup()
-                                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(cbGewicht)
-                                                        .add(cbBilanz)
-                                                        .add(cbPuls)
-                                                        .add(cbErbrochen))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(cbAtem)
-                                                        .add(cbBZ)
-                                                        .add(cbStuhlgang)))
-                                        .add(cbShowEdits))
-                                .addContainerGap(12, Short.MAX_VALUE))
-        );
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addComponent(cbRR)
+                                            .addComponent(cbBZ)
+                                            .addComponent(cbPuls))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addComponent(cbAtem)
+                                            .addComponent(cbGewicht)
+                                            .addComponent(cbTemp))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                                            .addComponent(cbBilanz)
+                                                            .addComponent(cbGroesse))
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                                            .addComponent(cbErbrochen)
+                                                            .addComponent(cbQuick)))
+                                            .addComponent(cbStuhlgang))
+                                    .addGap(18, 18, 18)
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addComponent(cbIDS)
+                                            .addComponent(cbShowEdits))
+                                    .addGap(39, 39, 39))
+            );
+            jPanel1Layout.setVerticalGroup(
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(cbRR)
+                                            .addComponent(cbGroesse)
+                                            .addComponent(cbTemp)
+                                            .addComponent(cbQuick)
+                                            .addComponent(cbIDS))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                            .addComponent(cbGewicht)
+                                                            .addComponent(cbBilanz)
+                                                            .addComponent(cbPuls)
+                                                            .addComponent(cbErbrochen))
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                            .addComponent(cbAtem)
+                                                            .addComponent(cbBZ)
+                                                            .addComponent(cbStuhlgang)))
+                                            .addComponent(cbShowEdits))
+                                    .addContainerGap(19, Short.MAX_VALUE))
+            );
+        }
 
-        jPanel2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel2 ========
+        {
+            jPanel2.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        jLabel2.setText("Werte anzeigen vom:");
+            //---- jLabel2 ----
+            jLabel2.setText("Werte anzeigen vom:");
 
-        jdcVon.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jdcVonPropertyChange(evt);
-            }
-        });
+            //---- jdcVon ----
+            jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    jdcVonPropertyChange(e);
+                }
+            });
 
-        btnHA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png"))); // NOI18N
-        btnHA.setToolTipText("Erster Eintrag");
-        btnHA.setBorder(null);
-        btnHA.setBorderPainted(false);
-        btnHA.setContentAreaFilled(false);
-        btnHA.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnHAActionPerformed(evt);
-            }
-        });
+            //---- btnHA ----
+            btnHA.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png")));
+            btnHA.setToolTipText("Erster Eintrag");
+            btnHA.setBorder(null);
+            btnHA.setBorderPainted(false);
+            btnHA.setContentAreaFilled(false);
+            btnHA.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnHAActionPerformed(e);
+                }
+            });
 
-        btnToday1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/history.png"))); // NOI18N
-        btnToday1.setToolTipText("Heute");
-        btnToday1.setBorder(null);
-        btnToday1.setBorderPainted(false);
-        btnToday1.setContentAreaFilled(false);
-        btnToday1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToday1ActionPerformed(evt);
-            }
-        });
+            //---- btnToday1 ----
+            btnToday1.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/history.png")));
+            btnToday1.setToolTipText("Heute");
+            btnToday1.setBorder(null);
+            btnToday1.setBorderPainted(false);
+            btnToday1.setContentAreaFilled(false);
+            btnToday1.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnToday1ActionPerformed(e);
+                }
+            });
 
-        jLabel1.setText("bis einschließlich:");
+            //---- jLabel1 ----
+            jLabel1.setText("bis einschlie\u00dflich:");
 
-        jdcBis.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jdcBisPropertyChange(evt);
-            }
-        });
+            //---- jdcBis ----
+            jdcBis.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    jdcBisPropertyChange(e);
+                }
+            });
 
-        btnToday2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/history.png"))); // NOI18N
-        btnToday2.setToolTipText("Heute");
-        btnToday2.setBorder(null);
-        btnToday2.setBorderPainted(false);
-        btnToday2.setContentAreaFilled(false);
-        btnToday2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnToday2ActionPerformed(evt);
-            }
-        });
+            //---- btnToday2 ----
+            btnToday2.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/history.png")));
+            btnToday2.setToolTipText("Heute");
+            btnToday2.setBorder(null);
+            btnToday2.setBorderPainted(false);
+            btnToday2.setContentAreaFilled(false);
+            btnToday2.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnToday2ActionPerformed(e);
+                }
+            });
 
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jLabel2)
-                                .add(2, 2, 2)
-                                .add(jdcVon, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 146, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnHA)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnToday1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jLabel1)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jdcBis, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 132, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnToday2)
-                                .addContainerGap(67, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jdcBis, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jdcVon, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(btnToday2)
-                                        .add(jLabel2)
-                                        .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                                .add(org.jdesktop.layout.GroupLayout.LEADING, btnHA, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .add(org.jdesktop.layout.GroupLayout.LEADING, btnToday1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)))
-                                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+            jPanel2.setLayout(jPanel2Layout);
+            jPanel2Layout.setHorizontalGroup(
+                    jPanel2Layout.createParallelGroup()
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jLabel2)
+                                    .addGap(2, 2, 2)
+                                    .addComponent(jdcVon, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnHA)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnToday1, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel1)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jdcBis, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnToday2)
+                                    .addContainerGap(179, Short.MAX_VALUE))
+            );
+            jPanel2Layout.setVerticalGroup(
+                    jPanel2Layout.createParallelGroup()
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel2Layout.createParallelGroup()
+                                            .addComponent(jdcBis, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jdcVon, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(btnToday2)
+                                            .addComponent(jLabel2)
+                                            .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                    .addComponent(btnHA, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(btnToday1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)))
+                                    .addContainerGap(20, Short.MAX_VALUE))
+            );
+            jPanel2Layout.linkSize(SwingConstants.VERTICAL, new Component[]{btnHA, btnToday1, btnToday2, jLabel1, jLabel2, jdcBis, jdcVon});
+        }
 
-        jPanel2Layout.linkSize(new java.awt.Component[]{btnHA, btnToday1, btnToday2, jLabel1, jLabel2, jdcBis, jdcVon}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jToolBar1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                layout.createParallelGroup()
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
+                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(lblBW, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
+                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE)
                                 .addContainerGap())
-                        .add(layout.createSequentialGroup()
+                        .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jspTblVW, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE)
+                                        .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jspTblVW, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .add(jToolBar1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(lblBW)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jspTblVW, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblBW)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspTblVW, GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
                                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -764,19 +835,33 @@ public class PnlVitalwerte extends CleanablePanel {
                 ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, bearbeitenMöglich);
                 ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, bearbeitenMöglich);
 
-                if (!alreadyEdited && singleRowSelected) {
+//                if (!alreadyEdited && singleRowSelected) {
+//                    menu.add(new JSeparator());
+//                    // #0000003
+//                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
+//
+//                    Query query = OPDE.getEM().createNamedQuery("BWerte.findByBwid");
+//                    query.setParameter("bwid", bwid);
+//                    entity.BWerte bwert = (entity.BWerte) query.getSingleResult();
+//                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));
+//
+//                    // #0000035
+//                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWerte", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
+//                }
+
+                BWerte aktuellerWert = BWerteTools.findByID(bwid);
+
+                if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                     menu.add(new JSeparator());
-                    // #0000003
-                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
-
-                    Query query = OPDE.getEM().createNamedQuery("BWerte.findByBwid");
-                    query.setParameter("bwid", bwid);
-                    entity.BWerte bwert = (entity.BWerte) query.getSingleResult();
-                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));
-
-                    // #0000035
-                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWerte", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
+                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, aktuellerWert, standardActionListener));
                 }
+
+                if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
+                    menu.add(new JSeparator());
+                    menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerWert, bewohner, standardActionListener));
+                }
+
+
             }
         }
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
@@ -856,33 +941,33 @@ public class PnlVitalwerte extends CleanablePanel {
     }//GEN-LAST:event_cbErbrochenActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnHA;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnPrint;
-    private javax.swing.JButton btnToday1;
-    private javax.swing.JButton btnToday2;
-    private javax.swing.JCheckBox cbAtem;
-    private javax.swing.JCheckBox cbBZ;
-    private javax.swing.JCheckBox cbBilanz;
-    private javax.swing.JCheckBox cbErbrochen;
-    private javax.swing.JCheckBox cbGewicht;
-    private javax.swing.JCheckBox cbGroesse;
-    private javax.swing.JCheckBox cbIDS;
-    private javax.swing.JCheckBox cbPuls;
-    private javax.swing.JCheckBox cbQuick;
-    private javax.swing.JCheckBox cbRR;
-    private javax.swing.JCheckBox cbShowEdits;
-    private javax.swing.JCheckBox cbStuhlgang;
-    private javax.swing.JCheckBox cbTemp;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JToolBar jToolBar1;
-    private com.toedter.calendar.JDateChooser jdcBis;
-    private com.toedter.calendar.JDateChooser jdcVon;
-    private javax.swing.JScrollPane jspTblVW;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JTable tblVital;
+    private JScrollPane jspTblVW;
+    private JTable tblVital;
+    private JToolBar jToolBar1;
+    private JButton btnPrint;
+    private JButton btnLogout;
+    private JLabel lblBW;
+    private JPanel jPanel1;
+    private JCheckBox cbRR;
+    private JCheckBox cbPuls;
+    private JCheckBox cbBZ;
+    private JCheckBox cbTemp;
+    private JCheckBox cbGewicht;
+    private JCheckBox cbAtem;
+    private JCheckBox cbGroesse;
+    private JCheckBox cbBilanz;
+    private JCheckBox cbStuhlgang;
+    private JCheckBox cbQuick;
+    private JCheckBox cbIDS;
+    private JCheckBox cbShowEdits;
+    private JCheckBox cbErbrochen;
+    private JPanel jPanel2;
+    private JLabel jLabel2;
+    private JDateChooser jdcVon;
+    private JButton btnHA;
+    private JButton btnToday1;
+    private JLabel jLabel1;
+    private JDateChooser jdcBis;
+    private JButton btnToday2;
     // End of variables declaration//GEN-END:variables
 }

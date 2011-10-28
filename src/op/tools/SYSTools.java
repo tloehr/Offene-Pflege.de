@@ -1679,13 +1679,15 @@ public class SYSTools {
     }
 
     public static Timeline flashLabel(JLabel lbl1, String text, int times) {
-        return flashLabel(lbl1, text, times, Color.red);
+        return flashLabel(lbl1, text, times, Color.RED);
     }
 
     public static Timeline flashLabel(JLabel lbl1, String text, int times, Color flashColor) {
+
         final JLabel lbl = lbl1;
         final Color oldColor = lbl1.getForeground();
         final String oldText = lbl1.getText();
+        OPDE.debug("oldText: "+oldText);
         lbl.setText(text);
         Timeline textmessageTL = new Timeline(lbl);
         textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), flashColor);
@@ -1694,23 +1696,29 @@ public class SYSTools {
         textmessageTL.addCallback(new TimelineCallbackAdapter() {
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+                OPDE.debug(newState);
                 if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
                     lbl.setText(oldText);
                     lbl.setForeground(oldColor);
-                    OPDE.debug("textmessageTL cancelled or done. Label set to: " + oldText);
+                    OPDE.debug("flashLabel cancelled or done. Label set to: " + oldText);
                 }
             }
         });
-
 
         if (times == 0) {
             textmessageTL.playLoop(Timeline.RepeatBehavior.REVERSE);
         } else {
             textmessageTL.playLoop(times, Timeline.RepeatBehavior.REVERSE);
         }
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         return textmessageTL;
     }
+
+
 
     public static void fadeinout(JLabel lbl, String text) {
         final JLabel lbl1 = lbl;

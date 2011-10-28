@@ -10,6 +10,12 @@
  */
 package op.care.sysfiles;
 
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
+import javax.swing.event.*;
 import entity.*;
 import op.OPDE;
 import op.tools.SYSTools;
@@ -61,116 +67,136 @@ public class DlgNewFile extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        txtFile = new JTextField();
+        btnSelectFile = new JButton();
+        lblFileExist = new JLabel();
+        jScrollPane1 = new JScrollPane();
+        txtBemerkung = new JTextPane();
+        jLabel1 = new JLabel();
+        cbBeleg = new JCheckBox();
+        btnOk = new JButton();
+        btnCancel = new JButton();
 
-        txtFile = new javax.swing.JTextField();
-        btnSelectFile = new javax.swing.JButton();
-        lblFileExist = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtBemerkung = new javax.swing.JTextPane();
-        jLabel1 = new javax.swing.JLabel();
-        cbBeleg = new javax.swing.JCheckBox();
-        btnOk = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        txtFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFileActionPerformed(evt);
+        //---- txtFile ----
+        txtFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtFileActionPerformed(e);
             }
         });
-        txtFile.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtFileFocusLost(evt);
-            }
-        });
-
-        btnSelectFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/fileopen.png"))); // NOI18N
-        btnSelectFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectFileActionPerformed(evt);
+        txtFile.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtFileFocusLost(e);
             }
         });
 
-        lblFileExist.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png"))); // NOI18N
+        //---- btnSelectFile ----
+        btnSelectFile.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileopen.png")));
+        btnSelectFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSelectFileActionPerformed(e);
+            }
+        });
+
+        //---- lblFileExist ----
+        lblFileExist.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
         lblFileExist.setToolTipText("Datei nicht gefunden.");
 
-        txtBemerkung.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtBemerkungCaretUpdate(evt);
-            }
-        });
-        jScrollPane1.setViewportView(txtBemerkung);
+        //======== jScrollPane1 ========
+        {
 
+            //---- txtBemerkung ----
+            txtBemerkung.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtBemerkungCaretUpdate(e);
+                }
+            });
+            jScrollPane1.setViewportView(txtBemerkung);
+        }
+
+        //---- jLabel1 ----
         jLabel1.setText("Bemerkung:");
 
+        //---- cbBeleg ----
         cbBeleg.setText("Einbuchungsbeleg drucken");
-        cbBeleg.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBelegActionPerformed(evt);
+        cbBeleg.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cbBelegActionPerformed(e);
             }
         });
 
-        btnOk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
+        //---- btnOk ----
+        btnOk.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
         btnOk.setText("Ok");
-        btnOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOkActionPerformed(evt);
+        btnOk.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOkActionPerformed(e);
             }
         });
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
+        //---- btnCancel ----
+        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
         btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCancelActionPerformed(e);
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(cbBeleg)
-                                        .add(jLabel1)
-                                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                                .add(txtFile, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(lblFileExist)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(btnSelectFile))
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                                .add(btnOk)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(btnCancel)))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(cbBeleg)
+                        .addComponent(jLabel1)
+                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(txtFile, GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblFileExist)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnSelectFile))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnOk)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel)))
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                        .add(txtFile)
-                                        .add(lblFileExist, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, btnSelectFile, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE))
-                                .add(18, 18, 18)
-                                .add(jLabel1)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                                .add(18, 18, 18)
-                                .add(cbBeleg)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(btnCancel)
-                                        .add(btnOk))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txtFile)
+                        .addComponent(lblFileExist, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSelectFile, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE))
+                    .addGap(18, 18, 18)
+                    .addComponent(jLabel1)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                    .addGap(18, 18, 18)
+                    .addComponent(cbBeleg)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnCancel)
+                        .addComponent(btnOk))
+                    .addContainerGap())
         );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbBelegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBelegActionPerformed
@@ -250,14 +276,14 @@ public class DlgNewFile extends javax.swing.JDialog {
     }//GEN-LAST:event_txtBemerkungCaretUpdate
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnOk;
-    private javax.swing.JButton btnSelectFile;
-    private javax.swing.JCheckBox cbBeleg;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblFileExist;
-    private javax.swing.JTextPane txtBemerkung;
-    private javax.swing.JTextField txtFile;
+    private JTextField txtFile;
+    private JButton btnSelectFile;
+    private JLabel lblFileExist;
+    private JScrollPane jScrollPane1;
+    private JTextPane txtBemerkung;
+    private JLabel jLabel1;
+    private JCheckBox cbBeleg;
+    private JButton btnOk;
+    private JButton btnCancel;
     // End of variables declaration//GEN-END:variables
 }

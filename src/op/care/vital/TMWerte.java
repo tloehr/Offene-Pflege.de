@@ -118,10 +118,9 @@ public class TMWerte
                             " 	SELECT DISTINCT f2.BWID, ifnull(anzahl,0) anzahl" +
                             " 	FROM BWerte f2" +
                             " 	LEFT OUTER JOIN (" +
-                            " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
-                            " 		WHERE TableName='BWerte'" +
-                            " 		GROUP BY ForeignKey" +
-                            " 		) va ON va.ForeignKey = f2.BWID" +
+                            " 		SELECT ForeignKey, count(*) anzahl FROM SYSBWERTE2VORGANG" +
+                            " 		GROUP BY BWID " +
+                            " 		) va ON va.BWID = f2.BWID" +
                             " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
                             " ) vrg ON vrg.BWID = bw.BWID " +
                             " WHERE bw.BWKennung = ? AND bw.PIT >= ? AND bw.PIT <= ? " +

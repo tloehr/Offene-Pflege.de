@@ -49,7 +49,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Verordnung.findByDafID", query = "SELECT b FROM Verordnung b WHERE b.dafID = :dafID"),
     @NamedQuery(name = "Verordnung.findBySitID", query = "SELECT b FROM Verordnung b WHERE b.sitID = :sitID"),
     @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
-public class Verordnung implements Serializable {
+public class Verordnung implements Serializable, VorgangElement {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -255,6 +255,28 @@ public class Verordnung implements Serializable {
 
     public Collection<Vorgaenge> getVorgaenge() {
         return vorgaenge;
+    }
+
+    @Override
+    public long getPITInMillis() {
+        return anDatum.getTime();
+    }
+
+    @Override
+    public String getContentAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public String getPITAsHTML() {
+        // TODO: fehlt noch
+        return "<html>not yet</html>";
+    }
+
+    @Override
+    public long getID() {
+        return verID;
     }
     
     @Override
