@@ -13,7 +13,7 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>left:default:grow</string> 
+        <string>default:grow</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
@@ -26,7 +26,7 @@
       </void> 
       <void method="setProperty"> 
        <string>title</string> 
-       <string>OpenCare Prototype C</string> 
+       <string>Offene-Pflege.de</string> 
       </void> 
       <void method="setProperty"> 
        <string>$sizePolicy</string> 
@@ -74,15 +74,7 @@
            <object class="com.jformdesigner.model.FormContainer"> 
             <string>javax.swing.JPanel</string> 
             <object class="com.jformdesigner.model.FormLayoutManager"> 
-             <class>org.jdesktop.layout.GroupLayout</class> 
-             <void method="setProperty"> 
-              <string>$horizontalGroup</string> 
-              <string>par l {space :0:807:x}</string> 
-             </void> 
-             <void method="setProperty"> 
-              <string>$verticalGroup</string> 
-              <string>par l {space :0:483:x}</string> 
-             </void> 
+             <class>javax.swing.BoxLayout</class> 
             </object> 
             <void property="name"> 
              <string>pnlUebergabe</string> 
@@ -107,7 +99,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$verticalGroup</string> 
-              <string>par l {space :0:483:x}</string> 
+              <string>par l {space :0:487:x}</string> 
              </void> 
             </object> 
             <void property="name"> 
@@ -155,7 +147,7 @@
              <class>com.jgoodies.forms.layout.FormLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>left:default:grow</string> 
+              <string>default:grow</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
@@ -224,10 +216,6 @@
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
-               <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-              </void> 
-              <void method="setProperty"> 
-               <string>vAlign</string> 
                <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
               </void> 
              </object> 
@@ -372,7 +360,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -398,7 +386,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -424,7 +412,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -450,7 +438,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -476,7 +464,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -502,7 +490,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -528,7 +516,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -554,7 +542,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -580,7 +568,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -606,7 +594,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:483:x}</string> 
+                <string>par l {space :0:487:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -668,19 +656,23 @@
        <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JPanel</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.BoxLayout</class> 
+         <class>java.awt.FlowLayout</class> 
          <void method="setProperty"> 
-          <string>axis</string> 
-          <int>2</int> 
+          <string>alignment</string> 
+          <int>0</int> 
+         </void> 
+         <void method="setProperty"> 
+          <string>vgap</string> 
+          <int>0</int> 
+         </void> 
+         <void method="setProperty"> 
+          <string>hgap</string> 
+          <int>40</int> 
          </void> 
         </object> 
         <void method="setProperty"> 
          <string>border</string> 
-         <object class="javax.swing.border.EtchedBorder"> 
-          <int>1</int> 
-          <null/> 
-          <null/> 
-         </object> 
+         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
         </void> 
         <void property="name"> 
          <string>pnlStatus</string> 
@@ -699,25 +691,9 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>com.jformdesigner.designer.wrapper.HSpacer</string> 
-          <void property="name"> 
-           <string>hSpacer1</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JProgressBar</string> 
           <void property="name"> 
            <string>pbHeap</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>com.jformdesigner.designer.wrapper.HSpacer</string> 
-          <void property="name"> 
-           <string>hSpacer2</string> 
           </void> 
          </object> 
         </void> 
@@ -730,14 +706,6 @@
           </void> 
           <void property="name"> 
            <string>lblHeap</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>com.jformdesigner.designer.wrapper.HSpacer</string> 
-          <void property="name"> 
-           <string>hSpacer3</string> 
           </void> 
          </object> 
         </void> 
@@ -766,7 +734,7 @@
         </void> 
         <void method="setProperty"> 
          <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
         </void> 
        </object> 
       </void> 

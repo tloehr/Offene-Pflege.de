@@ -98,6 +98,10 @@
          <string>gridWidth</string> 
          <int>3</int> 
         </void> 
+        <void method="setProperty"> 
+         <string>hAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -942,7 +946,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>1090</int> 
+        <int>990</int> 
         <int>510</int> 
        </object> 
       </void> 

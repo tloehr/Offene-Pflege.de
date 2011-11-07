@@ -170,19 +170,16 @@ public class FrmPflege extends javax.swing.JFrame {
         pnlFiles = new JPanel();
         pnlStatus = new JPanel();
         lblServer = new JLabel();
-        hSpacer1 = new JPanel(null);
         pbHeap = new JProgressBar();
-        hSpacer2 = new JPanel(null);
         lblHeap = new JLabel();
-        hSpacer3 = new JPanel(null);
         lblUser = new JLabel();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("OpenCare Prototype C");
+        setTitle("Offene-Pflege.de");
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "left:default:grow",
+            "default:grow",
             "fill:default:grow, fill:default"));
 
         //======== jtpMain ========
@@ -206,17 +203,7 @@ public class FrmPflege extends javax.swing.JFrame {
 
                 //======== pnlUebergabe ========
                 {
-
-                    GroupLayout pnlUebergabeLayout = new GroupLayout(pnlUebergabe);
-                    pnlUebergabe.setLayout(pnlUebergabeLayout);
-                    pnlUebergabeLayout.setHorizontalGroup(
-                        pnlUebergabeLayout.createParallelGroup()
-                            .addGap(0, 807, Short.MAX_VALUE)
-                    );
-                    pnlUebergabeLayout.setVerticalGroup(
-                        pnlUebergabeLayout.createParallelGroup()
-                            .addGap(0, 483, Short.MAX_VALUE)
-                    );
+                    pnlUebergabe.setLayout(new BoxLayout(pnlUebergabe, BoxLayout.X_AXIS));
                 }
                 jtpUebersicht.addTab("\u00dcbergabe", pnlUebergabe);
 
@@ -232,7 +219,7 @@ public class FrmPflege extends javax.swing.JFrame {
                     );
                     pnlSchichtleitungLayout.setVerticalGroup(
                         pnlSchichtleitungLayout.createParallelGroup()
-                            .addGap(0, 483, Short.MAX_VALUE)
+                            .addGap(0, 487, Short.MAX_VALUE)
                     );
                 }
                 jtpUebersicht.addTab("Schichtleitung", pnlSchichtleitung);
@@ -250,7 +237,7 @@ public class FrmPflege extends javax.swing.JFrame {
                 //======== pnlBW ========
                 {
                     pnlBW.setLayout(new FormLayout(
-                        "left:default:grow",
+                        "default:grow",
                         "fill:default, $rgap, default, $lgap, default:grow"));
 
                     //---- btnVerlegung ----
@@ -265,7 +252,7 @@ public class FrmPflege extends javax.swing.JFrame {
                             btnVerlegungActionPerformed(e);
                         }
                     });
-                    pnlBW.add(btnVerlegung, CC.xy(1, 1, CC.FILL, CC.FILL));
+                    pnlBW.add(btnVerlegung, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
 
                     //---- btnLogout ----
                     btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
@@ -314,7 +301,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlUeberLayout.setVerticalGroup(
                             pnlUeberLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("\u00dcbersicht", pnlUeber);
@@ -331,7 +318,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlTBLayout.setVerticalGroup(
                             pnlTBLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Pflegeberichte", pnlTB);
@@ -348,7 +335,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlDFNLayout.setVerticalGroup(
                             pnlDFNLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("DFN", pnlDFN);
@@ -365,7 +352,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlBHPLayout.setVerticalGroup(
                             pnlBHPLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("BHP", pnlBHP);
@@ -382,7 +369,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlVitalDummyLayout.setVerticalGroup(
                             pnlVitalDummyLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Werte", pnlVitalDummy);
@@ -399,7 +386,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlVerLayout.setVerticalGroup(
                             pnlVerLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Verordnungen", pnlVer);
@@ -416,7 +403,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlInfoLayout.setVerticalGroup(
                             pnlInfoLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Informationen", pnlInfo);
@@ -433,7 +420,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlPPlanungLayout.setVerticalGroup(
                             pnlPPlanungLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Planung", pnlPPlanung);
@@ -450,7 +437,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlVorgangLayout.setVerticalGroup(
                             pnlVorgangLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Vorg\u00e4nge", pnlVorgang);
@@ -467,7 +454,7 @@ public class FrmPflege extends javax.swing.JFrame {
                         );
                         pnlFilesLayout.setVerticalGroup(
                             pnlFilesLayout.createParallelGroup()
-                                .addGap(0, 483, Short.MAX_VALUE)
+                                .addGap(0, 487, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Dokumente", pnlFiles);
@@ -482,26 +469,23 @@ public class FrmPflege extends javax.swing.JFrame {
 
         //======== pnlStatus ========
         {
-            pnlStatus.setBorder(new EtchedBorder());
-            pnlStatus.setLayout(new BoxLayout(pnlStatus, BoxLayout.LINE_AXIS));
+            pnlStatus.setBorder(null);
+            pnlStatus.setLayout(new FlowLayout(FlowLayout.LEFT, 40, 0));
 
             //---- lblServer ----
             lblServer.setText("jLabel6");
             pnlStatus.add(lblServer);
-            pnlStatus.add(hSpacer1);
             pnlStatus.add(pbHeap);
-            pnlStatus.add(hSpacer2);
 
             //---- lblHeap ----
             lblHeap.setText("jLabel1");
             pnlStatus.add(lblHeap);
-            pnlStatus.add(hSpacer3);
 
             //---- lblUser ----
             lblUser.setText("jLabel6");
             pnlStatus.add(lblUser);
         }
-        contentPane.add(pnlStatus, CC.xy(1, 2, CC.FILL, CC.DEFAULT));
+        contentPane.add(pnlStatus, CC.xy(1, 2, CC.CENTER, CC.DEFAULT));
         setSize(851, 623);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -584,8 +568,7 @@ public class FrmPflege extends javax.swing.JFrame {
         super.dispose();
     }
 
-    public void cleanup() {
-        // Aufräumen
+    private void cleanup() {
         for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
             if (jtpPflegeakte.getComponentAt(i) != null && jtpPflegeakte.getComponentAt(i) instanceof CleanablePanel) {
                 CleanablePanel cp = (CleanablePanel) jtpPflegeakte.getComponentAt(i);
@@ -597,8 +580,9 @@ public class FrmPflege extends javax.swing.JFrame {
         if (jtpMain.getComponentAt(MAINTAB_UEBERSICHT) != null && jtpMain.getComponentAt(MAINTAB_UEBERSICHT) instanceof CleanablePanel) {
             CleanablePanel cp = (CleanablePanel) jtpMain.getComponentAt(MAINTAB_UEBERSICHT);
             cp.cleanup();
+            SYSTools.unregisterListeners((JComponent) jtpMain.getComponentAt(MAINTAB_UEBERSICHT));
+            jtpMain.setComponentAt(MAINTAB_UEBERSICHT, null);
         }
-        jtpMain.setComponentAt(MAINTAB_UEBERSICHT, null);
     }
 
     private void reloadDisplay() {
@@ -762,11 +746,8 @@ public class FrmPflege extends javax.swing.JFrame {
     private JPanel pnlFiles;
     private JPanel pnlStatus;
     private JLabel lblServer;
-    private JPanel hSpacer1;
     private JProgressBar pbHeap;
-    private JPanel hSpacer2;
     private JLabel lblHeap;
-    private JPanel hSpacer3;
     private JLabel lblUser;
     // End of variables declaration//GEN-END:variables
 

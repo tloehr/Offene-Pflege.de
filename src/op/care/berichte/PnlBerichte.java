@@ -45,8 +45,6 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -167,14 +165,18 @@ public class PnlBerichte extends CleanablePanel {
         prepareSearchArea();
 
         btnAddBericht.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-        btnEdit.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+
 
         splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
         splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
 
+
+
         this.initPhase = false;
 
         reloadTable();
+
+
 
     }
 
@@ -233,7 +235,7 @@ public class PnlBerichte extends CleanablePanel {
             case LAUFENDE_OPERATION_BERICHT_BEARBEITEN: {
                 if (txtBericht.getText().trim().isEmpty()) {
                     SYSTools.flashLabel(lblBW, "Kann keinen leeren Bericht speichern.", 6, Color.ORANGE);
-                }  else {
+                } else {
                     success = PflegeberichteTools.changeBericht(aktuellerBericht, editBericht);
                     editBericht = null;
                     splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
@@ -258,6 +260,7 @@ public class PnlBerichte extends CleanablePanel {
 
     private void splitButtonsCenterComponentResized(ComponentEvent e) {
         SYSTools.showSide(splitButtonsCenter, splitBCPercent);
+        OPDE.debug("splitButtonsCenterComponentResized(ComponentEvent e)");
     }
 
     private void jdcDatumPropertyChange(PropertyChangeEvent e) {
@@ -313,6 +316,7 @@ public class PnlBerichte extends CleanablePanel {
 
     private void splitTableEditorComponentResized(ComponentEvent e) {
         SYSTools.showSide(splitTableEditor, splitTEPercent);
+        OPDE.debug("splitTableEditorComponentResized(ComponentEvent e)");
     }
 
     private void btnDeleteActionPerformed(ActionEvent e) {
@@ -422,7 +426,7 @@ public class PnlBerichte extends CleanablePanel {
         lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
         lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("jLabel3");
-        add(lblBW, CC.xywh(2, 1, 3, 1));
+        add(lblBW, CC.xywh(2, 1, 3, 1, CC.FILL, CC.DEFAULT));
 
         //======== splitTableEditor ========
         {
@@ -675,6 +679,8 @@ public class PnlBerichte extends CleanablePanel {
         tcm1.getColumn(1).setHeaderValue("Info");
         tcm1.getColumn(2).setHeaderValue("Bericht");
 
+        OPDE.debug("jspTblTBComponentResized(java.awt.event.ComponentEvent evt)");
+
     }//GEN-LAST:event_jspTblTBComponentResized
 
     private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
@@ -741,8 +747,8 @@ public class PnlBerichte extends CleanablePanel {
             btnCancel.doClick();
         }
 
-        btnEdit.setEnabled(singleRowSelected);
-        btnDelete.setEnabled(singleRowSelected);
+        btnEdit.setEnabled(singleRowSelected && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnDelete.setEnabled(singleRowSelected && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
         if (evt.isPopupTrigger()) {
             /**
@@ -930,7 +936,7 @@ public class PnlBerichte extends CleanablePanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                jdcVon.setDate(new Date());
+                jdcBis.setDate(new Date());
             }
         });
 
@@ -982,6 +988,8 @@ public class PnlBerichte extends CleanablePanel {
         if (initPhase) {
             return;
         }
+
+        OPDE.debug("reloadTable()");
 //        if (textUpperLabelTL != null){
 //            textUpperLabelTL.cancel();
 //        }
@@ -1021,8 +1029,8 @@ public class PnlBerichte extends CleanablePanel {
                 + (cbShowEdits.isSelected() ? "" : " AND p.editedBy is null ")
                 + " ORDER BY p.pit DESC ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("von", von);
-        query.setParameter("bis", bis);
+        query.setParameter("von", new Date(SYSCalendar.startOfDay(von)));
+        query.setParameter("bis", new Date(SYSCalendar.endOfDay(bis)));
 
         if (!search.isEmpty()) {
             query.setParameter("search", "%" + search + "%");
@@ -1049,7 +1057,7 @@ public class PnlBerichte extends CleanablePanel {
         tblTB.getColumnModel().getColumn(1).setCellRenderer(new RNDBerichte());
         tblTB.getColumnModel().getColumn(2).setCellRenderer(new RNDBerichte());
 
-        //textUpperLabelTL.cancel();
+        dispatchEvent(new ComponentEvent(this, ComponentEvent.COMPONENT_RESIZED));
 
     }
 

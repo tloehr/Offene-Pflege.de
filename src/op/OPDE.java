@@ -268,8 +268,8 @@ public class OPDE {
 
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                new DlgException(new Exception(e));
-                //e.printStackTrace();
+                //new DlgException(new Exception(e));
+                e.printStackTrace();
                 OPDE.error(e);
             }
         });
