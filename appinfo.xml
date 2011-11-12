@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Document   : appinfo.xml
+    Created on : 08.11.2011
+    Author     : tloehr
+    Description: Standard Werte, die in der Applikation gebraucht werden.
+-->
+
+<app>
+    <database>
+        <!--
+        Hier stehen die Datenbank-Schema Versionen, die für diese Applikation geignet sind.
+        -->
+        <schema>1</schema>
+    </database>
+
+</app>

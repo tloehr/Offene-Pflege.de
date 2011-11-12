@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>fill:default:grow, fill:default</string> 
+        <string>fill:default:grow</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -649,92 +649,6 @@
         <void method="setProperty"> 
          <string>hAlign</string> 
          <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>java.awt.FlowLayout</class> 
-         <void method="setProperty"> 
-          <string>alignment</string> 
-          <int>0</int> 
-         </void> 
-         <void method="setProperty"> 
-          <string>vgap</string> 
-          <int>0</int> 
-         </void> 
-         <void method="setProperty"> 
-          <string>hgap</string> 
-          <int>40</int> 
-         </void> 
-        </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-        </void> 
-        <void property="name"> 
-         <string>pnlStatus</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>jLabel6</string> 
-          </void> 
-          <void property="name"> 
-           <string>lblServer</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JProgressBar</string> 
-          <void property="name"> 
-           <string>pbHeap</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>jLabel1</string> 
-          </void> 
-          <void property="name"> 
-           <string>lblHeap</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>jLabel6</string> 
-          </void> 
-          <void property="name"> 
-           <string>lblUser</string> 
-          </void> 
-         </object> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>1</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>2</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
         </void> 
        </object> 
       </void> 

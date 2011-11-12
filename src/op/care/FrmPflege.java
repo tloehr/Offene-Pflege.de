@@ -47,14 +47,12 @@ import op.tools.DBRetrieve;
 import op.tools.InternalClassACL;
 import op.tools.SYSTools;
 import op.vorgang.PnlVorgang;
-import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -102,7 +100,7 @@ public class FrmPflege extends javax.swing.JFrame {
     public HashMap dfnplanung;
 
     private boolean initPhase;
-    private HeapStat hs;
+    //private HeapStat hs;
     public JLabel bwlabel;
 
     /**
@@ -118,15 +116,22 @@ public class FrmPflege extends javax.swing.JFrame {
         bwlabel = null;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
         this.setVisible(true);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        lblServer.setText(OPDE.getUrl());
-        lblUser.setText("Benutzer: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()));
+
+        if (OPDE.isDebug()) {
+            setSize(1440, 900);
+            //setSize(1280, 1024);
+        } else {
+            this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+
+        //lblServer.setText(OPDE.getUrl());
+        //lblUser.setText("Benutzer: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()));
 
         createBewohnerListe();
 
-        hs = new HeapStat(pbHeap, lblHeap);
-        hs.start();
+//        hs = new HeapStat(pbHeap, lblHeap);
+//        hs.start();
 
         initPhase = false;
         jtpMain.setSelectedIndex(MAINTAB_BW);
@@ -135,6 +140,7 @@ public class FrmPflege extends javax.swing.JFrame {
         // Zugriffe
         jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getInternalClasses().userHasAccessLevelForThisClass(PnlBerichte.internalClassID, InternalClassACL.EXECUTE));
         jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getInternalClasses().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
+
 
         reloadDisplay();
     }
@@ -168,11 +174,6 @@ public class FrmPflege extends javax.swing.JFrame {
         pnlPPlanung = new JPanel();
         pnlVorgang = new JPanel();
         pnlFiles = new JPanel();
-        pnlStatus = new JPanel();
-        lblServer = new JLabel();
-        pbHeap = new JProgressBar();
-        lblHeap = new JLabel();
-        lblUser = new JLabel();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -180,7 +181,7 @@ public class FrmPflege extends javax.swing.JFrame {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "default:grow",
-            "fill:default:grow, fill:default"));
+            "fill:default:grow"));
 
         //======== jtpMain ========
         {
@@ -466,26 +467,6 @@ public class FrmPflege extends javax.swing.JFrame {
 
         }
         contentPane.add(jtpMain, CC.xy(1, 1, CC.FILL, CC.FILL));
-
-        //======== pnlStatus ========
-        {
-            pnlStatus.setBorder(null);
-            pnlStatus.setLayout(new FlowLayout(FlowLayout.LEFT, 40, 0));
-
-            //---- lblServer ----
-            lblServer.setText("jLabel6");
-            pnlStatus.add(lblServer);
-            pnlStatus.add(pbHeap);
-
-            //---- lblHeap ----
-            lblHeap.setText("jLabel1");
-            pnlStatus.add(lblHeap);
-
-            //---- lblUser ----
-            lblUser.setText("jLabel6");
-            pnlStatus.add(lblUser);
-        }
-        contentPane.add(pnlStatus, CC.xy(1, 2, CC.CENTER, CC.DEFAULT));
         setSize(851, 623);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -563,7 +544,7 @@ public class FrmPflege extends javax.swing.JFrame {
     }
 
     public void dispose() {
-        hs.interrupt();
+        //hs.interrupt();
         cleanup();
         super.dispose();
     }
@@ -744,11 +725,6 @@ public class FrmPflege extends javax.swing.JFrame {
     private JPanel pnlPPlanung;
     private JPanel pnlVorgang;
     private JPanel pnlFiles;
-    private JPanel pnlStatus;
-    private JLabel lblServer;
-    private JProgressBar pbHeap;
-    private JLabel lblHeap;
-    private JLabel lblUser;
     // End of variables declaration//GEN-END:variables
 
 

@@ -66,7 +66,7 @@ public class SYSHosts implements Serializable {
         this.hostname = hostname;
         this.ip = ip;
         this.mainHost = mainHost;
-        this.lpol = new Date();
+        this.lpol = null;
     }
 
     public Long getHostID() {

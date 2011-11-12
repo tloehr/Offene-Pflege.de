@@ -26,8 +26,9 @@
  */
 package op.tools;
 
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.SYSHosts;
 import entity.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
@@ -37,6 +38,9 @@ import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import org.pushingpixels.trident.ease.Spline;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
@@ -49,15 +53,16 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -500,7 +505,6 @@ public class SYSTools {
         String result = "(*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ") [" + currentBW + "]";
         return result;
     }
-
 
 
     public static String getBWLabel(String currentBW) {
@@ -1488,16 +1492,21 @@ public class SYSTools {
 
 
     public static double showSide(JSplitPane split, boolean leftUpper) {
-        return showSide(split, leftUpper, 0);
+        return showSide(split, leftUpper, 0, null);
+    }
+
+    public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis, TimelineCallback callback) {
+        double stop = leftUpper ? 0.0d : 1.0d;
+        return showSide(split, stop, speedInMillis, callback);
     }
 
     public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis) {
         double stop = leftUpper ? 0.0d : 1.0d;
-        return showSide(split, stop, speedInMillis);
+        return showSide(split, stop, speedInMillis, null);
     }
 
     public static double showSide(JSplitPane split, double pos) {
-        return showSide(split, pos, 0);
+        return showSide(split, pos, 0, null);
     }
 
     /**
@@ -1508,7 +1517,7 @@ public class SYSTools {
      * @param speedInMillis
      * @return Die neue, relative Position (zwischen 0 und 1)
      */
-    public static double showSide(JSplitPane split, double pos, int speedInMillis) {
+    public static double showSide(JSplitPane split, double pos, int speedInMillis, TimelineCallback callback) {
 
         if (OPDE.isAnimation() && speedInMillis > 0) {
             OPDE.debug("ShowSide double-version");
@@ -1531,6 +1540,12 @@ public class SYSTools {
             timeline1.setEase(new Spline(0.9f));
             timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
             timeline1.setDuration(speedInMillis);
+
+            if (callback != null){
+                timeline1.addCallback(callback);
+            }
+
+
             timeline1.play();
         } else {
             split.setDividerLocation(pos);
@@ -1539,10 +1554,10 @@ public class SYSTools {
     }
 
     public static double showSide(JSplitPane split, int pos) {
-        return showSide(split, pos, 0);
+        return showSide(split, pos, 0, null);
     }
 
-    public static double showSide(JSplitPane split, int pos, int speedInMillis) {
+    public static double showSide(JSplitPane split, int pos, int speedInMillis, TimelineCallback callback) {
 
         if (OPDE.isAnimation() && speedInMillis > 0) {
             OPDE.debug("ShowSide int-version");
@@ -1564,6 +1579,11 @@ public class SYSTools {
             timeline1.setEase(new Spline(0.9f));
             timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
             timeline1.setDuration(speedInMillis);
+
+            if (callback != null){
+                timeline1.addCallback(callback);
+            }
+
             timeline1.play();
         } else {
             split.setDividerLocation(pos);
@@ -1687,7 +1707,7 @@ public class SYSTools {
         final JLabel lbl = lbl1;
         final Color oldColor = lbl1.getForeground();
         final String oldText = lbl1.getText();
-        OPDE.debug("oldText: "+oldText);
+        OPDE.debug("oldText: " + oldText);
         lbl.setText(text);
         Timeline textmessageTL = new Timeline(lbl);
         textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), flashColor);
@@ -1719,7 +1739,6 @@ public class SYSTools {
     }
 
 
-
     public static void fadeinout(JLabel lbl, String text) {
         final JLabel lbl1 = lbl;
         final Color foreground = Color.black;
@@ -1747,7 +1766,7 @@ public class SYSTools {
         timeline1.playLoop(2, Timeline.RepeatBehavior.REVERSE);
     }
 
-     public static void packTable(JTable table, int margin) {
+    public static void packTable(JTable table, int margin) {
         for (int colindex = 0; colindex < table.getColumnCount(); colindex++) {
             packColumn(table, colindex, margin);
         }
@@ -1782,5 +1801,7 @@ public class SYSTools {
         // Set the width
         col.setPreferredWidth(width);
     }
+
+
 
 }

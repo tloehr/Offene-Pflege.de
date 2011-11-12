@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author tloehr
@@ -75,7 +76,7 @@ public class SYSHostsTools {
                         OPDE.getEM().getTransaction().rollback();
                     }
 
-                    OPDE.getLogger().debug("Wir müssten eigentlcih aufräumen");
+                    OPDE.getLogger().debug("Wir müssten eigentlich aufräumen");
                 }
 
                 if (mainhost) {
@@ -96,19 +97,13 @@ public class SYSHostsTools {
                     OPDE.getEM().getTransaction().commit();
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
             host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
-            OPDE.getEM().getTransaction().begin();
-            try {
-                OPDE.getEM().persist(host);
-                OPDE.getEM().getTransaction().commit();
-            } catch (Exception e1) {
-                OPDE.fatal(e1);
-                System.exit(0);
-            }
+            EntityTools.persist(host);
         }
         return host;
     }
+
 
     /**
      * Meldet den übergebenen Host ab, indem das Last Proof of Life auf NULL gesetzt wird.

@@ -28,6 +28,7 @@ package op;
 import entity.*;
 import op.care.BHPImport;
 import op.care.DFNImport;
+import op.system.FrmInit;
 import op.threads.ProofOfLife;
 import op.tools.*;
 import org.apache.commons.cli.*;
@@ -80,6 +81,15 @@ public class OPDE {
     protected static ArrayList<ImageIcon> animationCache;
     protected static boolean animation = false;
     protected static boolean debug;
+    protected static String opwd = "";
+
+    public static String getOpwd() {
+        return opwd;
+    }
+
+    public static String getOPCache() {
+        return opwd + System.getProperty("file.separator") + "cache";
+    }
 
     public static ArrayList<ImageIcon> getAnimationCache() {
         return animationCache;
@@ -166,13 +176,17 @@ public class OPDE {
 
     /**
      * Diese initDB() Methode wird verschwinden, sobald ich ganz auf JPA umgestellt habe.
+     *
      * @throws SQLException
      */
     public static void initDB() throws SQLException {
         if (db != null) return;
         String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
         String dbpw = localProps.getProperty("javax.persistence.jdbc.password");
-        db = new Database(url, dbuser, dbpw.toCharArray());
+        String hostkey = OPDE.getLocalProps().getProperty("hostkey");
+        // Passwort entschlüsseln
+        DesEncrypter desEncrypter = new DesEncrypter(hostkey);
+        db = new Database(url, dbuser, desEncrypter.decrypt(dbpw).toCharArray());
     }
 
     public static void warn(Object message) {
@@ -218,7 +232,7 @@ public class OPDE {
 
     public static void saveLocalProps() {
         try {
-            FileOutputStream out = new FileOutputStream(new File(localProps.getProperty("opwd") + System.getProperty("file.separator") + "local.properties"));
+            FileOutputStream out = new FileOutputStream(new File(opwd + System.getProperty("file.separator") + "local.properties"));
             localProps.store(out, "Lokale Einstellungen für Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {
@@ -257,7 +271,7 @@ public class OPDE {
      *
      * @param args Hier stehen die Kommandozeilen Parameter. Diese werden mit
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
         animationCache = new ArrayList(96);
@@ -289,38 +303,6 @@ public class OPDE {
             iOException.printStackTrace();
         }
 
-        /*
-        try {
-        // @Java-2
-        // http://openbook.galileodesign.de/javainsel5/javainsel25_004.htm
-
-        // Hin
-        Cipher c = Cipher.getInstance("DES");
-        Key k = new SecretKeySpec("01234567".getBytes(), "DES");
-        c.init(Cipher.ENCRYPT_MODE, k);
-        OutputStream out = new ByteOutputStream();
-        CipherOutputStream cos = new CipherOutputStream(out, c);
-        cos.write("Das wird anders werden".getBytes());
-        cos.close();
-        String crypt = out.toString();
-        System.out.println(crypt);
-
-        // und Her
-        c.init(Cipher.DECRYPT_MODE, k);
-        out = new ByteOutputStream();
-        cos = new CipherOutputStream(out, c);
-        cos.write(crypt.getBytes());
-        cos.close();
-        String decrypt = out.toString();
-        System.out.println(decrypt);
-
-
-        } catch (Exception ex) {
-        java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-
-         */
-
         // AUSWERTUNG KOMMANDOZEILE-----------------------------------------------------------------------------
         // Hier erfolgt die Unterscheidung, in welchem Modus OPDE gestartet wurde.
         Options opts = new Options();
@@ -329,7 +311,7 @@ public class OPDE {
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
 
-        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .op Verzeichnis befindet.").create("k");
+        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
         opts.addOption(konfigdir);
 
 
@@ -381,10 +363,9 @@ public class OPDE {
         // Alternatives Arbeitsverzeichnis setzen
         if (cl.hasOption("k")) {
             String homedir = cl.getOptionValue("k");
-            localProps.put("opwd", homedir + System.getProperty("file.separator") + ".op");
+            opwd = homedir + System.getProperty("file.separator") + ".opde";
         } else {
-            localProps.put("opwd", System.getProperty("user.home") + System.getProperty("file.separator") + ".op");
-            localProps.put("opcache", localProps.getProperty("opwd") + System.getProperty("file.separator") + "cache");
+            opwd = System.getProperty("user.home") + System.getProperty("file.separator") + ".opde";
         }
 
         if (cl.hasOption("a")) { // anonym Modus
@@ -395,49 +376,37 @@ public class OPDE {
             anonym = false;
         }
 
-        // Legt bei Bedarf ein neues Arbeitsverzeichnis an.
-        if (!new File(localProps.getProperty("opwd")).exists()) {
-            new File(localProps.getProperty("opwd")).mkdir();
-        }
-//        if (!new File(localProps.getProperty("ocreports")).exists()) {
-//            new File(localProps.getProperty("ocreports")).mkdir();
-//        }
-        if (!new File(localProps.getProperty("opcache")).exists()) {
-            new File(localProps.getProperty("opcache")).mkdir();
-        }
-//        if (!new File(localProps.getProperty("ocdownload")).exists()) {
-//            new File(localProps.getProperty("ocdownload")).mkdir();
-//        }
-
         // LogSystem initialisieren.
         logger = Logger.getRootLogger();
 
-        //SimpleLayout layout = new SimpleLayout();
-        PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
-        ConsoleAppender consoleAppender = new ConsoleAppender(layout);
-        logger.addAppender(consoleAppender);
-        String sep = System.getProperty("file.separator");
-        try {
-            FileAppender fileAppender = new FileAppender(layout, localProps.getProperty("opwd") + sep + "op.log", true);
-            logger.addAppender(fileAppender);
-        } catch (IOException ex) {
-            logger.fatal(localProps.getProperty("opwd") + ": falscher Pfad.");
-            System.exit(1);
-        }
+        if (loadLocalProperties()) {
 
-        loadLocalProperties();
 
-        animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
+            //SimpleLayout layout = new SimpleLayout();
+            PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
+            ConsoleAppender consoleAppender = new ConsoleAppender(layout);
+            logger.addAppender(consoleAppender);
+            String sep = System.getProperty("file.separator");
+            try {
+                FileAppender fileAppender = new FileAppender(layout, opwd + sep + "opde.log", true);
+                logger.addAppender(fileAppender);
+            } catch (IOException ex) {
+                logger.fatal(opwd + ": falscher Pfad.");
+                System.exit(1);
+            }
 
-        logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
 
-        if (cl.hasOption("l") || localProps.getProperty("debug").equalsIgnoreCase("true")) {
-            debug = true;
-            logger.setLevel(Level.ALL);
-        } else {
-            debug = false;
-            logger.setLevel(Level.INFO);
-        }
+            animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
+
+            logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
+
+            if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
+                debug = true;
+                logger.setLevel(Level.ALL);
+            } else {
+                debug = false;
+                logger.setLevel(Level.INFO);
+            }
 
 //        if (isDebug()) {
 //            url = "jdbc:mysql://" + localProps.getProperty("devdbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbdevcat");
@@ -445,48 +414,55 @@ public class OPDE {
 //            url = "jdbc:mysql://" + localProps.getProperty("dbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbcat");
 //        }
 
-        Properties jpaProps = new Properties();
-        jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
-        jpaProps.put("javax.persistence.jdbc.password", localProps.getProperty("javax.persistence.jdbc.password"));
-        jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
-        url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
-        jpaProps.put("javax.persistence.jdbc.url", url);
 
-        em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
+            String hostkey = OPDE.getLocalProps().getProperty("hostkey");
+            String cryptpassword = localProps.getProperty("javax.persistence.jdbc.password");
 
-        host = SYSHostsTools.getHost(OPDE.getLocalProps().getProperty("hostkey"));
+            // Passwort entschlüsseln
+            DesEncrypter desEncrypter = new DesEncrypter(hostkey);
 
-        if (host == null) {
-            logger.fatal("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten.");
-            logger.fatal("Wenn es dann nicht besser wird, fragen Sie den Administrator.");
-            System.exit(1);
-        }
+            Properties jpaProps = new Properties();
+            jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
+            jpaProps.put("javax.persistence.jdbc.password", desEncrypter.decrypt(cryptpassword));
+            jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
+            url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
+            jpaProps.put("javax.persistence.jdbc.url", url);
 
-        pol = new ProofOfLife();
-        pol.start();
+            em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
 
-        String header = SYSTools.getWindowTitle("");
+            host = SYSHostsTools.getHost(hostkey);
 
-        if (cl.hasOption("v")) {
-            System.out.println(header);
-            System.out.println(footer);
-            System.exit(0);
-        }
-
-        if (cl.hasOption("d")) {
-            String d = cl.getOptionValue("d");
-            try {
-                DFNImport.importDFN();
-            } catch (Exception ex) {
-                logger.fatal("Exception beim DFNImport", ex);
+            if (host == null) {
+                logger.fatal("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten.");
+                logger.fatal("Wenn es dann nicht besser wird, fragen Sie den Administrator.");
                 System.exit(1);
             }
-            System.exit(0);
-        }
 
-        if (cl.hasOption("b")) {
-            try {
-                int offset = 0;
+            pol = new ProofOfLife();
+            pol.start();
+
+            String header = SYSTools.getWindowTitle("");
+
+            if (cl.hasOption("v")) {
+                System.out.println(header);
+                System.out.println(footer);
+                System.exit(0);
+            }
+
+            if (cl.hasOption("d")) {
+                String d = cl.getOptionValue("d");
+                try {
+                    DFNImport.importDFN();
+                } catch (Exception ex) {
+                    logger.fatal("Exception beim DFNImport", ex);
+                    System.exit(1);
+                }
+                System.exit(0);
+            }
+
+            if (cl.hasOption("b")) {
+                try {
+                    int offset = 0;
 //                if (isDebug()) {
 //                    String sOffset = cl.getOptionValue("b");
 //                    OPDE.getLogger().debug(cl.getOptionValue("b"));
@@ -496,15 +472,15 @@ public class OPDE {
 //                        offset = 0;
 //                    }
 //                }
-                BHPImport.importBHP(0, 0, offset);
-            } catch (Exception ex) {
-                logger.fatal("Exception beim BHPImport", ex);
-                System.exit(1);
+                    BHPImport.importBHP(0, 0, offset);
+                } catch (Exception ex) {
+                    logger.fatal("Exception beim BHPImport", ex);
+                    System.exit(1);
+                }
+                System.exit(0);
             }
-            System.exit(0);
-        }
 
-        internalClasses = new InternalClasses();
+            internalClasses = new InternalClasses();
 //        try {
 //            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 //        } catch (ClassNotFoundException ex) {
@@ -517,31 +493,37 @@ public class OPDE {
 //            java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        }
 
-        ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+        }
     }
 
-    private static void loadLocalProperties() {
+    private static boolean loadLocalProperties() {
+        boolean success = false;
         Properties sysprops = System.getProperties();
         String sep = sysprops.getProperty("file.separator");
         try {
-            FileInputStream in = new FileInputStream(new File(localProps.getProperty("opwd") + sep + "local.properties"));
+            FileInputStream in = new FileInputStream(new File(opwd + sep + "local.properties"));
             Properties p = new Properties();
             p.load(in);
             localProps.putAll(p);
             p.clear();
-            // damit das nicht von den local.properties überschrieben werden kann.
-            //localProps.put("debug", OCDEBUG);
 
             in.close();
+
+            success = true;
         } catch (FileNotFoundException ex) {
-            // Keine local.properties. Nicht gut....
-            logger.fatal(localProps.getProperty("opwd") + sep + "local.properties existiert nicht. Bitte legen Sie diese Datei an.");
-            System.exit(1);
+            // Keine local.properties. Wir richten wohl gerade einen neuen Client ein.
+
+            FrmInit frame = new FrmInit();
+            frame.setVisible(true);
+            SYSTools.center(frame);
+
         } catch (IOException ex) {
-            logger.fatal(localProps.getProperty("opwd") + sep + "local.properties nicht lesbar. Bitte korrigieren Sie das Problem.");
+            logger.fatal(opwd + sep + "local.properties nicht lesbar. Bitte korrigieren Sie das Problem.");
             System.exit(1);
         }
+        return success;
     }
 
 

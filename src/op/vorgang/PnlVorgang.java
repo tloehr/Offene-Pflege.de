@@ -567,12 +567,12 @@ public class PnlVorgang extends CleanablePanel {
 
     private void btnAssignItemStateChanged(ItemEvent e) {
         double percent = btnAssign.isSelected() ? 0.65d : 1.0d;
-        SYSTools.showSide(splitDetailsOwner, percent, speedSlow);
+        SYSTools.showSide(splitDetailsOwner, percent, speedSlow, null);
     }
 
     private void btnDetailsItemStateChanged(ItemEvent e) {
         splitTDPercent = btnDetails.isSelected() ? 0.4d : 1.0d;
-        SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow);
+        SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow, null);
         loadDetails(aktuellerVorgang);
         btnEndReactivate.setEnabled(!btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
     }
@@ -1414,7 +1414,7 @@ public class PnlVorgang extends CleanablePanel {
             splitTDPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedFast);
         }
 
-        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.5d, speedSlow);
+        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.5d, speedSlow, null);
         textmessageTL = SYSTools.flashLabel(lblMessage, "Bericht speichern ?");
         SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
 
