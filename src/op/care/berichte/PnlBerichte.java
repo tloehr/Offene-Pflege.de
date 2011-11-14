@@ -27,6 +27,7 @@
 package op.care.berichte;
 
 import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
@@ -45,7 +46,6 @@ import tablemodels.TMPflegeberichte;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -96,7 +96,7 @@ public class PnlBerichte extends CleanablePanel {
     private JXTaskPane panelTime, panelText, panelTags, panelSpecials;
     private JCheckBox cbShowEdits, cbShowIDs;
 
-    private Timeline textmessageTL, textUpperLabelTL;
+    private Timeline textmessageTL, textUpperLabelTL, lblMessage2Timeline;
     private boolean dauerChanged;
 
     private Bewohner bewohner;
@@ -125,7 +125,6 @@ public class PnlBerichte extends CleanablePanel {
      */
     public PnlBerichte(FrmPflege pflege, Bewohner bewohner) {
         this.initPhase = true;
-        this.bewohner = bewohner;
         this.parent = pflege;
         this.laufendeOperation = LAUFENDE_OPERATION_NICHTS;
         this.textmessageTL = null;
@@ -136,11 +135,6 @@ public class PnlBerichte extends CleanablePanel {
 
 
         initComponents();
-        BewohnerTools.setBWLabel(lblBW, bewohner);
-
-        //TODO: die RestoreStates müssen nach JPA gewandelt werden.
-//        SYSTools.restoreState(this.getClass().getName() + ":cbShowEdits", cbShowEdits);
-//        SYSTools.restoreState(this.getClass().getName() + ":cbTBIDS", cbTBIDS);
 
         standardActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -177,10 +171,9 @@ public class PnlBerichte extends CleanablePanel {
 
         SYSTools.showSide(splitSearchEdit, panelSearch.getPreferredSize().width);
 
-
         this.initPhase = false;
 
-        reloadTable();
+        change2Bewohner(bewohner);
 
 
     }
@@ -249,9 +242,11 @@ public class PnlBerichte extends CleanablePanel {
         switch (laufendeOperation) {
             case LAUFENDE_OPERATION_BERICHT_EINGABE: {
                 if (txtBericht.getText().trim().isEmpty()) {
-                    SYSTools.flashLabel(lblBW, "Kann keinen leeren Bericht speichern.", 6, Color.ORANGE);
-                } else if (PBerichtTAGSTools.isSozial(aktuellerBericht) && !dauerChanged) {
-                    SYSTools.flashLabel(lblBW, "Bei Sozialberichten müssen Sie immer die Dauer setzen.", 6, Color.ORANGE);
+                    if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE){
+                        lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
+                    }
+//                } else if (PBerichtTAGSTools.isSozial(aktuellerBericht) && !dauerChanged) {
+//                    SYSTools.flashLabel(lblBW, "Bei Sozialberichten müssen Sie immer die Dauer setzen.", 6, Color.ORANGE);
                 } else {
                     success = EntityTools.persist(aktuellerBericht);
                     splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
@@ -260,7 +255,9 @@ public class PnlBerichte extends CleanablePanel {
             }
             case LAUFENDE_OPERATION_BERICHT_BEARBEITEN: {
                 if (txtBericht.getText().trim().isEmpty()) {
-                    SYSTools.flashLabel(lblBW, "Kann keinen leeren Bericht speichern.", 6, Color.ORANGE);
+                    if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE){
+                        lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
+                    }
                 } else {
                     success = PflegeberichteTools.changeBericht(aktuellerBericht, editBericht);
                     editBericht = null;
@@ -372,6 +369,7 @@ public class PnlBerichte extends CleanablePanel {
         jdcDatum.setMaxSelectableDate(now);
         txtUhrzeit.setText(df.format(editBericht.getPit()));
         txtBericht.setText(editBericht.getText());
+        txtBericht.requestFocus();
 
         initPhase = false;
         textmessageTL = SYSTools.flashLabel(lblMessage, "Geänderten Bericht speichern ?");
@@ -473,6 +471,7 @@ public class PnlBerichte extends CleanablePanel {
         txtUhrzeit = new JTextField();
         label3 = new JLabel();
         txtDauer = new JTextField();
+        scrollPane1 = new JScrollPane();
         txtBericht = new JTextArea();
         splitButtonsCenter = new JSplitPane();
         pnlUpper = new JPanel();
@@ -485,11 +484,14 @@ public class PnlBerichte extends CleanablePanel {
         btnApply = new JButton();
         btnCancel = new JButton();
         lblMessage = new JLabel();
+        hSpacer1 = new JPanel(null);
+        lblMessage2 = new JLabel();
+        hSpacer2 = new JPanel(null);
         lblBW = new JLabel();
 
         //======== this ========
         setLayout(new FormLayout(
-            "pref:grow, 0dlu, $rgap",
+            "default:grow, 0dlu, $rgap",
             "fill:default, $lgap, fill:default:grow, $lgap, 0dlu"));
 
         //======== splitSearchEdit ========
@@ -517,6 +519,7 @@ public class PnlBerichte extends CleanablePanel {
                 //======== splitTableEditor ========
                 {
                     splitTableEditor.setDividerSize(0);
+                    splitTableEditor.setDividerLocation(600);
                     splitTableEditor.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
@@ -566,8 +569,8 @@ public class PnlBerichte extends CleanablePanel {
                     //======== panel1 ========
                     {
                         panel1.setLayout(new FormLayout(
-                            "$rgap, 2*($lcgap, default), $lcgap, pref, $lcgap, $rgap",
-                            "0dlu, 5*($lgap, default)"));
+                            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
+                            "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
 
                         //---- label1 ----
                         label1.setText("Datum");
@@ -624,19 +627,11 @@ public class PnlBerichte extends CleanablePanel {
                         });
                         panel1.add(txtDauer, CC.xy(5, 7));
 
-                        //---- txtBericht ----
-                        txtBericht.setColumns(20);
-                        txtBericht.setLineWrap(true);
-                        txtBericht.setRows(5);
-                        txtBericht.setWrapStyleWord(true);
-                        txtBericht.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
-                        txtBericht.addCaretListener(new CaretListener() {
-                            @Override
-                            public void caretUpdate(CaretEvent e) {
-                                txtBerichtCaretUpdate(e);
-                            }
-                        });
-                        panel1.add(txtBericht, CC.xywh(3, 9, 3, 1));
+                        //======== scrollPane1 ========
+                        {
+                            scrollPane1.setViewportView(txtBericht);
+                        }
+                        panel1.add(scrollPane1, CC.xywh(3, 9, 3, 1, CC.FILL, CC.FILL));
                     }
                     splitTableEditor.setRightComponent(panel1);
                 }
@@ -752,6 +747,12 @@ public class PnlBerichte extends CleanablePanel {
                         lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
                         lblMessage.setText(" ");
                         pnlLower.add(lblMessage);
+                        pnlLower.add(hSpacer1);
+
+                        //---- lblMessage2 ----
+                        lblMessage2.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        pnlLower.add(lblMessage2);
+                        pnlLower.add(hSpacer2);
                     }
                     splitButtonsCenter.setBottomComponent(pnlLower);
                 }
@@ -765,7 +766,7 @@ public class PnlBerichte extends CleanablePanel {
         lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
         lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("jLabel3");
-        add(lblBW, CC.xy(1, 1));
+        add(lblBW, new CellConstraints(1, 1, 1, 1, CC.DEFAULT, CC.DEFAULT, new Insets(0, 5, 0, 0)));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspTblTBComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspTblTBComponentResized
@@ -791,6 +792,7 @@ public class PnlBerichte extends CleanablePanel {
 
     }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
+    @Override
     public void cleanup() {
         if (textUpperLabelTL != null) {
             textUpperLabelTL.cancel();
@@ -805,6 +807,17 @@ public class PnlBerichte extends CleanablePanel {
         jdcVon.cleanup();
         jdcBis.cleanup();
         taskSearch.removeAll();
+    }
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        if (laufendeOperation != LAUFENDE_OPERATION_NICHTS){
+            btnCancel.doClick();
+        }
+
+        this.bewohner = bewohner;
+        BewohnerTools.setBWLabel(lblBW, bewohner);
+        reloadTable();
     }
 
     private void printBericht(int[] sel) {
@@ -1063,6 +1076,7 @@ public class PnlBerichte extends CleanablePanel {
         cbShowEdits.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                SYSTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
                 reloadTable();
             }
         });
@@ -1070,6 +1084,7 @@ public class PnlBerichte extends CleanablePanel {
         cbShowIDs.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                SYSTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
                 reloadTable();
             }
         });
@@ -1085,6 +1100,9 @@ public class PnlBerichte extends CleanablePanel {
         panelSpecials.add(cbShowIDs);
         panelSpecials.setCollapsed(false);
         taskSearch.add((JPanel) panelSpecials);
+
+        SYSTools.restoreState( internalClassID + ":cbShowEdits", cbShowEdits);
+        SYSTools.restoreState( internalClassID + ":cbShowIDs", cbShowIDs);
 
     }
 
@@ -1181,6 +1199,7 @@ public class PnlBerichte extends CleanablePanel {
     private JTextField txtUhrzeit;
     private JLabel label3;
     private JTextField txtDauer;
+    private JScrollPane scrollPane1;
     private JTextArea txtBericht;
     private JSplitPane splitButtonsCenter;
     private JPanel pnlUpper;
@@ -1193,6 +1212,9 @@ public class PnlBerichte extends CleanablePanel {
     private JButton btnApply;
     private JButton btnCancel;
     private JLabel lblMessage;
+    private JPanel hSpacer1;
+    private JLabel lblMessage2;
+    private JPanel hSpacer2;
     private JLabel lblBW;
     // End of variables declaration//GEN-END:variables
 }

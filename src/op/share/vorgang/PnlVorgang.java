@@ -26,6 +26,7 @@
  */
 package op.share.vorgang;
 
+import entity.Bewohner;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -98,6 +99,11 @@ public class PnlVorgang extends CleanablePanel {
 
     public void cleanup() {
         SYSTools.unregisterListeners(this);
+    }
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**

@@ -27,9 +27,12 @@
 
 package op.care;
 
+import entity.Bewohner;
+
 /**
  * @author tloehr
  */
 public abstract class CleanablePanel extends javax.swing.JPanel {
     public abstract void cleanup();
+    public abstract void change2Bewohner(Bewohner bewohner);
 }

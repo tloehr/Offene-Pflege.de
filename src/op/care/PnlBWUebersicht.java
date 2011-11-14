@@ -57,6 +57,11 @@ public class PnlBWUebersicht extends CleanablePanel {
         SYSTools.unregisterListeners(this);
     }
 
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     /**
      * This method is called from within the constructor to
      * initialize the form.

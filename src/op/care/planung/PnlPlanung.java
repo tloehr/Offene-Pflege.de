@@ -91,8 +91,14 @@ public class PnlPlanung extends CleanablePanel {
         reloadTable();
     }
 
+    @Override
     public void cleanup() {
         SYSTools.unregisterListeners(this);
+    }
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**

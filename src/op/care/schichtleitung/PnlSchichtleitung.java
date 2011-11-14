@@ -28,6 +28,7 @@
 package op.care.schichtleitung;
 
 import com.toedter.calendar.JDateChooser;
+import entity.Bewohner;
 import entity.EinrichtungenTools;
 import op.care.CleanablePanel;
 import op.tools.*;
@@ -201,8 +202,14 @@ public class PnlSchichtleitung extends CleanablePanel {
         reloadDisplay();
     }//GEN-LAST:event_jdcDatumPropertyChange
 
+    @Override
     public void cleanup() {
         SYSTools.unregisterListeners(this);
+    }
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private String getAuswertung() {

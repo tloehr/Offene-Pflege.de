@@ -111,10 +111,16 @@ public class PnlBHP extends CleanablePanel {
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
     }
 
+    @Override
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
         SYSRunningClassesTools.moduleEnded(runningClass);
+    }
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**

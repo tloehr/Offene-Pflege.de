@@ -80,6 +80,11 @@ public class PnlFiles extends CleanablePanel {
         SYSTools.unregisterListeners(this);
     }
 
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     void loadTable() {
 
         List<SYSFiles> files = new ArrayList<SYSFiles>(SYSFilesTools.findByBewohner(bewohner));

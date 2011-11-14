@@ -88,6 +88,11 @@ public class PnlBWInfo extends CleanablePanel {
         SYSTools.unregisterListeners(this);
     }
 
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public void initPanel() {
         ignoreEvent = true;
         cmbKategorie.setModel(DBHandling.ladeKategorien(mode, true, mode == BWInfo.ART_ALLES));

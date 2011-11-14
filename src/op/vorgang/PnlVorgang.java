@@ -1406,6 +1406,11 @@ public class PnlVorgang extends CleanablePanel {
 
     }
 
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     private void btnAddBerichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBerichtActionPerformed
         laufendeOperation = LAUFENDE_OPERATION_BERICHT_EINGABE;
         pnlEditor.setHTML(null);

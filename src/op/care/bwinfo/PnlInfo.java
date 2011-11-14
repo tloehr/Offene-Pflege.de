@@ -127,8 +127,15 @@ public class PnlInfo extends CleanablePanel {
         OPDE.ocmain.lockOC();
     }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
+    @Override
     public void cleanup() {
 
+    }
+
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

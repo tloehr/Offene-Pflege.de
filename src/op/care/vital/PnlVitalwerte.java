@@ -583,6 +583,11 @@ public class PnlVitalwerte extends CleanablePanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     private void cbStuhlgangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbStuhlgangActionPerformed
         filter[STUHLGANG] = ((JCheckBox) evt.getSource()).isSelected();
         if (!initPhase) {

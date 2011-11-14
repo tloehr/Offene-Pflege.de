@@ -78,10 +78,16 @@ public class PnlDFN extends CleanablePanel {
         initPanel();
     }
 
+    @Override
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
         SYSRunningClassesTools.moduleEnded(runningClass);
+    }
+
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private void initPanel() {

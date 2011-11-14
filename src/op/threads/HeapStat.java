@@ -39,17 +39,16 @@ public class HeapStat
         extends Thread {
     private boolean interrupted;
     private JProgressBar jp;
-    private JLabel lb;
 
     /**
      * Creates a new instance of HeapStat
      */
-    public HeapStat(JProgressBar p, JLabel l) {
+    public HeapStat(JProgressBar p) {
         super();
         this.setName("HeapStat");
         this.interrupted = false;
         this.jp = p;
-        this.lb = l;
+        jp.setStringPainted(true);
     }
 
     public void run() {
@@ -65,10 +64,11 @@ public class HeapStat
             double mbSize = SYSTools.roundScale2(((double) heapSize) / 1048576);
             double mbUsedSize = SYSTools.roundScale2(((double) heapUsedSize) / 1048576);
             double percentUsed = SYSTools.roundScale2(mbUsedSize / mbSize * 100);
-            String stat = mbUsedSize + "M/" + mbSize + "M (" + percentUsed + "%)";
-            lb.setText(stat);
+            String stat = mbUsedSize + "M/" + mbSize + "M";
+
             jp.setValue((int) percentUsed);
-            //OPDE.getLogger().debug("HeapStat running: "+stat);
+            jp.setString(stat);
+
 
             try {
                 Thread.sleep(5000); // Millisekunden

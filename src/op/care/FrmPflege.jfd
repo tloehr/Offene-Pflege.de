@@ -99,7 +99,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$verticalGroup</string> 
-              <string>par l {space :0:487:x}</string> 
+              <string>par l {space :0:507:x}</string> 
              </void> 
             </object> 
             <void property="name"> 
@@ -134,7 +134,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>default:grow</string> 
+            <string>default:grow, linegap, default</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -232,7 +232,7 @@
               </void> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Abmelden</string> 
+               <string>&lt;html&gt;Löhr, Torsten&lt;br/&gt;Abmelden&lt;/html&gt;</string> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 
@@ -249,7 +249,7 @@
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>btnLogoutbtnLogoutHandler</string> 
+                <string>btnLogoutHandler</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -360,7 +360,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -386,7 +386,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -412,7 +412,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -438,7 +438,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -464,7 +464,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -490,7 +490,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -516,7 +516,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -542,7 +542,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -568,7 +568,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -594,7 +594,7 @@
                </void> 
                <void method="setProperty"> 
                 <string>$verticalGroup</string> 
-                <string>par l {space :0:487:x}</string> 
+                <string>par l {space :0:482:x}</string> 
                </void> 
               </object> 
               <void property="name"> 
@@ -619,6 +619,29 @@
             <void method="setProperty"> 
              <string>vAlign</string> 
              <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridHeight</string> 
+             <int>3</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JProgressBar</string> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Java Speicher</string> 
+            </void> 
+            <void property="name"> 
+             <string>pbHeap</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
+             <int>3</int> 
             </void> 
            </object> 
           </void> 
