@@ -35,20 +35,23 @@ import op.share.bwinfo.PnlBWInfo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author tloehr
  */
 public class PnlInfo extends CleanablePanel {
     private JPanel pnlMain;
+    private Frame panel;
 
     /**
      * Creates new form PnlInfo
      */
     public PnlInfo(Frame parent, Bewohner bewohner) {
         initComponents();
-        pnlMain = new PnlBWInfo(parent, BWInfo.ART_PFLEGE_STAMMDATEN, bewohner.getBWKennung(), "");
-        jspMain.setViewportView(pnlMain);
+        this.panel = parent;
+        change2Bewohner(bewohner);
     }
 
     /**
@@ -59,59 +62,56 @@ public class PnlInfo extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnNew = new JButton();
+        btnPrint = new JButton();
+        jspMain = new JScrollPane();
 
-        jToolBar1 = new javax.swing.JToolBar();
-        btnNew = new javax.swing.JButton();
-        btnPrint = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        jspMain = new javax.swing.JScrollPane();
+        //======== this ========
 
-        jToolBar1.setFloatable(false);
-        jToolBar1.setRollover(true);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
+            jToolBar1.setRollover(true);
 
-        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filenew.png"))); // NOI18N
-        btnNew.setText("Neu");
-        btnNew.setFocusable(false);
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnNew);
+            //---- btnNew ----
+            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
+            btnNew.setText("Neu");
+            btnNew.setFocusable(false);
+            btnNew.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNewActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnNew);
 
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/printer.png"))); // NOI18N
-        btnPrint.setText("Drucken");
-        btnPrint.setFocusable(false);
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnPrint);
+            //---- btnPrint ----
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer.png")));
+            btnPrint.setText("Drucken");
+            btnPrint.setFocusable(false);
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnPrintActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnPrint);
+        }
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.setFocusable(false);
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutbtnLogoutHandler(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 709, Short.MAX_VALUE)
-                        .addComponent(jspMain, javax.swing.GroupLayout.DEFAULT_SIZE, 709, Short.MAX_VALUE)
+                layout.createParallelGroup()
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                        .addComponent(jspMain, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup()
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspMain, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE))
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspMain, GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -135,15 +135,15 @@ public class PnlInfo extends CleanablePanel {
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        pnlMain = new PnlBWInfo(panel, BWInfo.ART_PFLEGE_STAMMDATEN, bewohner.getBWKennung(), "");
+        jspMain.setViewportView(pnlMain);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnNew;
-    private javax.swing.JButton btnPrint;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JScrollPane jspMain;
+    private JToolBar jToolBar1;
+    private JButton btnNew;
+    private JButton btnPrint;
+    private JScrollPane jspMain;
     // End of variables declaration//GEN-END:variables
 
 }

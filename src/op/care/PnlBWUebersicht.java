@@ -26,6 +26,11 @@
  */
 package op.care;
 
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
+import javax.swing.border.*;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
@@ -45,12 +50,9 @@ public class PnlBWUebersicht extends CleanablePanel {
      * Creates new form PnlBWUebersicht
      */
     public PnlBWUebersicht(FrmPflege pflege, Bewohner bewohner) {
-        this.bewohner = bewohner;
         initComponents();
         txtUebersicht.setContentType("text/html");
-        BewohnerTools.setBWLabel(lblBW, bewohner);
-
-        reloadDisplay();
+        change2Bewohner(bewohner);
     }
 
     public void cleanup() {
@@ -59,7 +61,9 @@ public class PnlBWUebersicht extends CleanablePanel {
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.bewohner = bewohner;
+        BewohnerTools.setBWLabel(lblBW, bewohner);
+        reloadDisplay();
     }
 
     /**
@@ -70,132 +74,157 @@ public class PnlBWUebersicht extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnLogout = new JButton();
+        btnPrint = new JButton();
+        lblBW = new JLabel();
+        jspHTML = new JScrollPane();
+        txtUebersicht = new JTextPane();
+        jPanel1 = new JPanel();
+        cbMedi = new JCheckBox();
+        cbBilanz = new JCheckBox();
+        cbBerichte = new JCheckBox();
+        cbBWInfo = new JCheckBox();
 
-        jToolBar1 = new javax.swing.JToolBar();
-        btnLogout = new javax.swing.JButton();
-        btnPrint = new javax.swing.JButton();
-        lblBW = new javax.swing.JLabel();
-        jspHTML = new javax.swing.JScrollPane();
-        txtUebersicht = new javax.swing.JTextPane();
-        jPanel1 = new javax.swing.JPanel();
-        cbMedi = new javax.swing.JCheckBox();
-        cbBilanz = new javax.swing.JCheckBox();
-        cbBerichte = new javax.swing.JCheckBox();
-        cbBWInfo = new javax.swing.JCheckBox();
+        //======== this ========
 
-        jToolBar1.setFloatable(false);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
+            //---- btnLogout ----
+            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
+            btnLogout.setText("Abmelden");
+            btnLogout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnLogoutActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnLogout);
 
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/printer.png"))); // NOI18N
-        btnPrint.setText("Drucken");
-        btnPrint.setFocusable(false);
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnPrint);
+            //---- btnPrint ----
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer.png")));
+            btnPrint.setText("Drucken");
+            btnPrint.setFocusable(false);
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnPrintActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnPrint);
+        }
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("jLabel3");
 
-        txtUebersicht.setEditable(false);
-        jspHTML.setViewportView(txtUebersicht);
+        //======== jspHTML ========
+        {
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+            //---- txtUebersicht ----
+            txtUebersicht.setEditable(false);
+            jspHTML.setViewportView(txtUebersicht);
+        }
 
-        cbMedi.setText("Verordnungen");
-        cbMedi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbMediActionPerformed(evt);
-            }
-        });
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-        cbBilanz.setSelected(true);
-        cbBilanz.setText("Bilanz");
-        cbBilanz.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBilanzActionPerformed(evt);
-            }
-        });
+            //---- cbMedi ----
+            cbMedi.setText("Verordnungen");
+            cbMedi.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbMediActionPerformed(e);
+                }
+            });
 
-        cbBerichte.setText("Berichte");
-        cbBerichte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBerichteActionPerformed(evt);
-            }
-        });
+            //---- cbBilanz ----
+            cbBilanz.setSelected(true);
+            cbBilanz.setText("Bilanz");
+            cbBilanz.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbBilanzActionPerformed(e);
+                }
+            });
 
-        cbBWInfo.setText("Informationen");
-        cbBWInfo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBWInfoActionPerformed(evt);
-            }
-        });
+            //---- cbBerichte ----
+            cbBerichte.setText("Berichte");
+            cbBerichte.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbBerichteActionPerformed(e);
+                }
+            });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(cbMedi)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbBilanz)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbBerichte)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbBWInfo)
-                                .addContainerGap(121, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbMedi)
-                                        .addComponent(cbBilanz)
-                                        .addComponent(cbBerichte)
-                                        .addComponent(cbBWInfo))
-                                .addContainerGap())
-        );
+            //---- cbBWInfo ----
+            cbBWInfo.setText("Informationen");
+            cbBWInfo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbBWInfoActionPerformed(e);
+                }
+            });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(cbMedi)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbBilanz)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbBerichte)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbBWInfo)
+                        .addContainerGap(128, Short.MAX_VALUE))
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbMedi)
+                            .addComponent(cbBilanz)
+                            .addComponent(cbBerichte)
+                            .addComponent(cbBWInfo))
+                        .addContainerGap())
+            );
+        }
+
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jspHTML, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(jspHTML, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                        .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspHTML, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblBW)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -229,16 +258,16 @@ public class PnlBWUebersicht extends CleanablePanel {
     }//GEN-LAST:event_cbBWInfoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnPrint;
-    private javax.swing.JCheckBox cbBWInfo;
-    private javax.swing.JCheckBox cbBerichte;
-    private javax.swing.JCheckBox cbBilanz;
-    private javax.swing.JCheckBox cbMedi;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JScrollPane jspHTML;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JTextPane txtUebersicht;
+    private JToolBar jToolBar1;
+    private JButton btnLogout;
+    private JButton btnPrint;
+    private JLabel lblBW;
+    private JScrollPane jspHTML;
+    private JTextPane txtUebersicht;
+    private JPanel jPanel1;
+    private JCheckBox cbMedi;
+    private JCheckBox cbBilanz;
+    private JCheckBox cbBerichte;
+    private JCheckBox cbBWInfo;
     // End of variables declaration//GEN-END:variables
 }

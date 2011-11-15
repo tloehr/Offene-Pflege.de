@@ -29,6 +29,7 @@ package op.share.bwinfo;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.SYSFilesTools;
+import entity.SYSPropsTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -110,12 +111,12 @@ public class PnlBWInfo extends CleanablePanel {
         // mit aufgenommen werden. Allerdings nur für die ComboBox.
         // Siehe Problem Nr. 15 und 20.
         String classname = this.getClass().getName() + ":" + mode;
-        SYSTools.restoreState(classname + "::cmbKategorie", cmbKategorie);
+        SYSPropsTools.restoreState(classname + "::cmbKategorie", cmbKategorie);
 
-        SYSTools.restoreState(this.getClass().getName() + "::cbPast", cbPast);
-        SYSTools.restoreState(this.getClass().getName() + "::cbEinzel", cbEinzel);
-        SYSTools.restoreState(this.getClass().getName() + "::cbTooltip", cbTooltip);
-        SYSTools.restoreState(this.getClass().getName() + "::cbDetail", cbDetail);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbPast", cbPast);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbEinzel", cbEinzel);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbTooltip", cbTooltip);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbDetail", cbDetail);
 
         fileActionListener = new ActionListener() {
 
@@ -656,7 +657,7 @@ public class PnlBWInfo extends CleanablePanel {
         if (ignoreEvent) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + "::cbPast", cbPast);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbPast", cbPast);
         reloadTable();
     }//GEN-LAST:event_cbPastActionPerformed
 
@@ -683,7 +684,7 @@ public class PnlBWInfo extends CleanablePanel {
             return;
         }
         String classname = this.getClass().getName() + ":" + mode;
-        SYSTools.storeState(classname + "::cmbKategorie", cmbKategorie);
+        SYSPropsTools.storeState(classname + "::cmbKategorie", cmbKategorie);
         reloadTable();
     }//GEN-LAST:event_cmbKategorieItemStateChanged
 
@@ -691,7 +692,7 @@ public class PnlBWInfo extends CleanablePanel {
         if (ignoreEvent) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + "::cbDetail", cbDetail);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbDetail", cbDetail);
         reloadTable();
     }//GEN-LAST:event_cbDetailActionPerformed
 
@@ -699,7 +700,7 @@ public class PnlBWInfo extends CleanablePanel {
         if (ignoreEvent) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + "::cbEinzel", cbEinzel);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbEinzel", cbEinzel);
         reloadTable();
     }//GEN-LAST:event_cbEinzelActionPerformed
 
@@ -707,7 +708,7 @@ public class PnlBWInfo extends CleanablePanel {
         if (ignoreEvent) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + "::cbTooltip", cbTooltip);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbTooltip", cbTooltip);
         reloadTable();
     }//GEN-LAST:event_cbTooltipActionPerformed
 
@@ -735,7 +736,7 @@ public class PnlBWInfo extends CleanablePanel {
                 ignoreEvent = true;
                 cbEinzel.setSelected(true);
                 ignoreEvent = false;
-                SYSTools.storeState(this.getClass().getName() + "::cbEinzel", cbEinzel);
+                SYSPropsTools.storeState(this.getClass().getName() + "::cbEinzel", cbEinzel);
             }
             if (dlg.getBWIKID() != ((ListElement) cmbKategorie.getSelectedItem()).getPk()) {
                 SYSTools.selectInComboBox(cmbKategorie, dlg.getBWIKID());

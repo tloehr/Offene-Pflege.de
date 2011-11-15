@@ -128,7 +128,7 @@ public class PnlVorgang extends CleanablePanel {
         });
 
         if (aktuellerBewohner != null) {
-            addVorgaengeFuerBW(aktuellerBewohner);
+            ((Container) taskContainer).add(addVorgaengeFuerBW(aktuellerBewohner));
         } else {
             addMeineVorgaenge();
             addMeineAbgelaufenenVorgaenge();
@@ -217,7 +217,7 @@ public class PnlVorgang extends CleanablePanel {
         ((Container) taskContainer).add(pnlAlleVorgaenge);
     }
 
-    protected void addVorgaengeFuerBW(Bewohner bewohner) {
+    protected JXTaskPane addVorgaengeFuerBW(Bewohner bewohner) {
         Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBewohner");
         query.setParameter("bewohner", bewohner);
         List<Vorgaenge> listVorgaenge = query.getResultList();
@@ -242,7 +242,9 @@ public class PnlVorgang extends CleanablePanel {
                 });
             }
         }
-        ((Container) taskContainer).add(bwpanel);
+
+
+        return bwpanel;
     }
 
 

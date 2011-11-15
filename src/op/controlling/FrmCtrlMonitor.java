@@ -65,22 +65,22 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }
 
     private void initForm() {
-        SYSTools.restoreState(this.getClass().getName() + "::cbBVAktivitaet", cbBVAktivitaet);
-        SYSTools.restoreState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
-        SYSTools.restoreState(this.getClass().getName() + "::cbGewicht", cbGewicht);
-        SYSTools.restoreState(this.getClass().getName() + "::cbBilanz", cbBilanz);
-        SYSTools.restoreState(this.getClass().getName() + "::cbNichtAbgehakteBHPs", cbNichtAbgehakteBHPs);
-        SYSTools.restoreState(this.getClass().getName() + "::cbPlanung", cbPlanung);
-        SYSTools.restoreState(this.getClass().getName() + "::cbVerordnungenOhneAnbruch", cbVerordnungenOhneAnbruch);
-        SYSTools.restoreState(this.getClass().getName() + "::cbSozialZeiten", cbSozialZeiten);
-        SYSTools.restoreState(this.getClass().getName() + "::cbGeringeVorraete", cbGeringeVorraete);
-        SYSTools.restoreState(this.getClass().getName() + "::cbMediControl", cbMediControl);
-        SYSTools.restoreState(this.getClass().getName() + "::cbSturzAnonym", cbSturzAnonym);
-        SYSTools.restoreState(this.getClass().getName() + "::cbSturz", cbSturz);
-        SYSTools.restoreState(this.getClass().getName() + "::cbBerichte", cbBerichte);
-        SYSTools.restoreState(this.getClass().getName() + "::cbWunden", cbWunden);
-        SYSTools.restoreState(this.getClass().getName() + "::cbInko", cbInko);
-        SYSTools.restoreState(this.getClass().getName() + "::cbBeschwerden", cbBeschwerden);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBVAktivitaet", cbBVAktivitaet);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbGewicht", cbGewicht);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBilanz", cbBilanz);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbNichtAbgehakteBHPs", cbNichtAbgehakteBHPs);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbPlanung", cbPlanung);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbVerordnungenOhneAnbruch", cbVerordnungenOhneAnbruch);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSozialZeiten", cbSozialZeiten);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbGeringeVorraete", cbGeringeVorraete);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbMediControl", cbMediControl);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSturzAnonym", cbSturzAnonym);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSturz", cbSturz);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBerichte", cbBerichte);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbWunden", cbWunden);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbInko", cbInko);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBeschwerden", cbBeschwerden);
         jbs = new JCheckBox[]{cbBVAktivitaet, cbBilanz, cbGewicht, cbGeringeVorraete, cbNichtAbgehakteBHPs, cbPlanung,
                 cbSozialBerichte, cbSozialZeiten, cbVerordnungenOhneAnbruch, cbMediControl, cbSturzAnonym,
                 cbSturz, cbBerichte, cbWunden, cbInko, cbBeschwerden
@@ -193,7 +193,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 // TODO: muss noch gefixt werden.
         //        ListElement[] mytags = SYSTools.merge(headtag, PnlBerichte.tags);
 //        cmbTags.setModel(new DefaultComboBoxModel(mytags));
-//        SYSTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
+//        SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
 
         txtBerichte.setText(SYSTools.catchNull(OPDE.getProps().getProperty(this.getClass().getName() + "::txtBerichte")));
 
@@ -1038,7 +1038,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbBVAktivitaetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBVAktivitaetActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbBVAktivitaet", cbBVAktivitaet);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbBVAktivitaet", cbBVAktivitaet);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbBVAktivitaetActionPerformed
 
@@ -1079,7 +1079,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_btnPrintActionPerformed
 
     private void cbSozialBerichteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSozialBerichteActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
     }//GEN-LAST:event_cbSozialBerichteActionPerformed
 
     private void spinBVWochenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinBVWochenStateChanged
@@ -1107,27 +1107,27 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinGewichtMonateStateChanged
 
     private void cbNichtAbgehakteBHPsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbNichtAbgehakteBHPsActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbNichtAbgehakteBHPs", cbNichtAbgehakteBHPs);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbNichtAbgehakteBHPs", cbNichtAbgehakteBHPs);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbNichtAbgehakteBHPsActionPerformed
 
     private void cbPlanungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPlanungActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbPlanung", cbPlanung);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbPlanung", cbPlanung);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbPlanungActionPerformed
 
     private void cbVerordnungenOhneAnbruchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbVerordnungenOhneAnbruchActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbVerordnungenOhneAnbruch", cbVerordnungenOhneAnbruch);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbVerordnungenOhneAnbruch", cbVerordnungenOhneAnbruch);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbVerordnungenOhneAnbruchActionPerformed
 
     private void cbBilanzActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBilanzActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbBilanz", cbBilanz);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbBilanz", cbBilanz);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbBilanzActionPerformed
 
     private void cbGewichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbGewichtActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbGewicht", cbGewicht);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbGewicht", cbGewicht);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbGewichtActionPerformed
 
@@ -1137,7 +1137,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_btnStopActionPerformed
 
     private void cbSozialZeitenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSozialZeitenActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbSozialZeiten", cbSozialZeiten);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbSozialZeiten", cbSozialZeiten);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbSozialZeitenActionPerformed
 
@@ -1154,17 +1154,17 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinVorratProzentStateChanged
 
     private void cbGeringeVorraeteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbGeringeVorraeteActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbGeringeVorraete", cbGeringeVorraete);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbGeringeVorraete", cbGeringeVorraete);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbGeringeVorraeteActionPerformed
 
     private void cbMediControlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbMediControlActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbMediControl", cbMediControl);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbMediControl", cbMediControl);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbMediControlActionPerformed
 
     private void cmbStationItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbStationItemStateChanged
-        SYSTools.storeState(this.getClass().getName() + "::cmbStation", cmbStation);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cmbStation", cmbStation);
     }//GEN-LAST:event_cmbStationItemStateChanged
 
     private void spinSturzAMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSturzAMonateStateChanged
@@ -1174,7 +1174,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinSturzAMonateStateChanged
 
     private void cbSturzAnonymActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSturzAnonymActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbSturzAnonym", cbSturzAnonym);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbSturzAnonym", cbSturzAnonym);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbSturzAnonymActionPerformed
 
@@ -1185,12 +1185,12 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinSturzMonateStateChanged
 
     private void cbSturzActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSturzActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbSturz", cbSturz);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbSturz", cbSturz);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbSturzActionPerformed
 
     private void cbBerichteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBerichteActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbBerichte", cbBerichte);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbBerichte", cbBerichte);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbBerichteActionPerformed
 
@@ -1205,7 +1205,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinBerichteMonateStateChanged
 
     private void cbWundenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbWundenActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbWunden", cbWunden);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbWunden", cbWunden);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbWundenActionPerformed
 
@@ -1215,12 +1215,12 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinWundenMonateStateChanged
 
     private void cbInkoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbInkoActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbInko", cbInko);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbInko", cbInko);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbInkoActionPerformed
 
     private void cbBeschwerdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBeschwerdenActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbBeschwerden", cbBeschwerden);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbBeschwerden", cbBeschwerden);
         btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbBeschwerdenActionPerformed
 
@@ -1230,7 +1230,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinBeschwerdenMonateStateChanged
 
     private void cmbTagsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbTagsItemStateChanged
-        SYSTools.storeState(this.getClass().getName() + "::cmbTags", cmbTags);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cmbTags", cmbTags);
     }//GEN-LAST:event_cmbTagsItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

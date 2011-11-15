@@ -98,31 +98,31 @@ public class TMWerte
             //stmt = OPDE.getDb().db.createStatement();
             String s =
                     " SELECT bw.BWID, bw.PIT, bw.UKennung, bw.Wert, bw.XML, bw.Bemerkung, bw.Beziehung, bw.Sortierung, bw._cdate, bw._mdate, bw.ReplacedBy, bw.ReplacementFor," +
-                            "       bw.EditBy, fia.anzahl, vrg.anzahl, ocu.Vorname, ocu.Nachname " +
+                            "       bw.EditBy, ocu.Vorname, ocu.Nachname " +
                             " FROM BWerte bw" +
                             " INNER JOIN OCUsers ocu ON ocu.UKennung = bw.UKennung " +
                             // Hier kommen die angehangen Dokumente hinzu
-                            " INNER JOIN " +
-                            " (" +
-                            " 	SELECT DISTINCT f1.BWID, ifnull(anzahl,0) anzahl" +
-                            " 	FROM BWerte f1" +
-                            " 	LEFT OUTER JOIN (" +
-                            " 		SELECT BWID, count(*) anzahl FROM SYSBWERTE2FILE" +
-                            " 		GROUP BY BWID" +
-                            " 		) fa ON fa.BWID = f1.BWID" +
-                            " 	WHERE f1.BWKennung=? AND f1.PIT >= ? AND f1.PIT <= ? " +
-                            " ) fia ON fia.BWID = bw.BWID" +
-                            // Hier die angehangenen Vorgänge
-                            " INNER JOIN " +
-                            " (" +
-                            " 	SELECT DISTINCT f2.BWID, ifnull(anzahl,0) anzahl" +
-                            " 	FROM BWerte f2" +
-                            " 	LEFT OUTER JOIN (" +
-                            " 		SELECT ForeignKey, count(*) anzahl FROM SYSBWERTE2VORGANG" +
-                            " 		GROUP BY BWID " +
-                            " 		) va ON va.BWID = f2.BWID" +
-                            " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
-                            " ) vrg ON vrg.BWID = bw.BWID " +
+//                            " INNER JOIN " +
+//                            " (" +
+//                            " 	SELECT DISTINCT f1.BWID, ifnull(anzahl,0) anzahl" +
+//                            " 	FROM BWerte f1" +
+//                            " 	LEFT OUTER JOIN (" +
+//                            " 		SELECT BWID, count(*) anzahl FROM SYSBWERTE2FILE" +
+//                            " 		GROUP BY BWID" +
+//                            " 		) fa ON fa.BWID = f1.BWID" +
+//                            " 	WHERE f1.BWKennung=? AND f1.PIT >= ? AND f1.PIT <= ? " +
+//                            " ) fia ON fia.BWID = bw.BWID" +
+//                            // Hier die angehangenen Vorgänge
+//                            " INNER JOIN " +
+//                            " (" +
+//                            " 	SELECT DISTINCT f2.BWID, ifnull(anzahl,0) anzahl" +
+//                            " 	FROM BWerte f2" +
+//                            " 	LEFT OUTER JOIN (" +
+//                            " 		SELECT ForeignKey, count(*) anzahl FROM SYSBWERTE2VORGANG" +
+//                            " 		GROUP BY BWID " +
+//                            " 		) va ON va.BWID = f2.BWID" +
+//                            " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
+//                            " ) vrg ON vrg.BWID = bw.BWID " +
                             " WHERE bw.BWKennung = ? AND bw.PIT >= ? AND bw.PIT <= ? " +
                             (showedits ? "" : " AND bw.ReplacedBy = 0 ");
             //"ORDER BY Beziehung, Datum, Uhrzeit";
@@ -165,12 +165,12 @@ public class TMWerte
             stmt.setString(1, currentBW);
             stmt.setTimestamp(2, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
             stmt.setTimestamp(3, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
-            stmt.setString(4, currentBW);
-            stmt.setTimestamp(5, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
-            stmt.setTimestamp(6, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
-            stmt.setString(7, currentBW);
-            stmt.setTimestamp(8, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
-            stmt.setTimestamp(9, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
+//            stmt.setString(4, currentBW);
+//            stmt.setTimestamp(5, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
+//            stmt.setTimestamp(6, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
+//            stmt.setString(7, currentBW);
+//            stmt.setTimestamp(8, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
+//            stmt.setTimestamp(9, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
 
             ResultSet rs = stmt.executeQuery();
 
@@ -210,7 +210,7 @@ public class TMWerte
                                 rs.getTimestamp("PIT"), currentBW, "Blutdruck und Puls",
                                 rrline, rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
                                 rs.getLong("BWID"), "<RR/>", sys, dia, puls, sysbwid, diabwid, pulsbwid, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), rs.getInt("vrg.anzahl"), rs.getInt("fia.anzahl"), "mmHg, S/m",
+                                rs.getLong("ReplacementFor"), rs.getString("EditBy"),  "mmHg, S/m",
                                 rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
                         };
                     } else {
@@ -219,7 +219,7 @@ public class TMWerte
                                 (rs.getDouble("Wert") == 0d ? "siehe Bemerkung" : new Double(rs.getDouble("Wert")).toString()),
                                 rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
                                 rs.getLong("BWID"), rs.getString("XML"), rs.getDouble("Wert"), 0d, 0d, 0L, 0L, 0L, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), rs.getInt("vrg.anzahl"), rs.getInt("fia.anzahl"), DBHandling.getBWertEinheit(rs.getString("XML")),
+                                rs.getLong("ReplacementFor"), rs.getString("EditBy"),  DBHandling.getBWertEinheit(rs.getString("XML")),
                                 rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
                         };
 
@@ -268,8 +268,6 @@ public class TMWerte
 
         long replacedby = (Long) o[COL_REPLACEDBY];
         long replacement4 = (Long) o[COL_REPLACEMENTFOR];
-        int fianzahl = (Integer) o[COL_DATEIEN_ANZAHL];
-        int vrganzahl = (Integer) o[COL_VORGANG_ANZAHL];
         long bwid = (Long) o[COL_BWID];
 
 
@@ -311,16 +309,16 @@ public class TMWerte
                 if (!bemerkung.equals("")) {
                     result += "<br/><b>Bemerkung:</b> " + bemerkung;
                 }
-                if (fianzahl > 0) {
-                    //URL url = this.getClass().getResource("/artwork/16x16/attach.png");
-                    //System.out.println(url.getPath());
-                    result += "<font color=\"green\">&#9679;</font>";
-                }
-                if (vrganzahl > 0) {
-                    //URL url = this.getClass().getResource("/artwork/16x16/mail-tagged.png");
-                    //System.out.println(url.getPath());
-                    result += "<font color=\"red\">&#9679;</font>";
-                }
+//                if (fianzahl > 0) {
+//                    //URL url = this.getClass().getResource("/artwork/16x16/attach.png");
+//                    //System.out.println(url.getPath());
+//                    result += "<font color=\"green\">&#9679;</font>";
+//                }
+//                if (vrganzahl > 0) {
+//                    //URL url = this.getClass().getResource("/artwork/16x16/mail-tagged.png");
+//                    //System.out.println(url.getPath());
+//                    result += "<font color=\"red\">&#9679;</font>";
+//                }
                 result = fonthead + result + "</font>";
 
                 break;

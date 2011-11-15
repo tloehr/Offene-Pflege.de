@@ -30,6 +30,8 @@ package op.care.med.vorrat;
 import java.awt.event.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+
+import entity.SYSPropsTools;
 import op.OPDE;
 import op.care.med.DBHandling;
 import op.care.med.DlgMediAssistent;
@@ -469,7 +471,7 @@ public class DlgBestand extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + "::cbDruck", cbDruck);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbDruck", cbDruck);
     }//GEN-LAST:event_cbDruckItemStateChanged
 
     private void cmbVorratMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmbVorratMouseEntered

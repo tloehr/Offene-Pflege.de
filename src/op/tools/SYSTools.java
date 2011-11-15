@@ -1184,32 +1184,7 @@ public class SYSTools {
         return dcbm;
     }
 
-    public static void storeState(String name, JCheckBox cb) {
-        //SYSTools.putProps(name, Boolean.toString(cb.isSelected()), false, "");
-        SYSPropsTools.storeProp(name, Boolean.toString(cb.isSelected()), OPDE.getLogin().getUser());
-    }
 
-    public static void restoreState(String name, JCheckBox cb) {
-        if (OPDE.getProps().containsKey(name)) {
-            cb.setSelected(OPDE.getProps().getProperty(name).equalsIgnoreCase("true"));
-        } else {
-            cb.setSelected(false);
-        }
-    }
-
-    public static void storeState(String name, JComboBox cmb) {
-        //SYSTools.putProps(name, Integer.toString(cmb.getSelectedIndex()), false, "");
-        SYSPropsTools.storeProp(name, Integer.toString(cmb.getSelectedIndex()), OPDE.getLogin().getUser());
-    }
-
-    public static void restoreState(String name, JComboBox cmb) {
-        if (OPDE.getProps().containsKey(name)) {
-            int index = Integer.parseInt(OPDE.getProps().getProperty(name));
-            cmb.setSelectedIndex(index);
-        } else {
-            cmb.setSelectedIndex(0);
-        }
-    }
 
     public static Color getColor(String colorname) {
         Color color = Color.black;
@@ -1705,12 +1680,12 @@ public class SYSTools {
     public static Timeline flashLabel(JLabel lbl1, String text, int times, Color flashColor) {
 
         final JLabel lbl = lbl1;
-        final Color oldColor = lbl1.getForeground();
+        final Color oldColor = Color.black; //lbl1.getForeground();
         final String oldText = lbl1.getText();
-        OPDE.debug("oldText: " + oldText);
+        //OPDE.debug("oldText: " + oldText);
         lbl.setText(text);
         Timeline textmessageTL = new Timeline(lbl);
-        textmessageTL.addPropertyToInterpolate("foreground", lbl.getForeground(), flashColor);
+        textmessageTL.addPropertyToInterpolate("foreground", oldColor, flashColor);
         textmessageTL.setDuration(600);
 
         textmessageTL.addCallback(new TimelineCallbackAdapter() {
@@ -1719,7 +1694,7 @@ public class SYSTools {
                 OPDE.debug(newState);
                 if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
                     lbl.setText(oldText);
-                    lbl.setForeground(oldColor);
+                    lbl.setForeground(Color.black);
                     OPDE.debug("flashLabel cancelled or done. Label set to: " + oldText);
                 }
             }
@@ -1730,11 +1705,11 @@ public class SYSTools {
         } else {
             textmessageTL.playLoop(times, Timeline.RepeatBehavior.REVERSE);
         }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
         return textmessageTL;
     }
 

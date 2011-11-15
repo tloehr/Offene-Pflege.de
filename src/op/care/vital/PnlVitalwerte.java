@@ -90,12 +90,11 @@ public class PnlVitalwerte extends CleanablePanel {
      */
     public PnlVitalwerte(FrmPflege parent, Bewohner bewohner) {
         initPhase = true;
-        this.currentBW = bewohner.getBWKennung();
-        this.bewohner = bewohner;
+
         this.parent = parent;
         ocs = OPDE.getOCSec();
         initComponents();
-        BewohnerTools.setBWLabel(lblBW, bewohner);
+
 
         jdcVon.setDate(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.WEEK_OF_MONTH));
         jdcBis.setDate(SYSCalendar.today_date());
@@ -115,7 +114,7 @@ public class PnlVitalwerte extends CleanablePanel {
                 reloadTable();
             }
         };
-        reloadTable();
+        change2Bewohner(bewohner);
         initPhase = false;
     }
 
@@ -585,7 +584,10 @@ public class PnlVitalwerte extends CleanablePanel {
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.currentBW = bewohner.getBWKennung();
+        this.bewohner = bewohner;
+        BewohnerTools.setBWLabel(lblBW, bewohner);
+        reloadTable();
     }
 
     private void cbStuhlgangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbStuhlgangActionPerformed
@@ -875,7 +877,7 @@ public class PnlVitalwerte extends CleanablePanel {
         if (this.initPhase) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + ":cbTBIDS", cbIDS);
+        SYSPropsTools.storeState(this.getClass().getName() + ":cbTBIDS", cbIDS);
         reloadTable();
     }//GEN-LAST:event_cbIDSActionPerformed
 
@@ -883,7 +885,7 @@ public class PnlVitalwerte extends CleanablePanel {
         if (this.initPhase) {
             return;
         }
-        SYSTools.storeState(this.getClass().getName() + ":cbShowEdits", cbShowEdits);
+        SYSPropsTools.storeState(this.getClass().getName() + ":cbShowEdits", cbShowEdits);
         reloadTable();
     }//GEN-LAST:event_cbShowEditsActionPerformed
 

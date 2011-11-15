@@ -53,7 +53,7 @@ public class DlgNewFile extends javax.swing.JDialog {
         this.entities = entities;
         initComponents();
         setTitle(SYSTools.getWindowTitle("Neue Datei anhängen"));
-        SYSTools.restoreState(this.getClass().getName() + "::cbBeleg", cbBeleg);
+        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBeleg", cbBeleg);
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -200,7 +200,7 @@ public class DlgNewFile extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbBelegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBelegActionPerformed
-        SYSTools.storeState(this.getClass().getName() + "::cbBeleg", cbBeleg);
+        SYSPropsTools.storeState(this.getClass().getName() + "::cbBeleg", cbBeleg);
     }//GEN-LAST:event_cbBelegActionPerformed
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed

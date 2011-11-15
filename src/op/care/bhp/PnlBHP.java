@@ -26,6 +26,9 @@
  */
 package op.care.bhp;
 
+import java.awt.event.*;
+import java.beans.*;
+import javax.swing.border.*;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
@@ -73,15 +76,17 @@ public class PnlBHP extends CleanablePanel {
      */
     public PnlBHP(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
-        this.bwkennung = bewohner.getBWKennung();
-        this.bewohner = bewohner;
+
         ocs = OPDE.getOCSec();
         initComponents();
-        initPanel();
+        change2Bewohner(bewohner);
 
     }
 
-    private void initPanel() {
+    @Override
+    public void change2Bewohner(Bewohner bewohner){
+        this.bwkennung = bewohner.getBWKennung();
+        this.bewohner = bewohner;
         SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
         runningClass = result[0];
 
@@ -118,11 +123,6 @@ public class PnlBHP extends CleanablePanel {
         SYSRunningClassesTools.moduleEnded(runningClass);
     }
 
-    @Override
-    public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     /**
      * This method is called from within the constructor to
      * initialize the form.
@@ -131,207 +131,235 @@ public class PnlBHP extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jspBHP = new JScrollPane();
+        tblBHP = new JTable();
+        jPanel1 = new JPanel();
+        btnNow = new JButton();
+        btnForward = new JButton();
+        btnBack = new JButton();
+        btnTop = new JButton();
+        jdcDatum = new JDateChooser();
+        cmbSchicht = new JComboBox();
+        btnBedarf = new JButton();
+        lblBW = new JLabel();
+        btnLock = new JButton();
+        jToolBar1 = new JToolBar();
+        btnLogout = new JButton();
+        jLabel12 = new JLabel();
 
-        jspBHP = new javax.swing.JScrollPane();
-        tblBHP = new javax.swing.JTable();
-        jPanel1 = new javax.swing.JPanel();
-        btnNow = new javax.swing.JButton();
-        btnForward = new javax.swing.JButton();
-        btnBack = new javax.swing.JButton();
-        btnTop = new javax.swing.JButton();
-        jdcDatum = new com.toedter.calendar.JDateChooser();
-        cmbSchicht = new javax.swing.JComboBox();
-        btnBedarf = new javax.swing.JButton();
-        lblBW = new javax.swing.JLabel();
-        btnLock = new javax.swing.JButton();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnLogout = new javax.swing.JButton();
-        jLabel12 = new javax.swing.JLabel();
+        //======== this ========
 
-        jspBHP.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jspBHP.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspBHPComponentResized(evt);
-            }
-        });
+        //======== jspBHP ========
+        {
+            jspBHP.setBorder(new BevelBorder(BevelBorder.RAISED));
+            jspBHP.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    jspBHPComponentResized(e);
+                }
+            });
 
-        tblBHP.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblBHPMousePressed(evt);
-            }
-        });
-        jspBHP.setViewportView(tblBHP);
+            //---- tblBHP ----
+            tblBHP.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblBHPMousePressed(e);
+                }
+            });
+            jspBHP.setViewportView(tblBHP);
+        }
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-        btnNow.setBackground(java.awt.Color.white);
-        btnNow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/history.png"))); // NOI18N
-        btnNow.setBorder(null);
-        btnNow.setBorderPainted(false);
-        btnNow.setOpaque(false);
-        btnNow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNowActionPerformed(evt);
-            }
-        });
+            //---- btnNow ----
+            btnNow.setBackground(Color.white);
+            btnNow.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/history.png")));
+            btnNow.setBorder(null);
+            btnNow.setBorderPainted(false);
+            btnNow.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNowActionPerformed(e);
+                }
+            });
 
-        btnForward.setBackground(java.awt.Color.white);
-        btnForward.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png"))); // NOI18N
-        btnForward.setBorder(null);
-        btnForward.setBorderPainted(false);
-        btnForward.setOpaque(false);
-        btnForward.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnForwardActionPerformed(evt);
-            }
-        });
+            //---- btnForward ----
+            btnForward.setBackground(Color.white);
+            btnForward.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
+            btnForward.setBorder(null);
+            btnForward.setBorderPainted(false);
+            btnForward.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnForwardActionPerformed(e);
+                }
+            });
 
-        btnBack.setBackground(java.awt.Color.white);
-        btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png"))); // NOI18N
-        btnBack.setBorder(null);
-        btnBack.setBorderPainted(false);
-        btnBack.setOpaque(false);
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
-            }
-        });
+            //---- btnBack ----
+            btnBack.setBackground(Color.white);
+            btnBack.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png")));
+            btnBack.setBorder(null);
+            btnBack.setBorderPainted(false);
+            btnBack.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBackActionPerformed(e);
+                }
+            });
 
-        btnTop.setBackground(java.awt.Color.white);
-        btnTop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png"))); // NOI18N
-        btnTop.setBorder(null);
-        btnTop.setBorderPainted(false);
-        btnTop.setOpaque(false);
-        btnTop.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnTopActionPerformed(evt);
-            }
-        });
+            //---- btnTop ----
+            btnTop.setBackground(Color.white);
+            btnTop.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png")));
+            btnTop.setBorder(null);
+            btnTop.setBorderPainted(false);
+            btnTop.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnTopActionPerformed(e);
+                }
+            });
 
-        jdcDatum.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jdcDatumPropertyChange(evt);
-            }
-        });
+            //---- jdcDatum ----
+            jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    jdcDatumPropertyChange(e);
+                }
+            });
 
-        cmbSchicht.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbSchichtItemStateChanged(evt);
-            }
-        });
+            //---- cmbSchicht ----
+            cmbSchicht.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbSchichtItemStateChanged(e);
+                }
+            });
 
-        btnBedarf.setText("Bei Bedarf");
-        btnBedarf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBedarfActionPerformed(evt);
-            }
-        });
+            //---- btnBedarf ----
+            btnBedarf.setText("Bei Bedarf");
+            btnBedarf.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBedarfActionPerformed(e);
+                }
+            });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jdcDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnTop, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnBack)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnForward)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnNow, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 407, Short.MAX_VALUE)
-                                .addComponent(btnBedarf)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbSchicht, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                .addComponent(cmbSchicht, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(btnBedarf))
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(btnNow, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnForward, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnBack, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnTop, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jdcDatum, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBack)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnForward)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 407, Short.MAX_VALUE)
+                        .addComponent(btnBedarf)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnBedarf))
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+        }
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
 
-        btnLock.setBackground(new java.awt.Color(255, 255, 255));
-        btnLock.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png"))); // NOI18N
+        //---- btnLock ----
+        btnLock.setBackground(Color.white);
+        btnLock.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png")));
         btnLock.setBorder(null);
         btnLock.setBorderPainted(false);
-        btnLock.setOpaque(false);
-        btnLock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLockActionPerformed(evt);
+        btnLock.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnLockActionPerformed(e);
             }
         });
 
-        jToolBar1.setFloatable(false);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutbtnLogoutHandler(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
+            //---- btnLogout ----
+            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
+            btnLogout.setText("Abmelden");
+            btnLogout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnLogoutbtnLogoutHandler(e);
+                }
+            });
+            jToolBar1.add(btnLogout);
+        }
 
+        //---- jLabel12 ----
         jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 809, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspBHP, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 803, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnLock)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspBHP, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel12)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(btnLock)
+                        .addComponent(lblBW))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -340,7 +368,7 @@ public class PnlBHP extends CleanablePanel {
     }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
-        initPanel();
+        change2Bewohner(bewohner);
     }//GEN-LAST:event_btnLockActionPerformed
 
     private void btnForwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForwardActionPerformed
@@ -675,20 +703,20 @@ public class PnlBHP extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBack;
-    private javax.swing.JButton btnBedarf;
-    private javax.swing.JButton btnForward;
-    private javax.swing.JButton btnLock;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnNow;
-    private javax.swing.JButton btnTop;
-    private javax.swing.JComboBox cmbSchicht;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JToolBar jToolBar1;
-    private com.toedter.calendar.JDateChooser jdcDatum;
-    private javax.swing.JScrollPane jspBHP;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JTable tblBHP;
+    private JScrollPane jspBHP;
+    private JTable tblBHP;
+    private JPanel jPanel1;
+    private JButton btnNow;
+    private JButton btnForward;
+    private JButton btnBack;
+    private JButton btnTop;
+    private JDateChooser jdcDatum;
+    private JComboBox cmbSchicht;
+    private JButton btnBedarf;
+    private JLabel lblBW;
+    private JButton btnLock;
+    private JToolBar jToolBar1;
+    private JButton btnLogout;
+    private JLabel jLabel12;
     // End of variables declaration//GEN-END:variables
 }

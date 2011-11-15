@@ -26,6 +26,9 @@
  */
 package op.care.dfn;
 
+import java.awt.event.*;
+import java.beans.*;
+import javax.swing.border.*;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
@@ -71,11 +74,9 @@ public class PnlDFN extends CleanablePanel {
      */
     public PnlDFN(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
-        this.bewohner = bewohner;
-        this.bwkennung = bewohner.getBWKennung();
         ocs = OPDE.getOCSec();
         initComponents();
-        initPanel();
+        change2Bewohner(bewohner);
     }
 
     @Override
@@ -85,12 +86,15 @@ public class PnlDFN extends CleanablePanel {
         SYSRunningClassesTools.moduleEnded(runningClass);
     }
 
-    @Override
-    public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    private void btnLockActionPerformed(ActionEvent e) {
+        change2Bewohner(bewohner);
     }
 
-    private void initPanel() {
+    @Override
+    public void change2Bewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+        this.bwkennung = bewohner.getBWKennung();
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
         runningClass = result[0];
@@ -106,22 +110,19 @@ public class PnlDFN extends CleanablePanel {
             btnLock.setEnabled(false);
             btnLock.setToolTipText(null);
         }
-//        ocs.setEnabled(this, "btnBedarf", btnBedarf, !readOnly);
 
         ignoreJDCEvent = true;
         jdcDatum.setDate(SYSCalendar.nowDBDate());
         btnForward.setEnabled(false); // In die Zukunft kann man nicht gucken.
 
-        //jdcDatum.setMaxSelectableDate(SYSCalendar.today_date());
         ArrayList hauf = DBRetrieve.getHauf(bwkennung);
         Date[] d = (Date[]) hauf.get(0);
         jdcDatum.setMinSelectableDate(d[0]);
-        BewohnerTools.setBWLabel(lblBW, bewohner);
+
 
         ignoreJDCEvent = false;
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
-        //cmbSchichtItemStateChanged(null);
-        // reloadTable(); wird durch cmbSchicht durchgeführt.
+
     }
 
     /**
@@ -132,209 +133,225 @@ public class PnlDFN extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnNew = new JButton();
+        lblBW = new JLabel();
+        btnLock = new JButton();
+        jPanel1 = new JPanel();
+        btnNow = new JButton();
+        btnForward = new JButton();
+        btnBack = new JButton();
+        btnTop = new JButton();
+        jdcDatum = new JDateChooser();
+        cmbSchicht = new JComboBox();
+        jspDFN = new JScrollPane();
+        tblDFN = new JTable();
 
-        bgSort = new javax.swing.ButtonGroup();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnNew = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        lblBW = new javax.swing.JLabel();
-        btnLock = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        btnNow = new javax.swing.JButton();
-        btnForward = new javax.swing.JButton();
-        btnBack = new javax.swing.JButton();
-        btnTop = new javax.swing.JButton();
-        jdcDatum = new com.toedter.calendar.JDateChooser();
-        cmbSchicht = new javax.swing.JComboBox();
-        jspDFN = new javax.swing.JScrollPane();
-        tblDFN = new javax.swing.JTable();
+        //======== this ========
 
-        jToolBar1.setFloatable(false);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filenew.png"))); // NOI18N
-        btnNew.setText("Neu");
-        btnNew.setFocusable(false);
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnNew);
+            //---- btnNew ----
+            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
+            btnNew.setText("Neu");
+            btnNew.setFocusable(false);
+            btnNew.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNewActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnNew);
+        }
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutbtnLogoutHandler(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
-
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
 
-        btnLock.setBackground(new java.awt.Color(255, 255, 255));
-        btnLock.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png"))); // NOI18N
+        //---- btnLock ----
+        btnLock.setBackground(Color.white);
+        btnLock.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png")));
         btnLock.setBorder(null);
         btnLock.setBorderPainted(false);
-        btnLock.setOpaque(false);
-        btnLock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLockActionPerformed(evt);
+        btnLock.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnLockActionPerformed(e);
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-        btnNow.setBackground(java.awt.Color.white);
-        btnNow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/history.png"))); // NOI18N
-        btnNow.setBorder(null);
-        btnNow.setBorderPainted(false);
-        btnNow.setOpaque(false);
-        btnNow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNowActionPerformed(evt);
-            }
-        });
+            //---- btnNow ----
+            btnNow.setBackground(Color.white);
+            btnNow.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/history.png")));
+            btnNow.setBorder(null);
+            btnNow.setBorderPainted(false);
+            btnNow.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNowActionPerformed(e);
+                }
+            });
 
-        btnForward.setBackground(java.awt.Color.white);
-        btnForward.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png"))); // NOI18N
-        btnForward.setBorder(null);
-        btnForward.setBorderPainted(false);
-        btnForward.setOpaque(false);
-        btnForward.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnForwardActionPerformed(evt);
-            }
-        });
+            //---- btnForward ----
+            btnForward.setBackground(Color.white);
+            btnForward.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
+            btnForward.setBorder(null);
+            btnForward.setBorderPainted(false);
+            btnForward.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnForwardActionPerformed(e);
+                }
+            });
 
-        btnBack.setBackground(java.awt.Color.white);
-        btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png"))); // NOI18N
-        btnBack.setBorder(null);
-        btnBack.setBorderPainted(false);
-        btnBack.setOpaque(false);
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
-            }
-        });
+            //---- btnBack ----
+            btnBack.setBackground(Color.white);
+            btnBack.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png")));
+            btnBack.setBorder(null);
+            btnBack.setBorderPainted(false);
+            btnBack.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBackActionPerformed(e);
+                }
+            });
 
-        btnTop.setBackground(java.awt.Color.white);
-        btnTop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png"))); // NOI18N
-        btnTop.setBorder(null);
-        btnTop.setBorderPainted(false);
-        btnTop.setOpaque(false);
-        btnTop.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnTopActionPerformed(evt);
-            }
-        });
+            //---- btnTop ----
+            btnTop.setBackground(Color.white);
+            btnTop.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png")));
+            btnTop.setBorder(null);
+            btnTop.setBorderPainted(false);
+            btnTop.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnTopActionPerformed(e);
+                }
+            });
 
-        jdcDatum.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jdcDatumPropertyChange(evt);
-            }
-        });
+            //---- jdcDatum ----
+            jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    jdcDatumPropertyChange(e);
+                }
+            });
 
-        cmbSchicht.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"}));
-        cmbSchicht.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbSchichtItemStateChanged(evt);
-            }
-        });
+            //---- cmbSchicht ----
+            cmbSchicht.setModel(new DefaultComboBoxModel(new String[] {
+                "Alles",
+                "Nacht, morgens",
+                "Fr\u00fch",
+                "Sp\u00e4t",
+                "Nacht, abends"
+            }));
+            cmbSchicht.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbSchichtItemStateChanged(e);
+                }
+            });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jdcDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnTop, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnBack)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnForward)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnNow, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 308, Short.MAX_VALUE)
-                                .addComponent(cmbSchicht, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(cmbSchicht, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(btnNow, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnForward, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnBack, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnTop, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jdcDatum, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBack)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnForward)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+                        .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(20, Short.MAX_VALUE))
+            );
+        }
 
-        jspDFN.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jspDFN.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspDFNComponentResized(evt);
-            }
-        });
+        //======== jspDFN ========
+        {
+            jspDFN.setBorder(new BevelBorder(BevelBorder.RAISED));
+            jspDFN.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    jspDFNComponentResized(e);
+                }
+            });
 
-        tblDFN.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblDFNMousePressed(evt);
-            }
-        });
-        jspDFN.setViewportView(tblDFN);
+            //---- tblDFN ----
+            tblDFN.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblDFNMousePressed(e);
+                }
+            });
+            jspDFN.setViewportView(tblDFN);
+        }
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspDFN, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnLock)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspDFN, GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspDFN, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup()
+                        .addComponent(btnLock)
+                        .addComponent(lblBW))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspDFN, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
         OPDE.ocmain.lockOC();
     }//GEN-LAST:event_btnLogoutbtnLogoutHandler
-
-    private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
-        initPanel();
-    }//GEN-LAST:event_btnLockActionPerformed
 
     private void btnNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNowActionPerformed
         jdcDatum.setDate(SYSCalendar.today_date());
@@ -560,20 +577,18 @@ public class PnlDFN extends CleanablePanel {
     }//GEN-LAST:event_btnNewActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgSort;
-    private javax.swing.JButton btnBack;
-    private javax.swing.JButton btnForward;
-    private javax.swing.JButton btnLock;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnNew;
-    private javax.swing.JButton btnNow;
-    private javax.swing.JButton btnTop;
-    private javax.swing.JComboBox cmbSchicht;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JToolBar jToolBar1;
-    private com.toedter.calendar.JDateChooser jdcDatum;
-    private javax.swing.JScrollPane jspDFN;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JTable tblDFN;
+    private JToolBar jToolBar1;
+    private JButton btnNew;
+    private JLabel lblBW;
+    private JButton btnLock;
+    private JPanel jPanel1;
+    private JButton btnNow;
+    private JButton btnForward;
+    private JButton btnBack;
+    private JButton btnTop;
+    private JDateChooser jdcDatum;
+    private JComboBox cmbSchicht;
+    private JScrollPane jspDFN;
+    private JTable tblDFN;
     // End of variables declaration//GEN-END:variables
 }

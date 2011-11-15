@@ -87,7 +87,7 @@ public class TMVerordnung
                     " F.Zubereitung, F.AnwText, F.PackEinheit, ifnull(bestand.DafID, 0) bestandDafID, M1.Bezeichnung mptext1, D1.Zusatz, " +
                     " F.AnwEinheit, bestand.APV, ifnull(vor.VorID, 0) vorid, vor.saldo, v.AnArztID, " +
                     " v.AbArztID, v.AnKHID, v.AbKHID, bestand.Summe bestsumme, " +
-                    " fia.anzahl, vrg.anzahl, ifnull(bestand.BestID, 0) BestID, ifnull(bestand.NextBest, 0) nextbest " +
+                    " ifnull(bestand.BestID, 0) BestID, ifnull(bestand.NextBest, 0) nextbest " +
                     " FROM BHPVerordnung v" +
                     " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID" +
                     " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID" +
@@ -116,29 +116,29 @@ public class TMVerordnung
                     "       SELECT best.VorID, best.DafID FROM MPBestand best " +
                     "   ) b ON a.VorID = b.VorID " +
                     " ) vor ON vor.DafID = v.DafID " +
-                    " INNER JOIN " +
+                   // " INNER JOIN " +
                     // Hier kommen die angehangen Dokumente hinzu
-                    " (" +
-                    " 	SELECT DISTINCT f1.VerID, ifnull(anzahl,0) anzahl" +
-                    " 	FROM BHPVerordnung f1" +
-                    " 	LEFT OUTER JOIN (" +
-                    " 		SELECT VerID, count(*) anzahl FROM SYSVER2FILE" +
-                    " 		GROUP BY VerID" +
-                    " 		) fa ON fa.VerID = f1.VerID" +
-                    " 	WHERE f1.BWKennung=?" +
-                    " ) fia ON fia.VerID = v.VerID " +
-                    // Hier die angehangenen Vorgänge
-                    " INNER JOIN " +
-                    " (" +
-                    " 	SELECT DISTINCT f2.VerID, ifnull(anzahl,0) anzahl" +
-                    " 	FROM BHPVerordnung f2" +
-                    " 	LEFT OUTER JOIN (" +
-                    " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
-                    " 		WHERE TableName='BHPVerordnung'" +
-                    " 		GROUP BY ForeignKey" +
-                    " 		) va ON va.ForeignKey = f2.VerID" +
-                    " 	WHERE f2.BWKennung=? " +
-                    " ) vrg ON vrg.VerID = v.VerID " +
+//                    " (" +
+//                    " 	SELECT DISTINCT f1.VerID, ifnull(anzahl,0) anzahl" +
+//                    " 	FROM BHPVerordnung f1" +
+//                    " 	LEFT OUTER JOIN (" +
+//                    " 		SELECT VerID, count(*) anzahl FROM SYSVER2FILE" +
+//                    " 		GROUP BY VerID" +
+//                    " 		) fa ON fa.VerID = f1.VerID" +
+//                    " 	WHERE f1.BWKennung=?" +
+//                    " ) fia ON fia.VerID = v.VerID " +
+//                    // Hier die angehangenen Vorgänge
+//                    " INNER JOIN " +
+//                    " (" +
+//                    " 	SELECT DISTINCT f2.VerID, ifnull(anzahl,0) anzahl" +
+//                    " 	FROM BHPVerordnung f2" +
+//                    " 	LEFT OUTER JOIN (" +
+//                    " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
+//                    " 		WHERE TableName='BHPVerordnung'" +
+//                    " 		GROUP BY ForeignKey" +
+//                    " 		) va ON va.ForeignKey = f2.VerID" +
+//                    " 	WHERE f2.BWKennung=? " +
+//                    " ) vrg ON vrg.VerID = v.VerID " +
                     // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
                     // ursprünglich verordneten abweichen.
                     " LEFT OUTER JOIN( " +
@@ -175,8 +175,8 @@ public class TMVerordnung
             //OPDE.getLogger().debug(sql);
             stmt.setString(1, bwkennung);
             stmt.setString(2, bwkennung);
-            stmt.setString(3, bwkennung);
-            stmt.setString(4, bwkennung);
+//            stmt.setString(3, bwkennung);
+//            stmt.setString(4, bwkennung);
             rs = stmt.executeQuery();
             rs.first();
         } catch (SQLException se) {
@@ -424,14 +424,12 @@ public class TMVerordnung
                 case COL_MSSN: {
                     String res = "";
                     res = getMassnahme();
-                    int fianzahl = rs.getInt("fia.Anzahl");
-                    int vrganzahl = rs.getInt("vrg.Anzahl");
-                    if (fianzahl > 0) {
-                        res += "<font color=\"green\">&#9679;</font>";
-                    }
-                    if (vrganzahl > 0) {
-                        res += "<font color=\"red\">&#9679;</font>";
-                    }
+//                    if (fianzahl > 0) {
+//                        res += "<font color=\"green\">&#9679;</font>";
+//                    }
+//                    if (vrganzahl > 0) {
+//                        res += "<font color=\"red\">&#9679;</font>";
+//                    }
                     result = res;
                     break;
                 }
@@ -503,17 +501,7 @@ public class TMVerordnung
                     result = verid;
                     break;
                 }
-                case COL_INFO: {
-                    BitSet bs = new BitSet();
-                    bs.set(0, rs.getLong("anzahl") > 0);
-                    //bs.set(1, rs.getLong("BestellID") > 0);
-                    result = bs;
-                    break;
-                }
-                case COL_DOK: {
-                    result = rs.getLong("anzahl") > 0; // Anzahl der Dokumente, die zugeordnet wurden.
-                    break;
-                }
+
 //                case COL_BESTELLID: {
 //                    result = rs.getLong("BestellID");
 //                    break;

@@ -8,6 +8,7 @@ import op.OPDE;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -64,6 +65,19 @@ public class SYSPropsTools {
     }
 
 
+    public static void storeBoolean(String key, boolean value) {
+        storeProp(key, value ? "true" : "false", null);
+    }
+
+    public static boolean isBoolean(String key) {
+        boolean bool = false;
+        if (OPDE.getProps().containsKey(key)) {
+            bool = OPDE.getProps().getProperty(key).equalsIgnoreCase("true");
+        }
+        return bool;
+    }
+
+
     /**
      * Lädt Properties aus der Tabelle OCProps ein.
      * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
@@ -96,4 +110,30 @@ public class SYSPropsTools {
 
         return p;
     }
+
+    public static void storeState(String name, JCheckBox cb) {
+        storeProp(name, Boolean.toString(cb.isSelected()), OPDE.getLogin().getUser());
+    }
+
+    public static void restoreState(String name, JCheckBox cb) {
+        if (OPDE.getProps().containsKey(name)) {
+            cb.setSelected(OPDE.getProps().getProperty(name).equalsIgnoreCase("true"));
+        } else {
+            cb.setSelected(false);
+        }
+    }
+
+    public static void storeState(String name, JComboBox cmb) {
+        storeProp(name, Integer.toString(cmb.getSelectedIndex()), OPDE.getLogin().getUser());
+    }
+
+    public static void restoreState(String name, JComboBox cmb) {
+        if (OPDE.getProps().containsKey(name)) {
+            int index = Integer.parseInt(OPDE.getProps().getProperty(name));
+            cmb.setSelectedIndex(index);
+        } else {
+            cmb.setSelectedIndex(0);
+        }
+    }
+
 }

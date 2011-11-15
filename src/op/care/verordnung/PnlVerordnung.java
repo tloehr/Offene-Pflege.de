@@ -26,6 +26,9 @@
  */
 package op.care.verordnung;
 
+import java.awt.event.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
 import entity.*;
 import op.OCSec;
 import op.OPDE;
@@ -95,18 +98,15 @@ public class PnlVerordnung extends CleanablePanel {
     public PnlVerordnung(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
         ocs = OPDE.getOCSec();
-        this.bewohner = bewohner;
-        this.bwkennung = bewohner.getBWKennung();
+
         initComponents();
-        initPanel();
+        change2Bewohner(bewohner);
     }
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    private void initPanel() {
+        this.bewohner = bewohner;
+        this.bwkennung = bewohner.getBWKennung();
         SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
         runningClass = result[0];
 
@@ -154,269 +154,320 @@ public class PnlVerordnung extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jspVerordnung = new JScrollPane();
+        tblVerordnung = new JTable();
+        jPanel1 = new JPanel();
+        cbOhneMedi = new JCheckBox();
+        cbBedarf = new JCheckBox();
+        cbMedi = new JCheckBox();
+        cbAbgesetzt = new JCheckBox();
+        jLabel1 = new JLabel();
+        jLabel2 = new JLabel();
+        cbRegel = new JCheckBox();
+        jLabel12 = new JLabel();
+        lblBW = new JLabel();
+        jToolBar1 = new JToolBar();
+        btnNew = new JButton();
+        btnBuchen = new JButton();
+        btnVorrat = new JButton();
+        btnPrint = new JButton();
+        btnStellplan = new JButton();
+        btnBestellungen = new JButton();
+        btnLogout = new JButton();
+        btnLock = new JButton();
 
-        jspVerordnung = new javax.swing.JScrollPane();
-        tblVerordnung = new javax.swing.JTable();
-        jPanel1 = new javax.swing.JPanel();
-        cbOhneMedi = new javax.swing.JCheckBox();
-        cbBedarf = new javax.swing.JCheckBox();
-        cbMedi = new javax.swing.JCheckBox();
-        cbAbgesetzt = new javax.swing.JCheckBox();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        cbRegel = new javax.swing.JCheckBox();
-        jLabel12 = new javax.swing.JLabel();
-        lblBW = new javax.swing.JLabel();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnNew = new javax.swing.JButton();
-        btnBuchen = new javax.swing.JButton();
-        btnVorrat = new javax.swing.JButton();
-        btnPrint = new javax.swing.JButton();
-        btnStellplan = new javax.swing.JButton();
-        btnBestellungen = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        btnLock = new javax.swing.JButton();
+        //======== this ========
 
-        jspVerordnung.setToolTipText("");
-        jspVerordnung.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspVerordnungComponentResized(evt);
-            }
-        });
-
-        tblVerordnung.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+        //======== jspVerordnung ========
+        {
+            jspVerordnung.setToolTipText("");
+            jspVerordnung.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    jspVerordnungComponentResized(e);
                 }
-        ));
-        tblVerordnung.setToolTipText("");
-        tblVerordnung.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblVerordnungMousePressed(evt);
-            }
-        });
-        jspVerordnung.setViewportView(tblVerordnung);
+            });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+            //---- tblVerordnung ----
+            tblVerordnung.setModel(new DefaultTableModel(
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
+            ) {
+                Class<?>[] columnTypes = new Class<?>[] {
+                    Object.class, Object.class, Object.class, Object.class
+                };
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    return columnTypes[columnIndex];
+                }
+            });
+            tblVerordnung.setToolTipText("");
+            tblVerordnung.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblVerordnungMousePressed(e);
+                }
+            });
+            jspVerordnung.setViewportView(tblVerordnung);
+        }
 
-        cbOhneMedi.setSelected(true);
-        cbOhneMedi.setText("ohne Medikamente");
-        cbOhneMedi.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbOhneMedi.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbOhneMedi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbOhneMediActionPerformed(evt);
-            }
-        });
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-        cbBedarf.setSelected(true);
-        cbBedarf.setText("bei Bedarf");
-        cbBedarf.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbBedarf.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbBedarf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBedarfActionPerformed(evt);
-            }
-        });
+            //---- cbOhneMedi ----
+            cbOhneMedi.setSelected(true);
+            cbOhneMedi.setText("ohne Medikamente");
+            cbOhneMedi.setBorder(BorderFactory.createEmptyBorder());
+            cbOhneMedi.setMargin(new Insets(0, 0, 0, 0));
+            cbOhneMedi.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbOhneMediActionPerformed(e);
+                }
+            });
 
-        cbMedi.setSelected(true);
-        cbMedi.setText("mit Medikamenten");
-        cbMedi.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbMedi.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbMedi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbMediActionPerformed(evt);
-            }
-        });
+            //---- cbBedarf ----
+            cbBedarf.setSelected(true);
+            cbBedarf.setText("bei Bedarf");
+            cbBedarf.setBorder(BorderFactory.createEmptyBorder());
+            cbBedarf.setMargin(new Insets(0, 0, 0, 0));
+            cbBedarf.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbBedarfActionPerformed(e);
+                }
+            });
 
-        cbAbgesetzt.setText("Abgesetzte");
-        cbAbgesetzt.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbAbgesetzt.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbAbgesetzt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbAbgesetztActionPerformed(evt);
-            }
-        });
+            //---- cbMedi ----
+            cbMedi.setSelected(true);
+            cbMedi.setText("mit Medikamenten");
+            cbMedi.setBorder(BorderFactory.createEmptyBorder());
+            cbMedi.setMargin(new Insets(0, 0, 0, 0));
+            cbMedi.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbMediActionPerformed(e);
+                }
+            });
 
-        jLabel1.setText("fm - nachts, früh morgens | mo - morgens | mi - mittags");
+            //---- cbAbgesetzt ----
+            cbAbgesetzt.setText("Abgesetzte");
+            cbAbgesetzt.setBorder(BorderFactory.createEmptyBorder());
+            cbAbgesetzt.setMargin(new Insets(0, 0, 0, 0));
+            cbAbgesetzt.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbAbgesetztActionPerformed(e);
+                }
+            });
 
-        jLabel2.setText("nm - nachmittags | ab - abends | sa - nachts, spät abends");
+            //---- jLabel1 ----
+            jLabel1.setText("fm - nachts, fr\u00fch morgens | mo - morgens | mi - mittags");
 
-        cbRegel.setSelected(true);
-        cbRegel.setText("regelmäßig");
-        cbRegel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbRegel.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbRegel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbRegelActionPerformed(evt);
-            }
-        });
+            //---- jLabel2 ----
+            jLabel2.setText("nm - nachmittags | ab - abends | sa - nachts, sp\u00e4t abends");
 
-        jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
+            //---- cbRegel ----
+            cbRegel.setSelected(true);
+            cbRegel.setText("regelm\u00e4\u00dfig");
+            cbRegel.setBorder(BorderFactory.createEmptyBorder());
+            cbRegel.setMargin(new Insets(0, 0, 0, 0));
+            cbRegel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbRegelActionPerformed(e);
+                }
+            });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(cbAbgesetzt)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cbMedi)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cbOhneMedi)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cbBedarf)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cbRegel))
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                .addContainerGap(343, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbAbgesetzt)
-                                        .addComponent(cbMedi)
-                                        .addComponent(cbOhneMedi)
-                                        .addComponent(cbBedarf)
-                                        .addComponent(cbRegel))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+            //---- jLabel12 ----
+            jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(cbAbgesetzt)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbMedi)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbOhneMedi)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbBedarf)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbRegel))
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(343, Short.MAX_VALUE))
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbAbgesetzt)
+                            .addComponent(cbMedi)
+                            .addComponent(cbOhneMedi)
+                            .addComponent(cbBedarf)
+                            .addComponent(cbRegel))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+        }
+
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
 
-        jToolBar1.setFloatable(false);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filenew.png"))); // NOI18N
-        btnNew.setText("Neu");
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnNew);
+            //---- btnNew ----
+            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
+            btnNew.setText("Neu");
+            btnNew.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNewActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnNew);
 
-        btnBuchen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png"))); // NOI18N
-        btnBuchen.setText("Buchen");
-        btnBuchen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuchenActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnBuchen);
+            //---- btnBuchen ----
+            btnBuchen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")));
+            btnBuchen.setText("Buchen");
+            btnBuchen.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBuchenActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnBuchen);
 
-        btnVorrat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png"))); // NOI18N
-        btnVorrat.setText("Vorrat");
-        btnVorrat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnVorratActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnVorrat);
+            //---- btnVorrat ----
+            btnVorrat.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png")));
+            btnVorrat.setText("Vorrat");
+            btnVorrat.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnVorratActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnVorrat);
 
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png"))); // NOI18N
-        btnPrint.setText("Drucken");
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnPrint);
+            //---- btnPrint ----
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
+            btnPrint.setText("Drucken");
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnPrintActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnPrint);
 
-        btnStellplan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png"))); // NOI18N
-        btnStellplan.setText("Stellplan");
-        btnStellplan.setToolTipText("<html>Druckt den Plan zum Tabletten stellen für den <b>aktuellen</b> Tag und für <b>alle</b> BewohnerInnen.</html>");
-        btnStellplan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStellplanActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnStellplan);
+            //---- btnStellplan ----
+            btnStellplan.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
+            btnStellplan.setText("Stellplan");
+            btnStellplan.setToolTipText("<html>Druckt den Plan zum Tabletten stellen f\u00fcr den <b>aktuellen</b> Tag und f\u00fcr <b>alle</b> BewohnerInnen.</html>");
+            btnStellplan.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnStellplanActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnStellplan);
 
-        btnBestellungen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filefind.png"))); // NOI18N
-        btnBestellungen.setText("Bestellungen");
-        btnBestellungen.setToolTipText("Bestellungen für alle BewohnerInnen anzeigen.");
-        btnBestellungen.setEnabled(false);
-        btnBestellungen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBestellungenActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnBestellungen);
+            //---- btnBestellungen ----
+            btnBestellungen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filefind.png")));
+            btnBestellungen.setText("Bestellungen");
+            btnBestellungen.setToolTipText("Bestellungen f\u00fcr alle BewohnerInnen anzeigen.");
+            btnBestellungen.setEnabled(false);
+            btnBestellungen.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBestellungenActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnBestellungen);
 
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutbtnLogoutHandler(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
+            //---- btnLogout ----
+            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
+            btnLogout.setText("Abmelden");
+            btnLogout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnLogoutbtnLogoutHandler(e);
+                }
+            });
+            jToolBar1.add(btnLogout);
+        }
 
-        btnLock.setBackground(new java.awt.Color(255, 255, 255));
-        btnLock.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png"))); // NOI18N
+        //---- btnLock ----
+        btnLock.setBackground(Color.white);
+        btnLock.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png")));
         btnLock.setBorder(null);
         btnLock.setBorderPainted(false);
-        btnLock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLockActionPerformed(evt);
+        btnLock.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnLockActionPerformed(e);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 967, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspVerordnung, javax.swing.GroupLayout.DEFAULT_SIZE, 927, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 967, Short.MAX_VALUE)
+                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnLock)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 927, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspVerordnung, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup()
+                        .addComponent(btnLock)
+                        .addComponent(lblBW))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -693,7 +744,7 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_btnVorratActionPerformed
 
     private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
-        initPanel();
+        change2Bewohner(bewohner);
     }//GEN-LAST:event_btnLockActionPerformed
 
     private void cbRegelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbRegelActionPerformed
@@ -805,27 +856,27 @@ public class PnlVerordnung extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBestellungen;
-    private javax.swing.JButton btnBuchen;
-    private javax.swing.JButton btnLock;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnNew;
-    private javax.swing.JButton btnPrint;
-    private javax.swing.JButton btnStellplan;
-    private javax.swing.JButton btnVorrat;
-    private javax.swing.JCheckBox cbAbgesetzt;
-    private javax.swing.JCheckBox cbBedarf;
-    private javax.swing.JCheckBox cbMedi;
-    private javax.swing.JCheckBox cbOhneMedi;
-    private javax.swing.JCheckBox cbRegel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JScrollPane jspVerordnung;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JTable tblVerordnung;
+    private JScrollPane jspVerordnung;
+    private JTable tblVerordnung;
+    private JPanel jPanel1;
+    private JCheckBox cbOhneMedi;
+    private JCheckBox cbBedarf;
+    private JCheckBox cbMedi;
+    private JCheckBox cbAbgesetzt;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JCheckBox cbRegel;
+    private JLabel jLabel12;
+    private JLabel lblBW;
+    private JToolBar jToolBar1;
+    private JButton btnNew;
+    private JButton btnBuchen;
+    private JButton btnVorrat;
+    private JButton btnPrint;
+    private JButton btnStellplan;
+    private JButton btnBestellungen;
+    private JButton btnLogout;
+    private JButton btnLock;
     // End of variables declaration//GEN-END:variables
 
     class HandleSelections implements ListSelectionListener {
