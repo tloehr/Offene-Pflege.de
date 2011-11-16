@@ -9,6 +9,8 @@
         <class>entity.Sysbwi2file</class>
         <class>entity.Syspb2file</class>
         <class>entity.SYSPB2VORGANG</class>
+        <class>entity.SYSBWerte2VORGANG</class>
+        <class>entity.SYSVER2VORGANG</class>
         <class>entity.Bewohner</class>
         <class>entity.Sysbw2file</class>
         <class>entity.BWInfoKat</class>

@@ -5,50 +5,39 @@
 
 package entity;
 
+import op.tools.SYSConst;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "BHPVerordnung")
 @NamedQueries({
-    @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Verordnung b"),
-    @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Verordnung b WHERE b.verID = :verID"),
-    @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Verordnung b WHERE b.anDatum = :anDatum"),
-    @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Verordnung b WHERE b.abDatum = :abDatum"),
-    @NamedQuery(name = "Verordnung.findByAnKHID", query = "SELECT b FROM Verordnung b WHERE b.anKHID = :anKHID"),
-    @NamedQuery(name = "Verordnung.findByAbKHID", query = "SELECT b FROM Verordnung b WHERE b.abKHID = :abKHID"),
-    @NamedQuery(name = "Verordnung.findByAnArztID", query = "SELECT b FROM Verordnung b WHERE b.anArztID = :anArztID"),
-    @NamedQuery(name = "Verordnung.findByAbArztID", query = "SELECT b FROM Verordnung b WHERE b.abArztID = :abArztID"),
-    @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
-    @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
-    @NamedQuery(name = "Verordnung.findByMassID", query = "SELECT b FROM Verordnung b WHERE b.massID = :massID"),
-    @NamedQuery(name = "Verordnung.findByDafID", query = "SELECT b FROM Verordnung b WHERE b.dafID = :dafID"),
-    @NamedQuery(name = "Verordnung.findBySitID", query = "SELECT b FROM Verordnung b WHERE b.sitID = :sitID"),
-    @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
+        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Verordnung b"),
+        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Verordnung b WHERE b.verID = :verID"),
+        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Verordnung b WHERE b.anDatum = :anDatum"),
+        @NamedQuery(name = "Verordnung.findByVorgang", query = " "
+                + " SELECT v, av.pdca FROM Verordnung ve "
+                + " JOIN ve.attachedVorgaenge av"
+                + " JOIN av.vorgang v"
+                + " WHERE v = :vorgang "),
+        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Verordnung b WHERE b.abDatum = :abDatum"),
+        @NamedQuery(name = "Verordnung.findByAnKHID", query = "SELECT b FROM Verordnung b WHERE b.anKHID = :anKHID"),
+        @NamedQuery(name = "Verordnung.findByAbKHID", query = "SELECT b FROM Verordnung b WHERE b.abKHID = :abKHID"),
+        @NamedQuery(name = "Verordnung.findByAnArztID", query = "SELECT b FROM Verordnung b WHERE b.anArztID = :anArztID"),
+        @NamedQuery(name = "Verordnung.findByAbArztID", query = "SELECT b FROM Verordnung b WHERE b.abArztID = :abArztID"),
+        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
+        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
+        @NamedQuery(name = "Verordnung.findByMassID", query = "SELECT b FROM Verordnung b WHERE b.massID = :massID"),
+        @NamedQuery(name = "Verordnung.findByDafID", query = "SELECT b FROM Verordnung b WHERE b.dafID = :dafID"),
+        @NamedQuery(name = "Verordnung.findBySitID", query = "SELECT b FROM Verordnung b WHERE b.sitID = :sitID"),
+        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
 public class Verordnung implements Serializable, VorgangElement {
     private static final long serialVersionUID = 1L;
     @Id
@@ -95,7 +84,9 @@ public class Verordnung implements Serializable, VorgangElement {
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
-    private Collection<Sysver2file> verFilesCollection;
+    private Collection<Sysver2file> attachedFiles;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    private Collection<SYSVER2VORGANG> attachedVorgaenge;
     // ==
     // N:1 Relationen
     // ==
@@ -108,19 +99,11 @@ public class Verordnung implements Serializable, VorgangElement {
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Bewohner bewohner;
-    // ==
-    // M:N Relationen
-    // ==
-    @ManyToMany
-    @JoinTable(name = "SYSVER2VORGANG", joinColumns =
-    @JoinColumn(name = "VerID"), inverseJoinColumns =
-    @JoinColumn(name = "VorgangID"))
-    private Collection<Vorgaenge> vorgaenge;
 
     public Verordnung() {
     }
 
-  
+
     public Long getVerID() {
         return verID;
     }
@@ -249,12 +232,16 @@ public class Verordnung implements Serializable, VorgangElement {
         this.angesetztDurch = angesetztDurch;
     }
 
-    public Collection<Sysver2file> getVerFilesCollection() {
-        return verFilesCollection;
+    public Collection<Sysver2file> getAttachedFiles() {
+        return attachedFiles;
     }
 
-    public Collection<Vorgaenge> getVorgaenge() {
-        return vorgaenge;
+    public Collection<SYSVER2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
+    }
+
+    public boolean isAbgesetzt() {
+        return abDatum.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
     @Override
@@ -278,7 +265,7 @@ public class Verordnung implements Serializable, VorgangElement {
     public long getID() {
         return verID;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

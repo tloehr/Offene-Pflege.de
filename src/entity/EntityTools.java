@@ -69,4 +69,18 @@ public class EntityTools {
         }
         return success;
     }
+
+    public static boolean refresh(Object entity) {
+        boolean success = false;
+
+        try {
+            OPDE.getEM().getTransaction().begin();
+            OPDE.getEM().refresh(entity);
+            OPDE.getEM().getTransaction().commit();
+            success = true;
+        } catch (Exception e) {
+            OPDE.getEM().getTransaction().rollback();
+        }
+        return success;
+    }
 }

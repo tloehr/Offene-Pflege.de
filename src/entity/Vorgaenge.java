@@ -79,6 +79,9 @@ public class Vorgaenge implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<SYSPB2VORGANG> attachedPflegeberichte;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    private Collection<SYSVER2VORGANG> attachedVerordnungen;
+
     // ==
     // M:N Relationen
     // ==
@@ -87,26 +90,26 @@ public class Vorgaenge implements Serializable {
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "PBID"))
 //    private Collection<Pflegeberichte> pflegeberichte;
-    @ManyToMany
-    @JoinTable(name = "SYSBWI2VORGANG", joinColumns =
-    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-    @JoinColumn(name = "BWInfoID"))
-    private Collection<BWInfo> bwinfos;
-    @ManyToMany
-    @JoinTable(name = "SYSPLAN2VORGANG", joinColumns =
-    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-    @JoinColumn(name = "PlanID"))
-    private Collection<Planung> planungen;
-    @ManyToMany
-    @JoinTable(name = "SYSVER2VORGANG", joinColumns =
-    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-    @JoinColumn(name = "VerID"))
-    private Collection<Verordnung> verordnungen;
-    @ManyToMany
-    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
-    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-    @JoinColumn(name = "BWID"))
-    private Collection<BWerte> bwerte;
+//    @ManyToMany
+//    @JoinTable(name = "SYSBWI2VORGANG", joinColumns =
+//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
+//    @JoinColumn(name = "BWInfoID"))
+//    private Collection<BWInfo> bwinfos;
+//    @ManyToMany
+//    @JoinTable(name = "SYSPLAN2VORGANG", joinColumns =
+//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
+//    @JoinColumn(name = "PlanID"))
+//    private Collection<Planung> planungen;
+//    @ManyToMany
+//    @JoinTable(name = "SYSVER2VORGANG", joinColumns =
+//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
+//    @JoinColumn(name = "VerID"))
+//    private Collection<Verordnung> verordnungen;
+//    @ManyToMany
+//    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
+//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
+//    @JoinColumn(name = "BWID"))
+//    private Collection<BWerte> bwerte;
 
     public Vorgaenge() {
     }
@@ -201,22 +204,6 @@ public class Vorgaenge implements Serializable {
 
     public void setKategorie(VKat kategorie) {
         this.kategorie = kategorie;
-    }
-
-    public Collection<BWerte> getBwerte() {
-        return bwerte;
-    }
-
-    public Collection<BWInfo> getBwinfos() {
-        return bwinfos;
-    }
-
-    public Collection<Planung> getPlanungen() {
-        return planungen;
-    }
-
-    public Collection<Verordnung> getVerordnungen() {
-        return verordnungen;
     }
 
     public boolean isAbgeschlossen(){

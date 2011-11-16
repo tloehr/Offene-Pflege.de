@@ -26,9 +26,6 @@
  */
 package op.care.verordnung;
 
-import java.awt.event.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
 import entity.*;
 import op.OCSec;
 import op.OPDE;
@@ -36,21 +33,18 @@ import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.care.bhp.PnlBHP;
 import op.care.med.vorrat.*;
-import op.tools.DlgException;
-import op.tools.SYSConst;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
+import op.tools.*;
 
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -89,7 +83,11 @@ public class PnlVerordnung extends CleanablePanel {
     private boolean attachAllowed;
     private boolean infosAllowed;
     private boolean documentsAllowed;
-    private ActionListener fileActionListener;
+        /**
+     * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
+     * aufgerufen wurden, einen reloadTable() auslösen können.
+     */
+    private ActionListener standardActionListener;
     private SYSRunningClasses runningClass, blockingClass;
 
     /**
@@ -137,7 +135,7 @@ public class PnlVerordnung extends CleanablePanel {
         absetzenAllowed = false;
         attachAllowed = false;
         documentsAllowed = false;
-        fileActionListener = new ActionListener() {
+        standardActionListener = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 reloadTable();
@@ -190,19 +188,20 @@ public class PnlVerordnung extends CleanablePanel {
 
             //---- tblVerordnung ----
             tblVerordnung.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ) {
-                Class<?>[] columnTypes = new Class<?>[] {
-                    Object.class, Object.class, Object.class, Object.class
+                Class<?>[] columnTypes = new Class<?>[]{
+                        Object.class, Object.class, Object.class, Object.class
                 };
+
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     return columnTypes[columnIndex];
@@ -293,43 +292,43 @@ public class PnlVerordnung extends CleanablePanel {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
+                    jPanel1Layout.createParallelGroup()
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cbAbgesetzt)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbMedi)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbOhneMedi)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbBedarf)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbRegel))
-                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap(343, Short.MAX_VALUE))
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                    .addComponent(cbAbgesetzt)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbMedi)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbOhneMedi)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbBedarf)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbRegel))
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                    .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addContainerGap(343, Short.MAX_VALUE))
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbAbgesetzt)
-                            .addComponent(cbMedi)
-                            .addComponent(cbOhneMedi)
-                            .addComponent(cbBedarf)
-                            .addComponent(cbRegel))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(cbAbgesetzt)
+                                            .addComponent(cbMedi)
+                                            .addComponent(cbOhneMedi)
+                                            .addComponent(cbBedarf)
+                                            .addComponent(cbRegel))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel1)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel2)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
         }
 
@@ -438,36 +437,36 @@ public class PnlVerordnung extends CleanablePanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 967, Short.MAX_VALUE)
-                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnLock)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 927, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 967, Short.MAX_VALUE)
+                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnLock)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 927, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(layout.createParallelGroup()
-                        .addComponent(btnLock)
-                        .addComponent(lblBW))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup()
+                                        .addComponent(btnLock)
+                                        .addComponent(lblBW))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -703,15 +702,26 @@ public class PnlVerordnung extends CleanablePanel {
             }
         });
         menu.add(itemPopupPrint);
-
         if (singleRowSelected) {
-            menu.add(new JSeparator());
+            Verordnung verordnung = OPDE.getEM().find(Verordnung.class, currentVerID);
+            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
+                menu.add(new JSeparator());
+                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, standardActionListener));
+            }
 
-            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BHPVerordnung", currentVerID, bwkennung, fileActionListener));
-            Query query = OPDE.getEM().createNamedQuery("Verordnung.findByVerID");
-            query.setParameter("verID", currentVerID);
-            entity.Verordnung verordnung = (entity.Verordnung) query.getSingleResult();
-            menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, fileActionListener));
+            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
+                menu.add(new JSeparator());
+                menu.add(VorgaengeTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
+            }
+
+
+//            menu.add(new JSeparator());
+//
+//            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BHPVerordnung", currentVerID, bwkennung, fileActionListener));
+//            Query query = OPDE.getEM().createNamedQuery("Verordnung.findByVerID");
+//            query.setParameter("verID", currentVerID);
+//            entity.Verordnung verordnung = (entity.Verordnung) query.getSingleResult();
+//            menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, fileActionListener));
         }
 
         menu.add(new JSeparator());

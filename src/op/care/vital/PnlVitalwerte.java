@@ -867,7 +867,6 @@ public class PnlVitalwerte extends CleanablePanel {
                     menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerWert, bewohner, standardActionListener));
                 }
 
-
             }
         }
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());

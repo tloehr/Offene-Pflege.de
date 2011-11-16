@@ -13,11 +13,11 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {comp jToolBar1::l::581:x, seq l {space :::p, comp lblBW::::541:x, space :::p}, seq t {space :::p, par t {comp jspHTML::l::541:x, comp jPanel1::l:::x}, space :::p}}</string> 
+        <string>par l {comp jToolBar1::l::469:x, seq l {space :::p, comp lblBW::::429:x, space :::p}, seq t {space :::p, par t {comp jspHTML::l::429:x, comp jPanel1::l:::x}, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, comp lblBW:::p::p, space :::p, comp jPanel1:::p::p, space :::p, comp jspHTML::::290:x, space :::p}}</string> 
+        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, comp lblBW:::p::p, space :::p, comp jPanel1:::p::p, space :::p, comp jspHTML::::143:x, space :::p}}</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -35,33 +35,6 @@
         </void> 
         <void property="name"> 
          <string>jToolBar1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/22x22/lock.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Abmelden</string> 
-          </void> 
-          <void property="name"> 
-           <string>btnLogout</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnLogoutActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
@@ -155,7 +128,7 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, comp cbMedi:::p::p, space :::p, comp cbBilanz:::p::p, space :::p, comp cbBerichte:::p::p, space :::p, comp cbBWInfo:::p::p, space ::128:x}}</string> 
+          <string>par l {seq l {space :::p, comp cbMedi:::p::p, space :::p, comp cbBilanz:::p::p, space :::p, comp cbBerichte:::p::p, space :::p, comp cbBWInfo:::p::p, space :::x}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
@@ -269,6 +242,13 @@
        <object class="java.awt.Dimension"> 
         <int>400</int> 
         <int>300</int> 
+       </object> 
+      </void> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>0</int> 
        </object> 
       </void> 
      </object> 

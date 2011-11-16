@@ -26,6 +26,7 @@
  */
 package op.care.berichte;
 
+import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -83,7 +84,7 @@ public class PnlBerichte extends CleanablePanel {
 
     private int laufendeOperation;
     private double splitTEPercent, splitBCPercent;
-    private boolean searchAreaVisible;
+    private boolean searchAreaVisible, singleRowSelected;
 
     /**
      * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
@@ -127,6 +128,7 @@ public class PnlBerichte extends CleanablePanel {
         this.aktuellerBericht = null;
         this.editBericht = null;
         this.dauerChanged = false;
+        this.singleRowSelected = false;
 
 
         initComponents();
@@ -201,10 +203,7 @@ public class PnlBerichte extends CleanablePanel {
                 }
             }
         });
-    }
-
-    private void btnDetailsItemStateChanged(ItemEvent e) {
-        // TODO add your code here
+        txtBericht.requestFocus();
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
@@ -214,6 +213,7 @@ public class PnlBerichte extends CleanablePanel {
             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                 if (newState == Timeline.TimelineState.DONE) {
                     btnSearch.setEnabled(true);
+                    btnAddBericht.setEnabled(true);
                 }
             }
         };
@@ -223,8 +223,6 @@ public class PnlBerichte extends CleanablePanel {
                     if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE) {
                         lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
                     }
-//                } else if (PBerichtTAGSTools.isSozial(aktuellerBericht) && !dauerChanged) {
-//                    SYSTools.flashLabel(lblBW, "Bei Sozialberichten müssen Sie immer die Dauer setzen.", 6, Color.ORANGE);
                 } else {
                     success = EntityTools.persist(aktuellerBericht);
                     splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
@@ -355,12 +353,12 @@ public class PnlBerichte extends CleanablePanel {
         jdcDatum.setMaxSelectableDate(now);
         txtUhrzeit.setText(df.format(editBericht.getPit()));
         txtBericht.setText(editBericht.getText());
-        txtBericht.requestFocus();
 
         initPhase = false;
         textmessageTL = SYSTools.flashLabel(lblMessage, "Geänderten Bericht speichern ?");
         splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
         splitTEPercent = SYSTools.showSide(splitTableEditor, 0.4d, speedFast, null);
+        txtBericht.requestFocus();
     }
 
     private void btnSearchActionPerformed(ActionEvent e) {
@@ -400,6 +398,13 @@ public class PnlBerichte extends CleanablePanel {
         } else {
             SYSTools.showSide(splitSearchEdit, SYSTools.RIGHT_LOWER_SIDE);
         }
+    }
+
+    private void tblTBMouseReleased(MouseEvent e) {
+        ListSelectionModel lsm = tblTB.getSelectionModel();
+        singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -478,8 +483,8 @@ public class PnlBerichte extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default:grow, 0dlu, $rgap",
-                "fill:default, $lgap, fill:default:grow, $lgap, 0dlu"));
+            "default:grow, 0dlu, $rgap",
+            "fill:default, $lgap, fill:default:grow, $lgap, 0dlu"));
 
         //======== splitSearchEdit ========
         {
@@ -500,8 +505,8 @@ public class PnlBerichte extends CleanablePanel {
             //======== pnlContent ========
             {
                 pnlContent.setLayout(new FormLayout(
-                        "pref:grow",
-                        "fill:default:grow, 20dlu"));
+                    "pref:grow",
+                    "fill:default:grow, 20dlu"));
 
                 //======== splitTableEditor ========
                 {
@@ -525,20 +530,19 @@ public class PnlBerichte extends CleanablePanel {
 
                         //---- tblTB ----
                         tblTB.setModel(new DefaultTableModel(
-                                new Object[][]{
-                                        {null, null, null, null},
-                                        {null, null, null, null},
-                                        {null, null, null, null},
-                                        {null, null, null, null},
-                                },
-                                new String[]{
-                                        "Title 1", "Title 2", "Title 3", "Title 4"
-                                }
+                            new Object[][] {
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                            },
+                            new String[] {
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                         ) {
-                            Class<?>[] columnTypes = new Class<?>[]{
-                                    Object.class, Object.class, Object.class, Object.class
+                            Class<?>[] columnTypes = new Class<?>[] {
+                                Object.class, Object.class, Object.class, Object.class
                             };
-
                             @Override
                             public Class<?> getColumnClass(int columnIndex) {
                                 return columnTypes[columnIndex];
@@ -549,6 +553,10 @@ public class PnlBerichte extends CleanablePanel {
                             public void mousePressed(MouseEvent e) {
                                 tblTBMousePressed(e);
                             }
+                            @Override
+                            public void mouseReleased(MouseEvent e) {
+                                tblTBMouseReleased(e);
+                            }
                         });
                         jspTblTB.setViewportView(tblTB);
                     }
@@ -557,8 +565,8 @@ public class PnlBerichte extends CleanablePanel {
                     //======== panel1 ========
                     {
                         panel1.setLayout(new FormLayout(
-                                "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
-                                "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
+                            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
+                            "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
 
                         //---- label1 ----
                         label1.setText("Datum");
@@ -608,7 +616,6 @@ public class PnlBerichte extends CleanablePanel {
                             public void focusGained(FocusEvent e) {
                                 txtDauerFocusGained(e);
                             }
-
                             @Override
                             public void focusLost(FocusEvent e) {
                                 txtDauerFocusLost(e);
@@ -618,6 +625,14 @@ public class PnlBerichte extends CleanablePanel {
 
                         //======== scrollPane1 ========
                         {
+
+                            //---- txtBericht ----
+                            txtBericht.addCaretListener(new CaretListener() {
+                                @Override
+                                public void caretUpdate(CaretEvent e) {
+                                    txtBerichtCaretUpdate(e);
+                                }
+                            });
                             scrollPane1.setViewportView(txtBericht);
                         }
                         panel1.add(scrollPane1, CC.xywh(3, 9, 3, 1, CC.FILL, CC.FILL));
@@ -825,7 +840,7 @@ public class PnlBerichte extends CleanablePanel {
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
             TMPflegeberichte tm = (TMPflegeberichte) tblTB.getModel();
-            out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel))));
+            out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false)));
 
             out.close();
             SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
@@ -841,7 +856,7 @@ public class PnlBerichte extends CleanablePanel {
         Point p = evt.getPoint();
         ListSelectionModel lsm = tblTB.getSelectionModel();
 
-        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+        singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
         int row = tblTB.rowAtPoint(p);
         if (singleRowSelected) {
@@ -1151,8 +1166,8 @@ public class PnlBerichte extends CleanablePanel {
             query.setParameter("search", "%" + search + "%");
         }
 
-
         tblTB.setModel(new TMPflegeberichte(query, cbShowIDs.isSelected()));
+
         //OPDE.debug("tl: "+tl.getState());
 //        if (tl.getState() == Timeline.TimelineState.READY){
 //            OPDE.debug("ready");

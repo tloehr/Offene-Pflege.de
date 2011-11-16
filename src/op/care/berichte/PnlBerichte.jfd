@@ -273,6 +273,14 @@
                   <boolean>true</boolean> 
                  </object> 
                 </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>java.awt.event.MouseListener</string> 
+                  <string>mouseReleased</string> 
+                  <string>tblTBMouseReleased</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
                </object> 
               </void> 
              </object> 
@@ -539,6 +547,14 @@
                   <string>javax.swing.JTextArea</string> 
                   <void property="name"> 
                    <string>txtBericht</string> 
+                  </void> 
+                  <void method="addEvent"> 
+                   <object class="com.jformdesigner.model.FormEvent"> 
+                    <string>javax.swing.event.CaretListener</string> 
+                    <string>caretUpdate</string> 
+                    <string>txtBerichtCaretUpdate</string> 
+                    <boolean>true</boolean> 
+                   </object> 
                   </void> 
                  </object> 
                 </void> 

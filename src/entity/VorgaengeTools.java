@@ -7,7 +7,6 @@ package entity;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
-import sun.rmi.rmic.newrmic.Main;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -80,6 +79,14 @@ public class VorgaengeTools {
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
+        query = OPDE.getEM().createNamedQuery("BWerte.findByVorgang");
+        query.setParameter("vorgang", vorgang);
+        elements.addAll(query.getResultList());
+
+        query = OPDE.getEM().createNamedQuery("Verordnung.findByVorgang");
+        query.setParameter("vorgang", vorgang);
+        elements.addAll(query.getResultList());
+
         Collections.sort(elements, elementsComparator);
 
         return elements;
@@ -125,16 +132,16 @@ public class VorgaengeTools {
         }
     }
 
-    public static Vorgaenge createVorgang(String title, VKat vkat, Bewohner bw){
+    public static Vorgaenge createVorgang(String title, VKat vkat, Bewohner bw) {
         Vorgaenge vorgang = new Vorgaenge(title, bw, vkat);
         VBericht vbericht = new VBericht("Neuen Vorgang erstellt.", VBerichtTools.VBERICHT_ART_CREATE, vorgang);
 
         OPDE.getEM().getTransaction().begin();
-        try{
+        try {
             OPDE.getEM().persist(vorgang);
             OPDE.getEM().persist(vbericht);
             OPDE.getEM().getTransaction().commit();
-        } catch (Exception e){
+        } catch (Exception e) {
             OPDE.getEM().getTransaction().rollback();
         }
         return vorgang;
@@ -147,12 +154,17 @@ public class VorgaengeTools {
      * @param vorgang
      */
     public static void add(VorgangElement element, Vorgaenge vorgang) {
-
         Object connectionObject = null;
         String elementBezeichnung = "";
         if (element instanceof Pflegeberichte) {
             connectionObject = new SYSPB2VORGANG(vorgang, (Pflegeberichte) element);
             elementBezeichnung = "Pflegebericht";
+        } else if (element instanceof BWerte) {
+            connectionObject = new SYSBWerte2VORGANG(vorgang, (BWerte) element);
+            elementBezeichnung = "Bewohner Wert";
+        } else if (element instanceof Verordnung) {
+            connectionObject = new SYSVER2VORGANG(vorgang, (Verordnung) element);
+            elementBezeichnung = "Ärztliche Verordnung";
         } else {
 
         }
@@ -177,6 +189,10 @@ public class VorgaengeTools {
         // Connection Objekt korregieren
         if (element instanceof Pflegeberichte) {
             ((SYSPB2VORGANG) connectionObject).setPdca(pdca);
+        } else if (element instanceof BWerte) {
+            ((SYSBWerte2VORGANG) connectionObject).setPdca(pdca);
+        } else if (element instanceof Verordnung) {
+            ((SYSVER2VORGANG) connectionObject).setPdca(pdca);
         } else {
 
         }
@@ -186,6 +202,10 @@ public class VorgaengeTools {
         VBericht vbericht = new VBericht("Neue Zuordnung wurde vorgenommen für: " + elementBezeichnung + " ID: " + element.getID(), VBerichtTools.VBERICHT_ART_ASSIGN_ELEMENT, vorgang);
         vbericht.setPdca(pdca);
         EntityTools.persist(vbericht);
+
+        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
+        // Daher muss das Objekt hier manuell neu gelesen werden.
+        EntityTools.refresh(element);
     }
 
     /**
@@ -201,6 +221,12 @@ public class VorgaengeTools {
         if (element instanceof Pflegeberichte) {
             query = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Pflegebericht";
+        } else if (element instanceof BWerte) {
+            query = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findByElementAndVorgang");
+            elementBezeichnung = "Bewohner Wert";
+        } else if (element instanceof Verordnung) {
+            query = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findByElementAndVorgang");
+            elementBezeichnung = "Ärztliche Verordnung";
         } else {
 
         }
@@ -224,6 +250,10 @@ public class VorgaengeTools {
             vbericht.setPdca(pdca);
             EntityTools.persist(vbericht);
         }
+
+        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
+        // Daher muss das Objekt hier manuell neu gelesen werden.
+        EntityTools.refresh(element);
     }
 
     public static void setWVVorgang(Vorgaenge vorgang, Date wv) {
@@ -286,7 +316,7 @@ public class VorgaengeTools {
                     if (!txt.getText().trim().isEmpty()) {
                         Vorgaenge vorgang = createVorgang(txt.getText(), kat, bw);
                         add(finalElement, vorgang);
-                        OPDE.debug("Vorgang '"+vorgang.getTitel()+"' für Bewohner '"+bw.getBWKennung()+"' angelegt. Element mit ID "+finalElement.getID()+" zugeordnet.");
+                        OPDE.debug("Vorgang '" + vorgang.getTitel() + "' für Bewohner '" + bw.getBWKennung() + "' angelegt. Element mit ID " + finalElement.getID() + " zugeordnet.");
                     }
                 }
             });
@@ -322,6 +352,10 @@ public class VorgaengeTools {
         Query complement = null;
         if (element instanceof Pflegeberichte) {
             complement = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof BWerte) {
+            complement = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof BWerte) {
+            complement = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             complement = null;
         }
@@ -359,6 +393,10 @@ public class VorgaengeTools {
         Query query = null;
         if (element instanceof Pflegeberichte) {
             query = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof BWerte) {
+            query = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof BWerte) {
+            query = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             query = null;
         }

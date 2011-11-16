@@ -213,17 +213,17 @@ public class DBHandling {
 
         if (medi) {
             TMVerordnung tmv = new TMVerordnung(bwkennung, false, true, true, true, true, false);
-            result += op.care.verordnung.DBHandling.getVerordnungenAsHTML(tmv, null, null);
+            result += op.care.verordnung.DBHandling.getVerordnungenAsHTML(tmv, bewohner, null);
         }
 
         if (bericht) {
 
-            Query query = OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerWithinPeriodSpecialsOnly");
+            Query query = OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerWithinPeriod");
             query.setParameter("bewohner", bewohner);
             query.setParameter("von", SYSCalendar.addDate(new Date(), -7));
             query.setParameter("bis", new Date());
 
-            result += PflegeberichteTools.getBerichteAsHTML(query.getResultList());
+            result += PflegeberichteTools.getBerichteAsHTML(query.getResultList(), true);
 
         }
 

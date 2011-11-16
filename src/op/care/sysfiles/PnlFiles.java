@@ -65,7 +65,7 @@ public class PnlFiles extends CleanablePanel {
     public PnlFiles(FrmPflege pflege, Bewohner bewohner) {
         initComponents();
         this.bewohner = bewohner;
-        bewohner = OPDE.getEM().find(Bewohner.class, bewohner);
+        bewohner = OPDE.getEM().find(Bewohner.class, bewohner.getBWKennung());
         this.parent = pflege;
         BewohnerTools.setBWLabel(lblBW, bewohner);
         tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

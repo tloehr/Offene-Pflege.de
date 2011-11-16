@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -22,20 +23,7 @@ import java.util.Date;
         @NamedQuery(name = "Pflegeberichte.findAll", query = "SELECT p FROM Pflegeberichte p"),
         @NamedQuery(name = "Pflegeberichte.findByPbid", query = "SELECT p FROM Pflegeberichte p WHERE p.pbid = :pbid"),
         @NamedQuery(name = "Pflegeberichte.findFirst", query = "SELECT p FROM Pflegeberichte p WHERE p.pbid = :pbid"),
-        /**
-         * Ermittelt Pflegeberichte eines Bewohner innerhalb eines bestimmten Zeitraums.
-         * Nur die als Besonders markiert sind. Wird für dem Überleitbogen benötigt.
-         * Da braucht man die gelöschten und geänderten sowieso nicht.
-         */
-        @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriodSpecialsOnly", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
-                + " AND p.editedBy is null AND p.tags IN (SELECT p1.tags FROM PBerichtTAGS t JOIN t.pflegeberichte p1 WHERE p1=p AND t.besonders = TRUE) "
-                + " ORDER BY p.pit DESC "),
-        /**
-         * Ermittelt Pflegeberichte eines Bewohner innerhalb eines bestimmten Zeitraums.
-         * Nur die als Besonders markiert sind.
-         */
+
         @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriod", query = " "
                 + " SELECT p FROM Pflegeberichte p "
                 + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
@@ -66,15 +54,15 @@ import java.util.Date;
                 + " AND p.text like :search "
                 + " AND p.editedBy is null "
                 + " ORDER BY p.pit DESC "),
-        /**
-         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
-         */
-        @NamedQuery(name = "Pflegeberichte.findByBewohnerAndTagsWithoutEdits", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner "
-                + " AND p.tags IN (SELECT p1.tags FROM PBerichtTAGS t JOIN t.pflegeberichte p1 WHERE p1=p and t.pbtagid IN (1,5,7,9))"
-                + " AND p.editedBy is null "
-                + " ORDER BY p.pit DESC "),
+//        /**
+//         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
+//         */
+//        @NamedQuery(name = "Pflegeberichte.findByBewohnerAndTagsWithoutEdits", query = " "
+//                + " SELECT p FROM Pflegeberichte p "
+//                + " WHERE p.bewohner = :bewohner "
+//                + " AND p.tags IN (SELECT p1.tags FROM PBerichtTAGS t JOIN t.pflegeberichte p1 WHERE p1=p and t.pbtagid IN (1,5,7,9))"
+//                + " AND p.editedBy is null "
+//                + " ORDER BY p.pit DESC "),
         /**
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
@@ -286,6 +274,16 @@ public class Pflegeberichte implements Serializable, VorgangElement {
 
     public void setAttachedFiles(Collection<Syspb2file> attachedFiles) {
         this.attachedFiles = attachedFiles;
+    }
+
+    public boolean isBesonders(){
+        boolean found = false;
+
+        Iterator<PBerichtTAGS> it = tags.iterator();
+        while (!found && it.hasNext()){
+            found = it.next().isBesonders();
+        }
+        return found;
     }
 
     /**

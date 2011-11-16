@@ -548,6 +548,10 @@ public class SYSCalendar {
         return schicht;
     }
 
+    public static int ermittleSchicht(Date date) {
+        return ermittleSchicht(date.getTime());
+    }
+
     public static String getHTMLColor4Schicht(int schicht) {
         String color = "";
         switch (schicht) {

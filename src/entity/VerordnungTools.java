@@ -110,8 +110,7 @@ public class VerordnungTools {
      */
     private static String getStellplan(ResultSet rs) {
 
-        // TODO: Kandidat für SYSProps
-        int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = 23;
+        int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
 
         int elementNumber = 1;
         boolean pagebreak = false;

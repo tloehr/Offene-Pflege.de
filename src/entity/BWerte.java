@@ -4,46 +4,37 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "BWerte")
 @NamedQueries({
-    @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM BWerte b"),
-    @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM BWerte b WHERE b.bwid = :bwid"),
-    @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM BWerte b WHERE b.pit = :pit"),
-    @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM BWerte b WHERE b.wert = :wert"),
-    @NamedQuery(name = "BWerte.findByBeziehung", query = "SELECT b FROM BWerte b WHERE b.beziehung = :beziehung"),
-    @NamedQuery(name = "BWerte.findBySortierung", query = "SELECT b FROM BWerte b WHERE b.sortierung = :sortierung"),
-    @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM BWerte b WHERE b.replacedBy = :replacedBy"),
-    @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM BWerte b WHERE b.replacementFor = :replacementFor"),
-    @NamedQuery(name = "BWerte.findByEditBy", query = "SELECT b FROM BWerte b WHERE b.editBy = :editBy"),
-    @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM BWerte b WHERE b.cdate = :cdate"),
-    @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM BWerte b WHERE b.mdate = :mdate")})
+        @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM BWerte b"),
+        /**
+         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
+         */
+        @NamedQuery(name = "BWerte.findByVorgang", query = " "
+                + " SELECT b, av.pdca FROM BWerte b "
+                + " JOIN b.attachedVorgaenge av"
+                + " JOIN av.vorgang v"
+                + " WHERE v = :vorgang "),
+        @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM BWerte b WHERE b.bwid = :bwid"),
+        @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM BWerte b WHERE b.pit = :pit"),
+        @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM BWerte b WHERE b.wert = :wert"),
+        @NamedQuery(name = "BWerte.findByBeziehung", query = "SELECT b FROM BWerte b WHERE b.beziehung = :beziehung"),
+        @NamedQuery(name = "BWerte.findBySortierung", query = "SELECT b FROM BWerte b WHERE b.sortierung = :sortierung"),
+        @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM BWerte b WHERE b.replacedBy = :replacedBy"),
+        @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM BWerte b WHERE b.replacementFor = :replacementFor"),
+        @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM BWerte b WHERE b.cdate = :cdate"),
+        @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM BWerte b WHERE b.mdate = :mdate")})
 public class BWerte implements Serializable, VorgangElement {
 
     private static final long serialVersionUID = 1L;
@@ -70,14 +61,6 @@ public class BWerte implements Serializable, VorgangElement {
     @Column(name = "XML")
     private String xml;
     @Basic(optional = false)
-    @Column(name = "ReplacedBy")
-    private long replacedBy;
-    @Basic(optional = false)
-    @Column(name = "ReplacementFor")
-    private long replacementFor;
-    @Column(name = "EditBy")
-    private String editBy;
-    @Basic(optional = false)
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date cdate;
@@ -85,6 +68,18 @@ public class BWerte implements Serializable, VorgangElement {
     @Column(name = "_mdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
+    // ==
+    // 1:N Relationen
+    // ==
+    @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users editedBy;
+    @JoinColumn(name = "ReplacedBy", referencedColumnName = "BWID")
+    @OneToOne
+    private BWerte replacedBy;
+    @JoinColumn(name = "ReplacementFor", referencedColumnName = "BWID")
+    @OneToOne
+    private BWerte replacementFor;
     // ==
     // N:1 Relationen
     // ==
@@ -94,14 +89,18 @@ public class BWerte implements Serializable, VorgangElement {
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Bewohner bewohner;
-    // ==
-    // M:N Relationen
-    // ==
-    @ManyToMany
-    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
-    @JoinColumn(name = "BWID"), inverseJoinColumns =
-    @JoinColumn(name = "VorgangID"))
-    private Collection<Vorgaenge> vorgaenge;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
+    private Collection<Sysbwerte2file> attachedFiles;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
+    private Collection<SYSBWerte2VORGANG> attachedVorgaenge;
+//    // ==
+//    // M:N Relationen
+//    // ==
+//    @ManyToMany
+//    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
+//    @JoinColumn(name = "BWID"), inverseJoinColumns =
+//    @JoinColumn(name = "VorgangID"))
+//    private Collection<Vorgaenge> vorgaenge;
 
     public BWerte() {
     }
@@ -162,28 +161,28 @@ public class BWerte implements Serializable, VorgangElement {
         this.xml = xml;
     }
 
-    public long getReplacedBy() {
+    public Users getEditedBy() {
+        return editedBy;
+    }
+
+    public void setEditedBy(Users editedBy) {
+        this.editedBy = editedBy;
+    }
+
+    public BWerte getReplacedBy() {
         return replacedBy;
     }
 
-    public void setReplacedBy(long replacedBy) {
+    public void setReplacedBy(BWerte replacedBy) {
         this.replacedBy = replacedBy;
     }
 
-    public long getReplacementFor() {
+    public BWerte getReplacementFor() {
         return replacementFor;
     }
 
-    public void setReplacementFor(long replacementFor) {
+    public void setReplacementFor(BWerte replacementFor) {
         this.replacementFor = replacementFor;
-    }
-
-    public String getEditBy() {
-        return editBy;
-    }
-
-    public void setEditBy(String editBy) {
-        this.editBy = editBy;
     }
 
     public Date getCdate() {
@@ -202,12 +201,28 @@ public class BWerte implements Serializable, VorgangElement {
         this.mdate = mdate;
     }
 
-    public Collection<Vorgaenge> getVorgaenge() {
-        return vorgaenge;
+    public Collection<Sysbwerte2file> getAttachedFiles() {
+        return attachedFiles;
+    }
+
+    public Collection<SYSBWerte2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
     }
 
     public Bewohner getBewohner() {
         return bewohner;
+    }
+
+    public boolean isReplaced() {
+        return replacedBy != null;
+    }
+
+    public boolean isReplacement() {
+        return replacementFor != null;
+    }
+
+    public boolean isDeleted() {
+        return editedBy != null && replacedBy == null && replacementFor == null;
     }
 
     public void setBewohner(Bewohner bewohner) {
@@ -229,14 +244,12 @@ public class BWerte implements Serializable, VorgangElement {
 
     @Override
     public String getContentAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        return BWerteTools.getAsHTML(this, false);
     }
 
     @Override
     public String getPITAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        return BWerteTools.getPITasHTML(this, false, false);
     }
 
     @Override

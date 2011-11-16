@@ -197,7 +197,7 @@ public class PflegeberichteTools {
         return html;
     }
 
-    public static String getBerichteAsHTML(List<Pflegeberichte> berichte) {
+    public static String getBerichteAsHTML(List<Pflegeberichte> berichte, boolean nurBesonderes) {
         String html = "";
 
         int num = berichte.size();
@@ -208,10 +208,14 @@ public class PflegeberichteTools {
             Iterator<Pflegeberichte> it = berichte.iterator();
             while (it.hasNext()) {
                 Pflegeberichte bericht = it.next();
-                html += "<tr>";
-                html += "<td>" + getDatumUndUser(bericht, false) + "</td>";
-                html += "<td>" + getAsHTML(bericht) + "</td>";
-                html += "</tr>";
+
+                if (!nurBesonderes || bericht.isBesonders()) {
+                    html += "<tr>";
+                    html += "<td>" + getDatumUndUser(bericht, false) + "</td>";
+                    html += "<td>" + getAsHTML(bericht) + "</td>";
+                    html += "</tr>";
+
+                }
 
             }
             html += "</table>";

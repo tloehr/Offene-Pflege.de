@@ -26,6 +26,8 @@
  */
 package op.care.vital;
 
+import entity.BWerte;
+import entity.BWerteTools;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
@@ -70,11 +72,9 @@ public class TMWerte
     public static final int COL_REPLACEDBY = 16;
     public static final int COL_REPLACEMENTFOR = 17;
     public static final int COL_EDITBY = 18;
-    public static final int COL_VORGANG_ANZAHL = 19;
-    public static final int COL_DATEIEN_ANZAHL = 20;
-    public static final int COL_EINHEIT = 21;
-    public static final int COL_MDATE = 22;
-    public static final int COL_NACHNAME = 23;
+    public static final int COL_EINHEIT = 19;
+    public static final int COL_MDATE = 20;
+    public static final int COL_NACHNAME = 21;
     public static final int TBL_PIT = 0;
     public static final int TBL_HTML = 1;
     public static final int TBL_OBJECT = 10;
@@ -210,7 +210,7 @@ public class TMWerte
                                 rs.getTimestamp("PIT"), currentBW, "Blutdruck und Puls",
                                 rrline, rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
                                 rs.getLong("BWID"), "<RR/>", sys, dia, puls, sysbwid, diabwid, pulsbwid, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                rs.getLong("ReplacementFor"), rs.getString("EditBy"),  "mmHg, S/m",
+                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), "mmHg, S/m",
                                 rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
                         };
                     } else {
@@ -219,7 +219,7 @@ public class TMWerte
                                 (rs.getDouble("Wert") == 0d ? "siehe Bemerkung" : new Double(rs.getDouble("Wert")).toString()),
                                 rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
                                 rs.getLong("BWID"), rs.getString("XML"), rs.getDouble("Wert"), 0d, 0d, 0L, 0L, 0L, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                rs.getLong("ReplacementFor"), rs.getString("EditBy"),  DBHandling.getBWertEinheit(rs.getString("XML")),
+                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), DBHandling.getBWertEinheit(rs.getString("XML")),
                                 rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
                         };
 
@@ -280,46 +280,15 @@ public class TMWerte
         }
 
         String fonthead = "<font " + color + ">";
+        BWerte bwert = BWerteTools.findByID(bwid);
 
         switch (c) {
             case TBL_PIT: { // COL_DATUM
-                //GregorianCalendar gc = SYSCalendar.addTime2Date(SYSCalendar.toGC((Date) o[COL_DATUM]), )
-                result = sdf.format((Date) o[COL_PIT]) + "; " + SYSTools.anonymizeUser(o[COL_NACHNAME].toString(), o[COL_VORNAME].toString());
-                if (showids) {
-                    result += "<br/><i>(" + bwid + ")</i>";
-                }
-                result = fonthead + result + "</font>";
-
+                result = BWerteTools.getPITasHTML(bwert, showids, true);
                 break;
             }
             case TBL_HTML: {
-                DateFormat df = DateFormat.getDateTimeInstance();
-                if (replacedby == bwid) {
-                    result += "<i>Gelöschter Eintrag. Gelöscht am/um: " + df.format((Date) o[COL_MDATE]) + " von " + o[COL_EDITBY].toString() + "</i><br/>";
-                }
-                if (replacement4 > 0 && replacement4 != bwid) {
-                    result += "<i>Dies ist ein Eintrag, der nachbearbeitet wurde.<br/>Am/um: " + df.format((Date) o[COL_CDATE]) + "<br/>Der Originaleintrag hatte die Nummer: " + replacement4 + "</i><br/>";
-                }
-                if (replacedby > 0 && replacedby != bwid) {
-                    result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format((Date) o[COL_CDATE]) + " von " + o[COL_EDITBY].toString() + " vorgenommen.";
-                    result += "<br/>Der Korrektureintrag hat die Nummer: " + replacedby + "</i><br/>";
-                }
-                result += "<b>" + o[COL_WERT].toString() + " " + o[COL_EINHEIT].toString() + "</b> (" + o[COL_ART].toString() + ")";
-                String bemerkung = SYSTools.catchNull(o[COL_BEMERKUNG]);
-                if (!bemerkung.equals("")) {
-                    result += "<br/><b>Bemerkung:</b> " + bemerkung;
-                }
-//                if (fianzahl > 0) {
-//                    //URL url = this.getClass().getResource("/artwork/16x16/attach.png");
-//                    //System.out.println(url.getPath());
-//                    result += "<font color=\"green\">&#9679;</font>";
-//                }
-//                if (vrganzahl > 0) {
-//                    //URL url = this.getClass().getResource("/artwork/16x16/mail-tagged.png");
-//                    //System.out.println(url.getPath());
-//                    result += "<font color=\"red\">&#9679;</font>";
-//                }
-                result = fonthead + result + "</font>";
+                result = BWerteTools.getAsHTML(bwert, true);
 
                 break;
             }

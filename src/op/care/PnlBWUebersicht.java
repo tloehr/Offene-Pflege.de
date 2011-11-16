@@ -75,7 +75,6 @@ public class PnlBWUebersicht extends CleanablePanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jToolBar1 = new JToolBar();
-        btnLogout = new JButton();
         btnPrint = new JButton();
         lblBW = new JLabel();
         jspHTML = new JScrollPane();
@@ -91,17 +90,6 @@ public class PnlBWUebersicht extends CleanablePanel {
         //======== jToolBar1 ========
         {
             jToolBar1.setFloatable(false);
-
-            //---- btnLogout ----
-            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
-            btnLogout.setText("Abmelden");
-            btnLogout.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnLogoutActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnLogout);
 
             //---- btnPrint ----
             btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer.png")));
@@ -183,7 +171,7 @@ public class PnlBWUebersicht extends CleanablePanel {
                         .addComponent(cbBerichte)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbBWInfo)
-                        .addContainerGap(128, Short.MAX_VALUE))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup()
@@ -202,15 +190,15 @@ public class PnlBWUebersicht extends CleanablePanel {
         setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
                     .addContainerGap())
                 .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addComponent(jspHTML, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                        .addComponent(jspHTML, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
                         .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addContainerGap())
         );
@@ -223,7 +211,7 @@ public class PnlBWUebersicht extends CleanablePanel {
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
+                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
                     .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -259,7 +247,6 @@ public class PnlBWUebersicht extends CleanablePanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JToolBar jToolBar1;
-    private JButton btnLogout;
     private JButton btnPrint;
     private JLabel lblBW;
     private JScrollPane jspHTML;

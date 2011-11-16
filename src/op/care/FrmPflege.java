@@ -44,6 +44,7 @@ import op.care.verordnung.PnlVerordnung;
 import op.care.vital.PnlVitalwerte;
 import op.threads.HeapStat;
 import op.tools.InternalClassACL;
+import op.tools.SYSPrint;
 import op.tools.SYSTools;
 import op.vorgang.PnlVorgang;
 import org.jdesktop.swingx.JXTaskPane;
@@ -196,8 +197,8 @@ public class FrmPflege extends javax.swing.JFrame {
         setTitle("Offene-Pflege.de");
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default:grow",
-                "fill:default:grow"));
+            "default:grow",
+            "fill:default:grow"));
 
         //======== jtpMain ========
         {
@@ -231,12 +232,12 @@ public class FrmPflege extends javax.swing.JFrame {
                     GroupLayout pnlSchichtleitungLayout = new GroupLayout(pnlSchichtleitung);
                     pnlSchichtleitung.setLayout(pnlSchichtleitungLayout);
                     pnlSchichtleitungLayout.setHorizontalGroup(
-                            pnlSchichtleitungLayout.createParallelGroup()
-                                    .addGap(0, 807, Short.MAX_VALUE)
+                        pnlSchichtleitungLayout.createParallelGroup()
+                            .addGap(0, 807, Short.MAX_VALUE)
                     );
                     pnlSchichtleitungLayout.setVerticalGroup(
-                            pnlSchichtleitungLayout.createParallelGroup()
-                                    .addGap(0, 507, Short.MAX_VALUE)
+                        pnlSchichtleitungLayout.createParallelGroup()
+                            .addGap(0, 507, Short.MAX_VALUE)
                     );
                 }
                 jtpUebersicht.addTab("Schichtleitung", pnlSchichtleitung);
@@ -248,14 +249,14 @@ public class FrmPflege extends javax.swing.JFrame {
             //======== pnlPflegeakte ========
             {
                 pnlPflegeakte.setLayout(new FormLayout(
-                        "pref, $lcgap, default:grow",
-                        "default:grow, $lgap, default"));
+                    "pref, $lcgap, default:grow",
+                    "default:grow, $lgap, default"));
 
                 //======== pnlBW ========
                 {
                     pnlBW.setLayout(new FormLayout(
-                            "default:grow",
-                            "fill:default, $rgap, default, $lgap, default:grow"));
+                        "default:grow",
+                        "fill:default, $rgap, default, $lgap, default:grow"));
 
                     //---- btnVerlegung ----
                     btnVerlegung.setForeground(new Color(255, 51, 0));
@@ -313,12 +314,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlUeberLayout = new GroupLayout(pnlUeber);
                         pnlUeber.setLayout(pnlUeberLayout);
                         pnlUeberLayout.setHorizontalGroup(
-                                pnlUeberLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlUeberLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlUeberLayout.setVerticalGroup(
-                                pnlUeberLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlUeberLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("\u00dcbersicht", pnlUeber);
@@ -330,12 +331,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlTBLayout = new GroupLayout(pnlTB);
                         pnlTB.setLayout(pnlTBLayout);
                         pnlTBLayout.setHorizontalGroup(
-                                pnlTBLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlTBLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlTBLayout.setVerticalGroup(
-                                pnlTBLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlTBLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Pflegeberichte", pnlTB);
@@ -347,12 +348,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlDFNLayout = new GroupLayout(pnlDFN);
                         pnlDFN.setLayout(pnlDFNLayout);
                         pnlDFNLayout.setHorizontalGroup(
-                                pnlDFNLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlDFNLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlDFNLayout.setVerticalGroup(
-                                pnlDFNLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlDFNLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("DFN", pnlDFN);
@@ -364,12 +365,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlBHPLayout = new GroupLayout(pnlBHP);
                         pnlBHP.setLayout(pnlBHPLayout);
                         pnlBHPLayout.setHorizontalGroup(
-                                pnlBHPLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlBHPLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlBHPLayout.setVerticalGroup(
-                                pnlBHPLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlBHPLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("BHP", pnlBHP);
@@ -381,12 +382,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlVitalDummyLayout = new GroupLayout(pnlVitalDummy);
                         pnlVitalDummy.setLayout(pnlVitalDummyLayout);
                         pnlVitalDummyLayout.setHorizontalGroup(
-                                pnlVitalDummyLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlVitalDummyLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlVitalDummyLayout.setVerticalGroup(
-                                pnlVitalDummyLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlVitalDummyLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Werte", pnlVitalDummy);
@@ -398,12 +399,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlVerLayout = new GroupLayout(pnlVer);
                         pnlVer.setLayout(pnlVerLayout);
                         pnlVerLayout.setHorizontalGroup(
-                                pnlVerLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlVerLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlVerLayout.setVerticalGroup(
-                                pnlVerLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlVerLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Verordnungen", pnlVer);
@@ -415,12 +416,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlInfoLayout = new GroupLayout(pnlInfo);
                         pnlInfo.setLayout(pnlInfoLayout);
                         pnlInfoLayout.setHorizontalGroup(
-                                pnlInfoLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlInfoLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlInfoLayout.setVerticalGroup(
-                                pnlInfoLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlInfoLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Informationen", pnlInfo);
@@ -432,12 +433,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlPPlanungLayout = new GroupLayout(pnlPPlanung);
                         pnlPPlanung.setLayout(pnlPPlanungLayout);
                         pnlPPlanungLayout.setHorizontalGroup(
-                                pnlPPlanungLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlPPlanungLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlPPlanungLayout.setVerticalGroup(
-                                pnlPPlanungLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlPPlanungLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Planung", pnlPPlanung);
@@ -449,12 +450,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlVorgangLayout = new GroupLayout(pnlVorgang);
                         pnlVorgang.setLayout(pnlVorgangLayout);
                         pnlVorgangLayout.setHorizontalGroup(
-                                pnlVorgangLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlVorgangLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlVorgangLayout.setVerticalGroup(
-                                pnlVorgangLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlVorgangLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Vorg\u00e4nge", pnlVorgang);
@@ -466,12 +467,12 @@ public class FrmPflege extends javax.swing.JFrame {
                         GroupLayout pnlFilesLayout = new GroupLayout(pnlFiles);
                         pnlFiles.setLayout(pnlFilesLayout);
                         pnlFilesLayout.setHorizontalGroup(
-                                pnlFilesLayout.createParallelGroup()
-                                        .addGap(0, 633, Short.MAX_VALUE)
+                            pnlFilesLayout.createParallelGroup()
+                                .addGap(0, 633, Short.MAX_VALUE)
                         );
                         pnlFilesLayout.setVerticalGroup(
-                                pnlFilesLayout.createParallelGroup()
-                                        .addGap(0, 482, Short.MAX_VALUE)
+                            pnlFilesLayout.createParallelGroup()
+                                .addGap(0, 482, Short.MAX_VALUE)
                         );
                     }
                     jtpPflegeakte.addTab("Dokumente", pnlFiles);
@@ -497,7 +498,8 @@ public class FrmPflege extends javax.swing.JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner == null) return;
-        print(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false));
+        //print(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false));
+        SYSPrint.print(this, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
     }//GEN-LAST:event_btnVerlegungActionPerformed
 
     private void jspBWComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBWComponentResized
