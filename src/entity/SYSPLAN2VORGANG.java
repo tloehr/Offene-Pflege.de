@@ -12,14 +12,14 @@ import javax.persistence.*;
  * Leider bin ich nicht selbst drauf gekommen.
  */
 @Entity
-@Table(name = "SYSVER2VORGANG")
+@Table(name = "SYSPLAN2VORGANG")
 @NamedQueries({
-        @NamedQuery(name = "SYSVER2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSVER2VORGANG s WHERE s.verordnung = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
-        @NamedQuery(name = "SYSVER2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSVER2VORGANG s WHERE s.verordnung = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
+        @NamedQuery(name = "SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
+                " SELECT s.vorgang FROM SYSPLAN2VORGANG s WHERE s.planung = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
+        @NamedQuery(name = "SYSPLAN2VORGANG.findByElementAndVorgang", query = " " +
+                " SELECT s FROM SYSPLAN2VORGANG s WHERE s.planung = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
 })
-public class SYSVER2VORGANG {
+public class SYSPLAN2VORGANG {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -35,17 +35,17 @@ public class SYSVER2VORGANG {
     private Vorgaenge vorgang;
 
     @ManyToOne
-    @JoinColumn(name = "VerID", referencedColumnName = "VerID")
-    private Verordnung verordnung;
+    @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
+    private Planung planung;
 
-    protected SYSVER2VORGANG() {
+    protected SYSPLAN2VORGANG() {
     }
 
-    public SYSVER2VORGANG(Vorgaenge vorgang, Verordnung verordnung) {
+    public SYSPLAN2VORGANG(Vorgaenge vorgang, Planung planung) {
         this.id = 0;
         this.pdca = VorgaengeTools.PDCA_OFF;
         this.vorgang = vorgang;
-        this.verordnung = verordnung;
+        this.planung = planung;
     }
 
     public short getPdca() {
@@ -64,12 +64,11 @@ public class SYSVER2VORGANG {
         this.vorgang = vorgang;
     }
 
-    public Verordnung getVerordnung() {
-        return verordnung;
+    public Planung getPlanung() {
+        return planung;
     }
 
-    public void setVerordnung(Verordnung verordnung) {
-        this.verordnung = verordnung;
+    public void setPlanung(Planung planung) {
+        this.planung = planung;
     }
 }
-

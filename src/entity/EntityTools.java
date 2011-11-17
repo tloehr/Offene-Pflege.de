@@ -19,6 +19,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().commit();
             success = true;
         } catch (Exception e) {
+            e.printStackTrace();
             OPDE.getEM().getTransaction().rollback();
         }
         return success;
@@ -33,6 +34,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().commit();
             success = true;
         } catch (Exception e) {
+            e.printStackTrace();
             OPDE.getEM().getTransaction().rollback();
         }
         return success;
@@ -51,6 +53,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().commit();
             success = true;
         } catch (Exception e) {
+            e.printStackTrace();
             OPDE.getEM().getTransaction().rollback();
         }
         return success;
@@ -65,6 +68,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().commit();
             success = true;
         } catch (Exception e) {
+            e.printStackTrace();
             OPDE.getEM().getTransaction().rollback();
         }
         return success;
@@ -79,6 +83,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().commit();
             success = true;
         } catch (Exception e) {
+            e.printStackTrace();
             OPDE.getEM().getTransaction().rollback();
         }
         return success;

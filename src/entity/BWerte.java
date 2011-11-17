@@ -69,7 +69,7 @@ public class BWerte implements Serializable, VorgangElement {
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
     // ==
-    // 1:N Relationen
+    // 1:1 Relationen
     // ==
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne

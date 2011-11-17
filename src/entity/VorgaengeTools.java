@@ -87,6 +87,14 @@ public class VorgaengeTools {
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
+        query = OPDE.getEM().createNamedQuery("BWInfo.findByVorgang");
+        query.setParameter("vorgang", vorgang);
+        elements.addAll(query.getResultList());
+
+        query = OPDE.getEM().createNamedQuery("Planung.findByVorgang");
+        query.setParameter("vorgang", vorgang);
+        elements.addAll(query.getResultList());
+
         Collections.sort(elements, elementsComparator);
 
         return elements;
@@ -165,6 +173,12 @@ public class VorgaengeTools {
         } else if (element instanceof Verordnung) {
             connectionObject = new SYSVER2VORGANG(vorgang, (Verordnung) element);
             elementBezeichnung = "Ärztliche Verordnung";
+        } else if (element instanceof BWInfo) {
+            connectionObject = new SYSBWI2VORGANG(vorgang, (BWInfo) element);
+            elementBezeichnung = "Bewohner Information";
+        } else if (element instanceof Planung) {
+            connectionObject = new SYSPLAN2VORGANG(vorgang, (Planung) element);
+            elementBezeichnung = "Pflegeplanung";
         } else {
 
         }
@@ -193,6 +207,10 @@ public class VorgaengeTools {
             ((SYSBWerte2VORGANG) connectionObject).setPdca(pdca);
         } else if (element instanceof Verordnung) {
             ((SYSVER2VORGANG) connectionObject).setPdca(pdca);
+        } else if (element instanceof BWInfo) {
+            ((SYSBWI2VORGANG) connectionObject).setPdca(pdca);
+        }  else if (element instanceof Planung) {
+            ((SYSPLAN2VORGANG) connectionObject).setPdca(pdca);
         } else {
 
         }
@@ -227,6 +245,12 @@ public class VorgaengeTools {
         } else if (element instanceof Verordnung) {
             query = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Ärztliche Verordnung";
+        } else if (element instanceof BWInfo) {
+            query = OPDE.getEM().createNamedQuery("SYSBWI2VORGANG.findByElementAndVorgang");
+            elementBezeichnung = "Bewohner Information";
+        } else if (element instanceof Planung) {
+            query = OPDE.getEM().createNamedQuery("SYSPLAN2VORGANG.findByElementAndVorgang");
+            elementBezeichnung = "Pflegeplanung";
         } else {
 
         }
@@ -354,8 +378,12 @@ public class VorgaengeTools {
             complement = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
             complement = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (element instanceof BWerte) {
+        } else if (element instanceof Verordnung) {
             complement = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof BWInfo) {
+            complement = OPDE.getEM().createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof Planung) {
+            complement = OPDE.getEM().createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             complement = null;
         }
@@ -395,8 +423,12 @@ public class VorgaengeTools {
             query = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
             query = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (element instanceof BWerte) {
+        } else if (element instanceof Verordnung) {
             query = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof BWInfo) {
+            query = OPDE.getEM().createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
+        } else if (element instanceof Planung) {
+            query = OPDE.getEM().createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             query = null;
         }

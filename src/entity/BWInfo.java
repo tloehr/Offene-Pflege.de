@@ -39,6 +39,11 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "BWInfo.findAll", query = "SELECT b FROM BWInfo b"),
         @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM BWInfo b WHERE b.bwinfoid = :bwinfoid"),
+        @NamedQuery(name = "BWInfo.findByVorgang", query = " "
+                + " SELECT bw, av.pdca FROM BWInfo bw "
+                + " JOIN bw.attachedVorgaenge av"
+                + " JOIN av.vorgang v"
+                + " WHERE v = :vorgang "),
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis"),
@@ -85,11 +90,13 @@ public class BWInfo implements Serializable, VorgangElement {
     // ==
     // M:N Relationen
     // ==
-//    @ManyToMany
-//    @JoinTable(name = "SYSBWINFO2VORGANG", joinColumns =
-//    @JoinColumn(name = "BWInfoID"), inverseJoinColumns =
-//    @JoinColumn(name = "VorgangID"))
-//    private Collection<Vorgaenge> vorgaenge;
+    // ==
+    // 1:N Relationen
+    // ==
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
+    private Collection<Sysbwi2file> attachedFiles;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
+    private Collection<SYSBWI2VORGANG> attachedVorgaenge;
 
 
     public BWInfo() {
@@ -169,6 +176,14 @@ public class BWInfo implements Serializable, VorgangElement {
 
     public void setAngesetztDurch(Users angesetztDurch) {
         this.angesetztDurch = angesetztDurch;
+    }
+
+    public Collection<Sysbwi2file> getAttachedFiles() {
+        return attachedFiles;
+    }
+
+    public Collection<SYSBWI2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
     }
 
     @Override

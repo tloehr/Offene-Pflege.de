@@ -4,40 +4,31 @@
  */
 package entity;
 
+import op.tools.SYSConst;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "Planung")
 @NamedQueries({
-    @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM Planung p"),
-    @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM Planung p WHERE p.planID = :planID"),
-    @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM Planung p WHERE p.stichwort = :stichwort"),
-    @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM Planung p WHERE p.von = :von"),
-    @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM Planung p WHERE p.bis = :bis"),
-    @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM Planung p WHERE p.planKennung = :planKennung"),
-    @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM Planung p WHERE p.nKontrolle = :nKontrolle")})
+        @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM Planung p"),
+        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM Planung p WHERE p.planID = :planID"),
+        @NamedQuery(name = "Planung.findByVorgang", query = " "
+                + " SELECT p, av.pdca FROM Planung p "
+                + " JOIN p.attachedVorgaenge av"
+                + " JOIN av.vorgang v"
+                + " WHERE v = :vorgang "),
+        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM Planung p WHERE p.stichwort = :stichwort"),
+        @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM Planung p WHERE p.von = :von"),
+        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM Planung p WHERE p.bis = :bis"),
+        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM Planung p WHERE p.planKennung = :planKennung"),
+        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM Planung p WHERE p.nKontrolle = :nKontrolle")})
 public class Planung implements Serializable, VorgangElement {
 
     private static final long serialVersionUID = 1L;
@@ -55,7 +46,7 @@ public class Planung implements Serializable, VorgangElement {
     @Lob
     @Column(name = "Ziel")
     private String ziel;
-//    @Basic(optional = false)
+    //    @Basic(optional = false)
 //    @Column(name = "BWIKID")
 //    private long bwikid;
     @Basic(optional = false)
@@ -88,14 +79,12 @@ public class Planung implements Serializable, VorgangElement {
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
     private BWInfoKat kategorie;
+
     // ==
-    // M:N Relationen
+    // 1:N Relationen
     // ==
-    @ManyToMany
-    @JoinTable(name = "SYSPLAN2VORGANG", joinColumns =
-    @JoinColumn(name = "PlanID"), inverseJoinColumns =
-    @JoinColumn(name = "VorgangID"))
-    private Collection<Vorgaenge> vorgaenge;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
+    private Collection<SYSPLAN2VORGANG> attachedVorgaenge;
 
     public Planung() {
     }
@@ -166,10 +155,6 @@ public class Planung implements Serializable, VorgangElement {
         this.nKontrolle = nKontrolle;
     }
 
-    public Collection<Vorgaenge> getVorgaenge() {
-        return vorgaenge;
-    }
-
     public Users getAbgesetztDurch() {
         return abgesetztDurch;
     }
@@ -202,6 +187,14 @@ public class Planung implements Serializable, VorgangElement {
         this.kategorie = kategorie;
     }
 
+    public Collection<SYSPLAN2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
+    }
+
+    public boolean isAbgesetzt() {
+        return bis.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    }
+
     @Override
     public long getPITInMillis() {
         return von.getTime();
@@ -223,7 +216,7 @@ public class Planung implements Serializable, VorgangElement {
     public long getID() {
         return planID;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

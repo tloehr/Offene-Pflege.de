@@ -11,6 +11,8 @@
         <class>entity.SYSPB2VORGANG</class>
         <class>entity.SYSBWerte2VORGANG</class>
         <class>entity.SYSVER2VORGANG</class>
+        <class>entity.SYSBWI2VORGANG</class>
+        <class>entity.SYSPLAN2VORGANG</class>
         <class>entity.Bewohner</class>
         <class>entity.Sysbw2file</class>
         <class>entity.BWInfoKat</class>
@@ -40,9 +42,36 @@
         <class>entity.VBericht</class>
         <class>entity.VKat</class>
         <class>entity.Planung</class>
+        <class>entity.Arzt</class>
+        <class>entity.BHP</class>
+        <class>entity.BhpPlanung</class>
+        <class>entity.BwInfoVorlagen</class>
+        <class>entity.Dfn</class>
+        <class>entity.Icd</class>
+        <class>entity.Kh</class>
+        <class>entity.KKasse</class>
+        <class>entity.medis.Mpapv</class>
+        <class>entity.medis.MpBestand</class>
+        <class>entity.medis.MpBestellung</class>
+        <class>entity.medis.MpBuchung</class>
+        <class>entity.medis.Darreichung</class>
+        <class>entity.medis.MpFormen</class>
+        <class>entity.medis.MpHersteller</class>
+        <class>entity.medis.MpStoffe</class>
+        <class>entity.medis.MpVorrat</class>
+        <class>entity.medis.MpZusammensetzung</class>
+        <class>entity.medis.MPackung</class>
+        <class>entity.medis.MedProdukte</class>
+        <class>entity.MassTermin</class>
+        <class>entity.Massnahmen</class>
+        <class>entity.Mitarbeiter</class>
+        <class>entity.PlanKontrolle</class>
+        <class>entity.QsQuery</class>
+        <class>entity.medis.Situationen</class>
+        <class>entity.Taschengeld</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
-            <property name="javax.persistence.jdbc.password" value="7t3rrw"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.user" value="opdeuser"/>
             <!--<property name="eclipselink.weaving" value="static"/>

@@ -5,6 +5,8 @@
 
 package entity;
 
+import entity.medis.Darreichung;
+import entity.medis.Situationen;
 import op.tools.SYSConst;
 
 import javax.persistence.*;
@@ -20,10 +22,10 @@ import java.util.Date;
 @Table(name = "BHPVerordnung")
 @NamedQueries({
         @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Verordnung b"),
-        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Verordnung b WHERE b.verID = :verID"),
+        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Verordnung b WHERE b.verid = :verid"),
         @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Verordnung b WHERE b.anDatum = :anDatum"),
         @NamedQuery(name = "Verordnung.findByVorgang", query = " "
-                + " SELECT v, av.pdca FROM Verordnung ve "
+                + " SELECT ve, av.pdca FROM Verordnung ve "
                 + " JOIN ve.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
@@ -34,9 +36,6 @@ import java.util.Date;
         @NamedQuery(name = "Verordnung.findByAbArztID", query = "SELECT b FROM Verordnung b WHERE b.abArztID = :abArztID"),
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
-        @NamedQuery(name = "Verordnung.findByMassID", query = "SELECT b FROM Verordnung b WHERE b.massID = :massID"),
-        @NamedQuery(name = "Verordnung.findByDafID", query = "SELECT b FROM Verordnung b WHERE b.dafID = :dafID"),
-        @NamedQuery(name = "Verordnung.findBySitID", query = "SELECT b FROM Verordnung b WHERE b.sitID = :sitID"),
         @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
 public class Verordnung implements Serializable, VorgangElement {
     private static final long serialVersionUID = 1L;
@@ -44,7 +43,7 @@ public class Verordnung implements Serializable, VorgangElement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "VerID")
-    private Long verID;
+    private Long verid;
     @Basic(optional = false)
     @Column(name = "AnDatum")
     @Temporal(TemporalType.TIMESTAMP)
@@ -70,13 +69,6 @@ public class Verordnung implements Serializable, VorgangElement {
     @Column(name = "Bemerkung")
     private String bemerkung;
     @Basic(optional = false)
-    @Column(name = "MassID")
-    private long massID;
-    @Column(name = "DafID")
-    private BigInteger dafID;
-    @Column(name = "SitID")
-    private BigInteger sitID;
-    @Basic(optional = false)
     @Column(name = "Stellplan")
     private boolean stellplan;
 
@@ -99,17 +91,26 @@ public class Verordnung implements Serializable, VorgangElement {
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Bewohner bewohner;
+    @JoinColumn(name = "MassID", referencedColumnName = "MassID")
+    @ManyToOne
+    private Massnahmen massnahme;
+    @JoinColumn(name = "DafID", referencedColumnName = "DafID")
+    @ManyToOne
+    private Darreichung darreichung;
+    @JoinColumn(name = "SitID", referencedColumnName = "SitID")
+    @ManyToOne
+    private Situationen situation;
+
 
     public Verordnung() {
     }
 
-
-    public Long getVerID() {
-        return verID;
+    public Long getVerid() {
+        return verid;
     }
 
-    public void setVerID(Long verID) {
-        this.verID = verID;
+    public void setVerid(Long verid) {
+        this.verid = verid;
     }
 
     public Date getAnDatum() {
@@ -184,31 +185,7 @@ public class Verordnung implements Serializable, VorgangElement {
         this.bemerkung = bemerkung;
     }
 
-    public long getMassID() {
-        return massID;
-    }
-
-    public void setMassID(long massID) {
-        this.massID = massID;
-    }
-
-    public BigInteger getDafID() {
-        return dafID;
-    }
-
-    public void setDafID(BigInteger dafID) {
-        this.dafID = dafID;
-    }
-
-    public BigInteger getSitID() {
-        return sitID;
-    }
-
-    public void setSitID(BigInteger sitID) {
-        this.sitID = sitID;
-    }
-
-    public boolean getStellplan() {
+    public boolean isStellplan() {
         return stellplan;
     }
 
@@ -218,6 +195,34 @@ public class Verordnung implements Serializable, VorgangElement {
 
     public Users getAbgesetztDurch() {
         return abgesetztDurch;
+    }
+
+    public Situationen getSituation() {
+        return situation;
+    }
+
+    public boolean hasMedi(){
+        return darreichung != null;
+    }
+
+    public void setSituation(Situationen situation) {
+        this.situation = situation;
+    }
+
+    public Darreichung getDarreichung() {
+        return darreichung;
+    }
+
+    public void setDarreichung(Darreichung darreichung) {
+        this.darreichung = darreichung;
+    }
+
+    public Massnahmen getMassnahme() {
+        return massnahme;
+    }
+
+    public void setMassnahme(Massnahmen massnahme) {
+        this.massnahme = massnahme;
     }
 
     public void setAbgesetztDurch(Users abgesetztDurch) {
@@ -263,13 +268,13 @@ public class Verordnung implements Serializable, VorgangElement {
 
     @Override
     public long getID() {
-        return verID;
+        return verid;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (verID != null ? verID.hashCode() : 0);
+        hash += (verid != null ? verid.hashCode() : 0);
         return hash;
     }
 
@@ -280,7 +285,7 @@ public class Verordnung implements Serializable, VorgangElement {
             return false;
         }
         Verordnung other = (Verordnung) object;
-        if ((this.verID == null && other.verID != null) || (this.verID != null && !this.verID.equals(other.verID))) {
+        if ((this.verid == null && other.verid != null) || (this.verid != null && !this.verid.equals(other.verid))) {
             return false;
         }
         return true;
@@ -288,7 +293,7 @@ public class Verordnung implements Serializable, VorgangElement {
 
     @Override
     public String toString() {
-        return "entity.Verordnung[verID=" + verID + "]";
+        return "entity.Verordnung[verID=" + verid + "]";
     }
 
 }

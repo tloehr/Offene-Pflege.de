@@ -12,14 +12,14 @@ import javax.persistence.*;
  * Leider bin ich nicht selbst drauf gekommen.
  */
 @Entity
-@Table(name = "SYSVER2VORGANG")
+@Table(name = "SYSBWI2VORGANG")
 @NamedQueries({
-        @NamedQuery(name = "SYSVER2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSVER2VORGANG s WHERE s.verordnung = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
-        @NamedQuery(name = "SYSVER2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSVER2VORGANG s WHERE s.verordnung = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
+        @NamedQuery(name = "SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
+                " SELECT s.vorgang FROM SYSBWI2VORGANG s WHERE s.bwinfo = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
+        @NamedQuery(name = "SYSBWI2VORGANG.findByElementAndVorgang", query = " " +
+                " SELECT s FROM SYSBWI2VORGANG s WHERE s.bwinfo = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
 })
-public class SYSVER2VORGANG {
+public class SYSBWI2VORGANG {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -35,17 +35,17 @@ public class SYSVER2VORGANG {
     private Vorgaenge vorgang;
 
     @ManyToOne
-    @JoinColumn(name = "VerID", referencedColumnName = "VerID")
-    private Verordnung verordnung;
+    @JoinColumn(name = "BWInfoID", referencedColumnName = "BWINFOID")
+    private BWInfo bwinfo;
 
-    protected SYSVER2VORGANG() {
+    protected SYSBWI2VORGANG() {
     }
 
-    public SYSVER2VORGANG(Vorgaenge vorgang, Verordnung verordnung) {
+    public SYSBWI2VORGANG(Vorgaenge vorgang, BWInfo bwinfo) {
         this.id = 0;
         this.pdca = VorgaengeTools.PDCA_OFF;
         this.vorgang = vorgang;
-        this.verordnung = verordnung;
+        this.bwinfo = bwinfo;
     }
 
     public short getPdca() {
@@ -64,12 +64,11 @@ public class SYSVER2VORGANG {
         this.vorgang = vorgang;
     }
 
-    public Verordnung getVerordnung() {
-        return verordnung;
+    public BWInfo getBwinfo() {
+        return bwinfo;
     }
 
-    public void setVerordnung(Verordnung verordnung) {
-        this.verordnung = verordnung;
+    public void setBwinfo(BWInfo bwinfo) {
+        this.bwinfo = bwinfo;
     }
 }
-

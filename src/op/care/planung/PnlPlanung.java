@@ -26,16 +26,12 @@
  */
 package op.care.planung;
 
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.*;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
+import op.tools.*;
 
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
@@ -56,7 +52,7 @@ import java.util.logging.Logger;
  * @author tloehr
  */
 public class PnlPlanung extends CleanablePanel {
-
+    public static final String internalClassID = "nursingrecords.planning";
     private JPopupMenu menu;
     //private int mode;
     private FrmPflege parent;
@@ -64,7 +60,7 @@ public class PnlPlanung extends CleanablePanel {
     private Bewohner bewohner;
     private ListSelectionListener lsl;
     private OCSec ocs;
-    private ActionListener fileActionListener;
+    private ActionListener standardActionListener;
 
     /**
      * Creates new form PnlPlanung
@@ -73,7 +69,7 @@ public class PnlPlanung extends CleanablePanel {
         this.parent = parent;
 
         ocs = OPDE.getOCSec();
-        fileActionListener = new ActionListener() {
+        standardActionListener = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 reloadTable();
@@ -441,8 +437,13 @@ public class PnlPlanung extends CleanablePanel {
         ocs.setEnabled(this, "itemPopupControl", itemPopupQuit, absetzenMöglich);
 
         if (singleRowSelected) {
-            menu.add(new JSeparator());
-            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "Planung", planid, bwkennung, fileActionListener));
+//            menu.add(new JSeparator());
+//            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "Planung", planid, bwkennung, fileActionListener));
+            Planung planung = OPDE.getEM().find(Planung.class, planid);
+            if (!planung.isAbgesetzt()) {
+                menu.add(new JSeparator());
+                menu.add(VorgaengeTools.getVorgangContextMenu(parent, planung, bewohner, standardActionListener));
+            }
         }
 
 

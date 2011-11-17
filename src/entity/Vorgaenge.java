@@ -72,7 +72,6 @@ public class Vorgaenge implements Serializable {
     //
     // 1:n Relationen
     //
-    //cascade={CascadeType.PERSIST, CascadeType.REMOVE}
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<VBericht> vorgangsBerichte;
 
@@ -81,6 +80,12 @@ public class Vorgaenge implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<SYSVER2VORGANG> attachedVerordnungen;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    private Collection<SYSBWI2VORGANG> attachedBWInfos;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    private Collection<SYSPLAN2VORGANG> attachedPlanungen;
 
     // ==
     // M:N Relationen

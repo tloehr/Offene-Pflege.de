@@ -219,14 +219,7 @@ public class VerordnungTools {
                 + SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
     }
 
-    /**
-     * Erstellt den Text für die Massnahmenspalte beim Ausdruck mit dem Styled Text XML Tags
-     * von JasperReports.
-     *
-     * @param rs ResultSet der zugrundeliegenden Abfrage. Die Position des Sets wird durch
-     *           die aufrufende JRDataSource bestimmt.
-     * @return XML Code für den Druck.
-     */
+
     private static String getMassnahme(ResultSet rs) throws SQLException {
         String result = "";
 
@@ -374,4 +367,124 @@ public class VerordnungTools {
 
         return result;
     }
+
+     private String getMassnahme(Verordnung verordnung) {
+        String result = "";
+
+        if (verordnung.isAbgesetzt()) {
+            result += "<s>"; // Abgesetzte
+        }
+        if (!verordnung.hasMedi()) {
+            result += verordnung.getMassnahme().getBezeichnung();
+        } else {
+//            // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
+//            if (rs.getLong("bestandDafID") > 0 && rs.getLong("bestandDafID") != rs.getLong("v.DafID")) { // Nur bei Abweichung.
+//                result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext1").replaceAll("-", "- ") +
+//                        SYSTools.catchNull(rs.getString("D1.Zusatz"), " ", "") + "</b></font>" +
+//                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
+//                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
+//                result += " <i>(ursprünglich verordnet: " + rs.getString("mptext").replaceAll("-", "- ") +
+//                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</i>";
+//            } else {
+//                result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext").replaceAll("-", "- ") +
+//                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</b></font>" +
+//                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
+//                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
+//
+//            }
+    // TODO: hier weiter
+//                result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().rs.getString("mptext").replaceAll("-", "- ") +
+//                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</b></font>" +
+//                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
+//                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
+
+        }
+        if (verordnung.isAbgesetzt()) {//if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
+            result += "</s>"; // Abgesetzte
+            //OPDE.getLogger().debug(this.toString() + ": " + result);
+        }
+
+        return result;
+    }
+//
+//    private String getHinweis(Verordnung verordnung) {
+//        String result = "";
+//        try {
+//            if (rs.getLong("SitID") > 0) {
+//                result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + rs.getString("sittext") + "</font></b><br/>";
+//            }
+//            if (rs.getString("Bemerkung") != null && !rs.getString("Bemerkung").equals("")) {
+//                result += "<b><u>Bemerkung:</u> </b>" + rs.getString("Bemerkung");
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return (result.equals("") ? "" : "<html><body>" + result + "</body></html>");
+//    }
+//
+//    public String getAN(Verordnung verordnung) {
+//        String result = "";
+//        try {
+//
+//            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+//            String datum = sdf.format(rs.getDate("AnDatum"));
+//
+//            result += "<html><body>";
+//            result += "<font color=\"green\">" + datum + "; ";
+//            if (rs.getLong("v.AnKHID") > 0) {
+//                result += rs.getString("khan.Name");
+//            }
+//            if (rs.getLong("v.AnArztID") > 0) {
+//                if (rs.getLong("v.AnKHID") > 0) {
+//                    result += " <i>bestätigt durch:</i> ";
+//                }
+//                result += rs.getString("an.Titel") + " ";
+//                if (OPDE.isAnonym()) {
+//                    result += rs.getString("an.Name").substring(0, 1) + "***";
+//                } else {
+//                    result += rs.getString("an.Name");
+//                }
+//
+//            }
+//            result += "; " + op.tools.DBRetrieve.getUsername(rs.getString("AnUKennung")) + "</font>";
+//            result += "</body></html>";
+//
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
+//
+//    public String getAB(Verordnung verordnung) {
+//        String result = "";
+//        try {
+//            if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() < SYSConst.BIS_AUF_WEITERES.getTimeInMillis()) {
+//                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+//                String datum = sdf.format(rs.getDate("AbDatum"));
+//
+//                result += "<html><body>";
+//                result += "<font color=\"red\">" + datum + "; ";
+//                if (rs.getLong("v.AbKHID") > 0) {
+//                    result += rs.getString("khab.Name");
+//                }
+//                if (rs.getLong("v.AbArztID") > 0) {
+//                    if (rs.getLong("v.AbKHID") > 0) {
+//                        result += " <i>bestätigt durch:</i> ";
+//                    }
+//                    result += rs.getString("ab.Titel");
+//                    if (OPDE.isAnonym()) {
+//                        result += rs.getString("ab.Name").substring(0, 1) + "***";
+//                    } else {
+//                        result += rs.getString("ab.Name");
+//                    }
+//
+//                }
+//                result += "; " + op.tools.DBRetrieve.getUsername(rs.getString("AbUKennung")) + "</font>";
+//                result += "</body></html>";
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 }

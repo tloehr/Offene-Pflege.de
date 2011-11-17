@@ -86,7 +86,7 @@ public class TMPlanungen extends AbstractTableModel {
                     " WHERE BWKennung = ? " +
                     // Nur für die Sturzgeschichte
                     // (!abgesetzt ? " AND p.Von <= now() AND p.Bis >= now() " : "");
-                    " AND p.Von <= '2011-01-03 12:20:00' AND p.Bis >= '2011-01-03 12:20:00' ";
+                    " AND p.Von <= now() AND p.Bis >= now() ";
 
 
             sql += " ORDER BY b.Sortierung, p.Stichwort ";
