@@ -207,6 +207,8 @@ public class OPDE {
     public static void fatal(Object message) {
         logger.fatal(message);
         SyslogTools.fatal(message.toString());
+        OPDE.getEM().close();
+        System.exit(1);
     }
 
     public static void error(Object message) {
@@ -429,6 +431,8 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.url", url);
 
             em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
+            // Cache lösche mit
+            // em.getEntityManagerFactory().getCache().evictAll();
 
             host = SYSHostsTools.getHost(hostkey);
 

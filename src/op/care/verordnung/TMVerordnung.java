@@ -26,6 +26,8 @@
  */
 package op.care.verordnung;
 
+import entity.Verordnung;
+import entity.VerordnungTools;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
@@ -116,7 +118,7 @@ public class TMVerordnung
                     "       SELECT best.VorID, best.DafID FROM MPBestand best " +
                     "   ) b ON a.VorID = b.VorID " +
                     " ) vor ON vor.DafID = v.DafID " +
-                   // " INNER JOIN " +
+                    // " INNER JOIN " +
                     // Hier kommen die angehangen Dokumente hinzu
 //                    " (" +
 //                    " 	SELECT DISTINCT f1.VerID, ifnull(anzahl,0) anzahl" +
@@ -400,16 +402,14 @@ public class TMVerordnung
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
      *
-     * @param verid
-     * @return
      */
-    private String getDosis(long verid) {
+    private String getDosis(Verordnung verordnung) {
         String result = "";
-        if (cache.containsKey(verid)) {
-            result = cache.get(verid).toString();
+        if (cache.containsKey(verordnung)) {
+            result = cache.get(verordnung).toString();
         } else {
-            result = op.care.verordnung.DBRetrieve.getDosis(verid);
-            cache.put(verid, result);
+            result = VerordnungTools.getDosis(verordnung);
+            cache.put(verordnung, result);
         }
         return result;
     }
@@ -419,82 +419,38 @@ public class TMVerordnung
         try {
             rs.absolute(r + 1);
             long verid = rs.getLong("VerID");
+            Verordnung verordnung = OPDE.getEM().find(Verordnung.class, verid);
             //OPDE.getLogger().debug(this.toString() + ":" + verid);
             switch (c) {
                 case COL_MSSN: {
                     String res = "";
-                    res = getMassnahme();
-//                    if (fianzahl > 0) {
-//                        res += "<font color=\"green\">&#9679;</font>";
-//                    }
-//                    if (vrganzahl > 0) {
-//                        res += "<font color=\"red\">&#9679;</font>";
-//                    }
+                    res = VerordnungTools.getMassnahme(verordnung);
+                    if (!verordnung.getAttachedFiles().isEmpty()) {
+                        res += "<font color=\"green\">&#9679;</font>";
+                    }
+                    if (!verordnung.getAttachedVorgaenge().isEmpty()) {
+                        res += "<font color=\"red\">&#9679;</font>";
+                    }
                     result = res;
                     break;
                 }
                 case COL_Dosis: {
-                    //long now = System.currentTimeMillis();
-//                    OPDE.getLogger().debug("Start @" + now);
-//                    OPDE.getLogger().debug(r);
-//                    OPDE.getLogger().debug(debug[c]);
 
-                    String tmp = "<html><body>";
-                    tmp += getDosis(verid);
-
-                    if (rs.getLong("DafID") > 0) { // Gilt nur für Medikamente, sonst passt das nicht
-                        if (rs.getBoolean("BisPackEnde")) {
-                            tmp += "nur bis Packungs Ende<br/>";
-                        }
-                        if (!isAbgesetzt() && mitBestand) {
-                            if (rs.getDouble("saldo") > 0) {
-                                tmp += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("saldo")) + " " +
-                                        SYSConst.EINHEIT[rs.getInt("PackEinheit")] +
-                                        "</font></b>";
-                                if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
-                                    double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
-                                    tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-                                            (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
-                                }
-                                if (rs.getLong("BestID") > 0) {
-                                    tmp += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + rs.getLong("BestID") + "</font></b>";
-
-                                    if (rs.getDouble("bestsumme") != rs.getDouble("saldo")) {
-                                        tmp += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("bestsumme")) + " " +
-                                                SYSConst.EINHEIT[rs.getInt("PackEinheit")] + "</font></b>";
-                                        if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
-                                            double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
-                                            tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-                                                    (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
-                                        }
-                                    }
-                                } else {
-                                    tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
-                                }
-//                                if (rs.getLong("BestellID") > 0){
-//                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
-//                                }
-                            } else {
-                                tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
-                            }
-                        }
-                    }
-                    tmp += "</body></html>";
-                    result = tmp;
+                    result = getDosis(verordnung);
                     //OPDE.getLogger().debug("END @" + System.currentTimeMillis());
                     //OPDE.getLogger().debug("Duration in sec" + (System.currentTimeMillis() - now));
                     break;
                 }
                 case COL_Hinweis: {
-                    result = getHinweis();
+                    result = VerordnungTools.getHinweis(verordnung);
                     break;
                 }
                 case COL_AN: {
-                    result = getAN();
+                    result = VerordnungTools.getAN(verordnung);
                     break;
                 }
                 case COL_AB: {
-                    result = getAB();
+                    result = VerordnungTools.getAB(verordnung);
                     break;
                 }
                 case COL_VERID: {

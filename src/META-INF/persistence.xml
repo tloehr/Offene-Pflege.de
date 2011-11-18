@@ -44,23 +44,23 @@
         <class>entity.Planung</class>
         <class>entity.Arzt</class>
         <class>entity.BHP</class>
-        <class>entity.BhpPlanung</class>
+        <class>entity.VerordnungPlanung</class>
         <class>entity.BwInfoVorlagen</class>
         <class>entity.Dfn</class>
         <class>entity.Icd</class>
-        <class>entity.Kh</class>
+        <class>entity.Krankenhaus</class>
         <class>entity.KKasse</class>
-        <class>entity.medis.Mpapv</class>
-        <class>entity.medis.MpBestand</class>
+        <class>entity.medis.APV</class>
+        <class>entity.medis.MedBestand</class>
         <class>entity.medis.MpBestellung</class>
-        <class>entity.medis.MpBuchung</class>
+        <class>entity.medis.MedBuchungen</class>
         <class>entity.medis.Darreichung</class>
-        <class>entity.medis.MpFormen</class>
-        <class>entity.medis.MpHersteller</class>
-        <class>entity.medis.MpStoffe</class>
-        <class>entity.medis.MpVorrat</class>
-        <class>entity.medis.MpZusammensetzung</class>
-        <class>entity.medis.MPackung</class>
+        <class>entity.medis.MedFormen</class>
+        <class>entity.medis.MedHersteller</class>
+        <class>entity.medis.MedStoffe</class>
+        <class>entity.medis.MedVorrat</class>
+        <class>entity.medis.MedZusammensetzung</class>
+        <class>entity.medis.MedPackung</class>
         <class>entity.medis.MedProdukte</class>
         <class>entity.MassTermin</class>
         <class>entity.Massnahmen</class>

@@ -1021,32 +1021,6 @@ public class SYSTools {
         return name.substring(dot + 1);
     }
 
-//    public static void putProps(String key, String value, boolean thisIPOnly, String bemerkung) {
-//        HashMap where = new HashMap();
-//        where.put("K", new Object[]{key, "="});
-//        where.put("UKennung", new Object[]{OPDE.getLogin().getUser().getUKennung(), "="});
-//        if (thisIPOnly) {
-//            where.put("IP", new Object[]{OPDE.getProps().getProperty("ip"), "="});
-//        }
-//        BigInteger bi = (BigInteger) DBHandling.getSingleValue("OCProps", "OCPID", where);
-//        HashMap hm = new HashMap();
-//        hm.put("K", key);
-//        hm.put("V", value);
-//        hm.put("IP", (thisIPOnly ? OPDE.getProps().getProperty("ip") : "*"));
-//        hm.put("Bemerkung", bemerkung);
-//        hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-//
-//        if (bi != null) {
-//            DBHandling.updateRecord("OCProps", hm, "OCPID", bi.longValue());
-//        } else {
-//            DBHandling.insertRecord("OCProps", hm);
-//        }
-//        OPDE.getProps().put(key, value);
-//        OPDE.getLogger().debug("putProps/4: key=" + key + "  value=" + value);
-//        hm.clear();
-//        where.clear();
-//    }
-
     public static String printDouble(double d) {
         String dbl = Double.toString(d);
         if (dbl.substring(dbl.length() - 2).equals(".0")) {

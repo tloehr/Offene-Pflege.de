@@ -3,6 +3,7 @@ package entity.medis;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 
 /**
@@ -13,7 +14,8 @@ import java.math.BigDecimal;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class MPackung {
+@Table(name = "MPackung")
+public class MedPackung {
     private long mpid;
 
     @javax.persistence.Column(name = "MPID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -91,14 +93,14 @@ public class MPackung {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MPackung mPackung = (MPackung) o;
+        MedPackung medPackung = (MedPackung) o;
 
-        if (dafId != mPackung.dafId) return false;
-        if (groesse != mPackung.groesse) return false;
-        if (mpid != mPackung.mpid) return false;
-        if (inhalt != null ? !inhalt.equals(mPackung.inhalt) : mPackung.inhalt != null) return false;
-        if (pzn != null ? !pzn.equals(mPackung.pzn) : mPackung.pzn != null) return false;
-        if (uKennung != null ? !uKennung.equals(mPackung.uKennung) : mPackung.uKennung != null) return false;
+        if (dafId != medPackung.dafId) return false;
+        if (groesse != medPackung.groesse) return false;
+        if (mpid != medPackung.mpid) return false;
+        if (inhalt != null ? !inhalt.equals(medPackung.inhalt) : medPackung.inhalt != null) return false;
+        if (pzn != null ? !pzn.equals(medPackung.pzn) : medPackung.pzn != null) return false;
+        if (uKennung != null ? !uKennung.equals(medPackung.uKennung) : medPackung.uKennung != null) return false;
 
         return true;
     }

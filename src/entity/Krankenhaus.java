@@ -1,8 +1,9 @@
-package entity.medis;
+package entity;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,29 +13,30 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class MpHersteller {
-    private long mphid;
+@Table(name = "KH")
+public class Krankenhaus {
+    private long khid;
 
-    @javax.persistence.Column(name = "MPHID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @javax.persistence.Column(name = "KHID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
-    public long getMphid() {
-        return mphid;
+    public long getKhid() {
+        return khid;
     }
 
-    public void setMphid(long mphid) {
-        this.mphid = mphid;
+    public void setKhid(long khid) {
+        this.khid = khid;
     }
 
-    private String firma;
+    private String name;
 
-    @javax.persistence.Column(name = "Firma", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
+    @javax.persistence.Column(name = "Name", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
     @Basic
-    public String getFirma() {
-        return firma;
+    public String getName() {
+        return name;
     }
 
-    public void setFirma(String firma) {
-        this.firma = firma;
+    public void setName(String name) {
+        this.name = name;
     }
 
     private String strasse;
@@ -97,61 +99,33 @@ public class MpHersteller {
         this.fax = fax;
     }
 
-    private String www;
-
-    @javax.persistence.Column(name = "WWW", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
-    public String getWww() {
-        return www;
-    }
-
-    public void setWww(String www) {
-        this.www = www;
-    }
-
-    private String uKennung;
-
-    @javax.persistence.Column(name = "UKennung", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
-    public String getuKennung() {
-        return uKennung;
-    }
-
-    public void setuKennung(String uKennung) {
-        this.uKennung = uKennung;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MpHersteller that = (MpHersteller) o;
+        Krankenhaus krankenhaus = (Krankenhaus) o;
 
-        if (mphid != that.mphid) return false;
-        if (fax != null ? !fax.equals(that.fax) : that.fax != null) return false;
-        if (firma != null ? !firma.equals(that.firma) : that.firma != null) return false;
-        if (ort != null ? !ort.equals(that.ort) : that.ort != null) return false;
-        if (plz != null ? !plz.equals(that.plz) : that.plz != null) return false;
-        if (strasse != null ? !strasse.equals(that.strasse) : that.strasse != null) return false;
-        if (tel != null ? !tel.equals(that.tel) : that.tel != null) return false;
-        if (uKennung != null ? !uKennung.equals(that.uKennung) : that.uKennung != null) return false;
-        if (www != null ? !www.equals(that.www) : that.www != null) return false;
+        if (khid != krankenhaus.khid) return false;
+        if (fax != null ? !fax.equals(krankenhaus.fax) : krankenhaus.fax != null) return false;
+        if (name != null ? !name.equals(krankenhaus.name) : krankenhaus.name != null) return false;
+        if (ort != null ? !ort.equals(krankenhaus.ort) : krankenhaus.ort != null) return false;
+        if (plz != null ? !plz.equals(krankenhaus.plz) : krankenhaus.plz != null) return false;
+        if (strasse != null ? !strasse.equals(krankenhaus.strasse) : krankenhaus.strasse != null) return false;
+        if (tel != null ? !tel.equals(krankenhaus.tel) : krankenhaus.tel != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (mphid ^ (mphid >>> 32));
-        result = 31 * result + (firma != null ? firma.hashCode() : 0);
+        int result = (int) (khid ^ (khid >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (strasse != null ? strasse.hashCode() : 0);
         result = 31 * result + (plz != null ? plz.hashCode() : 0);
         result = 31 * result + (ort != null ? ort.hashCode() : 0);
         result = 31 * result + (tel != null ? tel.hashCode() : 0);
         result = 31 * result + (fax != null ? fax.hashCode() : 0);
-        result = 31 * result + (www != null ? www.hashCode() : 0);
-        result = 31 * result + (uKennung != null ? uKennung.hashCode() : 0);
         return result;
     }
 }

@@ -3,6 +3,7 @@ package entity.medis;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +13,8 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class MpStoffe {
+@Table(name = "MPStoffe")
+public class MedStoffe {
     private long stoffId;
 
     @javax.persistence.Column(name = "StoffID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -54,12 +56,12 @@ public class MpStoffe {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MpStoffe mpStoffe = (MpStoffe) o;
+        MedStoffe medStoffe = (MedStoffe) o;
 
-        if (stoffId != mpStoffe.stoffId) return false;
-        if (bezeichnung != null ? !bezeichnung.equals(mpStoffe.bezeichnung) : mpStoffe.bezeichnung != null)
+        if (stoffId != medStoffe.stoffId) return false;
+        if (bezeichnung != null ? !bezeichnung.equals(medStoffe.bezeichnung) : medStoffe.bezeichnung != null)
             return false;
-        if (uKennung != null ? !uKennung.equals(mpStoffe.uKennung) : mpStoffe.uKennung != null) return false;
+        if (uKennung != null ? !uKennung.equals(medStoffe.uKennung) : medStoffe.uKennung != null) return false;
 
         return true;
     }

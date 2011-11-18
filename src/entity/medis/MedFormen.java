@@ -1,8 +1,11 @@
 package entity.medis;
 
+import op.tools.SYSTools;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +15,8 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class MpFormen {
+@Table(name = "MPFormen")
+public class MedFormen {
     private long formId;
 
     @javax.persistence.Column(name = "FormID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -30,7 +34,7 @@ public class MpFormen {
     @javax.persistence.Column(name = "Zubereitung", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
     @Basic
     public String getZubereitung() {
-        return zubereitung;
+        return SYSTools.catchNull(zubereitung);
     }
 
     public void setZubereitung(String zubereitung) {
@@ -42,7 +46,7 @@ public class MpFormen {
     @javax.persistence.Column(name = "AnwText", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
     @Basic
     public String getAnwText() {
-        return anwText;
+        return SYSTools.catchNull(anwText);
     }
 
     public void setAnwText(String anwText) {
@@ -126,17 +130,17 @@ public class MpFormen {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MpFormen mpFormen = (MpFormen) o;
+        MedFormen medFormen = (MedFormen) o;
 
-        if (anwEinheit != mpFormen.anwEinheit) return false;
-        if (equiv != mpFormen.equiv) return false;
-        if (formId != mpFormen.formId) return false;
-        if (massId != mpFormen.massId) return false;
-        if (packEinheit != mpFormen.packEinheit) return false;
-        if (status != mpFormen.status) return false;
-        if (stellplan != mpFormen.stellplan) return false;
-        if (anwText != null ? !anwText.equals(mpFormen.anwText) : mpFormen.anwText != null) return false;
-        if (zubereitung != null ? !zubereitung.equals(mpFormen.zubereitung) : mpFormen.zubereitung != null)
+        if (anwEinheit != medFormen.anwEinheit) return false;
+        if (equiv != medFormen.equiv) return false;
+        if (formId != medFormen.formId) return false;
+        if (massId != medFormen.massId) return false;
+        if (packEinheit != medFormen.packEinheit) return false;
+        if (status != medFormen.status) return false;
+        if (stellplan != medFormen.stellplan) return false;
+        if (anwText != null ? !anwText.equals(medFormen.anwText) : medFormen.anwText != null) return false;
+        if (zubereitung != null ? !zubereitung.equals(medFormen.zubereitung) : medFormen.zubereitung != null)
             return false;
 
         return true;

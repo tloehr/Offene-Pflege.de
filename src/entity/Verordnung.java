@@ -8,6 +8,7 @@ package entity;
 import entity.medis.Darreichung;
 import entity.medis.Situationen;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -30,10 +31,6 @@ import java.util.Date;
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
         @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Verordnung b WHERE b.abDatum = :abDatum"),
-        @NamedQuery(name = "Verordnung.findByAnKHID", query = "SELECT b FROM Verordnung b WHERE b.anKHID = :anKHID"),
-        @NamedQuery(name = "Verordnung.findByAbKHID", query = "SELECT b FROM Verordnung b WHERE b.abKHID = :abKHID"),
-        @NamedQuery(name = "Verordnung.findByAnArztID", query = "SELECT b FROM Verordnung b WHERE b.anArztID = :anArztID"),
-        @NamedQuery(name = "Verordnung.findByAbArztID", query = "SELECT b FROM Verordnung b WHERE b.abArztID = :abArztID"),
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
         @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
@@ -52,14 +49,6 @@ public class Verordnung implements Serializable, VorgangElement {
     @Column(name = "AbDatum")
     @Temporal(TemporalType.TIMESTAMP)
     private Date abDatum;
-    @Column(name = "AnKHID")
-    private BigInteger anKHID;
-    @Column(name = "AbKHID")
-    private BigInteger abKHID;
-    @Column(name = "AnArztID")
-    private BigInteger anArztID;
-    @Column(name = "AbArztID")
-    private BigInteger abArztID;
     @Column(name = "BisPackEnde")
     private Boolean bisPackEnde;
     @Basic(optional = false)
@@ -100,6 +89,18 @@ public class Verordnung implements Serializable, VorgangElement {
     @JoinColumn(name = "SitID", referencedColumnName = "SitID")
     @ManyToOne
     private Situationen situation;
+    @JoinColumn(name = "AnKHID", referencedColumnName = "KHID")
+    @ManyToOne
+    private Krankenhaus anKH;
+    @JoinColumn(name = "AbKHID", referencedColumnName = "KHID")
+    @ManyToOne
+    private Krankenhaus abKH;
+    @JoinColumn(name = "AnArztID", referencedColumnName = "ArztID")
+    @ManyToOne
+    private Arzt anArzt;
+    @JoinColumn(name = "AbArztID", referencedColumnName = "ArztID")
+    @ManyToOne
+    private Arzt abArzt;
 
 
     public Verordnung() {
@@ -129,39 +130,39 @@ public class Verordnung implements Serializable, VorgangElement {
         this.abDatum = abDatum;
     }
 
-    public BigInteger getAnKHID() {
-        return anKHID;
+    public Krankenhaus getAnKH() {
+        return anKH;
     }
 
-    public void setAnKHID(BigInteger anKHID) {
-        this.anKHID = anKHID;
+    public void setAnKH(Krankenhaus anKH) {
+        this.anKH = anKH;
     }
 
-    public BigInteger getAbKHID() {
-        return abKHID;
+    public Krankenhaus getAbKH() {
+        return abKH;
     }
 
-    public void setAbKHID(BigInteger abKHID) {
-        this.abKHID = abKHID;
+    public void setAbKH(Krankenhaus abKH) {
+        this.abKH = abKH;
     }
 
-    public BigInteger getAnArztID() {
-        return anArztID;
+    public Arzt getAnArzt() {
+        return anArzt;
     }
 
-    public void setAnArztID(BigInteger anArztID) {
-        this.anArztID = anArztID;
+    public void setAnArzt(Arzt anArzt) {
+        this.anArzt = anArzt;
     }
 
-    public BigInteger getAbArztID() {
-        return abArztID;
+    public Arzt getAbArzt() {
+        return abArzt;
     }
 
-    public void setAbArztID(BigInteger abArztID) {
-        this.abArztID = abArztID;
+    public void setAbArzt(Arzt abArzt) {
+        this.abArzt = abArzt;
     }
 
-    public Boolean getBisPackEnde() {
+    public Boolean isBisPackEnde() {
         return bisPackEnde;
     }
 
@@ -178,7 +179,7 @@ public class Verordnung implements Serializable, VorgangElement {
     }
 
     public String getBemerkung() {
-        return bemerkung;
+        return SYSTools.catchNull(bemerkung);
     }
 
     public void setBemerkung(String bemerkung) {
@@ -201,7 +202,7 @@ public class Verordnung implements Serializable, VorgangElement {
         return situation;
     }
 
-    public boolean hasMedi(){
+    public boolean hasMedi() {
         return darreichung != null;
     }
 
@@ -245,8 +246,20 @@ public class Verordnung implements Serializable, VorgangElement {
         return attachedVorgaenge;
     }
 
+    public Bewohner getBewohner() {
+        return bewohner;
+    }
+
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
     public boolean isAbgesetzt() {
         return abDatum.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    }
+
+    public boolean isBedarf() {
+        return situation != null;
     }
 
     @Override

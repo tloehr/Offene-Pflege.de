@@ -1,5 +1,7 @@
 package entity.medis;
 
+import op.tools.SYSTools;
+
 import javax.persistence.*;
 
 /**
@@ -12,15 +14,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "MPDarreichung")
 public class Darreichung {
-    private long dafId;
+    private Long dafId;
 
     @javax.persistence.Column(name = "DafID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
-    public long getDafId() {
+    public Long getDafId() {
         return dafId;
     }
 
-    public void setDafId(long dafId) {
+    public void setDafId(Long dafId) {
         this.dafId = dafId;
     }
 
@@ -29,23 +31,11 @@ public class Darreichung {
     @javax.persistence.Column(name = "Zusatz", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
     @Basic
     public String getZusatz() {
-        return zusatz;
+        return SYSTools.catchNull(zusatz);
     }
 
     public void setZusatz(String zusatz) {
         this.zusatz = zusatz;
-    }
-
-    private long formId;
-
-    @javax.persistence.Column(name = "FormID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getFormId() {
-        return formId;
-    }
-
-    public void setFormId(long formId) {
-        this.formId = formId;
     }
 
     private String uKennung;
@@ -65,29 +55,43 @@ public class Darreichung {
     @ManyToOne
     private MedProdukte medProdukt;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @JoinColumn(name = "FormID", referencedColumnName = "FormID")
+    @ManyToOne
+    private MedFormen medForm;
 
-        Darreichung that = (Darreichung) o;
+    public MedProdukte getMedProdukt() {
+        return medProdukt;
+    }
 
-        if (dafId != that.dafId) return false;
-        if (formId != that.formId) return false;
-        if (!medProdukt.equals(that)) return false;
-        if (uKennung != null ? !uKennung.equals(that.uKennung) : that.uKennung != null) return false;
-        if (zusatz != null ? !zusatz.equals(that.zusatz) : that.zusatz != null) return false;
+    public void setMedProdukt(MedProdukte medProdukt) {
+        this.medProdukt = medProdukt;
+    }
 
-        return true;
+    public MedFormen getMedForm() {
+        return medForm;
+    }
+
+    public void setMedForm(MedFormen medForm) {
+        this.medForm = medForm;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (dafId ^ (dafId >>> 32));
-        result = 31 * result + (zusatz != null ? zusatz.hashCode() : 0);
-        result = 31 * result + (int) (medProdukt.getMedPid() ^ (medProdukt.getMedPid() >>> 32));
-        result = 31 * result + (int) (formId ^ (formId >>> 32));
-        result = 31 * result + (uKennung != null ? uKennung.hashCode() : 0);
-        return result;
+        int hash = 0;
+        hash += (dafId != 0 ? dafId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Darreichung)) {
+            return false;
+        }
+        Darreichung other = (Darreichung) object;
+        if ((this.dafId == null && other.dafId != null) || (this.dafId != null && !this.dafId.equals(other.dafId))) {
+            return false;
+        }
+        return true;
     }
 }

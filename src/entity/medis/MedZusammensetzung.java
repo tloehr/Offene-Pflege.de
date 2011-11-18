@@ -3,6 +3,7 @@ package entity.medis;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 
 /**
@@ -13,7 +14,8 @@ import java.math.BigDecimal;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class MpZusammensetzung {
+@Table(name = "MPZusammensetzung")
+public class MedZusammensetzung {
     private long zusId;
 
     @javax.persistence.Column(name = "ZusID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -103,7 +105,7 @@ public class MpZusammensetzung {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MpZusammensetzung that = (MpZusammensetzung) o;
+        MedZusammensetzung that = (MedZusammensetzung) o;
 
         if (dafId != that.dafId) return false;
         if (dimension != that.dimension) return false;

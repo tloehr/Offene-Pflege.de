@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Mpapv {
+public class APV {
     private long apvid;
 
     @javax.persistence.Column(name = "APVID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -79,13 +79,13 @@ public class Mpapv {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Mpapv mpapv = (Mpapv) o;
+        APV APV = (APV) o;
 
-        if (apvid != mpapv.apvid) return false;
-        if (dafId != mpapv.dafId) return false;
-        if (tauschen != mpapv.tauschen) return false;
-        if (apv != null ? !apv.equals(mpapv.apv) : mpapv.apv != null) return false;
-        if (bwKennung != null ? !bwKennung.equals(mpapv.bwKennung) : mpapv.bwKennung != null) return false;
+        if (apvid != APV.apvid) return false;
+        if (dafId != APV.dafId) return false;
+        if (tauschen != APV.tauschen) return false;
+        if (apv != null ? !apv.equals(APV.apv) : APV.apv != null) return false;
+        if (bwKennung != null ? !bwKennung.equals(APV.bwKennung) : APV.bwKennung != null) return false;
 
         return true;
     }

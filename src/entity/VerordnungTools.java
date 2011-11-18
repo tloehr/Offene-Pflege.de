@@ -4,15 +4,21 @@
  */
 package entity;
 
+import entity.medis.MedBestand;
+import entity.medis.MedBestandTools;
+import entity.medis.MedVorrat;
 import op.OPDE;
 import op.tools.*;
 
+import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -108,7 +114,7 @@ public class VerordnungTools {
      * @param rs
      * @return
      */
-    private static String getStellplan(ResultSet rs) {
+    public static String getStellplan(ResultSet rs) {
 
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
 
@@ -214,13 +220,13 @@ public class VerordnungTools {
         return html;
     }
 
-    private static String getEinheit(ResultSet rs) throws SQLException {
+    public static String getEinheit(ResultSet rs) throws SQLException {
         return SYSTools.catchNull(rs.getString("Zubereitung"), "", ", ")
                 + SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
     }
 
 
-    private static String getMassnahme(ResultSet rs) throws SQLException {
+    public static String getMassnahme(ResultSet rs) throws SQLException {
         String result = "";
 
         if (rs.getLong("DafID") == 0) {
@@ -237,7 +243,7 @@ public class VerordnungTools {
         return result;
     }
 
-    private static String getHinweis(ResultSet rs) throws SQLException {
+    public static String getHinweis(ResultSet rs) throws SQLException {
         String result = "";
 
         // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
@@ -269,7 +275,7 @@ public class VerordnungTools {
         return result.equals("") ? "&nbsp;" : result;
     }
 
-    private static String getWiederholung(ResultSet rs) throws SQLException {
+    public static String getWiederholung(ResultSet rs) throws SQLException {
         String result = "";
 
         //ResultSet rs = DBRetrieve.getResultSet("BHPPlanung","VerID",verid,"=");
@@ -368,7 +374,7 @@ public class VerordnungTools {
         return result;
     }
 
-     private String getMassnahme(Verordnung verordnung) {
+    public static String getMassnahme(Verordnung verordnung) {
         String result = "";
 
         if (verordnung.isAbgesetzt()) {
@@ -377,26 +383,23 @@ public class VerordnungTools {
         if (!verordnung.hasMedi()) {
             result += verordnung.getMassnahme().getBezeichnung();
         } else {
-//            // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
-//            if (rs.getLong("bestandDafID") > 0 && rs.getLong("bestandDafID") != rs.getLong("v.DafID")) { // Nur bei Abweichung.
-//                result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext1").replaceAll("-", "- ") +
-//                        SYSTools.catchNull(rs.getString("D1.Zusatz"), " ", "") + "</b></font>" +
-//                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
-//                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
-//                result += " <i>(ursprünglich verordnet: " + rs.getString("mptext").replaceAll("-", "- ") +
-//                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</i>";
-//            } else {
-//                result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext").replaceAll("-", "- ") +
-//                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</b></font>" +
-//                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
-//                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
-//
-//            }
-    // TODO: hier weiter
-//                result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().rs.getString("mptext").replaceAll("-", "- ") +
-//                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</b></font>" +
-//                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
-//                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
+            // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
+
+            MedBestand aktuellerAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
+            if (aktuellerAnbruch != null && aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
+                result += "<font face=\"Sans Serif\"><b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
+                        aktuellerAnbruch.getDarreichung().getZusatz() + "</b></font>" +
+                        aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung() + " " +
+                        (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
+                result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
+                        verordnung.getDarreichung().getZusatz() + "</i>";
+            } else {
+                result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
+                        verordnung.getDarreichung().getZusatz() + "</b></font>" +
+                        verordnung.getDarreichung().getMedForm().getZubereitung() + " " +
+                        (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
+            }
+
 
         }
         if (verordnung.isAbgesetzt()) {//if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
@@ -406,85 +409,280 @@ public class VerordnungTools {
 
         return result;
     }
-//
-//    private String getHinweis(Verordnung verordnung) {
-//        String result = "";
-//        try {
-//            if (rs.getLong("SitID") > 0) {
-//                result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + rs.getString("sittext") + "</font></b><br/>";
-//            }
-//            if (rs.getString("Bemerkung") != null && !rs.getString("Bemerkung").equals("")) {
-//                result += "<b><u>Bemerkung:</u> </b>" + rs.getString("Bemerkung");
-//            }
-//        } catch (SQLException ex) {
-//            new DlgException(ex);
-//        }
-//        return (result.equals("") ? "" : "<html><body>" + result + "</body></html>");
-//    }
-//
-//    public String getAN(Verordnung verordnung) {
-//        String result = "";
-//        try {
-//
-//            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-//            String datum = sdf.format(rs.getDate("AnDatum"));
-//
-//            result += "<html><body>";
-//            result += "<font color=\"green\">" + datum + "; ";
-//            if (rs.getLong("v.AnKHID") > 0) {
-//                result += rs.getString("khan.Name");
-//            }
-//            if (rs.getLong("v.AnArztID") > 0) {
-//                if (rs.getLong("v.AnKHID") > 0) {
-//                    result += " <i>bestätigt durch:</i> ";
-//                }
-//                result += rs.getString("an.Titel") + " ";
-//                if (OPDE.isAnonym()) {
-//                    result += rs.getString("an.Name").substring(0, 1) + "***";
-//                } else {
-//                    result += rs.getString("an.Name");
-//                }
-//
-//            }
-//            result += "; " + op.tools.DBRetrieve.getUsername(rs.getString("AnUKennung")) + "</font>";
-//            result += "</body></html>";
-//
-//        } catch (SQLException ex) {
-//            new DlgException(ex);
-//        }
-//        return result;
-//    }
-//
-//    public String getAB(Verordnung verordnung) {
-//        String result = "";
-//        try {
-//            if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() < SYSConst.BIS_AUF_WEITERES.getTimeInMillis()) {
-//                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-//                String datum = sdf.format(rs.getDate("AbDatum"));
-//
-//                result += "<html><body>";
-//                result += "<font color=\"red\">" + datum + "; ";
-//                if (rs.getLong("v.AbKHID") > 0) {
-//                    result += rs.getString("khab.Name");
-//                }
-//                if (rs.getLong("v.AbArztID") > 0) {
-//                    if (rs.getLong("v.AbKHID") > 0) {
-//                        result += " <i>bestätigt durch:</i> ";
-//                    }
-//                    result += rs.getString("ab.Titel");
-//                    if (OPDE.isAnonym()) {
-//                        result += rs.getString("ab.Name").substring(0, 1) + "***";
-//                    } else {
-//                        result += rs.getString("ab.Name");
-//                    }
-//
-//                }
-//                result += "; " + op.tools.DBRetrieve.getUsername(rs.getString("AbUKennung")) + "</font>";
-//                result += "</body></html>";
-//            }
-//        } catch (SQLException ex) {
-//            new DlgException(ex);
-//        }
-//        return result;
-//    }
+
+    public static String getHinweis(Verordnung verordnung) {
+        String result = "";
+
+        if (verordnung.isBedarf()) {
+            result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b><br/>";
+        }
+        if (!verordnung.getBemerkung().isEmpty()) {
+            result += "<b><u>Bemerkung:</u> </b>" + verordnung.getBemerkung();
+        }
+        return (result.equals("") ? "" : "<html><body>" + result + "</body></html>");
+    }
+
+    public static String getAN(Verordnung verordnung) {
+        String result = "";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+        String datum = sdf.format(verordnung.getAnDatum());
+
+        result += "<html><body>";
+        result += "<font color=\"green\">" + datum + "; ";
+        if (verordnung.getAnKH() != null) {
+            result += verordnung.getAnKH().getName();
+        }
+        if (verordnung.getAnArzt() != null) {
+            if (verordnung.getAnKH() != null) {
+                result += " <i>bestätigt durch:</i> ";
+            }
+            result += verordnung.getAnArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAnArzt().getName(), SYSTools.INDEX_NACHNAME);
+        }
+        result += "; " + verordnung.getAngesetztDurch().getNameUndVorname() + "</font>";
+        result += "</body></html>";
+
+        return result;
+    }
+
+    public static String getAB(Verordnung verordnung) {
+        String result = "";
+
+        if (verordnung.isAbgesetzt()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+            String datum = sdf.format(verordnung.getAbDatum());
+
+            result += "<html><body>";
+            result += "<font color=\"red\">" + datum + "; ";
+
+            result += verordnung.getAbKH() != null ? verordnung.getAbKH().getName() : "";
+
+            if (verordnung.getAbArzt() != null) {
+                if (verordnung.getAbKH() != null) {
+                    result += " <i>bestätigt durch:</i> ";
+                }
+                result += verordnung.getAbArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAbArzt().getName(), SYSTools.INDEX_NACHNAME);
+            }
+            result += "; " + verordnung.getAbgesetztDurch().getNameUndVorname() + "</font>";
+            result += "</body></html>";
+        }
+        return result;
+    }
+
+    public static String getDosis(Verordnung verordnung) {
+        String result = "";
+        //OPDE.getLogger().debug("VerID: "+verid);
+
+        // ======================================================================================================
+        // Erster Teil
+        // ======================================================================================================
+
+        Query query = OPDE.getEM().createNamedQuery("VerordnungPlanung.findByVerordnungSorted");
+        query.setParameter("verordnung", verordnung);
+        Iterator<VerordnungPlanung> planungen = query.getResultList().iterator();
+
+        if (planungen.hasNext()) {
+            VerordnungPlanung vorherigePlanung = null;
+            while (planungen.hasNext()) {
+                VerordnungPlanung planung = planungen.next();
+
+                boolean headerNeeded = vorherigePlanung == null || VerordnungPlanungTools.getTerminStatus(vorherigePlanung) != VerordnungPlanungTools.getTerminStatus(planung);
+
+                if (vorherigePlanung != null && headerNeeded && VerordnungPlanungTools.getTerminStatus(vorherigePlanung) != VerordnungPlanungTools.MAXDOSIS) {
+                    // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
+                    // der erste Durchlauf, ein Wechsel stattgefunden hat und der
+                    // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
+                    result += "</table>";
+                }
+
+                vorherigePlanung = planung;
+                if (VerordnungPlanungTools.getTerminStatus(planung) == VerordnungPlanungTools.ZEIT) {
+                    if (headerNeeded) {
+                        result += "<table border=\"1\" cellspacing=\"0\">" +
+                                "   <tr>" +
+                                "      <th align=\"center\">fm</th>" +
+                                "      <th align=\"center\">mo</th>" +
+                                "      <th align=\"center\">mi</th>" +
+                                "      <th align=\"center\">nm</th>" +
+                                "      <th align=\"center\">ab</th>" +
+                                "      <th align=\"center\">sa</th>" +
+                                "      <th align=\"center\">Wdh.</th>" +
+                                "   </tr>";
+                    }
+                    result += "    <tr>" +
+                            "      <td align=\"center\">" + VerordnungPlanungTools.getValueAsString(planung.getNachtMo()) + "</td>" +
+                            "      <td align=\"center\">" + VerordnungPlanungTools.getValueAsString(planung.getMorgens()) + "</td>" +
+                            "      <td align=\"center\">" + VerordnungPlanungTools.getValueAsString(planung.getMittags()) + "</td>" +
+                            "      <td align=\"center\">" + VerordnungPlanungTools.getValueAsString(planung.getNachmittags()) + "</td>" +
+                            "      <td align=\"center\">" + VerordnungPlanungTools.getValueAsString(planung.getAbends()) + "</td>" +
+                            "      <td align=\"center\">" + VerordnungPlanungTools.getValueAsString(planung.getNachtAb()) + "</td>" +
+                            "      <td>" + getWiederholung(planung) + "</td>" +
+                            "    </tr>";
+                } else if (VerordnungPlanungTools.getTerminStatus(planung) == VerordnungPlanungTools.MAXDOSIS) {
+//                        if (rsDosis.getLong("DafID") > 0){
+//                            result += "Maximale Tagesdosis: ";
+//                        } else {
+//                            result += "Maximale Häufigkeit: ";
+//                        }
+                    result += "<b>Maximale Tagesdosis: ";
+                    result += planung.getMaxAnzahl() + "x " + SYSTools.printDouble(planung.getMaxEDosis().doubleValue());
+                    result += "</b><br/>";
+                } else if (VerordnungPlanungTools.getTerminStatus(planung) == VerordnungPlanungTools.UHRZEIT) {
+                    if (headerNeeded) {
+                        result += "<table border=\"1\" >" +
+                                "   <tr>" +
+                                "      <th align=\"center\">Uhrzeit</th>" +
+                                "      <th align=\"center\">Anzahl</th>" +
+                                "      <th align=\"center\">Wdh.</th>" +
+                                "   </tr>";
+                    }
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                    result += "    <tr>" +
+                            "      <td align=\"center\">" + sdf.format(planung.getUhrzeit()) + " Uhr</td>" +
+                            "      <td align=\"center\">" + SYSTools.printDouble(planung.getUhrzeitDosis().doubleValue()) + "</td>" +
+                            "      <td>" + getWiederholung(planung) + "</td>" +
+                            "    </tr>";
+                } else {
+                    result = "!!FEHLER!!";
+                }
+            }
+            if (VerordnungPlanungTools.getTerminStatus(vorherigePlanung) == VerordnungPlanungTools.MAXDOSIS) {
+                // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
+                // der erste Durchlauf, ein Wechsel stattgefunden hat und der
+                // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
+                result += "</table>";
+            }
+        } else {
+            result += "<i>Noch keine Dosierung / Anwendungsinformationen verfügbar</i><br/>";
+        }
+
+        // ======================================================================================================
+        // Zweiter Teil
+        // ======================================================================================================
+
+        if (verordnung.hasMedi()) { // Gilt nur für Medikamente, sonst passt das nicht
+            if (verordnung.isBisPackEnde()) {
+                result += "nur bis Packungs Ende<br/>";
+            }
+            if (!verordnung.isAbgesetzt() && mitBestand) {
+
+            }
+        }
+
+
+        return result;
+    }
+
+    public static String getSummen(Verordnung verordnung) {
+        String tmp = "";
+
+        BigDecimal vorratSumme = MedVorratTools.getSumme(VerordnungTools.)
+
+        if (rs.getDouble("saldo") > 0) {
+            tmp += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("saldo")) + " " +
+                    SYSConst.EINHEIT[rs.getInt("PackEinheit")] +
+                    "</font></b>";
+            if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
+                double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
+                tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+                        (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
+            }
+            if (rs.getLong("BestID") > 0) {
+                tmp += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + rs.getLong("BestID") + "</font></b>";
+
+                if (rs.getDouble("bestsumme") != rs.getDouble("saldo")) {
+                    tmp += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("bestsumme")) + " " +
+                            SYSConst.EINHEIT[rs.getInt("PackEinheit")] + "</font></b>";
+                    if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
+                        double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
+                        tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+                                (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
+                    }
+                }
+            } else {
+                tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+            }
+//                                if (rs.getLong("BestellID") > 0){
+//                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
+//                                }
+        } else {
+            tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
+        }
+
+    }
+
+
+    public static String getWiederholung(VerordnungPlanung planung) {
+        String result = "";
+
+        if (planung.isTaeglich()) {
+            if (planung.getTaeglich() > 1) {
+                result += "<b>alle " + planung.getTaeglich() + " Tage</b>";
+            }
+        } else if (planung.isWoechentlich()) {
+            result += "<b>";
+            if (planung.getWoechentlich() == 1) {
+                result += "jede Woche ";
+            } else {
+                result += "alle " + planung.getWoechentlich() + " Wochen ";
+            }
+
+            result += (planung.getMon() > 0 ? "Mon " : "");
+            result += (planung.getDie() > 0 ? "Die " : "");
+            result += (planung.getMit() > 0 ? "Mit " : "");
+            result += (planung.getDon() > 0 ? "Don " : "");
+            result += (planung.getFre() > 0 ? "Fre " : "");
+            result += (planung.getSam() > 0 ? "Sam " : "");
+            result += (planung.getSon() > 0 ? "Son " : "");
+
+            result += "</b>";
+        } else if (planung.isMonatlich()) {
+            result += "<b>";
+            if (planung.getMonatlich() == 1) {
+                result += "jeden Monat ";
+            } else {
+                result += "alle " + planung.getMonatlich() + " Monate ";
+            }
+
+            if (planung.getTagNum() > 0) {
+                result += "jeweils am " + planung.getTagNum() + ". des Monats";
+            } else {
+                int wtag = 0;
+                String tag = "";
+
+                // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
+                tag += (planung.getMon() > 0 ? "Montag" : "");
+                tag += (planung.getDie() > 0 ? "Dienstag" : "");
+                tag += (planung.getMit() > 0 ? "Mittwoch" : "");
+                tag += (planung.getDon() > 0 ? "Donnerstag" : "");
+                tag += (planung.getFre() > 0 ? "Freitag" : "");
+                tag += (planung.getSam() > 0 ? "Samstag" : "");
+                tag += (planung.getSon() > 0 ? "Sonntag" : "");
+
+                wtag += planung.getMon();
+                wtag += planung.getDie();
+                wtag += planung.getMit();
+                wtag += planung.getDon();
+                wtag += planung.getFre();
+                wtag += planung.getSam();
+                wtag += planung.getSon();
+
+                result += "jeweils am " + wtag + ". " + tag + " des Monats";
+            }
+            result += "</b>";
+        } else {
+            result = "";
+        }
+
+        if (planung.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
+            DateFormat df = DateFormat.getDateInstance();
+            if (SYSCalendar.isInFuture(planung.getlDatum().getTime())) {
+                result += "<br/>erste Anwendung am: ";
+            } else {
+                result += "<br/>Zuletzt eingeplant: ";
+            }
+            result += df.format(planung.getlDatum());
+        }
+
+        return result;
+    }
 }

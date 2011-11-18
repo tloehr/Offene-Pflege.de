@@ -1,11 +1,9 @@
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Time;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +13,13 @@ import java.sql.Timestamp;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class BhpPlanung {
+@Table(name = "BHPPlanung")
+@NamedQueries({
+        @NamedQuery(name = "VerordnungPlanung.findByVerordnungSorted", query = " " +
+                " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung AND vp.tmp = 0 " +
+                " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
+})
+public class VerordnungPlanung {
     private long bhppid;
 
     @javax.persistence.Column(name = "BHPPID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -28,17 +32,6 @@ public class BhpPlanung {
         this.bhppid = bhppid;
     }
 
-    private long verId;
-
-    @javax.persistence.Column(name = "VerID", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getVerId() {
-        return verId;
-    }
-
-    public void setVerId(long verId) {
-        this.verId = verId;
-    }
 
     private BigDecimal nachtMo;
 
@@ -292,15 +285,15 @@ public class BhpPlanung {
         this.son = son;
     }
 
-    private Timestamp lDatum;
+    private Date lDatum;
 
     @javax.persistence.Column(name = "LDatum", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
     @Basic
-    public Timestamp getlDatum() {
+    public Date getlDatum() {
         return lDatum;
     }
 
-    public void setlDatum(Timestamp lDatum) {
+    public void setlDatum(Date lDatum) {
         this.lDatum = lDatum;
     }
 
@@ -328,14 +321,71 @@ public class BhpPlanung {
         this.tmp = tmp;
     }
 
+    // ==
+    // N:1 Relationen
+    // ==
+    @JoinColumn(name = "VerID", referencedColumnName = "VerID")
+    @ManyToOne
+    private Verordnung verordnung;
+
+
+    public Verordnung getVerordnung() {
+        return verordnung;
+    }
+
+    public void setVerordnung(Verordnung verordnung) {
+        this.verordnung = verordnung;
+    }
+
+    /**
+     * gibt an, ob bei der Planungen die festen Zeiten wie Früh, Spät, Nacht usw. verwendet wurden
+     *
+     * @return
+     */
+    public boolean verwendetZeiten() {
+        return nachtMo.doubleValue() + morgens.doubleValue() + mittags.doubleValue() + nachmittags.doubleValue() + abends.doubleValue() + nachtAb.doubleValue() > 0;
+    }
+
+    /**
+     * ermittelt ob es sich um die Planung für eine Bedarfsmedikation handelt
+     *
+     * @return
+     */
+    public boolean verwendetMaximalDosis() {
+        return maxAnzahl > 0;
+    }
+
+    /**
+     * ermittelt ob es sich um die Planung per Uhrzeit handelt
+     *
+     * @return
+     */
+    public boolean verwendetUhrzeit() {
+        return uhrzeit != null;
+    }
+
+    public boolean isTaeglich(){
+        return taeglich > 0;
+    }
+
+    public boolean isWoechentlich(){
+        return woechentlich > 0;
+    }
+
+    public boolean isMonatlich(){
+        return monatlich > 0;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BhpPlanung that = (BhpPlanung) o;
+        VerordnungPlanung that = (VerordnungPlanung) o;
 
         if (bhppid != that.bhppid) return false;
+        if (verordnung != that.verordnung) return false;
         if (die != that.die) return false;
         if (don != that.don) return false;
         if (fre != that.fre) return false;
@@ -348,7 +398,6 @@ public class BhpPlanung {
         if (taeglich != that.taeglich) return false;
         if (tagNum != that.tagNum) return false;
         if (tmp != that.tmp) return false;
-        if (verId != that.verId) return false;
         if (woechentlich != that.woechentlich) return false;
         if (abends != null ? !abends.equals(that.abends) : that.abends != null) return false;
         if (lDatum != null ? !lDatum.equals(that.lDatum) : that.lDatum != null) return false;
@@ -368,7 +417,6 @@ public class BhpPlanung {
     @Override
     public int hashCode() {
         int result = (int) (bhppid ^ (bhppid >>> 32));
-        result = 31 * result + (int) (verId ^ (verId >>> 32));
         result = 31 * result + (nachtMo != null ? nachtMo.hashCode() : 0);
         result = 31 * result + (morgens != null ? morgens.hashCode() : 0);
         result = 31 * result + (mittags != null ? mittags.hashCode() : 0);
