@@ -32,6 +32,8 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import entity.files.SYSFilesTools;
+import entity.vorgang.VorgaengeTools;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;

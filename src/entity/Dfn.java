@@ -1,145 +1,176 @@
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.util.Date;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
- */
 @Entity
-public class Dfn {
-    private long dfnid;
-
-    @javax.persistence.Column(name = "DFNID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "DFN")
+@NamedQueries({
+    @NamedQuery(name = "Dfn.findAll", query = "SELECT d FROM DFN d"),
+    @NamedQuery(name = "Dfn.findByDfnid", query = "SELECT d FROM DFN d WHERE d.dfnid = :dfnid"),
+    @NamedQuery(name = "Dfn.findByBWKennung", query = "SELECT d FROM DFN d WHERE d.bWKennung = :bWKennung"),
+    @NamedQuery(name = "Dfn.findByTermID", query = "SELECT d FROM DFN d WHERE d.termID = :termID"),
+    @NamedQuery(name = "Dfn.findByUKennung", query = "SELECT d FROM DFN d WHERE d.uKennung = :uKennung"),
+    @NamedQuery(name = "Dfn.findByMassID", query = "SELECT d FROM DFN d WHERE d.massID = :massID"),
+    @NamedQuery(name = "Dfn.findBySoll", query = "SELECT d FROM DFN d WHERE d.soll = :soll"),
+    @NamedQuery(name = "Dfn.findByIst", query = "SELECT d FROM DFN d WHERE d.ist = :ist"),
+    @NamedQuery(name = "Dfn.findByStDatum", query = "SELECT d FROM DFN d WHERE d.stDatum = :stDatum"),
+    @NamedQuery(name = "Dfn.findBySZeit", query = "SELECT d FROM DFN d WHERE d.sZeit = :sZeit"),
+    @NamedQuery(name = "Dfn.findByIZeit", query = "SELECT d FROM DFN d WHERE d.iZeit = :iZeit"),
+    @NamedQuery(name = "Dfn.findByStatus", query = "SELECT d FROM DFN d WHERE d.status = :status"),
+    @NamedQuery(name = "Dfn.findByErforderlich", query = "SELECT d FROM DFN d WHERE d.erforderlich = :erforderlich"),
+    @NamedQuery(name = "Dfn.findByDauer", query = "SELECT d FROM DFN d WHERE d.dauer = :dauer"),
+    @NamedQuery(name = "Dfn.findByMdate", query = "SELECT d FROM DFN d WHERE d.mdate = :mdate")})
+public class DFN implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getDfnid() {
-        return dfnid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "DFNID")
+    private Long dfnid;
+    @Basic(optional = false)
+    @Column(name = "BWKennung")
+    private String bWKennung;
+    @Basic(optional = false)
+    @Column(name = "TermID")
+    private long termID;
+    @Column(name = "UKennung")
+    private String uKennung;
+    @Basic(optional = false)
+    @Column(name = "MassID")
+    private long massID;
+    @Basic(optional = false)
+    @Column(name = "Soll")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date soll;
+    @Column(name = "Ist")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ist;
+    @Basic(optional = false)
+    @Column(name = "StDatum")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date stDatum;
+    @Column(name = "SZeit")
+    private Boolean sZeit;
+    @Column(name = "IZeit")
+    private Boolean iZeit;
+    @Basic(optional = false)
+    @Column(name = "Status")
+    private boolean status;
+    @Basic(optional = false)
+    @Column(name = "Erforderlich")
+    private boolean erforderlich;
+    @Basic(optional = false)
+    @Column(name = "Dauer")
+    private BigDecimal dauer;
+    @Basic(optional = false)
+    @Column(name = "_mdate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date mdate;
+
+    public DFN() {
     }
 
-    public void setDfnid(long dfnid) {
+    public DFN(Long dfnid) {
         this.dfnid = dfnid;
     }
 
-    private String bwKennung;
-
-    @javax.persistence.Column(name = "BWKennung", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
-    public String getBwKennung() {
-        return bwKennung;
+    public DFN(Long dfnid, String bWKennung, long termID, long massID, Date soll, Date stDatum, boolean status, boolean erforderlich, BigDecimal dauer, Date mdate) {
+        this.dfnid = dfnid;
+        this.bWKennung = bWKennung;
+        this.termID = termID;
+        this.massID = massID;
+        this.soll = soll;
+        this.stDatum = stDatum;
+        this.status = status;
+        this.erforderlich = erforderlich;
+        this.dauer = dauer;
+        this.mdate = mdate;
     }
 
-    public void setBwKennung(String bwKennung) {
-        this.bwKennung = bwKennung;
+    public Long getDfnid() {
+        return dfnid;
     }
 
-    private long termId;
-
-    @javax.persistence.Column(name = "TermID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getTermId() {
-        return termId;
+    public void setDfnid(Long dfnid) {
+        this.dfnid = dfnid;
     }
 
-    public void setTermId(long termId) {
-        this.termId = termId;
+    public String getBWKennung() {
+        return bWKennung;
     }
 
-    private String uKennung;
+    public void setBWKennung(String bWKennung) {
+        this.bWKennung = bWKennung;
+    }
 
-    @javax.persistence.Column(name = "UKennung", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
-    public String getuKennung() {
+    public long getTermID() {
+        return termID;
+    }
+
+    public void setTermID(long termID) {
+        this.termID = termID;
+    }
+
+    public String getUKennung() {
         return uKennung;
     }
 
-    public void setuKennung(String uKennung) {
+    public void setUKennung(String uKennung) {
         this.uKennung = uKennung;
     }
 
-    private long massId;
-
-    @javax.persistence.Column(name = "MassID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getMassId() {
-        return massId;
+    public long getMassID() {
+        return massID;
     }
 
-    public void setMassId(long massId) {
-        this.massId = massId;
+    public void setMassID(long massID) {
+        this.massID = massID;
     }
 
-    private Timestamp soll;
-
-    @javax.persistence.Column(name = "Soll", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getSoll() {
+    public Date getSoll() {
         return soll;
     }
 
-    public void setSoll(Timestamp soll) {
+    public void setSoll(Date soll) {
         this.soll = soll;
     }
 
-    private Timestamp ist;
-
-    @javax.persistence.Column(name = "Ist", nullable = true, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getIst() {
+    public Date getIst() {
         return ist;
     }
 
-    public void setIst(Timestamp ist) {
+    public void setIst(Date ist) {
         this.ist = ist;
     }
 
-    private Timestamp stDatum;
-
-    @javax.persistence.Column(name = "StDatum", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getStDatum() {
+    public Date getStDatum() {
         return stDatum;
     }
 
-    public void setStDatum(Timestamp stDatum) {
+    public void setStDatum(Date stDatum) {
         this.stDatum = stDatum;
     }
 
-    private boolean sZeit;
-
-    @javax.persistence.Column(name = "SZeit", nullable = true, insertable = true, updatable = true, length = 0, precision = 0)
-    @Basic
-    public boolean issZeit() {
+    public Boolean getSZeit() {
         return sZeit;
     }
 
-    public void setsZeit(boolean sZeit) {
+    public void setSZeit(Boolean sZeit) {
         this.sZeit = sZeit;
     }
 
-    private boolean iZeit;
-
-    @javax.persistence.Column(name = "IZeit", nullable = true, insertable = true, updatable = true, length = 0, precision = 0)
-    @Basic
-    public boolean isiZeit() {
+    public Boolean getIZeit() {
         return iZeit;
     }
 
-    public void setiZeit(boolean iZeit) {
+    public void setIZeit(Boolean iZeit) {
         this.iZeit = iZeit;
     }
 
-    private boolean status;
-
-    @javax.persistence.Column(name = "Status", nullable = false, insertable = true, updatable = true, length = 0, precision = 0)
-    @Basic
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 
@@ -147,11 +178,7 @@ public class Dfn {
         this.status = status;
     }
 
-    private boolean erforderlich;
-
-    @javax.persistence.Column(name = "Erforderlich", nullable = false, insertable = true, updatable = true, length = 0, precision = 0)
-    @Basic
-    public boolean isErforderlich() {
+    public boolean getErforderlich() {
         return erforderlich;
     }
 
@@ -159,10 +186,6 @@ public class Dfn {
         this.erforderlich = erforderlich;
     }
 
-    private BigDecimal dauer;
-
-    @javax.persistence.Column(name = "Dauer", nullable = false, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getDauer() {
         return dauer;
     }
@@ -171,59 +194,38 @@ public class Dfn {
         this.dauer = dauer;
     }
 
-    private Timestamp mdate;
-
-    @javax.persistence.Column(name = "_mdate", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getMdate() {
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(Timestamp mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (dfnid != null ? dfnid.hashCode() : 0);
+        return hash;
+    }
 
-        Dfn dfn = (Dfn) o;
-
-        if (dfnid != dfn.dfnid) return false;
-        if (erforderlich != dfn.erforderlich) return false;
-        if (iZeit != dfn.iZeit) return false;
-        if (massId != dfn.massId) return false;
-        if (sZeit != dfn.sZeit) return false;
-        if (status != dfn.status) return false;
-        if (termId != dfn.termId) return false;
-        if (bwKennung != null ? !bwKennung.equals(dfn.bwKennung) : dfn.bwKennung != null) return false;
-        if (dauer != null ? !dauer.equals(dfn.dauer) : dfn.dauer != null) return false;
-        if (ist != null ? !ist.equals(dfn.ist) : dfn.ist != null) return false;
-        if (mdate != null ? !mdate.equals(dfn.mdate) : dfn.mdate != null) return false;
-        if (soll != null ? !soll.equals(dfn.soll) : dfn.soll != null) return false;
-        if (stDatum != null ? !stDatum.equals(dfn.stDatum) : dfn.stDatum != null) return false;
-        if (uKennung != null ? !uKennung.equals(dfn.uKennung) : dfn.uKennung != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof DFN)) {
+            return false;
+        }
+        DFN other = (DFN) object;
+        if ((this.dfnid == null && other.dfnid != null) || (this.dfnid != null && !this.dfnid.equals(other.dfnid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (dfnid ^ (dfnid >>> 32));
-        result = 31 * result + (bwKennung != null ? bwKennung.hashCode() : 0);
-        result = 31 * result + (int) (termId ^ (termId >>> 32));
-        result = 31 * result + (uKennung != null ? uKennung.hashCode() : 0);
-        result = 31 * result + (int) (massId ^ (massId >>> 32));
-        result = 31 * result + (soll != null ? soll.hashCode() : 0);
-        result = 31 * result + (ist != null ? ist.hashCode() : 0);
-        result = 31 * result + (stDatum != null ? stDatum.hashCode() : 0);
-        result = 31 * result + (sZeit ? 1 : 0);
-        result = 31 * result + (iZeit ? 1 : 0);
-        result = 31 * result + (status ? 1 : 0);
-        result = 31 * result + (erforderlich ? 1 : 0);
-        result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
-        result = 31 * result + (mdate != null ? mdate.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.Dfn[dfnid=" + dfnid + "]";
     }
+
 }
+

@@ -1,313 +1,338 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.math.BigInteger;
+import java.util.Date;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ *
+ * @author tloehr
  */
 @Entity
-public class MassTermin {
-    private long termId;
-
-    @javax.persistence.Column(name = "TermID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "MassTermin")
+@NamedQueries({
+    @NamedQuery(name = "MassTermin.findAll", query = "SELECT m FROM MassTermin m"),
+    @NamedQuery(name = "MassTermin.findByTermID", query = "SELECT m FROM MassTermin m WHERE m.termID = :termID"),
+    @NamedQuery(name = "MassTermin.findByMassID", query = "SELECT m FROM MassTermin m WHERE m.massID = :massID"),
+    @NamedQuery(name = "MassTermin.findByPlanID", query = "SELECT m FROM MassTermin m WHERE m.planID = :planID"),
+    @NamedQuery(name = "MassTermin.findByNachtMo", query = "SELECT m FROM MassTermin m WHERE m.nachtMo = :nachtMo"),
+    @NamedQuery(name = "MassTermin.findByMorgens", query = "SELECT m FROM MassTermin m WHERE m.morgens = :morgens"),
+    @NamedQuery(name = "MassTermin.findByMittags", query = "SELECT m FROM MassTermin m WHERE m.mittags = :mittags"),
+    @NamedQuery(name = "MassTermin.findByNachmittags", query = "SELECT m FROM MassTermin m WHERE m.nachmittags = :nachmittags"),
+    @NamedQuery(name = "MassTermin.findByAbends", query = "SELECT m FROM MassTermin m WHERE m.abends = :abends"),
+    @NamedQuery(name = "MassTermin.findByNachtAb", query = "SELECT m FROM MassTermin m WHERE m.nachtAb = :nachtAb"),
+    @NamedQuery(name = "MassTermin.findByUhrzeitAnzahl", query = "SELECT m FROM MassTermin m WHERE m.uhrzeitAnzahl = :uhrzeitAnzahl"),
+    @NamedQuery(name = "MassTermin.findByUhrzeit", query = "SELECT m FROM MassTermin m WHERE m.uhrzeit = :uhrzeit"),
+    @NamedQuery(name = "MassTermin.findByTaeglich", query = "SELECT m FROM MassTermin m WHERE m.taeglich = :taeglich"),
+    @NamedQuery(name = "MassTermin.findByWoechentlich", query = "SELECT m FROM MassTermin m WHERE m.woechentlich = :woechentlich"),
+    @NamedQuery(name = "MassTermin.findByMonatlich", query = "SELECT m FROM MassTermin m WHERE m.monatlich = :monatlich"),
+    @NamedQuery(name = "MassTermin.findByTagNum", query = "SELECT m FROM MassTermin m WHERE m.tagNum = :tagNum"),
+    @NamedQuery(name = "MassTermin.findByMon", query = "SELECT m FROM MassTermin m WHERE m.mon = :mon"),
+    @NamedQuery(name = "MassTermin.findByDie", query = "SELECT m FROM MassTermin m WHERE m.die = :die"),
+    @NamedQuery(name = "MassTermin.findByMit", query = "SELECT m FROM MassTermin m WHERE m.mit = :mit"),
+    @NamedQuery(name = "MassTermin.findByDon", query = "SELECT m FROM MassTermin m WHERE m.don = :don"),
+    @NamedQuery(name = "MassTermin.findByFre", query = "SELECT m FROM MassTermin m WHERE m.fre = :fre"),
+    @NamedQuery(name = "MassTermin.findBySam", query = "SELECT m FROM MassTermin m WHERE m.sam = :sam"),
+    @NamedQuery(name = "MassTermin.findBySon", query = "SELECT m FROM MassTermin m WHERE m.son = :son"),
+    @NamedQuery(name = "MassTermin.findByErforderlich", query = "SELECT m FROM MassTermin m WHERE m.erforderlich = :erforderlich"),
+    @NamedQuery(name = "MassTermin.findByLDatum", query = "SELECT m FROM MassTermin m WHERE m.lDatum = :lDatum"),
+    @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer"),
+    @NamedQuery(name = "MassTermin.findByTmp", query = "SELECT m FROM MassTermin m WHERE m.tmp = :tmp")})
+public class MassTermin implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getTermId() {
-        return termId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "TermID")
+    private Long termID;
+    @Basic(optional = false)
+    @Column(name = "MassID")
+    private long massID;
+    @Basic(optional = false)
+    @Column(name = "PlanID")
+    private long planID;
+    @Column(name = "NachtMo")
+    private Short nachtMo;
+    @Column(name = "Morgens")
+    private Short morgens;
+    @Column(name = "Mittags")
+    private Short mittags;
+    @Column(name = "Nachmittags")
+    private Short nachmittags;
+    @Column(name = "Abends")
+    private Short abends;
+    @Column(name = "NachtAb")
+    private Short nachtAb;
+    @Column(name = "UhrzeitAnzahl")
+    private Short uhrzeitAnzahl;
+    @Column(name = "Uhrzeit")
+    @Temporal(TemporalType.TIME)
+    private Date uhrzeit;
+    @Column(name = "Taeglich")
+    private Short taeglich;
+    @Column(name = "Woechentlich")
+    private Short woechentlich;
+    @Column(name = "Monatlich")
+    private Short monatlich;
+    @Column(name = "TagNum")
+    private Short tagNum;
+    @Column(name = "Mon")
+    private Short mon;
+    @Column(name = "Die")
+    private Short die;
+    @Column(name = "Mit")
+    private Short mit;
+    @Column(name = "Don")
+    private Short don;
+    @Column(name = "Fre")
+    private Short fre;
+    @Column(name = "Sam")
+    private Short sam;
+    @Column(name = "Son")
+    private Short son;
+    @Column(name = "Erforderlich")
+    private Boolean erforderlich;
+    @Basic(optional = false)
+    @Column(name = "LDatum")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lDatum;
+    @Basic(optional = false)
+    @Column(name = "Dauer")
+    private BigDecimal dauer;
+    @Lob
+    @Column(name = "XML")
+    private String xml;
+    @Lob
+    @Column(name = "Bemerkung")
+    private String bemerkung;
+    @Column(name = "tmp")
+    private BigInteger tmp;
+
+    public MassTermin() {
     }
 
-    public void setTermId(long termId) {
-        this.termId = termId;
+    public MassTermin(Long termID) {
+        this.termID = termID;
     }
 
-    private long massId;
-
-    @javax.persistence.Column(name = "MassID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getMassId() {
-        return massId;
+    public MassTermin(Long termID, long massID, long planID, Date lDatum, BigDecimal dauer) {
+        this.termID = termID;
+        this.massID = massID;
+        this.planID = planID;
+        this.lDatum = lDatum;
+        this.dauer = dauer;
     }
 
-    public void setMassId(long massId) {
-        this.massId = massId;
+    public Long getTermID() {
+        return termID;
     }
 
-    private long planId;
-
-    @javax.persistence.Column(name = "PlanID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getPlanId() {
-        return planId;
+    public void setTermID(Long termID) {
+        this.termID = termID;
     }
 
-    public void setPlanId(long planId) {
-        this.planId = planId;
+    public long getMassID() {
+        return massID;
     }
 
-    private byte nachtMo;
+    public void setMassID(long massID) {
+        this.massID = massID;
+    }
 
-    @javax.persistence.Column(name = "NachtMo", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getNachtMo() {
+    public long getPlanID() {
+        return planID;
+    }
+
+    public void setPlanID(long planID) {
+        this.planID = planID;
+    }
+
+    public Short getNachtMo() {
         return nachtMo;
     }
 
-    public void setNachtMo(byte nachtMo) {
+    public void setNachtMo(Short nachtMo) {
         this.nachtMo = nachtMo;
     }
 
-    private byte morgens;
-
-    @javax.persistence.Column(name = "Morgens", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getMorgens() {
+    public Short getMorgens() {
         return morgens;
     }
 
-    public void setMorgens(byte morgens) {
+    public void setMorgens(Short morgens) {
         this.morgens = morgens;
     }
 
-    private byte mittags;
-
-    @javax.persistence.Column(name = "Mittags", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getMittags() {
+    public Short getMittags() {
         return mittags;
     }
 
-    public void setMittags(byte mittags) {
+    public void setMittags(Short mittags) {
         this.mittags = mittags;
     }
 
-    private byte nachmittags;
-
-    @javax.persistence.Column(name = "Nachmittags", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getNachmittags() {
+    public Short getNachmittags() {
         return nachmittags;
     }
 
-    public void setNachmittags(byte nachmittags) {
+    public void setNachmittags(Short nachmittags) {
         this.nachmittags = nachmittags;
     }
 
-    private byte abends;
-
-    @javax.persistence.Column(name = "Abends", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getAbends() {
+    public Short getAbends() {
         return abends;
     }
 
-    public void setAbends(byte abends) {
+    public void setAbends(Short abends) {
         this.abends = abends;
     }
 
-    private byte nachtAb;
-
-    @javax.persistence.Column(name = "NachtAb", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getNachtAb() {
+    public Short getNachtAb() {
         return nachtAb;
     }
 
-    public void setNachtAb(byte nachtAb) {
+    public void setNachtAb(Short nachtAb) {
         this.nachtAb = nachtAb;
     }
 
-    private byte uhrzeitAnzahl;
-
-    @javax.persistence.Column(name = "UhrzeitAnzahl", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getUhrzeitAnzahl() {
+    public Short getUhrzeitAnzahl() {
         return uhrzeitAnzahl;
     }
 
-    public void setUhrzeitAnzahl(byte uhrzeitAnzahl) {
+    public void setUhrzeitAnzahl(Short uhrzeitAnzahl) {
         this.uhrzeitAnzahl = uhrzeitAnzahl;
     }
 
-    private Time uhrzeit;
-
-    @javax.persistence.Column(name = "Uhrzeit", nullable = true, insertable = true, updatable = true, length = 8, precision = 0)
-    @Basic
-    public Time getUhrzeit() {
+    public Date getUhrzeit() {
         return uhrzeit;
     }
 
-    public void setUhrzeit(Time uhrzeit) {
+    public void setUhrzeit(Date uhrzeit) {
         this.uhrzeit = uhrzeit;
     }
 
-    private byte taeglich;
-
-    @javax.persistence.Column(name = "Taeglich", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getTaeglich() {
+    public Short getTaeglich() {
         return taeglich;
     }
 
-    public void setTaeglich(byte taeglich) {
+    public void setTaeglich(Short taeglich) {
         this.taeglich = taeglich;
     }
 
-    private byte woechentlich;
-
-    @javax.persistence.Column(name = "Woechentlich", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getWoechentlich() {
+    public Short getWoechentlich() {
         return woechentlich;
     }
 
-    public void setWoechentlich(byte woechentlich) {
+    public void setWoechentlich(Short woechentlich) {
         this.woechentlich = woechentlich;
     }
 
-    private byte monatlich;
-
-    @javax.persistence.Column(name = "Monatlich", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getMonatlich() {
+    public Short getMonatlich() {
         return monatlich;
     }
 
-    public void setMonatlich(byte monatlich) {
+    public void setMonatlich(Short monatlich) {
         this.monatlich = monatlich;
     }
 
-    private byte tagNum;
-
-    @javax.persistence.Column(name = "TagNum", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getTagNum() {
+    public Short getTagNum() {
         return tagNum;
     }
 
-    public void setTagNum(byte tagNum) {
+    public void setTagNum(Short tagNum) {
         this.tagNum = tagNum;
     }
 
-    private byte mon;
-
-    @javax.persistence.Column(name = "Mon", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getMon() {
+    public Short getMon() {
         return mon;
     }
 
-    public void setMon(byte mon) {
+    public void setMon(Short mon) {
         this.mon = mon;
     }
 
-    private byte die;
-
-    @javax.persistence.Column(name = "Die", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getDie() {
+    public Short getDie() {
         return die;
     }
 
-    public void setDie(byte die) {
+    public void setDie(Short die) {
         this.die = die;
     }
 
-    private byte mit;
-
-    @javax.persistence.Column(name = "Mit", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getMit() {
+    public Short getMit() {
         return mit;
     }
 
-    public void setMit(byte mit) {
+    public void setMit(Short mit) {
         this.mit = mit;
     }
 
-    private byte don;
-
-    @javax.persistence.Column(name = "Don", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getDon() {
+    public Short getDon() {
         return don;
     }
 
-    public void setDon(byte don) {
+    public void setDon(Short don) {
         this.don = don;
     }
 
-    private byte fre;
-
-    @javax.persistence.Column(name = "Fre", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getFre() {
+    public Short getFre() {
         return fre;
     }
 
-    public void setFre(byte fre) {
+    public void setFre(Short fre) {
         this.fre = fre;
     }
 
-    private byte sam;
-
-    @javax.persistence.Column(name = "Sam", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getSam() {
+    public Short getSam() {
         return sam;
     }
 
-    public void setSam(byte sam) {
+    public void setSam(Short sam) {
         this.sam = sam;
     }
 
-    private byte son;
-
-    @javax.persistence.Column(name = "Son", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getSon() {
+    public Short getSon() {
         return son;
     }
 
-    public void setSon(byte son) {
+    public void setSon(Short son) {
         this.son = son;
     }
 
-    private boolean erforderlich;
-
-    @javax.persistence.Column(name = "Erforderlich", nullable = true, insertable = true, updatable = true, length = 0, precision = 0)
-    @Basic
-    public boolean isErforderlich() {
+    public Boolean getErforderlich() {
         return erforderlich;
     }
 
-    public void setErforderlich(boolean erforderlich) {
+    public void setErforderlich(Boolean erforderlich) {
         this.erforderlich = erforderlich;
     }
 
-    private Timestamp lDatum;
-
-    @javax.persistence.Column(name = "LDatum", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getlDatum() {
+    public Date getLDatum() {
         return lDatum;
     }
 
-    public void setlDatum(Timestamp lDatum) {
+    public void setLDatum(Date lDatum) {
         this.lDatum = lDatum;
     }
 
-    private BigDecimal dauer;
-
-    @javax.persistence.Column(name = "Dauer", nullable = false, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getDauer() {
         return dauer;
     }
@@ -316,10 +341,6 @@ public class MassTermin {
         this.dauer = dauer;
     }
 
-    private String xml;
-
-    @javax.persistence.Column(name = "XML", nullable = true, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getXml() {
         return xml;
     }
@@ -328,10 +349,6 @@ public class MassTermin {
         this.xml = xml;
     }
 
-    private String bemerkung;
-
-    @javax.persistence.Column(name = "Bemerkung", nullable = true, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getBemerkung() {
         return bemerkung;
     }
@@ -340,87 +357,37 @@ public class MassTermin {
         this.bemerkung = bemerkung;
     }
 
-    private long tmp;
-
-    @javax.persistence.Column(name = "tmp", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getTmp() {
+    public BigInteger getTmp() {
         return tmp;
     }
 
-    public void setTmp(long tmp) {
+    public void setTmp(BigInteger tmp) {
         this.tmp = tmp;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (termID != null ? termID.hashCode() : 0);
+        return hash;
+    }
 
-        MassTermin that = (MassTermin) o;
-
-        if (abends != that.abends) return false;
-        if (die != that.die) return false;
-        if (don != that.don) return false;
-        if (erforderlich != that.erforderlich) return false;
-        if (fre != that.fre) return false;
-        if (massId != that.massId) return false;
-        if (mit != that.mit) return false;
-        if (mittags != that.mittags) return false;
-        if (mon != that.mon) return false;
-        if (monatlich != that.monatlich) return false;
-        if (morgens != that.morgens) return false;
-        if (nachmittags != that.nachmittags) return false;
-        if (nachtAb != that.nachtAb) return false;
-        if (nachtMo != that.nachtMo) return false;
-        if (planId != that.planId) return false;
-        if (sam != that.sam) return false;
-        if (son != that.son) return false;
-        if (taeglich != that.taeglich) return false;
-        if (tagNum != that.tagNum) return false;
-        if (termId != that.termId) return false;
-        if (tmp != that.tmp) return false;
-        if (uhrzeitAnzahl != that.uhrzeitAnzahl) return false;
-        if (woechentlich != that.woechentlich) return false;
-        if (bemerkung != null ? !bemerkung.equals(that.bemerkung) : that.bemerkung != null) return false;
-        if (dauer != null ? !dauer.equals(that.dauer) : that.dauer != null) return false;
-        if (lDatum != null ? !lDatum.equals(that.lDatum) : that.lDatum != null) return false;
-        if (uhrzeit != null ? !uhrzeit.equals(that.uhrzeit) : that.uhrzeit != null) return false;
-        if (xml != null ? !xml.equals(that.xml) : that.xml != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof MassTermin)) {
+            return false;
+        }
+        MassTermin other = (MassTermin) object;
+        if ((this.termID == null && other.termID != null) || (this.termID != null && !this.termID.equals(other.termID))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (termId ^ (termId >>> 32));
-        result = 31 * result + (int) (massId ^ (massId >>> 32));
-        result = 31 * result + (int) (planId ^ (planId >>> 32));
-        result = 31 * result + (int) nachtMo;
-        result = 31 * result + (int) morgens;
-        result = 31 * result + (int) mittags;
-        result = 31 * result + (int) nachmittags;
-        result = 31 * result + (int) abends;
-        result = 31 * result + (int) nachtAb;
-        result = 31 * result + (int) uhrzeitAnzahl;
-        result = 31 * result + (uhrzeit != null ? uhrzeit.hashCode() : 0);
-        result = 31 * result + (int) taeglich;
-        result = 31 * result + (int) woechentlich;
-        result = 31 * result + (int) monatlich;
-        result = 31 * result + (int) tagNum;
-        result = 31 * result + (int) mon;
-        result = 31 * result + (int) die;
-        result = 31 * result + (int) mit;
-        result = 31 * result + (int) don;
-        result = 31 * result + (int) fre;
-        result = 31 * result + (int) sam;
-        result = 31 * result + (int) son;
-        result = 31 * result + (erforderlich ? 1 : 0);
-        result = 31 * result + (lDatum != null ? lDatum.hashCode() : 0);
-        result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
-        result = 31 * result + (xml != null ? xml.hashCode() : 0);
-        result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
-        result = 31 * result + (int) (tmp ^ (tmp >>> 32));
-        return result;
+    public String toString() {
+        return "entity.rest.MassTermin[termID=" + termID + "]";
     }
+
 }

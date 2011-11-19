@@ -4,6 +4,9 @@
  */
 package entity;
 
+import entity.files.Syspb2file;
+import entity.vorgang.SYSPB2VORGANG;
+import entity.vorgang.VorgangElement;
 import op.OPDE;
 import op.tools.SYSTools;
 

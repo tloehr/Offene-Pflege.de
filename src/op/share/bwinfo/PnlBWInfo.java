@@ -28,7 +28,7 @@ package op.share.bwinfo;
 
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.SYSFilesTools;
+import entity.files.SYSFilesTools;
 import entity.SYSPropsTools;
 import op.OCSec;
 import op.OPDE;

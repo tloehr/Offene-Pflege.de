@@ -28,6 +28,8 @@ package op.care.vital;
 
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import entity.files.SYSFilesTools;
+import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;

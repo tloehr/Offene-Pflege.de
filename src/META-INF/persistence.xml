@@ -4,21 +4,21 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
     <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <class>entity.SYSFiles</class>
-        <class>entity.Sysver2file</class>
-        <class>entity.Sysbwi2file</class>
-        <class>entity.Syspb2file</class>
-        <class>entity.SYSPB2VORGANG</class>
-        <class>entity.SYSBWerte2VORGANG</class>
-        <class>entity.SYSVER2VORGANG</class>
-        <class>entity.SYSBWI2VORGANG</class>
-        <class>entity.SYSPLAN2VORGANG</class>
+        <class>entity.files.SYSFiles</class>
+        <class>entity.files.Sysver2file</class>
+        <class>entity.files.Sysbwi2file</class>
+        <class>entity.files.Syspb2file</class>
+        <class>entity.vorgang.SYSPB2VORGANG</class>
+        <class>entity.vorgang.SYSBWerte2VORGANG</class>
+        <class>entity.vorgang.SYSVER2VORGANG</class>
+        <class>entity.vorgang.SYSBWI2VORGANG</class>
+        <class>entity.vorgang.SYSPLAN2VORGANG</class>
         <class>entity.Bewohner</class>
-        <class>entity.Sysbw2file</class>
+        <class>entity.files.Sysbw2file</class>
         <class>entity.BWInfoKat</class>
         <class>entity.BWInfoTyp</class>
         <class>entity.BWInfo</class>
-        <class>entity.Verordnung</class>
+        <class>entity.verordnungen.Verordnung</class>
         <class>entity.Groups</class>
         <class>entity.Users</class>
         <class>entity.Acl</class>
@@ -35,43 +35,43 @@
         <class>entity.SYSRunningClasses</class>
         <class>entity.SYSLogin</class>
         <class>entity.BWerte</class>
-        <class>entity.Sysbwerte2file</class>
+        <class>entity.files.Sysbwerte2file</class>
         <class>entity.SYSProps</class>
         <class>entity.Syslog</class>
-        <class>entity.Vorgaenge</class>
-        <class>entity.VBericht</class>
-        <class>entity.VKat</class>
+        <class>entity.vorgang.Vorgaenge</class>
+        <class>entity.vorgang.VBericht</class>
+        <class>entity.vorgang.VKat</class>
         <class>entity.Planung</class>
         <class>entity.Arzt</class>
-        <class>entity.BHP</class>
-        <class>entity.VerordnungPlanung</class>
-        <class>entity.BwInfoVorlagen</class>
-        <class>entity.Dfn</class>
-        <class>entity.Icd</class>
+        <class>entity.verordnungen.BHP</class>
+        <class>entity.verordnungen.VerordnungPlanung</class>
+        <class>entity.BWInfoVorlagen</class>
+        <class>entity.DFN</class>
+        <class>entity.ICD</class>
         <class>entity.Krankenhaus</class>
         <class>entity.KKasse</class>
-        <class>entity.medis.APV</class>
-        <class>entity.medis.MedBestand</class>
-        <class>entity.medis.MpBestellung</class>
-        <class>entity.medis.MedBuchungen</class>
-        <class>entity.medis.Darreichung</class>
-        <class>entity.medis.MedFormen</class>
-        <class>entity.medis.MedHersteller</class>
-        <class>entity.medis.MedStoffe</class>
-        <class>entity.medis.MedVorrat</class>
-        <class>entity.medis.MedZusammensetzung</class>
-        <class>entity.medis.MedPackung</class>
-        <class>entity.medis.MedProdukte</class>
+        <class>entity.verordnungen.APV</class>
+        <class>entity.verordnungen.MedBestand</class>
+        <class>entity.verordnungen.MpBestellung</class>
+        <class>entity.verordnungen.MedBuchungen</class>
+        <class>entity.verordnungen.Darreichung</class>
+        <class>entity.verordnungen.MedFormen</class>
+        <class>entity.verordnungen.MedHersteller</class>
+        <class>entity.verordnungen.MedStoffe</class>
+        <class>entity.verordnungen.MedVorrat</class>
+        <class>entity.verordnungen.MedZusammensetzung</class>
+        <class>entity.verordnungen.MedPackung</class>
+        <class>entity.verordnungen.MedProdukte</class>
         <class>entity.MassTermin</class>
         <class>entity.Massnahmen</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PlanKontrolle</class>
         <class>entity.QsQuery</class>
-        <class>entity.medis.Situationen</class>
+        <class>entity.verordnungen.Situationen</class>
         <class>entity.Taschengeld</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.password" value="75r9qq8"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.user" value="opdeuser"/>
             <!--<property name="eclipselink.weaving" value="static"/>

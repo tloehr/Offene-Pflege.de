@@ -25,6 +25,7 @@
  */
 package entity;
 
+import entity.files.Sysbw2file;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 

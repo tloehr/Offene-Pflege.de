@@ -4,6 +4,8 @@
  */
 package entity;
 
+import entity.vorgang.SYSPLAN2VORGANG;
+import entity.vorgang.VorgangElement;
 import op.tools.SYSConst;
 
 import javax.persistence.*;

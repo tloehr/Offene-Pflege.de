@@ -15,6 +15,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import entity.vorgang.*;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.share.tools.PnlEditor;

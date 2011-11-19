@@ -1,34 +1,41 @@
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
- */
 @Entity
-public class BwInfoVorlagen {
-    private long bwivid;
-
-    @javax.persistence.Column(name = "BWIVID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "BWInfoVorlagen")
+@NamedQueries({
+    @NamedQuery(name = "BWInfoVorlagen.findAll", query = "SELECT b FROM BWInfoVorlagen b"),
+    @NamedQuery(name = "BWInfoVorlagen.findByBwivid", query = "SELECT b FROM BWInfoVorlagen b WHERE b.bwivid = :bwivid"),
+    @NamedQuery(name = "BWInfoVorlagen.findByBezeichnung", query = "SELECT b FROM BWInfoVorlagen b WHERE b.bezeichnung = :bezeichnung"),
+    @NamedQuery(name = "BWInfoVorlagen.findByBwinftyp", query = "SELECT b FROM BWInfoVorlagen b WHERE b.bwinftyp = :bwinftyp")})
+public class BWInfoVorlagen implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getBwivid() {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "BWIVID")
+    private Long bwivid;
+    @Basic(optional = false)
+    @Column(name = "Bezeichnung")
+    private String bezeichnung;
+    @Basic(optional = false)
+    @Column(name = "BWINFTYP")
+    private String bwinftyp;
+
+    public BWInfoVorlagen() {
+    }
+
+
+    public Long getBwivid() {
         return bwivid;
     }
 
-    public void setBwivid(long bwivid) {
+    public void setBwivid(Long bwivid) {
         this.bwivid = bwivid;
     }
 
-    private String bezeichnung;
-
-    @javax.persistence.Column(name = "Bezeichnung", nullable = false, insertable = true, updatable = true, length = 200, precision = 0)
-    @Basic
     public String getBezeichnung() {
         return bezeichnung;
     }
@@ -37,10 +44,6 @@ public class BwInfoVorlagen {
         this.bezeichnung = bezeichnung;
     }
 
-    private String bwinftyp;
-
-    @javax.persistence.Column(name = "BWINFTYP", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getBwinftyp() {
         return bwinftyp;
     }
@@ -50,24 +53,28 @@ public class BwInfoVorlagen {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (bwivid != null ? bwivid.hashCode() : 0);
+        return hash;
+    }
 
-        BwInfoVorlagen that = (BwInfoVorlagen) o;
-
-        if (bwivid != that.bwivid) return false;
-        if (bezeichnung != null ? !bezeichnung.equals(that.bezeichnung) : that.bezeichnung != null) return false;
-        if (bwinftyp != null ? !bwinftyp.equals(that.bwinftyp) : that.bwinftyp != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof BWInfoVorlagen)) {
+            return false;
+        }
+        BWInfoVorlagen other = (BWInfoVorlagen) object;
+        if ((this.bwivid == null && other.bwivid != null) || (this.bwivid != null && !this.bwivid.equals(other.bwivid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (bwivid ^ (bwivid >>> 32));
-        result = 31 * result + (bezeichnung != null ? bezeichnung.hashCode() : 0);
-        result = 31 * result + (bwinftyp != null ? bwinftyp.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.BWInfoVorlagen[bwivid=" + bwivid + "]";
     }
+
 }

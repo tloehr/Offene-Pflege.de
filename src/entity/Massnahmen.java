@@ -1,35 +1,88 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.math.BigDecimal;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ *
+ * @author tloehr
  */
 @Entity
-public class Massnahmen {
-    private long massId;
-
-    @javax.persistence.Column(name = "MassID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "Massnahmen")
+@NamedQueries({
+    @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Massnahmen m"),
+    @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Massnahmen m WHERE m.massID = :massID"),
+    @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Massnahmen m WHERE m.bezeichnung = :bezeichnung"),
+    @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Massnahmen m WHERE m.dauer = :dauer"),
+    @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Massnahmen m WHERE m.massArt = :massArt"),
+    @NamedQuery(name = "Massnahmen.findByBwikid", query = "SELECT m FROM Massnahmen m WHERE m.bwikid = :bwikid"),
+    @NamedQuery(name = "Massnahmen.findByPsid", query = "SELECT m FROM Massnahmen m WHERE m.psid = :psid"),
+    @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Massnahmen m WHERE m.aktiv = :aktiv")})
+public class Massnahmen implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getMassId() {
-        return massId;
-    }
-
-    public void setMassId(long massId) {
-        this.massId = massId;
-    }
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "MassID")
+    private Long massID;
+    @Basic(optional = false)
+    @Column(name = "Bezeichnung")
     private String bezeichnung;
+    @Basic(optional = false)
+    @Column(name = "Dauer")
+    private BigDecimal dauer;
+    @Basic(optional = false)
+    @Column(name = "MassArt")
+    private int massArt;
+    @Basic(optional = false)
+    @Column(name = "BWIKID")
+    private long bwikid;
+    @Lob
+    @Column(name = "XMLT")
+    private String xmlt;
+    @Column(name = "PSID")
+    private Short psid;
+    @Column(name = "Aktiv")
+    private Boolean aktiv;
 
-    @javax.persistence.Column(name = "Bezeichnung", nullable = false, insertable = true, updatable = true, length = 500, precision = 0)
-    @Basic
+    public Massnahmen() {
+    }
+
+    public Massnahmen(Long massID) {
+        this.massID = massID;
+    }
+
+    public Massnahmen(Long massID, String bezeichnung, BigDecimal dauer, int massArt, long bwikid) {
+        this.massID = massID;
+        this.bezeichnung = bezeichnung;
+        this.dauer = dauer;
+        this.massArt = massArt;
+        this.bwikid = bwikid;
+    }
+
+    public Long getMassID() {
+        return massID;
+    }
+
+    public void setMassID(Long massID) {
+        this.massID = massID;
+    }
+
     public String getBezeichnung() {
         return bezeichnung;
     }
@@ -38,10 +91,6 @@ public class Massnahmen {
         this.bezeichnung = bezeichnung;
     }
 
-    private BigDecimal dauer;
-
-    @javax.persistence.Column(name = "Dauer", nullable = false, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getDauer() {
         return dauer;
     }
@@ -50,10 +99,6 @@ public class Massnahmen {
         this.dauer = dauer;
     }
 
-    private int massArt;
-
-    @javax.persistence.Column(name = "MassArt", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public int getMassArt() {
         return massArt;
     }
@@ -62,10 +107,6 @@ public class Massnahmen {
         this.massArt = massArt;
     }
 
-    private long bwikid;
-
-    @javax.persistence.Column(name = "BWIKID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
     public long getBwikid() {
         return bwikid;
     }
@@ -74,10 +115,6 @@ public class Massnahmen {
         this.bwikid = bwikid;
     }
 
-    private String xmlt;
-
-    @javax.persistence.Column(name = "XMLT", nullable = true, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getXmlt() {
         return xmlt;
     }
@@ -86,59 +123,45 @@ public class Massnahmen {
         this.xmlt = xmlt;
     }
 
-    private byte psid;
-
-    @javax.persistence.Column(name = "PSID", nullable = true, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getPsid() {
+    public Short getPsid() {
         return psid;
     }
 
-    public void setPsid(byte psid) {
+    public void setPsid(Short psid) {
         this.psid = psid;
     }
 
-    private boolean aktiv;
-
-    @javax.persistence.Column(name = "Aktiv", nullable = true, insertable = true, updatable = true, length = 0, precision = 0)
-    @Basic
-    public boolean isAktiv() {
+    public Boolean getAktiv() {
         return aktiv;
     }
 
-    public void setAktiv(boolean aktiv) {
+    public void setAktiv(Boolean aktiv) {
         this.aktiv = aktiv;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (massID != null ? massID.hashCode() : 0);
+        return hash;
+    }
 
-        Massnahmen that = (Massnahmen) o;
-
-        if (aktiv != that.aktiv) return false;
-        if (bwikid != that.bwikid) return false;
-        if (massArt != that.massArt) return false;
-        if (massId != that.massId) return false;
-        if (psid != that.psid) return false;
-        if (bezeichnung != null ? !bezeichnung.equals(that.bezeichnung) : that.bezeichnung != null) return false;
-        if (dauer != null ? !dauer.equals(that.dauer) : that.dauer != null) return false;
-        if (xmlt != null ? !xmlt.equals(that.xmlt) : that.xmlt != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Massnahmen)) {
+            return false;
+        }
+        Massnahmen other = (Massnahmen) object;
+        if ((this.massID == null && other.massID != null) || (this.massID != null && !this.massID.equals(other.massID))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (massId ^ (massId >>> 32));
-        result = 31 * result + (bezeichnung != null ? bezeichnung.hashCode() : 0);
-        result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
-        result = 31 * result + massArt;
-        result = 31 * result + (int) (bwikid ^ (bwikid >>> 32));
-        result = 31 * result + (xmlt != null ? xmlt.hashCode() : 0);
-        result = 31 * result + (int) psid;
-        result = 31 * result + (aktiv ? 1 : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.Massnahmen[massID=" + massID + "]";
     }
+
 }

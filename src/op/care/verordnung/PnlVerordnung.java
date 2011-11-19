@@ -27,6 +27,10 @@
 package op.care.verordnung;
 
 import entity.*;
+import entity.files.SYSFilesTools;
+import entity.verordnungen.Verordnung;
+import entity.verordnungen.VerordnungTools;
+import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -35,7 +39,6 @@ import op.care.bhp.PnlBHP;
 import op.care.med.vorrat.*;
 import op.tools.*;
 
-import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -720,7 +723,7 @@ public class PnlVerordnung extends CleanablePanel {
 //            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BHPVerordnung", currentVerID, bwkennung, fileActionListener));
 //            Query query = OPDE.getEM().createNamedQuery("Verordnung.findByVerID");
 //            query.setParameter("verID", currentVerID);
-//            entity.Verordnung verordnung = (entity.Verordnung) query.getSingleResult();
+//            entity.verordnungen.Verordnung verordnung = (entity.verordnungen.Verordnung) query.getSingleResult();
 //            menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, fileActionListener));
         }
 

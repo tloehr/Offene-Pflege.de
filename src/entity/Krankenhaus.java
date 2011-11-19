@@ -1,36 +1,51 @@
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 @Table(name = "KH")
-public class Krankenhaus {
-    private long khid;
-
-    @javax.persistence.Column(name = "KHID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@NamedQueries({
+    @NamedQuery(name = "Krankenhaus.findAll", query = "SELECT k FROM Krankenhaus k"),
+    @NamedQuery(name = "Krankenhaus.findByKhid", query = "SELECT k FROM Krankenhaus k WHERE k.khid = :khid"),
+    @NamedQuery(name = "Krankenhaus.findByName", query = "SELECT k FROM Krankenhaus k WHERE k.name = :name"),
+    @NamedQuery(name = "Krankenhaus.findByStrasse", query = "SELECT k FROM Krankenhaus k WHERE k.strasse = :strasse"),
+    @NamedQuery(name = "Krankenhaus.findByPlz", query = "SELECT k FROM Krankenhaus k WHERE k.plz = :plz"),
+    @NamedQuery(name = "Krankenhaus.findByOrt", query = "SELECT k FROM Krankenhaus k WHERE k.ort = :ort"),
+    @NamedQuery(name = "Krankenhaus.findByTel", query = "SELECT k FROM Krankenhaus k WHERE k.tel = :tel"),
+    @NamedQuery(name = "Krankenhaus.findByFax", query = "SELECT k FROM Krankenhaus k WHERE k.fax = :fax")})
+public class Krankenhaus implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getKhid() {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "KHID")
+    private Long khid;
+    @Basic(optional = false)
+    @Column(name = "Name")
+    private String name;
+    @Column(name = "Strasse")
+    private String strasse;
+    @Column(name = "PLZ")
+    private String plz;
+    @Column(name = "Ort")
+    private String ort;
+    @Column(name = "Tel")
+    private String tel;
+    @Column(name = "Fax")
+    private String fax;
+
+    public Krankenhaus() {
+    }
+
+    public Long getKhid() {
         return khid;
     }
 
-    public void setKhid(long khid) {
+    public void setKhid(Long khid) {
         this.khid = khid;
     }
 
-    private String name;
-
-    @javax.persistence.Column(name = "Name", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getName() {
         return name;
     }
@@ -39,10 +54,6 @@ public class Krankenhaus {
         this.name = name;
     }
 
-    private String strasse;
-
-    @javax.persistence.Column(name = "Strasse", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getStrasse() {
         return strasse;
     }
@@ -51,10 +62,6 @@ public class Krankenhaus {
         this.strasse = strasse;
     }
 
-    private String plz;
-
-    @javax.persistence.Column(name = "PLZ", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getPlz() {
         return plz;
     }
@@ -63,10 +70,6 @@ public class Krankenhaus {
         this.plz = plz;
     }
 
-    private String ort;
-
-    @javax.persistence.Column(name = "Ort", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getOrt() {
         return ort;
     }
@@ -75,10 +78,6 @@ public class Krankenhaus {
         this.ort = ort;
     }
 
-    private String tel;
-
-    @javax.persistence.Column(name = "Tel", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getTel() {
         return tel;
     }
@@ -87,10 +86,6 @@ public class Krankenhaus {
         this.tel = tel;
     }
 
-    private String fax;
-
-    @javax.persistence.Column(name = "Fax", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getFax() {
         return fax;
     }
@@ -100,32 +95,28 @@ public class Krankenhaus {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (khid != null ? khid.hashCode() : 0);
+        return hash;
+    }
 
-        Krankenhaus krankenhaus = (Krankenhaus) o;
-
-        if (khid != krankenhaus.khid) return false;
-        if (fax != null ? !fax.equals(krankenhaus.fax) : krankenhaus.fax != null) return false;
-        if (name != null ? !name.equals(krankenhaus.name) : krankenhaus.name != null) return false;
-        if (ort != null ? !ort.equals(krankenhaus.ort) : krankenhaus.ort != null) return false;
-        if (plz != null ? !plz.equals(krankenhaus.plz) : krankenhaus.plz != null) return false;
-        if (strasse != null ? !strasse.equals(krankenhaus.strasse) : krankenhaus.strasse != null) return false;
-        if (tel != null ? !tel.equals(krankenhaus.tel) : krankenhaus.tel != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Krankenhaus)) {
+            return false;
+        }
+        Krankenhaus other = (Krankenhaus) object;
+        if ((this.khid == null && other.khid != null) || (this.khid != null && !this.khid.equals(other.khid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (khid ^ (khid >>> 32));
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (strasse != null ? strasse.hashCode() : 0);
-        result = 31 * result + (plz != null ? plz.hashCode() : 0);
-        result = 31 * result + (ort != null ? ort.hashCode() : 0);
-        result = 31 * result + (tel != null ? tel.hashCode() : 0);
-        result = 31 * result + (fax != null ? fax.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.Krankenhaus[khid=" + khid + "]";
     }
+
 }

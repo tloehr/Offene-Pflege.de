@@ -1,34 +1,96 @@
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:48
- * To change this template use File | Settings | File Templates.
- */
 @Entity
-public class Arzt {
-    private long arztId;
-
-    @javax.persistence.Column(name = "ArztID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "Arzt")
+@NamedQueries({
+    @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Arzt a"),
+    @NamedQuery(name = "Arzt.findByArztID", query = "SELECT a FROM Arzt a WHERE a.arztID = :arztID"),
+    @NamedQuery(name = "Arzt.findByAnrede", query = "SELECT a FROM Arzt a WHERE a.anrede = :anrede"),
+    @NamedQuery(name = "Arzt.findByTitel", query = "SELECT a FROM Arzt a WHERE a.titel = :titel"),
+    @NamedQuery(name = "Arzt.findByName", query = "SELECT a FROM Arzt a WHERE a.name = :name"),
+    @NamedQuery(name = "Arzt.findByVorname", query = "SELECT a FROM Arzt a WHERE a.vorname = :vorname"),
+    @NamedQuery(name = "Arzt.findByStrasse", query = "SELECT a FROM Arzt a WHERE a.strasse = :strasse"),
+    @NamedQuery(name = "Arzt.findByPlz", query = "SELECT a FROM Arzt a WHERE a.plz = :plz"),
+    @NamedQuery(name = "Arzt.findByOrt", query = "SELECT a FROM Arzt a WHERE a.ort = :ort"),
+    @NamedQuery(name = "Arzt.findByTel", query = "SELECT a FROM Arzt a WHERE a.tel = :tel"),
+    @NamedQuery(name = "Arzt.findByFax", query = "SELECT a FROM Arzt a WHERE a.fax = :fax"),
+    @NamedQuery(name = "Arzt.findByMobil", query = "SELECT a FROM Arzt a WHERE a.mobil = :mobil"),
+    @NamedQuery(name = "Arzt.findByEMail", query = "SELECT a FROM Arzt a WHERE a.eMail = :eMail"),
+    @NamedQuery(name = "Arzt.findByFach", query = "SELECT a FROM Arzt a WHERE a.fach = :fach")})
+public class Arzt implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getArztId() {
-        return arztId;
-    }
-
-    public void setArztId(long arztId) {
-        this.arztId = arztId;
-    }
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "ArztID")
+    private Long arztID;
+    @Basic(optional = false)
+    @Column(name = "Anrede")
     private String anrede;
+    @Basic(optional = false)
+    @Column(name = "Titel")
+    private String titel;
+    @Basic(optional = false)
+    @Column(name = "Name")
+    private String name;
+    @Basic(optional = false)
+    @Column(name = "Vorname")
+    private String vorname;
+    @Basic(optional = false)
+    @Column(name = "Strasse")
+    private String strasse;
+    @Basic(optional = false)
+    @Column(name = "PLZ")
+    private String plz;
+    @Basic(optional = false)
+    @Column(name = "Ort")
+    private String ort;
+    @Basic(optional = false)
+    @Column(name = "Tel")
+    private String tel;
+    @Basic(optional = false)
+    @Column(name = "Fax")
+    private String fax;
+    @Column(name = "Mobil")
+    private String mobil;
+    @Column(name = "EMail")
+    private String eMail;
+    @Basic(optional = false)
+    @Column(name = "Fach")
+    private String fach;
 
-    @javax.persistence.Column(name = "Anrede", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
+    public Arzt() {
+    }
+
+    public Arzt(Long arztID) {
+        this.arztID = arztID;
+    }
+
+    public Arzt(Long arztID, String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax, String fach) {
+        this.arztID = arztID;
+        this.anrede = anrede;
+        this.titel = titel;
+        this.name = name;
+        this.vorname = vorname;
+        this.strasse = strasse;
+        this.plz = plz;
+        this.ort = ort;
+        this.tel = tel;
+        this.fax = fax;
+        this.fach = fach;
+    }
+
+    public Long getArztID() {
+        return arztID;
+    }
+
+    public void setArztID(Long arztID) {
+        this.arztID = arztID;
+    }
+
     public String getAnrede() {
         return anrede;
     }
@@ -37,10 +99,6 @@ public class Arzt {
         this.anrede = anrede;
     }
 
-    private String titel;
-
-    @javax.persistence.Column(name = "Titel", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
     public String getTitel() {
         return titel;
     }
@@ -49,10 +107,6 @@ public class Arzt {
         this.titel = titel;
     }
 
-    private String name;
-
-    @javax.persistence.Column(name = "Name", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getName() {
         return name;
     }
@@ -61,10 +115,6 @@ public class Arzt {
         this.name = name;
     }
 
-    private String vorname;
-
-    @javax.persistence.Column(name = "Vorname", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getVorname() {
         return vorname;
     }
@@ -73,10 +123,6 @@ public class Arzt {
         this.vorname = vorname;
     }
 
-    private String strasse;
-
-    @javax.persistence.Column(name = "Strasse", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getStrasse() {
         return strasse;
     }
@@ -85,10 +131,6 @@ public class Arzt {
         this.strasse = strasse;
     }
 
-    private String plz;
-
-    @javax.persistence.Column(name = "PLZ", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getPlz() {
         return plz;
     }
@@ -97,10 +139,6 @@ public class Arzt {
         this.plz = plz;
     }
 
-    private String ort;
-
-    @javax.persistence.Column(name = "Ort", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getOrt() {
         return ort;
     }
@@ -109,10 +147,6 @@ public class Arzt {
         this.ort = ort;
     }
 
-    private String tel;
-
-    @javax.persistence.Column(name = "Tel", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getTel() {
         return tel;
     }
@@ -121,10 +155,6 @@ public class Arzt {
         this.tel = tel;
     }
 
-    private String fax;
-
-    @javax.persistence.Column(name = "Fax", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getFax() {
         return fax;
     }
@@ -133,10 +163,6 @@ public class Arzt {
         this.fax = fax;
     }
 
-    private String mobil;
-
-    @javax.persistence.Column(name = "Mobil", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getMobil() {
         return mobil;
     }
@@ -145,22 +171,14 @@ public class Arzt {
         this.mobil = mobil;
     }
 
-    private String eMail;
-
-    @javax.persistence.Column(name = "EMail", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
-    public String geteMail() {
+    public String getEMail() {
         return eMail;
     }
 
-    public void seteMail(String eMail) {
+    public void setEMail(String eMail) {
         this.eMail = eMail;
     }
 
-    private String fach;
-
-    @javax.persistence.Column(name = "Fach", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getFach() {
         return fach;
     }
@@ -170,44 +188,28 @@ public class Arzt {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (arztID != null ? arztID.hashCode() : 0);
+        return hash;
+    }
 
-        Arzt arzt = (Arzt) o;
-
-        if (arztId != arzt.arztId) return false;
-        if (anrede != null ? !anrede.equals(arzt.anrede) : arzt.anrede != null) return false;
-        if (eMail != null ? !eMail.equals(arzt.eMail) : arzt.eMail != null) return false;
-        if (fach != null ? !fach.equals(arzt.fach) : arzt.fach != null) return false;
-        if (fax != null ? !fax.equals(arzt.fax) : arzt.fax != null) return false;
-        if (mobil != null ? !mobil.equals(arzt.mobil) : arzt.mobil != null) return false;
-        if (name != null ? !name.equals(arzt.name) : arzt.name != null) return false;
-        if (ort != null ? !ort.equals(arzt.ort) : arzt.ort != null) return false;
-        if (plz != null ? !plz.equals(arzt.plz) : arzt.plz != null) return false;
-        if (strasse != null ? !strasse.equals(arzt.strasse) : arzt.strasse != null) return false;
-        if (tel != null ? !tel.equals(arzt.tel) : arzt.tel != null) return false;
-        if (titel != null ? !titel.equals(arzt.titel) : arzt.titel != null) return false;
-        if (vorname != null ? !vorname.equals(arzt.vorname) : arzt.vorname != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Arzt)) {
+            return false;
+        }
+        Arzt other = (Arzt) object;
+        if ((this.arztID == null && other.arztID != null) || (this.arztID != null && !this.arztID.equals(other.arztID))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (arztId ^ (arztId >>> 32));
-        result = 31 * result + (anrede != null ? anrede.hashCode() : 0);
-        result = 31 * result + (titel != null ? titel.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
-        result = 31 * result + (strasse != null ? strasse.hashCode() : 0);
-        result = 31 * result + (plz != null ? plz.hashCode() : 0);
-        result = 31 * result + (ort != null ? ort.hashCode() : 0);
-        result = 31 * result + (tel != null ? tel.hashCode() : 0);
-        result = 31 * result + (fax != null ? fax.hashCode() : 0);
-        result = 31 * result + (mobil != null ? mobil.hashCode() : 0);
-        result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
-        result = 31 * result + (fach != null ? fach.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.Arzt[arztID=" + arztID + "]";
     }
+
 }

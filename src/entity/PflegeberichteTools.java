@@ -4,6 +4,10 @@
  */
 package entity;
 
+import entity.files.SYSFiles;
+import entity.files.Syspb2file;
+import entity.vorgang.SYSPB2VORGANG;
+import entity.vorgang.Vorgaenge;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;

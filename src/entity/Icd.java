@@ -1,34 +1,68 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package entity;
 
+import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ *
+ * @author tloehr
  */
 @Entity
-public class Icd {
-    private long icdid;
-
-    @javax.persistence.Column(name = "ICDID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "ICD")
+@NamedQueries({
+    @NamedQuery(name = "Icd.findAll", query = "SELECT i FROM ICD i"),
+    @NamedQuery(name = "Icd.findByIcdid", query = "SELECT i FROM ICD i WHERE i.icdid = :icdid"),
+    @NamedQuery(name = "Icd.findByIcd10", query = "SELECT i FROM ICD i WHERE i.icd10 = :icd10")})
+public class ICD implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getIcdid() {
-        return icdid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "ICDID")
+    private Long icdid;
+    @Basic(optional = false)
+    @Column(name = "ICD10")
+    private String icd10;
+    @Basic(optional = false)
+    @Lob
+    @Column(name = "Text")
+    private String text;
+
+    public ICD() {
     }
 
-    public void setIcdid(long icdid) {
+    public ICD(Long icdid) {
         this.icdid = icdid;
     }
 
-    private String icd10;
+    public ICD(Long icdid, String icd10, String text) {
+        this.icdid = icdid;
+        this.icd10 = icd10;
+        this.text = text;
+    }
 
-    @javax.persistence.Column(name = "ICD10", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
+    public Long getIcdid() {
+        return icdid;
+    }
+
+    public void setIcdid(Long icdid) {
+        this.icdid = icdid;
+    }
+
     public String getIcd10() {
         return icd10;
     }
@@ -37,10 +71,6 @@ public class Icd {
         this.icd10 = icd10;
     }
 
-    private String text;
-
-    @javax.persistence.Column(name = "Text", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getText() {
         return text;
     }
@@ -50,24 +80,28 @@ public class Icd {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (icdid != null ? icdid.hashCode() : 0);
+        return hash;
+    }
 
-        Icd icd = (Icd) o;
-
-        if (icdid != icd.icdid) return false;
-        if (icd10 != null ? !icd10.equals(icd.icd10) : icd.icd10 != null) return false;
-        if (text != null ? !text.equals(icd.text) : icd.text != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof ICD)) {
+            return false;
+        }
+        ICD other = (ICD) object;
+        if ((this.icdid == null && other.icdid != null) || (this.icdid != null && !this.icdid.equals(other.icdid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (icdid ^ (icdid >>> 32));
-        result = 31 * result + (icd10 != null ? icd10.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.Icd[icdid=" + icdid + "]";
     }
+
 }

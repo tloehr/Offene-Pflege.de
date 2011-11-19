@@ -4,6 +4,10 @@
  */
 package entity;
 
+import entity.files.Sysbwerte2file;
+import entity.vorgang.SYSBWerte2VORGANG;
+import entity.vorgang.VorgangElement;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;

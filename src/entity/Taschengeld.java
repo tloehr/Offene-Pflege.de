@@ -1,49 +1,114 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.math.BigInteger;
+import java.util.Date;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ *
+ * @author tloehr
  */
 @Entity
-public class Taschengeld {
-    private long tgid;
-
-    @javax.persistence.Column(name = "TGID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "Taschengeld")
+@NamedQueries({
+    @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Taschengeld t"),
+    @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Taschengeld t WHERE t.tgid = :tgid"),
+    @NamedQuery(name = "Taschengeld.findByBWKennung", query = "SELECT t FROM Taschengeld t WHERE t.bWKennung = :bWKennung"),
+    @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Taschengeld t WHERE t.belegDatum = :belegDatum"),
+    @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Taschengeld t WHERE t.belegtext = :belegtext"),
+    @NamedQuery(name = "Taschengeld.findByBetrag", query = "SELECT t FROM Taschengeld t WHERE t.betrag = :betrag"),
+    @NamedQuery(name = "Taschengeld.findByCancel", query = "SELECT t FROM Taschengeld t WHERE t.cancel = :cancel"),
+    @NamedQuery(name = "Taschengeld.findByCreator", query = "SELECT t FROM Taschengeld t WHERE t.creator = :creator"),
+    @NamedQuery(name = "Taschengeld.findByEditor", query = "SELECT t FROM Taschengeld t WHERE t.editor = :editor"),
+    @NamedQuery(name = "Taschengeld.findByEdate", query = "SELECT t FROM Taschengeld t WHERE t.edate = :edate"),
+    @NamedQuery(name = "Taschengeld.findByCdate", query = "SELECT t FROM Taschengeld t WHERE t.cdate = :cdate")})
+public class Taschengeld implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getTgid() {
-        return tgid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "TGID")
+    private Long tgid;
+    @Basic(optional = false)
+    @Column(name = "BWKennung")
+    private String bWKennung;
+    @Basic(optional = false)
+    @Column(name = "BelegDatum")
+    @Temporal(TemporalType.DATE)
+    private Date belegDatum;
+    @Basic(optional = false)
+    @Column(name = "Belegtext")
+    private String belegtext;
+    @Basic(optional = false)
+    @Column(name = "Betrag")
+    private BigDecimal betrag;
+    @Column(name = "_cancel")
+    private BigInteger cancel;
+    @Basic(optional = false)
+    @Column(name = "_creator")
+    private String creator;
+    @Column(name = "_editor")
+    private String editor;
+    @Basic(optional = false)
+    @Column(name = "_edate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date edate;
+    @Basic(optional = false)
+    @Column(name = "_cdate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date cdate;
+
+    public Taschengeld() {
     }
 
-    public void setTgid(long tgid) {
+    public Taschengeld(Long tgid) {
         this.tgid = tgid;
     }
 
-    private String bwKennung;
-
-    @javax.persistence.Column(name = "BWKennung", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
-    public String getBwKennung() {
-        return bwKennung;
+    public Taschengeld(Long tgid, String bWKennung, Date belegDatum, String belegtext, BigDecimal betrag, String creator, Date edate, Date cdate) {
+        this.tgid = tgid;
+        this.bWKennung = bWKennung;
+        this.belegDatum = belegDatum;
+        this.belegtext = belegtext;
+        this.betrag = betrag;
+        this.creator = creator;
+        this.edate = edate;
+        this.cdate = cdate;
     }
 
-    public void setBwKennung(String bwKennung) {
-        this.bwKennung = bwKennung;
+    public Long getTgid() {
+        return tgid;
     }
 
-    private Date belegDatum;
+    public void setTgid(Long tgid) {
+        this.tgid = tgid;
+    }
 
-    @javax.persistence.Column(name = "BelegDatum", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
+    public String getBWKennung() {
+        return bWKennung;
+    }
+
+    public void setBWKennung(String bWKennung) {
+        this.bWKennung = bWKennung;
+    }
+
     public Date getBelegDatum() {
         return belegDatum;
     }
@@ -52,10 +117,6 @@ public class Taschengeld {
         this.belegDatum = belegDatum;
     }
 
-    private String belegtext;
-
-    @javax.persistence.Column(name = "Belegtext", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getBelegtext() {
         return belegtext;
     }
@@ -64,10 +125,6 @@ public class Taschengeld {
         this.belegtext = belegtext;
     }
 
-    private BigDecimal betrag;
-
-    @javax.persistence.Column(name = "Betrag", nullable = false, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getBetrag() {
         return betrag;
     }
@@ -76,22 +133,14 @@ public class Taschengeld {
         this.betrag = betrag;
     }
 
-    private long cancel;
-
-    @javax.persistence.Column(name = "_cancel", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getCancel() {
+    public BigInteger getCancel() {
         return cancel;
     }
 
-    public void setCancel(long cancel) {
+    public void setCancel(BigInteger cancel) {
         this.cancel = cancel;
     }
 
-    private String creator;
-
-    @javax.persistence.Column(name = "_creator", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getCreator() {
         return creator;
     }
@@ -100,10 +149,6 @@ public class Taschengeld {
         this.creator = creator;
     }
 
-    private String editor;
-
-    @javax.persistence.Column(name = "_editor", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getEditor() {
         return editor;
     }
@@ -112,63 +157,45 @@ public class Taschengeld {
         this.editor = editor;
     }
 
-    private Timestamp edate;
-
-    @javax.persistence.Column(name = "_edate", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getEdate() {
+    public Date getEdate() {
         return edate;
     }
 
-    public void setEdate(Timestamp edate) {
+    public void setEdate(Date edate) {
         this.edate = edate;
     }
 
-    private Timestamp cdate;
-
-    @javax.persistence.Column(name = "_cdate", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getCdate() {
+    public Date getCdate() {
         return cdate;
     }
 
-    public void setCdate(Timestamp cdate) {
+    public void setCdate(Date cdate) {
         this.cdate = cdate;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (tgid != null ? tgid.hashCode() : 0);
+        return hash;
+    }
 
-        Taschengeld that = (Taschengeld) o;
-
-        if (cancel != that.cancel) return false;
-        if (tgid != that.tgid) return false;
-        if (belegDatum != null ? !belegDatum.equals(that.belegDatum) : that.belegDatum != null) return false;
-        if (belegtext != null ? !belegtext.equals(that.belegtext) : that.belegtext != null) return false;
-        if (betrag != null ? !betrag.equals(that.betrag) : that.betrag != null) return false;
-        if (bwKennung != null ? !bwKennung.equals(that.bwKennung) : that.bwKennung != null) return false;
-        if (cdate != null ? !cdate.equals(that.cdate) : that.cdate != null) return false;
-        if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
-        if (edate != null ? !edate.equals(that.edate) : that.edate != null) return false;
-        if (editor != null ? !editor.equals(that.editor) : that.editor != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Taschengeld)) {
+            return false;
+        }
+        Taschengeld other = (Taschengeld) object;
+        if ((this.tgid == null && other.tgid != null) || (this.tgid != null && !this.tgid.equals(other.tgid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (tgid ^ (tgid >>> 32));
-        result = 31 * result + (bwKennung != null ? bwKennung.hashCode() : 0);
-        result = 31 * result + (belegDatum != null ? belegDatum.hashCode() : 0);
-        result = 31 * result + (belegtext != null ? belegtext.hashCode() : 0);
-        result = 31 * result + (betrag != null ? betrag.hashCode() : 0);
-        result = 31 * result + (int) (cancel ^ (cancel >>> 32));
-        result = 31 * result + (creator != null ? creator.hashCode() : 0);
-        result = 31 * result + (editor != null ? editor.hashCode() : 0);
-        result = 31 * result + (edate != null ? edate.hashCode() : 0);
-        result = 31 * result + (cdate != null ? cdate.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.Taschengeld[tgid=" + tgid + "]";
     }
+
 }

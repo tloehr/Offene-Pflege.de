@@ -1,35 +1,92 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package entity;
 
+import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.sql.Timestamp;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ *
+ * @author tloehr
  */
 @Entity
-public class QsQuery {
-    private long qsqid;
-
-    @javax.persistence.Column(name = "QSQID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@Table(name = "QSQuery")
+@NamedQueries({
+    @NamedQuery(name = "QSQuery.findAll", query = "SELECT q FROM QSQuery q"),
+    @NamedQuery(name = "QSQuery.findByQsqid", query = "SELECT q FROM QSQuery q WHERE q.qsqid = :qsqid"),
+    @NamedQuery(name = "QSQuery.findByText", query = "SELECT q FROM QSQuery q WHERE q.text = :text"),
+    @NamedQuery(name = "QSQuery.findByKategorie", query = "SELECT q FROM QSQuery q WHERE q.kategorie = :kategorie"),
+    @NamedQuery(name = "QSQuery.findByCdate", query = "SELECT q FROM QSQuery q WHERE q.cdate = :cdate")})
+public class QSQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getQsqid() {
-        return qsqid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "QSQID")
+    private Long qsqid;
+    @Basic(optional = false)
+    @Column(name = "Text")
+    private String text;
+    @Basic(optional = false)
+    @Lob
+    @Column(name = "SEQUEL")
+    private String sequel;
+    @Basic(optional = false)
+    @Lob
+    @Column(name = "PARAMS")
+    private String params;
+    @Basic(optional = false)
+    @Lob
+    @Column(name = "FORMAT")
+    private String format;
+    @Basic(optional = false)
+    @Column(name = "Kategorie")
+    private long kategorie;
+    @Basic(optional = false)
+    @Column(name = "_cdate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date cdate;
+
+    public QSQuery() {
     }
 
-    public void setQsqid(long qsqid) {
+    public QSQuery(Long qsqid) {
         this.qsqid = qsqid;
     }
 
-    private String text;
+    public QSQuery(Long qsqid, String text, String sequel, String params, String format, long kategorie, Date cdate) {
+        this.qsqid = qsqid;
+        this.text = text;
+        this.sequel = sequel;
+        this.params = params;
+        this.format = format;
+        this.kategorie = kategorie;
+        this.cdate = cdate;
+    }
 
-    @javax.persistence.Column(name = "Text", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
+    public Long getQsqid() {
+        return qsqid;
+    }
+
+    public void setQsqid(Long qsqid) {
+        this.qsqid = qsqid;
+    }
+
     public String getText() {
         return text;
     }
@@ -38,10 +95,6 @@ public class QsQuery {
         this.text = text;
     }
 
-    private String sequel;
-
-    @javax.persistence.Column(name = "SEQUEL", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getSequel() {
         return sequel;
     }
@@ -50,10 +103,6 @@ public class QsQuery {
         this.sequel = sequel;
     }
 
-    private String params;
-
-    @javax.persistence.Column(name = "PARAMS", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getParams() {
         return params;
     }
@@ -62,10 +111,6 @@ public class QsQuery {
         this.params = params;
     }
 
-    private String format;
-
-    @javax.persistence.Column(name = "FORMAT", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getFormat() {
         return format;
     }
@@ -74,10 +119,6 @@ public class QsQuery {
         this.format = format;
     }
 
-    private long kategorie;
-
-    @javax.persistence.Column(name = "Kategorie", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
     public long getKategorie() {
         return kategorie;
     }
@@ -86,45 +127,37 @@ public class QsQuery {
         this.kategorie = kategorie;
     }
 
-    private Timestamp cdate;
-
-    @javax.persistence.Column(name = "_cdate", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-    @Basic
-    public Timestamp getCdate() {
+    public Date getCdate() {
         return cdate;
     }
 
-    public void setCdate(Timestamp cdate) {
+    public void setCdate(Date cdate) {
         this.cdate = cdate;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (qsqid != null ? qsqid.hashCode() : 0);
+        return hash;
+    }
 
-        QsQuery qsQuery = (QsQuery) o;
-
-        if (kategorie != qsQuery.kategorie) return false;
-        if (qsqid != qsQuery.qsqid) return false;
-        if (cdate != null ? !cdate.equals(qsQuery.cdate) : qsQuery.cdate != null) return false;
-        if (format != null ? !format.equals(qsQuery.format) : qsQuery.format != null) return false;
-        if (params != null ? !params.equals(qsQuery.params) : qsQuery.params != null) return false;
-        if (sequel != null ? !sequel.equals(qsQuery.sequel) : qsQuery.sequel != null) return false;
-        if (text != null ? !text.equals(qsQuery.text) : qsQuery.text != null) return false;
-
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof QSQuery)) {
+            return false;
+        }
+        QSQuery other = (QSQuery) object;
+        if ((this.qsqid == null && other.qsqid != null) || (this.qsqid != null && !this.qsqid.equals(other.qsqid))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (qsqid ^ (qsqid >>> 32));
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (sequel != null ? sequel.hashCode() : 0);
-        result = 31 * result + (params != null ? params.hashCode() : 0);
-        result = 31 * result + (format != null ? format.hashCode() : 0);
-        result = 31 * result + (int) (kategorie ^ (kategorie >>> 32));
-        result = 31 * result + (cdate != null ? cdate.hashCode() : 0);
-        return result;
+    public String toString() {
+        return "entity.rest.QSQuery[qsqid=" + qsqid + "]";
     }
+
 }

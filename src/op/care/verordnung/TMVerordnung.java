@@ -26,8 +26,8 @@
  */
 package op.care.verordnung;
 
-import entity.Verordnung;
-import entity.VerordnungTools;
+import entity.verordnungen.Verordnung;
+import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;

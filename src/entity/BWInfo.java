@@ -25,6 +25,10 @@
  */
 package entity;
 
+import entity.files.Sysbwi2file;
+import entity.vorgang.SYSBWI2VORGANG;
+import entity.vorgang.VorgangElement;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;

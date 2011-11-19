@@ -25,6 +25,7 @@
  */
 package entity;
 
+import entity.files.*;
 import op.tools.SYSTools;
 
 import javax.persistence.*;

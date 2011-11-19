@@ -25,7 +25,7 @@
  */
 package tablemodels;
 
-import entity.*;
+import entity.files.*;
 import op.tools.BeanTableModel;
 import op.tools.HTMLTools;
 import op.tools.SYSTools;

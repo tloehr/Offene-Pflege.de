@@ -26,11 +26,11 @@
  */
 package tablemodels;
 
-import entity.*;
-import op.OPDE;
+import entity.vorgang.VBericht;
+import entity.vorgang.VorgaengeTools;
+import entity.vorgang.VorgangElement;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
