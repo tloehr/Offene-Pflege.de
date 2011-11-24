@@ -2,6 +2,10 @@ package entity;
 
 import op.OPDE;
 
+import javax.persistence.Entity;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: tloehr
@@ -87,5 +91,22 @@ public class EntityTools {
             OPDE.getEM().getTransaction().rollback();
         }
         return success;
+    }
+
+    /**
+     * Erzeugt einen String, der die PrimärSchlüssel durch komma getrennt enthält.
+     * Ist ein Workaround für Queries mit dem Schlüsselwort IN.
+     *
+     * @param entities
+     * @return
+     */
+    public static String getIDList(List entities) {
+        String list = "";
+        Iterator it = entities.iterator();
+        while (it.hasNext()) {
+            list += OPDE.getEM().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(it.next());
+            list += it.hasNext() ? "," : "";
+        }
+        return list;
     }
 }

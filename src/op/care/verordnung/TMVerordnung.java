@@ -34,6 +34,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,7 +42,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -80,6 +83,16 @@ public class TMVerordnung
 
     public TMVerordnung(String bwkennung, boolean abgesetzt, boolean medi, boolean ohneMedi, boolean bedarf, boolean regel, boolean bestand) {
         super();
+
+
+        Query query = OPDE.getEM().createNamedQuery("Verordnung.findByBewohnerMitSaldenUndVorrat");
+        query.setParameter(1, "OA1");
+        query.setParameter(2, "OA1");
+
+        List list = query.getResultList();
+
+        // TODO: Hier gehts weiter. Wahnsinn. Das geht. Was ist mit den NULLs ?
+
         this.cache = new HashMap();
         this.mitBestand = bestand;
         try {
@@ -104,7 +117,12 @@ public class TMVerordnung
                     // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
                     // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
                     // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
+                    // Da sind dann für jeden Vorrat alle die DafIDs enthalten, die jemals auf den Vorrat
+                    // eingebucht wurden. Man kann z.B. sehen, dass VorID 435 bisher schon die DafIDs 50, 165 und 553
+                    // beinhaltet hatte.
                     // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
+                    // Das braucht man, weil in der Verordnung ja nur die DafID steht, die am Anfang
+                    // verwendet wurde. Das kann ja mittlerweile eine ganz andere sein.
                     " LEFT OUTER JOIN " +
                     " ( " +
                     "       SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
@@ -155,7 +173,8 @@ public class TMVerordnung
                     " WHERE BWKennung=? ";
             if (!abgesetzt) {
                 // sql += " AND v.AbDatum = '9999-12-31 23:59:59' ";
-                sql += " AND date(v.AbDatum) >= date(now()) ";
+                sql += " " +
+                        " ";
             }
             if (!(medi && ohneMedi)) { // ungleich gesetzt
                 if (medi) {
@@ -408,7 +427,7 @@ public class TMVerordnung
         if (cache.containsKey(verordnung)) {
             result = cache.get(verordnung).toString();
         } else {
-            result = VerordnungTools.getDosis(verordnung);
+            result = VerordnungTools.getDosis(verordnung, mitBestand);
             cache.put(verordnung, result);
         }
         return result;

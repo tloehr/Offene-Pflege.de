@@ -52,7 +52,6 @@
         <class>entity.KKasse</class>
         <class>entity.verordnungen.APV</class>
         <class>entity.verordnungen.MedBestand</class>
-        <class>entity.verordnungen.MpBestellung</class>
         <class>entity.verordnungen.MedBuchungen</class>
         <class>entity.verordnungen.Darreichung</class>
         <class>entity.verordnungen.MedFormen</class>
@@ -66,7 +65,7 @@
         <class>entity.Massnahmen</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PlanKontrolle</class>
-        <class>entity.QsQuery</class>
+        <class>entity.QSQuery</class>
         <class>entity.verordnungen.Situationen</class>
         <class>entity.Taschengeld</class>
         <properties>

@@ -35,6 +35,64 @@ import java.util.Date;
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
         @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
+
+@SqlResultSetMappings({
+        @SqlResultSetMapping(name = "Verordnung.findByBewohnerResultMapping",
+                entities = @EntityResult(entityClass = Verordnung.class),
+                columns = {@ColumnResult(name = "bestand.summe"), @ColumnResult(name = "vor.saldo")}
+        )
+})
+
+@NamedNativeQueries({
+        /**
+         * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
+         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Pflegeberichte mit einer
+         * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
+         * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
+         * Objekt ist immer der Pflegebericht, das zweiter ist ein Long Wert, der das count Ergebnis
+         * des Joins enthält.
+         *
+         */
+        @NamedNativeQuery(name = "Verordnung.findByBewohnerMitSaldenUndVorrat", query = " " +
+                " SELECT v.*, bestand.*, vor.* " +
+                " FROM BHPVerordnung v " +
+                // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
+                // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
+                // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
+                // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
+                // Da sind dann für jeden Vorrat alle die DafIDs enthalten, die jemals auf den Vorrat
+                // eingebucht wurden. Man kann z.B. sehen, dass VorID 435 bisher schon die DafIDs 50, 165 und 553
+                // beinhaltet hatte.
+                // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
+                // Das braucht man, weil in der Verordnung ja nur die DafID steht, die am Anfang
+                // verwendet wurde. Das kann ja mittlerweile eine ganz andere sein.
+                " LEFT OUTER JOIN " +
+                " ( " +
+                "       SELECT DISTINCT a.* FROM ( " +
+                "       SELECT best.*, sum(buch.Menge) saldo FROM MPBestand best " +
+                "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+                "       WHERE vor1.BWKennung = ? AND vor1.Bis = '9999-12-31 23:59:59'" +
+                "       GROUP BY VorID" +
+                "   ) a  " +
+                "   INNER JOIN (" +
+                "       SELECT best.VorID, best.DafID FROM MPBestand best " +
+                "   ) b ON a.VorID = b.VorID " +
+                " ) vor ON vor.DafID = v.DafID " +
+                // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
+                // ursprünglich verordneten abweichen.
+                " LEFT OUTER JOIN( " +
+                "       SELECT best1.*, SUM(buch1.Menge) summe " +
+                "       FROM MPBestand best1 " +
+                "       INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
+                "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+                "       GROUP BY best1.BestID" +
+                " ) bestand ON bestand.VorID = vor.VorID " +
+                " WHERE BWKennung = ? "
+                , resultSetMapping = "Verordnung.findByBewohnerResultMapping")
+
+})
+
 public class Verordnung implements Serializable, VorgangElement {
     private static final long serialVersionUID = 1L;
     @Id

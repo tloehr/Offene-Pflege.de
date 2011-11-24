@@ -9,8 +9,6 @@ import java.io.Serializable;
         @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM Darreichung m"),
         @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM Darreichung m WHERE m.dafID = :dafID"),
         @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM Darreichung m WHERE m.zusatz = :zusatz"),
-        @NamedQuery(name = "Darreichung.findByMedPID", query = "SELECT m FROM Darreichung m WHERE m.medPID = :medPID"),
-        @NamedQuery(name = "Darreichung.findByFormID", query = "SELECT m FROM Darreichung m WHERE m.formID = :formID"),
         @NamedQuery(name = "Darreichung.findByUKennung", query = "SELECT m FROM Darreichung m WHERE m.uKennung = :uKennung")})
 public class Darreichung implements Serializable {
     private static final long serialVersionUID = 1L;

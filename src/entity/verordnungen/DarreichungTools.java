@@ -1,7 +1,9 @@
 package entity.verordnungen;
 
 import entity.Bewohner;
+import entity.EntityTools;
 import op.OPDE;
+import op.tools.SYSConst;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -27,8 +29,7 @@ public class DarreichungTools {
      * Es werden Zuordnungen erlaubt, die aufgrund der Äquivalenzen zwischen
      * Formen bestehen. z.B. Tabletten zu Dragees zu Filmtabletten etc.
      *
-     * @param dafid PK der Darreichung
-     * @return ResultSet mit der gew¸nschten Liste.
+
      */
     public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         MedVorrat result = null;
@@ -50,38 +51,37 @@ public class DarreichungTools {
     }
 
     public static List<MedVorrat> getPassendeVorraeteZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
+        // TODO: das muss noch getestet werden
+
         List<MedVorrat> liste = new ArrayList();
-//
-//        // TODO: Hier gehts weiter
-//                String sql1 = " SELECT DISTINCT v.VorID, v.Text " +
-//                        " FROM MPVorrat v" +
-//                        " INNER JOIN MPBestand b ON v.VorID = b.VorID " +
-//                        " INNER JOIN MPDarreichung d ON b.DafID = d.DafID" +
-//                        " WHERE d.FormID IN (" +
-//                        "       SELECT FormID " +
-//                        "       FROM MPFormen " +
-//                        "       WHERE (Equiv IN ( " + // Alle Formen, die gleichwertig sind
-//                        "               SELECT Equiv " +
-//                        "               FROM MPDarreichung d " +
-//                        "               INNER JOIN MPFormen f ON f.FormID = d.FormID " +
-//                        "               WHERE d.DafID = ? " +
-//                        "               ) AND Equiv <> 0 " +
-//                        "           OR " +
-//                        "           ( FormID IN (" + // Falls diese Form keine Gleichwertigen besitzt (Equiv = 0), dann nur die Form selbst.
-//                        "               SELECT FormID FROM MPDarreichung WHERE DafID = ? )" +
-//                        "           )" +
-//                        "       )" +
-//                        " ) " +
-//                        " AND v.BWKennung=? " +
-//                        " AND v.Bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
-//                        " ORDER BY v.Text ";
-//                PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
-//                stmt1.setLong(1, dafid);
-//                stmt1.setLong(2, dafid);
-//                stmt1.setString(3, bwkennung);
-//                result = stmt1.executeQuery();
-//
-//
+
+        // 1. Form der gesuchten darreichung bestimmen.
+        MedFormen meineForm = darreichung.getMedForm();
+
+        // 2. Alle äquivalenten Formen dazu finden
+        List<MedFormen> aehnlicheFormen = new ArrayList<MedFormen>();
+        if (meineForm.getEquiv() != 0) {
+            Query query = OPDE.getEM().createNamedQuery("MedFormen.findByEquiv");
+            query.setParameter("equiv", meineForm.getEquiv());
+            aehnlicheFormen = query.getResultList();
+        } else {
+            aehnlicheFormen.add(meineForm);
+        }
+
+        // 3. Anhand der Bestände die passenden Vorräte ermitteln
+        Query queryVorraete = OPDE.getEM().createQuery(
+                " " +
+                " SELECT DISTINCT b.vorrat FROM MedBestand b " +
+                " WHERE b.vorrat.bewohner = :bewohner " +
+                " AND b.vorrat.bis = :bis " +
+                " AND b.darreichung.medForm.formID  IN " +
+                " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
+        );
+        queryVorraete.setParameter("bewohner", bewohner);
+        queryVorraete.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);
+
+        liste = queryVorraete.getResultList();
+
         return liste;
     }
 }

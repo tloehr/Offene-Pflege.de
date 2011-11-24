@@ -54,7 +54,7 @@ public class Sysver2file implements Serializable {
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
-    @JoinColumn(name = "VERID", referencedColumnName = "VERID")
+    @JoinColumn(name = "VERID", referencedColumnName = "VerID")
     @ManyToOne
     private Verordnung verordnung;
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")

@@ -8,7 +8,11 @@ package entity.verordnungen;
  * To change this template use File | Settings | File Templates.
  */
 public class MedVorratTools {
-    public static MedVorrat findByVerordnung(){
-           return null;
+    public static MedVorrat findByVerordnung(Verordnung verordnung){
+
+
+
+
+        return null;
     }
 }

@@ -383,7 +383,7 @@ public class VerordnungTools {
             // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
 
             MedBestand aktuellerAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
-            if (aktuellerAnbruch != null && aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
+            if (aktuellerAnbruch != null && !aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
                 result += "<font face=\"Sans Serif\"><b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
                         aktuellerAnbruch.getDarreichung().getZusatz() + "</b></font>" +
                         aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung() + " " +
@@ -465,7 +465,7 @@ public class VerordnungTools {
         return result;
     }
 
-    public static String getDosis(Verordnung verordnung) {
+    public static String getDosis(Verordnung verordnung, boolean mitBestand) {
         String result = "";
         //OPDE.getLogger().debug("VerID: "+verid);
 
@@ -552,6 +552,50 @@ public class VerordnungTools {
             result += "<i>Noch keine Dosierung / Anwendungsinformationen verfügbar</i><br/>";
         }
 
+        if (verordnung.hasMedi()) {
+
+
+
+//            if (verordnung.isBisPackEnde()) {
+//                result += "nur bis Packungs Ende<br/>";
+//            }
+//            if (mitBestand && !verordnung.isAbgesetzt()) {
+//                if (rs.getDouble("saldo") > 0) {
+//                    tmp += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("saldo")) + " " +
+//                            SYSConst.EINHEIT[rs.getInt("PackEinheit")] +
+//                            "</font></b>";
+//                    if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
+//                        double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
+//                        tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+//                                (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
+//                    }
+//                    if (rs.getLong("BestID") > 0) {
+//                        tmp += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + rs.getLong("BestID") + "</font></b>";
+//
+//                        if (rs.getDouble("bestsumme") != rs.getDouble("saldo")) {
+//                            tmp += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("bestsumme")) + " " +
+//                                    SYSConst.EINHEIT[rs.getInt("PackEinheit")] + "</font></b>";
+//                            if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
+//                                double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
+//                                tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+//                                        (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
+//                            }
+//                        }
+//                    } else {
+//                        tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+//                    }
+////                                if (rs.getLong("BestellID") > 0){
+////                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
+////                                }
+//                } else {
+//                    tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
+//                }
+//            }
+
+
+        }
+
+
         // ======================================================================================================
         // Zweiter Teil
         // ======================================================================================================
@@ -604,7 +648,7 @@ public class VerordnungTools {
 //        } else {
 //            tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
 //        }
-      return tmp;
+        return tmp;
     }
 
 

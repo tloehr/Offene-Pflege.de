@@ -11,14 +11,13 @@ import java.util.Date;
 @Entity
 @Table(name = "MPVorrat")
 @NamedQueries({
-    @NamedQuery(name = "MedVorrat.findAll", query = "SELECT m FROM MedVorrat m"),
-    @NamedQuery(name = "MedVorrat.findByVorID", query = "SELECT m FROM MedVorrat m WHERE m.vorID = :vorID"),
-    @NamedQuery(name = "MedVorrat.findByText", query = "SELECT m FROM MedVorrat m WHERE m.text = :text"),
-    @NamedQuery(name = "MedVorrat.findByBWKennung", query = "SELECT m FROM MedVorrat m WHERE m.bWKennung = :bWKennung"),
-    @NamedQuery(name = "MedVorrat.findByUKennung", query = "SELECT m FROM MedVorrat m WHERE m.uKennung = :uKennung"),
-    @NamedQuery(name = "MedVorrat.findByVon", query = "SELECT m FROM MedVorrat m WHERE m.von = :von"),
-    @NamedQuery(name = "MedVorrat.findByBis", query = "SELECT m FROM MedVorrat m WHERE m.bis = :bis"),
-    @NamedQuery(name = "MedVorrat.getSumme", query = " " +
+        @NamedQuery(name = "MedVorrat.findAll", query = "SELECT m FROM MedVorrat m"),
+        @NamedQuery(name = "MedVorrat.findByVorID", query = "SELECT m FROM MedVorrat m WHERE m.vorID = :vorID"),
+        @NamedQuery(name = "MedVorrat.findByText", query = "SELECT m FROM MedVorrat m WHERE m.text = :text"),
+        @NamedQuery(name = "MedVorrat.findByUKennung", query = "SELECT m FROM MedVorrat m WHERE m.uKennung = :uKennung"),
+        @NamedQuery(name = "MedVorrat.findByVon", query = "SELECT m FROM MedVorrat m WHERE m.von = :von"),
+        @NamedQuery(name = "MedVorrat.findByBis", query = "SELECT m FROM MedVorrat m WHERE m.bis = :bis"),
+        @NamedQuery(name = "MedVorrat.getSumme", query = " " +
                 " SELECT SUM(buch.menge) FROM MedVorrat vor JOIN vor.bestaende best JOIN best.buchungen buch WHERE vor = :vorrat "),
         @NamedQuery(name = "MedVorrat.findByBewohnerAndDarreichung", query = " " +
                 " SELECT vor FROM MedVorrat vor " +
@@ -29,8 +28,14 @@ import java.util.Date;
                 " SELECT vor FROM MedVorrat vor " +
                 " JOIN vor.bestaende best " +
                 " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
-                " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES)
-                })
+                " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
+        @NamedQuery(name = "MedVorrat.findBestandByBewohner", query = " " +
+                " SELECT best.vorrat, SUM(buch.menge) FROM MedBestand best " +
+                " JOIN best.buchungen buch " +
+                " " +
+                " WHERE best.vorrat.bewohner = :bewohner AND best.vorrat.bis = '9999-12-31 23:59:59' " +
+                " GROUP BY best.vorrat ")
+})
 public class MedVorrat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -41,9 +46,6 @@ public class MedVorrat implements Serializable {
     @Basic(optional = false)
     @Column(name = "Text")
     private String text;
-    @Basic(optional = false)
-    @Column(name = "BWKennung")
-    private String bWKennung;
     @Basic(optional = false)
     @Column(name = "UKennung")
     private String uKennung;
@@ -63,14 +65,6 @@ public class MedVorrat implements Serializable {
         this.vorID = vorID;
     }
 
-    public MedVorrat(Long vorID, String text, String bWKennung, String uKennung, Date von, Date bis) {
-        this.vorID = vorID;
-        this.text = text;
-        this.bWKennung = bWKennung;
-        this.uKennung = uKennung;
-        this.von = von;
-        this.bis = bis;
-    }
 
     public Long getVorID() {
         return vorID;
@@ -88,13 +82,6 @@ public class MedVorrat implements Serializable {
         this.text = text;
     }
 
-    public String getBWKennung() {
-        return bWKennung;
-    }
-
-    public void setBWKennung(String bWKennung) {
-        this.bWKennung = bWKennung;
-    }
 
     public String getUKennung() {
         return uKennung;
@@ -119,7 +106,7 @@ public class MedVorrat implements Serializable {
     public void setBis(Date bis) {
         this.bis = bis;
     }
-    
+
     // ==
     // 1:N Relationen
     // ==

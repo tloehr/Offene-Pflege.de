@@ -11,7 +11,6 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "VerordnungPlanung.findAll", query = "SELECT b FROM VerordnungPlanung b"),
     @NamedQuery(name = "VerordnungPlanung.findByBhppid", query = "SELECT b FROM VerordnungPlanung b WHERE b.bhppid = :bhppid"),
-    @NamedQuery(name = "VerordnungPlanung.findByVerID", query = "SELECT b FROM VerordnungPlanung b WHERE b.verID = :verID"),
     @NamedQuery(name = "VerordnungPlanung.findByNachtMo", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtMo = :nachtMo"),
     @NamedQuery(name = "VerordnungPlanung.findByMorgens", query = "SELECT b FROM VerordnungPlanung b WHERE b.morgens = :morgens"),
     @NamedQuery(name = "VerordnungPlanung.findByMittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.mittags = :mittags"),
@@ -47,8 +46,6 @@ public class VerordnungPlanung implements Serializable {
     @Basic(optional = false)
     @Column(name = "BHPPID")
     private Long bhppid;
-    @Column(name = "VerID")
-    private BigInteger verID;
     @Column(name = "NachtMo")
     private BigDecimal nachtMo;
     @Column(name = "Morgens")
@@ -105,15 +102,6 @@ public class VerordnungPlanung implements Serializable {
     public VerordnungPlanung() {
     }
 
-    public VerordnungPlanung(Long bhppid) {
-        this.bhppid = bhppid;
-    }
-
-    public VerordnungPlanung(Long bhppid, Date lDatum, String uKennung) {
-        this.bhppid = bhppid;
-        this.lDatum = lDatum;
-        this.uKennung = uKennung;
-    }
 
     public Long getBhppid() {
         return bhppid;
@@ -123,13 +111,6 @@ public class VerordnungPlanung implements Serializable {
         this.bhppid = bhppid;
     }
 
-    public BigInteger getVerID() {
-        return verID;
-    }
-
-    public void setVerID(BigInteger verID) {
-        this.verID = verID;
-    }
 
     public BigDecimal getNachtMo() {
         return nachtMo;

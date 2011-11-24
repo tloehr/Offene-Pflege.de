@@ -2,121 +2,123 @@ package entity.verordnungen;
 
 import op.tools.SYSTools;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 17.11.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 @Table(name = "MPFormen")
-public class MedFormen {
-    private long formId;
-
-    @javax.persistence.Column(name = "FormID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+@NamedQueries({
+    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM MedFormen m"),
+    @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM MedFormen m WHERE m.formID = :formID"),
+    @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM MedFormen m WHERE m.zubereitung = :zubereitung"),
+    @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM MedFormen m WHERE m.anwText = :anwText"),
+    @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM MedFormen m WHERE m.anwEinheit = :anwEinheit"),
+    @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM MedFormen m WHERE m.packEinheit = :packEinheit"),
+    @NamedQuery(name = "MedFormen.findByMassID", query = "SELECT m FROM MedFormen m WHERE m.massID = :massID"),
+    @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM MedFormen m WHERE m.stellplan = :stellplan"),
+    @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM MedFormen m WHERE m.status = :status"),
+    @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM MedFormen m WHERE m.equiv = :equiv")})
+public class MedFormen implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
-    public long getFormId() {
-        return formId;
-    }
-
-    public void setFormId(long formId) {
-        this.formId = formId;
-    }
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "FormID")
+    private Long formID;
+    @Basic(optional = false)
+    @Column(name = "Zubereitung")
     private String zubereitung;
+    @Basic(optional = false)
+    @Column(name = "AnwText")
+    private String anwText;
+    @Basic(optional = false)
+    @Column(name = "AnwEinheit")
+    private short anwEinheit;
+    @Basic(optional = false)
+    @Column(name = "PackEinheit")
+    private short packEinheit;
+    @Basic(optional = false)
+    @Column(name = "MassID")
+    private long massID;
+    @Basic(optional = false)
+    @Column(name = "Stellplan")
+    private short stellplan;
+    @Basic(optional = false)
+    @Column(name = "Status")
+    private short status;
+    @Basic(optional = false)
+    @Column(name = "Equiv")
+    private int equiv;
 
-    @javax.persistence.Column(name = "Zubereitung", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
+    public MedFormen() {
+    }
+
+
+
+    public Long getFormID() {
+        return formID;
+    }
+
+    public void setFormID(Long formID) {
+        this.formID = formID;
+    }
+
     public String getZubereitung() {
-        return SYSTools.catchNull(zubereitung);
+        return zubereitung;
     }
 
     public void setZubereitung(String zubereitung) {
         this.zubereitung = zubereitung;
     }
 
-    private String anwText;
-
-    @javax.persistence.Column(name = "AnwText", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getAnwText() {
-        return SYSTools.catchNull(anwText);
+        return anwText;
     }
 
     public void setAnwText(String anwText) {
         this.anwText = anwText;
     }
 
-    private byte anwEinheit;
-
-    @javax.persistence.Column(name = "AnwEinheit", nullable = false, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getAnwEinheit() {
+    public short getAnwEinheit() {
         return anwEinheit;
     }
 
-    public void setAnwEinheit(byte anwEinheit) {
+    public void setAnwEinheit(short anwEinheit) {
         this.anwEinheit = anwEinheit;
     }
 
-    private byte packEinheit;
-
-    @javax.persistence.Column(name = "PackEinheit", nullable = false, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getPackEinheit() {
+    public short getPackEinheit() {
         return packEinheit;
     }
 
-    public void setPackEinheit(byte packEinheit) {
+    public void setPackEinheit(short packEinheit) {
         this.packEinheit = packEinheit;
     }
 
-    private long massId;
-
-    @javax.persistence.Column(name = "MassID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    public long getMassId() {
-        return massId;
+    public long getMassID() {
+        return massID;
     }
 
-    public void setMassId(long massId) {
-        this.massId = massId;
+    public void setMassID(long massID) {
+        this.massID = massID;
     }
 
-    private byte stellplan;
-
-    @javax.persistence.Column(name = "Stellplan", nullable = false, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getStellplan() {
+    public short getStellplan() {
         return stellplan;
     }
 
-    public void setStellplan(byte stellplan) {
+    public void setStellplan(short stellplan) {
         this.stellplan = stellplan;
     }
 
-    private byte status;
-
-    @javax.persistence.Column(name = "Status", nullable = false, insertable = true, updatable = true, length = 3, precision = 0)
-    @Basic
-    public byte getStatus() {
+    public short getStatus() {
         return status;
     }
 
-    public void setStatus(byte status) {
+    public void setStatus(short status) {
         this.status = status;
     }
 
-    private int equiv;
-
-    @javax.persistence.Column(name = "Equiv", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public int getEquiv() {
         return equiv;
     }
@@ -126,37 +128,28 @@ public class MedFormen {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
+        int hash = 0;
+        hash += (formID != null ? formID.hashCode() : 0);
+        return hash;
+    }
 
-        MedFormen medFormen = (MedFormen) o;
-
-        if (anwEinheit != medFormen.anwEinheit) return false;
-        if (equiv != medFormen.equiv) return false;
-        if (formId != medFormen.formId) return false;
-        if (massId != medFormen.massId) return false;
-        if (packEinheit != medFormen.packEinheit) return false;
-        if (status != medFormen.status) return false;
-        if (stellplan != medFormen.stellplan) return false;
-        if (anwText != null ? !anwText.equals(medFormen.anwText) : medFormen.anwText != null) return false;
-        if (zubereitung != null ? !zubereitung.equals(medFormen.zubereitung) : medFormen.zubereitung != null)
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof MedFormen)) {
             return false;
-
+        }
+        MedFormen other = (MedFormen) object;
+        if ((this.formID == null && other.formID != null) || (this.formID != null && !this.formID.equals(other.formID))) {
+            return false;
+        }
         return true;
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (formId ^ (formId >>> 32));
-        result = 31 * result + (zubereitung != null ? zubereitung.hashCode() : 0);
-        result = 31 * result + (anwText != null ? anwText.hashCode() : 0);
-        result = 31 * result + (int) anwEinheit;
-        result = 31 * result + (int) packEinheit;
-        result = 31 * result + (int) (massId ^ (massId >>> 32));
-        result = 31 * result + (int) stellplan;
-        result = 31 * result + (int) status;
-        result = 31 * result + equiv;
-        return result;
+    public String toString() {
+        return "entity.rest.MedFormen[formID=" + formID + "]";
     }
+
 }
