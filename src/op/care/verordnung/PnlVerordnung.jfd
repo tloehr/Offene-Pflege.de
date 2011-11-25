@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -13,11 +13,11 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {comp jToolBar1::l::967:x, seq t {space :::p, comp lblBW::::909:x, space :::p, comp btnLock:::p::p, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}, seq l {space :::p, comp jspVerordnung::::927:x, space :::p}}</string> 
+        <string>par l {comp jToolBar1::l::755:x, seq t {space :::p, comp lblBW::::697:x, space :::p, comp btnLock:::p::p, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}, seq l {space :::p, comp jspVerordnung::::715:x, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, par l {comp btnLock:::p::p, comp lblBW:::p::p}, space :::p, comp jPanel1:::p::p, space :::p, comp jspVerordnung::::141:x, space :::p}}</string> 
+        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, par l {comp btnLock:::p::p, comp lblBW:::p::p}, space :::p, comp jPanel1:::p::p, space :::p, comp jspVerordnung::::76:x, space :::p}}</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -200,11 +200,11 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq {space :::p, par l {seq l {comp cbAbgesetzt:::p::p, space :::p, comp cbMedi:::p::p, space :::p, comp cbOhneMedi:::p::p, space :::p, comp cbBedarf:::p::p, space :::p, comp cbRegel:::p::p}, par t:l::p {comp jLabel12::l:::x:1, comp jLabel1::l:::x:1, comp jLabel2::l:::x:1}}, space ::343:x}}</string> 
+          <string>par l {seq {space :::p, par l {seq l {comp cbAbgesetzt:::p::p, space :::p, comp cbMedi:::p::p, space :::p, comp cbOhneMedi:::p::p, space :::p, comp cbBedarf:::p::p, space :::p, comp cbRegel:::p::p}, par t:l::p {comp jLabel12::l:::x:1, comp jLabel1::l:::x:1, comp jLabel2::l:::x:1}}, space ::131:x}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
-          <string>par l {seq l {space :::p, par b {comp cbAbgesetzt::b:p::p, comp cbMedi::b:p::p, comp cbOhneMedi::b:p::p, comp cbBedarf::b:p::p, comp cbRegel::b:p::p}, space :::p, comp jLabel1:::p::p, space :::p, comp jLabel2:::p::p, space :::p, comp jLabel12:::p::p, space :::x}}</string> 
+          <string>par l {seq l {space :::p, par b {comp cbAbgesetzt::b:p::p, comp cbMedi::b:p::p, comp cbOhneMedi::b:p::p, comp cbBedarf::b:p::p, comp cbRegel::b:p::p}, space :::p, comp jLabel1:::p::p, space :::p, comp jLabel2:::p::p, space :::p, comp jLabel12:::p::p, space ::20:x}}</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -680,33 +680,6 @@
           </void> 
          </object> 
         </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/22x22/lock.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Abmelden</string> 
-          </void> 
-          <void property="name"> 
-           <string>btnLogout</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnLogoutbtnLogoutHandler</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -755,8 +728,15 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>400</int> 
-        <int>300</int> 
+        <int>755</int> 
+        <int>315</int> 
+       </object> 
+      </void> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>0</int> 
        </object> 
       </void> 
      </object> 

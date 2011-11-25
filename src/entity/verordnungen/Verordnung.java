@@ -34,63 +34,57 @@ import java.util.Date;
         @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Verordnung b WHERE b.abDatum = :abDatum"),
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
-        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")})
+        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan"),
+        @NamedQuery(name = "Verordnung.findByBewohner", query = "SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum = '9999-12-31 23:59:59'")
+})
 
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Verordnung.findByBewohnerResultMapping",
+        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class),
-                columns = {@ColumnResult(name = "bestand.summe"), @ColumnResult(name = "vor.saldo")}
+                columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
         )
 })
 
 @NamedNativeQueries({
-        /**
-         * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
-         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Pflegeberichte mit einer
-         * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
-         * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
-         * Objekt ist immer der Pflegebericht, das zweiter ist ein Long Wert, der das count Ergebnis
-         * des Joins enthält.
-         *
-         */
-        @NamedNativeQuery(name = "Verordnung.findByBewohnerMitSaldenUndVorrat", query = " " +
-                " SELECT v.*, bestand.*, vor.* " +
+        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
+        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
+        // beigefügt.
+        @NamedNativeQuery(name = "Verordnung.findByBewohnerMitVorraeten", query = " " +
+                " SELECT v.*, vor.VorID, vor.saldo, bestand.BestID, bestand.summe " +
                 " FROM BHPVerordnung v " +
-                // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
-                // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
-                // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
-                // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
-                // Da sind dann für jeden Vorrat alle die DafIDs enthalten, die jemals auf den Vorrat
-                // eingebucht wurden. Man kann z.B. sehen, dass VorID 435 bisher schon die DafIDs 50, 165 und 553
-                // beinhaltet hatte.
-                // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
-                // Das braucht man, weil in der Verordnung ja nur die DafID steht, die am Anfang
-                // verwendet wurde. Das kann ja mittlerweile eine ganz andere sein.
+                // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
+                // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
+                // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
+                // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
+                // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
+                // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
+                // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
                 " LEFT OUTER JOIN " +
                 " ( " +
-                "       SELECT DISTINCT a.* FROM ( " +
-                "       SELECT best.*, sum(buch.Menge) saldo FROM MPBestand best " +
+                "   SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
+                "       SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
                 "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
                 "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
                 "       WHERE vor1.BWKennung = ? AND vor1.Bis = '9999-12-31 23:59:59'" +
-                "       GROUP BY VorID" +
+                "       GROUP BY best.VorID" +
                 "   ) a  " +
                 "   INNER JOIN (" +
                 "       SELECT best.VorID, best.DafID FROM MPBestand best " +
                 "   ) b ON a.VorID = b.VorID " +
                 " ) vor ON vor.DafID = v.DafID " +
-                // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
-                // ursprünglich verordneten abweichen.
-                " LEFT OUTER JOIN( " +
-                "       SELECT best1.*, SUM(buch1.Menge) summe " +
-                "       FROM MPBestand best1 " +
-                "       INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
-                "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
-                "       GROUP BY best1.BestID" +
+                " LEFT OUTER JOIN " +
+                " ( " +
+                "   SELECT best1.*, SUM(buch1.Menge) summe " +
+                "   FROM MPBestand best1 " +
+                "   INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
+                "   WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+                "   GROUP BY best1.BestID" +
                 " ) bestand ON bestand.VorID = vor.VorID " +
-                " WHERE BWKennung = ? "
-                , resultSetMapping = "Verordnung.findByBewohnerResultMapping")
-
+                " WHERE v.BWKennung = ? " +
+                // Wenn man als 3. Parameter eine 1 übergibt, dann werden alle
+                // Verordungen angezeigt, wenn nicht, dann nur die aktuellen.
+                " AND (1=? OR date(v.AbDatum) >= current_date())" +
+                " ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping")
 })
 
 public class Verordnung implements Serializable, VorgangElement {

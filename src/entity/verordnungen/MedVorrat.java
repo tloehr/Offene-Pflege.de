@@ -29,13 +29,15 @@ import java.util.Date;
                 " JOIN vor.bestaende best " +
                 " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
                 " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
-        @NamedQuery(name = "MedVorrat.findBestandByBewohner", query = " " +
+        @NamedQuery(name = "MedVorrat.findByBewohnerMitBestand", query = " " +
                 " SELECT best.vorrat, SUM(buch.menge) FROM MedBestand best " +
                 " JOIN best.buchungen buch " +
-                " " +
                 " WHERE best.vorrat.bewohner = :bewohner AND best.vorrat.bis = '9999-12-31 23:59:59' " +
                 " GROUP BY best.vorrat ")
 })
+
+
+
 public class MedVorrat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

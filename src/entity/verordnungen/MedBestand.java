@@ -19,9 +19,16 @@ import java.util.Date;
         @NamedQuery(name = "MedBestand.findByApv", query = "SELECT m FROM MedBestand m WHERE m.apv = :apv"),
         @NamedQuery(name = "MedBestand.findByDarreichungAndBewohnerImAnbruch", query = " " +
                 " SELECT b FROM MedBestand b WHERE b.vorrat.bewohner = :bewohner AND b.darreichung = :darreichung " +
-                " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'")
+                " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
 
+        @NamedQuery(name = "MedBestand.findByBewohnerImAnbruchMitSalden", query = " " +
+                " SELECT best, SUM(buch.menge) FROM MedBestand best" +
+                " JOIN best.buchungen buch" +
+                " WHERE best.vorrat.bewohner = :bewohner AND best.aus = '9999-12-31 23:59:59' " +
+                " AND best.anbruch < '9999-12-31 23:59:59' " +
+                " GROUP BY best ")
 })
+
 public class MedBestand implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

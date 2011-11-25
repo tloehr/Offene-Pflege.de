@@ -26,6 +26,7 @@
  */
 package op.care.verordnung;
 
+import entity.BewohnerTools;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
@@ -34,15 +35,11 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
-import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.BitSet;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,41 +54,26 @@ public class TMVerordnung
     public static final int COL_Hinweis = 2;
     public static final int COL_AN = 3;
     public static final int COL_AB = 4;
-    public static final int COL_INFO = 5;
-    public static final int COL_DOK = 6;
-    public static final int COL_VERID = 7;
-    public static final int COL_DAFID = 8;
-    public static final int COL_ANARZTID = 9;
-    public static final int COL_VORID = 10;
-    public static final int COL_ABGESETZT = 11;
-    public static final int COL_ABDATUM = 12;
-    public static final int COL_SITID = 13;
-    public static final int COL_ABARZTID = 14;
-    public static final int COL_ANKHID = 15;
-    public static final int COL_ABKHID = 16;
-    public static final int COL_BESTID = 17;
-    public static final int COL_NEXTBEST = 18;
+
     public final String[] debug = {"COL_MSSN", "COL_Dosis", "COL_Hinweis", "COL_AN", "COL_AB", "COL_INFO", "COL_DOK", "COL_VERID", "COL_BESTELLID",
             "COL_ANARZTID", "COL_VORID", "COL_ABGESETZT", "COL_ABDATUM", "COL_SITID", "COL_ABARZTID", "COL_ANKHID", "COL_ABKHID"
     };
-    ResultSet rs;
-    PreparedStatement stmt;
-    String sql;
+    //    ResultSet rs;
+//    PreparedStatement stmt;
+//    String sql;
     boolean mitBestand;
 
     HashMap cache;
 
+    protected List<Object[]> listeVerordnungen;
+
     public TMVerordnung(String bwkennung, boolean abgesetzt, boolean medi, boolean ohneMedi, boolean bedarf, boolean regel, boolean bestand) {
         super();
 
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(BewohnerTools.findByBWKennung(bwkennung), !abgesetzt);
 
-        Query query = OPDE.getEM().createNamedQuery("Verordnung.findByBewohnerMitSaldenUndVorrat");
-        query.setParameter(1, "OA1");
-        query.setParameter(2, "OA1");
+        // TODO: Hier gehts weiter. Ersetze den SQL Ausdruck durch die JPA Liste
 
-        List list = query.getResultList();
-
-        // TODO: Hier gehts weiter. Wahnsinn. Das geht. Was ist mit den NULLs ?
 
         this.cache = new HashMap();
         this.mitBestand = bestand;
@@ -123,18 +105,27 @@ public class TMVerordnung
                     // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
                     // Das braucht man, weil in der Verordnung ja nur die DafID steht, die am Anfang
                     // verwendet wurde. Das kann ja mittlerweile eine ganz andere sein.
+                    //
+                    // Also nochmal
+                    // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
+                    // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
+                    // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
+                    // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
+                    // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
+                    // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
+                    // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
                     " LEFT OUTER JOIN " +
                     " ( " +
                     "       SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
-                    "       SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
-                    "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                    "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
-                    "       WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
-                    "       GROUP BY VorID" +
-                    "   ) a  " +
-                    "   INNER JOIN (" +
-                    "       SELECT best.VorID, best.DafID FROM MPBestand best " +
-                    "   ) b ON a.VorID = b.VorID " +
+                    "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+                    "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                    "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+                    "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+                    "           GROUP BY VorID" +
+                    "       ) a  " +
+                    "       INNER JOIN (" +
+                    "           SELECT best.VorID, best.DafID FROM MPBestand best " +
+                    "       ) b ON a.VorID = b.VorID " +
                     " ) vor ON vor.DafID = v.DafID " +
                     // " INNER JOIN " +
                     // Hier kommen die angehangen Dokumente hinzu
@@ -420,7 +411,6 @@ public class TMVerordnung
     /**
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
-     *
      */
     private String getDosis(Verordnung verordnung) {
         String result = "";
@@ -433,106 +423,52 @@ public class TMVerordnung
         return result;
     }
 
-    public Object getValueAt(int r, int c) {
+    public Object getValueAt(int row, int col) {
         Object result = null;
-        try {
-            rs.absolute(r + 1);
-            long verid = rs.getLong("VerID");
-            Verordnung verordnung = OPDE.getEM().find(Verordnung.class, verid);
-            //OPDE.getLogger().debug(this.toString() + ":" + verid);
-            switch (c) {
-                case COL_MSSN: {
-                    String res = "";
-                    res = VerordnungTools.getMassnahme(verordnung);
-                    if (!verordnung.getAttachedFiles().isEmpty()) {
-                        res += "<font color=\"green\">&#9679;</font>";
-                    }
-                    if (!verordnung.getAttachedVorgaenge().isEmpty()) {
-                        res += "<font color=\"red\">&#9679;</font>";
-                    }
-                    result = res;
-                    break;
-                }
-                case COL_Dosis: {
 
-                    result = getDosis(verordnung);
-                    //OPDE.getLogger().debug("END @" + System.currentTimeMillis());
-                    //OPDE.getLogger().debug("Duration in sec" + (System.currentTimeMillis() - now));
-                    break;
+//            rs.absolute(r + 1);
+//            long verid = rs.getLong("VerID");
+        Verordnung verordnung = (Verordnung) listeVerordnungen.get(row)[0];
+        //OPDE.getEM().find(Verordnung.class, verid);
+        //OPDE.getLogger().debug(this.toString() + ":" + verid);
+        switch (col) {
+            case COL_MSSN: {
+                String res = "";
+                res = VerordnungTools.getMassnahme(verordnung);
+                if (!verordnung.getAttachedFiles().isEmpty()) {
+                    res += "<font color=\"green\">&#9679;</font>";
                 }
-                case COL_Hinweis: {
-                    result = VerordnungTools.getHinweis(verordnung);
-                    break;
+                if (!verordnung.getAttachedVorgaenge().isEmpty()) {
+                    res += "<font color=\"red\">&#9679;</font>";
                 }
-                case COL_AN: {
-                    result = VerordnungTools.getAN(verordnung);
-                    break;
-                }
-                case COL_AB: {
-                    result = VerordnungTools.getAB(verordnung);
-                    break;
-                }
-                case COL_VERID: {
-                    result = verid;
-                    break;
-                }
-
-//                case COL_BESTELLID: {
-//                    result = rs.getLong("BestellID");
-//                    break;
-//                }
-                case COL_ANARZTID: {
-                    result = rs.getLong("AnArztID");
-                    break;
-                }
-                case COL_ABARZTID: {
-                    result = rs.getLong("AbArztID");
-                    break;
-                }
-                case COL_ANKHID: {
-                    result = rs.getLong("AnKHID");
-                    break;
-                }
-                case COL_ABKHID: {
-                    result = rs.getLong("AbKHID");
-                    break;
-                }
-                case COL_VORID: {
-                    result = rs.getLong("vorid");
-                    break;
-                }
-                case COL_ABGESETZT: {
-                    // Abgesetzt ist alles, was nicht heute oder in der vergangenheit endete.
-                    result = isAbgesetzt();// && rs.getTimestamp("AbDatum").getTime() <= SYSCalendar.nowDB();
-                    break;
-                }
-                case COL_ABDATUM: {
-                    result = rs.getTimestamp("AbDatum");
-                    break;
-                }
-                case COL_SITID: {
-                    result = rs.getLong("SitID");
-                    break;
-                }
-                case COL_BESTID: {
-                    result = rs.getLong("BestID");
-                    break;
-                }
-                case COL_DAFID: {
-                    result = rs.getLong("v.DafID");
-                    break;
-                }
-                case COL_NEXTBEST: {
-                    result = rs.getLong("nextbest");
-                    break;
-                }
-                default: {
-                    result = "!!FEHLER!!";
-                }
+                result = res;
+                break;
             }
-        } catch (SQLException se) {
-            new DlgException(se);
+            case COL_Dosis: {
+
+                result = getDosis(verordnung);
+                //OPDE.getLogger().debug("END @" + System.currentTimeMillis());
+                //OPDE.getLogger().debug("Duration in sec" + (System.currentTimeMillis() - now));
+                break;
+            }
+            case COL_Hinweis: {
+                result = VerordnungTools.getHinweis(verordnung);
+                break;
+            }
+            case COL_AN: {
+                result = VerordnungTools.getAN(verordnung);
+                break;
+            }
+            case COL_AB: {
+                result = VerordnungTools.getAB(verordnung);
+                break;
+            }
+
+            default: {
+                result = "!!FEHLER!!";
+            }
         }
+
 
         return result;
     }

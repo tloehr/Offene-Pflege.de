@@ -4,23 +4,60 @@
  */
 package entity.verordnungen;
 
+import entity.Bewohner;
 import entity.Einrichtungen;
 import op.OPDE;
 import op.tools.*;
 
 import javax.persistence.Query;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author tloehr
  */
 public class VerordnungTools {
+
+    public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean nurAktuelle) {
+
+
+        Query queryVorrat = OPDE.getEM().createNamedQuery("Verordnung.findByBewohnerMitVorraeten");
+        queryVorrat.setParameter(1, bewohner.getBWKennung());
+        queryVorrat.setParameter(2, bewohner.getBWKennung());
+        queryVorrat.setParameter(3, !nurAktuelle );
+        List listeVorrat = queryVorrat.getResultList();
+
+        // Aus technischen Gründe, kann ich diese native SQL nicht direkt mit der Liste aller zugehörigen Objekte
+        // füllen lassen, daher muss ich das hier von Hand machen. Die Verordnungsobjekte sind zwar schon da, aber
+        // die Vorrats und Bestandsobjekte nicht. Da bei diesem Ausdruck NULLs auftreten können, geht das nicht automatisch.
+
+        Iterator it = listeVorrat.iterator();
+        while(it.hasNext()){
+            Object[] line = (Object[]) it.next();
+
+
+            if (line[1] != null){
+                BigInteger vorID = (BigInteger) line[1];
+                MedVorrat vorrat = OPDE.getEM().find(MedVorrat.class, vorID.longValue());
+                line[1] = vorrat;
+            }
+
+            if (line[3] != null){
+                BigInteger bestID = (BigInteger) line[3];
+                MedBestand bestand = OPDE.getEM().find(MedBestand.class, bestID.longValue());
+                line[3] = bestand;
+            }
+            OPDE.debug(line.length);
+        }
+
+        return listeVorrat;
+    }
 
     public static String getStellplanAsHTML(Einrichtungen einrichtung) {
         PreparedStatement stmt;
@@ -553,7 +590,6 @@ public class VerordnungTools {
         }
 
         if (verordnung.hasMedi()) {
-
 
 
 //            if (verordnung.isBisPackEnde()) {
