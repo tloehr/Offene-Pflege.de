@@ -50,8 +50,12 @@ import java.util.Date;
         // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
         // beigefügt.
         @NamedNativeQuery(name = "Verordnung.findByBewohnerMitVorraeten", query = " " +
-                " SELECT v.*, vor.VorID, vor.saldo, bestand.BestID, bestand.summe " +
+                " SELECT v.*, vor.VorID, vor.saldo, bestand.BestID, bestand.summe, M.Bezeichnung mptext, Ms.Bezeichnung mssntext " +
                 " FROM BHPVerordnung v " +
+                // Die drei folgenden Joins brauche ich nur für die Sortierung in der ORDER BY Klause
+                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
+                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
+                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID" +
                 // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
                 // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
                 // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
@@ -72,6 +76,7 @@ import java.util.Date;
                 "       SELECT best.VorID, best.DafID FROM MPBestand best " +
                 "   ) b ON a.VorID = b.VorID " +
                 " ) vor ON vor.DafID = v.DafID " +
+                // Dieses Join fügt diejenigen Bestände hinzu, die zur Zeit im Anbruch sind
                 " LEFT OUTER JOIN " +
                 " ( " +
                 "   SELECT best1.*, SUM(buch1.Menge) summe " +
@@ -84,7 +89,7 @@ import java.util.Date;
                 // Wenn man als 3. Parameter eine 1 übergibt, dann werden alle
                 // Verordungen angezeigt, wenn nicht, dann nur die aktuellen.
                 " AND (1=? OR date(v.AbDatum) >= current_date())" +
-                " ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping")
+                " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping")
 })
 
 public class Verordnung implements Serializable, VorgangElement {

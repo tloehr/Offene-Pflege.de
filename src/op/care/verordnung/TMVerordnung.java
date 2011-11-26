@@ -27,6 +27,8 @@
 package op.care.verordnung;
 
 import entity.BewohnerTools;
+import entity.verordnungen.MedBestand;
+import entity.verordnungen.MedVorrat;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
@@ -36,6 +38,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -67,370 +70,187 @@ public class TMVerordnung
 
     protected List<Object[]> listeVerordnungen;
 
-    public TMVerordnung(String bwkennung, boolean abgesetzt, boolean medi, boolean ohneMedi, boolean bedarf, boolean regel, boolean bestand) {
+    public TMVerordnung(String bwkennung, boolean abgesetzt, boolean bestand) {
         super();
 
         listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(BewohnerTools.findByBWKennung(bwkennung), !abgesetzt);
 
-        // TODO: Hier gehts weiter. Ersetze den SQL Ausdruck durch die JPA Liste
-
 
         this.cache = new HashMap();
         this.mitBestand = bestand;
-        try {
-            sql = " SELECT v.VerID, v.AnDatum, v.AbDatum, an.Anrede, an.Titel, an.Name, ab.Anrede, khan.Name, ab.Titel, ab.Name, " +
-                    " khab.Name, v.AnUKennung, v.AbUKennung, v.MassID, Ms.Bezeichnung mssntext, v.DafID," +
-                    " v.SitID, S.Text sittext, v.Bemerkung, v.BisPackEnde, M.Bezeichnung mptext, D.Zusatz, " +
-                    " F.Zubereitung, F.AnwText, F.PackEinheit, ifnull(bestand.DafID, 0) bestandDafID, M1.Bezeichnung mptext1, D1.Zusatz, " +
-                    " F.AnwEinheit, bestand.APV, ifnull(vor.VorID, 0) vorid, vor.saldo, v.AnArztID, " +
-                    " v.AbArztID, v.AnKHID, v.AbKHID, bestand.Summe bestsumme, " +
-                    " ifnull(bestand.BestID, 0) BestID, ifnull(bestand.NextBest, 0) nextbest " +
-                    " FROM BHPVerordnung v" +
-                    " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID" +
-                    " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID" +
-                    " LEFT OUTER JOIN Arzt an ON an.ArztID = v.AnArztID" +
-                    " LEFT OUTER JOIN KH khan ON khan.KHID = v.AnKHID" +
-                    " LEFT OUTER JOIN Arzt ab ON ab.ArztID = v.AbArztID" +
-                    " LEFT OUTER JOIN KH khab ON khab.KHID = v.AbKHID" +
-                    " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID" +
-                    " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID" +
-                    " LEFT OUTER JOIN Situationen S ON v.SitID = S.SitID" +
-                    // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
-                    // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
-                    // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
-                    // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
-                    // Da sind dann für jeden Vorrat alle die DafIDs enthalten, die jemals auf den Vorrat
-                    // eingebucht wurden. Man kann z.B. sehen, dass VorID 435 bisher schon die DafIDs 50, 165 und 553
-                    // beinhaltet hatte.
-                    // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
-                    // Das braucht man, weil in der Verordnung ja nur die DafID steht, die am Anfang
-                    // verwendet wurde. Das kann ja mittlerweile eine ganz andere sein.
-                    //
-                    // Also nochmal
-                    // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
-                    // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
-                    // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
-                    // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
-                    // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
-                    // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
-                    // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
-                    " LEFT OUTER JOIN " +
-                    " ( " +
-                    "       SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
-                    "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
-                    "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                    "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
-                    "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
-                    "           GROUP BY VorID" +
-                    "       ) a  " +
-                    "       INNER JOIN (" +
-                    "           SELECT best.VorID, best.DafID FROM MPBestand best " +
-                    "       ) b ON a.VorID = b.VorID " +
-                    " ) vor ON vor.DafID = v.DafID " +
-                    // " INNER JOIN " +
-                    // Hier kommen die angehangen Dokumente hinzu
-//                    " (" +
-//                    " 	SELECT DISTINCT f1.VerID, ifnull(anzahl,0) anzahl" +
-//                    " 	FROM BHPVerordnung f1" +
-//                    " 	LEFT OUTER JOIN (" +
-//                    " 		SELECT VerID, count(*) anzahl FROM SYSVER2FILE" +
-//                    " 		GROUP BY VerID" +
-//                    " 		) fa ON fa.VerID = f1.VerID" +
-//                    " 	WHERE f1.BWKennung=?" +
-//                    " ) fia ON fia.VerID = v.VerID " +
-//                    // Hier die angehangenen Vorgänge
-//                    " INNER JOIN " +
-//                    " (" +
-//                    " 	SELECT DISTINCT f2.VerID, ifnull(anzahl,0) anzahl" +
-//                    " 	FROM BHPVerordnung f2" +
-//                    " 	LEFT OUTER JOIN (" +
-//                    " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
-//                    " 		WHERE TableName='BHPVerordnung'" +
-//                    " 		GROUP BY ForeignKey" +
-//                    " 		) va ON va.ForeignKey = f2.VerID" +
-//                    " 	WHERE f2.BWKennung=? " +
-//                    " ) vrg ON vrg.VerID = v.VerID " +
-                    // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
-                    // ursprünglich verordneten abweichen.
-                    " LEFT OUTER JOIN( " +
-                    "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
-                    "       FROM MPBestand best1 " +
-                    "       INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
-                    "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
-                    "       GROUP BY best1.BestID" +
-                    " ) bestand ON bestand.VorID = vor.VorID " +
-                    " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
-                    " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
-                    " WHERE BWKennung=? ";
-            if (!abgesetzt) {
-                // sql += " AND v.AbDatum = '9999-12-31 23:59:59' ";
-                sql += " " +
-                        " ";
-            }
-            if (!(medi && ohneMedi)) { // ungleich gesetzt
-                if (medi) {
-                    sql += " AND v.DafID > 0 ";
-                } else {
-                    sql += " AND v.DafID = 0 ";
-                }
-            }
-            if (!(bedarf && regel)) { // ungleich gesetzt
-                if (bedarf) {
-                    sql += " AND v.SitID > 0 ";
-                } else {
-                    sql += " AND v.SitID = 0 ";
-                }
+//        try {
+//            sql = " SELECT v.VerID, v.AnDatum, v.AbDatum, an.Anrede, an.Titel, an.Name, ab.Anrede, khan.Name, ab.Titel, ab.Name, " +
+//                    " khab.Name, v.AnUKennung, v.AbUKennung, v.MassID, Ms.Bezeichnung mssntext, v.DafID," +
+//                    " v.SitID, S.Text sittext, v.Bemerkung, v.BisPackEnde, M.Bezeichnung mptext, D.Zusatz, " +
+//                    " F.Zubereitung, F.AnwText, F.PackEinheit, ifnull(bestand.DafID, 0) bestandDafID, M1.Bezeichnung mptext1, D1.Zusatz, " +
+//                    " F.AnwEinheit, bestand.APV, ifnull(vor.VorID, 0) vorid, vor.saldo, v.AnArztID, " +
+//                    " v.AbArztID, v.AnKHID, v.AbKHID, bestand.Summe bestsumme, " +
+//                    " ifnull(bestand.BestID, 0) BestID, ifnull(bestand.NextBest, 0) nextbest " +
+//                    " FROM BHPVerordnung v" +
+//                    " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID" +
+//                    " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID" +
+//                    " LEFT OUTER JOIN Arzt an ON an.ArztID = v.AnArztID" +
+//                    " LEFT OUTER JOIN KH khan ON khan.KHID = v.AnKHID" +
+//                    " LEFT OUTER JOIN Arzt ab ON ab.ArztID = v.AbArztID" +
+//                    " LEFT OUTER JOIN KH khab ON khab.KHID = v.AbKHID" +
+//                    " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID" +
+//                    " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID" +
+//                    " LEFT OUTER JOIN Situationen S ON v.SitID = S.SitID" +
+//                    // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
+//                    // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
+//                    // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
+//                    // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
+//                    // Da sind dann für jeden Vorrat alle die DafIDs enthalten, die jemals auf den Vorrat
+//                    // eingebucht wurden. Man kann z.B. sehen, dass VorID 435 bisher schon die DafIDs 50, 165 und 553
+//                    // beinhaltet hatte.
+//                    // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
+//                    // Das braucht man, weil in der Verordnung ja nur die DafID steht, die am Anfang
+//                    // verwendet wurde. Das kann ja mittlerweile eine ganz andere sein.
+//                    //
+//                    // Also nochmal
+//                    // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
+//                    // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
+//                    // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
+//                    // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
+//                    // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
+//                    // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
+//                    // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
+//                    " LEFT OUTER JOIN " +
+//                    " ( " +
+//                    "       SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
+//                    "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+//                    "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+//                    "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+//                    "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+//                    "           GROUP BY VorID" +
+//                    "       ) a  " +
+//                    "       INNER JOIN (" +
+//                    "           SELECT best.VorID, best.DafID FROM MPBestand best " +
+//                    "       ) b ON a.VorID = b.VorID " +
+//                    " ) vor ON vor.DafID = v.DafID " +
+//                    // " INNER JOIN " +
+//                    // Hier kommen die angehangen Dokumente hinzu
+////                    " (" +
+////                    " 	SELECT DISTINCT f1.VerID, ifnull(anzahl,0) anzahl" +
+////                    " 	FROM BHPVerordnung f1" +
+////                    " 	LEFT OUTER JOIN (" +
+////                    " 		SELECT VerID, count(*) anzahl FROM SYSVER2FILE" +
+////                    " 		GROUP BY VerID" +
+////                    " 		) fa ON fa.VerID = f1.VerID" +
+////                    " 	WHERE f1.BWKennung=?" +
+////                    " ) fia ON fia.VerID = v.VerID " +
+////                    // Hier die angehangenen Vorgänge
+////                    " INNER JOIN " +
+////                    " (" +
+////                    " 	SELECT DISTINCT f2.VerID, ifnull(anzahl,0) anzahl" +
+////                    " 	FROM BHPVerordnung f2" +
+////                    " 	LEFT OUTER JOIN (" +
+////                    " 		SELECT ForeignKey, count(*) anzahl FROM VorgangAssign" +
+////                    " 		WHERE TableName='BHPVerordnung'" +
+////                    " 		GROUP BY ForeignKey" +
+////                    " 		) va ON va.ForeignKey = f2.VerID" +
+////                    " 	WHERE f2.BWKennung=? " +
+////                    " ) vrg ON vrg.VerID = v.VerID " +
+//                    // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
+//                    // ursprünglich verordneten abweichen.
+//                    " LEFT OUTER JOIN( " +
+//                    "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
+//                    "       FROM MPBestand best1 " +
+//                    "       INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
+//                    "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+//                    "       GROUP BY best1.BestID" +
+//                    " ) bestand ON bestand.VorID = vor.VorID " +
+//                    " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
+//                    " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
+//                    " WHERE BWKennung=? ";
+//            if (!abgesetzt) {
+//                // sql += " AND v.AbDatum = '9999-12-31 23:59:59' ";
+//                sql += " " +
+//                        " ";
+//            }
+//            if (!(medi && ohneMedi)) { // ungleich gesetzt
+//                if (medi) {
+//                    sql += " AND v.DafID > 0 ";
+//                } else {
+//                    sql += " AND v.DafID = 0 ";
+//                }
+//            }
+//            if (!(bedarf && regel)) { // ungleich gesetzt
+//                if (bedarf) {
+//                    sql += " AND v.SitID > 0 ";
+//                } else {
+//                    sql += " AND v.SitID = 0 ";
+//                }
+//
+//            }
+//            sql += " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext)  ";
+//            stmt = OPDE.getDb().db.prepareStatement(sql);
+//            //OPDE.getLogger().debug(sql);
+//            stmt.setString(1, bwkennung);
+//            stmt.setString(2, bwkennung);
+////            stmt.setString(3, bwkennung);
+////            stmt.setString(4, bwkennung);
+//            rs = stmt.executeQuery();
+//            rs.first();
 
-            }
-            sql += " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext)  ";
-            stmt = OPDE.getDb().db.prepareStatement(sql);
-            //OPDE.getLogger().debug(sql);
-            stmt.setString(1, bwkennung);
-            stmt.setString(2, bwkennung);
-//            stmt.setString(3, bwkennung);
-//            stmt.setString(4, bwkennung);
-            rs = stmt.executeQuery();
-            rs.first();
-        } catch (SQLException se) {
-            new DlgException(se);
-        }
     }
 
-    public void reload(int row, int col) {
-        try {
-            rs = stmt.executeQuery();
-            rs.first();
-            fireTableRowsUpdated(row, col);
-        } catch (SQLException se) {
-            new DlgException(se);
-        }
+    public Verordnung getVerordnung(int row){
+         return (Verordnung) listeVerordnungen.get(row)[0];
     }
 
+    public MedVorrat getVorrat(int row){
+         return (MedVorrat) listeVerordnungen.get(row)[1];
+    }
+
+    public MedBestand getBestand(int row){
+         return (MedBestand) listeVerordnungen.get(row)[3];
+    }
+
+    public BigDecimal getVorratSaldo(int row){
+         return (BigDecimal) listeVerordnungen.get(row)[2];
+    }
+
+    public BigDecimal getBestandSaldo(int row){
+         return (BigDecimal) listeVerordnungen.get(row)[4];
+    }
+
+    @Override
     public int getRowCount() {
-        try {
-            rs.last();
-            return rs.getRow();
-        } catch (SQLException se) {
-            System.out.println(se.getMessage());
-            return -1;
-        }
+       return listeVerordnungen.size();
     }
 
+    @Override
     public int getColumnCount() {
         int result = 5;
         return result;
     }
 
+    @Override
     public Class getColumnClass(int c) {
-        Class result;
-        switch (c) {
-            case COL_VERID: {
-                result = Long.class;
-                break;
-            }
-            case COL_INFO: {
-                result = BitSet.class;
-                break;
-            }
-            case COL_DOK: {
-                result = Boolean.class;
-                break;
-            }
-//            case COL_BESTELLID: {
-//                result = Long.class;
-//                break;
-//            }
-            case COL_ANARZTID: {
-                result = Long.class;
-                break;
-            }
-            case COL_VORID: {
-                result = Long.class;
-                break;
-            }
-            case COL_ABGESETZT: {
-                result = Boolean.class;
-                break;
-            }
-            case COL_ABDATUM: {
-                result = Timestamp.class;
-                break;
-            }
-            case COL_ABARZTID: {
-                result = Long.class;
-                break;
-            }
-            case COL_ANKHID: {
-                result = Long.class;
-                break;
-            }
-            case COL_ABKHID: {
-                result = Long.class;
-                break;
-            }
-            default: {
-                result = String.class;
-            }
-        }
-        return result;
-    }
-
-//    // Dosis from Double
-//    private String dfd(double d) {
-//        String result;
-//        if (d == 0) {
-//            result = "";
-//        } else {
-//            result = Double.toString(d);
-//        }
-//        return result;
-//    }
-
-    private String getMassnahme() throws SQLException {
-        String result = "";
-
-//        if (OPDE.getProps().getProperty("DEBUG").equals("true")){
-//            result += "<b>"+rs.getLong("VerID")+"</b> ";
-//        }
-
-        if (isAbgesetzt()) {//rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
-            result += "<s>"; // Abgesetzte
-        }
-        if (rs.getLong("DafID") == 0) {
-            result += rs.getString("mssntext");
-        } else {
-            // Prüfen, was wirklich im Anbruch gegeben wird.
-            if (rs.getLong("bestandDafID") > 0 && rs.getLong("bestandDafID") != rs.getLong("v.DafID")) { // Nur bei Abweichung.
-                result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext1").replaceAll("-", "- ") +
-                        SYSTools.catchNull(rs.getString("D1.Zusatz"), " ", "") + "</b></font>" +
-                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
-                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
-                result += " <i>(ursprünglich verordnet: " + rs.getString("mptext").replaceAll("-", "- ") +
-                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</i>";
-            } else {
-                result += "<font face=\"Sans Serif\"><b>" + rs.getString("mptext").replaceAll("-", "- ") +
-                        SYSTools.catchNull(rs.getString("D.Zusatz"), " ", "") + "</b></font>" +
-                        SYSTools.catchNull(rs.getString("F.Zubereitung"), ", ", ", ") + " " +
-                        SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
-
-            }
-        }
-        if (isAbgesetzt()) {//if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
-            result += "</s>"; // Abgesetzte
-            //OPDE.getLogger().debug(this.toString() + ": " + result);
-        }
-
-        return result;
-    }
-
-    private String getHinweis() {
-        String result = "";
-        try {
-            if (rs.getLong("SitID") > 0) {
-                result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + rs.getString("sittext") + "</font></b><br/>";
-            }
-            if (rs.getString("Bemerkung") != null && !rs.getString("Bemerkung").equals("")) {
-                result += "<b><u>Bemerkung:</u> </b>" + rs.getString("Bemerkung");
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return (result.equals("") ? "" : "<html><body>" + result + "</body></html>");
-    }
-
-    public String getAN() {
-        String result = "";
-        try {
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-            String datum = sdf.format(rs.getDate("AnDatum"));
-
-            result += "<html><body>";
-            result += "<font color=\"green\">" + datum + "; ";
-            if (rs.getLong("v.AnKHID") > 0) {
-                result += rs.getString("khan.Name");
-            }
-            if (rs.getLong("v.AnArztID") > 0) {
-                if (rs.getLong("v.AnKHID") > 0) {
-                    result += " <i>bestätigt durch:</i> ";
-                }
-                result += rs.getString("an.Titel") + " ";
-                if (OPDE.isAnonym()) {
-                    result += rs.getString("an.Name").substring(0, 1) + "***";
-                } else {
-                    result += rs.getString("an.Name");
-                }
-
-            }
-            result += "; " + op.tools.DBRetrieve.getUsername(rs.getString("AnUKennung")) + "</font>";
-            result += "</body></html>";
-
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
-
-    public String getAB() {
-        String result = "";
-        try {
-            if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() < SYSConst.BIS_AUF_WEITERES.getTimeInMillis()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-                String datum = sdf.format(rs.getDate("AbDatum"));
-
-                result += "<html><body>";
-                result += "<font color=\"red\">" + datum + "; ";
-                if (rs.getLong("v.AbKHID") > 0) {
-                    result += rs.getString("khab.Name");
-                }
-                if (rs.getLong("v.AbArztID") > 0) {
-                    if (rs.getLong("v.AbKHID") > 0) {
-                        result += " <i>bestätigt durch:</i> ";
-                    }
-                    result += rs.getString("ab.Titel");
-                    if (OPDE.isAnonym()) {
-                        result += rs.getString("ab.Name").substring(0, 1) + "***";
-                    } else {
-                        result += rs.getString("ab.Name");
-                    }
-
-                }
-                result += "; " + op.tools.DBRetrieve.getUsername(rs.getString("AbUKennung")) + "</font>";
-                result += "</body></html>";
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
-
-    private boolean isAbgesetzt() throws SQLException {
-        return rs.getDate("AbDatum") != null && SYSCalendar.sameDay(rs.getDate("AbDatum"), SYSCalendar.today_date()) <= 0 && rs.getTimestamp("AbDatum").before(SYSCalendar.nowDBDate());
+        return String.class;
     }
 
     /**
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
      */
-    private String getDosis(Verordnung verordnung) {
+    protected String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, MedVorrat vorrat, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
         String result = "";
         if (cache.containsKey(verordnung)) {
             result = cache.get(verordnung).toString();
         } else {
-            result = VerordnungTools.getDosis(verordnung, mitBestand);
+            result = VerordnungTools.getDosis(verordnung, bestandImAnbruch, vorrat, bestandSumme, vorratSumme, mitBestand);
             cache.put(verordnung, result);
         }
         return result;
     }
 
+    @Override
     public Object getValueAt(int row, int col) {
         Object result = null;
+        Verordnung verordnung = getVerordnung(row);
 
-//            rs.absolute(r + 1);
-//            long verid = rs.getLong("VerID");
-        Verordnung verordnung = (Verordnung) listeVerordnungen.get(row)[0];
-        //OPDE.getEM().find(Verordnung.class, verid);
-        //OPDE.getLogger().debug(this.toString() + ":" + verid);
         switch (col) {
             case COL_MSSN: {
                 String res = "";
@@ -445,10 +265,7 @@ public class TMVerordnung
                 break;
             }
             case COL_Dosis: {
-
-                result = getDosis(verordnung);
-                //OPDE.getLogger().debug("END @" + System.currentTimeMillis());
-                //OPDE.getLogger().debug("Duration in sec" + (System.currentTimeMillis() - now));
+                result = getDosis(verordnung, getBestand(row), getVorrat(row), getBestandSaldo(row), getVorratSaldo(row), mitBestand);
                 break;
             }
             case COL_Hinweis: {
@@ -468,7 +285,6 @@ public class TMVerordnung
                 result = "!!FEHLER!!";
             }
         }
-
 
         return result;
     }

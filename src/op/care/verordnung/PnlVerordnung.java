@@ -485,9 +485,9 @@ public class PnlVerordnung extends CleanablePanel {
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
-            TMVerordnung tm = new TMVerordnung(bwkennung, cbAbgesetzt.isSelected(), cbMedi.isSelected(),
-                    cbOhneMedi.isSelected(), cbBedarf.isSelected(), cbRegel.isSelected(), false);
-            //TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
+//            TMVerordnung tm = new TMVerordnung(bwkennung, cbAbgesetzt.isSelected(), cbMedi.isSelected(),
+//                    cbOhneMedi.isSelected(), cbBedarf.isSelected(), cbRegel.isSelected(), false);
+            TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
 
             String html = SYSTools.htmlUmlautConversion(op.care.verordnung.DBHandling.getVerordnungenAsHTML(tm, bewohner, sel));
 
@@ -539,9 +539,9 @@ public class PnlVerordnung extends CleanablePanel {
         if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
             lsm.setSelectionInterval(row, row);
         }
-        final long bestid = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_BESTID);
-        final long dafid = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_DAFID);
-        final long nextbest = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_NEXTBEST);
+//        final long bestid = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_BESTID);
+//        final long dafid = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_DAFID);
+//        final long nextbest = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_NEXTBEST);
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
 

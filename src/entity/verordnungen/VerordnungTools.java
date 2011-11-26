@@ -24,8 +24,17 @@ import java.util.*;
  */
 public class VerordnungTools {
 
+    /**
+     * Diese Methode ermittelt eine Liste aller Verordnungen gemäß der unten genannten Einschränkungen.
+     * @param bewohner dessen Verordnungen wir suchen
+     * @param nurAktuelle true, wenn wir nur die aktuellen Verordnungen wünschen, false sonst.
+     * @return Eine Liste aus Objekt Arrays, die folgenden Aufbau hat:
+     * <center><code><b>{Verordnung, Vorrat, Saldo des Vorrats,
+     * Bestand (im Anbruch), Saldo des Bestandes, Bezeichnung des Medikamentes, Bezeichnung der Massnahme}</b></code></center>
+     * Es gibt Verordnungen, die keine Medikamente besitzen, bei denen steht dann <code>null</code> an den entsprechenden
+     * Stellen.
+     */
     public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean nurAktuelle) {
-
 
         Query queryVorrat = OPDE.getEM().createNamedQuery("Verordnung.findByBewohnerMitVorraeten");
         queryVorrat.setParameter(1, bewohner.getBWKennung());
@@ -502,7 +511,7 @@ public class VerordnungTools {
         return result;
     }
 
-    public static String getDosis(Verordnung verordnung, boolean mitBestand) {
+    public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, MedVorrat vorrat, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
         String result = "";
         //OPDE.getLogger().debug("VerID: "+verid);
 
