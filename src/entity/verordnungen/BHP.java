@@ -8,18 +8,19 @@ import java.util.Date;
 @Entity
 @Table(name = "BHP")
 @NamedQueries({
-    @NamedQuery(name = "BHP.findAll", query = "SELECT b FROM BHP b"),
-    @NamedQuery(name = "BHP.findByBHPid", query = "SELECT b FROM BHP b WHERE b.bhpid = :bhpid"),
-    @NamedQuery(name = "BHP.findByBHPpid", query = "SELECT b FROM BHP b WHERE b.bhppid = :bhppid"),
-    @NamedQuery(name = "BHP.findByUKennung", query = "SELECT b FROM BHP b WHERE b.uKennung = :uKennung"),
-    @NamedQuery(name = "BHP.findBySoll", query = "SELECT b FROM BHP b WHERE b.soll = :soll"),
-    @NamedQuery(name = "BHP.findByIst", query = "SELECT b FROM BHP b WHERE b.ist = :ist"),
-    @NamedQuery(name = "BHP.findBySZeit", query = "SELECT b FROM BHP b WHERE b.sZeit = :sZeit"),
-    @NamedQuery(name = "BHP.findByIZeit", query = "SELECT b FROM BHP b WHERE b.iZeit = :iZeit"),
-    @NamedQuery(name = "BHP.findByDosis", query = "SELECT b FROM BHP b WHERE b.dosis = :dosis"),
-    @NamedQuery(name = "BHP.findByStatus", query = "SELECT b FROM BHP b WHERE b.status = :status"),
-    @NamedQuery(name = "BHP.findByMdate", query = "SELECT b FROM BHP b WHERE b.mdate = :mdate"),
-    @NamedQuery(name = "BHP.findByDauer", query = "SELECT b FROM BHP b WHERE b.dauer = :dauer")})
+        @NamedQuery(name = "BHP.findAll", query = "SELECT b FROM BHP b"),
+        @NamedQuery(name = "BHP.findByBHPid", query = "SELECT b FROM BHP b WHERE b.bhpid = :bhpid"),
+        @NamedQuery(name = "BHP.findByUKennung", query = "SELECT b FROM BHP b WHERE b.uKennung = :uKennung"),
+        @NamedQuery(name = "BHP.findBySoll", query = "SELECT b FROM BHP b WHERE b.soll = :soll"),
+        @NamedQuery(name = "BHP.findByIst", query = "SELECT b FROM BHP b WHERE b.ist = :ist"),
+        @NamedQuery(name = "BHP.findBySZeit", query = "SELECT b FROM BHP b WHERE b.sZeit = :sZeit"),
+        @NamedQuery(name = "BHP.findByIZeit", query = "SELECT b FROM BHP b WHERE b.iZeit = :iZeit"),
+        @NamedQuery(name = "BHP.findByDosis", query = "SELECT b FROM BHP b WHERE b.dosis = :dosis"),
+        @NamedQuery(name = "BHP.findByStatus", query = "SELECT b FROM BHP b WHERE b.status = :status"),
+        @NamedQuery(name = "BHP.findByMdate", query = "SELECT b FROM BHP b WHERE b.mdate = :mdate"),
+        @NamedQuery(name = "BHP.findByDauer", query = "SELECT b FROM BHP b WHERE b.dauer = :dauer"),
+        @NamedQuery(name = "BHP.numByNOTStatusAndVerordnung", query = " " +
+                " SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.verordnungPlanung.verordnung = :verordnung AND bhp.status <> :status ")})
 public class BHP implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -27,9 +28,6 @@ public class BHP implements Serializable {
     @Basic(optional = false)
     @Column(name = "BHPID")
     private Long bhpid;
-    @Basic(optional = false)
-    @Column(name = "BHPPID")
-    private long bhppid;
     @Column(name = "UKennung")
     private String uKennung;
     @Basic(optional = false)
@@ -40,13 +38,13 @@ public class BHP implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date ist;
     @Column(name = "SZeit")
-    private Boolean sZeit;
+    private Byte sZeit;
     @Column(name = "IZeit")
-    private Boolean iZeit;
+    private Byte iZeit;
     @Column(name = "Dosis")
     private BigDecimal dosis;
     @Column(name = "Status")
-    private Boolean status;
+    private Byte status;
     @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
@@ -60,15 +58,16 @@ public class BHP implements Serializable {
     public BHP() {
     }
 
-    public BHP(Long bhpid) {
-        this.bhpid = bhpid;
+    @JoinColumn(name = "bhppid", referencedColumnName = "BHPPID")
+    @ManyToOne
+    private VerordnungPlanung verordnungPlanung;
+
+    public VerordnungPlanung getVerordnungPlanung() {
+        return verordnungPlanung;
     }
 
-    public BHP(Long bhpid, long bhppid, Date soll, Date mdate) {
-        this.bhpid = bhpid;
-        this.bhppid = bhppid;
-        this.soll = soll;
-        this.mdate = mdate;
+    public void setVerordnungPlanung(VerordnungPlanung verordnungPlanung) {
+        this.verordnungPlanung = verordnungPlanung;
     }
 
     public Long getBHPid() {
@@ -77,14 +76,6 @@ public class BHP implements Serializable {
 
     public void setBHPid(Long bhpid) {
         this.bhpid = bhpid;
-    }
-
-    public long getBHPpid() {
-        return bhppid;
-    }
-
-    public void setBHPpid(long bhppid) {
-        this.bhppid = bhppid;
     }
 
     public String getUKennung() {
@@ -111,20 +102,28 @@ public class BHP implements Serializable {
         this.ist = ist;
     }
 
-    public Boolean getSZeit() {
+    public Byte getsZeit() {
         return sZeit;
     }
 
-    public void setSZeit(Boolean sZeit) {
+    public void setsZeit(Byte sZeit) {
         this.sZeit = sZeit;
     }
 
-    public Boolean getIZeit() {
+    public Byte getiZeit() {
         return iZeit;
     }
 
-    public void setIZeit(Boolean iZeit) {
+    public void setiZeit(Byte iZeit) {
         this.iZeit = iZeit;
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
     }
 
     public BigDecimal getDosis() {
@@ -133,14 +132,6 @@ public class BHP implements Serializable {
 
     public void setDosis(BigDecimal dosis) {
         this.dosis = dosis;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
     }
 
     public String getBemerkung() {

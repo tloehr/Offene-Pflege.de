@@ -38,7 +38,7 @@ public class SYSRunningClassesTools {
      * <p/>
      * Die vorliegende Methode wird aufgerufen um die Verwendung einer bestimmten Klasse anzuzeigen. Sie prüft mögliche Konflikte und gibt eine Liste als Antwort zurück.
      *
-     * @return Das <b>erste</b> Objekt der Liste enthält das neu erstellte EntityObjekt, dass die Aktivität der gewünschten Klasse anzeigt. Sollte es nicht möglich sein, dass
+     * @return Das <b>erste</b> Objekt der Liste enthält das neu erstellte EntityObjekt, dass die Aktivität der gewünschten Klasse anzeigt. Sollte es nicht möglich sein, also dass
      *         die Klasse starten darf, dann ist das erste Objekt <code>null</code>. Das zweite (und alle weiteren folgenden) Objekt(e) enthalten die SYSRunningClasses der Module, die
      *         die gewünschte Ausführung verhindert haben. Das kann bedeuten, dass (im Falle einer MainClass) die Ausführung generell verhindert wurde, oder, (bei signaturabhängigen) Konflikten,
      *         statt des gewünschten Schreibzugriffs (RW) nur ein Lesezugriff (RO) ermöglicht wurde. Welche Status möglich ist, steht im ersten Objekt.
@@ -100,9 +100,7 @@ public class SYSRunningClassesTools {
     }
 
     public static void moduleEnded(SYSRunningClasses runningClass) {
-        OPDE.getEM().getTransaction().begin();
-        OPDE.getEM().remove(runningClass);
-        OPDE.getEM().getTransaction().commit();
+        EntityTools.delete(runningClass);
     }
 
     public static void endAllModules(SYSLogin login) {

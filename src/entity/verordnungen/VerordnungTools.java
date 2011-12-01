@@ -17,7 +17,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -26,20 +28,21 @@ public class VerordnungTools {
 
     /**
      * Diese Methode ermittelt eine Liste aller Verordnungen gemäß der unten genannten Einschränkungen.
-     * @param bewohner dessen Verordnungen wir suchen
+     *
+     * @param bewohner    dessen Verordnungen wir suchen
      * @param nurAktuelle true, wenn wir nur die aktuellen Verordnungen wünschen, false sonst.
      * @return Eine Liste aus Objekt Arrays, die folgenden Aufbau hat:
-     * <center><code><b>{Verordnung, Vorrat, Saldo des Vorrats,
-     * Bestand (im Anbruch), Saldo des Bestandes, Bezeichnung des Medikamentes, Bezeichnung der Massnahme}</b></code></center>
-     * Es gibt Verordnungen, die keine Medikamente besitzen, bei denen steht dann <code>null</code> an den entsprechenden
-     * Stellen.
+     *         <center><code><b>{Verordnung, Vorrat, Saldo des Vorrats,
+     *         Bestand (im Anbruch), Saldo des Bestandes, Bezeichnung des Medikamentes, Bezeichnung der Massnahme}</b></code></center>
+     *         Es gibt Verordnungen, die keine Medikamente besitzen, bei denen steht dann <code>null</code> an den entsprechenden
+     *         Stellen.
      */
     public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean nurAktuelle) {
 
         Query queryVorrat = OPDE.getEM().createNamedQuery("Verordnung.findByBewohnerMitVorraeten");
         queryVorrat.setParameter(1, bewohner.getBWKennung());
         queryVorrat.setParameter(2, bewohner.getBWKennung());
-        queryVorrat.setParameter(3, !nurAktuelle );
+        queryVorrat.setParameter(3, !nurAktuelle);
         List listeVorrat = queryVorrat.getResultList();
 
         // Aus technischen Gründe, kann ich diese native SQL nicht direkt mit der Liste aller zugehörigen Objekte
@@ -47,17 +50,17 @@ public class VerordnungTools {
         // die Vorrats und Bestandsobjekte nicht. Da bei diesem Ausdruck NULLs auftreten können, geht das nicht automatisch.
 
         Iterator it = listeVorrat.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             Object[] line = (Object[]) it.next();
 
 
-            if (line[1] != null){
+            if (line[1] != null) {
                 BigInteger vorID = (BigInteger) line[1];
                 MedVorrat vorrat = OPDE.getEM().find(MedVorrat.class, vorID.longValue());
                 line[1] = vorrat;
             }
 
-            if (line[3] != null){
+            if (line[3] != null) {
                 BigInteger bestID = (BigInteger) line[3];
                 MedBestand bestand = OPDE.getEM().find(MedBestand.class, bestID.longValue());
                 line[3] = bestand;
@@ -434,11 +437,11 @@ public class VerordnungTools {
                         aktuellerAnbruch.getDarreichung().getZusatz() + "</b></font>" +
                         aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung() + " " +
                         (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
-                result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
-                        verordnung.getDarreichung().getZusatz() + "</i>";
+                result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ");
+                result += (result.endsWith(" ") ? "" : " ") +verordnung.getDarreichung().getZusatz() + "</i>";
             } else {
                 result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
-                        verordnung.getDarreichung().getZusatz() + "</b></font>" +
+                        " " + verordnung.getDarreichung().getZusatz() + "</b></font>" +
                         verordnung.getDarreichung().getMedForm().getZubereitung() + " " +
                         (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
             }
@@ -588,9 +591,9 @@ public class VerordnungTools {
                     result = "!!FEHLER!!";
                 }
             }
-            if (VerordnungPlanungTools.getTerminStatus(vorherigePlanung) == VerordnungPlanungTools.MAXDOSIS) {
-                // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
-                // der erste Durchlauf, ein Wechsel stattgefunden hat und der
+            if (vorherigePlanung != null && VerordnungPlanungTools.getTerminStatus(vorherigePlanung) != VerordnungPlanungTools.MAXDOSIS) {
+                // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn das hier nicht
+                // der erste Durchlauf ist ODER ein Wechsel stattgefunden hat und der
                 // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
                 result += "</table>";
             }
@@ -601,41 +604,49 @@ public class VerordnungTools {
         if (verordnung.hasMedi()) {
 
 
-//            if (verordnung.isBisPackEnde()) {
-//                result += "nur bis Packungs Ende<br/>";
-//            }
-//            if (mitBestand && !verordnung.isAbgesetzt()) {
-//                if (rs.getDouble("saldo") > 0) {
-//                    tmp += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("saldo")) + " " +
-//                            SYSConst.EINHEIT[rs.getInt("PackEinheit")] +
-//                            "</font></b>";
-//                    if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
-//                        double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
-//                        tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-//                                (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
-//                    }
-//                    if (rs.getLong("BestID") > 0) {
-//                        tmp += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + rs.getLong("BestID") + "</font></b>";
-//
-//                        if (rs.getDouble("bestsumme") != rs.getDouble("saldo")) {
-//                            tmp += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("bestsumme")) + " " +
-//                                    SYSConst.EINHEIT[rs.getInt("PackEinheit")] + "</font></b>";
-//                            if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
-//                                double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
-//                                tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-//                                        (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
-//                            }
-//                        }
-//                    } else {
-//                        tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
-//                    }
-////                                if (rs.getLong("BestellID") > 0){
-////                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
-////                                }
-//                } else {
-//                    tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
-//                }
-//            }
+            if (verordnung.isBisPackEnde()) {
+                result += "nur bis Packungs Ende<br/>";
+            }
+            if (mitBestand && !verordnung.isAbgesetzt()) {
+                if (vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
+                    result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
+                            SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] +
+                            "</font></b>";
+                    if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
+
+                        BigDecimal anwmenge = vorratSumme.multiply(bestandImAnbruch.getApv());
+
+
+                        //double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
+                        result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+                                MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm());
+                        result += " (bei einem APV von "+  SYSTools.roundScale2(bestandImAnbruch.getApv()) +" zu 1)";
+                        result += "</i>";
+                    }
+                    if (bestandImAnbruch != null) {
+                        result += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + bestandImAnbruch.getBestID() + "</font></b>";
+
+                        if (vorratSumme.compareTo(bestandSumme) != 0) {
+                            result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + bestandSumme + " " +
+                                    SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] + "</font></b>";
+                            if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
+                                //double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
+                                BigDecimal anwmenge = bestandSumme.multiply(bestandImAnbruch.getApv());
+
+                                result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+                                        MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm()) + "</i>";
+                            }
+                        }
+                    } else {
+                        result += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+                    }
+//                                if (rs.getLong("BestellID") > 0){
+//                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
+//                                }
+                } else {
+                    result += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
+                }
+            }
 
 
         }

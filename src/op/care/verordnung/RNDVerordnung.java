@@ -51,36 +51,36 @@ public class RNDVerordnung extends RNDHTML {
         TableModel tm = table.getModel();
         //BitSet bs = ((BitSet) tm.getValueAt(row, TMVerordnung.COL_INFO));
 
-        if (column == TMVerordnung.COL_INFO) {
-            JPanel jp = new JPanel();
-            jp.setLayout(new FlowLayout());
-//            if (bs.get(0)) {
-//                JLabel l1 = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/attach.png")));
-//                l1.setToolTipText("Zu dieser Verordnung gibt es Dokumente");
-//                jp.add(l1);
-//            }
-//            if (bs.get(1)) {
-//                JLabel l2 = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
-//                l2.setToolTipText("Zu dieser Verordnung gibt es bereits eine Medikamentenbestellung.");
-//                jp.add(l2);
-//            }
-//            if (isSelected) {
-//                if (row % 2 == 0) {
-//                    color = SYSConst.grey80;
-//                } else {
-//                color = SYSConst.khaki3;
-//                }
-//            } else {
-//                if (row % 2 == 0) {
-//                    color = Color.WHITE;
-//                } else {
-//                    color = SYSConst.khaki2;
-//                }
-//            }
-//            jp.setBackground(color);
-            return jp;
-        } else {
+//        if (column == TMVerordnung.COL_INFO) {
+//            JPanel jp = new JPanel();
+//            jp.setLayout(new FlowLayout());
+////            if (bs.get(0)) {
+////                JLabel l1 = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/attach.png")));
+////                l1.setToolTipText("Zu dieser Verordnung gibt es Dokumente");
+////                jp.add(l1);
+////            }
+////            if (bs.get(1)) {
+////                JLabel l2 = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+////                l2.setToolTipText("Zu dieser Verordnung gibt es bereits eine Medikamentenbestellung.");
+////                jp.add(l2);
+////            }
+////            if (isSelected) {
+////                if (row % 2 == 0) {
+////                    color = SYSConst.grey80;
+////                } else {
+////                color = SYSConst.khaki3;
+////                }
+////            } else {
+////                if (row % 2 == 0) {
+////                    color = Color.WHITE;
+////                } else {
+////                    color = SYSConst.khaki2;
+////                }
+////            }
+////            jp.setBackground(color);
+//            return jp;
+//        } else {
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        }
+//        }
     }
 }

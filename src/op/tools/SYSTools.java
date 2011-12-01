@@ -56,6 +56,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -107,6 +108,11 @@ public class SYSTools {
     public static double roundScale2(double d) {
         return Math.rint(d * 100) / 100.;
     }
+
+    public static String roundScale2(BigDecimal bd) {
+        return bd.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString();
+    }
+
 
     /**
      * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf

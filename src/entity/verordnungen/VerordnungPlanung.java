@@ -9,36 +9,36 @@ import java.util.Date;
 @Entity
 @Table(name = "BHPPlanung")
 @NamedQueries({
-    @NamedQuery(name = "VerordnungPlanung.findAll", query = "SELECT b FROM VerordnungPlanung b"),
-    @NamedQuery(name = "VerordnungPlanung.findByBhppid", query = "SELECT b FROM VerordnungPlanung b WHERE b.bhppid = :bhppid"),
-    @NamedQuery(name = "VerordnungPlanung.findByNachtMo", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtMo = :nachtMo"),
-    @NamedQuery(name = "VerordnungPlanung.findByMorgens", query = "SELECT b FROM VerordnungPlanung b WHERE b.morgens = :morgens"),
-    @NamedQuery(name = "VerordnungPlanung.findByMittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.mittags = :mittags"),
-    @NamedQuery(name = "VerordnungPlanung.findByNachmittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachmittags = :nachmittags"),
-    @NamedQuery(name = "VerordnungPlanung.findByAbends", query = "SELECT b FROM VerordnungPlanung b WHERE b.abends = :abends"),
-    @NamedQuery(name = "VerordnungPlanung.findByNachtAb", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtAb = :nachtAb"),
-    @NamedQuery(name = "VerordnungPlanung.findByUhrzeitDosis", query = "SELECT b FROM VerordnungPlanung b WHERE b.uhrzeitDosis = :uhrzeitDosis"),
-    @NamedQuery(name = "VerordnungPlanung.findByUhrzeit", query = "SELECT b FROM VerordnungPlanung b WHERE b.uhrzeit = :uhrzeit"),
-    @NamedQuery(name = "VerordnungPlanung.findByMaxAnzahl", query = "SELECT b FROM VerordnungPlanung b WHERE b.maxAnzahl = :maxAnzahl"),
-    @NamedQuery(name = "VerordnungPlanung.findByMaxEDosis", query = "SELECT b FROM VerordnungPlanung b WHERE b.maxEDosis = :maxEDosis"),
-    @NamedQuery(name = "VerordnungPlanung.findByTaeglich", query = "SELECT b FROM VerordnungPlanung b WHERE b.taeglich = :taeglich"),
-    @NamedQuery(name = "VerordnungPlanung.findByWoechentlich", query = "SELECT b FROM VerordnungPlanung b WHERE b.woechentlich = :woechentlich"),
-    @NamedQuery(name = "VerordnungPlanung.findByMonatlich", query = "SELECT b FROM VerordnungPlanung b WHERE b.monatlich = :monatlich"),
-    @NamedQuery(name = "VerordnungPlanung.findByTagNum", query = "SELECT b FROM VerordnungPlanung b WHERE b.tagNum = :tagNum"),
-    @NamedQuery(name = "VerordnungPlanung.findByMon", query = "SELECT b FROM VerordnungPlanung b WHERE b.mon = :mon"),
-    @NamedQuery(name = "VerordnungPlanung.findByDie", query = "SELECT b FROM VerordnungPlanung b WHERE b.die = :die"),
-    @NamedQuery(name = "VerordnungPlanung.findByMit", query = "SELECT b FROM VerordnungPlanung b WHERE b.mit = :mit"),
-    @NamedQuery(name = "VerordnungPlanung.findByDon", query = "SELECT b FROM VerordnungPlanung b WHERE b.don = :don"),
-    @NamedQuery(name = "VerordnungPlanung.findByFre", query = "SELECT b FROM VerordnungPlanung b WHERE b.fre = :fre"),
-    @NamedQuery(name = "VerordnungPlanung.findBySam", query = "SELECT b FROM VerordnungPlanung b WHERE b.sam = :sam"),
-    @NamedQuery(name = "VerordnungPlanung.findBySon", query = "SELECT b FROM VerordnungPlanung b WHERE b.son = :son"),
-    @NamedQuery(name = "VerordnungPlanung.findByLDatum", query = "SELECT b FROM VerordnungPlanung b WHERE b.lDatum = :lDatum"),
-    @NamedQuery(name = "VerordnungPlanung.findByUKennung", query = "SELECT b FROM VerordnungPlanung b WHERE b.uKennung = :uKennung"),
-    @NamedQuery(name = "VerordnungPlanung.findByTmp", query = "SELECT b FROM VerordnungPlanung b WHERE b.tmp = :tmp"),
-    @NamedQuery(name = "VerordnungPlanung.findByVerordnungSorted", query = " " +
+        @NamedQuery(name = "VerordnungPlanung.findAll", query = "SELECT b FROM VerordnungPlanung b"),
+        @NamedQuery(name = "VerordnungPlanung.findByBhppid", query = "SELECT b FROM VerordnungPlanung b WHERE b.bhppid = :bhppid"),
+        @NamedQuery(name = "VerordnungPlanung.findByNachtMo", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtMo = :nachtMo"),
+        @NamedQuery(name = "VerordnungPlanung.findByMorgens", query = "SELECT b FROM VerordnungPlanung b WHERE b.morgens = :morgens"),
+        @NamedQuery(name = "VerordnungPlanung.findByMittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.mittags = :mittags"),
+        @NamedQuery(name = "VerordnungPlanung.findByNachmittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachmittags = :nachmittags"),
+        @NamedQuery(name = "VerordnungPlanung.findByAbends", query = "SELECT b FROM VerordnungPlanung b WHERE b.abends = :abends"),
+        @NamedQuery(name = "VerordnungPlanung.findByNachtAb", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtAb = :nachtAb"),
+        @NamedQuery(name = "VerordnungPlanung.findByUhrzeitDosis", query = "SELECT b FROM VerordnungPlanung b WHERE b.uhrzeitDosis = :uhrzeitDosis"),
+        @NamedQuery(name = "VerordnungPlanung.findByUhrzeit", query = "SELECT b FROM VerordnungPlanung b WHERE b.uhrzeit = :uhrzeit"),
+        @NamedQuery(name = "VerordnungPlanung.findByMaxAnzahl", query = "SELECT b FROM VerordnungPlanung b WHERE b.maxAnzahl = :maxAnzahl"),
+        @NamedQuery(name = "VerordnungPlanung.findByMaxEDosis", query = "SELECT b FROM VerordnungPlanung b WHERE b.maxEDosis = :maxEDosis"),
+        @NamedQuery(name = "VerordnungPlanung.findByTaeglich", query = "SELECT b FROM VerordnungPlanung b WHERE b.taeglich = :taeglich"),
+        @NamedQuery(name = "VerordnungPlanung.findByWoechentlich", query = "SELECT b FROM VerordnungPlanung b WHERE b.woechentlich = :woechentlich"),
+        @NamedQuery(name = "VerordnungPlanung.findByMonatlich", query = "SELECT b FROM VerordnungPlanung b WHERE b.monatlich = :monatlich"),
+        @NamedQuery(name = "VerordnungPlanung.findByTagNum", query = "SELECT b FROM VerordnungPlanung b WHERE b.tagNum = :tagNum"),
+        @NamedQuery(name = "VerordnungPlanung.findByMon", query = "SELECT b FROM VerordnungPlanung b WHERE b.mon = :mon"),
+        @NamedQuery(name = "VerordnungPlanung.findByDie", query = "SELECT b FROM VerordnungPlanung b WHERE b.die = :die"),
+        @NamedQuery(name = "VerordnungPlanung.findByMit", query = "SELECT b FROM VerordnungPlanung b WHERE b.mit = :mit"),
+        @NamedQuery(name = "VerordnungPlanung.findByDon", query = "SELECT b FROM VerordnungPlanung b WHERE b.don = :don"),
+        @NamedQuery(name = "VerordnungPlanung.findByFre", query = "SELECT b FROM VerordnungPlanung b WHERE b.fre = :fre"),
+        @NamedQuery(name = "VerordnungPlanung.findBySam", query = "SELECT b FROM VerordnungPlanung b WHERE b.sam = :sam"),
+        @NamedQuery(name = "VerordnungPlanung.findBySon", query = "SELECT b FROM VerordnungPlanung b WHERE b.son = :son"),
+        @NamedQuery(name = "VerordnungPlanung.findByLDatum", query = "SELECT b FROM VerordnungPlanung b WHERE b.lDatum = :lDatum"),
+        @NamedQuery(name = "VerordnungPlanung.findByUKennung", query = "SELECT b FROM VerordnungPlanung b WHERE b.uKennung = :uKennung"),
+        @NamedQuery(name = "VerordnungPlanung.findByTmp", query = "SELECT b FROM VerordnungPlanung b WHERE b.tmp = :tmp"),
+        @NamedQuery(name = "VerordnungPlanung.findByVerordnungSorted", query = " " +
                 " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung AND vp.tmp = 0 " +
                 " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
-                })
+})
 public class VerordnungPlanung implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -303,7 +303,7 @@ public class VerordnungPlanung implements Serializable {
     public void setTmp(BigInteger tmp) {
         this.tmp = tmp;
     }
-    
+
     // ==
     // N:1 Relationen
     // ==
@@ -347,15 +347,15 @@ public class VerordnungPlanung implements Serializable {
         return uhrzeit != null;
     }
 
-    public boolean isTaeglich(){
+    public boolean isTaeglich() {
         return taeglich > 0;
     }
 
-    public boolean isWoechentlich(){
+    public boolean isWoechentlich() {
         return woechentlich > 0;
     }
 
-    public boolean isMonatlich(){
+    public boolean isMonatlich() {
         return monatlich > 0;
     }
 

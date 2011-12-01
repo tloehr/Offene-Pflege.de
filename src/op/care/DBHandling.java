@@ -30,7 +30,7 @@ import entity.Bewohner;
 import entity.Einrichtungen;
 import entity.PflegeberichteTools;
 import op.OPDE;
-import op.care.verordnung.TMVerordnung;
+import tablemodels.TMVerordnung;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
 import op.tools.DBRetrieve;
@@ -212,7 +212,7 @@ public class DBHandling {
         }
 
         if (medi) {
-            TMVerordnung tmv = new TMVerordnung(bwkennung, false, true, true, true, true, false);
+            TMVerordnung tmv = new TMVerordnung(bewohner, false, false);
             result += op.care.verordnung.DBHandling.getVerordnungenAsHTML(tmv, bewohner, null);
         }
 

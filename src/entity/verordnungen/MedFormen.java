@@ -127,6 +127,11 @@ public class MedFormen implements Serializable {
         this.equiv = equiv;
     }
 
+    public boolean anwUndPackEinheitenGleich(){
+        return anwEinheit == packEinheit;
+    }
+
+
     @Override
     public int hashCode() {
         int hash = 0;

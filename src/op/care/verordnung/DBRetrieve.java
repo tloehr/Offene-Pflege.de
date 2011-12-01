@@ -46,23 +46,23 @@ import java.util.logging.Logger;
  */
 public class DBRetrieve {
 
-    public static long numAffectedBHPs(long verid) {
-        long result = 0;
-        String sql = " SELECT count(*) " +
-                " FROM BHP bhp INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
-                " WHERE bhpp.VerID = ? AND bhp.Status > 0";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, verid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                result = rs.getLong(1);
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    public static long numAffectedBHPs(long verid) {
+//        long result = 0;
+//        String sql = " SELECT count(*) " +
+//                " FROM BHP bhp INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+//                " WHERE bhpp.VerID = ? AND bhp.Status > 0";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, verid);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                result = rs.getLong(1);
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
     public static String getDosis(long verid) {
         String result = "";

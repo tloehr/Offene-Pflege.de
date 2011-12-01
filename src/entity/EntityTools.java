@@ -21,6 +21,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().begin();
             OPDE.getEM().persist(entity);
             OPDE.getEM().getTransaction().commit();
+            OPDE.getEM().refresh(entity);
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -36,6 +37,7 @@ public class EntityTools {
             OPDE.getEM().getTransaction().begin();
             OPDE.getEM().merge(entity);
             OPDE.getEM().getTransaction().commit();
+            OPDE.getEM().refresh(entity);
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,6 +57,7 @@ public class EntityTools {
                 OPDE.getEM().persist(entity);
             }
             OPDE.getEM().getTransaction().commit();
+            OPDE.getEM().refresh(entity);
             success = true;
         } catch (Exception e) {
             e.printStackTrace();

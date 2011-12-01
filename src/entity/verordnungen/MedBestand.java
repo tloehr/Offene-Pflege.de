@@ -162,6 +162,10 @@ public class MedBestand implements Serializable {
         return vorrat;
     }
 
+    public boolean hasNextBestand(){
+        return naechsterBestand != null;
+    }
+
     public void setVorrat(MedVorrat vorrat) {
         this.vorrat = vorrat;
     }

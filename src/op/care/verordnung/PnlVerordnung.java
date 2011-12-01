@@ -26,11 +26,12 @@
  */
 package op.care.verordnung;
 
-import javax.swing.border.*;
-import entity.*;
+import entity.Bewohner;
+import entity.BewohnerTools;
+import entity.SYSRunningClasses;
+import entity.SYSRunningClassesTools;
 import entity.files.SYSFilesTools;
-import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungTools;
+import entity.verordnungen.*;
 import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
@@ -38,24 +39,24 @@ import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.care.bhp.PnlBHP;
 import op.care.med.vorrat.*;
-import op.tools.*;
+import op.tools.DlgException;
+import op.tools.InternalClassACL;
+import op.tools.SYSPrint;
+import op.tools.SYSTools;
+import tablemodels.TMVerordnung;
+import tablerenderer.RNDHTML;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Timestamp;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,26 +69,11 @@ public class PnlVerordnung extends CleanablePanel {
     private String bwkennung;
     private Bewohner bewohner;
     private FrmPflege parent;
-    private ListSelectionListener lsl;
-    private long currentVerID = 0;
-    private long anarztid = 0;
-    private long abarztid = 0;
-    private long ankhid = 0;
-    private long abkhid = 0;
-    private long vorid = 0;
-    private long bestellid = 0;
-    private int currCol;
-    private boolean readOnly;
+    private boolean readOnly = false;
     private OCSec ocs;
     private JPopupMenu menu;
-    private boolean editAllowed;
-    private boolean changeAllowed;
-    private boolean absetzenAllowed;
-    private boolean deleteAllowed;
-    private boolean attachAllowed;
-    private boolean infosAllowed;
-    private boolean documentsAllowed;
-        /**
+
+    /**
      * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
      * aufgerufen wurden, einen reloadTable() auslösen können.
      */
@@ -112,16 +98,18 @@ public class PnlVerordnung extends CleanablePanel {
         SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
         runningClass = result[0];
 
-        if (!runningClass.isRW()) {
+        readOnly = !runningClass.isRW();
+
+        if (readOnly) {
             blockingClass = result[1];
-            btnLock.setEnabled(true);
             btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
                     + blockingClass.getLogin().getUser().getNameUndVorname()
                     + "</body></html>");
         } else {
-            btnLock.setEnabled(false);
             btnLock.setToolTipText(null);
         }
+
+        btnLock.setEnabled(readOnly);
 
         BewohnerTools.setBWLabel(lblBW, bewohner);
 
@@ -133,12 +121,6 @@ public class PnlVerordnung extends CleanablePanel {
         ocs.setEnabled(this, "btnPrint", btnPrint, false);
         ocs.setEnabled(this, "btnBestellungen", btnBestellungen, false);
 
-        editAllowed = false;
-        changeAllowed = false;
-        deleteAllowed = false;
-        absetzenAllowed = false;
-        attachAllowed = false;
-        documentsAllowed = false;
         standardActionListener = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -191,19 +173,20 @@ public class PnlVerordnung extends CleanablePanel {
 
             //---- tblVerordnung ----
             tblVerordnung.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ) {
-                Class<?>[] columnTypes = new Class<?>[] {
-                    Object.class, Object.class, Object.class, Object.class
+                Class<?>[] columnTypes = new Class<?>[]{
+                        Object.class, Object.class, Object.class, Object.class
                 };
+
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     return columnTypes[columnIndex];
@@ -294,43 +277,43 @@ public class PnlVerordnung extends CleanablePanel {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
+                    jPanel1Layout.createParallelGroup()
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cbAbgesetzt)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbMedi)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbOhneMedi)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbBedarf)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbRegel))
-                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap(131, Short.MAX_VALUE))
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                    .addComponent(cbAbgesetzt)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbMedi)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbOhneMedi)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbBedarf)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(cbRegel))
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                    .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addContainerGap(131, Short.MAX_VALUE))
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbAbgesetzt)
-                            .addComponent(cbMedi)
-                            .addComponent(cbOhneMedi)
-                            .addComponent(cbBedarf)
-                            .addComponent(cbRegel))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(20, Short.MAX_VALUE))
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(cbAbgesetzt)
+                                            .addComponent(cbMedi)
+                                            .addComponent(cbOhneMedi)
+                                            .addComponent(cbBedarf)
+                                            .addComponent(cbRegel))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel1)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel2)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addContainerGap(20, Short.MAX_VALUE))
             );
         }
 
@@ -428,36 +411,36 @@ public class PnlVerordnung extends CleanablePanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
-                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnLock)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
+                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnLock)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(layout.createParallelGroup()
-                        .addComponent(btnLock)
-                        .addComponent(lblBW))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup()
+                                        .addComponent(btnLock)
+                                        .addComponent(lblBW))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -524,177 +507,144 @@ public class PnlVerordnung extends CleanablePanel {
 
     }
 
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
-
     private void tblVerordnungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVerordnungMousePressed
-        if (!evt.isPopupTrigger()) {
-            return;
-        }
         Point p = evt.getPoint();
+
         final ListSelectionModel lsm = tblVerordnung.getSelectionModel();
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-        int row = tblVerordnung.rowAtPoint(p);
+
         if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
+
+            int row = tblVerordnung.rowAtPoint(p);
             lsm.setSelectionInterval(row, row);
         }
-//        final long bestid = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_BESTID);
-//        final long dafid = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_DAFID);
-//        final long nextbest = (Long) tblVerordnung.getModel().getValueAt(row, TMVerordnung.COL_NEXTBEST);
-        SYSTools.unregisterListeners(menu);
-        menu = new JPopupMenu();
 
-        JMenuItem itemPopupEdit = new JMenuItem("Korrigieren");
-        itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
+        final List<Verordnung> selection = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(tblVerordnung.getSelectedRows());
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new DlgVerordnung(parent, bwkennung, currentVerID, DlgVerordnung.EDIT_MODE);
-                reloadTable();
-            }
-        });
+        // Kontext Menü
+        if (singleRowSelected && evt.isPopupTrigger()) {
 
-        menu.add(itemPopupEdit);
-        ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, editAllowed);
-        //ocs.setEnabled(this, "itemPopupEditText", itemPopupEditText, !readOnly && status > 0 && changeable);
-        // -------------------------------------------------
-        JMenuItem itemPopupChange = new JMenuItem("Verändern");
-        itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
+            final Verordnung verordnung = (Verordnung) selection.get(0);
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new DlgVerordnung(parent, bwkennung, currentVerID, DlgVerordnung.CHANGE_MODE);
-                loadTable();
-            }
-        });
-        menu.add(itemPopupChange);
-        ocs.setEnabled(this, "itemPopupChange", itemPopupChange, changeAllowed);
-        // -------------------------------------------------
-        JMenuItem itemPopupQuit = new JMenuItem("Absetzen");
-        itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
+            long num = BHPTools.getNumBHPs(verordnung);
+            boolean editAllowed = !readOnly && num == 0;
+            boolean changeAllowed = !readOnly && !verordnung.isBedarf() && !verordnung.isAbgesetzt() && num > 0;
+            boolean absetzenAllowed = !readOnly && !verordnung.isAbgesetzt();
+            boolean deleteAllowed = !readOnly && num == 0;
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), currentVerID);
-                reloadTable();
-            }
-        });
-        menu.add(itemPopupQuit);
-        ocs.setEnabled(this, "itemPopupQuit", itemPopupQuit, absetzenAllowed);
-        // -------------------------------------------------
-        JMenuItem itemPopupDelete = new JMenuItem("Löschen");
-        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                if (JOptionPane.showConfirmDialog(parent, "Soll die Verordnung wirklich gelöscht werden.",
-                        "Verordnung löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    op.care.verordnung.DBHandling.deleteVerordnung(currentVerID);
+            //                    editAllowed = ;
+//                    changeAllowed = !readOnly && sitid == 0 && abdatum.equals(SYSConst.TS_BIS_AUF_WEITERES) && num > 0;
+//                    deleteAllowed = !readOnly && num == 0;
+//                    absetzenAllowed = !readOnly && !abgesetzt;
+//                    attachAllowed = !readOnly;
+//                    //orderAllowed = !readOnly && !abgesetzt && vorid > 0 && anarztid > 0 && bestellid == 0;
+//                    //delOrderAllowed = !readOnly && !abgesetzt && vorid > 0 && bestellid > 0;
+//                    documentsAllowed = !readOnly;
+
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+
+            JMenuItem itemPopupEdit = new JMenuItem("Korrigieren");
+            itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    new DlgVerordnung(parent, bwkennung, verordnung.getVerid(), DlgVerordnung.EDIT_MODE);
+                    reloadTable();
+                }
+            });
+
+            menu.add(itemPopupEdit);
+            ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, editAllowed);
+            //ocs.setEnabled(this, "itemPopupEditText", itemPopupEditText, !readOnly && status > 0 && changeable);
+            // -------------------------------------------------
+            JMenuItem itemPopupChange = new JMenuItem("Verändern");
+            itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    new DlgVerordnung(parent, bwkennung, verordnung.getVerid(), DlgVerordnung.CHANGE_MODE);
                     loadTable();
                 }
-            }
-        });
-        menu.add(itemPopupDelete);
-        ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, deleteAllowed);
-        // -------------------------------------------------
-//        JMenuItem itemPopupBest = new JMenuItem("Nachbestätigung durch Arzt");
-//        itemPopupBest.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                new DlgBestaetigung(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), currentVerID);
-//                loadTable();
-//            }
-//        });
-//        menu.add(itemPopupBest);
-        //ocs.setEnabled(this, "itemPopupBest", itemPopupBest, bestaetigungAllowed);
-        // -------------------------------------------------
-//        JMenuItem itemPopupOrder = new JMenuItem("Nachbestellen");
-//        itemPopupOrder.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                HashMap hm = new HashMap();
-//                hm.put("VorID", vorid);
-//                hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-//                hm.put("Text", "");
-//                hm.put("Datum", "!NOW!");
-//                hm.put("ArztID", anarztid);
-//                hm.put("Abschluss", "!BAW!");
-//                DBHandling.insertRecord("MPBestellung", hm);
-//                hm.clear();
-//                loadTable();
-//            }
-//        });
-//        menu.add(itemPopupOrder);
-//        ocs.setEnabled(this, "itemPopupOrder", itemPopupOrder, orderAllowed);
-        // -------------------------------------------------
-//        JMenuItem itemPopupOrderDetail = new JMenuItem("Nachbestellen mit Detaileingabe");
-//        itemPopupOrderDetail.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                new DlgBestellung(parent, anarztid, vorid);
-//                loadTable();
-//            }
-//        });
-//        menu.add(itemPopupOrderDetail);
-//        ocs.setEnabled(parent, "itemPopupOrder", itemPopupOrderDetail, orderAllowed);
-//        // -------------------------------------------------
-//        JMenuItem itemPopupDelOrder = new JMenuItem("Bestellung löschen");
-//        itemPopupDelOrder.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                DBHandling.deleteRecords("MPBestellung", "BestellID", bestellid);
-//                loadTable();
-//            }
-//        });
-//        menu.add(itemPopupDelOrder);
-//        ocs.setEnabled(parent, "itemPopupDelOrder", itemPopupDelOrder, delOrderAllowed);
+            });
+            menu.add(itemPopupChange);
+            ocs.setEnabled(this, "itemPopupChange", itemPopupChange, changeAllowed);
+            // -------------------------------------------------
+            JMenuItem itemPopupQuit = new JMenuItem("Absetzen");
+            itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
 
-        // -------------------------------------------------
-        if (dafid > 0) {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), verordnung.getVerid());
+                    reloadTable();
+                }
+            });
+            menu.add(itemPopupQuit);
+            ocs.setEnabled(this, "itemPopupQuit", itemPopupQuit, absetzenAllowed);
+            // -------------------------------------------------
+            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    if (JOptionPane.showConfirmDialog(parent, "Soll die Verordnung wirklich gelöscht werden.",
+                            "Verordnung löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        op.care.verordnung.DBHandling.deleteVerordnung(verordnung.getVerid());
+                        loadTable();
+                    }
+                }
+            });
+            menu.add(itemPopupDelete);
+            ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, deleteAllowed);
+
+            if (verordnung.hasMedi()) {
+                menu.add(new JSeparator());
+
+                final MedBestand bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
+                boolean bestandAbschliessenAllowed = !readOnly && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
+                boolean bestandAnbrechenAllowed = !readOnly && bestandImAnbruch == null;
+
+                JMenuItem itemPopupCloseBestand = new JMenuItem("Bestand abschließen");
+                itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
+
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        try {
+                            new DlgBestandAbschliessen(parent, bestandImAnbruch.getBestID());
+                            Thread.sleep(1000);
+                            reloadTable();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(PnlBHP.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
+                menu.add(itemPopupCloseBestand);
+                ocs.setEnabled(this, "itemPopupCloseBestand", itemPopupCloseBestand, bestandAbschliessenAllowed);
+
+                JMenuItem itemPopupOpenBestand = new JMenuItem("Bestand anbrechen");
+                itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
+
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        try {
+                            new DlgBestandAnbrechen(parent, verordnung.getDarreichung().getDafID(), bwkennung);
+                            Thread.sleep(1000);
+                            reloadTable();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(PnlBHP.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
+                menu.add(itemPopupOpenBestand);
+                ocs.setEnabled(this, "itemPopupOpenBestand", itemPopupOpenBestand, bestandAnbrechenAllowed);
+            }
             menu.add(new JSeparator());
 
-            JMenuItem itemPopupCloseBestand = new JMenuItem("Bestand abschließen");
-            itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
+            JMenuItem itemPopupPrint = new JMenuItem("Markierte Verordnungen drucken");
+            itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    try {
-                        new DlgBestandAbschliessen(parent, bestid);
-                        Thread.sleep(1000);
-                        reloadTable();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(PnlBHP.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    int[] sel = tblVerordnung.getSelectedRows();
+                    printVerordnungen(sel);
                 }
             });
-            menu.add(itemPopupCloseBestand);
-            ocs.setEnabled(this, "itemPopupCloseBestand", itemPopupCloseBestand, !readOnly && nextbest == 0 && bestid > 0);
+            menu.add(itemPopupPrint);
 
-            JMenuItem itemPopupOpenBestand = new JMenuItem("Bestand anbrechen");
-            itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    try {
-                        new DlgBestandAnbrechen(parent, dafid, bwkennung);
-                        Thread.sleep(1000);
-                        reloadTable();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(PnlBHP.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            });
-            menu.add(itemPopupOpenBestand);
-            ocs.setEnabled(this, "itemPopupOpenBestand", itemPopupOpenBestand, !readOnly && bestid == 0);
-        }
-        menu.add(new JSeparator());
-
-        JMenuItem itemPopupPrint = new JMenuItem("Markierte Verordnungen drucken");
-        itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                int[] sel = tblVerordnung.getSelectedRows();
-                printVerordnungen(sel);
-            }
-        });
-        menu.add(itemPopupPrint);
-        if (singleRowSelected) {
-            Verordnung verordnung = OPDE.getEM().find(Verordnung.class, currentVerID);
             if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
                 menu.add(new JSeparator());
                 menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, standardActionListener));
@@ -706,37 +656,30 @@ public class PnlVerordnung extends CleanablePanel {
             }
 
 
-//            menu.add(new JSeparator());
-//
-//            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BHPVerordnung", currentVerID, bwkennung, fileActionListener));
-//            Query query = OPDE.getEM().createNamedQuery("Verordnung.findByVerID");
-//            query.setParameter("verID", currentVerID);
-//            entity.verordnungen.Verordnung verordnung = (entity.verordnungen.Verordnung) query.getSingleResult();
-//            menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, fileActionListener));
-        }
+            menu.add(new JSeparator());
+            JMenuItem itemPopupInfo = new JMenuItem("Infos anzeigen");
+            itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
-        menu.add(new JSeparator());
-        JMenuItem itemPopupInfo = new JMenuItem("Infos anzeigen");
-        itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    final MedBestand bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                long bestid = op.care.med.DBHandling.getBestandImAnbruch(vorid);
-                long dafid = 0;
-                double apv = 0d;
-                double apvBest = 0d;
-                if (bestid > 0) {
-                    dafid = ((BigInteger) op.tools.DBRetrieve.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
-                    apv = op.care.med.DBHandling.getAPV(dafid, bwkennung);
-                    apvBest = ((BigDecimal) op.tools.DBRetrieve.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
+                    long dafid = 0;
+                    double apv = 0d;
+                    double apvBest = 0d;
+                    if (bestandImAnbruch != null) {
+                        dafid = bestandImAnbruch.getDarreichung().getDafID();
+                        apv = op.care.med.DBHandling.getAPV(dafid, bwkennung);
+                        apvBest = bestandImAnbruch.getApv().doubleValue();
+                    }
+                    JOptionPane.showMessageDialog(parent, "VerID: " + verordnung.getVerid() + "\nVorID: " + bestandImAnbruch.getVorrat().getVorID() + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
                 }
-                JOptionPane.showMessageDialog(parent, "VerID: " + currentVerID + "\nVorID: " + vorid + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        ocs.setEnabled(this, "itemPopupInfo", itemPopupInfo, infosAllowed);
-        menu.add(itemPopupInfo);
+            });
+            ocs.setEnabled(this, "itemPopupInfo", itemPopupInfo, true);
+            menu.add(itemPopupInfo);
 
 
-        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+        }
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
@@ -818,25 +761,20 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_btnNewActionPerformed
 
     public void cleanup() {
-        ListSelectionModel lsmtb = tblVerordnung.getSelectionModel();
-        if (lsl != null) {
-            lsmtb.removeListSelectionListener(lsl);
-        }
         SYSTools.unregisterListeners(this);
         SYSRunningClassesTools.moduleEnded(runningClass);
     }
 
     private void loadTable() {
-        ListSelectionModel lsm = tblVerordnung.getSelectionModel();
-        if (lsl != null) {
-            lsm.removeListSelectionListener(lsl);
-        }
-        lsl = new HandleSelections();
+//        ListSelectionModel lsm = tblVerordnung.getSelectionModel();
+//        if (lsl != null) {
+//            lsm.removeListSelectionListener(lsl);
+//        }
+//        lsl = new HandleSelections();
 
-        tblVerordnung.setModel(new TMVerordnung(bwkennung, cbAbgesetzt.isSelected(), cbMedi.isSelected(),
-                cbOhneMedi.isSelected(), cbBedarf.isSelected(), cbRegel.isSelected(), true));
+        tblVerordnung.setModel(new TMVerordnung(bewohner, cbAbgesetzt.isSelected(), cbMedi.isSelected()));
         tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        lsm.addListSelectionListener(lsl);
+        //lsm.addListSelectionListener(lsl);
 
         ocs.setEnabled(this, "btnBuchen", btnBuchen, !readOnly);// && tblVerordnung.getModel().getRowCount() > 0);
         ocs.setEnabled(this, "btnVorrat", btnVorrat, !readOnly);// && tblVerordnung.getModel().getRowCount() > 0);
@@ -844,16 +782,16 @@ public class PnlVerordnung extends CleanablePanel {
         ocs.setEnabled(this, "btnBestellungen", btnBestellungen, false); //!readOnly && tblVerordnung.getModel().getRowCount() > 0);
 
         jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
-        tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDVerordnung());
-        tblVerordnung.getColumnModel().getColumn(1).setCellRenderer(new RNDVerordnung());
-        tblVerordnung.getColumnModel().getColumn(2).setCellRenderer(new RNDVerordnung());
-        tblVerordnung.getColumnModel().getColumn(3).setCellRenderer(new RNDVerordnung());
-        tblVerordnung.getColumnModel().getColumn(4).setCellRenderer(new RNDVerordnung());
+        tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+        tblVerordnung.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+        tblVerordnung.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+        tblVerordnung.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
+        tblVerordnung.getColumnModel().getColumn(4).setCellRenderer(new RNDHTML());
     }
 
     private void reloadTable() {
         TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
-        tm.reload(currCol, 0);
+        tm.reload();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -879,61 +817,61 @@ public class PnlVerordnung extends CleanablePanel {
     private JButton btnLock;
     // End of variables declaration//GEN-END:variables
 
-    class HandleSelections implements ListSelectionListener {
-
-        public void valueChanged(ListSelectionEvent lse) {
-            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-            TableModel tm = tblVerordnung.getModel();
-            if (tm.getRowCount() <= 0) {
-                return;
-            }
-            if (!lse.getValueIsAdjusting()) {
-                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-                boolean singleSelection = lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex();
-                currCol = lsm.getLeadSelectionIndex();
-                if (lsm.isSelectionEmpty() || !singleSelection) {
-                    currentVerID = 0;
-                    editAllowed = false;
-                    changeAllowed = false;
-                    deleteAllowed = false;
-                    absetzenAllowed = false;
-                    attachAllowed = !singleSelection;
-                    documentsAllowed = false;
-                    infosAllowed = false;
-                } else {
-                    currentVerID = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_VERID)).longValue();
-                    anarztid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ANARZTID)).longValue();
-                    abarztid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABARZTID)).longValue();
-                    ankhid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ANKHID)).longValue();
-                    abkhid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABKHID)).longValue();
-                    vorid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_VORID)).longValue();
-                    //bestellid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_BESTELLID)).longValue();
-                    boolean abgesetzt = ((Boolean) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABGESETZT)).booleanValue();
-                    // Korrektur nur erlauben, wenn es noch keine abgehakten BHPs dazu gibt.
-                    long num = op.care.verordnung.DBRetrieve.numAffectedBHPs(currentVerID);
-                    Timestamp abdatum = (Timestamp) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABDATUM);
-                    long sitid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_SITID)).longValue();
-
-//                    bestaetigungAllowed = !readOnly && ((abgesetzt && abkhid != 0 && abarztid == 0)
-//                            || (!abgesetzt && ankhid != 0 && anarztid == 0));
-                    editAllowed = !readOnly && num == 0;
-                    changeAllowed = !readOnly && sitid == 0 && abdatum.equals(SYSConst.TS_BIS_AUF_WEITERES) && num > 0;
-                    deleteAllowed = !readOnly && num == 0;
-                    absetzenAllowed = !readOnly && !abgesetzt;
-                    attachAllowed = !readOnly;
-                    //orderAllowed = !readOnly && !abgesetzt && vorid > 0 && anarztid > 0 && bestellid == 0;
-                    //delOrderAllowed = !readOnly && !abgesetzt && vorid > 0 && bestellid > 0;
-                    documentsAllowed = !readOnly;
-                    infosAllowed = true;
-
+//    class HandleSelections implements ListSelectionListener {
 //
-//                    ocs.setEnabled(this, "btnEdit", btnEdit, );
-//                    ocs.setEnabled(this, "btnChange", btnChange, );
-//                    ocs.setEnabled(this, "btnAbsetzen", btnAbsetzen, !readOnly && num  > 0);
-//                    ocs.setEnabled(this, "btnDelete", btnDelete, !readOnly && num > 0);
-//                    ocs.setEnabled(this, "btnAttach", btnAttach, !readOnly);
-                }
-            }
-        }
-    }
+//        public void valueChanged(ListSelectionEvent lse) {
+//            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
+//            TableModel tm = tblVerordnung.getModel();
+//            if (tm.getRowCount() <= 0) {
+//                return;
+//            }
+//            if (!lse.getValueIsAdjusting()) {
+//                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
+//                boolean singleSelection = lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex();
+//                currCol = lsm.getLeadSelectionIndex();
+//                if (lsm.isSelectionEmpty() || !singleSelection) {
+//                    currentVerID = 0;
+//                    editAllowed = false;
+//                    changeAllowed = false;
+//                    deleteAllowed = false;
+//                    absetzenAllowed = false;
+//                    attachAllowed = !singleSelection;
+//                    documentsAllowed = false;
+//                    infosAllowed = false;
+//                } else {
+//                    currentVerID = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_VERID)).longValue();
+//                    anarztid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ANARZTID)).longValue();
+//                    abarztid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABARZTID)).longValue();
+//                    ankhid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ANKHID)).longValue();
+//                    abkhid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABKHID)).longValue();
+//                    vorid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_VORID)).longValue();
+//                    //bestellid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_BESTELLID)).longValue();
+//                    boolean abgesetzt = ((Boolean) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABGESETZT)).booleanValue();
+//                    // Korrektur nur erlauben, wenn es noch keine abgehakten BHPs dazu gibt.
+//                    long num = op.care.verordnung.DBRetrieve.numAffectedBHPs(currentVerID);
+//                    Timestamp abdatum = (Timestamp) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABDATUM);
+//                    long sitid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_SITID)).longValue();
+//
+////                    bestaetigungAllowed = !readOnly && ((abgesetzt && abkhid != 0 && abarztid == 0)
+////                            || (!abgesetzt && ankhid != 0 && anarztid == 0));
+//                    editAllowed = !readOnly && num == 0;
+//                    changeAllowed = !readOnly && sitid == 0 && abdatum.equals(SYSConst.TS_BIS_AUF_WEITERES) && num > 0;
+//                    deleteAllowed = !readOnly && num == 0;
+//                    absetzenAllowed = !readOnly && !abgesetzt;
+//                    attachAllowed = !readOnly;
+//                    //orderAllowed = !readOnly && !abgesetzt && vorid > 0 && anarztid > 0 && bestellid == 0;
+//                    //delOrderAllowed = !readOnly && !abgesetzt && vorid > 0 && bestellid > 0;
+//                    documentsAllowed = !readOnly;
+//                    infosAllowed = true;
+//
+////
+////                    ocs.setEnabled(this, "btnEdit", btnEdit, );
+////                    ocs.setEnabled(this, "btnChange", btnChange, );
+////                    ocs.setEnabled(this, "btnAbsetzen", btnAbsetzen, !readOnly && num  > 0);
+////                    ocs.setEnabled(this, "btnDelete", btnDelete, !readOnly && num > 0);
+////                    ocs.setEnabled(this, "btnAttach", btnAttach, !readOnly);
+//                }
+//            }
+//        }
+//    }
 }

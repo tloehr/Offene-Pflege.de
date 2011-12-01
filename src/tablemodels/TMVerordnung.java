@@ -24,8 +24,9 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.verordnung;
+package tablemodels;
 
+import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedVorrat;
@@ -42,6 +43,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -64,17 +66,19 @@ public class TMVerordnung
     //    ResultSet rs;
 //    PreparedStatement stmt;
 //    String sql;
-    boolean mitBestand;
+    protected boolean mitBestand, abgesetzt;
+    protected Bewohner bewohner;
 
-    HashMap cache;
+    protected HashMap cache;
 
     protected List<Object[]> listeVerordnungen;
 
-    public TMVerordnung(String bwkennung, boolean abgesetzt, boolean bestand) {
+    public TMVerordnung(Bewohner bewohner, boolean abgesetzt, boolean bestand) {
         super();
 
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(BewohnerTools.findByBWKennung(bwkennung), !abgesetzt);
-
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, !abgesetzt);
+        this.bewohner = bewohner;
+        this.abgesetzt = abgesetzt;
 
         this.cache = new HashMap();
         this.mitBestand = bestand;
@@ -213,6 +217,20 @@ public class TMVerordnung
 
     public BigDecimal getBestandSaldo(int row){
          return (BigDecimal) listeVerordnungen.get(row)[4];
+    }
+
+    public List<Verordnung> getVordnungenAt(int [] sel){
+        ArrayList<Verordnung> selection = new ArrayList<Verordnung>();
+        for (int i : sel){
+            selection.add(getVerordnung(i));
+        }
+        return selection;
+    }
+
+    public void reload(){
+        cache.clear();
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, !abgesetzt);
+        fireTableDataChanged();
     }
 
     @Override
