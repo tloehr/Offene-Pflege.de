@@ -89,9 +89,7 @@ public class SYSRunningClassesTools {
                 runningClass = new SYSRunningClasses(internalClassID, null, status);
             }
             result.set(0, runningClass);
-            OPDE.getEM().getTransaction().begin();
-            OPDE.getEM().persist(runningClass);
-            OPDE.getEM().getTransaction().commit();
+            EntityTools.persist(runningClass);
         } else { // Ansonsten sind wir schon fertig.
             result.addAll(unsignedConflicts);
         }
