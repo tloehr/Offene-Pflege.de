@@ -26,9 +26,7 @@
  */
 package op.tools;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import entity.Bewohner;
-import entity.SYSHosts;
 import entity.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
@@ -38,9 +36,6 @@ import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import org.pushingpixels.trident.ease.Spline;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
@@ -53,12 +48,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -910,9 +903,8 @@ public class SYSTools {
         if (!moduleName.equals("")) {
             moduleName = ", " + moduleName;
         }
-        return OPDE.getAppinfo().getProperty("program.PROGNAME") + moduleName + ", v" + OPDE.getAppinfo().getProperty("program.VERSION")
-                + "/" + OPDE.getAppinfo().getProperty("program.BUILDNUM")
-                + (OPDE.isDebug() ? " !! DEBUG !!" : "");
+        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion()
+                + "/" + OPDE.getAppInfo().getBuild() + (OPDE.isDebug() ? " !! DEBUG !!" : "");
     }
 
     public static void expandAll(JTree tree) {
@@ -1163,7 +1155,6 @@ public class SYSTools {
         }
         return dcbm;
     }
-
 
 
     public static Color getColor(String colorname) {
@@ -1496,7 +1487,7 @@ public class SYSTools {
             timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
             timeline1.setDuration(speedInMillis);
 
-            if (callback != null){
+            if (callback != null) {
                 timeline1.addCallback(callback);
             }
 
@@ -1535,7 +1526,7 @@ public class SYSTools {
             timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
             timeline1.setDuration(speedInMillis);
 
-            if (callback != null){
+            if (callback != null) {
                 timeline1.addCallback(callback);
             }
 
@@ -1756,7 +1747,6 @@ public class SYSTools {
         // Set the width
         col.setPreferredWidth(width);
     }
-
 
 
 }

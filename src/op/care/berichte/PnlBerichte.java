@@ -144,7 +144,7 @@ public class PnlBerichte extends CleanablePanel {
         tagFilter = new ArrayList<PBerichtTAGS>();
         prepareSearchArea();
 
-        btnAddBericht.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+        btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
 
         splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
@@ -405,8 +405,8 @@ public class PnlBerichte extends CleanablePanel {
     private void tblTBMouseReleased(MouseEvent e) {
         ListSelectionModel lsm = tblTB.getSelectionModel();
         singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -416,7 +416,7 @@ public class PnlBerichte extends CleanablePanel {
             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                 if (newState == Timeline.TimelineState.DONE) {
                     btnSearch.setEnabled(true);
-                    btnAddBericht.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+                    btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
                 }
             }
         };
@@ -874,8 +874,8 @@ public class PnlBerichte extends CleanablePanel {
             btnCancel.doClick();
         }
 
-        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
         if (evt.isPopupTrigger()) {
             /**
@@ -907,12 +907,12 @@ public class PnlBerichte extends CleanablePanel {
             }
 
 
-            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                 menu.add(new JSeparator());
                 menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, aktuellerBericht, standardActionListener));
             }
 
-            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                 menu.add(new JSeparator());
                 menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerBericht, bewohner, standardActionListener));
             }
@@ -1179,7 +1179,7 @@ public class PnlBerichte extends CleanablePanel {
 //        OPDE.debug("cancelling");
         //tl.cancel();
 
-        btnPrint.setEnabled(tblTB.getModel().getRowCount() > 0 && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
+        btnPrint.setEnabled(tblTB.getModel().getRowCount() > 0 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
 
         tblTB.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 

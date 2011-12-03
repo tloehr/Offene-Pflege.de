@@ -100,7 +100,7 @@ public class Acl implements Serializable, Comparable<Acl> {
 
     @Override
     public String toString() {
-        return OPDE.getInternalClasses().getInternalClasses().get(intclass.getClassname()).getAcls().get(acl).getDescription();
+        return OPDE.getAppInfo().getInternalClasses().get(intclass.getClassname()).getAcls().get(acl).getDescription();
     }
 
     @Override

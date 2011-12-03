@@ -14,14 +14,12 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.persistence.Query;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.io.InputStream;
+import java.util.*;
 
 /**
- * Die InternalClasses dient dazu Informationen bzgl. der Module innerhalb von OPDE
- * aus der Datei internalclasses.xml einzulesen und währen der Laufzeit
+ * Die AppInfo dient dazu Informationen bzgl. der Module innerhalb von OPDE
+ * aus der Datei appinfo.xml einzulesen und während der Laufzeit
  * bereit zu halten. Die xml Datei befindet sich im JAR Archiv und wird
  * nur währen der Entwicklungsphase bearbeitet.
  * <p/>
@@ -37,7 +35,7 @@ import java.util.List;
  *
  * @author tloehr
  */
-public class InternalClasses {
+public class AppInfo {
 
     /**
      * Ein Lookup Table, der zu einer internen Klassenbezeichnung die Informationen als InternalClass liefert.
@@ -49,17 +47,54 @@ public class InternalClasses {
      */
     private HashMap<String, List<String>> signedCollisionByClass, unsignedCollisionByClass, classByUnsignedCollision, classBySignedCollision, mainClassByUnsignedCollision;
 
-    public InternalClasses() {
+    /**
+     * Angabe darüber, welches Datenbank Schema diese Version des Programms unbedingt braucht.
+     */
+    private ArrayList<Integer> dbschema;
+
+    /**
+     * Diese defaultsProperties werden gebraucht, wenn der Client zum ersten mal eingerichtet wird. Dann stehen hier
+     * die unbedingt erforderlichen Konfigurationen drin. Diese werden dann in die local.properties übernommen,
+     * damit es nicht zu Exceptions kommt.
+     */
+    private SortedProperties defaultProperties;
+
+    /**
+     * Hier stehen Versions und Build Informationen drin. Diese stammen aus der appinfo.properties, die teilweise automatisch
+     * von einem ANT script geändert wird.
+     */
+    private Properties appinfo;
+
+    private String version;
+    private String build;
+    private String progname;
+
+    public AppInfo() {
+
+        appinfo = new Properties();
         internalClasses = new HashMap();
         signedCollisionByClass = new HashMap();
         unsignedCollisionByClass = new HashMap();
         classByUnsignedCollision = new HashMap();
         classBySignedCollision = new HashMap();
         mainClassByUnsignedCollision = new HashMap();
+        dbschema = new ArrayList<Integer>();
+        defaultProperties = new SortedProperties();
 
         try {
+
+            // lade appinfo.properties
+            InputStream in2 = OPDE.class.getResourceAsStream("/appinfo.properties");
+            appinfo.load(in2);
+            in2.close();
+
+            progname = appinfo.getProperty("program.PROGNAME");
+            version = appinfo.getProperty("program.VERSION");
+            build = appinfo.getProperty("program.BUILDNUM");
+
+            // parse appinfo.xml
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-            InputSource is = new org.xml.sax.InputSource(OPDE.class.getResourceAsStream("/internalclasses.xml"));
+            InputSource is = new org.xml.sax.InputSource(OPDE.class.getResourceAsStream("/appinfo.xml"));
             parser.setContentHandler(new HandlerClasses());
             parser.parse(is);
         } catch (SAXException sAXException) {
@@ -67,6 +102,9 @@ public class InternalClasses {
         } catch (IOException iOException) {
             OPDE.fatal(iOException);
         }
+
+        OPDE.debug("test");
+
     }
 
     public boolean hasCollisions(String internalClassName) {
@@ -167,7 +205,31 @@ public class InternalClasses {
         return allowed;
     }
 
+    public ArrayList<Integer> getDBschema() {
+        return dbschema;
+    }
+
+    public SortedProperties getDefaultProperties() {
+        return defaultProperties;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getBuild() {
+        return build;
+    }
+
+    public String getProgname() {
+        return progname;
+    }
+
     private class HandlerClasses extends DefaultHandler {
+
+        // Gibt an, in welcher Hauptumgebung sich der Parser gerade befindet. Ist er gerade im Classes Block,
+        // oder im Properties Block oder im Database Block.
+        String environment = "";
 
         InternalClass thisClass;
 
@@ -176,8 +238,12 @@ public class InternalClasses {
 
         @Override
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
-            if (!tagName.equalsIgnoreCase("classes")) {
-                //OPDE.getLogger().debug(this.toString() + ":" + tagName);
+
+            // Entweder die Environment wechselt gerade
+            if (tagName.equalsIgnoreCase("classes") || tagName.equalsIgnoreCase("database") || tagName.equalsIgnoreCase("properties")) {
+                environment = tagName;
+            } else if (environment.equalsIgnoreCase("classes")) { // oder wir sind schon in einer Umgebung.
+
                 if (tagName.equalsIgnoreCase("class")) {
                     thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"));
                 } else if (tagName.equalsIgnoreCase("insert")) {
@@ -244,6 +310,15 @@ public class InternalClasses {
                             mainClassByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
                         }
                     }
+                }
+
+            } else if (environment.equalsIgnoreCase("database")) {
+                if (tagName.equalsIgnoreCase("schema")) {
+                    dbschema.add(Integer.parseInt(attributes.getValue("version")));
+                }
+            } else if (environment.equalsIgnoreCase("properties")) {
+                if (tagName.equalsIgnoreCase("property")) {
+                    defaultProperties.put(attributes.getValue("key"), attributes.getValue("value"));
                 }
             }
         }

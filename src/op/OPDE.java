@@ -61,7 +61,6 @@ public class OPDE {
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
-    protected static Properties appinfo;
     //private static boolean admin;
     //public static Properties ocgroups;
     protected static Logger logger;
@@ -74,7 +73,7 @@ public class OPDE {
     protected static EventListenerList listenerList = new EventListenerList();
     protected static HashMap<String, ActionListener> runningModules = new HashMap();
     protected static EntityManager em;
-    protected static InternalClasses internalClasses;
+    protected static AppInfo appInfo;
     protected static SYSLogin login;
     protected static SYSHosts host;
     protected static ProofOfLife pol;
@@ -93,10 +92,6 @@ public class OPDE {
 
     public static ArrayList<ImageIcon> getAnimationCache() {
         return animationCache;
-    }
-
-    public static Properties getAppinfo() {
-        return appinfo;
     }
 
     public static boolean isDebug() {
@@ -243,8 +238,8 @@ public class OPDE {
         }
     }
 
-    public static InternalClasses getInternalClasses() {
-        return internalClasses;
+    public static AppInfo getAppInfo() {
+        return appInfo;
     }
 
     public static SYSHosts getHost() {
@@ -291,19 +286,8 @@ public class OPDE {
         });
 
         localProps = new SortedProperties();
-        appinfo = new Properties();
-        props = new Properties();
 
-        try {
-            // Lade Build Informationen
-            InputStream in2 = null;
-            //Class clazz = getClass();
-            in2 = OPDE.class.getResourceAsStream("/appinfo.properties");
-            appinfo.load(in2);
-            in2.close();
-        } catch (IOException iOException) {
-            iOException.printStackTrace();
-        }
+        props = new Properties();
 
         // AUSWERTUNG KOMMANDOZEILE-----------------------------------------------------------------------------
         // Hier erfolgt die Unterscheidung, in welchem Modus OPDE gestartet wurde.
@@ -380,14 +364,14 @@ public class OPDE {
 
         // LogSystem initialisieren.
         logger = Logger.getRootLogger();
+        PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
+        ConsoleAppender consoleAppender = new ConsoleAppender(layout);
+        logger.addAppender(consoleAppender);
+
+        appInfo = new AppInfo();
 
         if (loadLocalProperties()) {
 
-
-            //SimpleLayout layout = new SimpleLayout();
-            PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
-            ConsoleAppender consoleAppender = new ConsoleAppender(layout);
-            logger.addAppender(consoleAppender);
             String sep = System.getProperty("file.separator");
             try {
                 FileAppender fileAppender = new FileAppender(layout, opwd + sep + "opde.log", true);
@@ -484,7 +468,7 @@ public class OPDE {
                 System.exit(0);
             }
 
-            internalClasses = new InternalClasses();
+
 //        try {
 //            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 //        } catch (ClassNotFoundException ex) {

@@ -51,7 +51,7 @@ public class SYSRunningClassesTools {
         result.add(null); // Ergebnis immer an erster Stelle. Auch wenn sie null bleibt.
 
         List unsignedConflicts = new ArrayList();
-        String classesWithUnsignedConflicts = OPDE.getInternalClasses().getClassesWithUnsignedCollisions(internalClassID);
+        String classesWithUnsignedConflicts = OPDE.getAppInfo().getClassesWithUnsignedCollisions(internalClassID);
 
         if (!classesWithUnsignedConflicts.equals("")) {
             // Gibt es Klassen (signaturUNabhängig), die mit mir kollidieren, weil sie schon laufen ?
@@ -66,7 +66,7 @@ public class SYSRunningClassesTools {
         // Wenn bis hier KEINE Konflikte existieren UND eine signatur vorliegt, dann müssen wir weiter suchen.
         if (unsignedConflicts.isEmpty()) {
             if (signed) {
-                String classesWithSignedConflicts = OPDE.getInternalClasses().getClassesWithSignedCollisions(internalClassID);
+                String classesWithSignedConflicts = OPDE.getAppInfo().getClassesWithSignedCollisions(internalClassID);
                 // Suchen lohnt sich nur, wenn die Klasse schreiben will und es auch potenzielle Konflikte gibt.
                 if (status == SYSRunningClasses.STATUS_RW && !classesWithSignedConflicts.equals("")) {
                     String qWITH = ""

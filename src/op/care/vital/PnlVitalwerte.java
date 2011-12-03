@@ -859,12 +859,12 @@ public class PnlVitalwerte extends CleanablePanel {
 
                 BWerte aktuellerWert = BWerteTools.findByID(bwid);
 
-                if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                     menu.add(new JSeparator());
                     menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, aktuellerWert, standardActionListener));
                 }
 
-                if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                     menu.add(new JSeparator());
                     menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerWert, bewohner, standardActionListener));
                 }

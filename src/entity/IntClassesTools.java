@@ -37,7 +37,7 @@ public class IntClassesTools {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(group);
 
         // Alle bekannten Classen und deren möglichen Rechte (anhand internalclasses.xml) ermitteln.
-        ArrayList<InternalClass> classset = new ArrayList(OPDE.getInternalClasses().getInternalClasses().values());
+        ArrayList<InternalClass> classset = new ArrayList(OPDE.getAppInfo().getInternalClasses().values());
         Collections.sort(classset);
         Iterator<InternalClass> itClasses = classset.iterator();
 
@@ -55,11 +55,11 @@ public class IntClassesTools {
 
                 currentClass.setIntClass(dbClasses.get(classname));
 
-                DefaultMutableTreeNode classnode = new DefaultMutableTreeNode(OPDE.getInternalClasses().getInternalClasses().get(classname));
+                DefaultMutableTreeNode classnode = new DefaultMutableTreeNode(OPDE.getAppInfo().getInternalClasses().get(classname));
                 root.add(classnode);
 
                 // Alle ACLs, die diese Klasse kennt.
-                List<InternalClassACL> keyset = OPDE.getInternalClasses().getInternalClasses().get(classname).getAcls();
+                List<InternalClassACL> keyset = OPDE.getAppInfo().getInternalClasses().get(classname).getAcls();
                 Collections.sort(keyset);
 
                 Iterator<InternalClassACL> itACLs = keyset.iterator();
@@ -182,7 +182,7 @@ public class IntClassesTools {
     }
 
     public static void clearEntitiesFromAllInternalClasses() {
-        ArrayList<InternalClass> classset = new ArrayList(OPDE.getInternalClasses().getInternalClasses().values());
+        ArrayList<InternalClass> classset = new ArrayList(OPDE.getAppInfo().getInternalClasses().values());
         Iterator<InternalClass> itClasses = classset.iterator();
 
         while (itClasses.hasNext()) {

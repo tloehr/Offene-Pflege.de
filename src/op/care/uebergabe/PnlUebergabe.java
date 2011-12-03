@@ -503,7 +503,7 @@ public class PnlUebergabe extends CleanablePanel {
 //            itemPopupEdit.setEnabled(OPDE.internalClasses.userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
 
             menu = new JPopupMenu();
-            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.USER1)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.USER1)) {
                 DateFormat df = DateFormat.getDateTimeInstance();
                 JMenu menuListAck = new JMenu("Bestätigungen");
                 if (bericht instanceof Uebergabebuch) {

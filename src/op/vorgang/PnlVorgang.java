@@ -135,7 +135,7 @@ public class PnlVorgang extends CleanablePanel {
             addMeineAbgelaufenenVorgaenge();
             //addAlleVorgaenge();
             addVorgaengeFuerBW();
-            if (OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
                 addVorgaengeFuerMA();
                 addAblaufendeVorgaenge();
             }
@@ -562,7 +562,7 @@ public class PnlVorgang extends CleanablePanel {
             listOwner.setSelectedValue(vorgang.getBesitzer(), true);
 
             // ACLs
-            txtTitel.setEditable(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+            txtTitel.setEditable(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
             ignoreEvents = false;
         }
 
@@ -577,7 +577,7 @@ public class PnlVorgang extends CleanablePanel {
         splitTDPercent = btnDetails.isSelected() ? 0.4d : 1.0d;
         SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow, null);
         loadDetails(aktuellerVorgang);
-        btnEndReactivate.setEnabled(!btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
+        btnEndReactivate.setEnabled(!btnDetails.isSelected() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
@@ -714,7 +714,7 @@ public class PnlVorgang extends CleanablePanel {
             for (Iterator<Short> itAcl = list.iterator(); !answer && itAcl.hasNext(); ) {
                 short acl = itAcl.next();
                 // ist user Mitglied in einer der zugelassenen ACL Gruppen ?
-                answer = OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, acl);
+                answer = OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, acl);
             }
         } else {
             // Im Zweifel zulassen.
@@ -822,7 +822,7 @@ public class PnlVorgang extends CleanablePanel {
                 }
             });
             menu.add(itemPopupDelete);
-            itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+            itemPopupDelete.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
 
             menu.add(new JSeparator());
 
@@ -907,14 +907,14 @@ public class PnlVorgang extends CleanablePanel {
 
         }
 
-        btnEndReactivate.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
+        btnEndReactivate.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
         //btnDelete.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
-        btnAddBericht.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnSystemInfo.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+        btnAddBericht.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnSystemInfo.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
         //btnDelElement.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
-        btnDetails.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnPrint.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
+        btnDetails.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnPrint.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
 
         OPDE.debug(tblElements.getColumnCount());
 

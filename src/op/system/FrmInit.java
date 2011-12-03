@@ -48,9 +48,7 @@ import java.util.UUID;
  */
 public class FrmInit extends JFrame {
 
-    private final int schema = 1;
     private SortedProperties defaultProps;
-    private Connection db;
     private EntityManager em;
 
     public FrmInit() {
@@ -67,21 +65,17 @@ public class FrmInit extends JFrame {
         String catalog = txtCatalog.getText().trim();
 
 
-        defaultProps = new SortedProperties();
+        defaultProps = OPDE.getAppInfo().getDefaultProperties();
         defaultProps.put("javax.persistence.jdbc.user", user);
         defaultProps.put("javax.persistence.jdbc.password", pw);
 
         String url = "jdbc:mysql://" + server + ":" + port + "/" + catalog;
         defaultProps.put("javax.persistence.jdbc.url", url);
 
-        // und der Rest
-        loadDefaultProperties();
-
-
         try {
             em = Persistence.createEntityManagerFactory("OPDEPU", defaultProps).createEntityManager();
 
-            if (schemaKorrekt(schema)) {
+            if (schemaKorrekt()) {
                 lblTest.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
                 txtTest.setText("Verbindung erfolgreich hergestellt");
                 btnSave.setEnabled(true);
@@ -102,26 +96,20 @@ public class FrmInit extends JFrame {
         }
     }
 
-    private boolean schemaKorrekt(int schema) {
+    /**
+     * Ermitelt das aktuelle Datenbankschema, das in der Tabelle SYSProps unter dem Schlüssel DBSCHEMA gespeichert ist
+     * und prüft, ob dieses Schema (dargestellt durch einen Integer) sich in der Liste der unterstützten Schema dieser
+     * Programmversion befindet. Diese Liste wird anhand der appinfo.xml aufgebaut.
+     *
+     * @return ja oder nein
+     */
+    private boolean schemaKorrekt() {
         Query query = em.createNamedQuery("SYSProps.findByKey");
         query.setParameter("key", "DBSCHEMA");
         SYSProps dbschema = (SYSProps) query.getSingleResult();
 
-        return schema == Integer.parseInt(dbschema.getValue());
+        return OPDE.getAppInfo().getDBschema().contains(Integer.parseInt(dbschema.getValue()));
     }
-
-    private void loadDefaultProperties() {
-
-        InputStream in = OPDE.class.getResourceAsStream("/defaults.properties");
-        try {
-            defaultProps.load(in);
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-    }
-
 
     private void btnSaveActionPerformed(ActionEvent e) {
         // Legt bei Bedarf die nötigen Arbeitsverzeichnisse an

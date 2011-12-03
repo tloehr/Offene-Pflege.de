@@ -69,7 +69,7 @@ public class PnlFiles extends CleanablePanel {
         this.parent = pflege;
         BewohnerTools.setBWLabel(lblBW, bewohner);
         tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        btnNew.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+        btnNew.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
         loadTable();
     }
@@ -251,7 +251,7 @@ public class PnlFiles extends CleanablePanel {
                 }
             });
             menu.add(itemPopupShow);
-            itemPopupShow.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT));
+            itemPopupShow.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT));
 
             JMenuItem itemPopupDelete = new JMenuItem("Löschen");
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -265,11 +265,11 @@ public class PnlFiles extends CleanablePanel {
                 }
             });
             menu.add(itemPopupDelete);
-            itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+            itemPopupDelete.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         } else {
-            if (evt.getClickCount() == 2 && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT)) { // DoppelClick
+            if (evt.getClickCount() == 2 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT)) { // DoppelClick
                 SYSFilesTools.handleFile(sysfile, Action.OPEN);
             }
         }
