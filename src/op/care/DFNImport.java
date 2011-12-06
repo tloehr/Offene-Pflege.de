@@ -102,7 +102,7 @@ public class DFNImport {
             pk = (String) DBRetrieve.getSingleValue("Planung", "BWKennung", "PlanID", planid);
         }
 
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClasses.STATUS_RW);
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClassesTools.STATUS_RW);
         runningClass = result[0];
 
         if (runningClass != null) {

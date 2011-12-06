@@ -43,7 +43,7 @@ public class AppInfo {
     private HashMap<String, InternalClass> internalClasses;
     /*
      * Damit man nachher schnell suchen kann, welche Klassen "sich gegenseitig" ins Gehege kommen
-     * könnten, benötige ich diese beiden Listen.
+     * könnten, benötige ich diese Listen.
      */
     private HashMap<String, List<String>> signedCollisionByClass, unsignedCollisionByClass, classByUnsignedCollision, classBySignedCollision, mainClassByUnsignedCollision;
 
@@ -97,13 +97,12 @@ public class AppInfo {
             InputSource is = new org.xml.sax.InputSource(OPDE.class.getResourceAsStream("/appinfo.xml"));
             parser.setContentHandler(new HandlerClasses());
             parser.parse(is);
+            OPDE.debug("test");
         } catch (SAXException sAXException) {
             OPDE.fatal(sAXException);
         } catch (IOException iOException) {
             OPDE.fatal(iOException);
         }
-
-        OPDE.debug("test");
 
     }
 
@@ -116,6 +115,10 @@ public class AppInfo {
      * In diesem Fall geht es um die Kollisionen <b>ohne</b> Signaturen. Dabei wird der Fall unterschieden,
      * ob die übergebene Klasse eine MainClass ist oder nicht. Demnach unterscheidet sich die zurückgegebene
      * Liste.
+     * <p/>
+     * Eine MainClass erhält alle Klassen innerhalb der Collision Domains als Antwort zurück, außer sich selbst.
+     * Eine normale Klasse erhält immer nur die Main Classes zurück, weil sich normale Klassen gegenseitig nicht behindern
+     * (jedenfalls nicht im Falle von unsigned). Eine laufende MainClass hingegen blockt alle anderen weg.
      *
      * @param internalClassName
      * @return Dies ist die Liste der kollidierenden Klassen. Die einzelnen Klassen sind durch Kommata getrennt. Dadurch kann man diesen
@@ -123,28 +126,39 @@ public class AppInfo {
      */
     public String getClassesWithUnsignedCollisions(String internalClassName) {
         String list = "";
-        Iterator<String> collisionIDs = null;
 
         if (unsignedCollisionByClass.containsKey(internalClassName)) {
-            collisionIDs = unsignedCollisionByClass.get(internalClassName).iterator();
-        }
+            Iterator<String> collisionIDs = unsignedCollisionByClass.get(internalClassName).iterator();
 
-        while (collisionIDs != null && collisionIDs.hasNext()) {
-            String collisionID = collisionIDs.next();
-            boolean mainClass = mainClassByUnsignedCollision.containsKey(internalClassName) && mainClassByUnsignedCollision.get(internalClassName).contains(collisionID);
 
-            Iterator<String> conflicitingClasses = null;
-            // Wenn eine MainClass starten will, dann geht das nur, wenn KEIN anderer aus der CollisionDomain läuft.
-            // Daher enthält die Liste dann alle möglichen Konflikte
-            if (mainClass) {
-                conflicitingClasses = classByUnsignedCollision.get(collisionID).iterator();
-            } else { // Wenn eine normale Klasse starten will, dann geht das nur, wenn keine MainClass läuft.
-                conflicitingClasses = mainClassByUnsignedCollision.get(collisionID).iterator();
-            }
+            while (collisionIDs.hasNext()) {
+                String collisionID = collisionIDs.next();
 
-            while (conflicitingClasses.hasNext()) {
-                String classname = conflicitingClasses.next();
-                list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
+                // Ist die übergebene Klasse eine MainClass der aktuell betrachten Collision ID ?
+                boolean mainClass = mainClassByUnsignedCollision.containsKey(collisionID) && mainClassByUnsignedCollision.get(collisionID).contains(internalClassName);
+
+                // Wenn eine MainClass starten will, dann geht das nur, wenn KEIN anderer aus der CollisionDomain läuft.
+                // Daher enthält die Liste dann alle möglichen Konflikte
+                if (mainClass) {
+                    // Wenn ich eine MainClass bin, dann interessieren mich alle anderen Klassen,
+                    Iterator<String> conflicitingClasses = classByUnsignedCollision.get(collisionID).iterator();
+
+                    while (conflicitingClasses.hasNext()) {
+                        String classname = conflicitingClasses.next();
+                        list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
+                    }
+
+                } else {
+                    // Wenn ich eine normale Klasse bin, dann starte ich nur, wenn keine MainClass läuft
+                    Iterator<String> conflicitingClasses = mainClassByUnsignedCollision.get(collisionID).iterator();
+
+                    while (conflicitingClasses.hasNext()) {
+                        String classname = conflicitingClasses.next();
+                        list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
+                    }
+                }
+
+
             }
         }
         return list;
@@ -160,23 +174,22 @@ public class AppInfo {
      */
     public String getClassesWithSignedCollisions(String internalClassName) {
         String list = "";
-        Iterator<String> collisionIDs = null;
 
         if (signedCollisionByClass.containsKey(internalClassName)) {
-            collisionIDs = signedCollisionByClass.get(internalClassName).iterator();
-        }
+            Iterator<String> collisionIDs = signedCollisionByClass.get(internalClassName).iterator();
 
-        while (collisionIDs != null && collisionIDs.hasNext()) {
-            Iterator<String> conflicitingClasses;
-            conflicitingClasses = classBySignedCollision.get(collisionIDs.next()).iterator();
+            while (collisionIDs.hasNext()) {
+                Iterator<String> conflicitingClasses = classBySignedCollision.get(collisionIDs.next()).iterator();
 
-            while (conflicitingClasses.hasNext()) {
-                String classname = conflicitingClasses.next();
-                list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
+                while (conflicitingClasses.hasNext()) {
+                    String classname = conflicitingClasses.next();
+                    list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
+                }
             }
         }
         return list;
     }
+
 
     public HashMap<String, InternalClass> getInternalClasses() {
         return internalClasses;

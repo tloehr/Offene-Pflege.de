@@ -28,7 +28,7 @@ package op.care.verordnung;
 
 import com.toedter.calendar.JDateChooser;
 import op.OPDE;
-import op.care.BHPImport;
+import op.care.bhp.BHPImport;
 import op.care.med.DlgMediAssistent;
 import op.tools.DBHandling;
 import op.tools.DBRetrieve;

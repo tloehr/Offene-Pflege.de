@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care;
+package op.care.bhp;
 
 import entity.SYSRunningClasses;
 import entity.SYSRunningClassesTools;
@@ -85,7 +85,7 @@ public class BHPImport {
         if (verid > 0) {
             pk = (String) DBRetrieve.getSingleValue("BHPVerordnung", "BWKennung", "VerID", verid);
         }
-//        SYSMessenger.emergencyExit("op.care.BHPImport", pk);
+//        SYSMessenger.emergencyExit("op.care.bhp.BHPImport", pk);
 
         // Nicht länger als 5 Minuten versuchen. Es kann passieren, dass der abzuschiessende
         // Computer es nicht mehr schafft auf die Anfrage zu antworten BEVOR er runterfährt.
@@ -101,7 +101,10 @@ public class BHPImport {
 //        }
 //        SYSMessenger.forceApply();
 //
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClasses.STATUS_RW);
+
+
+
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClassesTools.STATUS_RW);
         SYSRunningClasses runningClass = result[0];
         if (runningClass != null) {
 

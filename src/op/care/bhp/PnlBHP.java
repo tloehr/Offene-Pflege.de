@@ -87,7 +87,7 @@ public class PnlBHP extends CleanablePanel {
     public void change2Bewohner(Bewohner bewohner){
         this.bwkennung = bewohner.getBWKennung();
         this.bewohner = bewohner;
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClassesTools.STATUS_RW);
         runningClass = result[0];
 
         cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));

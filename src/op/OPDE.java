@@ -26,7 +26,7 @@
 package op;
 
 import entity.*;
-import op.care.BHPImport;
+import op.care.bhp.BHPImport;
 import op.care.DFNImport;
 import op.system.FrmInit;
 import op.threads.ProofOfLife;
@@ -202,8 +202,8 @@ public class OPDE {
     public static void fatal(Object message) {
         logger.fatal(message);
         SyslogTools.fatal(message.toString());
-        OPDE.getEM().close();
-        System.exit(1);
+//        OPDE.getEM().close();
+//        System.exit(1);
     }
 
     public static void error(Object message) {
@@ -286,8 +286,15 @@ public class OPDE {
         });
 
         localProps = new SortedProperties();
-
         props = new Properties();
+
+        // LogSystem initialisieren.
+        logger = Logger.getRootLogger();
+        PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
+        ConsoleAppender consoleAppender = new ConsoleAppender(layout);
+        logger.addAppender(consoleAppender);
+
+        appInfo = new AppInfo();
 
         // AUSWERTUNG KOMMANDOZEILE-----------------------------------------------------------------------------
         // Hier erfolgt die Unterscheidung, in welchem Modus OPDE gestartet wurde.
@@ -334,15 +341,15 @@ public class OPDE {
             cl = parser.parse(opts, args);
         } catch (ParseException ex) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + OPDE.getLocalProps().getProperty("program.VERSION")
-                    + " Build:" + OPDE.getLocalProps().getProperty("program.BUILDNUM"), opts, footer);
+            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
+                    + " Build:" + appInfo.getBuild(), opts, footer);
             System.exit(0);
         }
 
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + OPDE.getLocalProps().getProperty("program.VERSION")
-                    + " Build:" + OPDE.getLocalProps().getProperty("program.BUILDNUM"), opts, footer);
+            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
+                    + " Build:" + appInfo.getBuild(), opts, footer);
             System.exit(0);
         }
 
@@ -362,13 +369,7 @@ public class OPDE {
             anonym = false;
         }
 
-        // LogSystem initialisieren.
-        logger = Logger.getRootLogger();
-        PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
-        ConsoleAppender consoleAppender = new ConsoleAppender(layout);
-        logger.addAppender(consoleAppender);
 
-        appInfo = new AppInfo();
 
         if (loadLocalProperties()) {
 
@@ -413,6 +414,11 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
             url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
             jpaProps.put("javax.persistence.jdbc.url", url);
+
+
+            if (isDebug()){
+                jpaProps.put("eclipselink.logging.level","FINER");
+            }
 
             em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
             // Cache lösche mit
@@ -481,7 +487,10 @@ public class OPDE {
 //            java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        }
 
-            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+           ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         }
     }

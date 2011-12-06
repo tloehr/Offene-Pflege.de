@@ -4,37 +4,24 @@
  */
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "SYSHosts")
 @NamedQueries({
-    @NamedQuery(name = "SYSHosts.findAll", query = "SELECT s FROM SYSHosts s"),
-    @NamedQuery(name = "SYSHosts.findByHostID", query = "SELECT s FROM SYSHosts s WHERE s.hostID = :hostID"),
-    @NamedQuery(name = "SYSHosts.findByHostKey", query = "SELECT s FROM SYSHosts s WHERE s.hostKey = :hostKey"),
-    @NamedQuery(name = "SYSHosts.findByHostname", query = "SELECT s FROM SYSHosts s WHERE s.hostname = :hostname"),
-    @NamedQuery(name = "SYSHosts.findByIp", query = "SELECT s FROM SYSHosts s WHERE s.ip = :ip"),
-    @NamedQuery(name = "SYSHosts.findOtherRunningMainHosts", query = "SELECT s FROM SYSHosts s WHERE s.mainHost = TRUE AND s.hostKey = :hostKey AND s.lpol IS NOT null "),
-    @NamedQuery(name = "SYSHosts.findByLpol", query = "SELECT s FROM SYSHosts s WHERE s.lpol = :lpol")})
+        @NamedQuery(name = "SYSHosts.findAll", query = "SELECT s FROM SYSHosts s"),
+        @NamedQuery(name = "SYSHosts.findByHostID", query = "SELECT s FROM SYSHosts s WHERE s.hostID = :hostID"),
+        @NamedQuery(name = "SYSHosts.findByHostKey", query = "SELECT s FROM SYSHosts s WHERE s.hostKey = :hostKey"),
+        @NamedQuery(name = "SYSHosts.findByHostname", query = "SELECT s FROM SYSHosts s WHERE s.hostname = :hostname"),
+        @NamedQuery(name = "SYSHosts.findByIp", query = "SELECT s FROM SYSHosts s WHERE s.ip = :ip"),
+        @NamedQuery(name = "SYSHosts.findOtherRunningMainHosts", query = "SELECT s FROM SYSHosts s WHERE s.mainHost = TRUE AND s.hostKey = :hostKey AND s.lpol IS NOT null "),
+        @NamedQuery(name = "SYSHosts.findByLpol", query = "SELECT s FROM SYSHosts s WHERE s.lpol = :lpol")})
 public class SYSHosts implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,6 +42,9 @@ public class SYSHosts implements Serializable {
     @Column(name = "LPOL")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lpol;
+    @Column(name = "UP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date up;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "host")
     private Collection<SYSLogin> logins;
 
@@ -115,6 +105,14 @@ public class SYSHosts implements Serializable {
 
     public void setLpol(Date lpol) {
         this.lpol = lpol;
+    }
+
+    public Date getUp() {
+        return up;
+    }
+
+    public void setUp(Date up) {
+        this.up = up;
     }
 
     @Override

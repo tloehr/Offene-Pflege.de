@@ -96,7 +96,7 @@ public class PnlDFN extends CleanablePanel {
         this.bwkennung = bewohner.getBWKennung();
         BewohnerTools.setBWLabel(lblBW, bewohner);
 
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClassesTools.STATUS_RW);
         runningClass = result[0];
         abwesend = DBRetrieve.getAbwesendSeit(bwkennung) != null;
 

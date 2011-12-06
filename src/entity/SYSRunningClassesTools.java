@@ -5,6 +5,7 @@
 package entity;
 
 import op.OPDE;
+import org.w3c.dom.Entity;
 
 import javax.persistence.Query;
 import java.util.ArrayList;
@@ -16,6 +17,11 @@ import java.util.List;
  */
 public class SYSRunningClassesTools {
 
+
+    public static final short STATUS_DONT_CARE = -1;
+    public static final short STATUS_RO = 0;
+    public static final short STATUS_RW = 1;
+
     /**
      * Wenn man ein Modul starten will, dann stellt sich dabei immer die Frage, ob die Verwendung dieses Moduls
      * zu einem Konflikt führen könnte. Sagen wir z.B. der User will eine Verordnung für einen bestimmten Bewohner
@@ -23,7 +29,7 @@ public class SYSRunningClassesTools {
      * <p/>
      * Außerdem soll es nicht möglich sein, dass der BHPImport läuft, wenn das PnlVerordnung oder PnlBHP für irgendeinen Bewohner offen ist.
      * <p/>
-     * In der Datei <code>/internalclasses.xml</code> werden die Klassen markiert, die zueinander in Konflikt stehen könnten.
+     * In der Datei <code>/appinfo.xml</code> werden die Klassen markiert, die zueinander in Konflikt stehen könnten.
      * <p/>
      * In unserem Beispiel kollidieren die Klassen PnlVerordnung (nachfolgend A) und PnlBHP (B) dann, wenn sie für <u>denselben</u> Bewohner aufgerufen
      * werden (also dieselbe <b>Signatur</b> besitzen. PnlBHP (B), PnlVerordnung (A) und BHPImport (C) kollidieren dann wenn,
@@ -68,7 +74,7 @@ public class SYSRunningClassesTools {
             if (signed) {
                 String classesWithSignedConflicts = OPDE.getAppInfo().getClassesWithSignedCollisions(internalClassID);
                 // Suchen lohnt sich nur, wenn die Klasse schreiben will und es auch potenzielle Konflikte gibt.
-                if (status == SYSRunningClasses.STATUS_RW && !classesWithSignedConflicts.equals("")) {
+                if (status == STATUS_RW && !classesWithSignedConflicts.equals("")) {
                     String qWITH = ""
                             + " SELECT s FROM SYSRunningClasses s "
                             + " WHERE s.status = :status "
@@ -80,7 +86,7 @@ public class SYSRunningClassesTools {
 
                     // Wenn es mindestens einen Konflikt gibt, dann wird der Status auf RO gesetzt.
                     if (!queryWITH.getResultList().isEmpty()) {
-                        status = SYSRunningClasses.STATUS_RO;
+                        status = STATUS_RO;
                         result.addAll(queryWITH.getResultList());
                     }
                 }
@@ -95,6 +101,46 @@ public class SYSRunningClassesTools {
         }
 
         return result.toArray(new SYSRunningClasses[]{});
+    }
+
+
+    public static SYSRunningClasses startModule(String internalClassID, Object signature, short status) {
+        SYSRunningClasses result = null;
+        if (signature != null) {
+            result = new SYSRunningClasses(internalClassID, signature.toString(), status);
+        } else {
+            result = new SYSRunningClasses(internalClassID, "", status);
+        }
+        EntityTools.persist(result);
+        return result;
+    }
+
+    public static List<SYSRunningClasses> getRunning(Object signature, int status, String[] classes) {
+
+        String strClasses = "";
+        for (String c : classes) {
+            strClasses += "'" + c + "'" + ",";
+        }
+        strClasses = strClasses.substring(0, strClasses.length() - 1);
+
+        String strquery = ""
+                + " SELECT s FROM SYSRunningClasses s "
+                + " WHERE s.classname IN (" + strClasses + ") "
+                + " AND s.signature = :signature "
+                + (status != STATUS_DONT_CARE ? " AND s.status = :status" : "");
+        Query query = OPDE.getEM().createQuery(strquery);
+        if (signature != null) {
+            query.setParameter("signature", signature.toString());
+        } else {
+            query.setParameter("signature", "");
+        }
+
+        if (status != STATUS_DONT_CARE) {
+            query.setParameter("status", status);
+        }
+
+        return query.getResultList();
+
     }
 
     public static void moduleEnded(SYSRunningClasses runningClass) {

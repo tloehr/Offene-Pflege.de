@@ -4,38 +4,28 @@
  */
 package entity;
 
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 import op.OPDE;
 
+import javax.persistence.*;
+import java.io.Serializable;
+
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "SYSRunningClasses")
 @NamedQueries({
-    @NamedQuery(name = "SYSRunningClasses.findAll", query = "SELECT s FROM SYSRunningClasses s"),
-    @NamedQuery(name = "SYSRunningClasses.findByRcid", query = "SELECT s FROM SYSRunningClasses s WHERE s.rcid = :rcid"),
-    @NamedQuery(name = "SYSRunningClasses.findBySignature", query = "SELECT s FROM SYSRunningClasses s WHERE s.signature = :signature"),
-    @NamedQuery(name = "SYSRunningClasses.findByLogin", query = "SELECT s FROM SYSRunningClasses s WHERE s.login = :login"),
-    @NamedQuery(name = "SYSRunningClasses.findByStatus", query = "SELECT s FROM SYSRunningClasses s WHERE s.status = :status")})
+        @NamedQuery(name = "SYSRunningClasses.findAll", query = "SELECT s FROM SYSRunningClasses s"),
+        @NamedQuery(name = "SYSRunningClasses.findByRcid", query = "SELECT s FROM SYSRunningClasses s WHERE s.rcid = :rcid"),
+        @NamedQuery(name = "SYSRunningClasses.findBySignature", query = "SELECT s FROM SYSRunningClasses s WHERE s.signature = :signature"),
+        @NamedQuery(name = "SYSRunningClasses.findByLogin", query = "SELECT s FROM SYSRunningClasses s WHERE s.login = :login"),
+        @NamedQuery(name = "SYSRunningClasses.findByHost", query = "SELECT s FROM SYSRunningClasses s WHERE s.login.host = :host"),
+        @NamedQuery(name = "SYSRunningClasses.findByStatus", query = "SELECT s FROM SYSRunningClasses s WHERE s.status = :status")})
 public class SYSRunningClasses implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public static final short STATUS_RO = 0;
-    public static final short STATUS_RW = 1;
-    
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -95,8 +85,8 @@ public class SYSRunningClasses implements Serializable {
         this.status = status;
     }
 
-    public boolean isRW(){
-        return status == STATUS_RW;
+    public boolean isRW() {
+        return status == SYSRunningClassesTools.STATUS_RW;
     }
 
     @Override

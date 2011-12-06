@@ -10,9 +10,7 @@ import op.tools.SYSTools;
 
 import javax.persistence.Query;
 import java.net.InetAddress;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.Date;
 
 /**
  * @author tloehr
@@ -49,34 +47,30 @@ public class SYSHostsTools {
                 // Da müssen wir erst aufräumen.
                 if (host.getLpol() != null && !SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
                     OPDE.warn("Host wurde beim letzten mal nicht korrekt beendet. Wird jetzt behoben.");
-                    OPDE.getEM().getTransaction().begin();
-                    try {
-                        // Welche Logins hängen an diesem beschädigten Host ?
-                        Query queryLogin = OPDE.getEM().createNamedQuery("SYSLogin.findByHost");
-                        queryLogin.setParameter("host", host);
-                        List<SYSLogin> logins = queryLogin.getResultList();
-                        if (!logins.isEmpty()) {
-                            Iterator<SYSLogin> itLogin = logins.iterator();
-                            while (itLogin.hasNext()) {
-                                SYSLogin login = itLogin.next();
-                                login.setLogout(host.getLpol());
+                }
 
-                                Query queryRC = OPDE.getEM().createNamedQuery("SYSRunningClasses.findByLogin");
-                                queryRC.setParameter("login", login);
-                                List<SYSRunningClasses> rc = queryRC.getResultList();
-                                Iterator<SYSRunningClasses> itRC = rc.iterator();
-                                while (itRC.hasNext()) {
-                                    OPDE.getEM().remove(itRC.next());
-                                }
-                            }
-                        }
-                        host.setLpol(null);
-                        OPDE.getEM().getTransaction().commit();
-                    } catch (Exception e) {
-                        OPDE.getEM().getTransaction().rollback();
-                    }
+                OPDE.getEM().getTransaction().begin();
+                try {
+                    // Welche Running Classes hängen an diesem beschädigten Host ?
+                    // Weg damit
+                    String classesJPQL = " DELETE FROM SYSRunningClasses s WHERE s.login.host = :host ";
+                    Query queryDeleteClasses = OPDE.getEM().createQuery(classesJPQL);
+                    queryDeleteClasses.setParameter("host", host);
+                    queryDeleteClasses.executeUpdate();
 
-                    OPDE.getLogger().debug("Wir müssten eigentlich aufräumen");
+                    // Welche Logins (nach dem letzten Start) hängen an diesem beschädigten Host ?
+                    // Weg damit
+                    String loginsJPQL = " DELETE FROM SYSLogin l WHERE l.host = :host AND l.login >= l.host.up ";
+                    Query queryDeleteLogins = OPDE.getEM().createQuery(loginsJPQL);
+                    queryDeleteLogins.setParameter("host", host);
+                    queryDeleteLogins.executeUpdate();
+
+                    host.setLpol(null);
+                    host.setUp(new Date());
+                    OPDE.getEM().merge(host);
+                    OPDE.getEM().getTransaction().commit();
+                } catch (Exception e) {
+                    OPDE.getEM().getTransaction().rollback();
                 }
 
                 if (mainhost) {
@@ -90,11 +84,10 @@ public class SYSHostsTools {
                         mainhost = false;
                     }
                 }
+
                 if (host.getMainHost() != mainhost) {
                     host.setMainHost(mainhost);
-                    OPDE.getEM().getTransaction().begin();
-                    OPDE.getEM().merge(host);
-                    OPDE.getEM().getTransaction().commit();
+                    EntityTools.merge(host);
                 }
             }
         } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
@@ -111,12 +104,8 @@ public class SYSHostsTools {
      * @param host
      */
     protected static void shutdown(SYSHosts host) {
-
-        OPDE.getEM().getTransaction().begin();
         host.setLpol(null);
-        OPDE.getEM().merge(host);
-        OPDE.getEM().getTransaction().commit();
-
+        EntityTools.merge(host);
     }
 
     /**

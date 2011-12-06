@@ -95,7 +95,7 @@ public class PnlVerordnung extends CleanablePanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         this.bwkennung = bewohner.getBWKennung();
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClasses.STATUS_RW);
+        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClassesTools.STATUS_RW);
         runningClass = result[0];
 
         readOnly = !runningClass.isRW();

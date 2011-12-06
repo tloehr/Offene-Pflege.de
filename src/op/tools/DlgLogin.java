@@ -26,6 +26,8 @@
 package op.tools;
 
 import entity.SYSLoginTools;
+import entity.SYSRunningClasses;
+import entity.SYSRunningClassesTools;
 import op.OPDE;
 
 import javax.swing.*;
@@ -388,6 +390,18 @@ public class DlgLogin extends javax.swing.JDialog {
 
                 OPDE.info("Anmeldung erfolgt: UKennung: " + username);
                 OPDE.info("LoginID: " + OPDE.getLogin().getUser().getUKennung());
+
+
+//                SYSRunningClasses sr = SYSRunningClassesTools.startModule("nursingrecords.bhp", null, SYSRunningClassesTools.STATUS_RW);
+//
+//                OPDE.debug(SYSRunningClassesTools.getRunning("9823bw", SYSRunningClassesTools.STATUS_DONT_CARE, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}));
+//                OPDE.debug(SYSRunningClassesTools.getRunning(null, SYSRunningClassesTools.STATUS_DONT_CARE, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}));
+//
+//                SYSRunningClassesTools.moduleEnded(sr);
+
+
+
+
                 dispose();
             }
 
