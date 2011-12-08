@@ -26,10 +26,10 @@
 package op;
 
 import entity.*;
-import op.care.bhp.BHPImport;
 import op.care.DFNImport;
+import op.care.bhp.BHPImport;
 import op.system.FrmInit;
-import op.threads.ProofOfLife;
+import op.threads.BackgroundMonitor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
@@ -76,7 +76,7 @@ public class OPDE {
     protected static AppInfo appInfo;
     protected static SYSLogin login;
     protected static SYSHosts host;
-    protected static ProofOfLife pol;
+    protected static BackgroundMonitor pol;
     protected static ArrayList<ImageIcon> animationCache;
     protected static boolean animation = false;
     protected static boolean debug;
@@ -98,7 +98,7 @@ public class OPDE {
         return debug;
     }
 
-    public static ProofOfLife getPoL() {
+    public static BackgroundMonitor getPoL() {
         return pol;
     }
 
@@ -370,7 +370,6 @@ public class OPDE {
         }
 
 
-
         if (loadLocalProperties()) {
 
             String sep = System.getProperty("file.separator");
@@ -386,6 +385,7 @@ public class OPDE {
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
             logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
+            logger.info(System.getProperty("os.name").toLowerCase());
 
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
                 debug = true;
@@ -416,9 +416,9 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.url", url);
 
 
-            if (isDebug()){
-                jpaProps.put("eclipselink.logging.level","FINER");
-            }
+//            if (isDebug()){
+//                jpaProps.put("eclipselink.logging.level","FINER");
+//            }
 
             em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
             // Cache lösche mit
@@ -432,7 +432,7 @@ public class OPDE {
                 System.exit(1);
             }
 
-            pol = new ProofOfLife();
+            pol = new BackgroundMonitor();
             pol.start();
 
             String header = SYSTools.getWindowTitle("");
@@ -475,22 +475,10 @@ public class OPDE {
             }
 
 
-//        try {
-//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(OPDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 
 
-
-
-           ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         }
     }

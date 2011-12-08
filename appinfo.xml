@@ -15,9 +15,6 @@
             Module, Erklärungen und ACLs, die von OPDE unterstützt werden. Hier steht drin, welche Klasse welche Fähigkeiten hat.
             Die einzelnen Rechte (hier ACLs) genannt, werden direkt im Programm-Code unterstützt. Bei der Vergabe von Zugriffsrechten
             werden diese Rechte als Mögliche Zuordnungen zu Gruppen angeboten.
-
-            Die Angaben hinter collideswith werden für die Auflösung von Zugriffskonflikten während der Laufzeit benötigt.
-            Damit z.B. nicht zwei Anwender für den selben Bewohner an den Medikamenten arbeiten dürfen.
         -->
 
         <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
@@ -29,8 +26,6 @@
             <print doc="Benutzer kann Verordnungen drucken"/>
             <update doc="Benutzer kann Verordnungen ändern/korrigieren/Dateien anhängen."/>
             <cancel doc="Benutzer kann Verordnungen absetzen."/>
-            <collideswith id="1" signature="false"/>
-            <collideswith id="2" signature="true"/>
         </class>
         <class name="nursingrecords.files" short="Pflegeakte/Dateien"
         long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Anzeige von Dateien, die dem/der BewohnerIn zugeordnet wurden.">
@@ -52,11 +47,8 @@
         </class>
         <class name="nursingrecords.bhp" short="Pflegeakte/Behandlungspflege" long="">
             <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
-            <collideswith id="1" signature="false"/>
-            <collideswith id="2" signature="true"/>
         </class>
         <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
-            <collideswith id="1" signature="false" mainClass="true"/>
         </class>
         <class name="opde.tickets" short="Vorgangsverwaltung" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen.">
             <manager doc="Man darf auf die Vorgänge anderer Mitarbeiter zugreifen."/>

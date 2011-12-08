@@ -287,42 +287,42 @@ public class AppInfo {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER3));
                 } else if (tagName.equalsIgnoreCase("user4")) {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER4));
-                } else if (tagName.equalsIgnoreCase("collideswith")) {
-                    String collisionDomain = attributes.getValue("id");
-                    boolean signed = attributes.getValue("signature").equalsIgnoreCase("true");
-                    boolean mainClass = SYSTools.catchNull(attributes.getValue("mainClass")).equalsIgnoreCase("true");
-
-                    if (signed) {
-                        // Wenn nötig leere Listen erzeugen.
-                        if (!signedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
-                            signedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
-                        }
-                        if (!classBySignedCollision.containsKey(collisionDomain)) {
-                            classBySignedCollision.put(collisionDomain, new ArrayList<String>());
-                        }
-
-                        signedCollisionByClass.get(thisClass.getInternalClassname()).add(collisionDomain);
-                        classBySignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
-
-                    } else {
-
-                        if (!unsignedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
-                            unsignedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
-                        }
-                        if (!classByUnsignedCollision.containsKey(collisionDomain)) {
-                            classByUnsignedCollision.put(collisionDomain, new ArrayList<String>());
-                        }
-
-                        unsignedCollisionByClass.get(thisClass.getInternalClassname()).add(collisionDomain);
-                        classByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
-
-                        if (mainClass) {
-                            if (!mainClassByUnsignedCollision.containsKey(thisClass.getInternalClassname())) {
-                                mainClassByUnsignedCollision.put(collisionDomain, new ArrayList<String>());
-                            }
-                            mainClassByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
-                        }
-                    }
+//                } else if (tagName.equalsIgnoreCase("collideswith")) {
+//                    String collisionDomain = attributes.getValue("id");
+//                    boolean signed = attributes.getValue("signature").equalsIgnoreCase("true");
+//                    boolean mainClass = SYSTools.catchNull(attributes.getValue("mainClass")).equalsIgnoreCase("true");
+//
+//                    if (signed) {
+//                        // Wenn nötig leere Listen erzeugen.
+//                        if (!signedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
+//                            signedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
+//                        }
+//                        if (!classBySignedCollision.containsKey(collisionDomain)) {
+//                            classBySignedCollision.put(collisionDomain, new ArrayList<String>());
+//                        }
+//
+//                        signedCollisionByClass.get(thisClass.getInternalClassname()).add(collisionDomain);
+//                        classBySignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
+//
+//                    } else {
+//
+//                        if (!unsignedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
+//                            unsignedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
+//                        }
+//                        if (!classByUnsignedCollision.containsKey(collisionDomain)) {
+//                            classByUnsignedCollision.put(collisionDomain, new ArrayList<String>());
+//                        }
+//
+//                        unsignedCollisionByClass.get(thisClass.getInternalClassname()).add(collisionDomain);
+//                        classByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
+//
+//                        if (mainClass) {
+//                            if (!mainClassByUnsignedCollision.containsKey(thisClass.getInternalClassname())) {
+//                                mainClassByUnsignedCollision.put(collisionDomain, new ArrayList<String>());
+//                            }
+//                            mainClassByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
+//                        }
+//                    }
                 }
 
             } else if (environment.equalsIgnoreCase("database")) {

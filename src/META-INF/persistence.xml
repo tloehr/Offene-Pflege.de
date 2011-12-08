@@ -8,6 +8,7 @@
         <class>entity.files.Sysver2file</class>
         <class>entity.files.Sysbwi2file</class>
         <class>entity.files.Syspb2file</class>
+        <class>entity.system.SYSMessages</class>
         <class>entity.vorgang.SYSPB2VORGANG</class>
         <class>entity.vorgang.SYSBWerte2VORGANG</class>
         <class>entity.vorgang.SYSVER2VORGANG</class>

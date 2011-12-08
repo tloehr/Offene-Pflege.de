@@ -29,7 +29,9 @@ package op.care.bhp;
 import entity.SYSRunningClasses;
 import entity.SYSRunningClassesTools;
 import op.OPDE;
-import op.tools.*;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import java.sql.*;
 import java.util.GregorianCalendar;
@@ -75,16 +77,17 @@ public class BHPImport {
         boolean treffer;
         int schichtOffset = 0;
         boolean doCommit = false;
+        SYSRunningClasses me = null;
 
         OPDE.initDB();
 
         Connection db = OPDE.getDb().db;
 
         // Zugriffskonflikt auflösen.
-        String pk = null;
-        if (verid > 0) {
-            pk = (String) DBRetrieve.getSingleValue("BHPVerordnung", "BWKennung", "VerID", verid);
-        }
+//        String pk = null;
+//        if (verid > 0) {
+//            pk = (String) DBRetrieve.getSingleValue("BHPVerordnung", "BWKennung", "VerID", verid);
+//        }
 //        SYSMessenger.emergencyExit("op.care.bhp.BHPImport", pk);
 
         // Nicht länger als 5 Minuten versuchen. Es kann passieren, dass der abzuschiessende
@@ -103,10 +106,11 @@ public class BHPImport {
 //
 
 
+        if (verid == 0) {
+            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5);
+        }
 
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClassesTools.STATUS_RW);
-        SYSRunningClasses runningClass = result[0];
-        if (runningClass != null) {
+        if (verid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.
 
             OPDE.getLogger().debug("VerID: " + verid);
             OPDE.getLogger().debug("Zeit: " + zeit);
@@ -352,7 +356,9 @@ public class BHPImport {
                 OPDE.getLogger().error("Rolling back transaction");
             }
             OPDE.info("BHPImport abgeschlossen");
-            SYSRunningClassesTools.moduleEnded(runningClass);
+            if (me != null) {
+                SYSRunningClassesTools.endModule(me);
+            }
         } else {
             OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");
         }

@@ -39,10 +39,7 @@ import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.care.bhp.PnlBHP;
 import op.care.med.vorrat.*;
-import op.tools.DlgException;
-import op.tools.InternalClassACL;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
+import op.tools.*;
 import tablemodels.TMVerordnung;
 import tablerenderer.RNDHTML;
 
@@ -78,7 +75,7 @@ public class PnlVerordnung extends CleanablePanel {
      * aufgerufen wurden, einen reloadTable() auslösen können.
      */
     private ActionListener standardActionListener;
-    private SYSRunningClasses runningClass, blockingClass;
+    private SYSRunningClasses myRunningClass, blockingClass;
 
     /**
      * Creates new form PnlVerordnung
@@ -95,13 +92,17 @@ public class PnlVerordnung extends CleanablePanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         this.bwkennung = bewohner.getBWKennung();
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClassesTools.STATUS_RW);
-        runningClass = result[0];
 
-        readOnly = !runningClass.isRW();
+        if (myRunningClass != null){
+            SYSRunningClassesTools.endModule(myRunningClass);
+        }
+
+        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
+        myRunningClass = pair.getFirst();
+        readOnly = !myRunningClass.isRW();
 
         if (readOnly) {
-            blockingClass = result[1];
+            blockingClass = pair.getSecond();
             btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
                     + blockingClass.getLogin().getUser().getNameUndVorname()
                     + "</body></html>");
@@ -762,7 +763,7 @@ public class PnlVerordnung extends CleanablePanel {
 
     public void cleanup() {
         SYSTools.unregisterListeners(this);
-        SYSRunningClassesTools.moduleEnded(runningClass);
+        SYSRunningClassesTools.endModule(myRunningClass);
     }
 
     private void loadTable() {

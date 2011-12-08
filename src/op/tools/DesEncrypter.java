@@ -1,5 +1,6 @@
 package op.tools;
 
+import op.OPDE;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -11,6 +12,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
+import java.util.Enumeration;
 
 /**
  * http://www.exampledepot.com/egs/javax.crypto/PassKey.html
@@ -24,8 +26,11 @@ public class DesEncrypter {
 
     public DesEncrypter(String passPhrase) {
         try {
-            // Wenn möglich den Default Salt durch die aktuelle Mac-Addresse ersetzen.
+
             NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+            if (ni == null){ // Das ist nötig, weil ein Linux in einer VMWare hier ein NULL liefert.
+                ni = NetworkInterface.getNetworkInterfaces().nextElement();
+            }
 
             // Die 6-Bytes MAC Adresse muss noch um zwei weitere, beliebige Bytes aufgefüllt werden. Das verlangt der Algorithmus
             byte[] salt = ArrayUtils.addAll(ni.getHardwareAddress(), new byte[]{(byte) 0x9B, (byte) 0xC8});

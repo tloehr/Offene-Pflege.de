@@ -77,6 +77,13 @@ public class SYSLogin implements Serializable {
         return user;
     }
 
+    public SYSHosts getHost() {
+        return host;
+    }
+
+    public void setHost(SYSHosts host) {
+        this.host = host;
+    }
 
     public Long getLoginID() {
         return loginID;

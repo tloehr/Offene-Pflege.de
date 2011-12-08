@@ -29,6 +29,7 @@ package op.care.bhp;
 import java.awt.event.*;
 import java.beans.*;
 import javax.swing.border.*;
+
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
@@ -87,22 +88,29 @@ public class PnlBHP extends CleanablePanel {
     public void change2Bewohner(Bewohner bewohner){
         this.bwkennung = bewohner.getBWKennung();
         this.bewohner = bewohner;
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, bwkennung, SYSRunningClassesTools.STATUS_RW);
-        runningClass = result[0];
+
+        if (runningClass != null){
+            SYSRunningClassesTools.endModule(runningClass);
+        }
+
+        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
+        runningClass = pair.getFirst();
+        readOnly = runningClass.isRW();
+
+        if (readOnly) {
+            blockingClass = pair.getSecond();
+            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
+                    + blockingClass.getLogin().getUser().getNameUndVorname()
+                    + "</body></html>");
+        } else {
+            btnLock.setToolTipText(null);
+        }
+
 
         cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
 
         abwesend = DBRetrieve.getAbwesendSeit(bwkennung) != null;
-        if (runningClass.isRW()) {
-            btnLock.setEnabled(false);
-            btnLock.setToolTipText(null);
-        } else {
-            blockingClass = result[1];
-            btnLock.setEnabled(true);
-            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
-                    + blockingClass.getLogin().getUser().getNameUndVorname()
-                    + "</body></html>");
-        }
+
         ocs.setEnabled(this, "btnBedarf", btnBedarf, !readOnly);
 
         ignoreJDCEvent = true;
@@ -120,7 +128,7 @@ public class PnlBHP extends CleanablePanel {
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
-        SYSRunningClassesTools.moduleEnded(runningClass);
+        SYSRunningClassesTools.endModule(runningClass);
     }
 
     /**

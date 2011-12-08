@@ -90,22 +90,19 @@ public class DFNImport {
         String bwkennung;
         int schichtOffset = 0;
         boolean doCommit = false;
+        SYSRunningClasses me = null;
+
 
 
         OPDE.initDB();
 
         Connection db = OPDE.getDb().db;
 
-        // Zugriffskonflikt auflösen.
-        String pk = null;
-        if (planid > 0) {
-            pk = (String) DBRetrieve.getSingleValue("Planung", "BWKennung", "PlanID", planid);
+        if (planid == 0) {
+            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5);
         }
 
-        SYSRunningClasses[] result = SYSRunningClassesTools.moduleStarted(internalClassID, pk, SYSRunningClassesTools.STATUS_RW);
-        runningClass = result[0];
-
-        if (runningClass != null) {
+        if (planid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.
 
             OPDE.getLogger().debug("PlanID: " + planid);
             OPDE.getLogger().debug("Zeit: " + zeit);
@@ -396,7 +393,9 @@ public class DFNImport {
                 OPDE.getLogger().error("Rolling back transaction");
             }
             OPDE.info("DFNImport abgeschlossen");
-            SYSRunningClassesTools.moduleEnded(runningClass);
+            if (me != null) {
+                SYSRunningClassesTools.endModule(me);
+            }
         } else {
             OPDE.warn("DFNImport NICHT abgeschlossen. Zugriffskonflikt.");
         }

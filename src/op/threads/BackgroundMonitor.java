@@ -26,6 +26,8 @@
  */
 package op.threads;
 
+import entity.EntityTools;
+import entity.system.SYSMessagesTools;
 import op.OPDE;
 
 import java.util.Date;
@@ -33,18 +35,20 @@ import java.util.Date;
 /**
  * @author tloehr
  */
-public class ProofOfLife extends Thread {
+public class BackgroundMonitor extends Thread {
 
     //long loginid;
     boolean interrupted;
 
+    int zyklen = 0;
+
     /**
      *
      */
-    public ProofOfLife() {
+    public BackgroundMonitor() {
         super();
         this.interrupted = false;
-        this.setName("ProofOfLife");
+        this.setName("BackgroundMonitor");
     }
 
     /**
@@ -52,15 +56,19 @@ public class ProofOfLife extends Thread {
      */
     public void run() {
         while (!interrupted) {
-            OPDE.getEM().getTransaction().begin();
-            OPDE.getHost().setLpol(new Date());
-            OPDE.getEM().merge(OPDE.getHost());
-            OPDE.getEM().getTransaction().commit();
+            zyklen++;
+
+            if (zyklen == 6) {
+                OPDE.getHost().setLpol(new Date());
+                EntityTools.merge(OPDE.getHost());
+            }
+
+            SYSMessagesTools.processSystemMessage();
 
             try {
-                Thread.sleep(60000); // Millisekunden, also schlafen wir 1 Minute.
+                Thread.sleep(10000);
             } catch (InterruptedException ie) {
-                OPDE.getLogger().debug("ProofOfLife INTERRUPTED !");
+                OPDE.getLogger().debug("BackgroundMonitor INTERRUPTED !");
                 interrupted = true;
             }
         }
