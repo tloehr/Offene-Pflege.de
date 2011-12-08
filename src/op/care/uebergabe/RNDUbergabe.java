@@ -80,7 +80,6 @@ public class RNDUbergabe
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     }
 
-    @Override
     public Color getBackground() {
         return color;
     }

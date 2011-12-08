@@ -6,6 +6,7 @@ package entity;
 
 import op.OPDE;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.Query;
@@ -58,11 +59,12 @@ public class SYSHostsTools {
                     queryDeleteClasses.setParameter("host", host);
                     queryDeleteClasses.executeUpdate();
 
-                    // Welche Logins (nach dem letzten Start) hängen an diesem beschädigten Host ?
-                    // Weg damit
-                    String loginsJPQL = " DELETE FROM SYSLogin l WHERE l.host = :host AND l.login >= l.host.up ";
+                    // Welche unbeendeten Logins hängen an diesem Host ?
+                    // Korrigieren
+                    String loginsJPQL = " UPDATE SYSLogin l SET l.logout = l.host.lpol WHERE l.host = :host AND l.logout = :logout ";
                     Query queryDeleteLogins = OPDE.getEM().createQuery(loginsJPQL);
                     queryDeleteLogins.setParameter("host", host);
+                    queryDeleteLogins.setParameter("logout", SYSConst.DATE_BIS_AUF_WEITERES);
                     queryDeleteLogins.executeUpdate();
 
                     host.setLpol(null);
@@ -105,6 +107,7 @@ public class SYSHostsTools {
      */
     protected static void shutdown(SYSHosts host) {
         host.setLpol(null);
+        host.setUp(null);
         EntityTools.merge(host);
     }
 

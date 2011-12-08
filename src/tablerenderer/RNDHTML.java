@@ -23,12 +23,15 @@ import java.util.Map;
  * Ich habe die ursprüngliche Klasse im JavaSpecialist Newsletter #106 gefunden und weitestgehend* unverändert übernommen.
  * Vielen Dank an den Autor Dr. Heinz M. Kabutz.
  *
+ * Anmerkungen zu Nimbus:
+ *
+ *
  * @author Heinz Kabutz: This code is from The Java Specialists' Newsletter http://www.javaspecialists.eu, used with permission.
- * @see http://www.offene-pflege.de/component/content/article/3-informationen/9-quellen#TJSN
+ * @see "http://www.offene-pflege.de/component/content/article/3-informationen/9-quellen#TJSN"
  *      <p/>
  *      geringe Änderung zur HTML Fähigkeit. JTextPane statt JTextArea
  */
-public class RNDHTML extends JTextPane implements TableCellRenderer {
+public class RNDHTML implements TableCellRenderer {
 
     private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
     /**
@@ -36,34 +39,48 @@ public class RNDHTML extends JTextPane implements TableCellRenderer {
      */
     private final Map cellSizes = new HashMap();
 
+    JTextPane txt;
+    JPanel panel;
+
     public RNDHTML() {
-        this.setEditable(false);
-        this.setContentType("text/html");
+
+        // Dieser Trick mit dem Einbetten der JTextPane ist nur wegen dem Nimbus Bug bei der Hintergrundfarbe einer Text Component.
+        // http://solutioncrawler.wordpress.com/2009/10/07/nimbus-lookfeel-und-seine-eigenarten/
+        txt = new JTextPane();
+        txt.setEditable(false);
+        txt.setContentType("text/html");
+        txt.setOpaque(false);
+        txt.setBackground(new Color(0,0,0,0));
+
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(txt);
+
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
-        adaptee.getTableCellRendererComponent(table, obj,
-                isSelected, hasFocus, row, column);
-        setForeground(adaptee.getForeground());
-        setBackground(adaptee.getBackground());
-        setBorder(adaptee.getBorder());
-        setFont(adaptee.getFont());
-        setText(adaptee.getText());
+
+        txt.setText(obj.toString());
+
 
         // This line was very important to get it working with JDK1.4
         TableColumnModel columnModel = table.getColumnModel();
-        setSize(columnModel.getColumn(column).getWidth(), 100000);
-        int height_wanted = (int) getPreferredSize().getHeight();
+        txt.setSize(columnModel.getColumn(column).getWidth(), 100000);
+        int height_wanted = (int) txt.getPreferredSize().getHeight();
         addSize(table, row, column, height_wanted);
         height_wanted = findTotalMaximumRowSize(table, row);
         if (height_wanted != table.getRowHeight(row)) {
             table.setRowHeight(row, Math.max(1, height_wanted));
         }
 
-        setBackground(SYSTools.getTableCellBackgroundColor(isSelected, row));
+        //setBackground();
 
-        return this;
+        panel.setBackground(SYSTools.getTableCellBackgroundColor(isSelected, row));
+
+        //setBackground(Color.BLUE);
+
+        return panel;
     }
 
     private void addSize(JTable table, int row, int column, int height) {

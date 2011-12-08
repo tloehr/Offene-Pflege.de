@@ -425,7 +425,7 @@ public class DlgLogin extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAboutActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        OPDE.getPoL().interrupt();
+        OPDE.getBM().interrupt();
 
         // Host als "heruntergefahren" deklarieren.
         OPDE.getEM().getTransaction().begin();

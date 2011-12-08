@@ -237,6 +237,7 @@ public class FrmInit extends JFrame {
         //======== panel1 ========
         {
             panel1.setBorder(new TitledBorder("Datenbank"));
+            panel1.setBackground(new Color(238, 238, 238));
             panel1.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, $rgap",
                 "4*(default, $lgap), default, $ugap, fill:default:grow"));
@@ -279,6 +280,7 @@ public class FrmInit extends JFrame {
 
             //======== panel4 ========
             {
+                panel4.setBackground(new Color(238, 238, 238));
                 panel4.setLayout(new FormLayout(
                     "default, $lcgap, default",
                     "default"));

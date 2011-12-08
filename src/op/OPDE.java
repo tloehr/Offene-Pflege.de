@@ -76,7 +76,7 @@ public class OPDE {
     protected static AppInfo appInfo;
     protected static SYSLogin login;
     protected static SYSHosts host;
-    protected static BackgroundMonitor pol;
+    protected static BackgroundMonitor bm;
     protected static ArrayList<ImageIcon> animationCache;
     protected static boolean animation = false;
     protected static boolean debug;
@@ -98,8 +98,8 @@ public class OPDE {
         return debug;
     }
 
-    public static BackgroundMonitor getPoL() {
-        return pol;
+    public static BackgroundMonitor getBM() {
+        return bm;
     }
 
     public static boolean isAnimation() {
@@ -432,8 +432,8 @@ public class OPDE {
                 System.exit(1);
             }
 
-            pol = new BackgroundMonitor();
-            pol.start();
+            bm = new BackgroundMonitor();
+            bm.start();
 
             String header = SYSTools.getWindowTitle("");
 

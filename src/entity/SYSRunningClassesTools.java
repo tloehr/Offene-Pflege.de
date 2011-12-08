@@ -23,7 +23,6 @@ public class SYSRunningClassesTools {
     public static final short STATUS_DONT_CARE = -1;
     public static final short STATUS_RO = 0;
     public static final short STATUS_RW = 1;
-    public static final short STATUS_WAITING = 2; // nur für unsigned im Wartezustand
 
     public static Pair<SYSRunningClasses, SYSRunningClasses> startModule(String internalClassID, Object signature, String[] conflictGroup) {
         SYSRunningClasses myClass = null, blocking = null;

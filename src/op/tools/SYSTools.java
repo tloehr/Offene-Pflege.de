@@ -1422,7 +1422,8 @@ public class SYSTools {
 
     public static Color getTableCellBackgroundColor(boolean isSelected, int row) {
         Color color;
-        Color selectionBackground = (Color) UIManager.get("Table.selectionBackground");
+        Color selectionBackground = UIManager.getColor("Table.selectionBackground");
+        Color alternate = UIManager.getColor("Table.alternateRowColor");
 
         if (isSelected) {
             color = selectionBackground;
@@ -1430,7 +1431,7 @@ public class SYSTools {
             if (row % 2 == 0) {
                 color = Color.white;
             } else {
-                color = SYSConst.bluegrey;
+                color = alternate;
             }
         }
         return color;

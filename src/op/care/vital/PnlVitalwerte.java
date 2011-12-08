@@ -34,11 +34,11 @@ import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
-import op.care.berichte.RNDBerichte;
 import op.tools.InternalClassACL;
 import op.tools.SYSCalendar;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
+import tablerenderer.RNDHTML;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -742,8 +742,8 @@ public class PnlVitalwerte extends CleanablePanel {
 
         // Hier kann die Klasse RNDBerichte verwendet werden. Sie ist einfach in
         // HTML Renderer ohne Zebra Muster. Genau was wir hier wollen.
-        tblVital.getColumnModel().getColumn(0).setCellRenderer(new RNDBerichte());
-        tblVital.getColumnModel().getColumn(1).setCellRenderer(new RNDBerichte());
+        tblVital.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+        tblVital.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
 
     }
 

@@ -274,7 +274,7 @@ public class OPMain extends javax.swing.JFrame {
         }
 
         SYSLoginTools.logout();
-        OPDE.getPoL().interrupt();
+        OPDE.getBM().interrupt();
         SYSHostsTools.shutdown();
         OPDE.getEM().close();
 

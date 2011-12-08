@@ -45,6 +45,7 @@ import org.jdesktop.swingx.JXTitledSeparator;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import tablemodels.TMPflegeberichte;
+import tablerenderer.RNDHTML;
 
 import javax.persistence.Query;
 import javax.swing.*;
@@ -1185,9 +1186,9 @@ public class PnlBerichte extends CleanablePanel {
 
         jspTblTB.dispatchEvent(new ComponentEvent(jspTblTB, ComponentEvent.COMPONENT_RESIZED));
 
-        tblTB.getColumnModel().getColumn(0).setCellRenderer(new RNDBerichte());
-        tblTB.getColumnModel().getColumn(1).setCellRenderer(new RNDBerichte());
-        tblTB.getColumnModel().getColumn(2).setCellRenderer(new RNDBerichte());
+        tblTB.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+        tblTB.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+        tblTB.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
 
         dispatchEvent(new ComponentEvent(this, ComponentEvent.COMPONENT_RESIZED));
 
