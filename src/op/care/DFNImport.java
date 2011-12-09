@@ -99,7 +99,7 @@ public class DFNImport {
         Connection db = OPDE.getDb().db;
 
         if (planid == 0) {
-            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5);
+            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
         }
 
         if (planid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.

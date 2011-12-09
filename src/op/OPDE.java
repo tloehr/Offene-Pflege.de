@@ -467,11 +467,13 @@ public class OPDE {
 //                        offset = 0;
 //                    }
 //                }
+                    OPDE.setLogin(new SYSLogin(OPDE.getEM().find(Users.class, "root")));
                     BHPImport.importBHP(0, 0, offset);
                 } catch (Exception ex) {
                     logger.fatal("Exception beim BHPImport", ex);
-                    System.exit(1);
                 }
+                SYSLoginTools.logout();
+                SYSHostsTools.shutdown();
                 System.exit(0);
             }
 

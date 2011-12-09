@@ -59,11 +59,13 @@ public class BackgroundMonitor extends Thread {
             zyklen++;
 
             if (zyklen % 6 == 0 || zyklen == 1) {   // Sofort und alle 6 Durchgänge
+                OPDE.debug("Background Monitor Zyklus: " + zyklen + " -- proof of life");
                 OPDE.getHost().setLpol(new Date());
                 EntityTools.merge(OPDE.getHost());
+            } else {
+                OPDE.debug("Background Monitor Zyklus: " + zyklen);
             }
 
-            OPDE.debug("Background Monitor Zyklus: "+zyklen);
 
             SYSMessagesTools.processSystemMessage();
 

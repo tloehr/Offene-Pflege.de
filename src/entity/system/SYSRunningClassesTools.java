@@ -7,6 +7,7 @@ package entity.system;
 import entity.EntityTools;
 import op.OPDE;
 import op.tools.Pair;
+import op.tools.SYSTools;
 
 import javax.persistence.Query;
 import java.util.ArrayList;
@@ -145,13 +146,12 @@ public class SYSRunningClassesTools {
                 + " SELECT s FROM SYSRunningClasses s "
                 + " WHERE s.classname IN (" + strClasses + ") "
                 + " AND s.login.host <> :host "
-                + (signature != null ? " AND s.signature = :signature " : "")
+                + " AND s.signature = :signature "
                 + (status != STATUS_DONT_CARE ? " AND s.status = :status " : "");
         Query query = OPDE.getEM().createQuery(strquery);
         query.setParameter("host", OPDE.getHost());
-        if (signature != null) {
-            query.setParameter("signature", signature.toString());
-        }
+
+        query.setParameter("signature", SYSTools.catchNull(signature));
 
         if (status != STATUS_DONT_CARE) {
             query.setParameter("status", status);
