@@ -30,6 +30,7 @@ import entity.*;
 import op.OPDE;
 import op.tools.SYSCalendar;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -55,14 +56,14 @@ public class TMUebergabe
 
     public TMUebergabe(Date datum, Einrichtungen einrichtung) {
         super();
-
-        Query queryUB = OPDE.getEM().createNamedQuery("Uebergabebuch.findByEinrichtungAndDatumAndAckUser");
+        EntityManager em = OPDE.createEM();
+        Query queryUB = em.createNamedQuery("Uebergabebuch.findByEinrichtungAndDatumAndAckUser");
         queryUB.setParameter(1, OPDE.getLogin().getUser().getUKennung());
         queryUB.setParameter(2, einrichtung.getEKennung());
         queryUB.setParameter(3, new Date(SYSCalendar.startOfDay(datum)));
         queryUB.setParameter(4, new Date(SYSCalendar.endOfDay(datum)));
 
-        Query queryPB = OPDE.getEM().createNamedQuery("Pflegeberichte.findByEinrichtungAndDatumAndAckUser");
+        Query queryPB = em.createNamedQuery("Pflegeberichte.findByEinrichtungAndDatumAndAckUser");
         queryPB.setParameter(1, OPDE.getLogin().getUser().getUKennung());
         queryPB.setParameter(2, einrichtung.getEKennung());
         queryPB.setParameter(3, new Date(SYSCalendar.startOfDay(datum)));

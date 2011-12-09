@@ -36,6 +36,7 @@ import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import org.pushingpixels.trident.ease.Spline;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
@@ -1343,7 +1344,8 @@ public class SYSTools {
 //    }
 
     public static DefaultListModel newListModel(String namedQuery, Object[]... params) {
-        Query query = OPDE.getEM().createNamedQuery(namedQuery);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery(namedQuery);
         if (params != null) {
             for (Object[] param : params) {
                 query.setParameter(param[0].toString(), param[1]);
@@ -1364,7 +1366,8 @@ public class SYSTools {
     }
 
     public static DefaultComboBoxModel newComboboxModel(String namedQuery, Object[]... params) {
-        Query query = OPDE.getEM().createNamedQuery(namedQuery);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery(namedQuery);
         if (params != null) {
             for (Object[] param : params) {
                 query.setParameter(param[0].toString(), param[1]);

@@ -9,6 +9,8 @@ import java.net.InetAddress;
 import java.util.Date;
 import op.OPDE;
 
+import javax.persistence.EntityManager;
+
 /**
  *
  * @author tloehr
@@ -36,7 +38,7 @@ public class SyslogTools {
     }
 
     public static void addLog(String message, short level){
-
+        EntityManager em = OPDE.createEM();
         InetAddress localMachine = null;
 
         try {
@@ -45,9 +47,9 @@ public class SyslogTools {
             System.exit(1);
         }
 
-        OPDE.getEM().getTransaction().begin();
-        OPDE.getEM().persist(new Syslog(localMachine.getHostName(), localMachine.getHostAddress(), OPDE.getLocalProps().getProperty("hostkey"), new Date(), message, level, OPDE.getLogin()));
-        OPDE.getEM().getTransaction().commit();
+        em.getTransaction().begin();
+        em.persist(new Syslog(localMachine.getHostName(), localMachine.getHostAddress(), OPDE.getLocalProps().getProperty("hostkey"), new Date(), message, level, OPDE.getLogin()));
+        em.getTransaction().commit();
     }
 
 }

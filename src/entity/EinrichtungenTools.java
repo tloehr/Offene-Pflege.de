@@ -6,6 +6,7 @@ package entity;
 
 import op.OPDE;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.util.Vector;
@@ -31,13 +32,13 @@ public class EinrichtungenTools {
      * @param cmb
      */
     public static void setComboBox(JComboBox cmb) {
-
-        Query query = OPDE.getEM().createNamedQuery("Einrichtungen.findAll");
+         EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Einrichtungen.findAll");
         cmb.setModel(new DefaultComboBoxModel(new Vector<Einrichtungen>(query.getResultList())));
 
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
 
-        Query query2 = OPDE.getEM().createNamedQuery("Stationen.findByStatID");
+        Query query2 = em.createNamedQuery("Stationen.findByStatID");
         query2.setParameter("statID", statid);
         Stationen station = (Stationen) query2.getSingleResult();
         cmb.setSelectedItem(station.getEinrichtung());

@@ -51,6 +51,7 @@ import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.jdesktop.swingx.VerticalLayout;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -533,7 +534,8 @@ public class FrmPflege extends javax.swing.JFrame {
     }
 
     private void createBewohnerListe() {
-        Query query = OPDE.getEM().createNamedQuery("Bewohner.findAllActiveSortedByStationen");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Bewohner.findAllActiveSortedByStationen");
         Iterator<Bewohner> it = query.getResultList().iterator();
 
         Stationen station = null;

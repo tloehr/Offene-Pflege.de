@@ -26,6 +26,7 @@
  */
 package op.care.berichte;
 
+import javax.persistence.EntityManager;
 import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -1152,8 +1153,8 @@ public class PnlBerichte extends CleanablePanel {
             von = bis;
         }
 
-
-        query = OPDE.getEM().createQuery(" "
+        EntityManager em = OPDE.createEM();
+        query = em.createQuery(" "
                 + " SELECT p FROM Pflegeberichte p "
                 + (tags.isEmpty() ? "" : " JOIN p.tags t ")
                 + " WHERE p.bewohner = :bewohner "

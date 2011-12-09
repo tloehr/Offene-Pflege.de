@@ -25,6 +25,7 @@
  */
 package op.tools;
 
+import entity.system.SYSHostsTools;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 
@@ -426,12 +427,7 @@ public class DlgLogin extends javax.swing.JDialog {
         OPDE.getBM().interrupt();
 
         // Host als "heruntergefahren" deklarieren.
-        OPDE.getEM().getTransaction().begin();
-        OPDE.getHost().setLpol(null);
-        OPDE.getEM().merge(OPDE.getHost());
-        OPDE.getEM().getTransaction().commit();
-
-        OPDE.getEM().close();
+        SYSHostsTools.shutdown();
 
     }//GEN-LAST:event_formWindowClosing
 

@@ -5,6 +5,7 @@ import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSConst;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ public class DarreichungTools {
      */
     public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         MedVorrat result = null;
-
+        EntityManager em = OPDE.createEM();
         try {
-            Query query = OPDE.getEM().createNamedQuery("MedVorrat.findByBewohnerAndDarreichung");
+            Query query = em.createNamedQuery("MedVorrat.findByBewohnerAndDarreichung");
             query.setParameter("bewohner", bewohner);
             query.setParameter("darreichung", darreichung);
 
@@ -52,7 +53,7 @@ public class DarreichungTools {
 
     public static List<MedVorrat> getPassendeVorraeteZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         // TODO: das muss noch getestet werden
-
+        EntityManager em = OPDE.createEM();
         List<MedVorrat> liste = new ArrayList();
 
         // 1. Form der gesuchten darreichung bestimmen.
@@ -61,7 +62,7 @@ public class DarreichungTools {
         // 2. Alle äquivalenten Formen dazu finden
         List<MedFormen> aehnlicheFormen = new ArrayList<MedFormen>();
         if (meineForm.getEquiv() != 0) {
-            Query query = OPDE.getEM().createNamedQuery("MedFormen.findByEquiv");
+            Query query = em.createNamedQuery("MedFormen.findByEquiv");
             query.setParameter("equiv", meineForm.getEquiv());
             aehnlicheFormen = query.getResultList();
         } else {
@@ -69,13 +70,13 @@ public class DarreichungTools {
         }
 
         // 3. Anhand der Bestände die passenden Vorräte ermitteln
-        Query queryVorraete = OPDE.getEM().createQuery(
+        Query queryVorraete = em.createQuery(
                 " " +
-                " SELECT DISTINCT b.vorrat FROM MedBestand b " +
-                " WHERE b.vorrat.bewohner = :bewohner " +
-                " AND b.vorrat.bis = :bis " +
-                " AND b.darreichung.medForm.formID  IN " +
-                " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
+                        " SELECT DISTINCT b.vorrat FROM MedBestand b " +
+                        " WHERE b.vorrat.bewohner = :bewohner " +
+                        " AND b.vorrat.bis = :bis " +
+                        " AND b.darreichung.medForm.formID  IN " +
+                        " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );
         queryVorraete.setParameter("bewohner", bewohner);
         queryVorraete.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);

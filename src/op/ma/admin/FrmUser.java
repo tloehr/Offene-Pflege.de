@@ -33,6 +33,7 @@ import op.tools.*;
 import tablemodels.TMUser;
 import tablerenderer.RNDOCUsers;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -70,6 +71,7 @@ public class FrmUser extends javax.swing.JFrame {
     private ListDataListener ldlMember, ldlUser;
     private CheckTreeManager cm;
     private CheckTreeSelectionModel sm;
+    private EntityManager em;
 
     /**
      * Creates new form FrmUser
@@ -91,7 +93,8 @@ public class FrmUser extends javax.swing.JFrame {
 
                     if (lstAllGroups.getSelectedIndex() >= 0) {
                         selectedGroup = (Groups) lstAllGroups.getSelectedValue();
-                        OPDE.getEM().refresh(selectedGroup);
+                        EntityManager em1 = OPDE.createEM();
+                        em1.refresh(selectedGroup);
                     } else {
                         selectedGroup = null;
                     }
@@ -111,7 +114,7 @@ public class FrmUser extends javax.swing.JFrame {
     }
 
     private void loadUserTable() {
-        Query query = OPDE.getEM().createNamedQuery("Users.findAllSorted");
+        Query query = em.createNamedQuery("Users.findAllSorted");
         tblUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         try {
             tblUsers.setModel(new TMUser(query.getResultList()));
@@ -222,7 +225,7 @@ public class FrmUser extends javax.swing.JFrame {
             lstMembers.getModel().removeListDataListener(ldlMember);
             lstUsers.getModel().removeListDataListener(ldlUser);
 
-            if (OPDE.getEM().contains(selectedGroup)) { // EntityBean ist schon gespeichert.
+            if (em.contains(selectedGroup)) { // EntityBean ist schon gespeichert.
                 if (selectedGroup.getGkennung().equalsIgnoreCase("everyone")) {
                     // everyone hat immer alle Benutzer als Mitglied.
                     lstMembers.setModel(SYSTools.newListModel("Users.findAllSorted"));
@@ -1195,7 +1198,7 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void txtUKennungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUKennungCaretUpdate
         if (mode == NEW_USER) {
-            Query query = OPDE.getEM().createNamedQuery("Users.findByUKennung");
+            Query query = em.createNamedQuery("Users.findByUKennung");
             query.setParameter("uKennung", txtUKennung.getText());
             if (query.getResultList().isEmpty()) {
                 lblUKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballgreen.png")));
@@ -1248,7 +1251,7 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         if (mode == EDIT_USER) {
-            OPDE.getEM().refresh(selectedUser);
+            em.refresh(selectedUser);
         } else {
             selectedUser = new Users();
         }
@@ -1292,12 +1295,12 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void btnDeleteGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteGroupActionPerformed
         if (JOptionPane.showConfirmDialog(this, "Möchten Sie die Gruppe '" + selectedGroup.getGkennung() + "' wirklich löschen  ?", "Gruppe löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            OPDE.getEM().getTransaction().begin();
+            em.getTransaction().begin();
             try {
-                OPDE.getEM().remove(selectedGroup);
-                OPDE.getEM().getTransaction().commit();
+                em.remove(selectedGroup);
+                em.getTransaction().commit();
             } catch (Exception e1) {
-                OPDE.getEM().getTransaction().rollback();
+                em.getTransaction().rollback();
                 new DlgException(e1);
             }
             selectedGroup = null;
@@ -1308,7 +1311,7 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void btnCancelGroupsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelGroupsActionPerformed
         if (mode == EDIT_GROUP) {
-            OPDE.getEM().refresh(selectedGroup);
+            em.refresh(selectedGroup);
         } else {
             selectedGroup = null;
         }
@@ -1335,7 +1338,7 @@ public class FrmUser extends javax.swing.JFrame {
     private void txtGKennungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtGKennungCaretUpdate
         if (mode == NEW_GROUP) {
             if (txtGKennung.getText().matches("[a-zA-Z0-9]+")) {
-                Query query = OPDE.getEM().createNamedQuery("Groups.findByGkennung");
+                Query query = em.createNamedQuery("Groups.findByGkennung");
                 query.setParameter("gkennung", txtGKennung.getText());
                 if (query.getResultList().isEmpty()) {
                     lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballgreen.png")));
@@ -1432,20 +1435,20 @@ public class FrmUser extends javax.swing.JFrame {
     }
 
     private void saveGroup() {
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
-            if (OPDE.getEM().contains(selectedGroup)) { // Gruppe existiert schon in der Datenbank
-                OPDE.getEM().merge(selectedGroup);
+            if (em.contains(selectedGroup)) { // Gruppe existiert schon in der Datenbank
+                em.merge(selectedGroup);
             } else {
-                OPDE.getEM().persist(selectedGroup);
+                em.persist(selectedGroup);
             }
             if (!selectedGroup.getGkennung().equalsIgnoreCase("admin")) { // Bei Admin kann man den Beaum nicht ändern.
                 IntClassesTools.saveTree((DefaultMutableTreeNode) treeRights.getModel().getRoot(), sm);
             }
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
 
         } catch (Exception e1) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             new DlgException(e1);
         }
         selectedGroup = null;
@@ -1455,24 +1458,24 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void saveUser() {
         setMemberships();
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
             if (selectedUser.getUKennung() == null) {
                 generatePassword();
-                OPDE.getEM().persist(selectedUser);
+                em.persist(selectedUser);
             } else {
-                OPDE.getEM().merge(selectedUser);
+                em.merge(selectedUser);
             }
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
         } catch (Exception e1) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             new DlgException(e1);
         }
 
         if (mode == NEW_USER) {
             //loadUserTable();
 
-            Query query = OPDE.getEM().createNamedQuery("Users.findAllSorted");
+            Query query = em.createNamedQuery("Users.findAllSorted");
             tblUsers.setModel(new TMUser(query.getResultList()));
 
 

@@ -44,6 +44,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -217,8 +218,8 @@ public class DBHandling {
         }
 
         if (bericht) {
-
-            Query query = OPDE.getEM().createNamedQuery("Pflegeberichte.findByBewohnerWithinPeriod");
+            EntityManager em = OPDE.createEM();
+            Query query = em.createNamedQuery("Pflegeberichte.findByBewohnerWithinPeriod");
             query.setParameter("bewohner", bewohner);
             query.setParameter("von", SYSCalendar.addDate(new Date(), -7));
             query.setParameter("bis", new Date());

@@ -7,6 +7,7 @@ package entity;
 import op.OPDE;
 import org.jdesktop.swingx.JXTaskPane;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -35,7 +36,8 @@ public class PBerichtTAGSTools {
      */
     public static JMenu createMenuForTags(Pflegeberichte bericht) {
         final Pflegeberichte finalbericht = bericht;
-        Query query = OPDE.getEM().createNamedQuery("PBerichtTAGS.findAllActive");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
 
         JMenu menu = new JMenu("Text-Markierungen");
@@ -73,9 +75,7 @@ public class PBerichtTAGSTools {
 
             @Override
             public void menuDeselected(MenuEvent e) {
-                OPDE.getEM().getTransaction().begin();
-                OPDE.getEM().merge(finalbericht);
-                OPDE.getEM().getTransaction().commit();
+                EntityTools.merge(finalbericht);
             }
 
             @Override
@@ -95,7 +95,8 @@ public class PBerichtTAGSTools {
      * @return das Panel zur weiteren Verwendung.
      */
     public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect, LayoutManager layout) {
-        Query query = OPDE.getEM().createNamedQuery("PBerichtTAGS.findAllActive");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
         JPanel panel = new JPanel(layout);
         Iterator<PBerichtTAGS> itTags = tags.iterator();
@@ -127,7 +128,8 @@ public class PBerichtTAGSTools {
      * @return das Panel zur weiteren Verwendung.
      */
     public static void addCheckBoxPanelForTags(JXTaskPane panel, ItemListener listener, Collection<PBerichtTAGS> preselect) {
-        Query query = OPDE.getEM().createNamedQuery("PBerichtTAGS.findAllActive");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
         Iterator<PBerichtTAGS> itTags = tags.iterator();
         while (itTags.hasNext()) {

@@ -4,6 +4,7 @@ import op.OPDE;
 import op.tools.DlgException;
 import op.tools.Zeitraum;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
 
@@ -16,7 +17,8 @@ import java.util.List;
  */
 public class BWInfoTools {
     public static BWInfo getLastBWInfo(Bewohner bewohner, BWInfoTyp bwinfotyp) {
-        Query query = OPDE.getEM().createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", bwinfotyp);
         query.setFirstResult(0);

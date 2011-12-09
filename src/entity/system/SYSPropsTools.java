@@ -7,6 +7,7 @@ package entity.system;
 import entity.Users;
 import op.OPDE;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
@@ -21,12 +22,12 @@ public class SYSPropsTools {
 
     public static void storeProp(String key, String value, Users user) {
         String namedQuery = "SYSProps.findByKeyAndUser";
-
+        EntityManager em = OPDE.createEM();
         if (user == null) {
             namedQuery = "SYSProps.findByKey";
         }
 
-        Query query = OPDE.getEM().createNamedQuery(namedQuery);
+        Query query = em.createNamedQuery(namedQuery);
         query.setParameter("key", key);
 
         if (user != null) {
@@ -45,17 +46,17 @@ public class SYSPropsTools {
         }
 
 
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
-            if (OPDE.getEM().contains(prop)) {
-                OPDE.getEM().merge(prop);
+            if (em.contains(prop)) {
+                em.merge(prop);
             } else {
-                OPDE.getEM().persist(prop);
+                em.persist(prop);
             }
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
         } catch (Exception e) {
             OPDE.fatal(e);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
 
         OPDE.setProp(key, value);
@@ -88,14 +89,14 @@ public class SYSPropsTools {
      * @return Ergebnis in einem Properties Objekt.
      */
     public static Properties loadProps(Users user) {
-
+        EntityManager em = OPDE.createEM();
         String namedQuery = "SYSProps.findByUser";
 
         if (user == null) {
             namedQuery = "SYSProps.findAllWOUsers";
         }
 
-        Query query = OPDE.getEM().createNamedQuery(namedQuery);
+        Query query = em.createNamedQuery(namedQuery);
 
         if (user != null) {
             query.setParameter("user", user);

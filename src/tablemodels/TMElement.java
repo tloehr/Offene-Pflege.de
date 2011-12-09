@@ -107,22 +107,22 @@ public class TMElement extends AbstractTableModel {
 //
 //        Object element = mymodel.get(row);
 //
-//        OPDE.getEM().getTransaction().begin();
+//        em.getTransaction().begin();
 //        try {
 //            if (element instanceof VBericht) {
 //                sourcemodel.remove(element);
 //                mymodel.remove(element);
 //                pdca.remove(row);
-//                OPDE.getEM().remove(element);
+//                em.remove(element);
 //                fireTableRowsDeleted(row, row);
 //            } else {
 //                OPDE.debug("nothing to delete... yet");
 //            }
-//            OPDE.getEM().getTransaction().commit();
+//            em.getTransaction().commit();
 //
 //        } catch (Exception e) {
 //            OPDE.fatal(e);
-//            OPDE.getEM().getTransaction().rollback();
+//            em.getTransaction().rollback();
 //        }
 //    }
 

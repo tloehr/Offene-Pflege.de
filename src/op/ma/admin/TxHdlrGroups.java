@@ -5,28 +5,28 @@
 package op.ma.admin;
 
 import entity.Groups;
+import op.OPDE;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-import javax.persistence.Query;
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.TransferHandler;
-import op.OPDE;
 
 /**
- *
  * @author tloehr
  */
 public class TxHdlrGroups extends TransferHandler {
 
     private HashMap<String, Groups> cache;
+    private EntityManager em;
 
     public TxHdlrGroups() {
         cache = new HashMap();
+        em = OPDE.createEM();
     }
 
     @Override
@@ -60,7 +60,7 @@ public class TxHdlrGroups extends TransferHandler {
             }
 
             StringTokenizer st = new StringTokenizer(data, "\n");
-            Query query = OPDE.getEM().createNamedQuery("Groups.findByGkennung");
+            Query query = em.createNamedQuery("Groups.findByGkennung");
             while (st.hasMoreTokens()) {
                 String key = st.nextToken();
                 if (!cache.containsKey(key)) {
@@ -86,7 +86,7 @@ public class TxHdlrGroups extends TransferHandler {
             }
             StringTokenizer st = new StringTokenizer(data, "\n");
 
-            Query query = OPDE.getEM().createNamedQuery("Groups.findByGkennung");
+            Query query = em.createNamedQuery("Groups.findByGkennung");
             while (st.hasMoreTokens()) {
                 String key = st.nextToken();
                 if (!cache.containsKey(key)) {

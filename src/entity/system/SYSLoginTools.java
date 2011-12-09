@@ -11,6 +11,8 @@ import entity.UsersTools;
 import op.OPDE;
 import op.tools.SYSConst;
 
+import javax.persistence.EntityManager;
+
 /**
  *
  * @author tloehr
@@ -20,12 +22,12 @@ public class SYSLoginTools {
     public static SYSLogin login(String username, String password) {
         SYSLogin login = null;
         Users user = UsersTools.checkPassword(username, password);
-
+        EntityManager em = OPDE.createEM();
         if (user != null) {
-            OPDE.getEM().getTransaction().begin();
+            em.getTransaction().begin();
             login = new SYSLogin(user);
-            OPDE.getEM().persist(login);
-            OPDE.getEM().getTransaction().commit();
+            em.persist(login);
+            em.getTransaction().commit();
         }
 
         return login;
@@ -36,20 +38,20 @@ public class SYSLoginTools {
     }
 
     protected static void logout(SYSLogin login) {
-
+        EntityManager em = OPDE.createEM();
         if (login == null) {
             return;
         }
 
         login.setLogout(new Date());
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
             SYSRunningClassesTools.endAllModules(login);
-            OPDE.getEM().merge(login);
-            OPDE.getEM().getTransaction().commit();
+            em.merge(login);
+            em.getTransaction().commit();
         } catch (Exception e) {
             login.setLogout(SYSConst.DATE_BIS_AUF_WEITERES);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             OPDE.getLogger().debug(e);
         }
     }

@@ -2,6 +2,7 @@ package entity.verordnungen;
 
 import op.OPDE;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
@@ -15,8 +16,8 @@ import javax.persistence.Query;
 public class MedBestandTools {
 
     public static MedBestand findByVerordnungImAnbruch(Verordnung verordnung) {
-
-        Query query = OPDE.getEM().createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
         query.setParameter("bewohner", verordnung.getBewohner());
         query.setParameter("darreichung", verordnung.getDarreichung());
 

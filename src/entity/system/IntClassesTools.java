@@ -11,6 +11,7 @@ import op.tools.CheckTreeSelectionModel;
 import op.tools.InternalClass;
 import op.tools.InternalClassACL;
 
+import javax.persistence.EntityManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.util.*;
@@ -118,13 +119,14 @@ public class IntClassesTools {
     }
 
     public static void saveTree(DefaultMutableTreeNode node, CheckTreeSelectionModel selmodel, boolean parentWasSelected) {
+        EntityManager em = OPDE.createEM();
         if (node.getUserObject() instanceof InternalClass) {
 
             InternalClass myInternalClass = (InternalClass) node.getUserObject();
             if (!myInternalClass.hasIntClass()) { // Bisher keine EntityBean ?
                 Groups group = (Groups) ((DefaultMutableTreeNode) node.getParent()).getUserObject();
                 IntClasses intClasses = new IntClasses(myInternalClass.getInternalClassname(), group);
-                OPDE.getEM().persist(intClasses);
+                em.persist(intClasses);
                 myInternalClass.setIntClass(intClasses);
                 OPDE.getLogger().debug("       saveTree: speichere EntityBean IntClass: " + myInternalClass.getInternalClassname());
             } else {
@@ -154,7 +156,7 @@ public class IntClassesTools {
                 if (!myACL.hasAclEntity()) { // Nur hinzufügen, wenn nötig.
                     OPDE.getLogger().debug("              saveTree: erstelle neue EntityBean");
                     Acl acl = new Acl(myACL.getAcl(), myClass.getIntClass());
-                    OPDE.getEM().persist(acl);
+                    em.persist(acl);
                 } else {
                     OPDE.getLogger().debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
                 }
@@ -163,7 +165,7 @@ public class IntClassesTools {
                 OPDE.getLogger().debug("              saveTree: " + InternalClassACL.strACLS[myACL.getAcl()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
                 if (myACL.hasAclEntity()) { // Nur löschen, wenn nötig.
                     OPDE.getLogger().debug("              saveTree: lösche jetzt die EntityBean");
-                    OPDE.getEM().remove(myACL.getAclEntity());
+                    em.remove(myACL.getAclEntity());
                     OPDE.getLogger().debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
                 }
             }

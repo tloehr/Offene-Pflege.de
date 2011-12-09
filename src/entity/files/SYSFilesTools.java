@@ -37,6 +37,7 @@ import op.tools.SYSTools;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -63,20 +64,21 @@ public class SYSFilesTools {
     public static Set<SYSFiles> findByBewohner(Bewohner bewohner) {
         Set<SYSFiles> files = new TreeSet<SYSFiles>();
         Query query;
+        EntityManager em = OPDE.createEM();
 
-        query = OPDE.getEM().createNamedQuery("SYSFiles.findByBWKennung", SYSFiles.class);
+        query = em.createNamedQuery("SYSFiles.findByBWKennung", SYSFiles.class);
         query.setParameter("bewohner", bewohner);
         files.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
+        query = em.createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
         query.setParameter("bewohner", bewohner);
         files.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("SYSFiles.findByBWKennung2BWI", SYSFiles.class);
+        query = em.createNamedQuery("SYSFiles.findByBWKennung2BWI", SYSFiles.class);
         query.setParameter("bewohner", bewohner);
         files.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
+        query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
         query.setParameter("bewohner", bewohner);
         files.addAll(query.getResultList());
 
@@ -102,7 +104,7 @@ public class SYSFilesTools {
      */
     public static SYSFiles putFile(File file) {
         SYSFiles sysfile = null;
-
+        EntityManager em = OPDE.createEM();
         try {
 
             FTPClient ftp = new FTPClient();
@@ -111,7 +113,7 @@ public class SYSFilesTools {
             ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
             String md5 = SYSTools.getMD5Checksum(file);
-            Query query = OPDE.getEM().createNamedQuery("SYSFiles.findByMd5");
+            Query query = em.createNamedQuery("SYSFiles.findByMd5");
             query.setParameter("md5", md5);
 
             // Gibts die Datei schon ?
@@ -119,9 +121,9 @@ public class SYSFilesTools {
                 try {
                     long ts = file.lastModified();
                     sysfile = new SYSFiles(file.getName(), md5, new Date(ts), file.length(), OPDE.getLogin().getUser());
-                    OPDE.getEM().getTransaction().begin();
-                    OPDE.getEM().persist(sysfile);
-                    OPDE.getEM().getTransaction().commit();
+                    em.getTransaction().begin();
+                    em.persist(sysfile);
+                    em.getTransaction().commit();
                     String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
                     FileInputStream fis = new FileInputStream(file);
                     ftp.storeFile(remoteFilename, fis);
@@ -136,9 +138,9 @@ public class SYSFilesTools {
                      * Und den krieg ich nur, wenn ich das persist committe.
                      * Falls dann doch noch was schief geht, lösche ich die Entität wieder.
                      */
-                    OPDE.getEM().getTransaction().begin();
-                    OPDE.getEM().remove(sysfile);
-                    OPDE.getEM().getTransaction().commit();
+                    em.getTransaction().begin();
+                    em.remove(sysfile);
+                    em.getTransaction().commit();
                 }
             } else { // Ansonsten die bestehende Datei zurückgeben
                 sysfile = (SYSFiles) query.getSingleResult();
@@ -225,9 +227,10 @@ public class SYSFilesTools {
      */
     public static boolean updateFile(File file, SYSFiles sysfile) {
         boolean success = false;
+        EntityManager em = OPDE.createEM();
         try {
             String newmd5 = SYSTools.getMD5Checksum(file);
-            OPDE.getEM().getTransaction().begin();
+            em.getTransaction().begin();
             // Ist überhaupt ein Austausch nötig ?
             if (!sysfile.getMd5().equals(newmd5)) {
                 FTPClient ftp = new FTPClient();
@@ -251,21 +254,22 @@ public class SYSFilesTools {
                 sysfile.setFiledate(new Date(ts));
                 sysfile.setFilesize(file.length());
 
-                OPDE.getEM().merge(sysfile);
+                em.merge(sysfile);
                 ftp.disconnect();
                 success = true;
             }
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
         } catch (Exception ex) {
             OPDE.fatal(ex);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
 
     public static boolean deleteFile(SYSFiles sysfile) {
         boolean success = false;
-        OPDE.getEM().getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
         try {
             FTPClient ftp = new FTPClient();
             ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
@@ -273,13 +277,13 @@ public class SYSFilesTools {
             ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
             String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
             ftp.deleteFile(remoteFilename);
-            OPDE.getEM().remove(sysfile);
+            em.remove(sysfile);
             ftp.disconnect();
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
             success = true;
         } catch (Exception ex) {
             OPDE.getLogger().debug(ex.getMessage(), ex);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             success = false;
         }
         return success;
@@ -381,6 +385,7 @@ public class SYSFilesTools {
      * @return
      */
     public static JMenu getSYSFilesContextMenu(java.awt.Frame parent, Object entity, ActionListener callback) {
+        EntityManager em = OPDE.createEM();
         JMenu menu = new JMenu("<html>Dokumente <font color=\"green\">&#9679;</font></html>");
         final Frame p = parent;
         final ActionListener cb = callback;
@@ -412,7 +417,7 @@ public class SYSFilesTools {
         // gibts kein Menü.
         if (!namedQuery.equals("")) {
             Query query;
-            query = OPDE.getEM().createNamedQuery(namedQuery, SYSFiles.class);
+            query = em.createNamedQuery(namedQuery, SYSFiles.class);
             query.setParameter(queryParameter, entity);
             filesList = new ArrayList(query.getResultList());
             menuFiles = getFilesAsMenu("Anzeigen", filesList);

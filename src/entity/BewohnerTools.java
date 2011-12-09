@@ -7,6 +7,7 @@ package entity;
 import op.OPDE;
 import op.tools.SYSCalendar;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.text.DateFormat;
@@ -22,7 +23,8 @@ public class BewohnerTools {
     public static final String GESCHLECHT[] = {"", "männlich", "weiblich"};
 
     public static Bewohner findByBWKennung(String bwkennung) {
-        Query query = OPDE.getEM().createNamedQuery("Bewohner.findByBWKennung");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Bewohner.findByBWKennung");
         query.setParameter("bWKennung", bwkennung);
         return (Bewohner) query.getSingleResult();
     }

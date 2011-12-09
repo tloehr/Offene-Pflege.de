@@ -7,8 +7,8 @@ package entity.system;
 import entity.EntityTools;
 import op.OPDE;
 import op.tools.Pair;
-import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -66,7 +66,7 @@ public class SYSRunningClassesTools {
         OPDE.debug("SYSRunningTools.startModule/5: " + internalClassID + " will starten.");
 
         // 1. ist ein unsignierter aus der conflictGroup da ? Dann mache ich direkt Schluss. Und der return ist false.
-        boolean block = !getRunning(null, STATUS_DONT_CARE, conflictGroup).isEmpty();
+        boolean block = !getRunning("", STATUS_DONT_CARE, conflictGroup).isEmpty();
         OPDE.debug("SYSRunningTools.startModule/5: unsigned blockade gefunden: " + block);
 
         // 2. sind signierte da, dann ist der return true. ich versuche dann solange bis ich erfolg habe und rufe dann success auf.
@@ -135,7 +135,7 @@ public class SYSRunningClassesTools {
      * @return
      */
     public static List<SYSRunningClasses> getRunning(Object signature, int status, String[] classes) {
-
+        EntityManager em = OPDE.createEM();
         String strClasses = "";
         for (String c : classes) {
             strClasses += "'" + c + "'" + ",";
@@ -146,12 +146,14 @@ public class SYSRunningClassesTools {
                 + " SELECT s FROM SYSRunningClasses s "
                 + " WHERE s.classname IN (" + strClasses + ") "
                 + " AND s.login.host <> :host "
-                + " AND s.signature = :signature "
+                + (signature != null ? " AND s.signature = :signature " : "")
                 + (status != STATUS_DONT_CARE ? " AND s.status = :status " : "");
-        Query query = OPDE.getEM().createQuery(strquery);
+        Query query = em.createQuery(strquery);
         query.setParameter("host", OPDE.getHost());
 
-        query.setParameter("signature", SYSTools.catchNull(signature));
+        if (signature != null) {
+            query.setParameter("signature", signature.toString());
+        }
 
         if (status != STATUS_DONT_CARE) {
             query.setParameter("status", status);
@@ -166,7 +168,8 @@ public class SYSRunningClassesTools {
     }
 
     public static void endAllModules(SYSLogin login) throws Exception {
-        Query query = OPDE.getEM().createQuery("DELETE FROM SYSRunningClasses r WHERE r.login = :login");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("DELETE FROM SYSRunningClasses r WHERE r.login = :login");
         query.setParameter("login", login);
         query.executeUpdate();
     }

@@ -10,6 +10,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.net.InetAddress;
 import java.util.Date;
@@ -29,8 +30,8 @@ public class SYSHostsTools {
             OPDE.fatal(uhe);
             System.exit(0);
         }
-
-        Query query = OPDE.getEM().createNamedQuery("SYSHosts.findByHostKey");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("SYSHosts.findByHostKey");
         query.setParameter("hostKey", hostkey);
         boolean mainhost = SYSTools.catchNull(OPDE.getLocalProps().getProperty("mainhost")).equalsIgnoreCase("true");
 
@@ -51,33 +52,33 @@ public class SYSHostsTools {
                     OPDE.warn("Host wurde beim letzten mal nicht korrekt beendet. Wird jetzt behoben.");
                 }
 
-                OPDE.getEM().getTransaction().begin();
                 try {
+                    em.getTransaction().begin();
                     // Welche Running Classes hängen an diesem beschädigten Host ?
                     // Weg damit
                     String classesJPQL = " DELETE FROM SYSRunningClasses s WHERE s.login.host = :host ";
-                    Query queryDeleteClasses = OPDE.getEM().createQuery(classesJPQL);
+                    Query queryDeleteClasses = em.createQuery(classesJPQL);
                     queryDeleteClasses.setParameter("host", host);
                     queryDeleteClasses.executeUpdate();
 
                     // Welche unbeendeten Logins hängen an diesem Host ?
                     // Korrigieren
                     String loginsJPQL = " UPDATE SYSLogin l SET l.logout = l.host.lpol WHERE l.host = :host AND l.logout = :logout ";
-                    Query queryDeleteLogins = OPDE.getEM().createQuery(loginsJPQL);
+                    Query queryDeleteLogins = em.createQuery(loginsJPQL);
                     queryDeleteLogins.setParameter("host", host);
                     queryDeleteLogins.setParameter("logout", SYSConst.DATE_BIS_AUF_WEITERES);
                     queryDeleteLogins.executeUpdate();
 
                     host.setLpol(null);
                     host.setUp(new Date());
-                    OPDE.getEM().merge(host);
-                    OPDE.getEM().getTransaction().commit();
+                    em.merge(host);
+                    em.getTransaction().commit();
                 } catch (Exception e) {
-                    OPDE.getEM().getTransaction().rollback();
+                    em.getTransaction().rollback();
                 }
 
                 if (mainhost) {
-                    Query query2 = OPDE.getEM().createNamedQuery("SYSHosts.findOtherRunningMainHosts");
+                    Query query2 = em.createNamedQuery("SYSHosts.findOtherRunningMainHosts");
                     query2.setParameter("hostKey", hostkey);
 
                     if (!query2.getResultList().isEmpty()) {
@@ -111,6 +112,7 @@ public class SYSHostsTools {
         host.setLpol(null);
         host.setUp(null);
         EntityTools.merge(host);
+        // OPDE.getBM().interrupt();
     }
 
     /**

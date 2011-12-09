@@ -10,6 +10,7 @@ import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +47,7 @@ public class VorgaengeTools {
      * @return
      */
     public static List findElementeByVorgang(Vorgaenge vorgang, boolean mitSystem) {
-
+        EntityManager em = OPDE.createEM();
         Comparator<Object> elementsComparator = new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
@@ -73,27 +74,27 @@ public class VorgaengeTools {
         List elements = new ArrayList();
         Query query;
 
-        query = OPDE.getEM().createNamedQuery(mitSystem ? "VBericht.findByVorgang" : "VBericht.findByVorgangOhneSystem");
+        query = em.createNamedQuery(mitSystem ? "VBericht.findByVorgang" : "VBericht.findByVorgangOhneSystem");
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("Pflegeberichte.findByVorgang");
+        query = em.createNamedQuery("Pflegeberichte.findByVorgang");
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("BWerte.findByVorgang");
+        query = em.createNamedQuery("BWerte.findByVorgang");
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("Verordnung.findByVorgang");
+        query = em.createNamedQuery("Verordnung.findByVorgang");
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("BWInfo.findByVorgang");
+        query = em.createNamedQuery("BWInfo.findByVorgang");
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
-        query = OPDE.getEM().createNamedQuery("Planung.findByVorgang");
+        query = em.createNamedQuery("Planung.findByVorgang");
         query.setParameter("vorgang", vorgang);
         elements.addAll(query.getResultList());
 
@@ -103,41 +104,44 @@ public class VorgaengeTools {
     }
 
     public static void deleteVorgang(Vorgaenge vorgang) {
+        EntityManager em = OPDE.createEM();
         vorgang.setBis(new Date());
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
-            OPDE.getEM().remove(vorgang);
-            OPDE.getEM().getTransaction().commit();
+            em.remove(vorgang);
+            em.getTransaction().commit();
         } catch (Exception ex) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             new DlgException(ex);
         }
     }
 
     public static void endVorgang(Vorgaenge vorgang) {
+        EntityManager em = OPDE.createEM();
         VBericht systemBericht = new VBericht("Vorgang abgeschlossen", VBerichtTools.VBERICHT_ART_CLOSE, vorgang);
         vorgang.setBis(new Date());
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
-            //OPDE.getEM().persist(systemBericht);
-            OPDE.getEM().merge(vorgang);
-            OPDE.getEM().getTransaction().commit();
+            //em.persist(systemBericht);
+            em.merge(vorgang);
+            em.getTransaction().commit();
         } catch (Exception ex) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             new DlgException(ex);
         }
     }
 
     public static void reopenVorgang(Vorgaenge vorgang) {
+        EntityManager em = OPDE.createEM();
         VBericht systemBericht = new VBericht("Vorgang wieder geöffnet", VBerichtTools.VBERICHT_ART_REOPEN, vorgang);
         vorgang.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
-            //OPDE.getEM().persist(systemBericht);
-            OPDE.getEM().merge(vorgang);
-            OPDE.getEM().getTransaction().commit();
+            //em.persist(systemBericht);
+            em.merge(vorgang);
+            em.getTransaction().commit();
         } catch (Exception ex) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             new DlgException(ex);
         }
     }
@@ -145,14 +149,14 @@ public class VorgaengeTools {
     public static Vorgaenge createVorgang(String title, VKat vkat, Bewohner bw) {
         Vorgaenge vorgang = new Vorgaenge(title, bw, vkat);
         VBericht vbericht = new VBericht("Neuen Vorgang erstellt.", VBerichtTools.VBERICHT_ART_CREATE, vorgang);
-
-        OPDE.getEM().getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
         try {
-            OPDE.getEM().persist(vorgang);
-            OPDE.getEM().persist(vbericht);
-            OPDE.getEM().getTransaction().commit();
+            em.persist(vorgang);
+            em.persist(vbericht);
+            em.getTransaction().commit();
         } catch (Exception e) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return vorgang;
     }
@@ -235,23 +239,24 @@ public class VorgaengeTools {
      * @param vorgang
      */
     public static void remove(VorgangElement element, Vorgaenge vorgang) {
+        EntityManager em = OPDE.createEM();
         List connectionObjects = null;
         String elementBezeichnung = "";
         Query query = null;
         if (element instanceof Pflegeberichte) {
-            query = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findByElementAndVorgang");
+            query = em.createNamedQuery("SYSPB2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Pflegebericht";
         } else if (element instanceof BWerte) {
-            query = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findByElementAndVorgang");
+            query = em.createNamedQuery("SYSBWerte2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Bewohner Wert";
         } else if (element instanceof Verordnung) {
-            query = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findByElementAndVorgang");
+            query = em.createNamedQuery("SYSVER2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Ärztliche Verordnung";
         } else if (element instanceof BWInfo) {
-            query = OPDE.getEM().createNamedQuery("SYSBWI2VORGANG.findByElementAndVorgang");
+            query = em.createNamedQuery("SYSBWI2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Bewohner Information";
         } else if (element instanceof Planung) {
-            query = OPDE.getEM().createNamedQuery("SYSPLAN2VORGANG.findByElementAndVorgang");
+            query = em.createNamedQuery("SYSPLAN2VORGANG.findByElementAndVorgang");
             elementBezeichnung = "Pflegeplanung";
         } else {
 
@@ -284,14 +289,15 @@ public class VorgaengeTools {
 
     public static void setWVVorgang(Vorgaenge vorgang, Date wv) {
         VBericht systemBericht = new VBericht("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), VBerichtTools.VBERICHT_ART_WV, vorgang);
+        EntityManager em = OPDE.createEM();
         vorgang.setWv(wv);
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
-            //OPDE.getEM().persist(systemBericht);
-            OPDE.getEM().merge(vorgang);
-            OPDE.getEM().getTransaction().commit();
+            //em.persist(systemBericht);
+            em.merge(vorgang);
+            em.getTransaction().commit();
         } catch (Exception ex) {
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
             new DlgException(ex);
         }
     }
@@ -330,7 +336,8 @@ public class VorgaengeTools {
         final Bewohner bw = bewohner;
         final VorgangElement finalElement = element;
         neu.add(txt);
-        Query query = OPDE.getEM().createNamedQuery("VKat.findAllSorted");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("VKat.findAllSorted");
 
         Iterator<VKat> it = query.getResultList().iterator();
         while (it.hasNext()) {
@@ -361,7 +368,7 @@ public class VorgaengeTools {
      */
     private static JMenu getVorgaenge2Assign(VorgangElement element, Bewohner bewohner, ActionListener callback) {
         JMenu result = new JMenu("Zuordnen zu");
-
+        EntityManager em = OPDE.createEM();
         final ActionListener cb = callback;
 
         final VorgangElement finalElement = element;
@@ -369,7 +376,7 @@ public class VorgaengeTools {
         // 1. Alle Vorgänge für den betreffenden BW suchen und in die Liste packen.
         List<Vorgaenge> vorgaenge = new ArrayList();
         Query query;
-        query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBewohner");
+        query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
         query.setParameter("bewohner", bewohner);
         vorgaenge.addAll(query.getResultList());
 
@@ -377,15 +384,15 @@ public class VorgaengeTools {
         // 2. Alle die Vorgänge entfernen, zu denen das betreffenden Object bereits zugeordnet wurde.
         Query complement = null;
         if (element instanceof Pflegeberichte) {
-            complement = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
+            complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
-            complement = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
+            complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof Verordnung) {
-            complement = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
+            complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWInfo) {
-            complement = OPDE.getEM().createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
+            complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof Planung) {
-            complement = OPDE.getEM().createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
+            complement = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             complement = null;
         }
@@ -411,7 +418,7 @@ public class VorgaengeTools {
     }
 
     private static JMenu getVorgaenge2Remove(VorgangElement element, ActionListener callback) {
-
+        EntityManager em = OPDE.createEM();
         JMenu result = new JMenu("Entfernen von");
 
         final ActionListener cb = callback;
@@ -422,15 +429,15 @@ public class VorgaengeTools {
         List<Vorgaenge> vorgaenge = new ArrayList();
         Query query = null;
         if (element instanceof Pflegeberichte) {
-            query = OPDE.getEM().createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
+            query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
-            query = OPDE.getEM().createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
+            query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof Verordnung) {
-            query = OPDE.getEM().createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
+            query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWInfo) {
-            query = OPDE.getEM().createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
+            query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof Planung) {
-            query = OPDE.getEM().createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
+            query = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             query = null;
         }

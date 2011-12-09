@@ -1,20 +1,18 @@
 package entity.system;
 
 import entity.EntityTools;
-import entity.PflegeberichteTools;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
-import tablemodels.TMPflegeberichte;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -33,7 +31,8 @@ public class SYSMessagesTools {
 
 
     public static void processSystemMessage() {
-        Query query = OPDE.getEM().createNamedQuery("SYSMessages.findByReceiverHostAndUnprocessed");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("SYSMessages.findByReceiverHostAndUnprocessed");
         query.setParameter("receiverHost", OPDE.getHost());
         Iterator<SYSMessages> it = query.getResultList().iterator();
         while (it.hasNext()) {
@@ -46,7 +45,7 @@ public class SYSMessagesTools {
                     SYSLoginTools.logout();
                     OPDE.getBM().interrupt();
                     SYSHostsTools.shutdown();
-                    OPDE.getEM().close();
+                    em.close();
 
                     String html = "<html><h1>Das Progamm musste automatisch beendet werden</h1><b>Der Grund:</b><br/>" + msg.getMessage() +
                             "</html>";
@@ -79,11 +78,19 @@ public class SYSMessagesTools {
     }
 
 
-    public static void setAllMesages2Processed(SYSHosts host){
-        Query query = OPDE.getEM().createQuery("UPDATE SYSMessages s SET s.processed = current_timestamp WHERE s.processed = :processed AND s.receiverHost = :host");
-        query.setParameter("processed", SYSConst.DATE_BIS_AUF_WEITERES);
-        query.setParameter("host", host);
-        query.executeUpdate();
+    public static void setAllMesages2Processed(SYSHosts host) {
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            Query query = em.createQuery("UPDATE SYSMessages s SET s.processed = current_timestamp WHERE s.processed = :processed AND s.receiverHost = :host");
+            query.setParameter("processed", SYSConst.DATE_BIS_AUF_WEITERES);
+            query.setParameter("host", host);
+            query.executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+        }
+
     }
 
 }

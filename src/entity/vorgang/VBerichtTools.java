@@ -4,8 +4,10 @@
  */
 package entity.vorgang;
 
+import entity.EntityTools;
 import op.OPDE;
 
+import javax.persistence.EntityManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -51,9 +53,7 @@ public class VBerichtTools {
     }
 
     public static void newBericht(Vorgaenge vorgang, String text, short art) {
-        OPDE.getEM().getTransaction().begin();
         VBericht vbericht = new VBericht(text, art, vorgang);
-        OPDE.getEM().persist(vbericht);
-        OPDE.getEM().getTransaction().commit();
+        EntityTools.persist(vbericht);
     }
 }

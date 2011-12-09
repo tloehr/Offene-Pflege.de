@@ -34,6 +34,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.JXErrorPane;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -230,17 +231,18 @@ public class DlgBericht extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        OPDE.getEM().getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
         try {
             Uebergabebuch bericht = new Uebergabebuch(SYSCalendar.addTime2Date(jdcDatum.getDate(), new Time(SYSCalendar.erkenneUhrzeit(txtTBUhrzeit.getText()).getTimeInMillis())), txtUebergabe.getText(), einrichtung, OPDE.getLogin().getUser());
-            OPDE.getEM().persist(bericht);
+            em.persist(bericht);
             // Der aktuelle User bestätigt direkt seinen eigenen Bericht.
             bericht.getUsersAcknowledged().add(new Uebergabe2User(bericht, OPDE.getLogin().getUser()));
-            OPDE.getEM().merge(bericht);
-            OPDE.getEM().getTransaction().commit();
+            em.merge(bericht);
+            em.getTransaction().commit();
         } catch (Exception e) {
             JXErrorPane.showDialog(e);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         this.dispose();
     }//GEN-LAST:event_btnSaveActionPerformed

@@ -34,6 +34,7 @@ import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.tools.*;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ListSelectionListener;
@@ -62,7 +63,7 @@ public class PnlPlanung extends CleanablePanel {
     private ListSelectionListener lsl;
     private OCSec ocs;
     private ActionListener standardActionListener;
-
+    private EntityManager em = OPDE.createEM();
     /**
      * Creates new form PnlPlanung
      */
@@ -440,7 +441,7 @@ public class PnlPlanung extends CleanablePanel {
         if (singleRowSelected) {
 //            menu.add(new JSeparator());
 //            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "Planung", planid, bwkennung, fileActionListener));
-            Planung planung = OPDE.getEM().find(Planung.class, planid);
+            Planung planung = em.find(Planung.class, planid);
             if (!planung.isAbgesetzt()) {
                 menu.add(new JSeparator());
                 menu.add(VorgaengeTools.getVorgangContextMenu(parent, planung, bewohner, standardActionListener));

@@ -10,6 +10,7 @@
  */
 package op.vorgang;
 
+import javax.persistence.EntityManager;
 import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -74,6 +75,7 @@ public class PnlVorgang extends CleanablePanel {
     protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
 
     private Timeline textmessageTL;
+    private EntityManager em = OPDE.createEM();
 
 
     /**
@@ -219,7 +221,7 @@ public class PnlVorgang extends CleanablePanel {
     }
 
     protected JXTaskPane addVorgaengeFuerBW(Bewohner bewohner) {
-        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBewohner");
+        Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
         query.setParameter("bewohner", bewohner);
         List<Vorgaenge> listVorgaenge = query.getResultList();
         Iterator<Vorgaenge> it = listVorgaenge.iterator();
@@ -252,14 +254,14 @@ public class PnlVorgang extends CleanablePanel {
     protected void addVorgaengeFuerBW() {
         //((Container) taskContainer).add(new JLabel("Bewohner"));
 
-        List<Bewohner> bewohner = OPDE.getEM().createNamedQuery("Bewohner.findAllActiveSorted").getResultList();
+        List<Bewohner> bewohner = em.createNamedQuery("Bewohner.findAllActiveSorted").getResultList();
 
         JXTaskPane allbwpanel = new JXTaskPane("nach BewohnerInnen");
         allbwpanel.setCollapsed(true);
 
         for (Bewohner bw : bewohner) {
 
-            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBewohner");
+            Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
             query.setParameter("bewohner", bw);
             List<Vorgaenge> listVorgaenge = query.getResultList();
             Iterator<Vorgaenge> it = listVorgaenge.iterator();
@@ -315,7 +317,7 @@ public class PnlVorgang extends CleanablePanel {
         pnlVorgaengeByMA.add(new JSeparator());
         Users selectedUser = (Users) cmbMA.getSelectedItem();
         if (selectedUser != null) {
-            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBesitzer");
+            Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
             query.setParameter("besitzer", selectedUser);
             List<Vorgaenge> listVorgaenge = query.getResultList();
             Iterator<Vorgaenge> it = listVorgaenge.iterator();
@@ -341,14 +343,14 @@ public class PnlVorgang extends CleanablePanel {
     }
 
     protected void addVorgaengeFuerMA() {
-        List<Users> listeUser = OPDE.getEM().createNamedQuery("Users.findByStatusSorted").setParameter("status", 1).getResultList();
+        List<Users> listeUser = em.createNamedQuery("Users.findByStatusSorted").setParameter("status", 1).getResultList();
 
         JXTaskPane allmapanel = new JXTaskPane("nach MitarbeiterInnen");
         allmapanel.setCollapsed(true);
 
         for (Users user : listeUser) {
 
-            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBesitzer");
+            Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
             query.setParameter("besitzer", user);
             List<Vorgaenge> listVorgaenge = query.getResultList();
             Iterator<Vorgaenge> it = listVorgaenge.iterator();
@@ -411,7 +413,7 @@ public class PnlVorgang extends CleanablePanel {
 
         if (pnlAlleVorgaenge.isEnabled()) {
 
-            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findAllActiveSorted");
+            Query query = em.createNamedQuery("Vorgaenge.findAllActiveSorted");
             ArrayList<Vorgaenge> alleAktiven = new ArrayList(query.getResultList());
 
             Iterator<Vorgaenge> it = alleAktiven.iterator();
@@ -442,7 +444,7 @@ public class PnlVorgang extends CleanablePanel {
 
         if (pnlVorgaengeRunningOut.isEnabled()) {
 
-            Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveRunningOut");
+            Query query = em.createNamedQuery("Vorgaenge.findActiveRunningOut");
             query.setParameter("wv", SYSCalendar.addDate(new Date(), 4)); // 4 Tage von heute aus gerechnet.
             ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
 
@@ -471,7 +473,7 @@ public class PnlVorgang extends CleanablePanel {
 
     protected void loadMeineVorgaenge() {
 
-        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findActiveByBesitzer");
+        Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
         query.setParameter("besitzer", OPDE.getLogin().getUser());
         ArrayList<Vorgaenge> byBesitzer = new ArrayList(query.getResultList());
 
@@ -507,7 +509,7 @@ public class PnlVorgang extends CleanablePanel {
 
     protected void loadMeineInaktivenVorgaenge() {
 
-        Query query = OPDE.getEM().createNamedQuery("Vorgaenge.findInactiveByBesitzer");
+        Query query = em.createNamedQuery("Vorgaenge.findInactiveByBesitzer");
         query.setParameter("besitzer", OPDE.getLogin().getUser());
 
         ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
@@ -594,17 +596,17 @@ public class PnlVorgang extends CleanablePanel {
             case LAUFENDE_OPERATION_VORGANG_BEARBEITEN: {
 
                 try {
-                    OPDE.getEM().getTransaction().begin();
+                    em.getTransaction().begin();
                     if (pdcaChanged) {
                         VBericht vbericht = new VBericht("PDCA Stufe erhöht auf: " + VorgaengeTools.PDCA[aktuellerVorgang.getPdca()], VBerichtTools.VBERICHT_ART_PDCA, aktuellerVorgang);
                         vbericht.setPdca(aktuellerVorgang.getPdca());
-                        OPDE.getEM().persist(vbericht);
+                        em.persist(vbericht);
                     }
-                    OPDE.getEM().merge(aktuellerVorgang);
-                    OPDE.getEM().getTransaction().commit();
+                    em.merge(aktuellerVorgang);
+                    em.getTransaction().commit();
                 } catch (Exception exc) {
                     OPDE.fatal(exc.getMessage());
-                    OPDE.getEM().getTransaction().rollback();
+                    em.getTransaction().rollback();
                 }
 
                 pdcaChanged = false;
@@ -641,7 +643,7 @@ public class PnlVorgang extends CleanablePanel {
             }
             case LAUFENDE_OPERATION_VORGANG_BEARBEITEN: {
                 btnPDCAPlus.setEnabled(true);
-                OPDE.getEM().refresh(aktuellerVorgang);
+                em.refresh(aktuellerVorgang);
                 loadDetails(aktuellerVorgang);
                 break;
             }

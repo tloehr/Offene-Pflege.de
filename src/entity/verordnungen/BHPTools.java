@@ -3,6 +3,7 @@ package entity.verordnungen;
 import op.OPDE;
 import op.tools.DlgException;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,8 +25,8 @@ public class BHPTools {
     public static final int STATUS_VERWEIGERT_VERWORFEN = 3;
 
     public static long getNumBHPs(Verordnung verordnung) {
-
-        Query query = OPDE.getEM().createNamedQuery("BHP.numByNOTStatusAndVerordnung");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("BHP.numByNOTStatusAndVerordnung");
         query.setParameter("verordnung", verordnung);
         query.setParameter("status", STATUS_OFFEN);
 

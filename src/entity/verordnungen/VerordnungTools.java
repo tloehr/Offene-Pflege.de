@@ -9,6 +9,7 @@ import entity.Einrichtungen;
 import op.OPDE;
 import op.tools.*;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -38,8 +39,8 @@ public class VerordnungTools {
      *         Stellen.
      */
     public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean nurAktuelle) {
-
-        Query queryVorrat = OPDE.getEM().createNamedQuery("Verordnung.findByBewohnerMitVorraeten");
+        EntityManager em = OPDE.createEM();
+        Query queryVorrat = em.createNamedQuery("Verordnung.findByBewohnerMitVorraeten");
         queryVorrat.setParameter(1, bewohner.getBWKennung());
         queryVorrat.setParameter(2, bewohner.getBWKennung());
         queryVorrat.setParameter(3, !nurAktuelle);
@@ -56,13 +57,13 @@ public class VerordnungTools {
 
             if (line[1] != null) {
                 BigInteger vorID = (BigInteger) line[1];
-                MedVorrat vorrat = OPDE.getEM().find(MedVorrat.class, vorID.longValue());
+                MedVorrat vorrat = em.find(MedVorrat.class, vorID.longValue());
                 line[1] = vorrat;
             }
 
             if (line[3] != null) {
                 BigInteger bestID = (BigInteger) line[3];
-                MedBestand bestand = OPDE.getEM().find(MedBestand.class, bestID.longValue());
+                MedBestand bestand = em.find(MedBestand.class, bestID.longValue());
                 line[3] = bestand;
             }
             OPDE.debug(line.length);
@@ -521,8 +522,8 @@ public class VerordnungTools {
         // ======================================================================================================
         // Erster Teil
         // ======================================================================================================
-
-        Query query = OPDE.getEM().createNamedQuery("VerordnungPlanung.findByVerordnungSorted");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("VerordnungPlanung.findByVerordnungSorted");
         query.setParameter("verordnung", verordnung);
         Iterator<VerordnungPlanung> planungen = query.getResultList().iterator();
 

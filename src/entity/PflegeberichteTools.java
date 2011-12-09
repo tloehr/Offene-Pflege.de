@@ -13,6 +13,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,7 +35,8 @@ public class PflegeberichteTools {
      */
     public static boolean deleteBericht(Pflegeberichte bericht) {
         boolean success = false;
-        OPDE.getEM().getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
         try {
 
             bericht.setEditedBy(OPDE.getLogin().getUser());
@@ -44,7 +46,7 @@ public class PflegeberichteTools {
             Iterator<Syspb2file> files = bericht.getAttachedFiles().iterator();
             while (files.hasNext()) {
                 Syspb2file oldAssignment = files.next();
-                OPDE.getEM().remove(oldAssignment);
+                em.remove(oldAssignment);
             }
             bericht.getAttachedFiles().clear();
 
@@ -53,22 +55,23 @@ public class PflegeberichteTools {
             while (vorgaenge.hasNext()) {
                 // gleichfalls
                 SYSPB2VORGANG oldAssignment = vorgaenge.next();
-                OPDE.getEM().remove(oldAssignment);
+                em.remove(oldAssignment);
             }
             bericht.getAttachedVorgaenge().clear();
 
-            OPDE.getEM().merge(bericht);
-            OPDE.getEM().getTransaction().commit();
+            em.merge(bericht);
+            em.getTransaction().commit();
             success = true;
         } catch (Exception e) {
             OPDE.getLogger().error(e.getMessage(), e);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
 
     public static Pflegeberichte firstBericht(Bewohner bewohner) {
-        Query query = OPDE.getEM().createNamedQuery("Pflegeberichte.findAllByBewohner");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
         query.setParameter("bewohner", bewohner);
         query.setFirstResult(0);
         query.setMaxResults(1);
@@ -88,7 +91,8 @@ public class PflegeberichteTools {
      */
     public static boolean changeBericht(Pflegeberichte oldBericht, Pflegeberichte newBericht) {
         boolean success = false;
-        OPDE.getEM().getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
         try {
             newBericht.setReplacementFor(oldBericht);
             // Dateien umbiegen
@@ -100,7 +104,7 @@ public class PflegeberichteTools {
                 SYSFiles file = oldAssignment.getSysfile();
                 Syspb2file newAssignment = new Syspb2file(oldAssignment.getBemerkung(), file, newBericht, oldAssignment.getUser(), oldAssignment.getPit());
                 newBericht.getAttachedFiles().add(newAssignment);
-                OPDE.getEM().remove(oldAssignment);
+                em.remove(oldAssignment);
             }
 
             // Vorgänge umbiegen
@@ -111,24 +115,24 @@ public class PflegeberichteTools {
                 Vorgaenge vorgang = oldAssignment.getVorgang();
                 SYSPB2VORGANG newAssignment = new SYSPB2VORGANG(vorgang, newBericht);
                 newBericht.getAttachedVorgaenge().add(newAssignment);
-                OPDE.getEM().remove(oldAssignment);
+                em.remove(oldAssignment);
             }
 
-            OPDE.getEM().persist(newBericht);
+            em.persist(newBericht);
 
             oldBericht.getAttachedFiles().clear();
             oldBericht.getAttachedVorgaenge().clear();
             oldBericht.setEditedBy(OPDE.getLogin().getUser());
             oldBericht.setEditpit(new Date());
             oldBericht.setReplacedBy(newBericht);
-            OPDE.getEM().merge(oldBericht);
+            em.merge(oldBericht);
 
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
 
             success = true;
         } catch (Exception e) {
             OPDE.error(e.getMessage());
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
@@ -162,14 +166,15 @@ public class PflegeberichteTools {
 
     public static boolean saveBericht(Pflegeberichte newBericht) {
         boolean success = false;
-        OPDE.getEM().getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
         try {
-            OPDE.getEM().persist(newBericht);
-            OPDE.getEM().getTransaction().commit();
+            em.persist(newBericht);
+            em.getTransaction().commit();
             success = true;
         } catch (Exception e) {
             OPDE.getLogger().error(e.getMessage(), e);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }

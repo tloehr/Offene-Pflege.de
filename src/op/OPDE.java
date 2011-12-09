@@ -34,8 +34,10 @@ import op.threads.BackgroundMonitor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
+import org.w3c.dom.Entity;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -73,7 +75,7 @@ public class OPDE {
     // der User sich abmeldet.
     protected static EventListenerList listenerList = new EventListenerList();
     protected static HashMap<String, ActionListener> runningModules = new HashMap();
-    protected static EntityManager em;
+    protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;
     protected static SYSHosts host;
@@ -114,6 +116,10 @@ public class OPDE {
     public static void setProp(String key, String value) {
         props.put(key, value);
 
+    }
+
+    public static EntityManagerFactory getEMF() {
+        return emf;
     }
 
     public static String getUrl() {
@@ -203,7 +209,7 @@ public class OPDE {
     public static void fatal(Object message) {
         logger.fatal(message);
         SyslogTools.fatal(message.toString());
-//        OPDE.getEM().close();
+//        em.close();
 //        System.exit(1);
     }
 
@@ -216,8 +222,8 @@ public class OPDE {
         logger.debug(message);
     }
 
-    public static EntityManager getEM() {
-        return em;
+    public static EntityManager createEM() {
+        return emf.createEntityManager();
     }
 
     public static Properties getProps() {
@@ -421,7 +427,7 @@ public class OPDE {
 //                jpaProps.put("eclipselink.logging.level","FINER");
 //            }
 
-            em = Persistence.createEntityManagerFactory("OPDEPU", jpaProps).createEntityManager();
+            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
             // Cache lösche mit
             // em.getEntityManagerFactory().getCache().evictAll();
 
@@ -467,7 +473,11 @@ public class OPDE {
 //                        offset = 0;
 //                    }
 //                }
-                    OPDE.setLogin(new SYSLogin(OPDE.getEM().find(Users.class, "root")));
+                    EntityManager myEM = OPDE.createEM();
+                    Users rootUser = myEM.find(Users.class, "root");
+                    SYSLogin rootLogin = new SYSLogin(rootUser);
+                    EntityTools.persist(rootLogin);
+                    OPDE.setLogin(rootLogin);
                     BHPImport.importBHP(0, 0, offset);
                 } catch (Exception ex) {
                     logger.fatal("Exception beim BHPImport", ex);

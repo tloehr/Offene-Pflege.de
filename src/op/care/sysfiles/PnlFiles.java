@@ -26,6 +26,7 @@
 package op.care.sysfiles;
 
 import java.awt.event.*;
+import javax.persistence.EntityManager;
 import javax.swing.table.*;
 import entity.Bewohner;
 import entity.BewohnerTools;
@@ -57,6 +58,7 @@ public class PnlFiles extends CleanablePanel {
     private JPopupMenu menu;
     private Bewohner bewohner;
     private javax.swing.JFrame parent;
+    private EntityManager em = OPDE.createEM();
 
 
     /**
@@ -65,7 +67,7 @@ public class PnlFiles extends CleanablePanel {
     public PnlFiles(FrmPflege pflege, Bewohner bewohner) {
         initComponents();
         this.bewohner = bewohner;
-        bewohner = OPDE.getEM().find(Bewohner.class, bewohner.getBWKennung());
+        bewohner = em.find(Bewohner.class, bewohner.getBWKennung());
         this.parent = pflege;
         BewohnerTools.setBWLabel(lblBW, bewohner);
         tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -12,6 +12,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
@@ -209,7 +210,8 @@ public class AppInfo {
     public boolean userHasAccessLevelForThisClass(String classname, short acl) {
         boolean allowed = true;
         if (!OPDE.isAdmin()) {
-            Query query = OPDE.getEM().createNamedQuery("IntClasses.findByUserAndClassnameAndACL");
+            EntityManager em = OPDE.createEM();
+            Query query = em.createNamedQuery("IntClasses.findByUserAndClassnameAndACL");
             query.setParameter("ocuser", OPDE.getLogin().getUser());
             query.setParameter("classname", classname);
             query.setParameter("shortacl", acl);

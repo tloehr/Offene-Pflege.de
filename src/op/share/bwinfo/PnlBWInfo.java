@@ -35,6 +35,7 @@ import op.OPDE;
 import op.care.CleanablePanel;
 import op.tools.*;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
@@ -66,6 +67,7 @@ public class PnlBWInfo extends CleanablePanel {
     private boolean ignoreEvent;
     private ActionListener fileActionListener;
     private Bewohner bewohner;
+    private EntityManager em;
 
     /**
      * @param parent    - zu welchem Fenster gehört dieses Panel ?
@@ -74,6 +76,7 @@ public class PnlBWInfo extends CleanablePanel {
      */
     public PnlBWInfo(Frame parent, int mode, String bwkennung, String preselection) {
         initComponents();
+        em = OPDE.createEM();
         this.mode = mode;
         this.parent = parent;
         this.bwkennung = bwkennung;
@@ -615,7 +618,7 @@ public class PnlBWInfo extends CleanablePanel {
                     menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, fileActionListener));
 
                     long bwinfoid = ((Long) entry.get("bwinfoid")).longValue();
-                    Query query = OPDE.getEM().createNamedQuery("BWInfo.findByBwinfoid");
+                    Query query = em.createNamedQuery("BWInfo.findByBwinfoid");
                     query.setParameter("bwinfoid", bwinfoid);
                     entity.BWInfo bwinfo = (entity.BWInfo) query.getSingleResult();
                     menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwinfo, fileActionListener));

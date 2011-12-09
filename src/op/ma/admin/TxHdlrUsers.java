@@ -12,6 +12,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
@@ -26,9 +27,11 @@ import op.OPDE;
 public class TxHdlrUsers extends TransferHandler {
 
     private HashMap<String, Users> cache;
+    private EntityManager em;
 
     public TxHdlrUsers() {
         cache = new HashMap();
+        em = OPDE.createEM();
     }
 
     @Override
@@ -60,7 +63,7 @@ public class TxHdlrUsers extends TransferHandler {
             }
 
             StringTokenizer st = new StringTokenizer(data, "\n");
-            Query query = OPDE.getEM().createNamedQuery("Users.findByUKennung");
+            Query query = em.createNamedQuery("Users.findByUKennung");
             while (st.hasMoreTokens()) {
                 String key = st.nextToken();
                 if (!cache.containsKey(key)) {
@@ -87,7 +90,7 @@ public class TxHdlrUsers extends TransferHandler {
             }
             StringTokenizer st = new StringTokenizer(data, "\n");
 
-            Query query = OPDE.getEM().createNamedQuery("Users.findByUKennung");
+            Query query = em.createNamedQuery("Users.findByUKennung");
             while (st.hasMoreTokens()) {
                 String key = st.nextToken();
                 if (!cache.containsKey(key)) {

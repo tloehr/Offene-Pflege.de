@@ -7,6 +7,7 @@ package entity;
 
 import op.OPDE;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -25,13 +26,14 @@ public class StationenTools {
      * @param cmb
      */
     public static void setComboBox(JComboBox cmb) {
-        Query query = OPDE.getEM().createNamedQuery("Stationen.findAllSorted");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Stationen.findAllSorted");
         cmb.setModel(new DefaultComboBoxModel(new Vector<Stationen>(query.getResultList())));
 
         //TODO: Kandidat für SYSProps
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
 
-        Query query2 = OPDE.getEM().createNamedQuery("Stationen.findByStatID");
+        Query query2 = em.createNamedQuery("Stationen.findByStatID");
         query2.setParameter("statID", statid);
         Stationen station = (Stationen) query2.getSingleResult();
         cmb.setSelectedItem(station);
@@ -40,8 +42,9 @@ public class StationenTools {
 
 
     public static Stationen getStation4ThisHost(){
+        EntityManager em = OPDE.createEM();
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
-        Query query = OPDE.getEM().createNamedQuery("Stationen.findByStatID");
+        Query query = em.createNamedQuery("Stationen.findByStatID");
         query.setParameter("statID", statid);
         return (Stationen) query.getSingleResult();
     }

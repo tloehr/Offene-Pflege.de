@@ -12,6 +12,7 @@ package op.care.sysfiles;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle;
@@ -35,6 +36,7 @@ public class DlgNewFile extends javax.swing.JDialog {
 
     File selectedFile;
     Object[] entities;
+    private EntityManager em = OPDE.createEM();
 
     /**
      * Creates new form DlgNewFile
@@ -212,7 +214,7 @@ public class DlgNewFile extends javax.swing.JDialog {
         SYSFiles sysfile = SYSFilesTools.putFile(selectedFile);
         Object relationEntity;
 
-        OPDE.getEM().getTransaction().begin();
+        em.getTransaction().begin();
         try {
             for (int i = 0; i < entities.length; i++) {
                 if (entities[i] instanceof Bewohner) {
@@ -224,14 +226,14 @@ public class DlgNewFile extends javax.swing.JDialog {
                 }
 
                 if (relationEntity != null) {
-                    OPDE.getEM().persist(relationEntity);
+                    em.persist(relationEntity);
 
                 }
             }
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().commit();
         } catch (Exception e) {
             OPDE.getLogger().error(e.getMessage(), e);
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         dispose();
     }//GEN-LAST:event_btnOkActionPerformed

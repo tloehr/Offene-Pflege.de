@@ -849,7 +849,7 @@ public class PnlVitalwerte extends CleanablePanel {
 //                    // #0000003
 //                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
 //
-//                    Query query = OPDE.getEM().createNamedQuery("BWerte.findByBwid");
+//                    Query query = em.createNamedQuery("BWerte.findByBwid");
 //                    query.setParameter("bwid", bwid);
 //                    entity.BWerte bwert = (entity.BWerte) query.getSingleResult();
 //                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));

@@ -2,7 +2,7 @@ package entity;
 
 import op.OPDE;
 
-import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,81 +17,82 @@ public class EntityTools {
     public static boolean persist(Object entity) {
         boolean success = false;
 
+        EntityManager em = OPDE.createEM();
         try {
-            OPDE.getEM().getTransaction().begin();
-            OPDE.getEM().persist(entity);
-            OPDE.getEM().getTransaction().commit();
-            OPDE.getEM().refresh(entity);
+            em.getTransaction().begin();
+            em.persist(entity);
+            em.getTransaction().commit();
+            em.refresh(entity);
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
 
     public static boolean merge(Object entity) {
         boolean success = false;
-
+        EntityManager em = OPDE.createEM();
         try {
-            OPDE.getEM().getTransaction().begin();
-            OPDE.getEM().merge(entity);
-            OPDE.getEM().getTransaction().commit();
-            OPDE.getEM().refresh(entity);
+            em.getTransaction().begin();
+            em.merge(entity);
+            em.getTransaction().commit();
+            em.refresh(entity);
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
 
     public static boolean store(Object entity) {
         boolean success = false;
-
+        EntityManager em = OPDE.createEM();
         try {
-            OPDE.getEM().getTransaction().begin();
-            if (OPDE.getEM().contains(entity)) {
-                OPDE.getEM().merge(entity);
+            em.getTransaction().begin();
+            if (em.contains(entity)) {
+                em.merge(entity);
             } else {
-                OPDE.getEM().persist(entity);
+                em.persist(entity);
             }
-            OPDE.getEM().getTransaction().commit();
-            OPDE.getEM().refresh(entity);
+            em.getTransaction().commit();
+            em.refresh(entity);
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
 
     public static boolean delete(Object entity) {
         boolean success = false;
-
+        EntityManager em = OPDE.createEM();
         try {
-            OPDE.getEM().getTransaction().begin();
-            OPDE.getEM().remove(entity);
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().begin();
+            em.remove(entity);
+            em.getTransaction().commit();
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
 
     public static boolean refresh(Object entity) {
         boolean success = false;
-
+        EntityManager em = OPDE.createEM();
         try {
-            OPDE.getEM().getTransaction().begin();
-            OPDE.getEM().refresh(entity);
-            OPDE.getEM().getTransaction().commit();
+            em.getTransaction().begin();
+            em.refresh(entity);
+            em.getTransaction().commit();
             success = true;
         } catch (Exception e) {
             e.printStackTrace();
-            OPDE.getEM().getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         return success;
     }
@@ -104,10 +105,11 @@ public class EntityTools {
      * @return
      */
     public static String getIDList(List entities) {
+        EntityManager em = OPDE.createEM();
         String list = "";
         Iterator it = entities.iterator();
         while (it.hasNext()) {
-            list += OPDE.getEM().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(it.next());
+            list += em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(it.next());
             list += it.hasNext() ? "," : "";
         }
         return list;

@@ -266,7 +266,7 @@ public class OPMain extends javax.swing.JFrame {
         SYSLoginTools.logout();
         OPDE.getBM().interrupt();
         SYSHostsTools.shutdown();
-        OPDE.getEM().close();
+
 
         OPDE.saveLocalProps();
 
@@ -456,7 +456,7 @@ public class OPMain extends javax.swing.JFrame {
             SYSLoginTools.logout();
 
             System.gc();
-            OPDE.getEM().getEntityManagerFactory().getCache().evictAll();
+            OPDE.getEMF().getCache().evictAll();
             this.setVisible(true);
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 

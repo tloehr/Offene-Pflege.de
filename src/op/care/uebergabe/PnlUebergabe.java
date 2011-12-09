@@ -38,6 +38,7 @@ import op.tools.InternalClassACL;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -69,6 +70,7 @@ public class PnlUebergabe extends CleanablePanel {
     private OCSec ocs;
     private javax.swing.JFrame parent;
     private JPopupMenu menu;
+    private EntityManager em = OPDE.createEM();
 
     /**
      * Creates new form PnlUebergabe
@@ -403,7 +405,7 @@ public class PnlUebergabe extends CleanablePanel {
         private void confirm() {
             int max = berichte.size();
 
-            OPDE.getEM().getTransaction().begin();
+            em.getTransaction().begin();
 
             try {
                 for (int row = 0; row < max; row++) {
@@ -413,20 +415,20 @@ public class PnlUebergabe extends CleanablePanel {
                         if (bericht[TMUebergabe.LIST_BERICHT] instanceof Uebergabebuch) {
                             Uebergabebuch uebergabe = (Uebergabebuch) bericht[TMUebergabe.LIST_BERICHT];
                             uebergabe.getUsersAcknowledged().add(new Uebergabe2User(uebergabe, OPDE.getLogin().getUser()));
-                            OPDE.getEM().merge(uebergabe);
+                            em.merge(uebergabe);
                         } else {
                             Pflegeberichte pflegebericht = (Pflegeberichte) bericht[TMUebergabe.LIST_BERICHT];
                             pflegebericht.getUsersAcknowledged().add(new PB2User(pflegebericht, OPDE.getLogin().getUser()));
-                            OPDE.getEM().merge(pflegebericht);
+                            em.merge(pflegebericht);
                         }
                     }
                     if (pm.isCanceled()) {
                         throw new Exception("Bestätigung abgebrochen.");
                     }
                 }
-                OPDE.getEM().getTransaction().commit();
+                em.getTransaction().commit();
             } catch (Exception e) {
-                OPDE.getEM().getTransaction().rollback();
+                em.getTransaction().rollback();
             }
             btnConfirmAll.setEnabled(true);
             reloadTable();

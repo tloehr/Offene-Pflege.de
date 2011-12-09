@@ -3,6 +3,7 @@ package entity.vorgang;
 import entity.EntityTools;
 import op.OPDE;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 /**
@@ -23,7 +24,8 @@ public class VKatTools {
 
     public static VKat addKat(String kat) {
         VKat vkat = null;
-        Query query = OPDE.getEM().createNamedQuery("VKat.findByText");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("VKat.findByText");
         query.setParameter("text", kat.trim());
         if (query.getResultList().isEmpty()){
             vkat = new VKat(kat.trim());

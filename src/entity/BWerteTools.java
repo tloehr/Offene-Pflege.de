@@ -6,6 +6,7 @@ import op.care.vital.DlgVital;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,8 +22,8 @@ public class BWerteTools {
 
     public static BWerte findByID(long id) {
         BWerte wert = null;
-
-        Query query = OPDE.getEM().createNamedQuery("BWerte.findByBwid");
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("BWerte.findByBwid");
         query.setParameter("bwid", id);
 
         wert = (BWerte) query.getSingleResult();
