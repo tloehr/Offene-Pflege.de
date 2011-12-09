@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
+import entity.Users;
 import op.OPDE;
 
 import javax.persistence.NoResultException;

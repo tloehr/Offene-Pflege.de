@@ -33,8 +33,8 @@ import javax.swing.border.*;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.SYSRunningClasses;
-import entity.SYSRunningClassesTools;
+import entity.system.SYSRunningClasses;
+import entity.system.SYSRunningClassesTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -95,7 +95,7 @@ public class PnlBHP extends CleanablePanel {
 
         Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
         runningClass = pair.getFirst();
-        readOnly = runningClass.isRW();
+        readOnly = !runningClass.isRW();
 
         if (readOnly) {
             blockingClass = pair.getSecond();

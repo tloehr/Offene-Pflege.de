@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.system;
 
 import java.net.InetAddress;
 import java.util.Date;

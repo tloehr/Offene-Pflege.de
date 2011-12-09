@@ -2,7 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
+
+import entity.Users;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -118,6 +120,6 @@ public class SYSProps implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.SYSProps[syspid=" + syspid + "]";
+        return "entity.system.SYSProps[syspid=" + syspid + "]";
     }
 }

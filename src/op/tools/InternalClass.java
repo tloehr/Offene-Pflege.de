@@ -5,7 +5,7 @@
 
 package op.tools;
 
-import entity.IntClasses;
+import entity.system.IntClasses;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,11 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
 import java.util.Date;
+
+import entity.Users;
+import entity.UsersTools;
 import op.OPDE;
-import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 
 /**

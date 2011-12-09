@@ -26,8 +26,8 @@
  */
 package op.care;
 
-import entity.SYSRunningClasses;
-import entity.SYSRunningClassesTools;
+import entity.system.SYSRunningClasses;
+import entity.system.SYSRunningClassesTools;
 import op.OPDE;
 import op.tools.*;
 

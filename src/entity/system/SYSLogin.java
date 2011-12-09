@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.system;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -23,6 +23,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import entity.Users;
 import op.OPDE;
 import op.tools.SYSConst;
 
@@ -131,7 +133,7 @@ public class SYSLogin implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.SYSLogin[loginID=" + loginID + "]";
+        return "entity.system.SYSLogin[loginID=" + loginID + "]";
     }
 
 }

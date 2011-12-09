@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
+import entity.Acl;
+import entity.Groups;
 import op.OPDE;
 import op.tools.CheckTreeSelectionModel;
 import op.tools.InternalClass;

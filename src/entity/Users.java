@@ -26,6 +26,7 @@
 package entity;
 
 import entity.files.*;
+import entity.system.SYSLogin;
 import op.tools.SYSTools;
 
 import javax.persistence.*;

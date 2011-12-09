@@ -1,10 +1,20 @@
 package entity.system;
 
 import entity.EntityTools;
+import entity.PflegeberichteTools;
 import op.OPDE;
-import op.OPMain;
+import op.tools.SYSConst;
+import op.tools.SYSPrint;
 import op.tools.SYSTools;
+import tablemodels.TMPflegeberichte;
+
 import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -23,24 +33,57 @@ public class SYSMessagesTools {
 
 
     public static void processSystemMessage() {
-        boolean logout = false;
         Query query = OPDE.getEM().createNamedQuery("SYSMessages.findByReceiverHostAndUnprocessed");
         query.setParameter("receiverHost", OPDE.getHost());
         Iterator<SYSMessages> it = query.getResultList().iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             SYSMessages msg = it.next();
-            if (msg.getCommand() == CMD_DO_LOGOUT){
-                logout = true;
-            } else if (msg.getCommand() == CMD_SHOW_MESSAGE){
+            if (msg.getCommand() == CMD_DO_LOGOUT) {
+
+                // Das wird einfacher und besser, wenn das Programm auf die Ein-Fenster-Variante umgestellt ist.
+                try {
+                    OPDE.closeDB();
+                    SYSLoginTools.logout();
+                    OPDE.getBM().interrupt();
+                    SYSHostsTools.shutdown();
+                    OPDE.getEM().close();
+
+                    String html = "<html><h1>Das Progamm musste automatisch beendet werden</h1><b>Der Grund:</b><br/>" + msg.getMessage() +
+                            "</html>";
+
+                    // Create temp file.
+                    File temp = File.createTempFile("emergency-exit", ".html");
+
+                    // Delete temp file when program exits.
+                    temp.deleteOnExit();
+
+                    // Write to temp file
+                    BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+                    out.write(SYSTools.htmlUmlautConversion(html));
+                    out.close();
+                    SYSPrint.handleFile(new JFrame(), temp.getAbsolutePath(), Desktop.Action.OPEN);
+
+                    System.exit(0);
+                } catch (Exception ex) {
+                    OPDE.fatal(ex);
+                    ex.printStackTrace();
+                    System.exit(1);
+                }
+
+            } else if (msg.getCommand() == CMD_SHOW_MESSAGE) {
                 OPDE.debug(SYSTools.catchNull(msg.getMessage()));
             }
             msg.setProcessed(new Date());
             EntityTools.merge(msg);
         }
+    }
 
-        if (logout){
 
-        }
+    public static void setAllMesages2Processed(SYSHosts host){
+        Query query = OPDE.getEM().createQuery("UPDATE SYSMessages s SET s.processed = current_timestamp WHERE s.processed = :processed AND s.receiverHost = :host");
+        query.setParameter("processed", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("host", host);
+        query.executeUpdate();
     }
 
 }

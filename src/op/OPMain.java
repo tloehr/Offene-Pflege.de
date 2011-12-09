@@ -25,8 +25,8 @@
  */
 package op;
 
-import entity.SYSHostsTools;
-import entity.SYSLoginTools;
+import entity.system.SYSHostsTools;
+import entity.system.SYSLoginTools;
 import op.share.tools.PnlEditor;
 import op.share.vorgang.TMVorgang;
 import op.tools.DlgException;
@@ -128,7 +128,6 @@ public class OPMain extends javax.swing.JFrame {
             public void windowClosing(WindowEvent e) {
                 formWindowClosing(e);
             }
-
             @Override
             public void windowDeiconified(WindowEvent e) {
                 formWindowDeiconified(e);
@@ -147,12 +146,12 @@ public class OPMain extends javax.swing.JFrame {
             GroupLayout pnlStatusLayout = new GroupLayout(pnlStatus);
             pnlStatus.setLayout(pnlStatusLayout);
             pnlStatusLayout.setHorizontalGroup(
-                    pnlStatusLayout.createParallelGroup()
-                            .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
+                pnlStatusLayout.createParallelGroup()
+                    .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, 948, Short.MAX_VALUE)
             );
             pnlStatusLayout.setVerticalGroup(
-                    pnlStatusLayout.createParallelGroup()
-                            .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                pnlStatusLayout.createParallelGroup()
+                    .addComponent(lblServer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             );
         }
 
@@ -177,25 +176,16 @@ public class OPMain extends javax.swing.JFrame {
 
             //---- tblVorgang ----
             tblVorgang.setModel(new DefaultTableModel(
-                    new Object[][]{
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                    },
-                    new String[]{
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
-            ) {
-                Class<?>[] columnTypes = new Class<?>[]{
-                        Object.class, Object.class, Object.class, Object.class
-                };
-
-                @Override
-                public Class<?> getColumnClass(int columnIndex) {
-                    return columnTypes[columnIndex];
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
                 }
-            });
+            ));
             tblVorgang.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -225,38 +215,38 @@ public class OPMain extends javax.swing.JFrame {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspVorgang, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
-                                .addGap(10, 10, 10)
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(btnLogout, GroupLayout.Alignment.TRAILING)
-                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                                .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)))
-                                .addContainerGap())
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspMainButtons, GroupLayout.DEFAULT_SIZE, 908, Short.MAX_VALUE)
-                                .addContainerGap())
+            contentPaneLayout.createParallelGroup()
+                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jspVorgang, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                        .addGap(10, 10, 10)
+                        .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(btnLogout, GroupLayout.Alignment.TRAILING)
+                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)))
+                        .addContainerGap())
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jspMainButtons, GroupLayout.DEFAULT_SIZE, 908, Short.MAX_VALUE)
+                        .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btnLogout)
-                                .addGap(18, 18, 18)
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
-                                        .addComponent(jspVorgang, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspMainButtons, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            contentPaneLayout.createParallelGroup()
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnLogout)
+                        .addGap(18, 18, 18)
+                        .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                                .addComponent(jspVorgang, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jspMainButtons, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
         pack();
         setLocationRelativeTo(getOwner());

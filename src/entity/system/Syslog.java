@@ -3,10 +3,9 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.system;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -164,7 +163,7 @@ public class Syslog implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Syslog[logid=" + logid + "]";
+        return "entity.system.Syslog[logid=" + logid + "]";
     }
 
 }

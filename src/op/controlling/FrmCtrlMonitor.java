@@ -26,7 +26,7 @@
  */
 package op.controlling;
 
-import entity.SYSPropsTools;
+import entity.system.SYSPropsTools;
 import entity.StationenTools;
 import op.OPDE;
 import op.tools.ListElement;

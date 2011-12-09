@@ -2,10 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
-import entity.system.SYSMessages;
-import entity.system.SYSMessagesTools;
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.Pair;
 
@@ -60,7 +59,7 @@ public class SYSRunningClassesTools {
     }
 
 
-    public static SYSRunningClasses startModule(String internalClassID, String[] conflictGroup, int maxtries) {
+    public static SYSRunningClasses startModule(String internalClassID, String[] conflictGroup, int maxtries, String message) {
         SYSRunningClasses result = null;
         int tries = 0;
         OPDE.debug("SYSRunningTools.startModule/5: " + internalClassID + " will starten.");
@@ -84,7 +83,7 @@ public class SYSRunningClassesTools {
                 tries++;
                 listSignedBlocks = getRunning(null, STATUS_RW, conflictGroup);
                 if (tries == 1) {
-                    notifyClasses(listSignedBlocks, SYSMessagesTools.CMD_DO_LOGOUT);
+                    notifyClasses(listSignedBlocks, SYSMessagesTools.CMD_DO_LOGOUT, message);
                 }
                 done = listSignedBlocks.isEmpty() || tries > maxtries;
                 if (done) {
@@ -117,11 +116,11 @@ public class SYSRunningClassesTools {
         return result;
     }
 
-    protected static void notifyClasses(List<SYSRunningClasses> list, int message) {
+    protected static void notifyClasses(List<SYSRunningClasses> list, int message, String textmessage) {
         Iterator<SYSRunningClasses> it = list.iterator();
         while (it.hasNext()) {
             SYSRunningClasses thisClass = it.next();
-            SYSMessages sysMessage = new SYSMessages(OPDE.getHost(), thisClass.getLogin().getHost(), message, null);
+            SYSMessages sysMessage = new SYSMessages(OPDE.getHost(), thisClass.getLogin().getHost(), message, textmessage);
             EntityTools.persist(sysMessage);
         }
     }

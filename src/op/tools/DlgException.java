@@ -26,9 +26,9 @@
 
 package op.tools;
 
-import entity.SYSHostsTools;
-import entity.SYSLoginTools;
-import entity.SyslogTools;
+import entity.system.SyslogTools;
+import entity.system.SYSHostsTools;
+import entity.system.SYSLoginTools;
 import op.OPDE;
 
 /**

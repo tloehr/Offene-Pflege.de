@@ -26,8 +26,8 @@
  */
 package op.care.bhp;
 
-import entity.SYSRunningClasses;
-import entity.SYSRunningClassesTools;
+import entity.system.SYSRunningClasses;
+import entity.system.SYSRunningClassesTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -107,7 +107,7 @@ public class BHPImport {
 
 
         if (verid == 0) {
-            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5);
+            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
         }
 
         if (verid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.

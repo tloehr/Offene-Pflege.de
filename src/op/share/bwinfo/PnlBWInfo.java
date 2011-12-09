@@ -29,7 +29,7 @@ package op.share.bwinfo;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.files.SYSFilesTools;
-import entity.SYSPropsTools;
+import entity.system.SYSPropsTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;

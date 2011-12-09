@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -106,6 +107,7 @@ public class SYSHostsTools {
      * @param host
      */
     protected static void shutdown(SYSHosts host) {
+        SYSMessagesTools.setAllMesages2Processed(host);
         host.setLpol(null);
         host.setUp(null);
         EntityTools.merge(host);

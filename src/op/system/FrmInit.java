@@ -7,16 +7,12 @@ package op.system;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
-import entity.SYSHosts;
-import entity.SYSProps;
+import entity.system.SYSHosts;
+import entity.system.SYSProps;
 import op.OPDE;
 import op.tools.DesEncrypter;
-import op.tools.SYSTools;
 import op.tools.SortedProperties;
 
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -27,11 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.util.UUID;
 
 /**

@@ -23,7 +23,7 @@
         <class>entity.Groups</class>
         <class>entity.Users</class>
         <class>entity.Acl</class>
-        <class>entity.IntClasses</class>
+        <class>entity.system.IntClasses</class>
         <class>entity.Pflegeberichte</class>
         <class>entity.PBerichtTAGS</class>
         <class>entity.Uebergabebuch</class>
@@ -32,13 +32,13 @@
         <class>entity.Einrichtungen</class>
         <class>entity.PB2User</class>
         <class>entity.Uebergabe2User</class>
-        <class>entity.SYSHosts</class>
-        <class>entity.SYSRunningClasses</class>
-        <class>entity.SYSLogin</class>
+        <class>entity.system.SYSHosts</class>
+        <class>entity.system.SYSRunningClasses</class>
+        <class>entity.system.SYSLogin</class>
         <class>entity.BWerte</class>
         <class>entity.files.Sysbwerte2file</class>
-        <class>entity.SYSProps</class>
-        <class>entity.Syslog</class>
+        <class>entity.system.SYSProps</class>
+        <class>entity.system.Syslog</class>
         <class>entity.vorgang.Vorgaenge</class>
         <class>entity.vorgang.VBericht</class>
         <class>entity.vorgang.VKat</class>

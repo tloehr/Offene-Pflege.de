@@ -21,6 +21,7 @@ import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import entity.files.Sysbw2file;
 import entity.files.Syspb2file;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.SYSTools;
 

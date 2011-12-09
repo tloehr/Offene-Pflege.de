@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -137,6 +137,6 @@ public class SYSHosts implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.SYSHosts[hostID=" + hostID + "]";
+        return "entity.system.SYSHosts[hostID=" + hostID + "]";
     }
 }

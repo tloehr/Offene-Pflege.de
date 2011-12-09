@@ -26,7 +26,7 @@
 package op.ma.admin;
 
 import entity.Groups;
-import entity.IntClassesTools;
+import entity.system.IntClassesTools;
 import entity.Users;
 import op.OPDE;
 import op.tools.*;

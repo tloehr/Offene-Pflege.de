@@ -27,7 +27,7 @@
 package op.tools;
 
 import entity.Bewohner;
-import entity.SYSPropsTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;

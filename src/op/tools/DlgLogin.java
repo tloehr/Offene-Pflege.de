@@ -25,9 +25,7 @@
  */
 package op.tools;
 
-import entity.SYSLoginTools;
-import entity.SYSRunningClasses;
-import entity.SYSRunningClassesTools;
+import entity.system.SYSLoginTools;
 import op.OPDE;
 
 import javax.swing.*;

@@ -28,10 +28,9 @@
 package op.care.med.vorrat;
 
 import java.awt.event.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 
-import entity.SYSPropsTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.med.DBHandling;
 import op.care.med.DlgMediAssistent;

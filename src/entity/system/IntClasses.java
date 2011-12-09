@@ -2,7 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
+
+import entity.Acl;
+import entity.Groups;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -116,6 +119,6 @@ public class IntClasses implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.IntClasses[" + classname + " " + icid + "]";
+        return "entity.system.IntClasses[" + classname + " " + icid + "]";
     }
 }

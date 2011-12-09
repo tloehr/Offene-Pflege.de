@@ -1,6 +1,5 @@
 package entity.system;
 
-import entity.SYSHosts;
 import op.tools.SYSConst;
 
 import javax.persistence.*;

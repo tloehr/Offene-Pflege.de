@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
 import op.OPDE;
 
@@ -111,6 +111,6 @@ public class SYSRunningClasses implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.SYSRunningClasses[rcid=" + rcid + "]";
+        return "entity.system.SYSRunningClasses[rcid=" + rcid + "]";
     }
 }
