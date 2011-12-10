@@ -26,8 +26,8 @@
 package op.ma.admin;
 
 import entity.Groups;
-import entity.system.IntClassesTools;
 import entity.Users;
+import entity.system.IntClassesTools;
 import op.OPDE;
 import op.tools.*;
 import tablemodels.TMUser;
@@ -71,7 +71,6 @@ public class FrmUser extends javax.swing.JFrame {
     private ListDataListener ldlMember, ldlUser;
     private CheckTreeManager cm;
     private CheckTreeSelectionModel sm;
-    private EntityManager em;
 
     /**
      * Creates new form FrmUser
@@ -95,6 +94,7 @@ public class FrmUser extends javax.swing.JFrame {
                         selectedGroup = (Groups) lstAllGroups.getSelectedValue();
                         EntityManager em1 = OPDE.createEM();
                         em1.refresh(selectedGroup);
+                        em1.close();
                     } else {
                         selectedGroup = null;
                     }
@@ -114,9 +114,10 @@ public class FrmUser extends javax.swing.JFrame {
     }
 
     private void loadUserTable() {
-        Query query = em.createNamedQuery("Users.findAllSorted");
-        tblUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        EntityManager em = OPDE.createEM();
         try {
+            Query query = em.createNamedQuery("Users.findAllSorted");
+            tblUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tblUsers.setModel(new TMUser(query.getResultList()));
             tblUsers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
@@ -135,8 +136,11 @@ public class FrmUser extends javax.swing.JFrame {
             });
             tblUsers.getColumnModel().getColumn(0).setCellRenderer(new RNDOCUsers());
         } catch (Exception e) {
-            new DlgException(e);
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
+
     }
 
     private void setGroupTab() {
@@ -225,19 +229,21 @@ public class FrmUser extends javax.swing.JFrame {
             lstMembers.getModel().removeListDataListener(ldlMember);
             lstUsers.getModel().removeListDataListener(ldlUser);
 
-            if (em.contains(selectedGroup)) { // EntityBean ist schon gespeichert.
-                if (selectedGroup.getGkennung().equalsIgnoreCase("everyone")) {
-                    // everyone hat immer alle Benutzer als Mitglied.
-                    lstMembers.setModel(SYSTools.newListModel("Users.findAllSorted"));
-                    lstUsers.setModel(new DefaultListModel());
-                } else {
-                    lstMembers.setModel(SYSTools.newListModel("Users.findAllMembers", new Object[]{"group", selectedGroup}));
-                    lstUsers.setModel(SYSTools.newListModel("Users.findAllNonMembers", new Object[]{"group", selectedGroup}));
-                }
-            } else {
-                lstMembers.setModel(new DefaultListModel());
-                lstUsers.setModel(SYSTools.newListModel("Users.findAllSorted"));
-            }
+            // TODO: hier liegt noch was im Argen
+            // Hab den Teil auskommentiert
+//            if (em.contains(selectedGroup)) { // EntityBean ist schon gespeichert.
+//                if (selectedGroup.getGkennung().equalsIgnoreCase("everyone")) {
+//                    // everyone hat immer alle Benutzer als Mitglied.
+//                    lstMembers.setModel(SYSTools.newListModel("Users.findAllSorted"));
+//                    lstUsers.setModel(new DefaultListModel());
+//                } else {
+//                    lstMembers.setModel(SYSTools.newListModel("Users.findAllMembers", new Object[]{"group", selectedGroup}));
+//                    lstUsers.setModel(SYSTools.newListModel("Users.findAllNonMembers", new Object[]{"group", selectedGroup}));
+//                }
+//            } else {
+//                lstMembers.setModel(new DefaultListModel());
+//                lstUsers.setModel(SYSTools.newListModel("Users.findAllSorted"));
+//            }
 
             lstMembers.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             lstUsers.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -1198,6 +1204,7 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void txtUKennungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUKennungCaretUpdate
         if (mode == NEW_USER) {
+            EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Users.findByUKennung");
             query.setParameter("uKennung", txtUKennung.getText());
             if (query.getResultList().isEmpty()) {
@@ -1211,6 +1218,7 @@ public class FrmUser extends javax.swing.JFrame {
                 ukennung_status = CONFLICT;
             }
             setRightButtonsOnUserTab();
+            em.close();
         }
     }//GEN-LAST:event_txtUKennungCaretUpdate
 
@@ -1251,7 +1259,9 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         if (mode == EDIT_USER) {
+            EntityManager em = OPDE.createEM();
             em.refresh(selectedUser);
+            em.close();
         } else {
             selectedUser = new Users();
         }
@@ -1295,13 +1305,17 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void btnDeleteGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteGroupActionPerformed
         if (JOptionPane.showConfirmDialog(this, "Möchten Sie die Gruppe '" + selectedGroup.getGkennung() + "' wirklich löschen  ?", "Gruppe löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            em.getTransaction().begin();
+            EntityManager em = OPDE.createEM();
+
             try {
+                em.getTransaction().begin();
                 em.remove(selectedGroup);
                 em.getTransaction().commit();
             } catch (Exception e1) {
                 em.getTransaction().rollback();
                 new DlgException(e1);
+            } finally {
+                em.close();
             }
             selectedGroup = null;
             mode = BROWSE_GROUP;
@@ -1311,7 +1325,9 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void btnCancelGroupsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelGroupsActionPerformed
         if (mode == EDIT_GROUP) {
+            EntityManager em = OPDE.createEM();
             em.refresh(selectedGroup);
+            em.close();
         } else {
             selectedGroup = null;
         }
@@ -1338,6 +1354,7 @@ public class FrmUser extends javax.swing.JFrame {
     private void txtGKennungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtGKennungCaretUpdate
         if (mode == NEW_GROUP) {
             if (txtGKennung.getText().matches("[a-zA-Z0-9]+")) {
+                EntityManager em = OPDE.createEM();
                 Query query = em.createNamedQuery("Groups.findByGkennung");
                 query.setParameter("gkennung", txtGKennung.getText());
                 if (query.getResultList().isEmpty()) {
@@ -1351,6 +1368,7 @@ public class FrmUser extends javax.swing.JFrame {
                     selectedGroup.setGkennung(null);
                     gkennung_status = CONFLICT;
                 }
+                em.close();
             } else {
                 lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
                 lblGKennungFree.setToolTipText("Keine Leer- oder Sonderzeichen als Gruppenkennung verwenden.");
@@ -1435,8 +1453,11 @@ public class FrmUser extends javax.swing.JFrame {
     }
 
     private void saveGroup() {
-        em.getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+
         try {
+            em.getTransaction().begin();
+            // TODO: Das muss anderes geregelt werden.
             if (em.contains(selectedGroup)) { // Gruppe existiert schon in der Datenbank
                 em.merge(selectedGroup);
             } else {
@@ -1449,7 +1470,9 @@ public class FrmUser extends javax.swing.JFrame {
 
         } catch (Exception e1) {
             em.getTransaction().rollback();
-            new DlgException(e1);
+            OPDE.fatal(e1);
+        } finally {
+            em.close();
         }
         selectedGroup = null;
         mode = BROWSE_GROUP;
@@ -1458,8 +1481,10 @@ public class FrmUser extends javax.swing.JFrame {
 
     private void saveUser() {
         setMemberships();
-        em.getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+
         try {
+            em.getTransaction().begin();
             if (selectedUser.getUKennung() == null) {
                 generatePassword();
                 em.persist(selectedUser);
@@ -1469,7 +1494,9 @@ public class FrmUser extends javax.swing.JFrame {
             em.getTransaction().commit();
         } catch (Exception e1) {
             em.getTransaction().rollback();
-            new DlgException(e1);
+            OPDE.fatal(e1);
+        } finally {
+            em.close();
         }
 
         if (mode == NEW_USER) {

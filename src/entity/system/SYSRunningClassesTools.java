@@ -159,7 +159,11 @@ public class SYSRunningClassesTools {
             query.setParameter("status", status);
         }
 
-        return query.getResultList();
+        List<SYSRunningClasses> list = query.getResultList();
+
+        em.close();
+
+        return list;
 
     }
 
@@ -169,9 +173,17 @@ public class SYSRunningClassesTools {
 
     public static void endAllModules(SYSLogin login) throws Exception {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("DELETE FROM SYSRunningClasses r WHERE r.login = :login");
-        query.setParameter("login", login);
-        query.executeUpdate();
+        try {
+            em.getTransaction().begin();
+            Query query = em.createQuery("DELETE FROM SYSRunningClasses r WHERE r.login = :login");
+            query.setParameter("login", login);
+            query.executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
     }
 
 

@@ -225,6 +225,7 @@ public class DBHandling {
             query.setParameter("bis", new Date());
 
             result += PflegeberichteTools.getBerichteAsHTML(query.getResultList(), true);
+            em.close();
 
         }
 

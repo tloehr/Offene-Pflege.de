@@ -97,6 +97,8 @@ public class SYSHostsTools {
         } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
             host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
             EntityTools.persist(host);
+        } finally {
+            em.close();
         }
         return host;
     }

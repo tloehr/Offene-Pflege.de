@@ -83,6 +83,8 @@ public class PBerichtTAGSTools {
             }
         });
 
+        em.close();
+
         return menu;
     }
 
@@ -114,6 +116,7 @@ public class PBerichtTAGSTools {
 
             panel.add(cb);
         }
+        em.close();
         return panel;
 
     }
@@ -146,6 +149,7 @@ public class PBerichtTAGSTools {
 
             panel.add(cb);
         }
+        em.close();
     }
 
     /**

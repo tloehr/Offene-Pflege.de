@@ -572,6 +572,7 @@ public class FrmPflege extends javax.swing.JFrame {
                 }
             });
         }
+        em.close();
     }
 
     public void dispose() {

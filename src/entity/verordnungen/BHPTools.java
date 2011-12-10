@@ -1,14 +1,9 @@
 package entity.verordnungen;
 
 import op.OPDE;
-import op.tools.DlgException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,8 +24,9 @@ public class BHPTools {
         Query query = em.createNamedQuery("BHP.numByNOTStatusAndVerordnung");
         query.setParameter("verordnung", verordnung);
         query.setParameter("status", STATUS_OFFEN);
-
-        return (Long) query.getSingleResult();
+        long num = (Long) query.getSingleResult();
+        em.close();
+        return num;
     }
 
 

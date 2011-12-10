@@ -24,6 +24,7 @@ public class BWInfoTools {
         query.setFirstResult(0);
         query.setMaxResults(1);
         List<BWInfo> bwinfos = query.getResultList();
+        em.close();
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 

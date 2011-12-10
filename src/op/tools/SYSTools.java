@@ -1351,7 +1351,12 @@ public class SYSTools {
                 query.setParameter(param[0].toString(), param[1]);
             }
         }
-        return newListModel(query.getResultList());
+
+        DefaultListModel lmodel = newListModel(query.getResultList());
+
+        em.close();
+
+        return lmodel;
     }
 
     public static DefaultListModel newListModel(List list) {
@@ -1373,7 +1378,11 @@ public class SYSTools {
                 query.setParameter(param[0].toString(), param[1]);
             }
         }
-        return newComboboxModel(query.getResultList());
+        DefaultComboBoxModel lcombo =newComboboxModel(query.getResultList());
+
+        em.close();
+
+        return lcombo;
     }
 
     public static DefaultComboBoxModel newComboboxModel(List list) {

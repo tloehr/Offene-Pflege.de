@@ -26,6 +26,7 @@ public class BewohnerTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Bewohner.findByBWKennung");
         query.setParameter("bWKennung", bwkennung);
+        em.close();
         return (Bewohner) query.getSingleResult();
     }
 

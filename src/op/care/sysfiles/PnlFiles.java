@@ -58,7 +58,7 @@ public class PnlFiles extends CleanablePanel {
     private JPopupMenu menu;
     private Bewohner bewohner;
     private javax.swing.JFrame parent;
-    private EntityManager em = OPDE.createEM();
+
 
 
     /**
@@ -67,7 +67,9 @@ public class PnlFiles extends CleanablePanel {
     public PnlFiles(FrmPflege pflege, Bewohner bewohner) {
         initComponents();
         this.bewohner = bewohner;
+        EntityManager em = OPDE.createEM();
         bewohner = em.find(Bewohner.class, bewohner.getBWKennung());
+        em.close();
         this.parent = pflege;
         BewohnerTools.setBWLabel(lblBW, bewohner);
         tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

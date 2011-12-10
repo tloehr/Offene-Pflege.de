@@ -70,7 +70,6 @@ public class PnlUebergabe extends CleanablePanel {
     private OCSec ocs;
     private javax.swing.JFrame parent;
     private JPopupMenu menu;
-    private EntityManager em = OPDE.createEM();
 
     /**
      * Creates new form PnlUebergabe
@@ -405,9 +404,12 @@ public class PnlUebergabe extends CleanablePanel {
         private void confirm() {
             int max = berichte.size();
 
-            em.getTransaction().begin();
+
+            EntityManager em = OPDE.createEM();
+
 
             try {
+                em.getTransaction().begin();
                 for (int row = 0; row < max; row++) {
                     setProgressFromWorker(row);
                     Object[] bericht = (Object[]) berichte.get(row);
@@ -429,6 +431,8 @@ public class PnlUebergabe extends CleanablePanel {
                 em.getTransaction().commit();
             } catch (Exception e) {
                 em.getTransaction().rollback();
+            } finally {
+                em.close();
             }
             btnConfirmAll.setEnabled(true);
             reloadTable();
@@ -549,7 +553,7 @@ public class PnlUebergabe extends CleanablePanel {
 
     private void btnLastLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastLoginActionPerformed
         // Der Tag der letzten Abmeldung
-        jdcDatum.setDate(SYSLoginTools.getPreviousLogin(OPDE.getLogin()).getLogout());
+        //jdcDatum.setDate(SYSLoginTools.getPreviousLogin(OPDE.getLogin()).getLogout());
 
         // Hier muss erst die Infratstruktur für die neue anmeldung rein.
         // Wir brauchen eine HOSTS tabelle, die dann auf Logins verweist.

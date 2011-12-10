@@ -66,8 +66,9 @@ public class VerordnungTools {
                 MedBestand bestand = em.find(MedBestand.class, bestID.longValue());
                 line[3] = bestand;
             }
-            OPDE.debug(line.length);
         }
+
+        em.close();
 
         return listeVorrat;
     }
@@ -666,7 +667,7 @@ public class VerordnungTools {
 //            }
 //        }
 
-
+        em.close();
         return result;
     }
 

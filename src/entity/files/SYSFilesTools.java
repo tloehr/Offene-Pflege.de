@@ -25,10 +25,7 @@
  */
 package entity.files;
 
-import entity.BWInfo;
-import entity.BWerte;
-import entity.Bewohner;
-import entity.Pflegeberichte;
+import entity.*;
 import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.care.sysfiles.DlgNewFile;
@@ -82,6 +79,7 @@ public class SYSFilesTools {
         query.setParameter("bewohner", bewohner);
         files.addAll(query.getResultList());
 
+        em.close();
         return files;
     }
 
@@ -141,9 +139,12 @@ public class SYSFilesTools {
                     em.getTransaction().begin();
                     em.remove(sysfile);
                     em.getTransaction().commit();
+                } finally {
+                    em.close();
                 }
             } else { // Ansonsten die bestehende Datei zurückgeben
                 sysfile = (SYSFiles) query.getSingleResult();
+                em.close();
             }
 
         } catch (Exception ex) {
@@ -285,6 +286,8 @@ public class SYSFilesTools {
             OPDE.getLogger().debug(ex.getMessage(), ex);
             em.getTransaction().rollback();
             success = false;
+        } finally {
+            em.close();
         }
         return success;
     }
@@ -454,6 +457,7 @@ public class SYSFilesTools {
             }
             menu.add(menuFiles);
         }
+        em.close();
         return menu;
     }
 

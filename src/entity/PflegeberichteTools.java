@@ -38,7 +38,6 @@ public class PflegeberichteTools {
         EntityManager em = OPDE.createEM();
         em.getTransaction().begin();
         try {
-
             bericht.setEditedBy(OPDE.getLogin().getUser());
             bericht.setEditpit(new Date());
 
@@ -65,6 +64,8 @@ public class PflegeberichteTools {
         } catch (Exception e) {
             OPDE.getLogger().error(e.getMessage(), e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return success;
     }
@@ -75,8 +76,9 @@ public class PflegeberichteTools {
         query.setParameter("bewohner", bewohner);
         query.setFirstResult(0);
         query.setMaxResults(1);
-
-        return (Pflegeberichte) query.getSingleResult();
+        Pflegeberichte p = (Pflegeberichte) query.getSingleResult();
+        em.close();
+        return p;
     }
 
 
@@ -133,6 +135,8 @@ public class PflegeberichteTools {
         } catch (Exception e) {
             OPDE.error(e.getMessage());
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return success;
     }
@@ -175,6 +179,8 @@ public class PflegeberichteTools {
         } catch (Exception e) {
             OPDE.getLogger().error(e.getMessage(), e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return success;
     }

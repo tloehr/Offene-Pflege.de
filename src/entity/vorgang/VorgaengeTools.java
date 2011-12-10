@@ -100,49 +100,41 @@ public class VorgaengeTools {
 
         Collections.sort(elements, elementsComparator);
 
+        em.close();
         return elements;
-    }
-
-    public static void deleteVorgang(Vorgaenge vorgang) {
-        EntityManager em = OPDE.createEM();
-        vorgang.setBis(new Date());
-        em.getTransaction().begin();
-        try {
-            em.remove(vorgang);
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            em.getTransaction().rollback();
-            new DlgException(ex);
-        }
     }
 
     public static void endVorgang(Vorgaenge vorgang) {
         EntityManager em = OPDE.createEM();
-        VBericht systemBericht = new VBericht("Vorgang abgeschlossen", VBerichtTools.VBERICHT_ART_CLOSE, vorgang);
-        vorgang.setBis(new Date());
-        em.getTransaction().begin();
         try {
-            //em.persist(systemBericht);
+            em.getTransaction().begin();
+            VBericht systemBericht = new VBericht("Vorgang abgeschlossen", VBerichtTools.VBERICHT_ART_CLOSE, vorgang);
+            em.persist(systemBericht);
+            vorgang.setBis(new Date());
             em.merge(vorgang);
             em.getTransaction().commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             em.getTransaction().rollback();
-            new DlgException(ex);
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
     }
 
     public static void reopenVorgang(Vorgaenge vorgang) {
         EntityManager em = OPDE.createEM();
-        VBericht systemBericht = new VBericht("Vorgang wieder geöffnet", VBerichtTools.VBERICHT_ART_REOPEN, vorgang);
-        vorgang.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
-        em.getTransaction().begin();
         try {
-            //em.persist(systemBericht);
+            em.getTransaction().begin();
+            VBericht systemBericht = new VBericht("Vorgang wieder geöffnet", VBerichtTools.VBERICHT_ART_REOPEN, vorgang);
+            em.persist(systemBericht);
+            vorgang.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
             em.merge(vorgang);
             em.getTransaction().commit();
         } catch (Exception ex) {
             em.getTransaction().rollback();
             new DlgException(ex);
+        } finally {
+            em.close();
         }
     }
 
@@ -150,13 +142,15 @@ public class VorgaengeTools {
         Vorgaenge vorgang = new Vorgaenge(title, bw, vkat);
         VBericht vbericht = new VBericht("Neuen Vorgang erstellt.", VBerichtTools.VBERICHT_ART_CREATE, vorgang);
         EntityManager em = OPDE.createEM();
-        em.getTransaction().begin();
         try {
+            em.getTransaction().begin();
             em.persist(vorgang);
             em.persist(vbericht);
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return vorgang;
     }
@@ -168,137 +162,148 @@ public class VorgaengeTools {
      * @param vorgang
      */
     public static void add(VorgangElement element, Vorgaenge vorgang) {
-        Object connectionObject = null;
-        String elementBezeichnung = "";
-        if (element instanceof Pflegeberichte) {
-            connectionObject = new SYSPB2VORGANG(vorgang, (Pflegeberichte) element);
-            elementBezeichnung = "Pflegebericht";
-        } else if (element instanceof BWerte) {
-            connectionObject = new SYSBWerte2VORGANG(vorgang, (BWerte) element);
-            elementBezeichnung = "Bewohner Wert";
-        } else if (element instanceof Verordnung) {
-            connectionObject = new SYSVER2VORGANG(vorgang, (Verordnung) element);
-            elementBezeichnung = "Ärztliche Verordnung";
-        } else if (element instanceof BWInfo) {
-            connectionObject = new SYSBWI2VORGANG(vorgang, (BWInfo) element);
-            elementBezeichnung = "Bewohner Information";
-        } else if (element instanceof Planung) {
-            connectionObject = new SYSPLAN2VORGANG(vorgang, (Planung) element);
-            elementBezeichnung = "Pflegeplanung";
-        } else {
 
-        }
+        //TODO: Das hier muss völlig überarbeitet werden. Die Position muss anders ermittelt werden.
 
-        EntityTools.persist(connectionObject);
-
-        // Jetzt fehlt nur noch eins: der PDCA Zyklus muss ermittelt werden. Dieser ergibt sich daraus, WO das Element einsortiert wurde. Daher fragen wir jetzt eine Gesamtübersicht ab.
-        // Der PDCA des neuen Elements ist der des vorherigen Elements. Ist das neue Element das erste in der Liste, ist der PDCA zwingend PLAN.
-
-        List alleElememente = findElementeByVorgang(vorgang, true);
-        int index = alleElememente.indexOf(element);
-        short pdca = PDCA_PLAN;
-        if (index > 0) {
-            Object o = alleElememente.get(index - 1);
-            if (o instanceof Object[]) {
-                pdca = ((Short) ((Object[]) o)[1]);
-            } else {
-                pdca = ((VBericht) o).getPdca();
-            }
-        }
-
-        // Connection Objekt korregieren
-        if (element instanceof Pflegeberichte) {
-            ((SYSPB2VORGANG) connectionObject).setPdca(pdca);
-        } else if (element instanceof BWerte) {
-            ((SYSBWerte2VORGANG) connectionObject).setPdca(pdca);
-        } else if (element instanceof Verordnung) {
-            ((SYSVER2VORGANG) connectionObject).setPdca(pdca);
-        } else if (element instanceof BWInfo) {
-            ((SYSBWI2VORGANG) connectionObject).setPdca(pdca);
-        }  else if (element instanceof Planung) {
-            ((SYSPLAN2VORGANG) connectionObject).setPdca(pdca);
-        } else {
-
-        }
-        EntityTools.merge(connectionObject);
-
-        // Nun noch den Systembericht erstellen.
-        VBericht vbericht = new VBericht("Neue Zuordnung wurde vorgenommen für: " + elementBezeichnung + " ID: " + element.getID(), VBerichtTools.VBERICHT_ART_ASSIGN_ELEMENT, vorgang);
-        vbericht.setPdca(pdca);
-        EntityTools.persist(vbericht);
-
-        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
-        // Daher muss das Objekt hier manuell neu gelesen werden.
-        EntityTools.refresh(element);
+//
+//        EntityManager em = OPDE.createEM();
+//        try{
+//        Object connectionObject = null;
+//        String elementBezeichnung = "";
+//        if (element instanceof Pflegeberichte) {
+//            connectionObject = new SYSPB2VORGANG(vorgang, (Pflegeberichte) element);
+//            elementBezeichnung = "Pflegebericht";
+//        } else if (element instanceof BWerte) {
+//            connectionObject = new SYSBWerte2VORGANG(vorgang, (BWerte) element);
+//            elementBezeichnung = "Bewohner Wert";
+//        } else if (element instanceof Verordnung) {
+//            connectionObject = new SYSVER2VORGANG(vorgang, (Verordnung) element);
+//            elementBezeichnung = "Ärztliche Verordnung";
+//        } else if (element instanceof BWInfo) {
+//            connectionObject = new SYSBWI2VORGANG(vorgang, (BWInfo) element);
+//            elementBezeichnung = "Bewohner Information";
+//        } else if (element instanceof Planung) {
+//            connectionObject = new SYSPLAN2VORGANG(vorgang, (Planung) element);
+//            elementBezeichnung = "Pflegeplanung";
+//        } else {
+//
+//        }
+//
+//        em.persist(connectionObject);
+//
+//        // Jetzt fehlt nur noch eins: der PDCA Zyklus muss ermittelt werden. Dieser ergibt sich daraus, WO das Element einsortiert wurde. Daher fragen wir jetzt eine Gesamtübersicht ab.
+//        // Der PDCA des neuen Elements ist der des vorherigen Elements. Ist das neue Element das erste in der Liste, ist der PDCA zwingend PLAN.
+//
+//        List alleElememente = findElementeByVorgang(vorgang, true);
+//        int index = alleElememente.indexOf(element);
+//        short pdca = PDCA_PLAN;
+//        if (index > 0) {
+//            Object o = alleElememente.get(index - 1);
+//            if (o instanceof Object[]) {
+//                pdca = ((Short) ((Object[]) o)[1]);
+//            } else {
+//                pdca = ((VBericht) o).getPdca();
+//            }
+//        }
+//
+//        // Connection Objekt korregieren
+//        if (element instanceof Pflegeberichte) {
+//            ((SYSPB2VORGANG) connectionObject).setPdca(pdca);
+//        } else if (element instanceof BWerte) {
+//            ((SYSBWerte2VORGANG) connectionObject).setPdca(pdca);
+//        } else if (element instanceof Verordnung) {
+//            ((SYSVER2VORGANG) connectionObject).setPdca(pdca);
+//        } else if (element instanceof BWInfo) {
+//            ((SYSBWI2VORGANG) connectionObject).setPdca(pdca);
+//        } else if (element instanceof Planung) {
+//            ((SYSPLAN2VORGANG) connectionObject).setPdca(pdca);
+//        } else {
+//
+//        }
+//        EntityTools.merge(connectionObject);
+//
+//        // Nun noch den Systembericht erstellen.
+//        VBericht vbericht = new VBericht("Neue Zuordnung wurde vorgenommen für: " + elementBezeichnung + " ID: " + element.getID(), VBerichtTools.VBERICHT_ART_ASSIGN_ELEMENT, vorgang);
+//        vbericht.setPdca(pdca);
+//        EntityTools.persist(vbericht);
+//
+//        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
+//        // Daher muss das Objekt hier manuell neu gelesen werden.
+//        EntityTools.refresh(element);
     }
 
     /**
-     * Hängt ein VorgangElement an einen Vorgang an und erstellt einen entsprechenden SystemBericht dazu.
-     *
      * @param element
      * @param vorgang
      */
     public static void remove(VorgangElement element, Vorgaenge vorgang) {
-        EntityManager em = OPDE.createEM();
-        List connectionObjects = null;
-        String elementBezeichnung = "";
-        Query query = null;
-        if (element instanceof Pflegeberichte) {
-            query = em.createNamedQuery("SYSPB2VORGANG.findByElementAndVorgang");
-            elementBezeichnung = "Pflegebericht";
-        } else if (element instanceof BWerte) {
-            query = em.createNamedQuery("SYSBWerte2VORGANG.findByElementAndVorgang");
-            elementBezeichnung = "Bewohner Wert";
-        } else if (element instanceof Verordnung) {
-            query = em.createNamedQuery("SYSVER2VORGANG.findByElementAndVorgang");
-            elementBezeichnung = "Ärztliche Verordnung";
-        } else if (element instanceof BWInfo) {
-            query = em.createNamedQuery("SYSBWI2VORGANG.findByElementAndVorgang");
-            elementBezeichnung = "Bewohner Information";
-        } else if (element instanceof Planung) {
-            query = em.createNamedQuery("SYSPLAN2VORGANG.findByElementAndVorgang");
-            elementBezeichnung = "Pflegeplanung";
-        } else {
-
-        }
-
-        query.setParameter("element", element);
-        query.setParameter("vorgang", vorgang);
-        connectionObjects = query.getResultList();
-
-        // Eigentlich sollte es nie mehr als einen dieser Objekte geben, aber dennoch.
-        Iterator it = connectionObjects.iterator();
-        while (it.hasNext()) {
-            Object obj = it.next();
-            short pdca = PDCA_OFF;
-            if (element instanceof Pflegeberichte) {
-                pdca = ((SYSPB2VORGANG) obj).getPdca();
-            } else {
-
-            }
-            EntityTools.delete(obj);
-            VBericht vbericht = new VBericht("Zuordnung entfernt für: " + elementBezeichnung + " ID: " + element.getID(), VBerichtTools.VBERICHT_ART_REMOVE_ELEMENT, vorgang);
-            vbericht.setPdca(pdca);
-            EntityTools.persist(vbericht);
-        }
-
-        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
-        // Daher muss das Objekt hier manuell neu gelesen werden.
-        EntityTools.refresh(element);
+//        EntityManager em = OPDE.createEM();
+//        String elementBezeichnung = "";
+//        Query query = null;
+//        if (element instanceof Pflegeberichte) {
+//            query = em.createNamedQuery("SYSPB2VORGANG.findByElementAndVorgang");
+//            elementBezeichnung = "Pflegebericht";
+//        } else if (element instanceof BWerte) {
+//            query = em.createNamedQuery("SYSBWerte2VORGANG.findByElementAndVorgang");
+//            elementBezeichnung = "Bewohner Wert";
+//        } else if (element instanceof Verordnung) {
+//            query = em.createNamedQuery("SYSVER2VORGANG.findByElementAndVorgang");
+//            elementBezeichnung = "Ärztliche Verordnung";
+//        } else if (element instanceof BWInfo) {
+//            query = em.createNamedQuery("SYSBWI2VORGANG.findByElementAndVorgang");
+//            elementBezeichnung = "Bewohner Information";
+//        } else if (element instanceof Planung) {
+//            query = em.createNamedQuery("SYSPLAN2VORGANG.findByElementAndVorgang");
+//            elementBezeichnung = "Pflegeplanung";
+//        } else {
+//
+//        }
+//
+//        query.setParameter("element", element);
+//        query.setParameter("vorgang", vorgang);
+//        connectionObjects = query.getSingleResult();
+//
+//
+//        // Eigentlich sollte es nie mehr als einen dieser Objekte geben, aber dennoch.
+//        Iterator it = connectionObjects.iterator();
+//        while (it.hasNext()) {
+//            Object obj = it.next();
+//            short pdca = PDCA_OFF;
+//            if (element instanceof Pflegeberichte) {
+//                pdca = ((SYSPB2VORGANG) obj).getPdca();
+//            } else {
+//
+//            }
+//            EntityTools.delete(obj);
+//            VBericht vbericht = new VBericht("Zuordnung entfernt für: " + elementBezeichnung + " ID: " + element.getID(), VBerichtTools.VBERICHT_ART_REMOVE_ELEMENT, vorgang);
+//            vbericht.setPdca(pdca);
+//            EntityTools.persist(vbericht);
+//        }
+//
+//        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
+//        // Daher muss das Objekt hier manuell neu gelesen werden.
+//        EntityTools.refresh(element);
     }
 
     public static void setWVVorgang(Vorgaenge vorgang, Date wv) {
-        VBericht systemBericht = new VBericht("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), VBerichtTools.VBERICHT_ART_WV, vorgang);
+
         EntityManager em = OPDE.createEM();
-        vorgang.setWv(wv);
-        em.getTransaction().begin();
+
         try {
-            //em.persist(systemBericht);
+            em.getTransaction().begin();
+
+            VBericht systemBericht = new VBericht("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), VBerichtTools.VBERICHT_ART_WV, vorgang);
+            em.persist(systemBericht);
+
+            vorgang.setWv(wv);
             em.merge(vorgang);
+
             em.getTransaction().commit();
         } catch (Exception ex) {
             em.getTransaction().rollback();
-            new DlgException(ex);
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
         }
     }
 
@@ -355,6 +360,9 @@ public class VorgaengeTools {
             });
             neu.add(mi);
         }
+
+        em.close();
+
         return neu;
     }
 
@@ -413,17 +421,18 @@ public class VorgaengeTools {
             });
             result.add(mi);
         }
-
+        em.close();
         return result;
     }
 
     private static JMenu getVorgaenge2Remove(VorgangElement element, ActionListener callback) {
-        EntityManager em = OPDE.createEM();
+
         JMenu result = new JMenu("Entfernen von");
 
         final ActionListener cb = callback;
 
         final VorgangElement finalElement = element;
+        EntityManager em = OPDE.createEM();
 
         // 1. Alle aktiven Vorgänge suchen, die diesem Element zugeordnet sind.
         List<Vorgaenge> vorgaenge = new ArrayList();
@@ -458,6 +467,8 @@ public class VorgaengeTools {
             });
             result.add(mi);
         }
+
+        em.close();
         return result;
     }
 

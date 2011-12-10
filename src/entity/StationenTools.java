@@ -37,6 +37,7 @@ public class StationenTools {
         query2.setParameter("statID", statid);
         Stationen station = (Stationen) query2.getSingleResult();
         cmb.setSelectedItem(station);
+        em.close();
     }
 
 
@@ -46,7 +47,9 @@ public class StationenTools {
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
         Query query = em.createNamedQuery("Stationen.findByStatID");
         query.setParameter("statID", statid);
-        return (Stationen) query.getSingleResult();
+        Stationen s = (Stationen) query.getSingleResult();
+        em.close();
+        return s;
     }
 
 

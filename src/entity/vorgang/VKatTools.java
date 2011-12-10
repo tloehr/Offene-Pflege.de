@@ -33,6 +33,7 @@ public class VKatTools {
         } else {
             vkat = (VKat) query.getResultList().get(0);
         }
+        em.close();
         return vkat;
     }
 }

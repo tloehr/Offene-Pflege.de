@@ -22,80 +22,88 @@ public class EntityTools {
             em.getTransaction().begin();
             em.persist(entity);
             em.getTransaction().commit();
-            em.refresh(entity);
             success = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            OPDE.fatal(e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return success;
     }
 
-    public static boolean merge(Object entity) {
-        boolean success = false;
+    public static <T> T merge(T entity) {
+        T mergedEntity = null;
         EntityManager em = OPDE.createEM();
+
         try {
             em.getTransaction().begin();
-            em.merge(entity);
+            mergedEntity = em.merge(entity);
             em.getTransaction().commit();
-            em.refresh(entity);
-            success = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            OPDE.fatal(e);
             em.getTransaction().rollback();
         }
-        return success;
+        return mergedEntity;
     }
 
-    public static boolean store(Object entity) {
-        boolean success = false;
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            if (em.contains(entity)) {
-                em.merge(entity);
-            } else {
-                em.persist(entity);
-            }
-            em.getTransaction().commit();
-            em.refresh(entity);
-            success = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            em.getTransaction().rollback();
-        }
-        return success;
-    }
+//    public static <T> T store(T entity) {
+//        boolean success = false;
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//            if (em.contains(entity)) {
+//                em.merge(entity);
+//            } else {
+//                em.persist(entity);
+//            }
+//            em.getTransaction().commit();
+//            em.refresh(entity);
+//            success = true;
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//            em.getTransaction().rollback();
+//        }
+//        return success;
+//    }
 
     public static boolean delete(Object entity) {
         boolean success = false;
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            em.remove(entity);
+            if (em.contains(entity)){
+                em.remove(entity);
+            } else {
+                em.remove(em.merge(entity));
+            }
             em.getTransaction().commit();
             success = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            OPDE.fatal(e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return success;
     }
 
-    public static boolean refresh(Object entity) {
-        boolean success = false;
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            em.refresh(entity);
-            em.getTransaction().commit();
-            success = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            em.getTransaction().rollback();
-        }
-        return success;
-    }
+//    public static boolean refresh(Object entity) {
+//        boolean success = false;
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//            em.refresh(entity);
+//            em.getTransaction().commit();
+//            success = true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            em.getTransaction().rollback();
+//        } finally {
+//            em.close();
+//        }
+//        return success;
+//    }
 
     /**
      * Erzeugt einen String, der die PrimärSchlüssel durch komma getrennt enthält.
@@ -112,6 +120,7 @@ public class EntityTools {
             list += em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(it.next());
             list += it.hasNext() ? "," : "";
         }
+        em.close();
         return list;
     }
 }

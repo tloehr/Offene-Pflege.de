@@ -36,7 +36,7 @@ public class DlgNewFile extends javax.swing.JDialog {
 
     File selectedFile;
     Object[] entities;
-    private EntityManager em = OPDE.createEM();
+
 
     /**
      * Creates new form DlgNewFile
@@ -214,8 +214,10 @@ public class DlgNewFile extends javax.swing.JDialog {
         SYSFiles sysfile = SYSFilesTools.putFile(selectedFile);
         Object relationEntity;
 
-        em.getTransaction().begin();
+        EntityManager em = OPDE.createEM();
+
         try {
+            em.getTransaction().begin();
             for (int i = 0; i < entities.length; i++) {
                 if (entities[i] instanceof Bewohner) {
                     relationEntity = new Sysbw2file(txtBemerkung.getText().trim(), sysfile, (Bewohner) entities[i], OPDE.getLogin().getUser());
@@ -234,6 +236,8 @@ public class DlgNewFile extends javax.swing.JDialog {
         } catch (Exception e) {
             OPDE.getLogger().error(e.getMessage(), e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         dispose();
     }//GEN-LAST:event_btnOkActionPerformed

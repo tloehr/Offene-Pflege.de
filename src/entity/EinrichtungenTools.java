@@ -32,7 +32,7 @@ public class EinrichtungenTools {
      * @param cmb
      */
     public static void setComboBox(JComboBox cmb) {
-         EntityManager em = OPDE.createEM();
+        EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Einrichtungen.findAll");
         cmb.setModel(new DefaultComboBoxModel(new Vector<Einrichtungen>(query.getResultList())));
 
@@ -41,6 +41,7 @@ public class EinrichtungenTools {
         Query query2 = em.createNamedQuery("Stationen.findByStatID");
         query2.setParameter("statID", statid);
         Stationen station = (Stationen) query2.getSingleResult();
+        em.close();
         cmb.setSelectedItem(station.getEinrichtung());
     }
 }

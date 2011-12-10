@@ -46,6 +46,7 @@ public class SYSMessagesTools {
                     OPDE.getBM().interrupt();
                     SYSHostsTools.shutdown();
                     em.close();
+                    OPDE.getEMF().close();
 
                     String html = "<html><h1>Das Progamm musste automatisch beendet werden</h1><b>Der Grund:</b><br/>" + msg.getMessage() +
                             "</html>";
@@ -89,6 +90,8 @@ public class SYSMessagesTools {
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
 
     }

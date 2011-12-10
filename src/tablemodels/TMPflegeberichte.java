@@ -47,15 +47,11 @@ public class TMPflegeberichte
     public static final int COL_BERICHT = 99;
     boolean showIDs;
     ArrayList<Pflegeberichte> pflegeberichte = new ArrayList();
-    Bewohner bewohner;
 
-    public TMPflegeberichte(Query query, boolean showIDs) {
+
+    public TMPflegeberichte(ArrayList<Pflegeberichte> pflegeberichte, boolean showIDs) {
         this.showIDs = showIDs;
-        if (query == null) {
-            pflegeberichte = new ArrayList<Pflegeberichte>();
-        } else {
-            pflegeberichte = new ArrayList<Pflegeberichte>(query.getResultList());
-        }
+        this.pflegeberichte = pflegeberichte;
     }
 
     @Override

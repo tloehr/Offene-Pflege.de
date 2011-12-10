@@ -34,6 +34,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.swing.table.AbstractTableModel;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -280,7 +281,8 @@ public class TMWerte
         }
 
         String fonthead = "<font " + color + ">";
-        BWerte bwert = BWerteTools.findByID(bwid);
+        EntityManager em = OPDE.createEM();
+        BWerte bwert = em.find(BWerte.class, bwid);
 
         switch (c) {
             case TBL_PIT: { // COL_DATUM
@@ -300,6 +302,7 @@ public class TMWerte
                 break;
             }
         }
+        em.close();
         return result;
     }
 }

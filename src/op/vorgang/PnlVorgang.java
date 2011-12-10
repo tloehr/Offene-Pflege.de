@@ -27,6 +27,7 @@ import op.tools.SYSTools;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.pushingpixels.trident.Timeline;
+import org.w3c.dom.Entity;
 import tablemodels.TMElement;
 import tablerenderer.RNDHTML;
 
@@ -75,7 +76,7 @@ public class PnlVorgang extends CleanablePanel {
     protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
 
     private Timeline textmessageTL;
-    private EntityManager em = OPDE.createEM();
+
 
 
     /**
@@ -221,6 +222,7 @@ public class PnlVorgang extends CleanablePanel {
     }
 
     protected JXTaskPane addVorgaengeFuerBW(Bewohner bewohner) {
+        EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
         query.setParameter("bewohner", bewohner);
         List<Vorgaenge> listVorgaenge = query.getResultList();
@@ -246,6 +248,7 @@ public class PnlVorgang extends CleanablePanel {
             }
         }
 
+        em.close();
 
         return bwpanel;
     }
@@ -253,7 +256,7 @@ public class PnlVorgang extends CleanablePanel {
 
     protected void addVorgaengeFuerBW() {
         //((Container) taskContainer).add(new JLabel("Bewohner"));
-
+        EntityManager em = OPDE.createEM();
         List<Bewohner> bewohner = em.createNamedQuery("Bewohner.findAllActiveSorted").getResultList();
 
         JXTaskPane allbwpanel = new JXTaskPane("nach BewohnerInnen");
@@ -291,6 +294,8 @@ public class PnlVorgang extends CleanablePanel {
         }
 
         ((Container) taskContainer).add(allbwpanel);
+
+        em.close();
     }
 
 
@@ -317,6 +322,7 @@ public class PnlVorgang extends CleanablePanel {
         pnlVorgaengeByMA.add(new JSeparator());
         Users selectedUser = (Users) cmbMA.getSelectedItem();
         if (selectedUser != null) {
+            EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
             query.setParameter("besitzer", selectedUser);
             List<Vorgaenge> listVorgaenge = query.getResultList();
@@ -339,10 +345,12 @@ public class PnlVorgang extends CleanablePanel {
                     }
                 });
             }
+            em.close();
         }
     }
 
     protected void addVorgaengeFuerMA() {
+        EntityManager em = OPDE.createEM();
         List<Users> listeUser = em.createNamedQuery("Users.findByStatusSorted").setParameter("status", 1).getResultList();
 
         JXTaskPane allmapanel = new JXTaskPane("nach MitarbeiterInnen");
@@ -384,7 +392,7 @@ public class PnlVorgang extends CleanablePanel {
         }
 
         ((Container) taskContainer).add(allmapanel);
-
+        em.close();
     }
 
     protected void addMeineVorgaenge() {
@@ -412,7 +420,7 @@ public class PnlVorgang extends CleanablePanel {
     protected void loadAllVorgaenge() {
 
         if (pnlAlleVorgaenge.isEnabled()) {
-
+            EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Vorgaenge.findAllActiveSorted");
             ArrayList<Vorgaenge> alleAktiven = new ArrayList(query.getResultList());
 
@@ -436,6 +444,7 @@ public class PnlVorgang extends CleanablePanel {
                 });
 
             }
+            em.close();
         }
     }
 
@@ -443,7 +452,7 @@ public class PnlVorgang extends CleanablePanel {
     protected void loadVorgaengeRunningOut() {
 
         if (pnlVorgaengeRunningOut.isEnabled()) {
-
+            EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Vorgaenge.findActiveRunningOut");
             query.setParameter("wv", SYSCalendar.addDate(new Date(), 4)); // 4 Tage von heute aus gerechnet.
             ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
@@ -468,11 +477,12 @@ public class PnlVorgang extends CleanablePanel {
                 });
 
             }
+            em.close();
         }
     }
 
     protected void loadMeineVorgaenge() {
-
+         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
         query.setParameter("besitzer", OPDE.getLogin().getUser());
         ArrayList<Vorgaenge> byBesitzer = new ArrayList(query.getResultList());
@@ -504,11 +514,13 @@ public class PnlVorgang extends CleanablePanel {
             });
 
         }
+
         pnlMyVorgaenge.setTitle("Meine Vorgänge (" + byBesitzer.size() + ")");
+        em.close();
     }
 
     protected void loadMeineInaktivenVorgaenge() {
-
+        EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Vorgaenge.findInactiveByBesitzer");
         query.setParameter("besitzer", OPDE.getLogin().getUser());
 
@@ -536,7 +548,7 @@ public class PnlVorgang extends CleanablePanel {
         }
 
         pnlMeineAltenVorgaenge.setTitle("Meine alten Vorgänge (" + vorgaenge.size() + ")");
-
+        em.close();
     }
 
 
@@ -587,14 +599,14 @@ public class PnlVorgang extends CleanablePanel {
         switch (laufendeOperation) {
             case LAUFENDE_OPERATION_BERICHT_EINGABE: {
                 VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
-                EntityTools.store(vbericht);
+                EntityTools.persist(vbericht);
                 //((TMElement) tblElements.getModel()).addVBericht(vbericht);
                 loadTable(aktuellerVorgang);
                 splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow);
                 break;
             }
             case LAUFENDE_OPERATION_VORGANG_BEARBEITEN: {
-
+                EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
                     if (pdcaChanged) {
@@ -602,11 +614,13 @@ public class PnlVorgang extends CleanablePanel {
                         vbericht.setPdca(aktuellerVorgang.getPdca());
                         em.persist(vbericht);
                     }
-                    em.merge(aktuellerVorgang);
+                    aktuellerVorgang = em.merge(aktuellerVorgang);
                     em.getTransaction().commit();
                 } catch (Exception exc) {
-                    OPDE.fatal(exc.getMessage());
                     em.getTransaction().rollback();
+                    OPDE.fatal(exc);
+                } finally {
+                    em.close();
                 }
 
                 pdcaChanged = false;
@@ -643,7 +657,9 @@ public class PnlVorgang extends CleanablePanel {
             }
             case LAUFENDE_OPERATION_VORGANG_BEARBEITEN: {
                 btnPDCAPlus.setEnabled(true);
+                EntityManager em = OPDE.createEM();
                 em.refresh(aktuellerVorgang);
+                em.close();
                 loadDetails(aktuellerVorgang);
                 break;
             }

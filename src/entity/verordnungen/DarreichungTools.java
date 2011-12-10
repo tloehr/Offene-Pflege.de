@@ -29,8 +29,6 @@ public class DarreichungTools {
      * neuen DAF passen. Notfalls muss man einen Vorrat anlegen.
      * Es werden Zuordnungen erlaubt, die aufgrund der Äquivalenzen zwischen
      * Formen bestehen. z.B. Tabletten zu Dragees zu Filmtabletten etc.
-     *
-
      */
     public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         MedVorrat result = null;
@@ -46,7 +44,10 @@ public class DarreichungTools {
             result = null;
         } catch (Exception e) {
             OPDE.fatal(e.getMessage());
+        } finally {
+            em.close();
         }
+
 
         return result;
     }
@@ -82,7 +83,7 @@ public class DarreichungTools {
         queryVorraete.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);
 
         liste = queryVorraete.getResultList();
-
+        em.close();
         return liste;
     }
 }

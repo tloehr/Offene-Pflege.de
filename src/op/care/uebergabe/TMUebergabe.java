@@ -73,6 +73,8 @@ public class TMUebergabe
         berichte.addAll(queryUB.getResultList());
         berichte.addAll(queryPB.getResultList());
 
+        em.close();
+
     }
 
     @Override

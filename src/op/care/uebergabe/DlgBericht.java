@@ -232,8 +232,8 @@ public class DlgBericht extends javax.swing.JDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         EntityManager em = OPDE.createEM();
-        em.getTransaction().begin();
         try {
+            em.getTransaction().begin();
             Uebergabebuch bericht = new Uebergabebuch(SYSCalendar.addTime2Date(jdcDatum.getDate(), new Time(SYSCalendar.erkenneUhrzeit(txtTBUhrzeit.getText()).getTimeInMillis())), txtUebergabe.getText(), einrichtung, OPDE.getLogin().getUser());
             em.persist(bericht);
             // Der aktuelle User bestätigt direkt seinen eigenen Bericht.
@@ -243,6 +243,8 @@ public class DlgBericht extends javax.swing.JDialog {
         } catch (Exception e) {
             JXErrorPane.showDialog(e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         this.dispose();
     }//GEN-LAST:event_btnSaveActionPerformed

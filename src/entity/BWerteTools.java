@@ -20,17 +20,6 @@ import java.text.SimpleDateFormat;
  */
 public class BWerteTools {
 
-    public static BWerte findByID(long id) {
-        BWerte wert = null;
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BWerte.findByBwid");
-        query.setParameter("bwid", id);
-
-        wert = (BWerte) query.getSingleResult();
-
-        return wert;
-    }
-
     public static String getPITasHTML(BWerte bwert, boolean showids, boolean colorize) {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String color = "";

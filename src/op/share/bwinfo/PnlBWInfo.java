@@ -67,7 +67,7 @@ public class PnlBWInfo extends CleanablePanel {
     private boolean ignoreEvent;
     private ActionListener fileActionListener;
     private Bewohner bewohner;
-    private EntityManager em;
+
 
     /**
      * @param parent    - zu welchem Fenster gehört dieses Panel ?
@@ -76,7 +76,6 @@ public class PnlBWInfo extends CleanablePanel {
      */
     public PnlBWInfo(Frame parent, int mode, String bwkennung, String preselection) {
         initComponents();
-        em = OPDE.createEM();
         this.mode = mode;
         this.parent = parent;
         this.bwkennung = bwkennung;
@@ -618,10 +617,12 @@ public class PnlBWInfo extends CleanablePanel {
                     menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, fileActionListener));
 
                     long bwinfoid = ((Long) entry.get("bwinfoid")).longValue();
+                    EntityManager em = OPDE.createEM();
                     Query query = em.createNamedQuery("BWInfo.findByBwinfoid");
                     query.setParameter("bwinfoid", bwinfoid);
                     entity.BWInfo bwinfo = (entity.BWInfo) query.getSingleResult();
                     menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwinfo, fileActionListener));
+                    em.close();
                     //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, tblBWInfo, true, true, SYSFiles.CODE_PLANUNG, fileActionListener));
                 }
             }

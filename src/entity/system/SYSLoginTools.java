@@ -6,6 +6,7 @@ package entity.system;
 
 import java.util.Date;
 
+import entity.EntityTools;
 import entity.Users;
 import entity.UsersTools;
 import op.OPDE;
@@ -22,12 +23,10 @@ public class SYSLoginTools {
     public static SYSLogin login(String username, String password) {
         SYSLogin login = null;
         Users user = UsersTools.checkPassword(username, password);
-        EntityManager em = OPDE.createEM();
+
         if (user != null) {
-            em.getTransaction().begin();
             login = new SYSLogin(user);
-            em.persist(login);
-            em.getTransaction().commit();
+            EntityTools.persist(login);
         }
 
         return login;
@@ -38,11 +37,12 @@ public class SYSLoginTools {
     }
 
     protected static void logout(SYSLogin login) {
-        EntityManager em = OPDE.createEM();
+
         if (login == null) {
             return;
         }
 
+        EntityManager em = OPDE.createEM();
         login.setLogout(new Date());
         em.getTransaction().begin();
         try {
@@ -53,10 +53,12 @@ public class SYSLoginTools {
             login.setLogout(SYSConst.DATE_BIS_AUF_WEITERES);
             em.getTransaction().rollback();
             OPDE.getLogger().debug(e);
+        } finally {
+            em.close();
         }
     }
 
-    public static SYSLogin getPreviousLogin(SYSLogin login) {
-        return login;
-    }
+//    public static SYSLogin getPreviousLogin(SYSLogin login) {
+//        return login;
+//    }
 }

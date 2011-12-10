@@ -20,6 +20,7 @@ public class BWInfoTypTools {
         Query query = em.createNamedQuery("BWInfoTyp.findByBwinftyp");
         query.setParameter("bwinftyp", bwinftyp);
         List<BWInfoTyp> bwInfoTyps = query.getResultList();
+        em.close();
         return bwInfoTyps.isEmpty() ? null : bwInfoTyps.get(0);
     }
 

@@ -30,6 +30,8 @@ public class MedBestandTools {
         } catch (Exception e) {
             OPDE.fatal(e);
             System.exit(1);
+        } finally {
+            em.close();
         }
 
         return result;

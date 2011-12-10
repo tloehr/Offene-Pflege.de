@@ -216,6 +216,7 @@ public class AppInfo {
             query.setParameter("classname", classname);
             query.setParameter("shortacl", acl);
             allowed = !query.getResultList().isEmpty();
+            em.close();
         }
         return allowed;
     }

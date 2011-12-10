@@ -22,11 +22,10 @@ import java.util.StringTokenizer;
 public class TxHdlrGroups extends TransferHandler {
 
     private HashMap<String, Groups> cache;
-    private EntityManager em;
+
 
     public TxHdlrGroups() {
         cache = new HashMap();
-        em = OPDE.createEM();
     }
 
     @Override
@@ -60,6 +59,7 @@ public class TxHdlrGroups extends TransferHandler {
             }
 
             StringTokenizer st = new StringTokenizer(data, "\n");
+            EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Groups.findByGkennung");
             while (st.hasMoreTokens()) {
                 String key = st.nextToken();
@@ -69,7 +69,7 @@ public class TxHdlrGroups extends TransferHandler {
                 }
                 listModel.add(index, cache.get(key));
             }
-
+            em.close();
             return true;
         }
     }
@@ -85,7 +85,7 @@ public class TxHdlrGroups extends TransferHandler {
                 data = "";
             }
             StringTokenizer st = new StringTokenizer(data, "\n");
-
+            EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Groups.findByGkennung");
             while (st.hasMoreTokens()) {
                 String key = st.nextToken();
@@ -95,6 +95,7 @@ public class TxHdlrGroups extends TransferHandler {
                 }
                 ((DefaultListModel) sourceList.getModel()).removeElement(cache.get(key));
             }
+            em.close();
         }
     }
 

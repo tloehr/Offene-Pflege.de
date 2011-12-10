@@ -475,9 +475,12 @@ public class OPDE {
 //                }
                     EntityManager myEM = OPDE.createEM();
                     Users rootUser = myEM.find(Users.class, "root");
+                    myEM.close();
+
                     SYSLogin rootLogin = new SYSLogin(rootUser);
                     EntityTools.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
+
                     BHPImport.importBHP(0, 0, offset);
                 } catch (Exception ex) {
                     logger.fatal("Exception beim BHPImport", ex);

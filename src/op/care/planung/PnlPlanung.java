@@ -63,7 +63,7 @@ public class PnlPlanung extends CleanablePanel {
     private ListSelectionListener lsl;
     private OCSec ocs;
     private ActionListener standardActionListener;
-    private EntityManager em = OPDE.createEM();
+
     /**
      * Creates new form PnlPlanung
      */
@@ -441,11 +441,14 @@ public class PnlPlanung extends CleanablePanel {
         if (singleRowSelected) {
 //            menu.add(new JSeparator());
 //            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "Planung", planid, bwkennung, fileActionListener));
+
+            EntityManager em = OPDE.createEM();
             Planung planung = em.find(Planung.class, planid);
             if (!planung.isAbgesetzt()) {
                 menu.add(new JSeparator());
                 menu.add(VorgaengeTools.getVorgangContextMenu(parent, planung, bewohner, standardActionListener));
             }
+            em.close();
         }
 
 

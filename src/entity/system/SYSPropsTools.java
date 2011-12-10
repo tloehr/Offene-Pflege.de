@@ -46,8 +46,8 @@ public class SYSPropsTools {
         }
 
 
-        em.getTransaction().begin();
         try {
+            em.getTransaction().begin();
             if (em.contains(prop)) {
                 em.merge(prop);
             } else {
@@ -57,6 +57,8 @@ public class SYSPropsTools {
         } catch (Exception e) {
             OPDE.fatal(e);
             em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
 
         OPDE.setProp(key, value);
@@ -109,6 +111,8 @@ public class SYSPropsTools {
             SYSProps prop = it.next();
             p.put(prop.getKey(), prop.getValue());
         }
+
+        em.close();
 
         return p;
     }

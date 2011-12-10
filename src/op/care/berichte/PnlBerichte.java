@@ -1134,7 +1134,7 @@ public class PnlBerichte extends CleanablePanel {
             btnCancel.doClick();
         }
 
-        Query query = null;
+
 
         String tags = "";
         if (!panelTags.isCollapsed()) {
@@ -1154,7 +1154,7 @@ public class PnlBerichte extends CleanablePanel {
         }
 
         EntityManager em = OPDE.createEM();
-        query = em.createQuery(" "
+        Query query = em.createQuery(" "
                 + " SELECT p FROM Pflegeberichte p "
                 + (tags.isEmpty() ? "" : " JOIN p.tags t ")
                 + " WHERE p.bewohner = :bewohner "
@@ -1171,7 +1171,11 @@ public class PnlBerichte extends CleanablePanel {
             query.setParameter("search", "%" + search + "%");
         }
 
-        tblTB.setModel(new TMPflegeberichte(query, cbShowIDs.isSelected()));
+        ArrayList<Pflegeberichte> listBerichte = new ArrayList<Pflegeberichte>(query.getResultList());
+        em.close();
+
+        tblTB.setModel(new TMPflegeberichte(listBerichte, cbShowIDs.isSelected()));
+
 
         //OPDE.debug("tl: "+tl.getState());
 //        if (tl.getState() == Timeline.TimelineState.READY){
