@@ -104,7 +104,7 @@ public class TMPlanungen extends AbstractTableModel {
                 boolean z = true;
                 while (rs.next()) {
                     int current = rs.getInt("b.Sortierung");
-                    //OPDE.getLogger().debug("#"+rs.getRow()+"   prev: "+prev + "    current: "+current + "     "+z+"  "+rs.getString("k.Bezeichnung"));                    
+                    //OPDE.debug("#"+rs.getRow()+"   prev: "+prev + "    current: "+current + "     "+z+"  "+rs.getString("k.Bezeichnung"));
                     if (prev != current) {
                         prev = current;
                         z = !z;
@@ -245,7 +245,7 @@ public class TMPlanungen extends AbstractTableModel {
         try {
             rs.absolute(r + 1);
             long planid = rs.getLong("PlanID");
-            //OPDE.getLogger().debug(this.toString() + ":" + verid);
+            //OPDE.debug(this.toString() + ":" + verid);
             switch (c) {
                 case COL_KATEGORIE: {
                     String res = "";
@@ -261,7 +261,7 @@ public class TMPlanungen extends AbstractTableModel {
 //                    int vrganzahl = rs.getInt("vrg.Anzahl");
 //                    if (vrganzahl > 0) {
 //                        result = result + "<font color=\"red\">&#9679;</font>";
-//                        OPDE.getLogger().debug(result);
+//                        OPDE.debug(result);
 //                    }
                     if (this.details) {
                         result = DBHandling.getPlanungAsHTML(planid);

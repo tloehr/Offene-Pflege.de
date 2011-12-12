@@ -25,10 +25,8 @@ public class SYSMessages implements Serializable {
     @Basic(optional = false)
     @Column(name = "MID")
     private Long mid;
-    @Basic(optional = false)
     @Column(name = "Sender")
     private String sender;
-    @Basic(optional = false)
     @Column(name = "Recipient")
     private String recipient;
     @Column(name = "Command")
@@ -59,6 +57,8 @@ public class SYSMessages implements Serializable {
     public SYSMessages(SYSHosts senderHost, SYSHosts receiverHost, Integer command, String message) {
         this.senderHost = senderHost;
         this.receiverHost = receiverHost;
+        this.recipient = null;
+        this.sender = null;
         this.command = command;
         this.message = message;
         this.sent = new Date();

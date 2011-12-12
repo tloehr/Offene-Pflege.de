@@ -36,7 +36,7 @@ public class TxHdlrGroups extends TransferHandler {
 
     @Override
     public boolean importData(TransferHandler.TransferSupport info) {
-        //OPDE.getLogger().debug("isDrop: " + info.isDrop());
+        //OPDE.debug("isDrop: " + info.isDrop());
         if (!info.isDrop()) {
             return false;
         } else {

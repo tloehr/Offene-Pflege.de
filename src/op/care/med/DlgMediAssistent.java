@@ -808,7 +808,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
 
     private void txtPZNFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPZNFocusLost
         txtPZN.setText(pzn);
-        OPDE.getLogger().debug(txtPZN.getText());
+        OPDE.debug(txtPZN.getText());
     }//GEN-LAST:event_txtPZNFocusLost
 
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed

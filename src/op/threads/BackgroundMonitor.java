@@ -80,7 +80,7 @@ public class BackgroundMonitor extends Thread {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ie) {
-                OPDE.getLogger().debug("BackgroundMonitor INTERRUPTED !");
+                OPDE.debug("BackgroundMonitor INTERRUPTED !");
                 interrupted = true;
             }
         }

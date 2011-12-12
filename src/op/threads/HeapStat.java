@@ -74,7 +74,7 @@ public class HeapStat
                 Thread.sleep(5000); // Millisekunden
             } catch (InterruptedException ie) {
                 interrupted = true;
-                OPDE.getLogger().debug("HeapStat interrupted!");
+                OPDE.debug("HeapStat interrupted!");
             }
         }
     }

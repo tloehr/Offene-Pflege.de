@@ -316,7 +316,7 @@ public class DBHandling {
         PreparedStatement stmt;
         ResultSet rs;
 
-        OPDE.getLogger().debug("loadPlanung: planid:" + planid);
+        OPDE.debug("loadPlanung: planid:" + planid);
 
         try {
             stmt = OPDE.getDb().db.prepareStatement(sql);
@@ -325,7 +325,7 @@ public class DBHandling {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                OPDE.getLogger().debug("loadPlanung: termid:" + rs.getLong("TermID"));
+                OPDE.debug("loadPlanung: termid:" + rs.getLong("TermID"));
                 String termin = getTerminAsHTML(
                         rs.getTime("Uhrzeit"), rs.getInt("UhrzeitAnzahl"), rs.getInt("NachtMo"),
                         rs.getInt("Morgens"), rs.getInt("Mittags"), rs.getInt("Nachmittags"), rs.getInt("Abends"),

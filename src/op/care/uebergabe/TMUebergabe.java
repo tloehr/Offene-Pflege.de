@@ -101,7 +101,7 @@ public class TMUebergabe
     @Override
     public Object getValueAt(int row, int col) {
         Object result = null;
-        OPDE.getLogger().debug(berichte);
+        OPDE.debug(berichte);
         Object[] bericht = (Object[]) berichte.get(row);
         // Zur Info
         // bericht[LIST_BERICHT] enthält immer das Berichte Objekt (entweder Ubergabebuch oder Pflegeberichte)

@@ -66,7 +66,7 @@ public class DBRetrieve {
 
     public static String getDosis(long verid) {
         String result = "";
-        //OPDE.getLogger().debug("VerID: "+verid);
+        //OPDE.debug("VerID: "+verid);
         try {
             HashMap where = new HashMap();
             where.put("VerID", new Object[]{verid, "="});
@@ -85,7 +85,7 @@ public class DBRetrieve {
                 final int MAXDOSIS = 2;
                 int previousState = -1;
                 while (rsDosis.next()) {
-                    //OPDE.getLogger().debug("ResultSet: "+rsDosis.getRow());
+                    //OPDE.debug("ResultSet: "+rsDosis.getRow());
                     int currentState;
                     // Zeit verwendet ?
                     if ((rsDosis.getDouble("NachtMo") + rsDosis.getDouble("NachtAb") + rsDosis.getDouble("Morgens") +
@@ -520,7 +520,7 @@ public class DBRetrieve {
                 " WHERE VerID=? ";
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            //OPDE.getLogger().debug(sql);
+            //OPDE.debug(sql);
             stmt.setLong(1, verid);
             ResultSet rs = stmt.executeQuery();
             rs.first();

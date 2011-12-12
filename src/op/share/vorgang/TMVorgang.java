@@ -115,12 +115,12 @@ public class TMVorgang extends AbstractTableModel {
 
         if (bwkennung != null) {
             where += " AND v.BWKennung = ? ";
-            OPDE.getLogger().debug(bwkennung);
+            OPDE.debug(bwkennung);
         }
 
         if (besitzer != null) {
             where += " AND v.Besitzer = ? ";
-            OPDE.getLogger().debug(besitzer);
+            OPDE.debug(besitzer);
         }
 
         Date dwv = new Date();

@@ -820,7 +820,7 @@ public class DBHandling {
             }
             result &= menge > 0 && entnahmeVorrat(vorid, menge, bhpid);
         }
-        OPDE.getLogger().debug(result ? "" : "entnahmeVorrat/5 fehlgeschlagen");
+        OPDE.debug(result ? "" : "entnahmeVorrat/5 fehlgeschlagen");
 
         return result;
     }
@@ -881,7 +881,7 @@ public class DBHandling {
         } else {
             result = false;
         }
-        OPDE.getLogger().debug(result ? "" : "entnahmeVorrat/3 fehlgeschlagen");
+        OPDE.debug(result ? "" : "entnahmeVorrat/3 fehlgeschlagen");
         return result;
     }
 

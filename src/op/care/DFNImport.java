@@ -104,9 +104,9 @@ public class DFNImport {
 
         if (planid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.
 
-            OPDE.getLogger().debug("PlanID: " + planid);
-            OPDE.getLogger().debug("Zeit: " + zeit);
-            OPDE.getLogger().debug("Offset:" + daysoffset);
+            OPDE.debug("PlanID: " + planid);
+            OPDE.debug("Zeit: " + zeit);
+            OPDE.debug("Offset:" + daysoffset);
 
             try {
                 // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
@@ -119,7 +119,7 @@ public class DFNImport {
 
                 GregorianCalendar gcStichtag = new GregorianCalendar();
                 gcStichtag.add(GregorianCalendar.DATE, daysoffset);
-                OPDE.getLogger().debug("Stichtag: " + SYSCalendar.printGC(gcStichtag));
+                OPDE.debug("Stichtag: " + SYSCalendar.printGC(gcStichtag));
                 Date sDatum = new Date(gcStichtag.getTimeInMillis());
 
                 // Mache aus "Montag" -> "Mon"
@@ -185,10 +185,10 @@ public class DFNImport {
                 OPDE.info(SYSTools.getWindowTitle("DFNImport"));
                 OPDE.info("Schreibe nach: " + OPDE.getUrl());
 
-                OPDE.getLogger().debug(selectSQL);
-                OPDE.getLogger().debug(updateSQL);
-                OPDE.getLogger().debug(insertSQL);
-                OPDE.getLogger().debug(forcedSQL);
+                OPDE.debug(selectSQL);
+                OPDE.debug(updateSQL);
+                OPDE.debug(insertSQL);
+                OPDE.debug(forcedSQL);
 
                 if (planid > 0) {
                     stmtSource.setInt(1, daysoffset);

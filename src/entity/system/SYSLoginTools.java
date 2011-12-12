@@ -52,7 +52,7 @@ public class SYSLoginTools {
         } catch (Exception e) {
             login.setLogout(SYSConst.DATE_BIS_AUF_WEITERES);
             em.getTransaction().rollback();
-            OPDE.getLogger().debug(e);
+            OPDE.debug(e);
         } finally {
             em.close();
         }

@@ -40,7 +40,7 @@ public class Tools {
                             sm.isPathSelected(new TreePath(child.getPath()), true)) {
                         childrenSum += (Double) ((Object[]) le.getObject())[ParserMassnahmen.O_SUMME];
                         // Hier muss ich noch mal ran.
-                        //OPDE.getLogger().debug("Children: " + le.getValue() + childrenSum + " %" + childrenPercent);
+                        //OPDE.debug("Children: " + le.getValue() + childrenSum + " %" + childrenPercent);
                     } else {
                         ((Object[]) le.getObject())[ParserMassnahmen.O_SUMME] = 0d;
                     }
@@ -59,7 +59,7 @@ public class Tools {
                 ListElement le = (ListElement) node.getUserObject();
                 sum = mfprozent * (childrenSum + (Double) ((Object[]) le.getObject())[ParserMassnahmen.O_ZEIT] + mfzeit);
                 sum = SYSTools.roundScale2(sum);
-                //OPDE.getLogger().debug("Node: " + le.getValue() + sum);
+                //OPDE.debug("Node: " + le.getValue() + sum);
                 // Die Summe neu setzen, dieser Knoten ist wahrscheinlich auch Kind von jemandem ;-)
                 ((Object[]) le.getObject())[ParserMassnahmen.O_SUMME] = sum;
 

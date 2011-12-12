@@ -109,7 +109,7 @@ public class Misc {
                     OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + (apvAlt + apvNeu) / 2);
                 }
             } else {
-                OPDE.getLogger().debug("inhaltRechnersich = 0, BestID: " + bestid + " DafID: " + dafid);
+                OPDE.debug("inhaltRechnersich = 0, BestID: " + bestid + " DafID: " + dafid);
             }
         }
         return apvNeu;

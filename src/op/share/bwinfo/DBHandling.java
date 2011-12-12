@@ -56,7 +56,7 @@ public class DBHandling {
      *         (String, Date, Date, long, String, String, Timestamp, Timestamp)
      */
     public static ArrayList getLastBWInfo(String bwkennung, String bwinftyp) {
-        //OPDE.getLogger().debug("DBRetrieve.getLastBWInfo() :: " + bwkennung + ", " + bwinftyp);
+        //OPDE.debug("DBRetrieve.getLastBWInfo() :: " + bwkennung + ", " + bwinftyp);
         ArrayList result = new ArrayList();
         String sql = "SELECT BWINFOID, XML, Von, Bis, AnUKennung FROM BWInfo " +
                 " WHERE BWKennung=? AND BWINFTYP=? " +
@@ -273,7 +273,7 @@ public class DBHandling {
             for (int v = 0; v < numBwi; v++) {
                 // nur drucken, wenn sel = null ist oder wenn v im Array sel vorhanden ist.
                 if (sel == null || Arrays.binarySearch(sel, v) > -1) {
-                    //OPDE.getLogger().debug(tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ));
+                    //OPDE.debug(tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ));
                     if (!tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ).toString().equalsIgnoreCase("")) {
                         result += "<h2>" + SYSTools.unHTML2(tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ).toString()) + "</h2>";
                     } else {

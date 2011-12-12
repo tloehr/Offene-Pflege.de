@@ -658,7 +658,7 @@ public class DlgBestand extends javax.swing.JDialog {
         thread = new Thread() {
             public void run() {
                 try {
-                    OPDE.getLogger().debug("thread");
+                    OPDE.debug("thread");
                     while (flashVorrat) {
                         if (lblVorrat.getForeground() != Color.RED) {
                             lblVorrat.setForeground(Color.RED);

@@ -111,7 +111,7 @@ public class TMVorlagen extends AbstractTableModel {
         Object result = null;
         try {
             rs.absolute(r + 1);
-            //OPDE.getLogger().debug(this.toString() + ":" + verid);
+            //OPDE.debug(this.toString() + ":" + verid);
             switch (c) {
                 case COL_STICHWORT: {
                     result = rs.getString("Stichwort");

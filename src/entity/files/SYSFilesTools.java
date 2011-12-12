@@ -283,7 +283,7 @@ public class SYSFilesTools {
             em.getTransaction().commit();
             success = true;
         } catch (Exception ex) {
-            OPDE.getLogger().debug(ex.getMessage(), ex);
+            OPDE.debug(ex);
             em.getTransaction().rollback();
             success = false;
         } finally {

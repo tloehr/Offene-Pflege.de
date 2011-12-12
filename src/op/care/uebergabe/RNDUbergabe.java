@@ -62,7 +62,7 @@ public class RNDUbergabe
             this.color = SYSConst.khaki1;
         }
 
-        OPDE.getLogger().debug(value);
+        OPDE.debug(value);
 
         // Das hier für das Zeichen zur Kenntnisnahme
         if (column == TMUebergabe.COL_ACKN) {

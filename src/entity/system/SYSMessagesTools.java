@@ -60,9 +60,6 @@ public class SYSMessagesTools {
                     // Create temp file.
                     File temp = File.createTempFile("emergency-exit", ".html");
 
-                    // Delete temp file when program exits.
-                    temp.deleteOnExit();
-
                     // Write to temp file
                     BufferedWriter out = new BufferedWriter(new FileWriter(temp));
                     out.write(SYSTools.htmlUmlautConversion(html));

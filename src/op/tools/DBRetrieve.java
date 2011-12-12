@@ -149,7 +149,7 @@ public class DBRetrieve {
             }
         }
 
-        OPDE.getLogger().debug("getSingleValue/3: " + sql);
+        OPDE.debug("getSingleValue/3: " + sql);
 
         try {
             stmt = OPDE.getDb().db.prepareStatement(sql);
@@ -308,7 +308,7 @@ public class DBRetrieve {
 
 
         try {
-            OPDE.getLogger().debug("getResultSet: " + sql);
+            OPDE.debug("getResultSet: " + sql);
             stmt = OPDE.getDb().db.prepareStatement(sql);
 
             // FILTER------------
@@ -447,7 +447,7 @@ public class DBRetrieve {
      *         (String, Date, Date, long, String, String, Timestamp, Timestamp)
      */
     public static ArrayList getLetztesBWAttribut(String bwkennung, String BWINFTYP) {
-        OPDE.getLogger().debug("DBRetrieve.getLetztesBWAttribut() :: " + bwkennung + ", " + BWINFTYP);
+        OPDE.debug("DBRetrieve.getLetztesBWAttribut() :: " + bwkennung + ", " + BWINFTYP);
         ArrayList result = new ArrayList();
         String sql = "SELECT XML, Von, Bis, BWINFOID, Bemerkung FROM BWInfo " +
                 " WHERE BWKennung=? AND BWINFTYP=? " +
@@ -628,8 +628,8 @@ public class DBRetrieve {
                         // ein freier ermittelt wird, der gar nicht da ist.
                         Date[] date = {von, bis};
                         result.add(date);
-                        OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(von));
-                        OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(bis));
+                        OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(von));
+                        OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(bis));
                     }
 
                     // Hier beginnt schon die Vorbereitung für den nächsten Datensatz.
@@ -651,14 +651,14 @@ public class DBRetrieve {
                     // Nicht, dann hängen wir noch das abschließende Intervall an
                     Date[] lastInterval = {von, SYSConst.DATE_BIS_AUF_WEITERES};
                     result.add(lastInterval);
-                    OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(von));
-                    OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
+                    OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(von));
+                    OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
                 }
             } else {
                 Date[] date = {SYSConst.DATE_VON_ANFANG_AN, SYSConst.DATE_BIS_AUF_WEITERES};
                 result.add(date);
-                OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_VON_ANFANG_AN));
-                OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
+                OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): von =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_VON_ANFANG_AN));
+                OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
             }
         } catch (SQLException ex) {
             new DlgException(ex);
@@ -694,8 +694,8 @@ public class DBRetrieve {
                         // ein freier ermittelt wird, der gar nicht da ist.
                         Date[] date = {von, bis};
                         result.add(date);
-                        OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(von));
-                        OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(bis));
+                        OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(von));
+                        OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(bis));
                     }
 
                     // Hier beginnt schon die Vorbereitung für den nächsten Datensatz.
@@ -716,14 +716,14 @@ public class DBRetrieve {
                     // Nicht, dann hängen wir noch das abschließende Intervall an
                     Date[] lastInterval = {von, SYSConst.DATE_BIS_AUF_WEITERES};
                     result.add(lastInterval);
-                    OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(von));
-                    OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
+                    OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(von));
+                    OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
                 }
             } else { // ist noch alles leer, dann kann man auch alles eintragen.
                 Date[] date = {SYSConst.DATE_VON_ANFANG_AN, SYSConst.DATE_BIS_AUF_WEITERES};
                 result.add(date);
-                OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_VON_ANFANG_AN));
-                OPDE.getLogger().debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
+                OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): von =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_VON_ANFANG_AN));
+                OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
             }
         } catch (SQLException ex) {
             new DlgException(ex);
@@ -864,7 +864,7 @@ public class DBRetrieve {
                 text = (SYSTools.catchNull(zub).equals("") ? anw : zub + ", " + anw);
 
                 ListElement le = new ListElement(text, rs.getLong("FormID"));
-                OPDE.getLogger().debug("getMPFormen:>>" + text + ", " + rs.getLong("FormID"));
+                OPDE.debug("getMPFormen:>>" + text + ", " + rs.getLong("FormID"));
                 dcbmMassnahmen.addElement(le);
             }
         } // try

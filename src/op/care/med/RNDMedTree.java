@@ -61,15 +61,15 @@ public class RNDMedTree extends JLabel implements TreeCellRenderer {
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent evt) {
-                OPDE.getLogger().debug(evt);
+                OPDE.debug(evt);
                 if (evt.isPopupTrigger()) {
-                    OPDE.getLogger().debug(evt.getButton());
+                    OPDE.debug(evt.getButton());
                     menu.show(evt.getComponent(), evt.getX(), evt.getY());
                 }
             }
 
             public void mouseReleased(MouseEvent evt) {
-                OPDE.getLogger().debug(evt);
+                OPDE.debug(evt);
                 if (evt.isPopupTrigger()) {
                     menu.show(evt.getComponent(), evt.getX(), evt.getY());
                 }

@@ -920,10 +920,10 @@ public class DlgVerordnung extends javax.swing.JDialog {
             HashMap hm = new HashMap();
             hm.put("BWKennung", bwkennung);
             if (SYSCalendar.sameDay(jdcAN.getDate(), new Date()) == 0) {
-                OPDE.getLogger().debug("jdcAN steht auf HEUTE");
+                OPDE.debug("jdcAN steht auf HEUTE");
                 hm.put("AnDatum", "!NOW!");
             } else {
-                OPDE.getLogger().debug("jdcAN steht nicht auf HEUTE");
+                OPDE.debug("jdcAN steht nicht auf HEUTE");
                 hm.put("AnDatum", jdcAN.getDate());
             }
 
@@ -933,16 +933,16 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 abarztid = ((ListElement) cmbAB.getSelectedItem()).getPk();
                 abkhid = ((ListElement) cmbKHAb.getSelectedItem()).getPk();
                 if (SYSCalendar.sameDay(jdcAB.getDate(), new Date()) == 0) {
-                    OPDE.getLogger().debug("jdcAB steht auf HEUTE");
+                    OPDE.debug("jdcAB steht auf HEUTE");
                     if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
-                        OPDE.getLogger().debug("jdcAB und jdcAN sind gleich");
+                        OPDE.debug("jdcAB und jdcAN sind gleich");
                         hm.put("AnDatum", new Timestamp(SYSCalendar.startOfDay()));
                         hm.put("AbDatum", new Timestamp(SYSCalendar.endOfDay()));
                     } else {
                         hm.put("AbDatum", "!NOW!");
                     }
                 } else {
-                    OPDE.getLogger().debug("jdcAB steht nicht auf HEUTE");
+                    OPDE.debug("jdcAB steht nicht auf HEUTE");
                     hm.put("AbDatum", new Timestamp(SYSCalendar.endOfDay(jdcAB.getDate())));
                 }
                 hm.put("AbUKennung", lblAB.getText());
@@ -1005,7 +1005,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
         } catch (SQLException ex) {
             try {
-                OPDE.getLogger().debug(ex.getMessage());
+                OPDE.debug(ex.getMessage());
                 OPDE.getDb().db.rollback();
             } catch (SQLException ex1) {
                 new DlgException(ex1);

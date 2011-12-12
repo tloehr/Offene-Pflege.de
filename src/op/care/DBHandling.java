@@ -376,7 +376,7 @@ public class DBHandling {
             int numBwi = tmbwi.getRowCount();
             if (numBwi > 0) {
                 for (int v = 0; v < numBwi; v++) {
-                    //OPDE.getLogger().debug(tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ));
+                    //OPDE.debug(tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ));
                     if (!tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ).toString().equalsIgnoreCase("")) {
                         result += "<h2>" + SYSTools.unHTML2(tmbwi.getValueAt(v, TMBWInfo.COL_KATBEZ).toString()) + "</h2>";
                     } else {

@@ -158,7 +158,7 @@ public class OCSec {
                 "SELECT ClassName, ComponentName, Executable, Visible, Access FROM OCRights " +
                 "WHERE ClassName=? AND GKennung='everyone'";
         try {
-            OPDE.getLogger().debug("OCSEC: init class" + classname);
+            OPDE.debug("OCSEC: init class" + classname);
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
             stmt.setString(1, classname);
             stmt.setString(2, OPDE.getLogin().getUser().getUKennung());
@@ -179,14 +179,14 @@ public class OCSec {
                         bs.set(VISIBLE, bs.get(VISIBLE) || rs.getBoolean("Visible"));
                         bs.set(ACCESS, bs.get(ACCESS) || rs.getBoolean("Access"));
                         classes.put(key, bs);
-                        OPDE.getLogger().debug("OCSEC: altering right > " + key + " " + bs);
+                        OPDE.debug("OCSEC: altering right > " + key + " " + bs);
                     } else { // gibts noch nicht, dann einfach hinzufügen
                         BitSet bs = new BitSet();
                         bs.set(EXEC, rs.getBoolean("Executable"));
                         bs.set(VISIBLE, rs.getBoolean("Visible"));
                         bs.set(ACCESS, rs.getBoolean("Access"));
                         classes.put(key, bs);
-                        OPDE.getLogger().debug("OCSEC: storing right > " + key + " " + bs);
+                        OPDE.debug("OCSEC: storing right > " + key + " " + bs);
                     }
                 }
             }
@@ -270,7 +270,7 @@ public class OCSec {
         } else {
             result = true;
         }
-        OPDE.getLogger().debug("OCSEC: " + key + " (" + BIT[bit] + ") => " + result);
+        OPDE.debug("OCSEC: " + key + " (" + BIT[bit] + ") => " + result);
         return result;
     }
 

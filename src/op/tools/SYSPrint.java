@@ -126,7 +126,7 @@ public class SYSPrint {
 
     private static void printLabel(String text) {
 
-        OPDE.getLogger().debug(text);
+        OPDE.debug(text);
 
         DocFlavor flavor = DocFlavor.STRING.TEXT_PLAIN;//.STRING;//DocFlavor.INPUT_STREAM.TEXT_HTML_US_ASCII;
 
@@ -138,7 +138,7 @@ public class SYSPrint {
         try {
             PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null); // alle Drucker listen
 //            for (int i=0; i < prservices.length; i++){
-//                OPDE.getLogger().debug(prservices[i].getName());
+//                OPDE.debug(prservices[i].getName());
 //            }
             int idxPrintService = 0;
             if (null == prservices || 0 >= prservices.length) {
@@ -177,14 +177,14 @@ public class SYSPrint {
         DocFlavor[] prdfl = prserv.getSupportedDocFlavors();
         if (null != prattr && 0 < prattr.length) {
             for (int i = 0; i < prattr.length; i++) {
-                OPDE.getLogger().debug("      PrintService-Attribute[" + i + "]: " + prattr[i].getName() + " = " + prattr[i]);
+                OPDE.debug("      PrintService-Attribute[" + i + "]: " + prattr[i].getName() + " = " + prattr[i]);
             }
         }
         if (null != prdfl && 0 < prdfl.length) {
             for (int i = 0; i < prdfl.length; i++) {
                 s2 = prdfl[i].getMimeType();
                 if (null != s2 && !s2.equals(s1)) {
-                    OPDE.getLogger().debug("      PrintService-DocFlavor-Mime[" + i + "]: " + s2);
+                    OPDE.debug("      PrintService-DocFlavor-Mime[" + i + "]: " + s2);
                 }
                 s1 = s2;
             }

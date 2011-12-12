@@ -75,7 +75,7 @@ public class DlgRecordEdit extends javax.swing.JDialog {
             }
             table = rsmd.getTableName(1);
         } catch (Exception e) {
-            OPDE.getLogger().debug(e);
+            OPDE.debug(e);
         }
         this.titel = titel;
         initComponents();
@@ -163,7 +163,7 @@ public class DlgRecordEdit extends javax.swing.JDialog {
                 fieldList.add(tf);
             }
         } catch (SQLException ex) {
-            OPDE.getLogger().debug(ex);
+            OPDE.debug(ex);
         }
         SYSTools.centerOnParent(this);
         setTitle(SYSTools.getWindowTitle(titel));
@@ -182,7 +182,7 @@ public class DlgRecordEdit extends javax.swing.JDialog {
                 DBHandling.insertRecord(table, hm);
             }
         } catch (SQLException ex) {
-            OPDE.getLogger().debug(ex);
+            OPDE.debug(ex);
         }
         dispose();
     }//GEN-LAST:event_btnSaveActionPerformed

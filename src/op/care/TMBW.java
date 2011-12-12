@@ -89,7 +89,7 @@ public class TMBW extends AbstractTableModel {
             s = "SELECT bw.nachname Nachname, bw.vorname Vorname, bw.BWKennung, bw.Geschlecht  FROM Bewohner bw "
                     + " ORDER BY Nachname, Vorname";
 
-            //OPDE.getLogger().debug(s);
+            //OPDE.debug(s);
 
             stmt = OPDE.getDb().db.prepareStatement(s);
 

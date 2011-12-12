@@ -7,6 +7,7 @@ package entity.system;
 import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -90,12 +91,14 @@ public class SYSHostsTools {
                     OPDE.getLocalProps().setProperty("mainhost", Boolean.toString(mainhost));
 
                 } catch (Exception e) {
+                    OPDE.fatal(e);
                     em.getTransaction().rollback();
                 }
 
 
             }
         } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
+            OPDE.debug(e);
             host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
             EntityTools.persist(host);
         } finally {
@@ -110,8 +113,8 @@ public class SYSHostsTools {
      */
     public static void shutdown() {
         SYSMessagesTools.setAllMesages2Processed();
-        OPDE.getHost().setLpol(null);
-        OPDE.getHost().setUp(null);
+        OPDE.getHost().setLpol(SYSConst.DATE_VON_ANFANG_AN);
+        OPDE.getHost().setUp(SYSConst.DATE_VON_ANFANG_AN);
         EntityTools.merge(OPDE.getHost());
         // OPDE.getBM().interrupt();
     }

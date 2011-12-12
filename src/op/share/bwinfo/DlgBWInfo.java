@@ -371,7 +371,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
     }
 
     private void saveEDIT() {
-        //OPDE.getLogger().debug(toXML());
+        //OPDE.debug(toXML());
         HashMap hm = new HashMap();
         hm.put("Von", von);
         hm.put("Bis", bis);
@@ -394,7 +394,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
             OPDE.getDb().db.commit();
 
             // Zuerst den bestehenden kürzen
-            OPDE.getLogger().debug(toXML());
+            OPDE.debug(toXML());
             HashMap hm = new HashMap();
             hm.put("Bis", SYSCalendar.addField(von, -1, GregorianCalendar.SECOND)); // Ist in beiden Fällen das gleiche.
             // Die Intervalle sind eine künstliche Beschränkung. So dass die Wechsel jeweils um Mitternacht erfolgen.

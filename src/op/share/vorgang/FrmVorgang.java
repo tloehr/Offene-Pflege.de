@@ -308,7 +308,7 @@ public class FrmVorgang extends javax.swing.JFrame {
 
     private void cmbBesitzerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbBesitzerItemStateChanged
         ListElement el = (ListElement) cmbBesitzer.getSelectedItem();
-        //OPDE.getLogger().debug(el.getData());
+        //OPDE.debug(el.getData());
         this.besitzer = el.getData();
 
         reloadDisplay();

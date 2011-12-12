@@ -132,7 +132,7 @@ public class TMDFN
 //                boolean z = true;
 //                while (rs.next()) {
 //                    int current = rs.getInt("k.Sortierung");
-//                    //OPDE.getLogger().debug("#"+rs.getRow()+"   prev: "+prev + "    current: "+current + "     "+z+"  "+rs.getString("k.Bezeichnung"));
+//                    //OPDE.debug("#"+rs.getRow()+"   prev: "+prev + "    current: "+current + "     "+z+"  "+rs.getString("k.Bezeichnung"));
 //                    if (prev != current) {
 //                        prev = current;
 //                        z = !z;

@@ -112,9 +112,9 @@ public class BHPImport {
 
         if (verid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.
 
-            OPDE.getLogger().debug("VerID: " + verid);
-            OPDE.getLogger().debug("Zeit: " + zeit);
-            OPDE.getLogger().debug("Offset:" + daysoffset);
+            OPDE.debug("VerID: " + verid);
+            OPDE.debug("Zeit: " + zeit);
+            OPDE.debug("Offset:" + daysoffset);
 
             try {
                 // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
@@ -127,7 +127,7 @@ public class BHPImport {
 
                 GregorianCalendar gcStichtag = new GregorianCalendar();
                 gcStichtag.add(GregorianCalendar.DATE, daysoffset);
-                OPDE.getLogger().debug("Stichtag: " + SYSCalendar.printGC(gcStichtag));
+                OPDE.debug("Stichtag: " + SYSCalendar.printGC(gcStichtag));
                 Date sDatum = new Date(gcStichtag.getTimeInMillis());
 
                 // Mache aus "Montag" -> "Mon"

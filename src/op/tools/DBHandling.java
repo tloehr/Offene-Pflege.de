@@ -148,12 +148,12 @@ public class DBHandling {
 //                stmt.setString(2, OPDE.getLogin().getUser().getUKennung());
 //            }
 //            rs = stmt.executeQuery();
-//            OPDE.getLogger().debug("getOCProps/2: " + sql);
-//            OPDE.getLogger().debug("getOCProps/2: ip:" + ip);
-//            OPDE.getLogger().debug("getOCProps/2: only4me:" + only4me);
+//            OPDE.debug("getOCProps/2: " + sql);
+//            OPDE.debug("getOCProps/2: ip:" + ip);
+//            OPDE.debug("getOCProps/2: only4me:" + only4me);
 //            while (rs.next()) {
 //                p.put(rs.getString("K"), rs.getString("V"));
-//                OPDE.getLogger().debug("getOCProps/2: " + rs.getString("K") + " ==> " + rs.getString("V"));
+//                OPDE.debug("getOCProps/2: " + rs.getString("K") + " ==> " + rs.getString("V"));
 //            }
 //        } // try
 //        catch (SQLException se) {
@@ -255,7 +255,7 @@ public class DBHandling {
             } else if (o != null && o.toString().equalsIgnoreCase("!NOW+1!")) { // Sonderfall für mysql Datenbankfunktion now()
                 values += "DATE_ADD(now(),INTERVAL 1 SECOND)";
             } else {
-                OPDE.getLogger().debug(l++ + ": " + col);
+                OPDE.debug(l++ + ": " + col);
                 val.add(o); // value, für spätere setObject Schleife
                 values += "?";
             }
@@ -269,12 +269,12 @@ public class DBHandling {
         values += ")";
 
         String sql = "INSERT INTO " + table + " " + cols + " VALUES " + values;
-        OPDE.getLogger().debug("DBHandling.insertRecord: " + sql);
+        OPDE.debug("DBHandling.insertRecord: " + sql);
 
         try {
             stmt = OPDE.getDb().db.prepareStatement(sql);
             for (int i = 0; i < val.size(); i++) {
-                OPDE.getLogger().debug(i);
+                OPDE.debug(i);
                 stmt.setObject(i + 1, val.get(i));
                 //System.out.println(whereval.get(i));
             }
@@ -329,7 +329,7 @@ public class DBHandling {
 
         sql += " WHERE " + pkname + " = ?";
 
-        OPDE.getLogger().debug("DBHandling.updatingRecord: " + sql);
+        OPDE.debug("DBHandling.updatingRecord: " + sql);
 
         try {
             stmt = OPDE.getDb().db.prepareStatement(sql);
@@ -387,7 +387,7 @@ public class DBHandling {
 
         sql += " WHERE " + pkname + " = ?";
 
-        OPDE.getLogger().debug("DBHandling.updatingRecord: " + sql);
+        OPDE.debug("DBHandling.updatingRecord: " + sql);
 
         try {
             stmt = OPDE.getDb().db.prepareStatement(sql);

@@ -189,7 +189,7 @@ public class TMVerordnung
 //            }
 //            sql += " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext)  ";
 //            stmt = OPDE.getDb().db.prepareStatement(sql);
-//            //OPDE.getLogger().debug(sql);
+//            //OPDE.debug(sql);
 //            stmt.setString(1, bwkennung);
 //            stmt.setString(2, bwkennung);
 ////            stmt.setString(3, bwkennung);

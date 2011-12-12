@@ -242,7 +242,7 @@ public class TMBedarf
         try {
             rs.absolute(r + 1);
             long verid = rs.getLong("VerID");
-            //OPDE.getLogger().debug(this.toString() + ":" + verid);
+            //OPDE.debug(this.toString() + ":" + verid);
             switch (c) {
                 // Hier muss die Situation stehen. Dann gehts im DlgBedarf weiter
                 case COL_SIT: {

@@ -278,7 +278,7 @@ public class OPMain extends javax.swing.JFrame {
     }
 
     private void newFrame(String classname) {
-        OPDE.getLogger().debug("NewFrame with Classname: " + classname);
+        OPDE.debug("NewFrame with Classname: " + classname);
         // Key für die InnerClass
         final String key = classname;
         if (!frames.containsKey(classname)) {

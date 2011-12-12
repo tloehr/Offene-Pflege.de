@@ -465,7 +465,7 @@ public class PnlBHP extends CleanablePanel {
                         && (status == TMBHP.STATUS_OFFEN
                         || (ukennung.equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung())
                         && SYSCalendar.earlyEnough(mdate, 30) && !op.care.med.DBHandling.betrifftAbgeschlossenenBestand(bhpid))); // damit man nichts rückgängig machen kann, was irgendwie einen abgeschlossenen Bestand betrifft.
-        OPDE.getLogger().debug(changeable ? "changeable" : "NOT changeable");
+        OPDE.debug(changeable ? "changeable" : "NOT changeable");
         if (changeable) {
             // Drückt auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
             if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) {
@@ -545,7 +545,7 @@ public class PnlBHP extends CleanablePanel {
                     tm.setUpdate(row, status);
 
                     if (fullReloadNecessary) {
-                        //OPDE.getLogger().debug("fullReloadNecessary");
+                        //OPDE.debug("fullReloadNecessary");
                         reloadTable();
                     }
                 }

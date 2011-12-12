@@ -320,7 +320,7 @@ public class PnlVorgang extends CleanablePanel {
                         reloadVTable();
                     }
                 });
-                OPDE.getLogger().debug(mi.getText());
+                OPDE.debug(mi.getText());
                 result.add(mi);
             }
 
@@ -474,7 +474,7 @@ public class PnlVorgang extends CleanablePanel {
             menu = new JPopupMenu();
             Point p = evt.getPoint();
             int row = tblElement.rowAtPoint(p);
-            OPDE.getLogger().debug(row);
+            OPDE.debug(row);
 
             JMenuItem itemPopupText = new JMenuItem("Neuen Vorgangsbericht erstellen");
             itemPopupText.addActionListener(new java.awt.event.ActionListener() {
@@ -547,7 +547,7 @@ public class PnlVorgang extends CleanablePanel {
                 lblBW = lblbw;
             }
         } else if (!SYSTools.catchNull(besitzer).equals("")) {
-            OPDE.getLogger().debug(besitzer);
+            OPDE.debug(besitzer);
             lblBW.setText("Vorgänge zeigen für: " + DBRetrieve.getUsername(besitzer));
             lblbw = null;
         } else {

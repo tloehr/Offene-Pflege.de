@@ -226,15 +226,15 @@ public class SYSTools {
                         // It is possible that someone could create a listener
                         // that doesn't extend from EventListener.  If so,
                         // ignore it
-                        OPDE.getLogger().debug("Listener " + params[0] + " does not extend EventListener");
+                        OPDE.debug("Listener " + params[0] + " does not extend EventListener");
                         continue;
                     }
                     for (int j = 0; j < listeners.length; j++) {
                         try {
                             method.invoke(comp, new Object[]{listeners[j]});
-                            //OPDE.getLogger().debug("removed Listener " + name + "for comp " + comp + "\n");
+                            //OPDE.debug("removed Listener " + name + "for comp " + comp + "\n");
                         } catch (Exception e) {
-                            OPDE.getLogger().debug("Cannot invoke removeListener method " + e);
+                            OPDE.debug("Cannot invoke removeListener method " + e);
                             // Continue on.  The reason for removing all listeners is to
                             // make sure that we don't have a listener holding on to something
                             // which will keep it from being garbage collected. We want to
@@ -247,7 +247,7 @@ public class SYSTools {
                     // one argument is removePropertyChangeListener.  If it is
                     // something other than that, flag it and move on.
                     if (!name.equals("removePropertyChangeListener")) {
-                        OPDE.getLogger().debug("    Wrong number of Args " + name);
+                        OPDE.debug("    Wrong number of Args " + name);
                     }
                 }
             }

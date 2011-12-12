@@ -166,7 +166,7 @@ public class TMBWInfo extends AbstractTableModel {
             }
             case COL_HTMLRAW: {
                 result = attrib.get("html").toString();
-                OPDE.getLogger().debug(result);
+                OPDE.debug(result);
                 break;
             }
             case COL_KATBEZ_ATTRIB: {

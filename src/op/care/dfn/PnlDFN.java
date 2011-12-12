@@ -438,7 +438,7 @@ public class PnlDFN extends CleanablePanel {
                         (ukennung.equals("") ||
                                 (ukennung.equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung()) &&
                                         SYSCalendar.earlyEnough(mdate, 30)));
-        OPDE.getLogger().debug(changeable ? "changeable" : "NOT changeable");
+        OPDE.debug(changeable ? "changeable" : "NOT changeable");
         if (changeable) {
             // Drückt der Anwender auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
             if (!evt.isPopupTrigger() && col == TMDFN.COL_STATUS) {

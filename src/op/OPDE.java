@@ -142,7 +142,7 @@ public class OPDE {
             listenerList.add(ActionListener.class, listener);
             runningModules.put(internalClassID, listener);
             success = true;
-            OPDE.getLogger().debug("Modul " + internalClassID + " hinzugefügt.");
+            OPDE.debug("Modul " + internalClassID + " hinzugefügt.");
         }
         return success;
     }
@@ -150,7 +150,7 @@ public class OPDE {
     public static void removeModule(String internalClassID) {
         listenerList.remove(ActionListener.class, runningModules.get(internalClassID));
         runningModules.remove(internalClassID);
-        OPDE.getLogger().debug("Modul " + internalClassID + " entfernt.");
+        OPDE.debug("Modul " + internalClassID + " entfernt.");
     }
 
     public static void notifyAboutLogout() {
@@ -466,7 +466,7 @@ public class OPDE {
                     int offset = 0;
 //                if (isDebug()) {
 //                    String sOffset = cl.getOptionValue("b");
-//                    OPDE.getLogger().debug(cl.getOptionValue("b"));
+//                    OPDE.debug(cl.getOptionValue("b"));
 //                    try {
 //                        offset = Integer.parseInt(sOffset);
 //                    } catch (NumberFormatException ex) {

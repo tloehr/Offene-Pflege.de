@@ -54,7 +54,7 @@ public class RNDMassTree implements TreeCellRenderer {
         Double sum = (Double) o[ParserMassnahmen.O_SUMME];
         int typ = (Integer) o[ParserMassnahmen.O_TYP];
         lbl1.setFont(new java.awt.Font("Dialog", 0, 10));
-        //OPDE.getLogger().debug(mdfs.size());
+        //OPDE.debug(mdfs.size());
         if (modfaktorenSelected(mdfs)) {
             pnl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         } else {
@@ -65,7 +65,7 @@ public class RNDMassTree implements TreeCellRenderer {
         }
         if (sum > 0 && sum.doubleValue() != zeit.doubleValue()) {
             label += " <font color=\"green\"><b>" + sum + " Min</b></font>";
-            //OPDE.getLogger().debug(label + zeit + " " + new Boolean(sum != zeit).toString());
+            //OPDE.debug(label + zeit + " " + new Boolean(sum != zeit).toString());
         }
         lbl1.setText(SYSTools.toHTML(label + modfaktoren2html(mdfs)));
 

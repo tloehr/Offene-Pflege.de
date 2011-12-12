@@ -452,7 +452,7 @@ public class VerordnungTools {
         }
         if (verordnung.isAbgesetzt()) {//if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
             result += "</s>"; // Abgesetzte
-            //OPDE.getLogger().debug(this.toString() + ": " + result);
+            //OPDE.debug(this.toString() + ": " + result);
         }
 
         return result;
@@ -518,7 +518,7 @@ public class VerordnungTools {
 
     public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, MedVorrat vorrat, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
         String result = "";
-        //OPDE.getLogger().debug("VerID: "+verid);
+        //OPDE.debug("VerID: "+verid);
 
         // ======================================================================================================
         // Erster Teil
