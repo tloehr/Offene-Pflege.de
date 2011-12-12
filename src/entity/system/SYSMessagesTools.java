@@ -30,6 +30,11 @@ public class SYSMessagesTools {
     public static final int CMD_DO_LOGOUT = 1;
 
 
+    /**
+     * Prüft ob es Nachrichten für diesen Host gibt und arbeitet sie ab. Wenn nötig,
+     * wir der Host herunter gefahren.
+     *
+     */
     public static void processSystemMessage() {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("SYSMessages.findByReceiverHostAndUnprocessed");
@@ -41,12 +46,13 @@ public class SYSMessagesTools {
 
                 // Das wird einfacher und besser, wenn das Programm auf die Ein-Fenster-Variante umgestellt ist.
                 try {
-                    OPDE.closeDB();
-                    SYSLoginTools.logout();
-                    OPDE.getBM().interrupt();
-                    SYSHostsTools.shutdown();
-                    em.close();
-                    OPDE.getEMF().close();
+
+                    OPDE.closeDB(); // JDBC Zugriff
+                    SYSLoginTools.logout(); // Login Objekt abschließen
+                    OPDE.getBM().interrupt(); // Background Monitor beenden
+                    SYSHostsTools.shutdown(); // Den aktuellen HOST als "heruntergefahren" markieren
+                    em.close(); // Den aktuellen EntityManager schließen
+                    OPDE.getEMF().close(); // Die Factory selbst schließen.
 
                     String html = "<html><h1>Das Progamm musste automatisch beendet werden</h1><b>Der Grund:</b><br/>" + msg.getMessage() +
                             "</html>";
@@ -78,14 +84,20 @@ public class SYSMessagesTools {
         }
     }
 
-
-    public static void setAllMesages2Processed(SYSHosts host) {
+    /**
+     * setzt einfach alle noch offenen Nachrichten auf erledigt. Wird bei einem Shutdown gebraucht.
+     * Die Nachrichten werden zwar nicht mehr abgearbeitet, aber das spielt dann auch keine
+     * Rolle mehr.
+     *
+     */
+    public static void setAllMesages2Processed() {
         EntityManager em = OPDE.createEM();
+
         try {
             em.getTransaction().begin();
             Query query = em.createQuery("UPDATE SYSMessages s SET s.processed = current_timestamp WHERE s.processed = :processed AND s.receiverHost = :host");
             query.setParameter("processed", SYSConst.DATE_BIS_AUF_WEITERES);
-            query.setParameter("host", host);
+            query.setParameter("host", OPDE.getHost());
             query.executeUpdate();
             em.getTransaction().commit();
         } catch (Exception e) {

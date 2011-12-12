@@ -4,6 +4,8 @@
  */
 package entity.system;
 
+import op.tools.SYSConst;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
@@ -20,7 +22,7 @@ import java.util.Date;
         @NamedQuery(name = "SYSHosts.findByHostKey", query = "SELECT s FROM SYSHosts s WHERE s.hostKey = :hostKey"),
         @NamedQuery(name = "SYSHosts.findByHostname", query = "SELECT s FROM SYSHosts s WHERE s.hostname = :hostname"),
         @NamedQuery(name = "SYSHosts.findByIp", query = "SELECT s FROM SYSHosts s WHERE s.ip = :ip"),
-        @NamedQuery(name = "SYSHosts.findOtherRunningMainHosts", query = "SELECT s FROM SYSHosts s WHERE s.mainHost = TRUE AND s.hostKey = :hostKey AND s.lpol IS NOT null "),
+        @NamedQuery(name = "SYSHosts.findOtherMainHosts", query = "SELECT s FROM SYSHosts s WHERE s.mainHost = TRUE AND s <> :host"),
         @NamedQuery(name = "SYSHosts.findByLpol", query = "SELECT s FROM SYSHosts s WHERE s.lpol = :lpol")})
 public class SYSHosts implements Serializable {
 
@@ -56,7 +58,7 @@ public class SYSHosts implements Serializable {
         this.hostname = hostname;
         this.ip = ip;
         this.mainHost = mainHost;
-        this.lpol = null;
+        this.lpol = SYSConst.DATE_VON_ANFANG_AN;
     }
 
     public Long getHostID() {
@@ -91,7 +93,7 @@ public class SYSHosts implements Serializable {
         this.ip = ip;
     }
 
-    public Boolean getMainHost() {
+    public Boolean isMainHost() {
         return mainHost;
     }
 

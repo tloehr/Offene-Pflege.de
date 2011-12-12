@@ -33,8 +33,15 @@ import op.OPDE;
 import java.util.Date;
 
 /**
- * @author tloehr
- */
+     * Dieser Monitor läuft solange wie die Applikation selbst.
+     * Er hat verschiedene Aufgaben
+     * <ul>
+     *     <li>Regelmäßig (alle 60 Sekunden) beim aktuellen Host einen Beweis zu liefern, dass dieser noch 'lebt'.</li>
+     *     <li>Er kümmert sich um das OPDE eigene Druck System. Also Warteschlangen usw.</li>
+     *     <li>Er sorgt dafür, dass alle 30 Sekunden geprüft wird ob Nachrichten abzuarbeiten sind.</li>
+     *     <li>Er kümmert sich um das Zentrale Message Fenster.</li>
+     * </ul>
+     */
 public class BackgroundMonitor extends Thread {
 
     //long loginid;
@@ -42,9 +49,7 @@ public class BackgroundMonitor extends Thread {
 
     int zyklen = 0;
 
-    /**
-     *
-     */
+
     public BackgroundMonitor() {
         super();
         this.interrupted = false;
@@ -58,6 +63,7 @@ public class BackgroundMonitor extends Thread {
         while (!interrupted) {
             zyklen++;
 
+            // Alle 60 Sekunden
             if (zyklen % 6 == 0 || zyklen == 1) {   // Sofort und alle 6 Durchgänge
                 OPDE.debug("Background Monitor Zyklus: " + zyklen + " -- proof of life");
                 OPDE.getHost().setLpol(new Date());
@@ -66,8 +72,10 @@ public class BackgroundMonitor extends Thread {
                 OPDE.debug("Background Monitor Zyklus: " + zyklen);
             }
 
-
-            SYSMessagesTools.processSystemMessage();
+            // Alle 30 Sekunden
+            if (zyklen % 3 == 0) {
+                SYSMessagesTools.processSystemMessage();
+            }
 
             try {
                 Thread.sleep(10000);

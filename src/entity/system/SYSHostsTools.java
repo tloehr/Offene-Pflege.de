@@ -7,7 +7,6 @@ package entity.system;
 import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -33,24 +32,25 @@ public class SYSHostsTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("SYSHosts.findByHostKey");
         query.setParameter("hostKey", hostkey);
+        // MainHost Angabe aus der local.properties
         boolean mainhost = SYSTools.catchNull(OPDE.getLocalProps().getProperty("mainhost")).equalsIgnoreCase("true");
 
         try {
             // doppelte Hostkeys können nicht auftreten. Die sind unique.
             host = (SYSHosts) query.getSingleResult();
 
-            // Das bedeutet, dass der Host sich entweder korrekt abgemeldet hat oder sich mindestens 2 Minuten lang nicht gemeldet hat. Dann gehen wir davon aus, dass der Host abgestürzt ist.
+            // Das bedeutet, dass der Host sich entweder korrekt abgemeldet hat oder sich mindestens 2 Minuten lang nicht gemeldet hat.
+            // Dann gehen wir davon aus, dass der Host abgestürzt ist.
             // Der Host scheint noch zu leben. Dann können wir nich nochmal starten. Gäb sonst Durcheinander.
-            if (host.getLpol() != null && SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
+            if (SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
                 OPDE.fatal("Es gibt bereits einen aktiven Host mit demselben Hostkey.");
                 host = null;
             } else {
                 // ===================== REPARATUR DEFEKTER HOST EINTRÄGE ======================
                 // Ein frühere Sitzung ist zusammengebrochen und nicht sauber beendet worden.
                 // Da müssen wir erst aufräumen.
-                if (host.getLpol() != null && !SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
-                    OPDE.warn("Host wurde beim letzten mal nicht korrekt beendet. Wird jetzt behoben.");
-                }
+
+                OPDE.warn("Host wurde beim letzten mal nicht korrekt beendet. Wird jetzt behoben.");
 
                 try {
                     em.getTransaction().begin();
@@ -66,33 +66,34 @@ public class SYSHostsTools {
                     String loginsJPQL = " UPDATE SYSLogin l SET l.logout = l.host.lpol WHERE l.host = :host AND l.logout = :logout ";
                     Query queryDeleteLogins = em.createQuery(loginsJPQL);
                     queryDeleteLogins.setParameter("host", host);
-                    queryDeleteLogins.setParameter("logout", SYSConst.DATE_BIS_AUF_WEITERES);
+                    queryDeleteLogins.setParameter("logout", host.getLpol());
                     queryDeleteLogins.executeUpdate();
 
-                    host.setLpol(null);
+                    if (mainhost) {
+                        Query query2 = em.createNamedQuery("SYSHosts.findOtherMainHosts");
+                        query2.setParameter("host", host);
+
+                        if (!query2.getResultList().isEmpty()) {
+                            SYSHosts alreadyRunningHost = (SYSHosts) query2.getResultList().get(0);
+                            OPDE.warn("Es gibt bereits einen MainHost mit der Adresse: " + alreadyRunningHost.getIp());
+                            OPDE.warn("Unsere Maschine läuft entgegen des Wunsches nun als normaler Host.");
+                            mainhost = false;
+                        }
+                    }
+
+                    host.setMainHost(mainhost); // Die lokale Einstellung überschreibt immer die Datenbank Einstellung des Hosts.
+                    host.setLpol(new Date());
                     host.setUp(new Date());
                     em.merge(host);
                     em.getTransaction().commit();
+
+                    OPDE.getLocalProps().setProperty("mainhost", Boolean.toString(mainhost));
+
                 } catch (Exception e) {
                     em.getTransaction().rollback();
                 }
 
-                if (mainhost) {
-                    Query query2 = em.createNamedQuery("SYSHosts.findOtherRunningMainHosts");
-                    query2.setParameter("hostKey", hostkey);
 
-                    if (!query2.getResultList().isEmpty()) {
-                        SYSHosts alreadyRunningHost = (SYSHosts) query2.getResultList().get(0);
-                        OPDE.warn("Es gibt bereits einen laufenden MainHost mit der Adresse: " + alreadyRunningHost.getIp());
-                        OPDE.warn("Unsere Maschine läuft entgegen des Wunsches nun als normaler Host. Bitte local.properties reparieren.");
-                        mainhost = false;
-                    }
-                }
-
-                if (host.getMainHost() != mainhost) {
-                    host.setMainHost(mainhost);
-                    EntityTools.merge(host);
-                }
             }
         } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
             host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
@@ -105,22 +106,13 @@ public class SYSHostsTools {
 
 
     /**
-     * Meldet den übergebenen Host ab, indem das Last Proof of Life auf NULL gesetzt wird.
-     *
-     * @param host
-     */
-    protected static void shutdown(SYSHosts host) {
-        SYSMessagesTools.setAllMesages2Processed(host);
-        host.setLpol(null);
-        host.setUp(null);
-        EntityTools.merge(host);
-        // OPDE.getBM().interrupt();
-    }
-
-    /**
-     * Meldet den aktuellen Host ab.
+     * Meldet den aktuellen Host ab, indem das Last Proof of Life auf NULL gesetzt wird.
      */
     public static void shutdown() {
-        shutdown(OPDE.getHost());
+        SYSMessagesTools.setAllMesages2Processed();
+        OPDE.getHost().setLpol(null);
+        OPDE.getHost().setUp(null);
+        EntityTools.merge(OPDE.getHost());
+        // OPDE.getBM().interrupt();
     }
 }
