@@ -58,6 +58,19 @@ public class BHP implements Serializable {
     public BHP() {
     }
 
+    public BHP(VerordnungPlanung verordnungPlanung) {
+        this.verordnungPlanung = verordnungPlanung;
+    }
+
+    public BHP(VerordnungPlanung verordnungPlanung, Date soll, Byte sZeit, BigDecimal dosis) {
+        this.verordnungPlanung = verordnungPlanung;
+        this.soll = soll;
+        this.sZeit = sZeit;
+        this.dosis = dosis;
+        this.status = BHPTools.STATUS_OFFEN;
+        this.mdate = new Date();
+    }
+
     @JoinColumn(name = "bhppid", referencedColumnName = "BHPPID")
     @ManyToOne
     private VerordnungPlanung verordnungPlanung;
@@ -102,11 +115,11 @@ public class BHP implements Serializable {
         this.ist = ist;
     }
 
-    public Byte getsZeit() {
+    public Byte getSollZeit() {
         return sZeit;
     }
 
-    public void setsZeit(Byte sZeit) {
+    public void setSollZeit(Byte sZeit) {
         this.sZeit = sZeit;
     }
 
@@ -180,7 +193,20 @@ public class BHP implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.BHP[bhpid=" + bhpid + "]";
+        return "BHP{" +
+                "bhpid=" + bhpid +
+                ", uKennung='" + uKennung + '\'' +
+                ", soll=" + soll +
+                ", ist=" + ist +
+                ", sZeit=" + sZeit +
+                ", iZeit=" + iZeit +
+                ", dosis=" + dosis +
+                ", status=" + status +
+                ", bemerkung='" + bemerkung + '\'' +
+                ", mdate=" + mdate +
+                ", dauer=" + dauer +
+                ", verordnungPlanung=" + verordnungPlanung +
+                '}';
     }
 
 }

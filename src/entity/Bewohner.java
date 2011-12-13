@@ -80,7 +80,7 @@ public class Bewohner implements Serializable {
     private String editor;
     @Basic(optional = false)
     @Column(name = "adminonly")
-    private boolean adminonly;
+    private short adminonly;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
     private Collection<Sysbw2file> bwFilesCollection;
 
@@ -105,7 +105,7 @@ public class Bewohner implements Serializable {
         this.bWKennung = bWKennung;
     }
 
-    public Bewohner(String bWKennung, String nachname, String vorname, int geschlecht, Date gebDatum, Date version, String editor, boolean adminonly) {
+    public Bewohner(String bWKennung, String nachname, String vorname, int geschlecht, Date gebDatum, Date version, String editor, short adminonly) {
         this.bWKennung = bWKennung;
         this.nachname = nachname;
         this.vorname = vorname;
@@ -202,11 +202,11 @@ public class Bewohner implements Serializable {
         this.editor = editor;
     }
 
-    public boolean getAdminonly() {
+    public short getAdminonly() {
         return adminonly;
     }
 
-    public void setAdminonly(boolean adminonly) {
+    public void setAdminonly(short adminonly) {
         this.adminonly = adminonly;
     }
 

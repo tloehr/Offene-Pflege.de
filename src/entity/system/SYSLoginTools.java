@@ -44,15 +44,14 @@ public class SYSLoginTools {
 
         EntityManager em = OPDE.createEM();
         login.setLogout(new Date());
-        em.getTransaction().begin();
         try {
+            em.getTransaction().begin();
             SYSRunningClassesTools.endAllModules(login);
-            em.merge(login);
+            login = em.merge(login);
             em.getTransaction().commit();
+            OPDE.setLogin(login);
         } catch (Exception e) {
-            login.setLogout(SYSConst.DATE_BIS_AUF_WEITERES);
-            em.getTransaction().rollback();
-            OPDE.debug(e);
+            OPDE.fatal(e);
         } finally {
             em.close();
         }

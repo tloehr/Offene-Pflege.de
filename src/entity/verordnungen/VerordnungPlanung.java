@@ -1,5 +1,7 @@
 package entity.verordnungen;
 
+import entity.Users;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -33,10 +35,8 @@ import java.util.Date;
         @NamedQuery(name = "VerordnungPlanung.findBySam", query = "SELECT b FROM VerordnungPlanung b WHERE b.sam = :sam"),
         @NamedQuery(name = "VerordnungPlanung.findBySon", query = "SELECT b FROM VerordnungPlanung b WHERE b.son = :son"),
         @NamedQuery(name = "VerordnungPlanung.findByLDatum", query = "SELECT b FROM VerordnungPlanung b WHERE b.lDatum = :lDatum"),
-        @NamedQuery(name = "VerordnungPlanung.findByUKennung", query = "SELECT b FROM VerordnungPlanung b WHERE b.uKennung = :uKennung"),
-        @NamedQuery(name = "VerordnungPlanung.findByTmp", query = "SELECT b FROM VerordnungPlanung b WHERE b.tmp = :tmp"),
         @NamedQuery(name = "VerordnungPlanung.findByVerordnungSorted", query = " " +
-                " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung AND vp.tmp = 0 " +
+                " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung " +
                 " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
 })
 public class VerordnungPlanung implements Serializable {
@@ -93,11 +93,6 @@ public class VerordnungPlanung implements Serializable {
     @Column(name = "LDatum")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lDatum;
-    @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
-    @Column(name = "tmp")
-    private BigInteger tmp;
 
     public VerordnungPlanung() {
     }
@@ -288,28 +283,16 @@ public class VerordnungPlanung implements Serializable {
         this.lDatum = lDatum;
     }
 
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
-    }
-
-    public BigInteger getTmp() {
-        return tmp;
-    }
-
-    public void setTmp(BigInteger tmp) {
-        this.tmp = tmp;
-    }
-
     // ==
     // N:1 Relationen
     // ==
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
     @ManyToOne
     private Verordnung verordnung;
+
+    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
 
 
     public Verordnung getVerordnung() {
@@ -318,6 +301,14 @@ public class VerordnungPlanung implements Serializable {
 
     public void setVerordnung(Verordnung verordnung) {
         this.verordnung = verordnung;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     /**
@@ -381,7 +372,32 @@ public class VerordnungPlanung implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.VerordnungPlanung[bhppid=" + bhppid + "]";
+        return "VerordnungPlanung{" +
+                "bhppid=" + bhppid +
+                ", nachtMo=" + nachtMo +
+                ", morgens=" + morgens +
+                ", mittags=" + mittags +
+                ", nachmittags=" + nachmittags +
+                ", abends=" + abends +
+                ", nachtAb=" + nachtAb +
+                ", uhrzeitDosis=" + uhrzeitDosis +
+                ", uhrzeit=" + uhrzeit +
+                ", maxAnzahl=" + maxAnzahl +
+                ", maxEDosis=" + maxEDosis +
+                ", taeglich=" + taeglich +
+                ", woechentlich=" + woechentlich +
+                ", monatlich=" + monatlich +
+                ", tagNum=" + tagNum +
+                ", mon=" + mon +
+                ", die=" + die +
+                ", mit=" + mit +
+                ", don=" + don +
+                ", fre=" + fre +
+                ", sam=" + sam +
+                ", son=" + son +
+                ", lDatum=" + lDatum +
+                ", uKennung='" + user.getUKennung() + '\'' +
+                ", verordnung=" + verordnung +
+                '}';
     }
-
 }

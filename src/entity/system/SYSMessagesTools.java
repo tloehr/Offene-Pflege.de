@@ -48,11 +48,7 @@ public class SYSMessagesTools {
                 try {
 
                     OPDE.closeDB(); // JDBC Zugriff
-                    SYSLoginTools.logout(); // Login Objekt abschließen
-                    OPDE.getBM().interrupt(); // Background Monitor beenden
-                    SYSHostsTools.shutdown(); // Den aktuellen HOST als "heruntergefahren" markieren
-                    em.close(); // Den aktuellen EntityManager schließen
-                    OPDE.getEMF().close(); // Die Factory selbst schließen.
+
 
                     String html = "<html><h1>Das Progamm musste automatisch beendet werden</h1><b>Der Grund:</b><br/>" + msg.getMessage() +
                             "</html>";
@@ -66,7 +62,7 @@ public class SYSMessagesTools {
                     out.close();
                     SYSPrint.handleFile(new JFrame(), temp.getAbsolutePath(), Desktop.Action.OPEN);
 
-                    System.exit(0);
+                    SYSHostsTools.shutdown(0); // Den aktuellen HOST als "heruntergefahren" markieren
                 } catch (Exception ex) {
                     OPDE.fatal(ex);
                     ex.printStackTrace();

@@ -111,11 +111,15 @@ public class SYSHostsTools {
     /**
      * Meldet den aktuellen Host ab, indem das Last Proof of Life auf NULL gesetzt wird.
      */
-    public static void shutdown() {
+    public static void shutdown(int status) {
         SYSMessagesTools.setAllMesages2Processed();
+        OPDE.saveLocalProps();
+        SYSLoginTools.logout();
+        OPDE.getBM().interrupt();
         OPDE.getHost().setLpol(SYSConst.DATE_VON_ANFANG_AN);
         OPDE.getHost().setUp(SYSConst.DATE_VON_ANFANG_AN);
         EntityTools.merge(OPDE.getHost());
-        // OPDE.getBM().interrupt();
+        OPDE.getEMF().close();
+        System.exit(status);
     }
 }

@@ -550,7 +550,7 @@ public class PnlVerordnung extends CleanablePanel {
             itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgVerordnung(parent, bwkennung, verordnung.getVerid(), DlgVerordnung.EDIT_MODE);
+                    new DlgVerordnung(parent, bwkennung, verordnung, DlgVerordnung.EDIT_MODE);
                     reloadTable();
                 }
             });
@@ -563,7 +563,7 @@ public class PnlVerordnung extends CleanablePanel {
             itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgVerordnung(parent, bwkennung, verordnung.getVerid(), DlgVerordnung.CHANGE_MODE);
+                    new DlgVerordnung(parent, bwkennung, verordnung, DlgVerordnung.CHANGE_MODE);
                     loadTable();
                 }
             });

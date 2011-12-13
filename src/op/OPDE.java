@@ -209,8 +209,7 @@ public class OPDE {
     public static void fatal(Object message) {
         logger.fatal(message);
         SyslogTools.fatal(message.toString());
-//        em.close();
-//        System.exit(1);
+        SYSHostsTools.shutdown(1);
     }
 
     public static void error(Object message) {
@@ -481,13 +480,11 @@ public class OPDE {
                     EntityTools.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
 
-                    BHPImport.importBHP(0, 0, offset);
+                    BHPImport.importBHP(null, null);
                 } catch (Exception ex) {
                     logger.fatal("Exception beim BHPImport", ex);
                 }
-                SYSLoginTools.logout();
-                SYSHostsTools.shutdown();
-                System.exit(0);
+                SYSHostsTools.shutdown(0);
             }
 
 

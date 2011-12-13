@@ -269,7 +269,11 @@ public class SYSCalendar {
                 return "";
             }
         }
-    } //public static String WochentagName(GregorianCalendar gc){
+    }
+
+    public static String WochentagName(Date d) {
+        return WochentagName(toGC(d));
+    }
 
     /**
      * Calculates the number of days between two calendar days in a manner
@@ -955,6 +959,10 @@ public class SYSCalendar {
         return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
     }
 
+
+    public static Date addTime2Date(Date date, Date time) {
+        return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
+    }
     /**
      * Setzt die Zeitkomponente eines GregorianCalendars. Das heisst ganz einfach,
      * wenn man ein Datum hat (in einem GC) und in einem anderen GC steht die Uhrzeit, dann
@@ -998,6 +1006,10 @@ public class SYSCalendar {
         return gc1.compareTo(gc2);
     }
 
+    public static int compareTime(Date date1, Date date2) {
+        return compareTime(date1.getTime(), date2.getTime());
+    }
+
     public static long startOfDay() {
         return startOfDay(new Date());
     }
@@ -1006,8 +1018,28 @@ public class SYSCalendar {
         return midOfDay(new Date());
     }
 
+    /**
+     * Nimmt den aktuellen Zeitpunkt, setzt die Zeit auf 23:59:59 und gibt das Ergebnis zurück.
+     * @return
+     */
     public static long endOfDay() {
         return endOfDay(new Date());
+    }
+
+    /**
+     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 23:59:59
+     *
+     * @param d
+     * @return
+     */
+    public static long endOfDay(Date d) {
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTimeInMillis(d.getTime());
+        gc.set(GregorianCalendar.HOUR_OF_DAY, 23);
+        gc.set(GregorianCalendar.MINUTE, 59);
+        gc.set(GregorianCalendar.SECOND, 59);
+        gc.set(GregorianCalendar.MILLISECOND, 0);
+        return gc.getTimeInMillis();
     }
 
     /**
@@ -1042,21 +1074,7 @@ public class SYSCalendar {
         return gc.getTimeInMillis();
     }
 
-    /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 23:59:59
-     *
-     * @param d
-     * @return
-     */
-    public static long endOfDay(Date d) {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTimeInMillis(d.getTime());
-        gc.set(GregorianCalendar.HOUR_OF_DAY, 23);
-        gc.set(GregorianCalendar.MINUTE, 59);
-        gc.set(GregorianCalendar.SECOND, 59);
-        gc.set(GregorianCalendar.MILLISECOND, 0);
-        return gc.getTimeInMillis();
-    }
+
 
     /**
      * Berechnet zu einem gegebenen Jahr den Ostersonntag. Dieser wird als GregorianCalendar zurückgegeben.

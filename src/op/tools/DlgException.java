@@ -151,10 +151,6 @@ public class DlgException extends javax.swing.JDialog {
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
         OPDE.fatal("Benutzer hat das Programm nach Exception beendet.");
-        SYSHostsTools.shutdown();
-        //OPDE.getDb().doLogout();
-        SYSLoginTools.logout();
-        System.exit(1);
     }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed

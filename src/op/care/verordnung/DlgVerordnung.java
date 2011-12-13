@@ -27,6 +27,7 @@
 package op.care.verordnung;
 
 import com.toedter.calendar.JDateChooser;
+import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.care.bhp.BHPImport;
 import op.care.med.DlgMediAssistent;
@@ -74,14 +75,18 @@ public class DlgVerordnung extends javax.swing.JDialog {
     long verkennung;
     boolean pleaseDropTmp = false; // Sorgt dafür das Eingaben weggeschmissen werden, falls man das Fenster über den Close Button schließt.
 
+    Verordnung verordnung = null;
+
+
     /**
      * Creates new form DlgVerordnung
      */
-    public DlgVerordnung(java.awt.Frame parent, String bwkennung, long verid, int mode) {
+    public DlgVerordnung(java.awt.Frame parent, String bwkennung, Verordnung verordnung, int mode) {
         super(parent, true);
         this.parent = parent;
         this.bwkennung = bwkennung;
-        this.verid = verid;
+        this.verid = verordnung.getVerid();
+        this.verordnung = verordnung;
         this.editMode = mode;
         initDialog();
     }
@@ -91,6 +96,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         this.parent = parent;
         this.bwkennung = bwkennung;
         this.verid = 0;
+        this.verordnung = null;
         this.editMode = NEW_MODE;
         initDialog();
     }
@@ -1029,9 +1035,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (tblDosis.getModel().getRowCount() > 0 && cmbSit.getSelectedIndex() < 0) {
             try {
                 if (editMode == CHANGE_MODE) {
-                    BHPImport.importBHP(verid, SYSCalendar.nowDB(), 0);
+                    BHPImport.importBHP(verordnung, new Date());
                 } else {
-                    BHPImport.importBHP(verid);
+                    BHPImport.importBHP(verordnung);
                 }
             } catch (Exception e) {
                 new DlgException(e);
