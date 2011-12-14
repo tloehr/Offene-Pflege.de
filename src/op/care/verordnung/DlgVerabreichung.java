@@ -26,13 +26,21 @@
  */
 package op.care.verordnung;
 
+import com.toedter.calendar.JDateChooser;
+import entity.verordnungen.*;
 import op.OPDE;
 import op.tools.DBHandling;
 import op.tools.DBRetrieve;
 import op.tools.*;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
@@ -50,46 +58,41 @@ public class DlgVerabreichung extends javax.swing.JDialog {
 
     private HashMap template;
     private JRadioButton dummy;
-    private long bhppid;
     private String tage[] = {"Mon", "Die", "Mit", "Don", "Fre", "Sam", "Son"};
     private boolean ignoreEvent = false;
-    private boolean bedarf;
-    private long verid;
-    private long dafid;
     private Component parent;
     private JDCPropertyChangeListener jdcpcl;
+    private Verordnung verordnung;
+    private VerordnungPlanung planung;
+
 
     /**
      * für Neueingaben
      */
-    public DlgVerabreichung(java.awt.Frame parent, long verid, long dafid, boolean bedarf) {
-        this(parent, 0, verid, dafid, bedarf);
+    public DlgVerabreichung(java.awt.Frame parent, Verordnung verordnung) {
+        this(parent, null, verordnung);
     }
 
-    public DlgVerabreichung(JDialog parent, long verid, long dafid, boolean bedarf) {
-        this(parent, 0, verid, dafid, bedarf);
+    public DlgVerabreichung(JDialog parent, Verordnung verordnung) {
+        this(parent, null, verordnung);
     }
 
     /**
      * für Änderungen
      */
-    public DlgVerabreichung(java.awt.Frame parent, long bhppid, long verid, long dafid, boolean bedarf) {
+    public DlgVerabreichung(java.awt.Frame parent, VerordnungPlanung planung, Verordnung verordnung) {
         super(parent, true);
         this.parent = parent;
-        this.bhppid = bhppid;
-        this.verid = verid;
-        this.dafid = dafid;
-        this.bedarf = bedarf;
+        this.verordnung = verordnung;
+        this.planung = planung;
         initDialog();
     }
 
-    public DlgVerabreichung(JDialog parent, long bhppid, long verid, long dafid, boolean bedarf) {
+    public DlgVerabreichung(JDialog parent, VerordnungPlanung planung, Verordnung verordnung) {
         super(parent, true);
         this.parent = parent;
-        this.bhppid = bhppid;
-        this.verid = verid;
-        this.dafid = dafid;
-        this.bedarf = bedarf;
+        this.verordnung = verordnung;
+        this.planung = planung;
         initDialog();
     }
 
@@ -99,11 +102,8 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         initData();
 
         String einheit = "x";
-        if (dafid > 0) {
-            long formid = ((BigInteger) DBRetrieve.getSingleValue("MPDarreichung", "FormID", "DafID", dafid)).longValue();
-            ArrayList al = DBRetrieve.getMPForm(formid);
-            int anwEinheit = ((Integer) al.get(1)).intValue();
-            einheit = SYSConst.EINHEIT[anwEinheit] + SYSTools.catchNull(al.get(3).toString(), " ", "");
+        if (verordnung.getDarreichung() != null) {
+            einheit = MedFormenTools.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()];
         }
 
         lblEin1.setText("Einheit: " + einheit);
@@ -117,15 +117,15 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         cmbUhrzeit.setModel(new DefaultComboBoxModel(SYSCalendar.fillUhrzeiten().toArray()));
 
         ignoreEvent = true;
-        if (bedarf) {
+        if (verordnung.isBedarf()) {
             txtMaxTimes.setText((template.get("MaxAnzahl")).toString());
             txtEDosis.setText(Double.toString(Double.parseDouble(template.get("MaxEDosis").toString())));
         } else {
             txtMaxTimes.setText("0");
             txtEDosis.setText("0.0");
         }
-        lblDosis.setEnabled(bedarf);
-        lblX.setEnabled(bedarf);
+        lblDosis.setEnabled(verordnung.isBedarf());
+        lblX.setEnabled(verordnung.isBedarf());
 
         if (template.get("Uhrzeit") == null) {
             cmbUhrzeit.setSelectedIndex(-1);
@@ -190,16 +190,16 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         rbMonatTag.setSelected(Integer.parseInt(spinMonatTag.getValue().toString()) > 0);
         rbMonatWTag.setSelected(Integer.parseInt(spinMonatWTag.getValue().toString()) > 0);
 
-        txtNachtMo.setEnabled(!bedarf);
-        txtMorgens.setEnabled(!bedarf);
-        txtMittags.setEnabled(!bedarf);
-        txtNachmittags.setEnabled(!bedarf);
-        txtAbends.setEnabled(!bedarf);
-        txtUhrzeit.setEnabled(!bedarf);
-        txtNachtAb.setEnabled(!bedarf);
-        cmbUhrzeit.setEnabled(!bedarf);
-        txtMaxTimes.setEnabled(bedarf);
-        txtEDosis.setEnabled(bedarf);
+        txtNachtMo.setEnabled(!verordnung.isBedarf());
+        txtMorgens.setEnabled(!verordnung.isBedarf());
+        txtMittags.setEnabled(!verordnung.isBedarf());
+        txtNachmittags.setEnabled(!verordnung.isBedarf());
+        txtAbends.setEnabled(!verordnung.isBedarf());
+        txtUhrzeit.setEnabled(!verordnung.isBedarf());
+        txtNachtAb.setEnabled(!verordnung.isBedarf());
+        cmbUhrzeit.setEnabled(!verordnung.isBedarf());
+        txtMaxTimes.setEnabled(verordnung.isBedarf());
+        txtEDosis.setEnabled(verordnung.isBedarf());
 
         txtMorgens.setBackground(SYSConst.lightblue);
         txtMittags.setBackground(SYSConst.gold7);
@@ -207,12 +207,12 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         txtAbends.setBackground(SYSConst.bermuda_sand);
         txtNachtAb.setBackground(SYSConst.bluegrey);
 
-        SYSTools.setXEnabled(pnlWdh, !bedarf);
-        cmbWTag.setEnabled(!bedarf);
+        SYSTools.setXEnabled(pnlWdh, !verordnung.isBedarf());
+        cmbWTag.setEnabled(!verordnung.isBedarf());
 
-        jdcLDatum.setEnabled(!bedarf);
+        jdcLDatum.setEnabled(!verordnung.isBedarf());
 
-        if (bedarf) {
+        if (verordnung.isBedarf()) {
             txtEDosis.requestFocus();
         } else {
             txtMorgens.requestFocus();
@@ -233,745 +233,871 @@ public class DlgVerabreichung extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jPanel3 = new JPanel();
+        jPanel2 = new JPanel();
+        lblDosis = new JLabel();
+        txtMaxTimes = new JTextField();
+        lblX = new JLabel();
+        txtEDosis = new JTextField();
+        lblEin1 = new JLabel();
+        pnlRegular = new JPanel();
+        jLabel1 = new JLabel();
+        jLabel2 = new JLabel();
+        jLabel3 = new JLabel();
+        jLabel4 = new JLabel();
+        jLabel6 = new JLabel();
+        cmbUhrzeit = new JComboBox();
+        jLabel11 = new JLabel();
+        txtNachtMo = new JTextField();
+        txtNachtAb = new JTextField();
+        txtMittags = new JTextField();
+        txtMorgens = new JTextField();
+        txtNachmittags = new JTextField();
+        txtAbends = new JTextField();
+        txtUhrzeit = new JTextField();
+        pnlWdh = new JPanel();
+        rbTag = new JRadioButton();
+        rbWoche = new JRadioButton();
+        rbMonat = new JRadioButton();
+        jLabel7 = new JLabel();
+        jLabel8 = new JLabel();
+        cbMon = new JCheckBox();
+        cbDie = new JCheckBox();
+        cbMit = new JCheckBox();
+        cbDon = new JCheckBox();
+        cbFre = new JCheckBox();
+        cbSam = new JCheckBox();
+        cbSon = new JCheckBox();
+        jLabel9 = new JLabel();
+        rbMonatTag = new JRadioButton();
+        jLabel10 = new JLabel();
+        rbMonatWTag = new JRadioButton();
+        cmbWTag = new JComboBox();
+        spinTaeglich = new JSpinner();
+        spinWoche = new JSpinner();
+        spinMonat = new JSpinner();
+        spinMonatTag = new JSpinner();
+        spinMonatWTag = new JSpinner();
+        jLabel13 = new JLabel();
+        jdcLDatum = new JDateChooser();
+        jPanel1 = new JPanel();
+        btnDiscard = new JButton();
+        btnSave = new JButton();
+        bgWdh = new ButtonGroup();
+        bgMonat = new ButtonGroup();
 
-        bgWdh = new javax.swing.ButtonGroup();
-        bgMonat = new javax.swing.ButtonGroup();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        lblDosis = new javax.swing.JLabel();
-        txtMaxTimes = new javax.swing.JTextField();
-        lblX = new javax.swing.JLabel();
-        txtEDosis = new javax.swing.JTextField();
-        lblEin1 = new javax.swing.JLabel();
-        pnlRegular = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        cmbUhrzeit = new javax.swing.JComboBox();
-        jLabel11 = new javax.swing.JLabel();
-        txtNachtMo = new javax.swing.JTextField();
-        txtNachtAb = new javax.swing.JTextField();
-        txtMittags = new javax.swing.JTextField();
-        txtMorgens = new javax.swing.JTextField();
-        txtNachmittags = new javax.swing.JTextField();
-        txtAbends = new javax.swing.JTextField();
-        txtUhrzeit = new javax.swing.JTextField();
-        pnlWdh = new javax.swing.JPanel();
-        rbTag = new javax.swing.JRadioButton();
-        rbWoche = new javax.swing.JRadioButton();
-        rbMonat = new javax.swing.JRadioButton();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        cbMon = new javax.swing.JCheckBox();
-        cbDie = new javax.swing.JCheckBox();
-        cbMit = new javax.swing.JCheckBox();
-        cbDon = new javax.swing.JCheckBox();
-        cbFre = new javax.swing.JCheckBox();
-        cbSam = new javax.swing.JCheckBox();
-        cbSon = new javax.swing.JCheckBox();
-        jLabel9 = new javax.swing.JLabel();
-        rbMonatTag = new javax.swing.JRadioButton();
-        jLabel10 = new javax.swing.JLabel();
-        rbMonatWTag = new javax.swing.JRadioButton();
-        cmbWTag = new javax.swing.JComboBox();
-        spinTaeglich = new javax.swing.JSpinner();
-        spinWoche = new javax.swing.JSpinner();
-        spinMonat = new javax.swing.JSpinner();
-        spinMonatTag = new javax.swing.JSpinner();
-        spinMonatWTag = new javax.swing.JSpinner();
-        jLabel13 = new javax.swing.JLabel();
-        jdcLDatum = new com.toedter.calendar.JDateChooser();
-        jPanel1 = new javax.swing.JPanel();
-        btnDiscard = new javax.swing.JButton();
-        btnSave = new javax.swing.JButton();
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        //======== jPanel3 ========
+        {
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Dosierung (bei Bedarf)"));
+            //======== jPanel2 ========
+            {
+                jPanel2.setBorder(new TitledBorder("Dosierung (bei Bedarf)"));
 
-        lblDosis.setText("Max. Tagesdosis:");
+                //---- lblDosis ----
+                lblDosis.setText("Max. Tagesdosis:");
 
-        txtMaxTimes.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtMaxTimes.setText("1");
-        txtMaxTimes.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtMaxTimesCaretUpdate(evt);
+                //---- txtMaxTimes ----
+                txtMaxTimes.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtMaxTimes.setText("1");
+                txtMaxTimes.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtMaxTimesCaretUpdate(e);
+                    }
+                });
+                txtMaxTimes.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtMaxTimesActionPerformed(e);
+                    }
+                });
+                txtMaxTimes.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtMaxTimesFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMaxTimesFocusLost(e);
+                    }
+                });
+
+                //---- lblX ----
+                lblX.setText("x");
+
+                //---- txtEDosis ----
+                txtEDosis.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtEDosis.setText("1.0");
+                txtEDosis.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtEDosisCaretUpdate(e);
+                    }
+                });
+                txtEDosis.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtEDosisActionPerformed(e);
+                    }
+                });
+                txtEDosis.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtEDosisFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtEDosisFocusLost(e);
+                    }
+                });
+
+                GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+                jPanel2.setLayout(jPanel2Layout);
+                jPanel2Layout.setHorizontalGroup(
+                    jPanel2Layout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                            .addContainerGap(18, Short.MAX_VALUE)
+                            .addComponent(lblDosis)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtMaxTimes, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblX)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(txtEDosis, GroupLayout.PREFERRED_SIZE, 134, GroupLayout.PREFERRED_SIZE)
+                            .addContainerGap())
+                );
+                jPanel2Layout.setVerticalGroup(
+                    jPanel2Layout.createParallelGroup()
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel2Layout.createParallelGroup()
+                                .addComponent(txtEDosis, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblDosis)
+                                    .addComponent(txtMaxTimes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblX)))
+                            .addContainerGap(59, Short.MAX_VALUE))
+                );
             }
-        });
-        txtMaxTimes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMaxTimesActionPerformed(evt);
-            }
-        });
-        txtMaxTimes.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtMaxTimesFocusGained(evt);
+
+            //---- lblEin1 ----
+            lblEin1.setForeground(new Color(51, 51, 255));
+            lblEin1.setText("Einheit:");
+
+            //======== pnlRegular ========
+            {
+                pnlRegular.setBorder(new TitledBorder("Dosierung, H\u00e4ufigkeit (Regelm\u00e4\u00dfig)"));
+
+                //---- jLabel1 ----
+                jLabel1.setForeground(new Color(0, 0, 204));
+                jLabel1.setText("Morgens:");
+
+                //---- jLabel2 ----
+                jLabel2.setForeground(new Color(255, 102, 0));
+                jLabel2.setText("Mittags:");
+
+                //---- jLabel3 ----
+                jLabel3.setForeground(new Color(255, 0, 51));
+                jLabel3.setText("Abends:");
+
+                //---- jLabel4 ----
+                jLabel4.setText("Nacht, sp\u00e4t abends:");
+
+                //---- jLabel6 ----
+                jLabel6.setText("Nachts, fr\u00fch morgens:");
+
+                //---- cmbUhrzeit ----
+                cmbUhrzeit.setModel(new DefaultComboBoxModel(new String[] {
+                    "10:00",
+                    "10:15",
+                    "10:30",
+                    "10:45"
+                }));
+                cmbUhrzeit.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbUhrzeitItemStateChanged(e);
+                    }
+                });
+
+                //---- jLabel11 ----
+                jLabel11.setForeground(new Color(0, 153, 51));
+                jLabel11.setText("Nachmittag:");
+
+                //---- txtNachtMo ----
+                txtNachtMo.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtNachtMo.setText("0.0");
+                txtNachtMo.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtNachtMoCaretUpdate(e);
+                    }
+                });
+                txtNachtMo.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtNachtMoActionPerformed(e);
+                    }
+                });
+                txtNachtMo.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtNachtMoFocusLost(e);
+                    }
+                });
+
+                //---- txtNachtAb ----
+                txtNachtAb.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtNachtAb.setText("0.0");
+                txtNachtAb.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtNachtAbCaretUpdate(e);
+                    }
+                });
+                txtNachtAb.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtNachtAbActionPerformed(e);
+                    }
+                });
+                txtNachtAb.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtNachtAbFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtNachtAbFocusLost(e);
+                    }
+                });
+
+                //---- txtMittags ----
+                txtMittags.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtMittags.setText("0.0");
+                txtMittags.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtMittagsCaretUpdate(e);
+                    }
+                });
+                txtMittags.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtMittagsActionPerformed(e);
+                    }
+                });
+                txtMittags.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtMittagsFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMittagsFocusLost(e);
+                    }
+                });
+
+                //---- txtMorgens ----
+                txtMorgens.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtMorgens.setText("1.0");
+                txtMorgens.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtMorgensCaretUpdate(e);
+                    }
+                });
+                txtMorgens.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtMorgensActionPerformed(e);
+                    }
+                });
+                txtMorgens.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtMorgensFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMorgensFocusLost(e);
+                    }
+                });
+
+                //---- txtNachmittags ----
+                txtNachmittags.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtNachmittags.setText("0.0");
+                txtNachmittags.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtNachmittagsCaretUpdate(e);
+                    }
+                });
+                txtNachmittags.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtNachmittagsActionPerformed(e);
+                    }
+                });
+                txtNachmittags.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtNachmittagsFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtNachmittagsFocusLost(e);
+                    }
+                });
+
+                //---- txtAbends ----
+                txtAbends.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtAbends.setText("0.0");
+                txtAbends.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtAbendsCaretUpdate(e);
+                    }
+                });
+                txtAbends.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtAbendsActionPerformed(e);
+                    }
+                });
+                txtAbends.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtAbendsFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtAbendsFocusLost(e);
+                    }
+                });
+
+                //---- txtUhrzeit ----
+                txtUhrzeit.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtUhrzeit.setText("0.0");
+                txtUhrzeit.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtUhrzeitCaretUpdate(e);
+                    }
+                });
+                txtUhrzeit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtUhrzeitActionPerformed(e);
+                    }
+                });
+                txtUhrzeit.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtUhrzeitFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtUhrzeitFocusLost(e);
+                    }
+                });
+
+                GroupLayout pnlRegularLayout = new GroupLayout(pnlRegular);
+                pnlRegular.setLayout(pnlRegularLayout);
+                pnlRegularLayout.setHorizontalGroup(
+                    pnlRegularLayout.createParallelGroup()
+                        .addGroup(pnlRegularLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel3)
+                                .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cmbUhrzeit, GroupLayout.Alignment.TRAILING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel1, GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel6, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel2, GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel11, GroupLayout.Alignment.TRAILING)))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(txtNachtMo, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .addComponent(txtMorgens, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .addComponent(txtMittags, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .addComponent(txtAbends, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .addComponent(txtNachtAb, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .addComponent(txtUhrzeit, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .addComponent(txtNachmittags, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+                            .addContainerGap())
+                );
+                pnlRegularLayout.setVerticalGroup(
+                    pnlRegularLayout.createParallelGroup()
+                        .addGroup(pnlRegularLayout.createSequentialGroup()
+                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel6)
+                                .addComponent(txtNachtMo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addGap(6, 6, 6)
+                            .addGroup(pnlRegularLayout.createParallelGroup()
+                                .addGroup(pnlRegularLayout.createSequentialGroup()
+                                    .addGap(76, 76, 76)
+                                    .addComponent(jLabel11))
+                                .addGroup(pnlRegularLayout.createSequentialGroup()
+                                    .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(txtMorgens, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(txtMittags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtNachmittags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtAbends, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel3))
+                            .addGap(2, 2, 2)
+                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtNachtAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel4))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cmbUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap(26, Short.MAX_VALUE))
+                );
             }
 
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtMaxTimesFocusLost(evt);
-            }
-        });
+            //======== pnlWdh ========
+            {
+                pnlWdh.setBorder(new TitledBorder("Wiederholungen"));
 
-        lblX.setText("x");
+                //---- rbTag ----
+                rbTag.setText("t\u00e4glich alle");
+                rbTag.setBorder(BorderFactory.createEmptyBorder());
+                rbTag.setMargin(new Insets(0, 0, 0, 0));
+                rbTag.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        rbTagActionPerformed(e);
+                    }
+                });
 
-        txtEDosis.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtEDosis.setText("1.0");
-        txtEDosis.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtEDosisCaretUpdate(evt);
-            }
-        });
-        txtEDosis.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtEDosisActionPerformed(evt);
-            }
-        });
-        txtEDosis.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtEDosisFocusGained(evt);
+                //---- rbWoche ----
+                rbWoche.setText("w\u00f6chentlich alle");
+                rbWoche.setBorder(BorderFactory.createEmptyBorder());
+                rbWoche.setMargin(new Insets(0, 0, 0, 0));
+                rbWoche.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        rbWocheActionPerformed(e);
+                    }
+                });
+
+                //---- rbMonat ----
+                rbMonat.setText("monatlich alle");
+                rbMonat.setBorder(BorderFactory.createEmptyBorder());
+                rbMonat.setMargin(new Insets(0, 0, 0, 0));
+                rbMonat.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        rbMonatActionPerformed(e);
+                    }
+                });
+
+                //---- jLabel7 ----
+                jLabel7.setText("Tage");
+
+                //---- jLabel8 ----
+                jLabel8.setText("Wochen am:");
+
+                //---- cbMon ----
+                cbMon.setText("Mon");
+                cbMon.setBorder(BorderFactory.createEmptyBorder());
+                cbMon.setMargin(new Insets(0, 0, 0, 0));
+                cbMon.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbMonActionPerformed(e);
+                    }
+                });
+
+                //---- cbDie ----
+                cbDie.setText("Die");
+                cbDie.setBorder(BorderFactory.createEmptyBorder());
+                cbDie.setMargin(new Insets(0, 0, 0, 0));
+                cbDie.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbDieActionPerformed(e);
+                    }
+                });
+
+                //---- cbMit ----
+                cbMit.setText("Mit");
+                cbMit.setBorder(BorderFactory.createEmptyBorder());
+                cbMit.setMargin(new Insets(0, 0, 0, 0));
+                cbMit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbMitActionPerformed(e);
+                    }
+                });
+
+                //---- cbDon ----
+                cbDon.setText("Don");
+                cbDon.setBorder(BorderFactory.createEmptyBorder());
+                cbDon.setMargin(new Insets(0, 0, 0, 0));
+                cbDon.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbDonActionPerformed(e);
+                    }
+                });
+
+                //---- cbFre ----
+                cbFre.setText("Fre");
+                cbFre.setBorder(BorderFactory.createEmptyBorder());
+                cbFre.setMargin(new Insets(0, 0, 0, 0));
+                cbFre.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbFreActionPerformed(e);
+                    }
+                });
+
+                //---- cbSam ----
+                cbSam.setText("Sam");
+                cbSam.setBorder(BorderFactory.createEmptyBorder());
+                cbSam.setMargin(new Insets(0, 0, 0, 0));
+                cbSam.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSamActionPerformed(e);
+                    }
+                });
+
+                //---- cbSon ----
+                cbSon.setText("Son");
+                cbSon.setBorder(BorderFactory.createEmptyBorder());
+                cbSon.setMargin(new Insets(0, 0, 0, 0));
+                cbSon.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSonActionPerformed(e);
+                    }
+                });
+
+                //---- jLabel9 ----
+                jLabel9.setText("Monat(e)");
+
+                //---- rbMonatTag ----
+                rbMonatTag.setText("wiederholt am");
+                rbMonatTag.setBorder(BorderFactory.createEmptyBorder());
+                rbMonatTag.setMargin(new Insets(0, 0, 0, 0));
+                rbMonatTag.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        rbMonatTagActionPerformed(e);
+                    }
+                });
+
+                //---- jLabel10 ----
+                jLabel10.setText("Tag");
+
+                //---- rbMonatWTag ----
+                rbMonatWTag.setText("wiederholt am");
+                rbMonatWTag.setBorder(BorderFactory.createEmptyBorder());
+                rbMonatWTag.setMargin(new Insets(0, 0, 0, 0));
+                rbMonatWTag.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        rbMonatWTagActionPerformed(e);
+                    }
+                });
+
+                //---- cmbWTag ----
+                cmbWTag.setModel(new DefaultComboBoxModel(new String[] {
+                    "Montag",
+                    "Dienstag",
+                    "Mittwoch",
+                    "Donnerstag",
+                    "Freitag",
+                    "Samstag",
+                    "Sonntag"
+                }));
+                cmbWTag.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbWTagItemStateChanged(e);
+                    }
+                });
+
+                //---- spinTaeglich ----
+                spinTaeglich.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinTaeglichStateChanged(e);
+                    }
+                });
+
+                //---- spinWoche ----
+                spinWoche.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinWocheStateChanged(e);
+                    }
+                });
+
+                //---- spinMonat ----
+                spinMonat.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinMonatStateChanged(e);
+                    }
+                });
+
+                //---- spinMonatTag ----
+                spinMonatTag.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinMonatTagStateChanged(e);
+                    }
+                });
+
+                //---- spinMonatWTag ----
+                spinMonatWTag.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinMonatWTagStateChanged(e);
+                    }
+                });
+
+                //---- jLabel13 ----
+                jLabel13.setText("Erste Anwendung am:");
+
+                GroupLayout pnlWdhLayout = new GroupLayout(pnlWdh);
+                pnlWdh.setLayout(pnlWdhLayout);
+                pnlWdhLayout.setHorizontalGroup(
+                    pnlWdhLayout.createParallelGroup()
+                        .addGroup(pnlWdhLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(pnlWdhLayout.createParallelGroup()
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addGap(17, 17, 17)
+                                    .addGroup(pnlWdhLayout.createParallelGroup()
+                                        .addGroup(pnlWdhLayout.createSequentialGroup()
+                                            .addComponent(rbMonatTag)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(pnlWdhLayout.createSequentialGroup()
+                                            .addComponent(rbMonatWTag)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)))
+                                    .addGap(20, 20, 20)
+                                    .addGroup(pnlWdhLayout.createParallelGroup()
+                                        .addComponent(jLabel10)
+                                        .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addComponent(rbWoche)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel8))
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addComponent(rbTag)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel7))
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addGap(17, 17, 17)
+                                    .addGroup(pnlWdhLayout.createParallelGroup()
+                                        .addGroup(pnlWdhLayout.createSequentialGroup()
+                                            .addComponent(cbFre)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(cbSam)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(cbSon))
+                                        .addGroup(pnlWdhLayout.createSequentialGroup()
+                                            .addComponent(cbMon)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(cbDie)
+                                            .addGap(16, 16, 16)
+                                            .addComponent(cbMit)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(cbDon))))
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addComponent(rbMonat)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel9))
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addComponent(jLabel13)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jdcLDatum, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)))
+                            .addContainerGap())
+                );
+                pnlWdhLayout.setVerticalGroup(
+                    pnlWdhLayout.createParallelGroup()
+                        .addGroup(pnlWdhLayout.createSequentialGroup()
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(rbTag)
+                                .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel7))
+                            .addGap(18, 18, 18)
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(rbWoche)
+                                .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel8))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbMon)
+                                .addComponent(cbDie)
+                                .addComponent(cbMit)
+                                .addComponent(cbDon))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbFre)
+                                .addComponent(cbSam)
+                                .addComponent(cbSon))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(rbMonat)
+                                .addComponent(jLabel9)
+                                .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(rbMonatTag)
+                                .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel10))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(rbMonatWTag)
+                                .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(pnlWdhLayout.createParallelGroup()
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jLabel13))
+                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jdcLDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addContainerGap(138, Short.MAX_VALUE))
+                );
             }
 
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtEDosisFocusLost(evt);
-            }
-        });
+            GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
+            jPanel3.setLayout(jPanel3Layout);
+            jPanel3Layout.setHorizontalGroup(
+                jPanel3Layout.createParallelGroup()
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                    .addComponent(pnlRegular, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblEin1, GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(pnlWdh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            );
+            jPanel3Layout.setVerticalGroup(
+                jPanel3Layout.createParallelGroup()
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(pnlWdh, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                            .addComponent(lblEin1)
+                                            .addGap(1, 1, 1)
+                                            .addComponent(pnlRegular, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addContainerGap())
+            );
+        }
 
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(lblDosis)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtMaxTimes, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(lblX)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(txtEDosis, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 134, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel2Layout.createSequentialGroup()
+        //======== jPanel1 ========
+        {
+
+            //---- btnDiscard ----
+            btnDiscard.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnDiscard.setText("Verwerfen");
+            btnDiscard.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnDiscardActionPerformed(e);
+                }
+            });
+
+            //---- btnSave ----
+            btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnSave.setText("Speichern");
+            btnSave.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSaveActionPerformed(e);
+                }
+            });
+
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnSave)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDiscard)
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnDiscard)
+                            .addComponent(btnSave))
+                        .addContainerGap())
+            );
+        }
+
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(txtEDosis, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                .add(lblDosis)
-                                                .add(txtMaxTimes, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .add(lblX)))
-                                .addContainerGap(43, Short.MAX_VALUE))
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addContainerGap())
+                                        .addComponent(jPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
         );
-
-        lblEin1.setForeground(new java.awt.Color(51, 51, 255));
-        lblEin1.setText("Einheit:");
-
-        pnlRegular.setBorder(javax.swing.BorderFactory.createTitledBorder("Dosierung, Häufigkeit (Regelmäßig)"));
-
-        jLabel1.setForeground(new java.awt.Color(0, 0, 204));
-        jLabel1.setText("Morgens:");
-
-        jLabel2.setForeground(new java.awt.Color(255, 102, 0));
-        jLabel2.setText("Mittags:");
-
-        jLabel3.setForeground(new java.awt.Color(255, 0, 51));
-        jLabel3.setText("Abends:");
-
-        jLabel4.setText("Nacht, spät abends:");
-
-        jLabel6.setText("Nachts, früh morgens:");
-
-        cmbUhrzeit.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"10:00", "10:15", "10:30", "10:45"}));
-        cmbUhrzeit.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbUhrzeitItemStateChanged(evt);
-            }
-        });
-
-        jLabel11.setForeground(new java.awt.Color(0, 153, 51));
-        jLabel11.setText("Nachmittag:");
-
-        txtNachtMo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtNachtMo.setText("0.0");
-        txtNachtMo.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtNachtMoCaretUpdate(evt);
-            }
-        });
-        txtNachtMo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNachtMoActionPerformed(evt);
-            }
-        });
-        txtNachtMo.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtNachtMoFocusLost(evt);
-            }
-        });
-
-        txtNachtAb.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtNachtAb.setText("0.0");
-        txtNachtAb.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtNachtAbCaretUpdate(evt);
-            }
-        });
-        txtNachtAb.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNachtAbActionPerformed(evt);
-            }
-        });
-        txtNachtAb.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtNachtAbFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtNachtAbFocusLost(evt);
-            }
-        });
-
-        txtMittags.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtMittags.setText("0.0");
-        txtMittags.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtMittagsCaretUpdate(evt);
-            }
-        });
-        txtMittags.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMittagsActionPerformed(evt);
-            }
-        });
-        txtMittags.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtMittagsFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtMittagsFocusLost(evt);
-            }
-        });
-
-        txtMorgens.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtMorgens.setText("1.0");
-        txtMorgens.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtMorgensCaretUpdate(evt);
-            }
-        });
-        txtMorgens.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMorgensActionPerformed(evt);
-            }
-        });
-        txtMorgens.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtMorgensFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtMorgensFocusLost(evt);
-            }
-        });
-
-        txtNachmittags.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtNachmittags.setText("0.0");
-        txtNachmittags.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtNachmittagsCaretUpdate(evt);
-            }
-        });
-        txtNachmittags.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNachmittagsActionPerformed(evt);
-            }
-        });
-        txtNachmittags.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtNachmittagsFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtNachmittagsFocusLost(evt);
-            }
-        });
-
-        txtAbends.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtAbends.setText("0.0");
-        txtAbends.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtAbendsCaretUpdate(evt);
-            }
-        });
-        txtAbends.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtAbendsActionPerformed(evt);
-            }
-        });
-        txtAbends.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtAbendsFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtAbendsFocusLost(evt);
-            }
-        });
-
-        txtUhrzeit.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtUhrzeit.setText("0.0");
-        txtUhrzeit.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtUhrzeitCaretUpdate(evt);
-            }
-        });
-        txtUhrzeit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtUhrzeitActionPerformed(evt);
-            }
-        });
-        txtUhrzeit.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtUhrzeitFocusGained(evt);
-            }
-
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtUhrzeitFocusLost(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout pnlRegularLayout = new org.jdesktop.layout.GroupLayout(pnlRegular);
-        pnlRegular.setLayout(pnlRegularLayout);
-        pnlRegularLayout.setHorizontalGroup(
-                pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlRegularLayout.createSequentialGroup()
+        contentPaneLayout.setVerticalGroup(
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                        .add(jLabel4)
-                                        .add(jLabel3)
-                                        .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, cmbUhrzeit, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel1)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel11)))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                        .add(txtNachtMo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .add(txtMorgens, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .add(txtMittags, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .add(txtAbends, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .add(txtNachtAb, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .add(txtNachmittags, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
-                                .addContainerGap())
+                                .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
-        pnlRegularLayout.setVerticalGroup(
-                pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlRegularLayout.createSequentialGroup()
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(jLabel6)
-                                        .add(txtNachtMo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(6, 6, 6)
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(pnlRegularLayout.createSequentialGroup()
-                                                .add(76, 76, 76)
-                                                .add(jLabel11))
-                                        .add(pnlRegularLayout.createSequentialGroup()
-                                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(txtMorgens, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                        .add(jLabel1))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                                        .add(txtMittags, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                        .add(jLabel2))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(txtNachmittags, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(txtAbends, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel3))
-                                .add(2, 2, 2)
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(txtNachtAb, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel4))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlRegularLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(txtUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(cmbUhrzeit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        setSize(739, 482);
+        setLocationRelativeTo(null);
 
-        pnlWdh.setBorder(javax.swing.BorderFactory.createTitledBorder("Wiederholungen"));
-
+        //---- bgWdh ----
         bgWdh.add(rbTag);
-        rbTag.setText("täglich alle");
-        rbTag.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbTag.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        rbTag.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbTagActionPerformed(evt);
-            }
-        });
-
         bgWdh.add(rbWoche);
-        rbWoche.setText("wöchentlich alle");
-        rbWoche.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbWoche.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        rbWoche.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbWocheActionPerformed(evt);
-            }
-        });
-
         bgWdh.add(rbMonat);
-        rbMonat.setText("monatlich alle");
-        rbMonat.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbMonat.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        rbMonat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbMonatActionPerformed(evt);
-            }
-        });
 
-        jLabel7.setText("Tage");
-
-        jLabel8.setText("Wochen am:");
-
-        cbMon.setText("Mon");
-        cbMon.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbMon.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbMon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbMonActionPerformed(evt);
-            }
-        });
-
-        cbDie.setText("Die");
-        cbDie.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbDie.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbDie.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbDieActionPerformed(evt);
-            }
-        });
-
-        cbMit.setText("Mit");
-        cbMit.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbMit.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbMit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbMitActionPerformed(evt);
-            }
-        });
-
-        cbDon.setText("Don");
-        cbDon.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbDon.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbDon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbDonActionPerformed(evt);
-            }
-        });
-
-        cbFre.setText("Fre");
-        cbFre.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbFre.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbFre.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbFreActionPerformed(evt);
-            }
-        });
-
-        cbSam.setText("Sam");
-        cbSam.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbSam.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbSam.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSamActionPerformed(evt);
-            }
-        });
-
-        cbSon.setText("Son");
-        cbSon.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbSon.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbSon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSonActionPerformed(evt);
-            }
-        });
-
-        jLabel9.setText("Monat(e)");
-
+        //---- bgMonat ----
         bgMonat.add(rbMonatTag);
-        rbMonatTag.setText("wiederholt am");
-        rbMonatTag.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbMonatTag.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        rbMonatTag.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbMonatTagActionPerformed(evt);
-            }
-        });
-
-        jLabel10.setText("Tag");
-
         bgMonat.add(rbMonatWTag);
-        rbMonatWTag.setText("wiederholt am");
-        rbMonatWTag.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbMonatWTag.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        rbMonatWTag.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbMonatWTagActionPerformed(evt);
-            }
-        });
-
-        cmbWTag.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"}));
-        cmbWTag.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbWTagItemStateChanged(evt);
-            }
-        });
-
-        spinTaeglich.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinTaeglichStateChanged(evt);
-            }
-        });
-
-        spinWoche.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinWocheStateChanged(evt);
-            }
-        });
-
-        spinMonat.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinMonatStateChanged(evt);
-            }
-        });
-
-        spinMonatTag.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinMonatTagStateChanged(evt);
-            }
-        });
-
-        spinMonatWTag.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinMonatWTagStateChanged(evt);
-            }
-        });
-
-        jLabel13.setText("Erste Anwendung am:");
-
-        org.jdesktop.layout.GroupLayout pnlWdhLayout = new org.jdesktop.layout.GroupLayout(pnlWdh);
-        pnlWdh.setLayout(pnlWdhLayout);
-        pnlWdhLayout.setHorizontalGroup(
-                pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlWdhLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(17, 17, 17)
-                                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                                .add(rbMonatTag)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(spinMonatTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                                .add(rbMonatWTag)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(spinMonatWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                                .add(20, 20, 20)
-                                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(jLabel10)
-                                                        .add(cmbWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(rbWoche)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(spinWoche, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jLabel8))
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(rbTag)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(spinTaeglich, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jLabel7))
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(17, 17, 17)
-                                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                                .add(cbFre)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(cbSam)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(cbSon))
-                                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                                .add(cbMon)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(cbDie)
-                                                                .add(16, 16, 16)
-                                                                .add(cbMit)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(cbDon))))
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(rbMonat)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(spinMonat, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jLabel9))
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(jLabel13)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jdcLDatum, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)))
-                                .addContainerGap())
-        );
-        pnlWdhLayout.setVerticalGroup(
-                pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(pnlWdhLayout.createSequentialGroup()
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(rbTag)
-                                        .add(spinTaeglich, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel7))
-                                .add(18, 18, 18)
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(rbWoche)
-                                        .add(spinWoche, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel8))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(cbMon)
-                                        .add(cbDie)
-                                        .add(cbMit)
-                                        .add(cbDon))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(cbFre)
-                                        .add(cbSam)
-                                        .add(cbSon))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(rbMonat)
-                                        .add(jLabel9)
-                                        .add(spinMonat, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(rbMonatTag)
-                                        .add(spinMonatTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jLabel10))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(rbMonatWTag)
-                                        .add(spinMonatWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(cmbWTag, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(pnlWdhLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .add(18, 18, 18)
-                                                .add(jLabel13))
-                                        .add(pnlWdhLayout.createSequentialGroup()
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                                .add(jdcLDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(98, Short.MAX_VALUE))
-        );
-
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(pnlRegular, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .add(lblEin1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pnlWdh, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                        .add(pnlWdh, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3Layout.createSequentialGroup()
-                                                .add(lblEin1)
-                                                .add(1, 1, 1)
-                                                .add(pnlRegular, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap())
-        );
-
-        btnDiscard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
-        btnDiscard.setText("Verwerfen");
-        btnDiscard.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDiscardActionPerformed(evt);
-            }
-        });
-
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
-        btnSave.setText("Speichern");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(btnSave)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnDiscard)
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(btnDiscard)
-                                        .add(btnSave))
-                                .addContainerGap())
-        );
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap(530, Short.MAX_VALUE)
-                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 739) / 2, (screenSize.height - 482) / 2, 739, 482);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmbUhrzeitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbUhrzeitItemStateChanged
@@ -1001,35 +1127,8 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     }
 
     private void initData() {
-        if (bhppid > 0) {
-            template = DBRetrieve.getSingleRecord("BHPPlanung", "BHPPID", bhppid);
-        } else {
-            BigDecimal b0 = new BigDecimal(0d);
-            BigDecimal b1 = new BigDecimal(1d);
-            template = new HashMap();
-            template.put("NachtMo", b0);
-            template.put("Mittags", b0);
-            template.put("Nachmittags", b0);
-            template.put("Abends", b0);
-            template.put("NachtAb", b0);
-            template.put("UhrzeitDosis", b0);
-            template.put("Uhrzeit", null);
-            template.put("Taeglich", 1);
-            template.put("Woechentlich", 0);
-            template.put("Monatlich", 0);
-            template.put("TagNum", 0);
-            template.put("Bemerkung", "");
-            template.put("LDatum", new Timestamp(SYSCalendar.now()));
-            if (bedarf) {
-                template.put("Morgens", b0);
-                template.put("MaxAnzahl", 1);
-                template.put("MaxEDosis", b1);
-            } else {
-                template.put("Morgens", b1);
-                template.put("MaxAnzahl", 0);
-                template.put("MaxEDosis", b0);
-            }
-
+        if (planung == null) {
+            planung = new VerordnungPlanung(verordnung);
         }
     }
 
@@ -1374,7 +1473,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     public void save() {
-        HashMap hm = new HashMap();
+        //HashMap hm = new HashMap();
 
         hm.put("NachtMo", txtNachtMo.getText());
         hm.put("Morgens", txtMorgens.getText());
@@ -1754,57 +1853,57 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgMonat;
-    private javax.swing.ButtonGroup bgWdh;
-    private javax.swing.JButton btnDiscard;
-    private javax.swing.JButton btnSave;
-    private javax.swing.JCheckBox cbDie;
-    private javax.swing.JCheckBox cbDon;
-    private javax.swing.JCheckBox cbFre;
-    private javax.swing.JCheckBox cbMit;
-    private javax.swing.JCheckBox cbMon;
-    private javax.swing.JCheckBox cbSam;
-    private javax.swing.JCheckBox cbSon;
-    private javax.swing.JComboBox cmbUhrzeit;
-    private javax.swing.JComboBox cmbWTag;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private com.toedter.calendar.JDateChooser jdcLDatum;
-    private javax.swing.JLabel lblDosis;
-    private javax.swing.JLabel lblEin1;
-    private javax.swing.JLabel lblX;
-    private javax.swing.JPanel pnlRegular;
-    private javax.swing.JPanel pnlWdh;
-    private javax.swing.JRadioButton rbMonat;
-    private javax.swing.JRadioButton rbMonatTag;
-    private javax.swing.JRadioButton rbMonatWTag;
-    private javax.swing.JRadioButton rbTag;
-    private javax.swing.JRadioButton rbWoche;
-    private javax.swing.JSpinner spinMonat;
-    private javax.swing.JSpinner spinMonatTag;
-    private javax.swing.JSpinner spinMonatWTag;
-    private javax.swing.JSpinner spinTaeglich;
-    private javax.swing.JSpinner spinWoche;
-    private javax.swing.JTextField txtAbends;
-    private javax.swing.JTextField txtEDosis;
-    private javax.swing.JTextField txtMaxTimes;
-    private javax.swing.JTextField txtMittags;
-    private javax.swing.JTextField txtMorgens;
-    private javax.swing.JTextField txtNachmittags;
-    private javax.swing.JTextField txtNachtAb;
-    private javax.swing.JTextField txtNachtMo;
-    private javax.swing.JTextField txtUhrzeit;
+    private JPanel jPanel3;
+    private JPanel jPanel2;
+    private JLabel lblDosis;
+    private JTextField txtMaxTimes;
+    private JLabel lblX;
+    private JTextField txtEDosis;
+    private JLabel lblEin1;
+    private JPanel pnlRegular;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JLabel jLabel4;
+    private JLabel jLabel6;
+    private JComboBox cmbUhrzeit;
+    private JLabel jLabel11;
+    private JTextField txtNachtMo;
+    private JTextField txtNachtAb;
+    private JTextField txtMittags;
+    private JTextField txtMorgens;
+    private JTextField txtNachmittags;
+    private JTextField txtAbends;
+    private JTextField txtUhrzeit;
+    private JPanel pnlWdh;
+    private JRadioButton rbTag;
+    private JRadioButton rbWoche;
+    private JRadioButton rbMonat;
+    private JLabel jLabel7;
+    private JLabel jLabel8;
+    private JCheckBox cbMon;
+    private JCheckBox cbDie;
+    private JCheckBox cbMit;
+    private JCheckBox cbDon;
+    private JCheckBox cbFre;
+    private JCheckBox cbSam;
+    private JCheckBox cbSon;
+    private JLabel jLabel9;
+    private JRadioButton rbMonatTag;
+    private JLabel jLabel10;
+    private JRadioButton rbMonatWTag;
+    private JComboBox cmbWTag;
+    private JSpinner spinTaeglich;
+    private JSpinner spinWoche;
+    private JSpinner spinMonat;
+    private JSpinner spinMonatTag;
+    private JSpinner spinMonatWTag;
+    private JLabel jLabel13;
+    private JDateChooser jdcLDatum;
+    private JPanel jPanel1;
+    private JButton btnDiscard;
+    private JButton btnSave;
+    private ButtonGroup bgWdh;
+    private ButtonGroup bgMonat;
     // End of variables declaration//GEN-END:variables
 }

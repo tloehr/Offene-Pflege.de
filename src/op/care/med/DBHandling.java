@@ -65,28 +65,7 @@ public class DBHandling {
     public static final int FORMSTATUS_APV_PER_DAF = 1;
     public static final int FORMSTATUS_APV_PER_BW = 2;
 
-    public static DefaultComboBoxModel getMedis(String suchmuster) {
-        DefaultComboBoxModel dlm = null;
-        suchmuster = "%" + suchmuster + "%";
-        String sql = " SELECT D.DafID, M.Bezeichnung, D.Zusatz, " +
-                " Concat(if(F.Zubereitung<>'', concat(F.Zubereitung, ' '), ''), " +
-                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
-                " WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, F.AnwText)) zub " +
-                " FROM MProdukte M " +
-                " INNER JOIN MPDarreichung D ON M.MedPID = D.MedPID " +
-                " INNER JOIN MPFormen F ON D.FormID = F.FormID " +
-                " WHERE M.Bezeichnung LIKE ? " +
-                " ORDER BY M.Bezeichnung, Zusatz, Zubereitung ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, suchmuster);
-            ResultSet rs = stmt.executeQuery();
-            dlm = SYSTools.rs2cmb(rs);
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return dlm;
-    }
+
 
     /**
      * Setzt für einen Bestand <b>alle</b> Buchungen zur¸ck, bis auf die Anfangsbuchung.
@@ -104,29 +83,6 @@ public class DBHandling {
         }
     }
 
-    public static DefaultComboBoxModel getMedis(long dafid) {
-        DefaultComboBoxModel dlm = null;
-        String sql = " SELECT D.DafID, M.Bezeichnung, D.Zusatz, " +
-                " Concat(if(F.Zubereitung<>'', concat(F.Zubereitung, ' '), ''), " +
-                " if(F.AnwText='', CASE F.AnwEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' " +
-                " WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END, F.AnwText)) zub, H.Firma " +
-                " " +
-                " FROM MProdukte M " +
-                " INNER JOIN MPDarreichung D ON M.MedPID = D.MedPID " +
-                " INNER JOIN MPFormen F ON D.FormID = F.FormID " +
-                " INNER JOIN MPHersteller H ON H.MPHID = M.MPHID " +
-                " WHERE D.DafID = ? " +
-                " ORDER BY M.Bezeichnung, Zusatz, Zubereitung ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, dafid);
-            ResultSet rs = stmt.executeQuery();
-            dlm = SYSTools.rs2cmb(rs);
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return dlm;
-    }
 
     public static int getFormStatus(long bestid) {
         long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue(" MPBestand", "DafID", "BestID", bestid)).longValue();

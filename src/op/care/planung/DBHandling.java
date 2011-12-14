@@ -56,45 +56,6 @@ public class DBHandling {
     public static final int MSSN_MODE_NUR_BHP = 1;
     public static final int MSSN_MODE_NUR_PFLEGE = 2;
 
-    public static DefaultComboBoxModel getMassnahmen(int mode) {
-        return getMassnahmen(mode, "");
-    }
-
-    public static DefaultComboBoxModel getMassnahmen(int mode, String suche) {
-        DefaultComboBoxModel dcbmMassnahmen = new DefaultComboBoxModel();
-
-        PreparedStatement stmt;
-        ResultSet rs;
-
-        // Fehler: nur aktive Massnahmen anzeigen
-        try {
-            String sql = "";
-            if (suche.equals("")) { // alle anzeigen
-                sql = "SELECT MassID, Bezeichnung FROM Massnahmen " +
-                        " WHERE Aktiv=1 AND " +
-                        (mode == MSSN_MODE_NUR_BHP ? " MassArt = 2 " : "") +
-                        (mode == MSSN_MODE_NUR_PFLEGE ? " MassArt = 1 " : "") +
-                        " ORDER BY Bezeichnung ";
-            } else {
-                sql = "SELECT MassID, Bezeichnung FROM Massnahmen " +
-                        " WHERE Aktiv=1 AND Bezeichnung like ? " +
-                        (mode == MSSN_MODE_NUR_BHP ? " AND MassArt = 2 " : "") +
-                        (mode == MSSN_MODE_NUR_PFLEGE ? " AND MassArt = 1 " : "") +
-                        " ORDER BY Bezeichnung ";
-            }
-            stmt = OPDE.getDb().db.prepareStatement(sql);
-            if (!suche.equals("")) {
-                suche = "%" + suche + "%";
-                stmt.setString(1, suche);
-            }
-            rs = stmt.executeQuery();
-            dcbmMassnahmen = SYSTools.rs2cmb(rs);
-        } catch (SQLException se) {
-            new DlgException(se);
-        }
-
-        return dcbmMassnahmen;
-    }
 
     /**
      * copy2tmp erstellt eine temporäre Kopie der Pflegeplanung zur Bearbeitung.

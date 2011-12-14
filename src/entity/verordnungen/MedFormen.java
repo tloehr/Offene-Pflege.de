@@ -1,5 +1,6 @@
 package entity.verordnungen;
 
+import entity.Massnahmen;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
@@ -14,7 +15,6 @@ import java.io.Serializable;
     @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM MedFormen m WHERE m.anwText = :anwText"),
     @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM MedFormen m WHERE m.anwEinheit = :anwEinheit"),
     @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM MedFormen m WHERE m.packEinheit = :packEinheit"),
-    @NamedQuery(name = "MedFormen.findByMassID", query = "SELECT m FROM MedFormen m WHERE m.massID = :massID"),
     @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM MedFormen m WHERE m.stellplan = :stellplan"),
     @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM MedFormen m WHERE m.status = :status"),
     @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM MedFormen m WHERE m.equiv = :equiv")})
@@ -37,9 +37,6 @@ public class MedFormen implements Serializable {
     @Basic(optional = false)
     @Column(name = "PackEinheit")
     private short packEinheit;
-    @Basic(optional = false)
-    @Column(name = "MassID")
-    private long massID;
     @Basic(optional = false)
     @Column(name = "Stellplan")
     private short stellplan;
@@ -95,14 +92,6 @@ public class MedFormen implements Serializable {
         this.packEinheit = packEinheit;
     }
 
-    public long getMassID() {
-        return massID;
-    }
-
-    public void setMassID(long massID) {
-        this.massID = massID;
-    }
-
     public short getStellplan() {
         return stellplan;
     }
@@ -130,6 +119,15 @@ public class MedFormen implements Serializable {
     public boolean anwUndPackEinheitenGleich(){
         return anwEinheit == packEinheit;
     }
+
+    public Massnahmen getMassnahme() {
+        return massnahme;
+    }
+
+    // N:1 Relationen
+    @JoinColumn(name = "MassID", referencedColumnName = "MassID")
+    @ManyToOne
+    private Massnahmen massnahme;
 
 
     @Override

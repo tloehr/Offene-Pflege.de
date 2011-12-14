@@ -164,6 +164,10 @@ public class Verordnung implements Serializable, VorgangElement {
     public Verordnung() {
     }
 
+    public Verordnung(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
     public Long getVerid() {
         return verid;
     }
@@ -364,7 +368,28 @@ public class Verordnung implements Serializable, VorgangElement {
 
     @Override
     public String toString() {
-        return "entity.verordnungen.Verordnung[verID=" + verid + "]";
+        return "Verordnung{" +
+                "verid=" + verid +
+                ", anDatum=" + anDatum +
+                ", abDatum=" + abDatum +
+                ", bisPackEnde=" + bisPackEnde +
+                ", verKennung=" + verKennung +
+                ", bemerkung='" + bemerkung + '\'' +
+                ", stellplan=" + stellplan +
+                ", attachedFiles=" + attachedFiles +
+                ", attachedVorgaenge=" + attachedVorgaenge +
+                ", angesetztDurch=" + angesetztDurch +
+                ", abgesetztDurch=" + abgesetztDurch +
+                ", bewohner=" + bewohner +
+                ", massnahme=" + massnahme +
+                ", darreichung=" + darreichung +
+                ", situation=" + situation +
+                ", anKH=" + anKH +
+                ", abKH=" + abKH +
+                ", anArzt=" + anArzt +
+                ", abArzt=" + abArzt +
+                '}';
     }
+
 
 }

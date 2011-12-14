@@ -6,7 +6,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "Arzt")
 @NamedQueries({
-    @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Arzt a"),
+    @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Arzt a ORDER BY a.name, a.vorname"),
     @NamedQuery(name = "Arzt.findByArztID", query = "SELECT a FROM Arzt a WHERE a.arztID = :arztID"),
     @NamedQuery(name = "Arzt.findByAnrede", query = "SELECT a FROM Arzt a WHERE a.anrede = :anrede"),
     @NamedQuery(name = "Arzt.findByTitel", query = "SELECT a FROM Arzt a WHERE a.titel = :titel"),

@@ -27,8 +27,8 @@ package op;
 
 import entity.*;
 import entity.system.*;
+import entity.verordnungen.BHPTools;
 import op.care.DFNImport;
-import op.care.bhp.BHPImport;
 import op.system.FrmInit;
 import op.threads.BackgroundMonitor;
 import op.tools.*;
@@ -480,7 +480,7 @@ public class OPDE {
                     EntityTools.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
 
-                    BHPImport.importBHP(null, null);
+                    BHPTools.importBHP(null, null);
                 } catch (Exception ex) {
                     logger.fatal("Exception beim BHPImport", ex);
                 }

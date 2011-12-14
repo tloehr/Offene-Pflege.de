@@ -5,7 +5,6 @@ import entity.Users;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
@@ -95,6 +94,33 @@ public class VerordnungPlanung implements Serializable {
     private Date lDatum;
 
     public VerordnungPlanung() {
+    }
+
+    public VerordnungPlanung(Verordnung verordnung) {
+        nachtMo = BigDecimal.ZERO;
+        mittags = BigDecimal.ZERO;
+        abends = BigDecimal.ZERO;
+        nachtAb = BigDecimal.ZERO;
+        uhrzeitDosis = BigDecimal.ZERO;
+        uhrzeit = null;
+        taeglich = 1;
+        woechentlich = 0;
+        monatlich = 0;
+        tagNum = 0;
+        lDatum = new Date();
+
+        this.verordnung = verordnung;
+
+        if (verordnung.isBedarf()) {
+            morgens = BigDecimal.ZERO;
+            maxAnzahl = 1;
+            maxEDosis = BigDecimal.ONE;
+        } else {
+            morgens = BigDecimal.ONE;
+            maxAnzahl = 0;
+            maxEDosis = BigDecimal.ZERO;
+        }
+
     }
 
 

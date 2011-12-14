@@ -1,13 +1,21 @@
 package entity.verordnungen;
 
+import entity.Arzt;
 import entity.Bewohner;
 import entity.EntityTools;
 import op.OPDE;
+import op.tools.DlgException;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +27,48 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DarreichungTools {
+
+    public static ListCellRenderer getDarreichungRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+                JLabel l = new JLabel();
+                if (o == null) {
+                    l.setText("<i>Keine Auswahl</i>");
+                } else if (o instanceof Darreichung) {
+                    Darreichung darreichung = (Darreichung) o;
+                    String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
+                    String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
+
+                    String text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
+                    text += zubereitung.isEmpty() ? "" : zubereitung + " ";
+                    text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+
+                    l.setText(text);
+                }
+                return l;
+            }
+        };
+    }
+
+    public static List<Darreichung> findDarreichungByMedProduktText(String suche) {
+        suche = "%" + suche + "%";
+
+        EntityManager em = OPDE.createEM();
+
+        Query query = em.createQuery(" " +
+                " SELECT d FROM Darreichung d " +
+                " WHERE d.medProdukt.bezeichnung like :suche" +
+                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.medForm.zubereitung ");
+
+        query.setParameter("suche", suche);
+
+        List<Darreichung> list = query.getResultList();
+
+        em.close();
+
+        return list;
+    }
 
     /**
      * Dieses Methode wird vorwiegend bei den Verordnungen eingesetzt.
@@ -86,4 +136,6 @@ public class DarreichungTools {
         em.close();
         return liste;
     }
+
+
 }

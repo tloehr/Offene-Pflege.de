@@ -26,30 +26,36 @@
  */
 package op.care.verordnung;
 
+import java.beans.*;
+
 import com.toedter.calendar.JDateChooser;
-import entity.verordnungen.Verordnung;
+import entity.*;
+import entity.verordnungen.*;
 import op.OPDE;
-import op.care.bhp.BHPImport;
 import op.care.med.DlgMediAssistent;
 import op.tools.DBHandling;
-import op.tools.DBRetrieve;
 import op.tools.*;
+import org.apache.commons.beanutils.BeanUtils;
 import tablerenderer.RNDHTML;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeListener;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -59,44 +65,73 @@ public class DlgVerordnung extends javax.swing.JDialog {
     public static final int NEW_MODE = 1; // Neu
     public static final int EDIT_MODE = 2; // Korrigieren
     public static final int CHANGE_MODE = 3; // Ändern
-    private long verid;
-    private long dafid;
+
     private java.awt.Frame parent;
     private boolean ignoreSitCaret;
     private boolean ignoreEvent;
-    //private boolean bhpVorhanden; // true, wenn die Verordnung bereits abgehakte BHPs besitzt. false, sonst.
-    private boolean abgesetzt;
-    //private boolean ohneMedi; // true, wenn die Verordnung gar nichts mit Medikamenten zu tun hat.
-    private boolean beiBedarf; // true, wenn die Verordnung nur bei Bedarf zur Anwendung kommt.
+
+
     private JPopupMenu menu;
-    private String bwkennung;
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
-    long verkennung;
-    boolean pleaseDropTmp = false; // Sorgt dafür das Eingaben weggeschmissen werden, falls man das Fenster über den Close Button schließt.
 
-    Verordnung verordnung = null;
+    Verordnung verordnung = null, oldVerordnung = null;
 
 
     /**
      * Creates new form DlgVerordnung
      */
-    public DlgVerordnung(java.awt.Frame parent, String bwkennung, Verordnung verordnung, int mode) {
+    public DlgVerordnung(java.awt.Frame parent, Verordnung verordnung, int mode) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = bwkennung;
-        this.verid = verordnung.getVerid();
-        this.verordnung = verordnung;
+
         this.editMode = mode;
+        if (editMode == CHANGE_MODE){
+            try {
+                this.oldVerordnung = verordnung;
+                this.verordnung = (Verordnung) BeanUtils.cloneBean(verordnung);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (InstantiationException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        } else {
+            this.verordnung = verordnung;
+        }
         initDialog();
     }
 
-    public DlgVerordnung(java.awt.Frame parent, String bwkennung) {
+    private void cbStellplanActionPerformed(ActionEvent e) {
+        if (ignoreEvent) {
+            return;
+        }
+        verordnung.setStellplan(cbStellplan.isSelected());
+    }
+
+    private void jdcANPropertyChange(PropertyChangeEvent e) {
+        if (ignoreEvent) {
+            return;
+        }
+        verordnung.setAnDatum(jdcAN.getDate());
+        saveOK();
+    }
+
+    private void jdcABPropertyChange(PropertyChangeEvent e) {
+        if (ignoreEvent) {
+            return;
+        }
+        verordnung.setAbDatum(jdcAB.getDate());
+        saveOK();
+    }
+
+    public DlgVerordnung(java.awt.Frame parent, Bewohner bewohner) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = bwkennung;
-        this.verid = 0;
-        this.verordnung = null;
+        this.verordnung = new Verordnung(bewohner);
         this.editMode = NEW_MODE;
         initDialog();
     }
@@ -109,507 +144,640 @@ public class DlgVerordnung extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        lblBW = new JLabel();
+        lblTitle = new JLabel();
+        jSeparator1 = new JSeparator();
+        jPanel1 = new JPanel();
+        cmbSit = new JComboBox();
+        txtMed = new JTextField();
+        cmbMed = new JComboBox();
+        cmbMass = new JComboBox();
+        txtSit = new JTextField();
+        btnBedarf = new JButton();
+        btnMed = new JButton();
+        jPanel8 = new JPanel();
+        jspDosis = new JScrollPane();
+        tblDosis = new JTable();
+        cbPackEnde = new JCheckBox();
+        cbStellplan = new JCheckBox();
+        jLabel6 = new JLabel();
+        jPanel3 = new JPanel();
+        jPanel4 = new JPanel();
+        jLabel3 = new JLabel();
+        jdcAB = new JDateChooser();
+        jLabel4 = new JLabel();
+        cmbAB = new JComboBox();
+        cbAB = new JCheckBox();
+        lblAB = new JLabel();
+        cmbKHAb = new JComboBox();
+        jScrollPane3 = new JScrollPane();
+        txtBemerkung = new JTextPane();
+        jLabel5 = new JLabel();
+        jPanel2 = new JPanel();
+        jLabel1 = new JLabel();
+        jdcAN = new JDateChooser();
+        cmbAN = new JComboBox();
+        jLabel2 = new JLabel();
+        lblAN = new JLabel();
+        cmbKHAn = new JComboBox();
+        jSeparator2 = new JSeparator();
+        btnSave = new JButton();
+        btnClose = new JButton();
+        jPanel5 = new JPanel();
+        lblVerordnung = new JLabel();
 
-        bgMedikament = new javax.swing.ButtonGroup();
-        lblBW = new javax.swing.JLabel();
-        lblTitle = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jPanel1 = new javax.swing.JPanel();
-        cmbSit = new javax.swing.JComboBox();
-        txtMed = new javax.swing.JTextField();
-        cmbMed = new javax.swing.JComboBox();
-        cmbMass = new javax.swing.JComboBox();
-        txtSit = new javax.swing.JTextField();
-        btnBedarf = new javax.swing.JButton();
-        btnMed = new javax.swing.JButton();
-        jPanel8 = new javax.swing.JPanel();
-        jspDosis = new javax.swing.JScrollPane();
-        tblDosis = new javax.swing.JTable();
-        cbPackEnde = new javax.swing.JCheckBox();
-        cbStellplan = new javax.swing.JCheckBox();
-        jLabel6 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jdcAB = new com.toedter.calendar.JDateChooser();
-        jLabel4 = new javax.swing.JLabel();
-        cmbAB = new javax.swing.JComboBox();
-        cbAB = new javax.swing.JCheckBox();
-        lblAB = new javax.swing.JLabel();
-        cmbKHAb = new javax.swing.JComboBox();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        txtBemerkung = new javax.swing.JTextPane();
-        jLabel5 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jdcAN = new com.toedter.calendar.JDateChooser();
-        cmbAN = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
-        lblAN = new javax.swing.JLabel();
-        cmbKHAn = new javax.swing.JComboBox();
-        jSeparator2 = new javax.swing.JSeparator();
-        btnSave = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
-        lblVerordnung = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                formWindowClosing(e);
             }
         });
+        Container contentPane = getContentPane();
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
 
-        lblTitle.setFont(new java.awt.Font("Dialog", 1, 24));
-        lblTitle.setText("Ärztliche Verordnung");
+        //---- lblTitle ----
+        lblTitle.setFont(new Font("Dialog", Font.BOLD, 24));
+        lblTitle.setText("\u00c4rztliche Verordnung");
 
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        cmbSit.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbSit.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbSitItemStateChanged(evt);
-            }
-        });
-
-        txtMed.setText("jTextField1");
-        txtMed.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtMedCaretUpdate(evt);
-            }
-        });
-        txtMed.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtMedFocusGained(evt);
-            }
-        });
-
-        cmbMed.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbMed.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbMedItemStateChanged(evt);
-            }
-        });
-
-        cmbMass.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbMass.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbMassItemStateChanged(evt);
-            }
-        });
-
-        txtSit.setText("jTextField1");
-        txtSit.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtSitCaretUpdate(evt);
-            }
-        });
-
-        btnBedarf.setText("Situation");
-        btnBedarf.setEnabled(false);
-        btnBedarf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBedarfActionPerformed(evt);
-            }
-        });
-
-        btnMed.setText("Medikament");
-        btnMed.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMedActionPerformed(evt);
-            }
-        });
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Dosis / Häufigkeit"));
-
-        jspDosis.setToolTipText("<html>Drücken Sie die <b>rechte</b> Maustaste, wenn Sie neue Dosierungen eintragen wollen.</html>");
-        jspDosis.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jspDosisMousePressed(evt);
-            }
-        });
-        jspDosis.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspDosisComponentResized(evt);
-            }
-        });
-
-        tblDosis.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+            //---- cmbSit ----
+            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbSit.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbSitItemStateChanged(e);
                 }
-        ));
-        tblDosis.setToolTipText("<html>Drücken Sie die <b>rechte</b> Maustaste, wenn Sie Veränderungen vornehmen wollen.</html>");
-        tblDosis.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblDosisMousePressed(evt);
-            }
-        });
-        jspDosis.setViewportView(tblDosis);
+            });
 
-        cbPackEnde.setText("Bis Packungsende");
-        cbPackEnde.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbPackEnde.setEnabled(false);
-        cbPackEnde.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbPackEnde.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbPackEndeActionPerformed(evt);
-            }
-        });
+            //---- txtMed ----
+            txtMed.setText("jTextField1");
+            txtMed.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtMedCaretUpdate(e);
+                }
+            });
+            txtMed.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtMedFocusGained(e);
+                }
+            });
 
-        cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
-        cbStellplan.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbStellplan.setMargin(new java.awt.Insets(0, 0, 0, 0));
+            //---- cmbMed ----
+            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbMed.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbMedItemStateChanged(e);
+                }
+            });
 
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-                jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            //---- cmbMass ----
+            cmbMass.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbMass.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbMassItemStateChanged(e);
+                }
+            });
+
+            //---- txtSit ----
+            txtSit.setText("jTextField1");
+            txtSit.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtSitCaretUpdate(e);
+                }
+            });
+
+            //---- btnBedarf ----
+            btnBedarf.setText("Situation");
+            btnBedarf.setEnabled(false);
+            btnBedarf.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBedarfActionPerformed(e);
+                }
+            });
+
+            //---- btnMed ----
+            btnMed.setText("Medikament");
+            btnMed.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnMedActionPerformed(e);
+                }
+            });
+
+            //======== jPanel8 ========
+            {
+                jPanel8.setBorder(new TitledBorder("Dosis / H\u00e4ufigkeit"));
+
+                //======== jspDosis ========
+                {
+                    jspDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie neue Dosierungen eintragen wollen.</html>");
+                    jspDosis.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            jspDosisMousePressed(e);
+                        }
+                    });
+                    jspDosis.addComponentListener(new ComponentAdapter() {
+                        @Override
+                        public void componentResized(ComponentEvent e) {
+                            jspDosisComponentResized(e);
+                        }
+                    });
+
+                    //---- tblDosis ----
+                    tblDosis.setModel(new DefaultTableModel(
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
+                    ));
+                    tblDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie Ver\u00e4nderungen vornehmen wollen.</html>");
+                    tblDosis.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            tblDosisMousePressed(e);
+                        }
+                    });
+                    jspDosis.setViewportView(tblDosis);
+                }
+
+                //---- cbPackEnde ----
+                cbPackEnde.setText("Bis Packungsende");
+                cbPackEnde.setBorder(BorderFactory.createEmptyBorder());
+                cbPackEnde.setEnabled(false);
+                cbPackEnde.setMargin(new Insets(0, 0, 0, 0));
+                cbPackEnde.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbPackEndeActionPerformed(e);
+                    }
+                });
+
+                //---- cbStellplan ----
+                cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
+                cbStellplan.setBorder(BorderFactory.createEmptyBorder());
+                cbStellplan.setMargin(new Insets(0, 0, 0, 0));
+                cbStellplan.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbStellplanActionPerformed(e);
+                    }
+                });
+
+                GroupLayout jPanel8Layout = new GroupLayout(jPanel8);
+                jPanel8.setLayout(jPanel8Layout);
+                jPanel8Layout.setHorizontalGroup(
+                    jPanel8Layout.createParallelGroup()
                         .addGroup(jPanel8Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jspDosis, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+                                .addGroup(jPanel8Layout.createParallelGroup()
+                                        .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
                                         .addGroup(jPanel8Layout.createSequentialGroup()
                                                 .addComponent(cbPackEnde)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(cbStellplan)))
                                 .addContainerGap())
-        );
-        jPanel8Layout.setVerticalGroup(
-                jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                                .addComponent(jspDosis, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                );
+                jPanel8Layout.setVerticalGroup(
+                    jPanel8Layout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                                .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel8Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(cbPackEnde)
                                         .addComponent(cbStellplan))
                                 .addContainerGap())
-        );
-
-        jLabel6.setText("Massnahmen:");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(jLabel6)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cmbMass, 0, 417, Short.MAX_VALUE))
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(btnBedarf, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(btnMed, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(txtSit, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
-                                                        .addComponent(txtMed, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                        .addComponent(cmbSit, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(cmbMed, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(btnMed)
-                                                        .addComponent(txtMed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(btnBedarf)
-                                                        .addComponent(txtSit, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(cmbMed, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cmbSit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel6)
-                                        .addComponent(cmbMass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-
-        jPanel3.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Absetzung"));
-
-        jLabel3.setText("Am:");
-
-        jdcAB.setEnabled(false);
-
-        jLabel4.setText("Durch:");
-
-        cmbAB.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbAB.setEnabled(false);
-        cmbAB.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbABItemStateChanged(evt);
+                );
             }
-        });
 
-        cbAB.setText("Abgesetzt");
-        cbAB.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbAB.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbAB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbABActionPerformed(evt);
-            }
-        });
+            //---- jLabel6 ----
+            jLabel6.setText("Massnahmen:");
 
-        lblAB.setText("jLabel13");
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel1Layout.createParallelGroup()
+                                    .addComponent(jPanel8, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addComponent(jLabel6)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(cmbMass, 0, 485, Short.MAX_VALUE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                    .addComponent(btnBedarf, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(btnMed, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addGroup(jPanel1Layout.createParallelGroup()
+                                                    .addComponent(txtSit, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                                                    .addComponent(txtMed, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                    .addComponent(cmbSit, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(cmbMed, GroupLayout.PREFERRED_SIZE, 275, GroupLayout.PREFERRED_SIZE))))
+                            .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel1Layout.createParallelGroup()
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                    .addComponent(btnMed)
+                                                    .addComponent(txtMed, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                    .addComponent(btnBedarf)
+                                                    .addComponent(txtSit, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addComponent(cmbMed, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(cmbSit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel6)
+                                    .addComponent(cmbMass, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jPanel8, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addContainerGap())
+            );
+        }
 
-        cmbKHAb.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbKHAb.setEnabled(false);
-        cmbKHAb.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbKHAbItemStateChanged(evt);
-            }
-        });
+        //======== jPanel3 ========
+        {
+            jPanel3.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            //======== jPanel4 ========
+            {
+                jPanel4.setBorder(new TitledBorder("Absetzung"));
+
+                //---- jLabel3 ----
+                jLabel3.setText("Am:");
+
+                //---- jdcAB ----
+                jdcAB.setEnabled(false);
+                jdcAB.addPropertyChangeListener("date", new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent e) {
+                        jdcABPropertyChange(e);
+                    }
+                });
+
+                //---- jLabel4 ----
+                jLabel4.setText("Durch:");
+
+                //---- cmbAB ----
+                cmbAB.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbAB.setEnabled(false);
+                cmbAB.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbABItemStateChanged(e);
+                    }
+                });
+
+                //---- cbAB ----
+                cbAB.setText("Abgesetzt");
+                cbAB.setBorder(BorderFactory.createEmptyBorder());
+                cbAB.setMargin(new Insets(0, 0, 0, 0));
+                cbAB.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbABActionPerformed(e);
+                    }
+                });
+
+                //---- lblAB ----
+                lblAB.setText("jLabel13");
+
+                //---- cmbKHAb ----
+                cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbKHAb.setEnabled(false);
+                cmbKHAb.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbKHAbItemStateChanged(e);
+                    }
+                });
+
+                GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
+                jPanel4.setLayout(jPanel4Layout);
+                jPanel4Layout.setHorizontalGroup(
+                    jPanel4Layout.createParallelGroup()
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel4Layout.createParallelGroup()
                                         .addComponent(cbAB)
                                         .addGroup(jPanel4Layout.createSequentialGroup()
-                                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(jPanel4Layout.createParallelGroup()
                                                         .addComponent(jLabel4)
                                                         .addComponent(jLabel3))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(jPanel4Layout.createParallelGroup()
                                                         .addComponent(cmbAB, 0, 189, Short.MAX_VALUE)
                                                         .addComponent(cmbKHAb, 0, 189, Short.MAX_VALUE)
-                                                        .addComponent(jdcAB, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                                        .addComponent(lblAB, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))))
+                                                        .addComponent(jdcAB, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                        .addComponent(lblAB, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))))
                                 .addContainerGap())
-        );
-        jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                );
+                jPanel4Layout.setVerticalGroup(
+                    jPanel4Layout.createParallelGroup()
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(cbAB)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addComponent(jLabel3)
-                                        .addComponent(jdcAB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jdcAB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel4)
-                                        .addComponent(cmbAB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbKHAb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cmbAB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbKHAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblAB)
                                 .addContainerGap())
-        );
-
-        txtBemerkung.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtBemerkungCaretUpdate(evt);
+                );
             }
-        });
-        jScrollPane3.setViewportView(txtBemerkung);
 
-        jLabel5.setText("Bemerkung:");
+            //======== jScrollPane3 ========
+            {
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Ansetzung"));
-
-        jLabel1.setText("Am:");
-
-        cmbAN.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbAN.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbANItemStateChanged(evt);
+                //---- txtBemerkung ----
+                txtBemerkung.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtBemerkungCaretUpdate(e);
+                    }
+                });
+                jScrollPane3.setViewportView(txtBemerkung);
             }
-        });
 
-        jLabel2.setText("Durch:");
+            //---- jLabel5 ----
+            jLabel5.setText("Bemerkung:");
 
-        lblAN.setText("jLabel11");
+            //======== jPanel2 ========
+            {
+                jPanel2.setBorder(new TitledBorder("Ansetzung"));
 
-        cmbKHAn.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbKHAn.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbKHAnItemStateChanged(evt);
-            }
-        });
+                //---- jLabel1 ----
+                jLabel1.setText("Am:");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                //---- jdcAN ----
+                jdcAN.addPropertyChangeListener("date", new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent e) {
+                        jdcANPropertyChange(e);
+                    }
+                });
+
+                //---- cmbAN ----
+                cmbAN.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbAN.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbANItemStateChanged(e);
+                    }
+                });
+
+                //---- jLabel2 ----
+                jLabel2.setText("Durch:");
+
+                //---- lblAN ----
+                lblAN.setText("jLabel11");
+
+                //---- cmbKHAn ----
+                cmbKHAn.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbKHAn.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbKHAnItemStateChanged(e);
+                    }
+                });
+
+                GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+                jPanel2.setLayout(jPanel2Layout);
+                jPanel2Layout.setHorizontalGroup(
+                    jPanel2Layout.createParallelGroup()
                         .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel2Layout.createParallelGroup()
                                         .addComponent(jLabel2)
                                         .addComponent(jLabel1))
                                 .addGap(5, 5, 5)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jdcAN, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                                .addGroup(jPanel2Layout.createParallelGroup()
+                                        .addComponent(jdcAN, GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
                                         .addComponent(cmbKHAn, 0, 192, Short.MAX_VALUE)
                                         .addComponent(cmbAN, 0, 192, Short.MAX_VALUE)
-                                        .addComponent(lblAN, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))
+                                        .addComponent(lblAN, GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))
                                 .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                );
+                jPanel2Layout.setVerticalGroup(
+                    jPanel2Layout.createParallelGroup()
                         .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel2Layout.createParallelGroup()
                                         .addComponent(jLabel1)
-                                        .addComponent(jdcAN, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jdcAN, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
                                 .addGap(9, 9, 9)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel2)
-                                        .addComponent(cmbAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbKHAn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cmbAN, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbKHAn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblAN)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                                .addContainerGap(66, Short.MAX_VALUE))
+                );
+            }
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+            GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
+            jPanel3.setLayout(jPanel3Layout);
+            jPanel3Layout.setHorizontalGroup(
+                jPanel3Layout.createParallelGroup()
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                    .addComponent(jLabel5, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                                    .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jPanel4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
+                            .addContainerGap())
+            );
+            jPanel3Layout.setVerticalGroup(
+                jPanel3Layout.createParallelGroup()
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabel5)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                            .addContainerGap())
+            );
+        }
 
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
+        //---- btnSave ----
+        btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
         btnSave.setText("Speichern");
         btnSave.setEnabled(false);
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSaveActionPerformed(e);
             }
         });
 
-        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
-        btnClose.setText("Schließen");
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
+        //---- btnClose ----
+        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+        btnClose.setText("Schlie\u00dfen");
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCloseActionPerformed(e);
             }
         });
 
-        jPanel5.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel5 ========
+        {
+            jPanel5.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        lblVerordnung.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblVerordnung.setForeground(new java.awt.Color(0, 51, 255));
-        lblVerordnung.setText("jLabel11");
+            //---- lblVerordnung ----
+            lblVerordnung.setFont(new Font("Dialog", Font.BOLD, 18));
+            lblVerordnung.setForeground(new Color(0, 51, 255));
+            lblVerordnung.setText("jLabel11");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblVerordnung, javax.swing.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-        jPanel5Layout.setVerticalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(lblVerordnung, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+            GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
+            jPanel5.setLayout(jPanel5Layout);
+            jPanel5Layout.setHorizontalGroup(
+                jPanel5Layout.createParallelGroup()
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, 888, Short.MAX_VALUE)
+                            .addContainerGap())
+            );
+            jPanel5Layout.setVerticalGroup(
+                jPanel5Layout.createParallelGroup()
+                    .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            );
+        }
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 891, Short.MAX_VALUE)
-                                        .addComponent(lblBW, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 891, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 891, Short.MAX_VALUE)
-                                        .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 891, Short.MAX_VALUE)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(btnSave)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnClose))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+                                .addComponent(lblBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+                                .addComponent(jSeparator1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+                                .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                        .addComponent(btnSave)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnClose))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitle)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnClose)
-                                        .addComponent(btnSave))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblTitle)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblBW)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnClose)
+                                .addComponent(btnSave))
+                        .addContainerGap())
         );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmbABItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbABItemStateChanged
         if (ignoreEvent) {
             return;
         }
-        ((JComboBox) evt.getSource()).setToolTipText(((JComboBox) evt.getSource()).getSelectedItem().toString());
+
+        verordnung.setAbArzt((Arzt) cmbAB.getSelectedItem());
+
         saveOK();
     }//GEN-LAST:event_cmbABItemStateChanged
 
@@ -617,7 +785,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
-        ((JComboBox) evt.getSource()).setToolTipText(((JComboBox) evt.getSource()).getSelectedItem().toString());
+
+        verordnung.setAbKH((Krankenhaus) cmbKHAb.getSelectedItem());
+
         saveOK();
     }//GEN-LAST:event_cmbKHAbItemStateChanged
 
@@ -625,26 +795,29 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
-        ((JComboBox) evt.getSource()).setToolTipText(((JComboBox) evt.getSource()).getSelectedItem().toString());
+        verordnung.setAnKH((Krankenhaus) cmbKHAn.getSelectedItem());
+
         saveOK();
     }//GEN-LAST:event_cmbKHAnItemStateChanged
 
     public void initDialog() {
         initComponents();
         prepareTMPData();
-        SYSTools.setBWLabel(lblBW, bwkennung);
+        SYSTools.setBWLabel(lblBW, verordnung.getBewohner());
         setTitle(SYSTools.getWindowTitle("Ärztliche Verordnungen, Detailansicht"));
-        fillÄrzte();
+        fillAerzteUndKHs();
 
         ignoreSitCaret = true;
         ignoreEvent = true;
         txtSit.setText("");
         txtMed.setText("");
-        cmbMass.setModel(op.care.planung.DBHandling.getMassnahmen(op.care.planung.DBHandling.MSSN_MODE_NUR_BHP));
+        cmbMass.setModel(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_BHP).toArray()));
+        cmbMass.setRenderer(MassnahmenTools.getMassnahmenRenderer());
         jdcAN.setMinSelectableDate(new Date());
         jdcAB.setMinSelectableDate(new Date());
+        cmbMed.setRenderer(DarreichungTools.getDarreichungRenderer());
+        cmbSit.setRenderer(SituationenTools.getSituationenRenderer());
         if (this.editMode == NEW_MODE) { // NewMode
-            dafid = 0;
             lblTitle.setText(lblTitle.getText() + " (Neuer Eintrag)");
             jdcAN.setDate(SYSCalendar.today_date());
             cbAB.setSelected(false);
@@ -658,42 +831,44 @@ public class DlgVerordnung extends javax.swing.JDialog {
             cbStellplan.setSelected(false);
             tblDosis.setModel(new DefaultTableModel());
             lblVerordnung.setText(" ");
-            verkennung = 0;
+
             cbPackEnde.setEnabled(false);
         } else { // CHANGE oder EDIT
             lblTitle.setText(lblTitle.getText() + (editMode == EDIT_MODE ? " (Korrektur)" : " (Änderung der bestehenden Verordnung)"));
             // Bei einer Änderung muss sich das Fenster am Anfang in einem Zustand befinden,
             // der ein Save ermöglich
             btnSave.setEnabled(true);
-            HashMap verordnung = DBRetrieve.getSingleRecord("BHPVerordnung", new String[]{"AnDatum", "AbDatum", "AnArztID", "AbArztID", "AnKHID", "AbKHID", "AnUKennung", "AbUKennung", "VerKennung", "Bemerkung", "MassID", "DafID", "SitID", "BisPackEnde", "Stellplan"}, "VerID", verid);
-            abgesetzt = ((BigInteger) verordnung.get("AbArztID")).longValue() > 0 || ((BigInteger) verordnung.get("AbKHID")).longValue() > 0;
-            beiBedarf = ((BigInteger) verordnung.get("SitID")).longValue() > 0;
-            verkennung = ((BigInteger) verordnung.get("VerKennung")).longValue();
+            //HashMap verordnung = DBRetrieve.getSingleRecord("BHPVerordnung", new String[]{"AnDatum", "AbDatum", "AnArztID", "AbArztID", "AnKHID", "AbKHID", "AnUKennung", "AbUKennung", "VerKennung", "Bemerkung", "MassID", "DafID", "SitID", "BisPackEnde", "Stellplan"}, "VerID", verid);
+
             jdcAN.setDate(new Date());
             if (this.editMode == EDIT_MODE) {
-                lblAN.setText((String) verordnung.get("AnUKennung"));
+                lblAN.setText(verordnung.getAngesetztDurch().getUKennung());
             } else {
                 lblAN.setText(OPDE.getLogin().getUser().getUKennung());
             }
-            SYSTools.selectInComboBox(cmbAN, ((BigInteger) verordnung.get("AnArztID")).longValue());
-            SYSTools.selectInComboBox(cmbKHAn, ((BigInteger) verordnung.get("AnKHID")).longValue());
+            cmbAN.setSelectedItem(verordnung.getAnArzt());
+            cmbKHAn.setSelectedItem(verordnung.getAnKH());
             cmbAB.setToolTipText(cmbAB.getSelectedItem().toString());
-            cbPackEnde.setSelected(((Boolean) verordnung.get("BisPackEnde")).booleanValue());
+            cbPackEnde.setSelected(verordnung.isBisPackEnde());
             cmbKHAn.setToolTipText(cmbKHAn.getSelectedItem().toString());
             jdcAN.setEnabled(editMode == EDIT_MODE);
-            txtBemerkung.setText(SYSTools.catchNull((String) verordnung.get("Bemerkung")));
-            dafid = ((BigInteger) verordnung.get("DafID")).longValue();
-            cmbMed.setModel(op.care.med.DBHandling.getMedis(dafid));
+            txtBemerkung.setText(SYSTools.catchNull(verordnung.getBemerkung()));
+
+            cmbMed.setModel(new DefaultComboBoxModel(new MedProdukte[]{verordnung.getDarreichung().getMedProdukt()}));
+
             cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
             cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
-            cbStellplan.setSelected(((Boolean) verordnung.get("Stellplan")).booleanValue());
-            //cmbMedItemStateChanged(null);
-            cmbSit.setModel(op.care.med.DBHandling.getSit(((BigInteger) verordnung.get("SitID")).longValue()));
-            SYSTools.selectInComboBox(cmbMass, ((Long) verordnung.get("MassID")).longValue());
+            cbStellplan.setSelected(verordnung.isStellplan());
+
+            cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{verordnung.getSituation()}));
+
+            cmbMass.setSelectedItem(verordnung.getMassnahme());
+
             cmbMed.setEnabled(this.editMode != CHANGE_MODE);
             txtMed.setEnabled(this.editMode != CHANGE_MODE);
             txtSit.setEnabled(this.editMode != CHANGE_MODE);
             cmbSit.setEnabled(this.editMode != CHANGE_MODE);
+
             if (cmbMed.getSelectedItem() != null) {
                 lblVerordnung.setText(cmbMed.getSelectedItem().toString());
                 cbPackEnde.setEnabled(true);
@@ -701,22 +876,19 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 lblVerordnung.setText(cmbMass.getSelectedItem().toString());
                 cbPackEnde.setEnabled(false);
             }
-            if (!abgesetzt) {
+            if (!verordnung.isAbgesetzt()) {
                 cbAB.setSelected(false);
                 lblAB.setText("");
                 cmbAB.setSelectedIndex(-1);
             } else {
                 cbAB.setSelected(true);
-                jdcAB.setDate((Date) verordnung.get("AbDatum"));
-                lblAB.setText((String) verordnung.get("AbUKennung"));
-                SYSTools.selectInComboBox(cmbAB, ((BigInteger) verordnung.get("AbArztID")).longValue());
-                SYSTools.selectInComboBox(cmbKHAb, ((BigInteger) verordnung.get("AbKHID")).longValue());
+                jdcAB.setDate(verordnung.getAbDatum());
+                lblAB.setText(verordnung.getAbgesetztDurch().getUKennung());
+                cmbAB.setSelectedItem(verordnung.getAbArzt());
+                cmbKHAb.setSelectedItem(verordnung.getAbKH());
                 cmbAB.setToolTipText(cmbAB.getSelectedItem().toString());
                 cmbKHAb.setToolTipText(cmbKHAb.getSelectedItem().toString());
             }
-            verordnung.clear();
-            verordnung = null;
-
         }
 
         reloadTable();
@@ -749,6 +921,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
+        verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
         saveOK();
     }//GEN-LAST:event_cmbMassItemStateChanged
 
@@ -801,9 +974,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Date ldatum = null;
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, 0, verid, dafid, cmbSit.getSelectedIndex() >= 0);
+                DlgVerabreichung dlg = new DlgVerabreichung(parent, 0, verordnung, cmbSit.getSelectedIndex() >= 0);
                 dlg = null;
-                pleaseDropTmp = true;
                 reloadTable();
             }
         });
@@ -816,15 +988,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
-        ListElement df = (ListElement) cmbMed.getSelectedItem();
-        // Massnahme passend setzen.
-        SYSTools.selectInComboBox(cmbMass, op.care.med.DBHandling.getMassID(df.getPk()));
+        verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
+        cmbMass.setSelectedItem(verordnung.getDarreichung().getMedForm().getMassnahme());
         cmbMass.setEnabled(false);
         cbStellplan.setEnabled(false);
         cbStellplan.setSelected(false);
-        cmbMed.setToolTipText(cmbMed.getSelectedItem().toString());
         lblVerordnung.setText(cmbMed.getSelectedItem().toString());
-        dafid = df.getPk();
         // Bestand prüfen
         saveOK();
     }//GEN-LAST:event_cmbMedItemStateChanged
@@ -833,6 +1002,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
+        verordnung.setBisPackEnde(cbPackEnde.isSelected());
         saveOK();
     }//GEN-LAST:event_cbPackEndeActionPerformed
 
@@ -843,7 +1013,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         boolean massOK = cmbMass.getSelectedItem() != null;
         boolean dosisVorhanden = tblDosis.getModel().getRowCount() > 0;
         btnSave.setEnabled(ansetzungOK && absetzungOK && medOK && massOK && dosisVorhanden);
-        cbPackEnde.setEnabled(!beiBedarf && cmbMed.getModel().getSize() > 0);
+        cbPackEnde.setEnabled(!verordnung.isBedarf() && cmbMed.getModel().getSize() > 0);
 
         if (!btnSave.isEnabled()) {
             String ursache = "<html><body>Es fehlen noch Angaben, bevor Sie speichern können.<ul>";
@@ -861,17 +1031,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
     }
 
     private void prepareTMPData() {
-        if (this.editMode != NEW_MODE) {
-            try {
-                op.care.verordnung.DBHandling.copy2tmp(this.verid);
-            } catch (SQLException ex) {
-                new DlgException(ex);
-            }
-        }
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        pleaseDropTmp = false;
         save();
         syncBHP();
         dispose();
@@ -890,14 +1052,15 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
+        verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
         saveOK();
-        beiBedarf = cmbSit.getSelectedIndex() > -1;
     }//GEN-LAST:event_cmbSitItemStateChanged
 
     private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
         if (ignoreEvent) {
             return;
         }
+        verordnung.setBemerkung(txtBemerkung.getText());
         saveOK();
     }//GEN-LAST:event_txtBemerkungCaretUpdate
 
@@ -909,117 +1072,106 @@ public class DlgVerordnung extends javax.swing.JDialog {
             cmbSit.setModel(new DefaultComboBoxModel());
             btnBedarf.setEnabled(false);
         } else {
-            cmbSit.setModel(op.care.med.DBHandling.getSit(txtSit.getText()));
+            cmbSit.setModel(new DefaultComboBoxModel(SituationenTools.findSituationByText(txtSit.getText()).toArray()));
             btnBedarf.setEnabled(cmbSit.getModel().getSize() == 0);
         }
-        beiBedarf = cmbSit.getSelectedIndex() > -1;
         saveOK();
     }//GEN-LAST:event_txtSitCaretUpdate
 
     private void save() {
         try {
-            // Hier beginnt eine Transaktion
-            OPDE.getDb().db.setAutoCommit(false);
-            OPDE.getDb().db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-            OPDE.getDb().db.commit();
 
-            HashMap hm = new HashMap();
-            hm.put("BWKennung", bwkennung);
-            if (SYSCalendar.sameDay(jdcAN.getDate(), new Date()) == 0) {
-                OPDE.debug("jdcAN steht auf HEUTE");
-                hm.put("AnDatum", "!NOW!");
-            } else {
-                OPDE.debug("jdcAN steht nicht auf HEUTE");
-                hm.put("AnDatum", jdcAN.getDate());
-            }
+        } catch (Exception e){
 
-            long abarztid;
-            long abkhid;
-            if (cbAB.isSelected()) {
-                abarztid = ((ListElement) cmbAB.getSelectedItem()).getPk();
-                abkhid = ((ListElement) cmbKHAb.getSelectedItem()).getPk();
-                if (SYSCalendar.sameDay(jdcAB.getDate(), new Date()) == 0) {
-                    OPDE.debug("jdcAB steht auf HEUTE");
-                    if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
-                        OPDE.debug("jdcAB und jdcAN sind gleich");
-                        hm.put("AnDatum", new Timestamp(SYSCalendar.startOfDay()));
-                        hm.put("AbDatum", new Timestamp(SYSCalendar.endOfDay()));
-                    } else {
-                        hm.put("AbDatum", "!NOW!");
-                    }
-                } else {
-                    OPDE.debug("jdcAB steht nicht auf HEUTE");
-                    hm.put("AbDatum", new Timestamp(SYSCalendar.endOfDay(jdcAB.getDate())));
-                }
-                hm.put("AbUKennung", lblAB.getText());
-            } else {
-                //abdatum = new Date(SYSConst.BIS_AUF_WEITERES.getTimeInMillis());
-                abarztid = 0l;
-                abkhid = 0l;
-                hm.put("AbDatum", "!BAW!");
-            }
+        } finally {
 
-            hm.put("AnArztID", ((ListElement) cmbAN.getSelectedItem()).getPk());
-            hm.put("AnKHID", ((ListElement) cmbKHAn.getSelectedItem()).getPk());
-            hm.put("AbArztID", abarztid);
-            hm.put("AbKHID", abkhid);
-            hm.put("AnUKennung", lblAN.getText());
-            hm.put("Stellplan", cbStellplan.isSelected());
-            hm.put("BisPackEnde", cbPackEnde.isSelected());
-            hm.put("Bemerkung", txtBemerkung.getText());
-            hm.put("MassID", ((ListElement) cmbMass.getSelectedItem()).getPk());
-            hm.put("DafID", dafid);
-            long sitid = 0;
-            if (cmbSit.getSelectedIndex() > -1) {
-                sitid = ((ListElement) cmbSit.getSelectedItem()).getPk();
-            }
-            hm.put("SitID", sitid);
-
-            // Sicherung
-            if (editMode == NEW_MODE) { // =================== NEU ====================
-                // Bei einer neuen Verordnung kann einfach eingetragen werden. Die BHP spielt hier keine Rolle.
-                hm.put("VerKennung", OPDE.getDb().getUID("__verkenn"));
-                verid = DBHandling.insertRecord("BHPVerordnung", hm);
-                if (verid < 0) {
-                    throw new SQLException();
-                }
-            } else if (editMode == EDIT_MODE) { // =================== KORREKTUR ====================
-                // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
-                if (!DBHandling.updateRecord("BHPVerordnung", hm, "VerID", verid)) {
-                    throw new SQLException();
-                }
-                op.care.verordnung.DBHandling.deleteBHP(verid);
-            } else if (editMode == CHANGE_MODE) { // =================== VERÄNDERUNG ====================
-                // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
-                // Dann werden die nicht mehr benötigten BHPs entfernt.
-                // Dann wird die neue Verordnung angesetzt.
-                hm.put("VerKennung", verkennung);
-                if (!op.care.verordnung.DBHandling.absetzen(verid, ((ListElement) cmbAN.getSelectedItem()).getPk(), ((ListElement) cmbKHAn.getSelectedItem()).getPk())) {
-                    throw new SQLException("Fehler beim Absetzen");
-                }
-                //op.care.verordnung.DBHandling.cleanBHP(verid, SYSCalendar.nowDB());
-                hm.put("AnDatum", "!NOW+1!");
-                verid = DBHandling.insertRecord("BHPVerordnung", hm);
-            } else {
-                throw new SQLException();
-            }
-            // Die bisher nur als TMP markierten Einträge werden in GÜLTIG geändert.
-            op.care.verordnung.DBHandling.tmp2real(verid);
-
-            OPDE.getDb().db.commit();
-            OPDE.getDb().db.setAutoCommit(true);
-
-        } catch (SQLException ex) {
-            try {
-                OPDE.debug(ex.getMessage());
-                OPDE.getDb().db.rollback();
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
         }
+
+//            if (cbAB.isSelected()) {
+//                abarztid = ((ListElement) cmbAB.getSelectedItem()).getPk();
+//                abkhid = ((ListElement) cmbKHAb.getSelectedItem()).getPk();
+//                if (SYSCalendar.sameDay(jdcAB.getDate(), new Date()) == 0) {
+//                    OPDE.debug("jdcAB steht auf HEUTE");
+//                    if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
+//                        OPDE.debug("jdcAB und jdcAN sind gleich");
+//                        hm.put("AnDatum", new Timestamp(SYSCalendar.startOfDay()));
+//                        hm.put("AbDatum", new Timestamp(SYSCalendar.endOfDay()));
+//                    } else {
+//                        hm.put("AbDatum", "!NOW!");
+//                    }
+//                } else {
+//                    OPDE.debug("jdcAB steht nicht auf HEUTE");
+//                    hm.put("AbDatum", new Timestamp(SYSCalendar.endOfDay(jdcAB.getDate())));
+//                }
+//                hm.put("AbUKennung", lblAB.getText());
+//            } else {
+//                //abdatum = new Date(SYSConst.BIS_AUF_WEITERES.getTimeInMillis());
+//                abarztid = 0l;
+//                abkhid = 0l;
+//                hm.put("AbDatum", "!BAW!");
+//            }
+//
+//            hm.put("AnArztID", ((ListElement) cmbAN.getSelectedItem()).getPk());
+//            hm.put("AnKHID", ((ListElement) cmbKHAn.getSelectedItem()).getPk());
+//            hm.put("AbArztID", abarztid);
+//            hm.put("AbKHID", abkhid);
+//            hm.put("AnUKennung", lblAN.getText());
+//            hm.put("Stellplan", cbStellplan.isSelected());
+//            hm.put("BisPackEnde", cbPackEnde.isSelected());
+//            hm.put("Bemerkung", txtBemerkung.getText());
+//            hm.put("MassID", ((ListElement) cmbMass.getSelectedItem()).getPk());
+//            hm.put("DafID", dafid);
+//            long sitid = 0;
+//            if (cmbSit.getSelectedIndex() > -1) {
+//                sitid = ((ListElement) cmbSit.getSelectedItem()).getPk();
+//            }
+//            hm.put("SitID", sitid);
+//
+//            // Sicherung
+//            if (editMode == NEW_MODE) { // =================== NEU ====================
+//                // Bei einer neuen Verordnung kann einfach eingetragen werden. Die BHP spielt hier keine Rolle.
+//                hm.put("VerKennung", OPDE.getDb().getUID("__verkenn"));
+//                verid = DBHandling.insertRecord("BHPVerordnung", hm);
+//                if (verid < 0) {
+//                    throw new SQLException();
+//                }
+//            } else if (editMode == EDIT_MODE) { // =================== KORREKTUR ====================
+//                // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
+//                if (!DBHandling.updateRecord("BHPVerordnung", hm, "VerID", verid)) {
+//                    throw new SQLException();
+//                }
+//                op.care.verordnung.DBHandling.deleteBHP(verid);
+//            } else if (editMode == CHANGE_MODE) { // =================== VERÄNDERUNG ====================
+//                // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
+//                // Dann werden die nicht mehr benötigten BHPs entfernt.
+//                // Dann wird die neue Verordnung angesetzt.
+//                hm.put("VerKennung", verkennung);
+//                if (!op.care.verordnung.DBHandling.absetzen(verid, ((ListElement) cmbAN.getSelectedItem()).getPk(), ((ListElement) cmbKHAn.getSelectedItem()).getPk())) {
+//                    throw new SQLException("Fehler beim Absetzen");
+//                }
+//                //op.care.verordnung.DBHandling.cleanBHP(verid, SYSCalendar.nowDB());
+//                hm.put("AnDatum", "!NOW+1!");
+//                verid = DBHandling.insertRecord("BHPVerordnung", hm);
+//            } else {
+//                throw new SQLException();
+//            }
+//            // Die bisher nur als TMP markierten Einträge werden in GÜLTIG geändert.
+//            op.care.verordnung.DBHandling.tmp2real(verid);
+//
+//            OPDE.getDb().db.commit();
+//            OPDE.getDb().db.setAutoCommit(true);
+//
+//        } catch (SQLException ex) {
+//            try {
+//                OPDE.debug(ex.getMessage());
+//                OPDE.getDb().db.rollback();
+//            } catch (SQLException ex1) {
+//                new DlgException(ex1);
+//                ex1.printStackTrace();
+//                System.exit(1);
+//            }
+//            new DlgException(ex);
+//        }
 
         // Wenn bisher noch keine Dosierungen eingetragen wurden, dann fragt das System jetzt nach.
 //        if (tblDosis.getModel().getRowCount() == 0){
@@ -1035,9 +1187,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (tblDosis.getModel().getRowCount() > 0 && cmbSit.getSelectedIndex() < 0) {
             try {
                 if (editMode == CHANGE_MODE) {
-                    BHPImport.importBHP(verordnung, new Date());
+                    BHPTools.importBHP(verordnung, new Date());
                 } else {
-                    BHPImport.importBHP(verordnung);
+                    BHPTools.importBHP(verordnung);
                 }
             } catch (Exception e) {
                 new DlgException(e);
@@ -1053,7 +1205,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
 //            JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde geändert. Bitte zuerst speichern.");
 //            return;
 //        }
-        if (abgesetzt && !SYSCalendar.isInFuture(jdcAB.getDate().getTime())) {
+        if (verordnung.isAbgesetzt() && !SYSCalendar.isInFuture(jdcAB.getDate().getTime())) {
             JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
             return;
         }
@@ -1083,13 +1235,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 //Date ldatum = null;
                 DlgVerabreichung dlg = new DlgVerabreichung(parent, 0, verid, dafid, cmbSit.getSelectedIndex() >= 0);
                 dlg = null;
-                pleaseDropTmp = true;
                 reloadTable();
             }
         });
         menu.add(itemPopupNew);
         // Bei Bedarfsmedikation kann immer nur eine Dosis eingegeben werden.
-        itemPopupNew.setEnabled(!beiBedarf || tm.getRowCount() == 0);
+        itemPopupNew.setEnabled(!verordnung.isBedarf() || tm.getRowCount() == 0);
 
         JMenuItem itemPopupEditText = new JMenuItem("Bearbeiten");
         itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
@@ -1130,7 +1281,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         }
         if (txtMed.getText().equals("")) {
             cmbMed.setModel(new DefaultComboBoxModel());
-            dafid = 0;
+
             cmbMass.setEnabled(true);
             cbStellplan.setEnabled(true);
             cbStellplan.setSelected(false);
@@ -1143,15 +1294,25 @@ public class DlgVerordnung extends javax.swing.JDialog {
         } else {
             if (txtMed.getText().matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
                 String pzn = txtMed.getText();
+
+                EntityManager em = OPDE.createEM();
                 pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
-                HashMap pznsuche = op.tools.DBRetrieve.getSingleRecord("MPackung", "PZN", pzn);
-                if (pznsuche != null) {
-                    long d = ((BigInteger) pznsuche.get("DafID")).longValue();
-                    //long mpid = ((BigInteger) pznsuche.get("MPID")).longValue();
-                    cmbMed.setModel(op.care.med.DBHandling.getMedis(d));
+                Query pznQuery = em.createNamedQuery("MedPackung.findByPzn");
+                pznQuery.setParameter("pzn", pzn);
+
+                try {
+                    MedPackung medPackung = (MedPackung) pznQuery.getSingleResult();
+                    cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{medPackung.getDarreichung()}));
+                } catch (NoResultException nre) {
+                    OPDE.debug("Nichts passendes zu dieser PZN gefunden");
+                } catch (Exception e) {
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
                 }
+
             } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
-                cmbMed.setModel(op.care.med.DBHandling.getMedis(txtMed.getText()));
+                cmbMed.setModel(new DefaultComboBoxModel(DarreichungTools.findDarreichungByMedProduktText(txtMed.getText()).toArray()));
             }
 
             if (cmbMed.getModel().getSize() > 0) {
@@ -1167,17 +1328,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 cbPackEnde.setSelected(false);
                 ignoreEvent = false;
             }
-            cbPackEnde.setEnabled(!beiBedarf && cmbMed.getModel().getSize() > 0);
+            cbPackEnde.setEnabled(!verordnung.isBedarf() && cmbMed.getModel().getSize() > 0);
         }
     }//GEN-LAST:event_txtMedCaretUpdate
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        try {
-            op.care.verordnung.DBHandling.dropTmp();
-            pleaseDropTmp = false;
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
+
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
@@ -1185,7 +1341,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (ignoreEvent) {
             return;
         }
-        ((JComboBox) evt.getSource()).setToolTipText(((JComboBox) evt.getSource()).getSelectedItem().toString());
+        verordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());
         saveOK();
     }//GEN-LAST:event_cmbANItemStateChanged
 
@@ -1198,38 +1354,47 @@ public class DlgVerordnung extends javax.swing.JDialog {
         cmbKHAb.setEnabled(cbAB.isSelected());
         cmbAB.setSelectedIndex(0);
         cmbKHAb.setSelectedIndex(0);
-        jdcAB.setDate(SYSCalendar.today_date());
+        jdcAB.setDate(new Date());
         jdcAB.setMinSelectableDate(jdcAN.getDate());
         lblAB.setText(cbAB.isSelected() ? OPDE.getLogin().getUser().getUKennung() : "");
         saveOK();
     }//GEN-LAST:event_cbABActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (pleaseDropTmp) {
-            try {
-                op.care.verordnung.DBHandling.dropTmp();
-            } catch (SQLException ex) {
-                new DlgException(ex);
-            }
-        }
         dispose();
     }//GEN-LAST:event_formWindowClosing
 
-    private void fillÄrzte() {
-        ResultSet rs1 = DBRetrieve.getResultSet("Arzt", new String[]{"ArztID", "Name", "Vorname", "Ort"}, new String[]{"Name", "Vorname"});
-        cmbAN.setModel(SYSTools.rs2cmb(rs1, true));
-        cmbAB.setModel(SYSTools.rs2cmb(rs1, true));
+    private void fillAerzteUndKHs() {
+        EntityManager em = OPDE.createEM();
+        Query queryArzt = em.createNamedQuery("Arzt.findAll");
+        List<Arzt> listAerzte = queryArzt.getResultList();
+        listAerzte.add(0, null);
+
+        Query queryKH = em.createNamedQuery("Krankenhaus.findAll");
+        List<Krankenhaus> listKH = queryKH.getResultList();
+        listKH.add(0, null);
+
+        cmbAN.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
+        cmbAB.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
+        cmbAN.setRenderer(ArztTools.getArztRenderer());
+        cmbAB.setRenderer(ArztTools.getArztRenderer());
         cmbAN.setSelectedIndex(0);
         cmbAB.setSelectedIndex(0);
-        ResultSet rs2 = DBRetrieve.getResultSet("KH", new String[]{"KHID", "Name", "Ort"}, new String[]{"Name"});
-        cmbKHAn.setModel(SYSTools.rs2cmb(rs2, true));
-        cmbKHAb.setModel(SYSTools.rs2cmb(rs2, true));
+
+        cmbKHAn.setModel(new DefaultComboBoxModel(listKH.toArray()));
+        cmbKHAb.setModel(new DefaultComboBoxModel(listKH.toArray()));
+        cmbKHAn.setRenderer(KrankenhausTools.getKHRenderer());
+        cmbKHAb.setRenderer(KrankenhausTools.getKHRenderer());
+        cmbKHAn.setSelectedIndex(0);
+        cmbKHAb.setSelectedIndex(0);
+
+        em.close();
     }
 
     private void reloadTable() {
         String zubereitung = "x";
-        if (dafid > 0) {
-            zubereitung = op.care.med.DBHandling.getAnwEinheit(dafid);
+        if (verordnung.getDarreichung() != null) {
+            zubereitung = verordnung.getDarreichung().getMedForm().getZubereitung();
         }
 
         tblDosis.setModel(new TMDosis(zubereitung));
@@ -1250,48 +1415,47 @@ public class DlgVerordnung extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgMedikament;
-    private javax.swing.JButton btnBedarf;
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnMed;
-    private javax.swing.JButton btnSave;
-    private javax.swing.JCheckBox cbAB;
-    private javax.swing.JCheckBox cbPackEnde;
-    private javax.swing.JCheckBox cbStellplan;
-    private javax.swing.JComboBox cmbAB;
-    private javax.swing.JComboBox cmbAN;
-    private javax.swing.JComboBox cmbKHAb;
-    private javax.swing.JComboBox cmbKHAn;
-    private javax.swing.JComboBox cmbMass;
-    private javax.swing.JComboBox cmbMed;
-    private javax.swing.JComboBox cmbSit;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private com.toedter.calendar.JDateChooser jdcAB;
-    private com.toedter.calendar.JDateChooser jdcAN;
-    private javax.swing.JScrollPane jspDosis;
-    private javax.swing.JLabel lblAB;
-    private javax.swing.JLabel lblAN;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JLabel lblTitle;
-    private javax.swing.JLabel lblVerordnung;
-    private javax.swing.JTable tblDosis;
-    private javax.swing.JTextPane txtBemerkung;
-    private javax.swing.JTextField txtMed;
-    private javax.swing.JTextField txtSit;
+    private JLabel lblBW;
+    private JLabel lblTitle;
+    private JSeparator jSeparator1;
+    private JPanel jPanel1;
+    private JComboBox cmbSit;
+    private JTextField txtMed;
+    private JComboBox cmbMed;
+    private JComboBox cmbMass;
+    private JTextField txtSit;
+    private JButton btnBedarf;
+    private JButton btnMed;
+    private JPanel jPanel8;
+    private JScrollPane jspDosis;
+    private JTable tblDosis;
+    private JCheckBox cbPackEnde;
+    private JCheckBox cbStellplan;
+    private JLabel jLabel6;
+    private JPanel jPanel3;
+    private JPanel jPanel4;
+    private JLabel jLabel3;
+    private JDateChooser jdcAB;
+    private JLabel jLabel4;
+    private JComboBox cmbAB;
+    private JCheckBox cbAB;
+    private JLabel lblAB;
+    private JComboBox cmbKHAb;
+    private JScrollPane jScrollPane3;
+    private JTextPane txtBemerkung;
+    private JLabel jLabel5;
+    private JPanel jPanel2;
+    private JLabel jLabel1;
+    private JDateChooser jdcAN;
+    private JComboBox cmbAN;
+    private JLabel jLabel2;
+    private JLabel lblAN;
+    private JComboBox cmbKHAn;
+    private JSeparator jSeparator2;
+    private JButton btnSave;
+    private JButton btnClose;
+    private JPanel jPanel5;
+    private JLabel lblVerordnung;
     // End of variables declaration//GEN-END:variables
 //    class HandleSelections implements ListSelectionListener {
 //        public void valueChanged(ListSelectionEvent lse) {

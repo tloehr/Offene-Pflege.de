@@ -10,6 +10,7 @@ import op.tools.SYSConst;
  * To change this template use File | Settings | File Templates.
  */
 public class MedFormenTools {
+    public static final String EINHEIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
 
     public static String getAnwText(MedFormen form) {
 
