@@ -1,17 +1,22 @@
 package entity.verordnungen;
 
+import entity.Users;
+import op.OPDE;
+import op.tools.SYSConst;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 
 @Entity
 @Table(name = "MPBestand")
 @NamedQueries({
         @NamedQuery(name = "MedBestand.findAll", query = "SELECT m FROM MedBestand m"),
         @NamedQuery(name = "MedBestand.findByBestID", query = "SELECT m FROM MedBestand m WHERE m.bestID = :bestID"),
-        @NamedQuery(name = "MedBestand.findByUKennung", query = "SELECT m FROM MedBestand m WHERE m.uKennung = :uKennung"),
         @NamedQuery(name = "MedBestand.findByEin", query = "SELECT m FROM MedBestand m WHERE m.ein = :ein"),
         @NamedQuery(name = "MedBestand.findByAnbruch", query = "SELECT m FROM MedBestand m WHERE m.anbruch = :anbruch"),
         @NamedQuery(name = "MedBestand.findByAus", query = "SELECT m FROM MedBestand m WHERE m.aus = :aus"),
@@ -20,7 +25,9 @@ import java.util.Date;
         @NamedQuery(name = "MedBestand.findByDarreichungAndBewohnerImAnbruch", query = " " +
                 " SELECT b FROM MedBestand b WHERE b.vorrat.bewohner = :bewohner AND b.darreichung = :darreichung " +
                 " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
-
+        @NamedQuery(name = "MedBestand.findByVorratImAnbruch", query = " " +
+                " SELECT b FROM MedBestand b WHERE b.vorrat = :vorrat " +
+                " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
         @NamedQuery(name = "MedBestand.findByBewohnerImAnbruchMitSalden", query = " " +
                 " SELECT best, SUM(buch.menge) FROM MedBestand best" +
                 " JOIN best.buchungen buch" +
@@ -36,10 +43,6 @@ public class MedBestand implements Serializable {
     @Basic(optional = false)
     @Column(name = "BestID")
     private Long bestID;
-
-    @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
     @Basic(optional = false)
     @Column(name = "Ein")
     @Temporal(TemporalType.TIMESTAMP)
@@ -61,10 +64,18 @@ public class MedBestand implements Serializable {
     public MedBestand() {
     }
 
-    public MedBestand(Long bestID) {
-        this.bestID = bestID;
+    public MedBestand(BigDecimal apv, MedVorrat vorrat, Darreichung darreichung, MedPackung packung, String text) {
+        this.apv = apv;
+        this.vorrat = vorrat;
+        this.darreichung = darreichung;
+        this.packung = packung;
+        this.text = text;
+        this.ein = new Date();
+        this.anbruch = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.aus = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.user = OPDE.getLogin().getUser();
+        this.buchungen = new ArrayList<MedBuchungen>();
     }
-
 
     public Long getBestID() {
         return bestID;
@@ -72,14 +83,6 @@ public class MedBestand implements Serializable {
 
     public void setBestID(Long bestID) {
         this.bestID = bestID;
-    }
-
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
     }
 
     public Date getEin() {
@@ -145,6 +148,19 @@ public class MedBestand implements Serializable {
     @ManyToOne
     private MedBestand naechsterBestand;
 
+    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
+
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
     public Collection<MedBuchungen> getBuchungen() {
         return buchungen;
     }
@@ -162,7 +178,7 @@ public class MedBestand implements Serializable {
         return vorrat;
     }
 
-    public boolean hasNextBestand(){
+    public boolean hasNextBestand() {
         return naechsterBestand != null;
     }
 

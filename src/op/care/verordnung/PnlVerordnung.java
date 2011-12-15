@@ -63,7 +63,7 @@ import java.util.logging.Logger;
 public class PnlVerordnung extends CleanablePanel {
 
     public static final String internalClassID = "nursingrecords.prescription";
-    private String bwkennung;
+
     private Bewohner bewohner;
     private FrmPflege parent;
     private boolean readOnly = false;
@@ -91,7 +91,6 @@ public class PnlVerordnung extends CleanablePanel {
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
-        this.bwkennung = bewohner.getBWKennung();
 
         if (myRunningClass != null){
             SYSRunningClassesTools.endModule(myRunningClass);
@@ -475,7 +474,7 @@ public class PnlVerordnung extends CleanablePanel {
 
             String html = SYSTools.htmlUmlautConversion(op.care.verordnung.DBHandling.getVerordnungenAsHTML(tm, bewohner, sel));
 
-            out.write(SYSTools.addHTMLTitle(html, SYSTools.getBWLabel(bwkennung), true));
+            out.write(SYSTools.addHTMLTitle(html, BewohnerTools.getBWLabelText(bewohner), true));
 
             out.close();
             SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
@@ -550,7 +549,7 @@ public class PnlVerordnung extends CleanablePanel {
             itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgVerordnung(parent, bwkennung, verordnung, DlgVerordnung.EDIT_MODE);
+                    new DlgVerordnung(parent, verordnung, DlgVerordnung.EDIT_MODE);
                     reloadTable();
                 }
             });
@@ -563,7 +562,7 @@ public class PnlVerordnung extends CleanablePanel {
             itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgVerordnung(parent, bwkennung, verordnung, DlgVerordnung.CHANGE_MODE);
+                    new DlgVerordnung(parent, verordnung, DlgVerordnung.CHANGE_MODE);
                     loadTable();
                 }
             });
@@ -587,7 +586,7 @@ public class PnlVerordnung extends CleanablePanel {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(parent, "Soll die Verordnung wirklich gelöscht werden.",
                             "Verordnung löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        op.care.verordnung.DBHandling.deleteVerordnung(verordnung.getVerid());
+                        op.care.verordnung.DBHandling.deleteVerordnung(verordnung);
                         loadTable();
                     }
                 }
@@ -607,7 +606,7 @@ public class PnlVerordnung extends CleanablePanel {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
                         try {
-                            new DlgBestandAbschliessen(parent, bestandImAnbruch.getBestID());
+                            new DlgBestandAbschliessen(parent, bestandImAnbruch);
                             Thread.sleep(1000);
                             reloadTable();
                         } catch (InterruptedException ex) {
@@ -627,7 +626,7 @@ public class PnlVerordnung extends CleanablePanel {
                             Thread.sleep(1000);
                             reloadTable();
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(PnlBHP.class.getName()).log(Level.SEVERE, null, ex);
+                            OPDE.fatal(ex);
                         }
                     }
                 });
@@ -669,7 +668,7 @@ public class PnlVerordnung extends CleanablePanel {
                     double apvBest = 0d;
                     if (bestandImAnbruch != null) {
                         dafid = bestandImAnbruch.getDarreichung().getDafID();
-                        apv = op.care.med.DBHandling.getAPV(dafid, bwkennung);
+                        apv = op.care.med.DBHandling.getAPV(dafid, bewohner,"");
                         apvBest = bestandImAnbruch.getApv().doubleValue();
                     }
                     JOptionPane.showMessageDialog(parent, "VerID: " + verordnung.getVerid() + "\nVorID: " + bestandImAnbruch.getVorrat().getVorID() + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
@@ -684,7 +683,7 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
-        new DlgVorrat(this.parent, bwkennung);
+        new DlgVorrat(this.parent, bewohner, "");
         loadTable();
     }//GEN-LAST:event_btnVorratActionPerformed
 
@@ -729,7 +728,7 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_cbAbgesetztActionPerformed
 
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
-        new DlgBestand(parent, bwkennung);
+        new DlgBestand(parent, bewohner, "");
         loadTable();
     }//GEN-LAST:event_btnBuchenActionPerformed
 
@@ -757,7 +756,7 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_jspVerordnungComponentResized
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        new DlgVerordnung(parent, bwkennung);
+        new DlgVerordnung(parent, bewohner);
         loadTable();
     }//GEN-LAST:event_btnNewActionPerformed
 

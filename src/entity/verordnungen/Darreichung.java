@@ -2,6 +2,7 @@ package entity.verordnungen;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 
 @Entity
 @Table(name = "MPDarreichung")
@@ -54,6 +55,16 @@ public class Darreichung implements Serializable {
     public void setUKennung(String uKennung) {
         this.uKennung = uKennung;
     }
+
+    public Collection<MedPackung> getPackungen() {
+        return packungen;
+    }
+
+    // ==
+    // 1:N Relationen
+    // ==
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
+    private Collection<MedPackung> packungen;
 
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")

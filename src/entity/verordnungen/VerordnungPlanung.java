@@ -1,6 +1,7 @@
 package entity.verordnungen;
 
 import entity.Users;
+import op.OPDE;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -120,6 +121,16 @@ public class VerordnungPlanung implements Serializable {
             maxAnzahl = 0;
             maxEDosis = BigDecimal.ZERO;
         }
+
+        mon = 0;
+        die = 0;
+        mit = 0;
+        don = 0;
+        fre = 0;
+        sam = 0;
+        son = 0;
+
+        user = OPDE.getLogin().getUser();
 
     }
 

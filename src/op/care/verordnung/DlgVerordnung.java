@@ -33,9 +33,10 @@ import entity.*;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.DlgMediAssistent;
-import op.tools.DBHandling;
+
 import op.tools.*;
 import org.apache.commons.beanutils.BeanUtils;
+import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -54,7 +55,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -942,11 +942,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private void btnBedarfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBedarfActionPerformed
         if (JOptionPane.showConfirmDialog(this, "\"" + txtSit.getText() + "\"", "Situation hinzufügen",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-            HashMap hm = new HashMap();
-            hm.put("Text", txtSit.getText());
-            long sitid = DBHandling.insertRecord("Situationen", hm);
-            hm.clear();
-            cmbSit.setModel(op.care.med.DBHandling.getSit(sitid));
+
+            Situationen neueSituation = new Situationen(txtSit.getText());
+            EntityTools.persist(neueSituation);
+
+            cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{neueSituation}));
             cbPackEnde.setEnabled(false);
             ignoreEvent = true;
             cbPackEnde.setSelected(false);
@@ -974,7 +974,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Date ldatum = null;
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, 0, verordnung, cmbSit.getSelectedIndex() >= 0);
+                DlgVerabreichung dlg = new DlgVerabreichung(parent, verordnung);
                 dlg = null;
                 reloadTable();
             }
@@ -1201,18 +1201,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (!evt.isPopupTrigger()) {
             return;
         }
-//        if (formDirty){
-//            JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde geändert. Bitte zuerst speichern.");
-//            return;
-//        }
+
         if (verordnung.isAbgesetzt() && !SYSCalendar.isInFuture(jdcAB.getDate().getTime())) {
             JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
             return;
         }
-//        if (bhpVorhanden){
-//            JOptionPane.showMessageDialog(tblDosis, "Verordnung ist schon in Betrieb. Sie können diese nicht mehr ändern.");
-//            return;
-//        }
+
         final TMDosis tm = (TMDosis) tblDosis.getModel();
         if (tm.getRowCount() == 0) {
             return;
@@ -1222,7 +1216,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
         final int row = tblDosis.rowAtPoint(p);
         ListSelectionModel lsm = tblDosis.getSelectionModel();
         lsm.setSelectionInterval(row, row);
-        final long bhppid = ((Long) tm.getValueAt(row, TMDosis.COL_BHPPID)).longValue();
+
+
+        //final long bhppid = ((Long) tm.getValueAt(row, TMDosis.COL_BHPPID)).longValue();
+
+
 
         // Menüeinträge
         SYSTools.unregisterListeners(menu);
@@ -1233,7 +1231,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 //Date ldatum = null;
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, 0, verid, dafid, cmbSit.getSelectedIndex() >= 0);
+                DlgVerabreichung dlg = new DlgVerabreichung(parent, verordnung);
                 dlg = null;
                 reloadTable();
             }
@@ -1246,7 +1244,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
         itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, bhppid, verid, dafid, cmbSit.getSelectedIndex() >= 0);
+                VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
+                DlgVerabreichung dlg = new DlgVerabreichung(parent, planung, verordnung);
                 dlg = null;
                 reloadTable();
             }
@@ -1259,7 +1258,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DBHandling.deleteRecords("BHPPlanung", "BHPPID", bhppid);
+                VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
+                verordnung.getPlanungen().remove(planung);
                 reloadTable();
             }
         });
@@ -1397,7 +1397,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
             zubereitung = verordnung.getDarreichung().getMedForm().getZubereitung();
         }
 
-        tblDosis.setModel(new TMDosis(zubereitung));
+        tblDosis.setModel(new TMDosis(zubereitung, verordnung));
         tblDosis.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
         tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setCellRenderer(new RNDHTML());

@@ -1,5 +1,8 @@
 package entity.verordnungen;
 
+import entity.Users;
+import op.OPDE;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -9,14 +12,12 @@ import java.util.Date;
 @Entity
 @Table(name = "MPBuchung")
 @NamedQueries({
-    @NamedQuery(name = "MedBuchungen.findAll", query = "SELECT m FROM MedBuchungen m"),
-    @NamedQuery(name = "MedBuchungen.findByBuchID", query = "SELECT m FROM MedBuchungen m WHERE m.buchID = :buchID"),
-    @NamedQuery(name = "MedBuchungen.findByBhpid", query = "SELECT m FROM MedBuchungen m WHERE m.bhpid = :bhpid"),
-    @NamedQuery(name = "MedBuchungen.findByMenge", query = "SELECT m FROM MedBuchungen m WHERE m.menge = :menge"),
-    @NamedQuery(name = "MedBuchungen.findByText", query = "SELECT m FROM MedBuchungen m WHERE m.text = :text"),
-    @NamedQuery(name = "MedBuchungen.findByUKennung", query = "SELECT m FROM MedBuchungen m WHERE m.uKennung = :uKennung"),
-    @NamedQuery(name = "MedBuchungen.findByStatus", query = "SELECT m FROM MedBuchungen m WHERE m.status = :status"),
-    @NamedQuery(name = "MedBuchungen.findByPit", query = "SELECT m FROM MedBuchungen m WHERE m.pit = :pit")})
+        @NamedQuery(name = "MedBuchungen.findAll", query = "SELECT m FROM MedBuchungen m"),
+        @NamedQuery(name = "MedBuchungen.findByBuchID", query = "SELECT m FROM MedBuchungen m WHERE m.buchID = :buchID"),
+        @NamedQuery(name = "MedBuchungen.findByMenge", query = "SELECT m FROM MedBuchungen m WHERE m.menge = :menge"),
+        @NamedQuery(name = "MedBuchungen.findByText", query = "SELECT m FROM MedBuchungen m WHERE m.text = :text"),
+        @NamedQuery(name = "MedBuchungen.findByStatus", query = "SELECT m FROM MedBuchungen m WHERE m.status = :status"),
+        @NamedQuery(name = "MedBuchungen.findByPit", query = "SELECT m FROM MedBuchungen m WHERE m.pit = :pit")})
 public class MedBuchungen implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -32,9 +33,6 @@ public class MedBuchungen implements Serializable {
     @Column(name = "Text")
     private String text;
     @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
-    @Basic(optional = false)
     @Column(name = "Status")
     private short status;
     @Basic(optional = false)
@@ -43,6 +41,15 @@ public class MedBuchungen implements Serializable {
     private Date pit;
 
     public MedBuchungen() {
+    }
+
+    public MedBuchungen(MedBestand bestand, BigDecimal menge) {
+        this.pit = new Date();
+        this.bestand = bestand;
+        this.menge = menge;
+        this.bhp = null;
+        this.status = MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND;
+        this.user = OPDE.getLogin().getUser();
     }
 
     public Long getBuchID() {
@@ -77,14 +84,6 @@ public class MedBuchungen implements Serializable {
         this.text = text;
     }
 
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
-    }
-
     public short getStatus() {
         return status;
     }
@@ -100,11 +99,19 @@ public class MedBuchungen implements Serializable {
     public void setPit(Date pit) {
         this.pit = pit;
     }
-    
+
     // N:1 Relationen
     @JoinColumn(name = "BestID", referencedColumnName = "BestID")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private MedBestand bestand;
+
+    @JoinColumn(name = "BHPID", referencedColumnName = "BHPID")
+    @ManyToOne
+    private BHP bhp;
+
+    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
 
     @Override
     public int hashCode() {

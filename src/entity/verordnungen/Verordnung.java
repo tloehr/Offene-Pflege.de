@@ -126,6 +126,8 @@ public class Verordnung implements Serializable, VorgangElement {
     private Collection<Sysver2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private Collection<SYSVER2VORGANG> attachedVorgaenge;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    private Collection<VerordnungPlanung> planungen;
     // ==
     // N:1 Relationen
     // ==
@@ -322,6 +324,10 @@ public class Verordnung implements Serializable, VorgangElement {
 
     public boolean isBedarf() {
         return situation != null;
+    }
+
+    public Collection<VerordnungPlanung> getPlanungen() {
+        return planungen;
     }
 
     @Override

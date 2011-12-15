@@ -27,10 +27,9 @@
 package op.care.verordnung;
 
 import com.toedter.calendar.JDateChooser;
-import entity.verordnungen.*;
-import op.OPDE;
-import op.tools.DBHandling;
-import op.tools.DBRetrieve;
+import entity.verordnungen.MedFormenTools;
+import entity.verordnungen.Verordnung;
+import entity.verordnungen.VerordnungPlanung;
 import op.tools.*;
 
 import javax.swing.*;
@@ -42,21 +41,16 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 
 /**
  * @author tloehr
  */
 public class DlgVerabreichung extends javax.swing.JDialog {
 
-    private HashMap template;
+    //private HashMap template;
     private JRadioButton dummy;
     private String tage[] = {"Mon", "Die", "Mit", "Don", "Fre", "Sam", "Son"};
     private boolean ignoreEvent = false;
@@ -84,6 +78,10 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         super(parent, true);
         this.parent = parent;
         this.verordnung = verordnung;
+        if (planung == null){
+            planung = new VerordnungPlanung(verordnung);
+            verordnung.getPlanungen().add(planung);
+        }
         this.planung = planung;
         initDialog();
     }
@@ -92,6 +90,10 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         super(parent, true);
         this.parent = parent;
         this.verordnung = verordnung;
+        if (planung == null){
+            planung = new VerordnungPlanung(verordnung);
+            verordnung.getPlanungen().add(planung);
+        }
         this.planung = planung;
         initDialog();
     }
@@ -99,7 +101,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     private void initDialog() {
 
         initComponents();
-        initData();
 
         String einheit = "x";
         if (verordnung.getDarreichung() != null) {
@@ -109,7 +110,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         lblEin1.setText("Einheit: " + einheit);
 
         this.setTitle(SYSTools.getWindowTitle("Dosierung/Häufigkeit"));
-        int selectIndex = 0;
 
         dummy = new JRadioButton();
         bgMonat.add(dummy);
@@ -118,20 +118,20 @@ public class DlgVerabreichung extends javax.swing.JDialog {
 
         ignoreEvent = true;
         if (verordnung.isBedarf()) {
-            txtMaxTimes.setText((template.get("MaxAnzahl")).toString());
-            txtEDosis.setText(Double.toString(Double.parseDouble(template.get("MaxEDosis").toString())));
+            txtMaxTimes.setText(planung.getMaxAnzahl().toString());
+            txtEDosis.setText(planung.getMaxEDosis().toString());
         } else {
             txtMaxTimes.setText("0");
-            txtEDosis.setText("0.0");
+            txtEDosis.setText(BigDecimal.ZERO.toString());
         }
         lblDosis.setEnabled(verordnung.isBedarf());
         lblX.setEnabled(verordnung.isBedarf());
 
-        if (template.get("Uhrzeit") == null) {
+        if (planung.getUhrzeit() == null) {
             cmbUhrzeit.setSelectedIndex(-1);
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-            SYSTools.selectInComboBox(cmbUhrzeit, sdf.format((Time) template.get("Uhrzeit")), true);
+            SYSTools.selectInComboBox(cmbUhrzeit, sdf.format(planung.getUhrzeit()), true);
         }
         spinTaeglich.setModel(new SpinnerNumberModel(0, 0, 365, 1));
         spinWoche.setModel(new SpinnerNumberModel(0, 0, 52, 1));
@@ -139,50 +139,61 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         spinMonatTag.setModel(new SpinnerNumberModel(1, 0, 31, 1));
         spinMonatWTag.setModel(new SpinnerNumberModel(0, 0, 5, 1));
 
-        for (int i = 0; i < 7; i++) {
-            if (template.containsKey(tage[i])) {
-                selectIndex = i;
-            }
-        }
-
-        spinTaeglich.setValue(template.get("Taeglich"));
-        rbTag.setSelected(Integer.parseInt(spinTaeglich.getValue().toString()) > 0);
-        spinWoche.setValue(template.get("Woechentlich"));
-        rbWoche.setSelected(Integer.parseInt(spinWoche.getValue().toString()) > 0);
-        spinMonat.setValue(template.get("Monatlich"));
-        rbMonat.setSelected(Integer.parseInt(spinMonat.getValue().toString()) > 0);
-        spinMonatTag.setValue(template.get("TagNum"));
+        spinTaeglich.setValue(planung.getTaeglich());
+        rbTag.setSelected(planung.getTaeglich() > 0);
+        spinWoche.setValue(planung.getWoechentlich());
+        rbWoche.setSelected(planung.getWoechentlich() > 0);
+        spinMonat.setValue(planung.getMonatlich());
+        rbMonat.setSelected(planung.getMonatlich() > 0);
+        spinMonatTag.setValue(planung.getTagNum());
 
 
-        if (((Integer) template.get("Woechentlich")).intValue() > 0) {
-            cbMon.setSelected(((Integer) template.get("Mon")).intValue() > 0);
-            cbDie.setSelected(((Integer) template.get("Die")).intValue() > 0);
-            cbMit.setSelected(((Integer) template.get("Mit")).intValue() > 0);
-            cbDon.setSelected(((Integer) template.get("Don")).intValue() > 0);
-            cbFre.setSelected(((Integer) template.get("Fre")).intValue() > 0);
-            cbSam.setSelected(((Integer) template.get("Sam")).intValue() > 0);
-            cbSon.setSelected(((Integer) template.get("Son")).intValue() > 0);
+        if (planung.getWoechentlich() > 0) {
+            cbMon.setSelected(planung.getMon() > 0);
+            cbDie.setSelected(planung.getDie() > 0);
+            cbMit.setSelected(planung.getMit() > 0);
+            cbDon.setSelected(planung.getDon() > 0);
+            cbFre.setSelected(planung.getFre() > 0);
+            cbSam.setSelected(planung.getSam() > 0);
+            cbSon.setSelected(planung.getSon() > 0);
             rbWoche.setSelected(true);
         }
 
-        if (((Integer) template.get("Monatlich")).intValue() > 0) {
-            if (((Integer) template.get("TagNum")).intValue() > 0) {
-                spinMonatTag.setValue(template.get("TagNum"));
+        if (planung.getMonatlich() > 0) {
+            if (planung.getTagNum() > 0) {
+                spinMonatTag.setValue(planung.getTagNum());
                 rbMonatTag.setSelected(true);
             } else {
-                cmbWTag.setSelectedIndex(selectIndex);
-                spinMonatWTag.setValue(template.get(tage[selectIndex]));
+                if (planung.getMon() > 0) {
+                    cmbWTag.setSelectedIndex(0);
+                    spinMonatWTag.setValue(planung.getMon());
+                } else if (planung.getDie() > 0) {
+                    cmbWTag.setSelectedIndex(1);
+                    spinMonatWTag.setValue(planung.getDie());
+                } else if (planung.getMit() > 0) {
+                    cmbWTag.setSelectedIndex(2);
+                    spinMonatWTag.setValue(planung.getMit());
+                } else if (planung.getDon() > 0) {
+                    cmbWTag.setSelectedIndex(3);
+                    spinMonatWTag.setValue(planung.getDon());
+                } else if (planung.getFre() > 0) {
+                    cmbWTag.setSelectedIndex(4);
+                    spinMonatWTag.setValue(planung.getFre());
+                } else if (planung.getSam() > 0) {
+                    cmbWTag.setSelectedIndex(5);
+                    spinMonatWTag.setValue(planung.getSam());
+                } else if (planung.getSon() > 0) {
+                    cmbWTag.setSelectedIndex(6);
+                    spinMonatWTag.setValue(planung.getSon());
+                }
+
                 rbMonatWTag.setSelected(true);
             }
             rbMonat.setSelected(true);
         }
 
-        if (((Integer) template.get("Taeglich")).intValue() > 0) {
-            rbTag.setSelected(true);
-        }
-
         jdcLDatum.setMinSelectableDate(new Date());
-        jdcLDatum.setDate(new Date(Math.max(((Timestamp) template.get("LDatum")).getTime(), SYSCalendar.startOfDay())));
+        jdcLDatum.setDate(new Date(Math.max(planung.getLDatum().getTime(), SYSCalendar.startOfDay())));
         jdcpcl = new JDCPropertyChangeListener();
         jdcLDatum.getDateEditor().addPropertyChangeListener(jdcpcl);
 
@@ -320,6 +331,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtMaxTimesFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtMaxTimesFocusLost(e);
@@ -349,6 +361,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtEDosisFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtEDosisFocusLost(e);
@@ -358,29 +371,29 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                 GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
                 jPanel2.setLayout(jPanel2Layout);
                 jPanel2Layout.setHorizontalGroup(
-                    jPanel2Layout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                            .addContainerGap(18, Short.MAX_VALUE)
-                            .addComponent(lblDosis)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtMaxTimes, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(lblX)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(txtEDosis, GroupLayout.PREFERRED_SIZE, 134, GroupLayout.PREFERRED_SIZE)
-                            .addContainerGap())
+                        jPanel2Layout.createParallelGroup()
+                                .addGroup(GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                        .addContainerGap(18, Short.MAX_VALUE)
+                                        .addComponent(lblDosis)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtMaxTimes, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblX)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(txtEDosis, GroupLayout.PREFERRED_SIZE, 134, GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap())
                 );
                 jPanel2Layout.setVerticalGroup(
-                    jPanel2Layout.createParallelGroup()
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel2Layout.createParallelGroup()
-                                .addComponent(txtEDosis, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblDosis)
-                                    .addComponent(txtMaxTimes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblX)))
-                            .addContainerGap(59, Short.MAX_VALUE))
+                        jPanel2Layout.createParallelGroup()
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                .addComponent(txtEDosis, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(lblDosis)
+                                                        .addComponent(txtMaxTimes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(lblX)))
+                                        .addContainerGap(59, Short.MAX_VALUE))
                 );
             }
 
@@ -411,11 +424,11 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                 jLabel6.setText("Nachts, fr\u00fch morgens:");
 
                 //---- cmbUhrzeit ----
-                cmbUhrzeit.setModel(new DefaultComboBoxModel(new String[] {
-                    "10:00",
-                    "10:15",
-                    "10:30",
-                    "10:45"
+                cmbUhrzeit.setModel(new DefaultComboBoxModel(new String[]{
+                        "10:00",
+                        "10:15",
+                        "10:30",
+                        "10:45"
                 }));
                 cmbUhrzeit.addItemListener(new ItemListener() {
                     @Override
@@ -448,6 +461,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtNachtMoFocusLost(e);
@@ -474,6 +488,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtNachtAbFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtNachtAbFocusLost(e);
@@ -500,6 +515,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtMittagsFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtMittagsFocusLost(e);
@@ -526,6 +542,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtMorgensFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtMorgensFocusLost(e);
@@ -552,6 +569,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtNachmittagsFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtNachmittagsFocusLost(e);
@@ -578,6 +596,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtAbendsFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtAbendsFocusLost(e);
@@ -604,6 +623,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                     public void focusGained(FocusEvent e) {
                         txtUhrzeitFocusGained(e);
                     }
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtUhrzeitFocusLost(e);
@@ -613,63 +633,63 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                 GroupLayout pnlRegularLayout = new GroupLayout(pnlRegular);
                 pnlRegular.setLayout(pnlRegularLayout);
                 pnlRegularLayout.setHorizontalGroup(
-                    pnlRegularLayout.createParallelGroup()
-                        .addGroup(pnlRegularLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel4)
-                                .addComponent(jLabel3)
-                                .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cmbUhrzeit, GroupLayout.Alignment.TRAILING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel6, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel2, GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel11, GroupLayout.Alignment.TRAILING)))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(txtNachtMo, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                .addComponent(txtMorgens, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                .addComponent(txtMittags, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                .addComponent(txtAbends, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                .addComponent(txtNachtAb, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                .addComponent(txtUhrzeit, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                .addComponent(txtNachmittags, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
-                            .addContainerGap())
+                        pnlRegularLayout.createParallelGroup()
+                                .addGroup(pnlRegularLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                .addComponent(jLabel4)
+                                                .addComponent(jLabel3)
+                                                .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(cmbUhrzeit, GroupLayout.Alignment.TRAILING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel1, GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jLabel6, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel2, GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jLabel11, GroupLayout.Alignment.TRAILING)))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                .addComponent(txtNachtMo, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                .addComponent(txtMorgens, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                .addComponent(txtMittags, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                .addComponent(txtAbends, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                .addComponent(txtNachtAb, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                .addComponent(txtUhrzeit, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                                .addComponent(txtNachmittags, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+                                        .addContainerGap())
                 );
                 pnlRegularLayout.setVerticalGroup(
-                    pnlRegularLayout.createParallelGroup()
-                        .addGroup(pnlRegularLayout.createSequentialGroup()
-                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel6)
-                                .addComponent(txtNachtMo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addGap(6, 6, 6)
-                            .addGroup(pnlRegularLayout.createParallelGroup()
+                        pnlRegularLayout.createParallelGroup()
                                 .addGroup(pnlRegularLayout.createSequentialGroup()
-                                    .addGap(76, 76, 76)
-                                    .addComponent(jLabel11))
-                                .addGroup(pnlRegularLayout.createSequentialGroup()
-                                    .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(txtMorgens, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel1))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(txtMittags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel2))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(txtNachmittags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtAbends, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel3))
-                            .addGap(2, 2, 2)
-                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtNachtAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel4))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(cmbUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap(26, Short.MAX_VALUE))
+                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jLabel6)
+                                                .addComponent(txtNachtMo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addGap(6, 6, 6)
+                                        .addGroup(pnlRegularLayout.createParallelGroup()
+                                                .addGroup(pnlRegularLayout.createSequentialGroup()
+                                                        .addGap(76, 76, 76)
+                                                        .addComponent(jLabel11))
+                                                .addGroup(pnlRegularLayout.createSequentialGroup()
+                                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(txtMorgens, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jLabel1))
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(txtMittags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jLabel2))
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(txtNachmittags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(txtAbends, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel3))
+                                        .addGap(2, 2, 2)
+                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(txtNachtAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel4))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlRegularLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(txtUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(cmbUhrzeit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addContainerGap(26, Short.MAX_VALUE))
                 );
             }
 
@@ -822,14 +842,14 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                 });
 
                 //---- cmbWTag ----
-                cmbWTag.setModel(new DefaultComboBoxModel(new String[] {
-                    "Montag",
-                    "Dienstag",
-                    "Mittwoch",
-                    "Donnerstag",
-                    "Freitag",
-                    "Samstag",
-                    "Sonntag"
+                cmbWTag.setModel(new DefaultComboBoxModel(new String[]{
+                        "Montag",
+                        "Dienstag",
+                        "Mittwoch",
+                        "Donnerstag",
+                        "Freitag",
+                        "Samstag",
+                        "Sonntag"
                 }));
                 cmbWTag.addItemListener(new ItemListener() {
                     @Override
@@ -884,141 +904,141 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                 GroupLayout pnlWdhLayout = new GroupLayout(pnlWdh);
                 pnlWdh.setLayout(pnlWdhLayout);
                 pnlWdhLayout.setHorizontalGroup(
-                    pnlWdhLayout.createParallelGroup()
-                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(pnlWdhLayout.createParallelGroup()
+                        pnlWdhLayout.createParallelGroup()
                                 .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addGap(17, 17, 17)
-                                    .addGroup(pnlWdhLayout.createParallelGroup()
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                            .addComponent(rbMonatTag)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                            .addComponent(rbMonatWTag)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)))
-                                    .addGap(20, 20, 20)
-                                    .addGroup(pnlWdhLayout.createParallelGroup()
-                                        .addComponent(jLabel10)
-                                        .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                                .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addComponent(rbWoche)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel8))
-                                .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addComponent(rbTag)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel7))
-                                .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addGap(17, 17, 17)
-                                    .addGroup(pnlWdhLayout.createParallelGroup()
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                            .addComponent(cbFre)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(cbSam)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(cbSon))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                            .addComponent(cbMon)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(cbDie)
-                                            .addGap(16, 16, 16)
-                                            .addComponent(cbMit)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(cbDon))))
-                                .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addComponent(rbMonat)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel9))
-                                .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addComponent(jLabel13)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jdcLDatum, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)))
-                            .addContainerGap())
+                                        .addContainerGap()
+                                        .addGroup(pnlWdhLayout.createParallelGroup()
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addGap(17, 17, 17)
+                                                        .addGroup(pnlWdhLayout.createParallelGroup()
+                                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                                        .addComponent(rbMonatTag)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
+                                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                                        .addComponent(rbMonatWTag)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)))
+                                                        .addGap(20, 20, 20)
+                                                        .addGroup(pnlWdhLayout.createParallelGroup()
+                                                                .addComponent(jLabel10)
+                                                                .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addComponent(rbWoche)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(jLabel8))
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addComponent(rbTag)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(jLabel7))
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addGap(17, 17, 17)
+                                                        .addGroup(pnlWdhLayout.createParallelGroup()
+                                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                                        .addComponent(cbFre)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(cbSam)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(cbSon))
+                                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                                        .addComponent(cbMon)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(cbDie)
+                                                                        .addGap(16, 16, 16)
+                                                                        .addComponent(cbMit)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(cbDon))))
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addComponent(rbMonat)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(jLabel9))
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addComponent(jLabel13)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(jdcLDatum, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)))
+                                        .addContainerGap())
                 );
                 pnlWdhLayout.setVerticalGroup(
-                    pnlWdhLayout.createParallelGroup()
-                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbTag)
-                                .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel7))
-                            .addGap(18, 18, 18)
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbWoche)
-                                .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel8))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbMon)
-                                .addComponent(cbDie)
-                                .addComponent(cbMit)
-                                .addComponent(cbDon))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbFre)
-                                .addComponent(cbSam)
-                                .addComponent(cbSon))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbMonat)
-                                .addComponent(jLabel9)
-                                .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbMonatTag)
-                                .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel10))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbMonatWTag)
-                                .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(pnlWdhLayout.createParallelGroup()
+                        pnlWdhLayout.createParallelGroup()
                                 .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jLabel13))
-                                .addGroup(pnlWdhLayout.createSequentialGroup()
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jdcLDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                            .addContainerGap(138, Short.MAX_VALUE))
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(rbTag)
+                                                .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel7))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(rbWoche)
+                                                .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel8))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbMon)
+                                                .addComponent(cbDie)
+                                                .addComponent(cbMit)
+                                                .addComponent(cbDon))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbFre)
+                                                .addComponent(cbSam)
+                                                .addComponent(cbSon))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(rbMonat)
+                                                .addComponent(jLabel9)
+                                                .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(rbMonatTag)
+                                                .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel10))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(rbMonatWTag)
+                                                .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(pnlWdhLayout.createParallelGroup()
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addGap(18, 18, 18)
+                                                        .addComponent(jLabel13))
+                                                .addGroup(pnlWdhLayout.createSequentialGroup()
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                        .addComponent(jdcLDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                        .addContainerGap(138, Short.MAX_VALUE))
                 );
             }
 
             GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
             jPanel3.setLayout(jPanel3Layout);
             jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup()
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel3Layout.createParallelGroup()
-                                    .addComponent(pnlRegular, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lblEin1, GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(pnlWdh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    jPanel3Layout.createParallelGroup()
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel3Layout.createParallelGroup()
+                                            .addComponent(pnlRegular, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(lblEin1, GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(pnlWdh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
             );
             jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup()
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(pnlWdh, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                            .addComponent(lblEin1)
-                                            .addGap(1, 1, 1)
-                                            .addComponent(pnlRegular, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                            .addContainerGap())
+                    jPanel3Layout.createParallelGroup()
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                            .addComponent(pnlWdh, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                                    .addComponent(lblEin1)
+                                                    .addGap(1, 1, 1)
+                                                    .addComponent(pnlRegular, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                    .addContainerGap())
             );
         }
 
@@ -1048,22 +1068,22 @@ public class DlgVerabreichung extends javax.swing.JDialog {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnSave)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDiscard)
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(btnSave)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnDiscard)
+                                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnDiscard)
-                            .addComponent(btnSave))
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(btnDiscard)
+                                            .addComponent(btnSave))
+                                    .addContainerGap())
             );
         }
 
@@ -1126,11 +1146,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         super.dispose();
     }
 
-    private void initData() {
-        if (planung == null) {
-            planung = new VerordnungPlanung(verordnung);
-        }
-    }
 
     private void rbMonatWTagActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbMonatWTagActionPerformed
         if (ignoreEvent) {
@@ -1475,78 +1490,59 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     public void save() {
         //HashMap hm = new HashMap();
 
-        hm.put("NachtMo", txtNachtMo.getText());
-        hm.put("Morgens", txtMorgens.getText());
-        hm.put("Mittags", txtMittags.getText());
-        hm.put("Nachmittags", txtNachmittags.getText());
-        hm.put("Abends", txtAbends.getText());
-        hm.put("NachtAb", txtNachtAb.getText());
-        hm.put("UhrzeitDosis", txtUhrzeit.getText());
+        planung.setNachtMo(new BigDecimal(Double.parseDouble(txtNachtMo.getText())));
+        planung.setMorgens(new BigDecimal(Double.parseDouble(txtMorgens.getText())));
+        planung.setMittags(new BigDecimal(Double.parseDouble(txtMittags.getText())));
+        planung.setNachmittags(new BigDecimal(Double.parseDouble(txtNachmittags.getText())));
+        planung.setAbends(new BigDecimal(Double.parseDouble(txtAbends.getText())));
+        planung.setNachtAb(new BigDecimal(Double.parseDouble(txtNachtAb.getText())));
+        planung.setUhrzeitDosis(new BigDecimal(Double.parseDouble(txtUhrzeit.getText())));
+
         ListElement e = (ListElement) cmbUhrzeit.getSelectedItem();
-
         if (e == null) {
-            hm.put("Uhrzeit", null);
+            planung.setUhrzeit(null);
         } else {
-            hm.put("Uhrzeit", new Timestamp(((GregorianCalendar) e.getObject()).getTimeInMillis()));
+            planung.setUhrzeit(new Date(((GregorianCalendar) e.getObject()).getTimeInMillis()));
         }
-        hm.put("MaxAnzahl", txtMaxTimes.getText());
-        hm.put("MaxEDosis", txtEDosis.getText());
+        planung.setMaxAnzahl(Integer.parseInt(txtMaxTimes.getText()));
+        planung.setMaxEDosis(new BigDecimal(Double.parseDouble(txtEDosis.getText())));
 
-        hm.put("Taeglich", spinTaeglich.getValue());
-        hm.put("Woechentlich", spinWoche.getValue());
-        hm.put("Monatlich", spinMonat.getValue());
-        hm.put("TagNum", spinMonatTag.getValue());
+        planung.setTaeglich(Short.parseShort(spinTaeglich.getValue().toString()));
+        planung.setWoechentlich(Short.parseShort(spinWoche.getValue().toString()));
+        planung.setMonatlich(Short.parseShort(spinMonat.getValue().toString()));
+        planung.setTagNum(Short.parseShort(spinMonatTag.getValue().toString()));
 
-        hm.put("LDatum", jdcLDatum.getDate());
+        planung.setLDatum(jdcLDatum.getDate());
 
-        if (cbSon.isSelected()) {
-            hm.put("Son", 1);
-        } else {
-            hm.put("Son", 0);
-        }
-        if (cbSam.isSelected()) {
-            hm.put("Sam", 1);
-        } else {
-            hm.put("Sam", 0);
-        }
-        if (cbFre.isSelected()) {
-            hm.put("Fre", 1);
-        } else {
-            hm.put("Fre", 0);
-        }
-        if (cbDon.isSelected()) {
-            hm.put("Don", 1);
-        } else {
-            hm.put("Don", 0);
-        }
-        if (cbMit.isSelected()) {
-            hm.put("Mit", 1);
-        } else {
-            hm.put("Mit", 0);
-        }
-        if (cbDie.isSelected()) {
-            hm.put("Die", 1);
-        } else {
-            hm.put("Die", 0);
-        }
-        if (cbMon.isSelected()) {
-            hm.put("Mon", 1);
-        } else {
-            hm.put("Mon", 0);
-        }
+        planung.setMon(cbMon.isSelected() ? (short) 1 : (short) 0);
+        planung.setDie(cbDie.isSelected() ? (short) 1 : (short) 0);
+        planung.setMit(cbMit.isSelected() ? (short) 1 : (short) 0);
+        planung.setDon(cbDon.isSelected() ? (short) 1 : (short) 0);
+        planung.setFre(cbFre.isSelected() ? (short) 1 : (short) 0);
+        planung.setSam(cbSam.isSelected() ? (short) 1 : (short) 0);
+        planung.setSon(cbSon.isSelected() ? (short) 1 : (short) 0);
 
         if (rbMonatWTag.isSelected()) {
-            hm.put(tage[cmbWTag.getSelectedIndex()], spinMonatWTag.getValue());
+            short s = Short.parseShort(spinMonatWTag.getValue().toString());
+            if (cmbWTag.getSelectedIndex() == 0) {
+                planung.setMon(s);
+            } else if (cmbWTag.getSelectedIndex() == 1) {
+                planung.setDie(s);
+            } else if (cmbWTag.getSelectedIndex() == 2) {
+                planung.setMit(s);
+            } else if (cmbWTag.getSelectedIndex() == 3) {
+                planung.setDon(s);
+            } else if (cmbWTag.getSelectedIndex() == 4) {
+                planung.setFre(s);
+            } else if (cmbWTag.getSelectedIndex() == 5) {
+                planung.setSam(s);
+            } else if (cmbWTag.getSelectedIndex() == 6) {
+                planung.setSon(s);
+            }
         }
 
-        if (bhppid == 0) {
-            hm.put("VerID", verid);
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            hm.put("tmp", OPDE.getLogin().getLoginID());
-            DBHandling.insertRecord("BHPPlanung", hm);
-        } else {
-            DBHandling.updateRecord("BHPPlanung", hm, "BHPPID", bhppid);
-        }
+
+
     }
 
     private void txtZeitCaretUpdate(javax.swing.event.CaretEvent evt) {
@@ -1562,7 +1558,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     }
 
     private void btnDiscardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDiscardActionPerformed
-        this.template = null;
+        planung = null;
         this.setVisible(false);
     }//GEN-LAST:event_btnDiscardActionPerformed
 

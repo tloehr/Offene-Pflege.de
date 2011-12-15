@@ -114,7 +114,7 @@ public class SYSConst {
     public static final String STAERKE[] = {"g", "mg", "µg", "E", "mcm", "TSD E", "MIO E", "mmol", "ml"}; // Für Medikamente
     public static final String EINHEIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
     public static final String STOFFTYP[] = {"Wirkstoff", "Hilfsstoff", "Sonstiger Stoff"};
-    public static final String GROESSE[] = {"N1", "N2", "N3", "AP", "OP"};
+
     public static final byte UZ = 0; // Solluhrzeit
     public static final byte FM = 1; // Nacht Morgens
     public static final byte MO = 2; // Morgens

@@ -28,8 +28,8 @@ public class Situationen implements Serializable {
     public Situationen() {
     }
 
-    public Situationen(Long sitID) {
-        this.sitID = sitID;
+    public Situationen(String text) {
+        this.text = text;
     }
 
     public Long getSitID() {

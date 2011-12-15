@@ -1,6 +1,8 @@
 package entity.verordnungen;
 
 import entity.Bewohner;
+import entity.Users;
+import op.OPDE;
 import op.tools.SYSConst;
 
 import javax.persistence.*;
@@ -37,7 +39,6 @@ import java.util.Date;
 })
 
 
-
 public class MedVorrat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -49,9 +50,6 @@ public class MedVorrat implements Serializable {
     @Column(name = "Text")
     private String text;
     @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
-    @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)
     private Date von;
@@ -61,12 +59,34 @@ public class MedVorrat implements Serializable {
     private Date bis;
 
     public MedVorrat() {
+
+
     }
 
-    public MedVorrat(Long vorID) {
-        this.vorID = vorID;
+    public Bewohner getBewohner() {
+        return bewohner;
     }
 
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
+    public MedVorrat(Bewohner bewohner, String text) {
+        this.bewohner = bewohner;
+        this.text = text;
+        this.user = OPDE.getLogin().getUser();
+        this.von = new Date();
+        this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+
+    }
 
     public Long getVorID() {
         return vorID;
@@ -82,15 +102,6 @@ public class MedVorrat implements Serializable {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
     }
 
     public Date getVon() {
@@ -121,6 +132,12 @@ public class MedVorrat implements Serializable {
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Bewohner bewohner;
+    // ==
+    // N:1 Relationen
+    // ==
+    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
 
     @Override
     public int hashCode() {

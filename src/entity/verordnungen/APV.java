@@ -6,31 +6,24 @@ package entity.verordnungen;
  * and open the template in the editor.
  */
 
+import entity.Bewohner;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "MPAPV")
 @NamedQueries({
-    @NamedQuery(name = "APV.findAll", query = "SELECT m FROM APV m"),
-    @NamedQuery(name = "APV.findByApvid", query = "SELECT m FROM APV m WHERE m.apvid = :apvid"),
-    @NamedQuery(name = "APV.findByDafID", query = "SELECT m FROM APV m WHERE m.dafID = :dafID"),
-    @NamedQuery(name = "APV.findByBWKennung", query = "SELECT m FROM APV m WHERE m.bWKennung = :bWKennung"),
-    @NamedQuery(name = "APV.findByApv", query = "SELECT m FROM APV m WHERE m.apv = :apv"),
-    @NamedQuery(name = "APV.findByTauschen", query = "SELECT m FROM APV m WHERE m.tauschen = :tauschen")})
+        @NamedQuery(name = "APV.findAll", query = "SELECT m FROM APV m"),
+        @NamedQuery(name = "APV.findByApvid", query = "SELECT m FROM APV m WHERE m.apvid = :apvid"),
+        @NamedQuery(name = "APV.findByBewohnerAndDarreichung", query = "SELECT m FROM APV m WHERE m.bewohner = :bewohner AND m.darreichung = :darreichung"),
+        @NamedQuery(name = "APV.findByDarreichungOnly", query = "SELECT m FROM APV m WHERE m.bewohner IS NULL AND m.darreichung = :darreichung"),
+        @NamedQuery(name = "APV.findByApv", query = "SELECT m FROM APV m WHERE m.apv = :apv"),
+        @NamedQuery(name = "APV.findByTauschen", query = "SELECT m FROM APV m WHERE m.tauschen = :tauschen")})
 public class APV implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -38,12 +31,6 @@ public class APV implements Serializable {
     @Basic(optional = false)
     @Column(name = "APVID")
     private Long apvid;
-    @Basic(optional = false)
-    @Column(name = "DafID")
-    private long dafID;
-    @Basic(optional = false)
-    @Column(name = "BWKennung")
-    private String bWKennung;
     @Basic(optional = false)
     @Column(name = "APV")
     private BigDecimal apv;
@@ -58,13 +45,6 @@ public class APV implements Serializable {
         this.apvid = apvid;
     }
 
-    public APV(Long apvid, long dafID, String bWKennung, BigDecimal apv, boolean tauschen) {
-        this.apvid = apvid;
-        this.dafID = dafID;
-        this.bWKennung = bWKennung;
-        this.apv = apv;
-        this.tauschen = tauschen;
-    }
 
     public Long getApvid() {
         return apvid;
@@ -72,22 +52,6 @@ public class APV implements Serializable {
 
     public void setApvid(Long apvid) {
         this.apvid = apvid;
-    }
-
-    public long getDafID() {
-        return dafID;
-    }
-
-    public void setDafID(long dafID) {
-        this.dafID = dafID;
-    }
-
-    public String getBWKennung() {
-        return bWKennung;
-    }
-
-    public void setBWKennung(String bWKennung) {
-        this.bWKennung = bWKennung;
     }
 
     public BigDecimal getApv() {
@@ -105,6 +69,34 @@ public class APV implements Serializable {
     public void setTauschen(boolean tauschen) {
         this.tauschen = tauschen;
     }
+
+    //
+    // N:1 Relationen
+    //
+
+    public Bewohner getBewohner() {
+        return bewohner;
+    }
+
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
+    public Darreichung getDarreichung() {
+        return darreichung;
+    }
+
+    public void setDarreichung(Darreichung darreichung) {
+        this.darreichung = darreichung;
+    }
+
+    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @ManyToOne
+    private Bewohner bewohner;
+
+    @JoinColumn(name = "DafID", referencedColumnName = "DafID")
+    @ManyToOne
+    private Darreichung darreichung;
 
     @Override
     public int hashCode() {
