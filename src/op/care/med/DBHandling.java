@@ -404,66 +404,66 @@ public class DBHandling {
         return result;
     }
 
-    public static String getBestandTextAsHTML(long bestid) {
-        String result = "";
-        String sql = " SELECT vor.BWKennung, best.Ein, best.UKennung, prod.Bezeichnung, daf.Zusatz, pack.PZN, " +
-                " CASE pack.Groesse WHEN 0 THEN 'N1' WHEN 1 THEN 'N2' " +
-                " WHEN 2 THEN 'N3' WHEN 3 THEN 'AP' WHEN 4 THEN 'OP' ELSE '' END Groesse, pack.Inhalt, best.Text," +
-                " f.PackEinheit, f.Zubereitung, f.AnwText " +//, ifnull(b.saldo, 0.00) Bestandsmenge " +
-                " FROM MPBestand best " +
-                " INNER JOIN MPVorrat vor ON vor.VorID = best.VorID " +
-                " INNER JOIN MPDarreichung daf ON daf.DafID = best.DafID " +
-                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
-                " INNER JOIN MPFormen f ON f.FormID = daf.FormID " +
-                " LEFT OUTER JOIN MPackung pack ON best.MPID = pack.MPID " +
-                " WHERE best.BestID = ? ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bestid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                result += "<br/><font color=\"blue\"><b>" + rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz") + ", ";
-                double inhalt = rs.getDouble("pack.Inhalt");
-                if (!SYSTools.catchNull(rs.getString("PZN")).equals("")) {
-                    result += "PZN: " + rs.getString("PZN") + ", ";
-                    result += rs.getString("Groesse") + ", " + inhalt + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] + " ";
-                    String zubereitung = SYSTools.catchNull(rs.getString("f.Zubereitung"));
-                    String anwtext = SYSTools.catchNull(rs.getString("f.AnwText"));
-                    result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
-                    result += "</b></font><br/>";
-                }
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    public static String getBestandTextAsHTML(long bestid) {
+//        String result = "";
+//        String sql = " SELECT vor.BWKennung, best.Ein, best.UKennung, prod.Bezeichnung, daf.Zusatz, pack.PZN, " +
+//                " CASE pack.Groesse WHEN 0 THEN 'N1' WHEN 1 THEN 'N2' " +
+//                " WHEN 2 THEN 'N3' WHEN 3 THEN 'AP' WHEN 4 THEN 'OP' ELSE '' END Groesse, pack.Inhalt, best.Text," +
+//                " f.PackEinheit, f.Zubereitung, f.AnwText " +//, ifnull(b.saldo, 0.00) Bestandsmenge " +
+//                " FROM MPBestand best " +
+//                " INNER JOIN MPVorrat vor ON vor.VorID = best.VorID " +
+//                " INNER JOIN MPDarreichung daf ON daf.DafID = best.DafID " +
+//                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
+//                " INNER JOIN MPFormen f ON f.FormID = daf.FormID " +
+//                " LEFT OUTER JOIN MPackung pack ON best.MPID = pack.MPID " +
+//                " WHERE best.BestID = ? ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, bestid);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                result += "<br/><font color=\"blue\"><b>" + rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz") + ", ";
+//                double inhalt = rs.getDouble("pack.Inhalt");
+//                if (!SYSTools.catchNull(rs.getString("PZN")).equals("")) {
+//                    result += "PZN: " + rs.getString("PZN") + ", ";
+//                    result += rs.getString("Groesse") + ", " + inhalt + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] + " ";
+//                    String zubereitung = SYSTools.catchNull(rs.getString("f.Zubereitung"));
+//                    String anwtext = SYSTools.catchNull(rs.getString("f.AnwText"));
+//                    result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
+//                    result += "</b></font><br/>";
+//                }
+//            }
+//            rs.close();
+//            stmt.close();
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
-    /**
-     * Ermittelt die Menge, die in einer Packung noch enthalten ist.
-     *
-     * @param bestid pk der betreffenden Packung
-     * @return die Summe in der Packungs Einheit.
-     */
-    public static double getBestandSumme(long bestid) {
-        double result = 0d;
-        String sql = "SELECT IFNULL(SUM(b.Menge), 0) summe " +
-                " FROM MPBestand m " +
-                " INNER JOIN MPBuchung b ON m.BestID = b.BestID " +
-                " WHERE m.BestID=?";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bestid);
-            ResultSet rs = stmt.executeQuery();
-            rs.first();
-            result = rs.getDouble("summe");
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    /**
+//     * Ermittelt die Menge, die in einer Packung noch enthalten ist.
+//     *
+//     * @param bestid pk der betreffenden Packung
+//     * @return die Summe in der Packungs Einheit.
+//     */
+//    public static double getBestandSumme(long bestid) {
+//        double result = 0d;
+//        String sql = "SELECT IFNULL(SUM(b.Menge), 0) summe " +
+//                " FROM MPBestand m " +
+//                " INNER JOIN MPBuchung b ON m.BestID = b.BestID " +
+//                " WHERE m.BestID=?";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, bestid);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.first();
+//            result = rs.getDouble("summe");
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
     /**
      * Ermittelt, welches das P?ckchen im Anbruch in einem bestimmten Vorrat ist.
@@ -498,32 +498,32 @@ public class DBHandling {
         return result;
     }
 
-    /**
-     * Ermittelt eines Liste alles Best?nde in einem Vorrat, die noch nicht angebrochen sind.
-     *
-     * @param vorid pk des Vorrats
-     * @return Ein DCBM, was die passenden BestIDs enth?lt. An erster Stelle steht immer das Wort "Keine"
-     */
-    public static DefaultComboBoxModel getBestandGeschlossen(long vorid) {
-        DefaultComboBoxModel result = new DefaultComboBoxModel();
-        result.addElement("Keine");
-        String sql = "SELECT BestID FROM MPBestand " +
-                " WHERE VorID = ? AND Aus = '9999-12-31 23:59:59' AND Anbruch = '9999-12-31 23:59:59' " +
-                " ORDER BY Ein ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, vorid);
-            ResultSet rs = stmt.executeQuery();
-            rs.beforeFirst();
-            while (rs.next()) {
-                result.addElement(new Long(rs.getLong("BestID")));
-            }
-
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    /**
+//     * Ermittelt eines Liste alles Best?nde in einem Vorrat, die noch nicht angebrochen sind.
+//     *
+//     * @param vorid pk des Vorrats
+//     * @return Ein DCBM, was die passenden BestIDs enth?lt. An erster Stelle steht immer das Wort "Keine"
+//     */
+//    public static DefaultComboBoxModel getBestandGeschlossen(long vorid) {
+//        DefaultComboBoxModel result = new DefaultComboBoxModel();
+//        result.addElement("Keine");
+//        String sql = "SELECT BestID FROM MPBestand " +
+//                " WHERE VorID = ? AND Aus = '9999-12-31 23:59:59' AND Anbruch = '9999-12-31 23:59:59' " +
+//                " ORDER BY Ein ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, vorid);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.beforeFirst();
+//            while (rs.next()) {
+//                result.addElement(new Long(rs.getLong("BestID")));
+//            }
+//
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
 //    /**
 //     * ermittelt ob ein bestimmter Vorrat einen Bestand im Anbruch hat oder nicht.
@@ -588,90 +588,90 @@ public class DBHandling {
         return result;
     }
 
-    public static void closeBestand(long bestid, String text, boolean mitNeuberechnung, int status) {
-        Connection db = OPDE.getDb().db;
-        //boolean result = false;
-        boolean doCommit = false;
-        try {
-            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
-            if (db.getAutoCommit()) {
-                db.setAutoCommit(false);
-                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                db.commit();
-                doCommit = true;
-            }
-
-            double bestand = getBestandSumme(bestid);
-            HashMap hm = new HashMap();
-            hm.put("BestID", bestid);
-            hm.put("BHPID", 0);
-            hm.put("Menge", bestand * -1);
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            hm.put("Text", text);
-            hm.put("Status", status);
-            hm.put("PIT", "!NOW!");
-            if (op.tools.DBHandling.insertRecord("MPBuchung", hm) < 0) {
-                throw new SQLException("Fehler beim Einf¸gen der Buchung");
-            }
-
-            hm.clear();
-            hm.put("Aus", "!NOW!");
-            hm.put("NextBest", 0);
-            if (!op.tools.DBHandling.updateRecord("MPBestand", hm, "BestID", bestid)) {
-                throw new SQLException("Fehler bei Update des Bestandes");
-            }
-            hm.clear();
-
-            if (mitNeuberechnung) { // Wenn gew¸nscht wird bei Abschluss der Packung der APV neu berechnet.
-                long vorid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "VorID", "BestID", bestid)).longValue();
-                long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
-                OPDE.info("Neuberechnung von DafID:" + dafid);
-                String bwkennung = op.tools.DBHandling.getSingleValue("MPVorrat", "BWKennung", "VorID", vorid).toString();
-                int formstatus = getFormStatus(bestid);
-                if (formstatus != FORMSTATUS_APV1) {
-                    double apvNeu = berechneBuchungsWert(bestid);
-                    if (formstatus == FORMSTATUS_APV_PER_BW) {
-                        addAPV(dafid, bwkennung, apvNeu);
-                        OPDE.info("FormStatus APV_PER_BW. APVneu: " + apvNeu);
-                    } else {
-                        // Das ist der APV aus MPBestand.
-                        double apvAlt = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
-                        HashMap hm2 = new HashMap();
-                        hm2.put("BWKennung", new Object[]{"", "="});
-                        hm2.put("DafID", new Object[]{dafid, "="});
-                        boolean tauschen = (Boolean) DBRetrieve.getSingleValue("MPAPV", "Tauschen", hm2);
-                        hm2.clear();
-                        if (tauschen) {
-                            setAPV(dafid, apvNeu, false); // der alte APV wird durch den neuen APV ersetzt.
-                            op.tools.DBHandling.updateRecord("MPAPV", hm2, text, hm);
-                            OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
-                        } else {
-                            setAPV(dafid, (apvAlt + apvNeu) / 2, false); // der DafID APV wird durch den Mittelwert aus altem und neuem APV ersetzt.
-                            OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + (apvAlt + apvNeu) / 2);
-                        }
-
-                    }
-                } else {
-                    OPDE.info("FormStatus APV1. Keine Berechnung n?tig.");
-                }
-            }
-            if (doCommit) {
-                db.commit();
-                db.setAutoCommit(true);
-            }
-        } catch (SQLException ex) {
-            try {
-                if (doCommit) {
-                    db.rollback();
-                }
-                new DlgException(ex);
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-        }
-    }
+//    public static void closeBestand(long bestid, String text, boolean mitNeuberechnung, int status) {
+//        Connection db = OPDE.getDb().db;
+//        //boolean result = false;
+//        boolean doCommit = false;
+//        try {
+//            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
+//            if (db.getAutoCommit()) {
+//                db.setAutoCommit(false);
+//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+//                db.commit();
+//                doCommit = true;
+//            }
+//
+//            double bestand = getBestandSumme(bestid);
+//            HashMap hm = new HashMap();
+//            hm.put("BestID", bestid);
+//            hm.put("BHPID", 0);
+//            hm.put("Menge", bestand * -1);
+//            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//            hm.put("Text", text);
+//            hm.put("Status", status);
+//            hm.put("PIT", "!NOW!");
+//            if (op.tools.DBHandling.insertRecord("MPBuchung", hm) < 0) {
+//                throw new SQLException("Fehler beim Einf¸gen der Buchung");
+//            }
+//
+//            hm.clear();
+//            hm.put("Aus", "!NOW!");
+//            hm.put("NextBest", 0);
+//            if (!op.tools.DBHandling.updateRecord("MPBestand", hm, "BestID", bestid)) {
+//                throw new SQLException("Fehler bei Update des Bestandes");
+//            }
+//            hm.clear();
+//
+//            if (mitNeuberechnung) { // Wenn gew¸nscht wird bei Abschluss der Packung der APV neu berechnet.
+//                long vorid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "VorID", "BestID", bestid)).longValue();
+//                long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
+//                OPDE.info("Neuberechnung von DafID:" + dafid);
+//                String bwkennung = op.tools.DBHandling.getSingleValue("MPVorrat", "BWKennung", "VorID", vorid).toString();
+//                int formstatus = getFormStatus(bestid);
+//                if (formstatus != FORMSTATUS_APV1) {
+//                    double apvNeu = berechneBuchungsWert(bestid);
+//                    if (formstatus == FORMSTATUS_APV_PER_BW) {
+//                        addAPV(dafid, bwkennung, apvNeu);
+//                        OPDE.info("FormStatus APV_PER_BW. APVneu: " + apvNeu);
+//                    } else {
+//                        // Das ist der APV aus MPBestand.
+//                        double apvAlt = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
+//                        HashMap hm2 = new HashMap();
+//                        hm2.put("BWKennung", new Object[]{"", "="});
+//                        hm2.put("DafID", new Object[]{dafid, "="});
+//                        boolean tauschen = (Boolean) DBRetrieve.getSingleValue("MPAPV", "Tauschen", hm2);
+//                        hm2.clear();
+//                        if (tauschen) {
+//                            setAPV(dafid, apvNeu, false); // der alte APV wird durch den neuen APV ersetzt.
+//                            op.tools.DBHandling.updateRecord("MPAPV", hm2, text, hm);
+//                            OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
+//                        } else {
+//                            setAPV(dafid, (apvAlt + apvNeu) / 2, false); // der DafID APV wird durch den Mittelwert aus altem und neuem APV ersetzt.
+//                            OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + (apvAlt + apvNeu) / 2);
+//                        }
+//
+//                    }
+//                } else {
+//                    OPDE.info("FormStatus APV1. Keine Berechnung n?tig.");
+//                }
+//            }
+//            if (doCommit) {
+//                db.commit();
+//                db.setAutoCommit(true);
+//            }
+//        } catch (SQLException ex) {
+//            try {
+//                if (doCommit) {
+//                    db.rollback();
+//                }
+//                new DlgException(ex);
+//            } catch (SQLException ex1) {
+//                new DlgException(ex1);
+//                ex1.printStackTrace();
+//                System.exit(1);
+//            }
+//        }
+//    }
 
 //    public static boolean anbrechen(long bestid) {
 //        boolean result = false;
@@ -845,127 +845,127 @@ public class DBHandling {
 //        return entnahmeVorrat(vorid, wunschmenge, 0);
 //    }
 
-    /**
-     * Diese Methode bucht auf einen Bestand immer genau soviel drauf oder runter, damit er auf
-     * dem gew¸nschten soll landet.
-     *
-     * @param bestid um die es geht.
-     * @param soll.  gew¸nschter Endbestand. Muss >= 0 sein.
-     * @return PK der neuen Buchung.
-     * @throws java.sql.SQLException
-     */
-    public static long setzeBestand(long bestid, double soll, String text, int status) throws SQLException {
-        long buchid = -1;
-        if (soll >= 0) {
-            double bestand = getBestandSumme(bestid);
-            if (bestand != soll) {
-                double result = 0d;
-                if (bestand <= 0) {
-                    result = Math.abs(bestand) + soll;
-                } else {
-                    result = bestand * -1 + soll;
-                }
-                // passende Buchung anlegen.
-                HashMap hm2 = new HashMap();
-                hm2.put("BHPID", 0l);
-                hm2.put("Menge", result);
-                hm2.put("BestID", bestid);
-                hm2.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-                hm2.put("PIT", "!NOW!");
-                hm2.put("Text", text);
-                hm2.put("Status", status);
+//    /**
+//     * Diese Methode bucht auf einen Bestand immer genau soviel drauf oder runter, damit er auf
+//     * dem gew¸nschten soll landet.
+//     *
+//     * @param bestid um die es geht.
+//     * @param soll.  gew¸nschter Endbestand. Muss >= 0 sein.
+//     * @return PK der neuen Buchung.
+//     * @throws java.sql.SQLException
+//     */
+//    public static long setzeBestand(long bestid, double soll, String text, int status) throws SQLException {
+//        long buchid = -1;
+//        if (soll >= 0) {
+//            double bestand = getBestandSumme(bestid);
+//            if (bestand != soll) {
+//                double result = 0d;
+//                if (bestand <= 0) {
+//                    result = Math.abs(bestand) + soll;
+//                } else {
+//                    result = bestand * -1 + soll;
+//                }
+//                // passende Buchung anlegen.
+//                HashMap hm2 = new HashMap();
+//                hm2.put("BHPID", 0l);
+//                hm2.put("Menge", result);
+//                hm2.put("BestID", bestid);
+//                hm2.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//                hm2.put("PIT", "!NOW!");
+//                hm2.put("Text", text);
+//                hm2.put("Status", status);
+//
+//                buchid = op.tools.DBHandling.insertRecord("MPBuchung", hm2);
+//                if (buchid < 0) {
+//                    throw new SQLException();
+//                }
+//            } else {
+//                buchid = 0;
+//            }
+//        }
+//        return buchid;
+//    }
 
-                buchid = op.tools.DBHandling.insertRecord("MPBuchung", hm2);
-                if (buchid < 0) {
-                    throw new SQLException();
-                }
-            } else {
-                buchid = 0;
-            }
-        }
-        return buchid;
-    }
-
-    /**
-     * Die Berechnungsmethode unterscheidet verschiedene F?lle:
-     * <p/>
-     * <ul>
-     * <li>Die betroffene Packung hat die FormStatus = APV1. Das sind z.B. alle Tabletten oder Kapseln. Hier macht es
-     * keinen Sinn, irgendwelche Verh?ltnisma?e neu zu rechnen. Wenn es eine Diskrepanz zwischen gerechnetem und realem Bestandswert
-     * gibt, dann ist irgendeine Tablette runtergefallen und nicht ausgebucht worden. Deshalb wird der Bestand einfach korrgiert und dann
-     * ist das eben so.
-     * <ul><li>Die Packung ist <b>jetzt</b> leer. Egal, wie der Buchungsbestand war. Er wird jetzt <i>gewaltsam</i> auf 0 gebracht.
-     * Der Bestand abgeschlossen und (wenn gew¸nscht) der neue angebrochen.</li>
-     * </ul></li>
-     * <p/>
-     * <li>Die Packung hat die Form Salben, Cremes. FORMSTATUS = APV_PER_BW. Hierbei passiert es h?ufig, dass die Menge, die bei einer Anwendung
-     * verbraucht wird individuell vom Bewohner abh?ngt. Der eine braucht viel Salbe, der andere wenig. H?ngt auch vom Krankheitsverlauf ab.
-     * Sagen wir mal eine Salbe gegen Schuppenflechte. Das kann an einem Tag wenig und an einem anderen Tag viel sein. Somit macht es keinen Sinn,
-     * hier einen Wert f¸r die Salbe zu speichern. H?chstens einen Mittelwert aus allen Bewohner APVs.
-     * <ul>
-     * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Tabelle MPAPV eingetragen und zwar mit
-     * mit der entsprechenden BWKennung.</li>
-     * </ul></li>
-     * <p/>
-     * <li>Die Packung hat die Form Tropfen, Sirup. FORMSTATUS = APV_PER_DAF. Hier macht es wiederum keinen Sinn einen APV pro BW zu speichern.
-     * 5 Tropfen sind eben bei allen Bewohnern 5 Tropfen.
-     * <ul>
-     * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Tabelle MPAPV eingetragen, hier allerdings mit
-     * BWKennung = "".</li>
-     * </ul></li>
-     * </ul>
-     * <p/>
-     * Nach den Berechnungen wird immer (wenn gew¸nscht) ein neuer Bestand angebrochen. Falls ein APV berechnet wurde, wird jeweils der neue Mittelwert
-     * ¸ber alle APVs einer Darreichung als neuer Anfangs APV dieser Darreichung hinterlegt. Also MPDarreicung.APV = AVG(MPAPV.APV).
-     *
-     * @param bestid des Bestandes, f¸r den das Verh?ltnis neu berechnet werden soll.
-     */
-    public static double berechneBuchungsWert(long bestid) {
-
-        long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
-        long formid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPDarreichung", "FormID", "DafID", dafid)).longValue();
-        long formstatus = ((Integer) op.tools.DBHandling.getSingleValue("MPFormen", "Status", "FormID", formid)).intValue();
-
-        double apvNeu = 1d;
-
-        if (formstatus != FORMSTATUS_APV1) {
-            HashMap filter = new HashMap();
-            filter.put("BestID", new Object[]{bestid, "="});
-            filter.put("Status", new Object[]{STATUS_EINBUCHEN_ANFANGSBESTAND, "="});
-            double inhaltReal = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBuchung", "Menge", filter)).doubleValue();
-            filter.clear();
-            double inhaltRechnerisch = 0d;
-            double apvAlt = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
-
-            String sqlGetSumme = "" +
-                    " SELECT SUM(Dosis) FROM BHP bhp " +
-                    " INNER JOIN MPBuchung buch ON bhp.BHPID = buch.BHPID " +
-                    " WHERE buch.BestID = ? ";
-            try {
-                PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlGetSumme);
-                stmt.setLong(1, bestid);
-                ResultSet rs = stmt.executeQuery();
-                rs.first();
-                double bhpsumme = rs.getDouble(1);
-                inhaltRechnerisch = bhpsumme / apvAlt;
-            } catch (SQLException ex) {
-                new DlgException(ex);
-            }
-
-            apvNeu = inhaltReal / inhaltRechnerisch * apvAlt;
-
-            // Zu gro?e APV Abweichungen verhindern. Siehe Problem 14 in bugs.offene-pflege.de
-            double apvkorridor = Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")) / 100;
-            double halbeBreite = apvAlt * apvkorridor;
-            double korridorUnten = apvAlt - halbeBreite;
-            double korridorOben = apvAlt + halbeBreite;
-            // Liegt der neue apv AUSSERHALB des maximalen Korridors, so wird er verworfen
-            if (apvNeu < korridorUnten || korridorOben < apvNeu) {
-                apvNeu = apvAlt;
-            }
-        }
-        return apvNeu;
-    }
+//    /**
+//     * Die Berechnungsmethode unterscheidet verschiedene F?lle:
+//     * <p/>
+//     * <ul>
+//     * <li>Die betroffene Packung hat die FormStatus = APV1. Das sind z.B. alle Tabletten oder Kapseln. Hier macht es
+//     * keinen Sinn, irgendwelche Verh?ltnisma?e neu zu rechnen. Wenn es eine Diskrepanz zwischen gerechnetem und realem Bestandswert
+//     * gibt, dann ist irgendeine Tablette runtergefallen und nicht ausgebucht worden. Deshalb wird der Bestand einfach korrgiert und dann
+//     * ist das eben so.
+//     * <ul><li>Die Packung ist <b>jetzt</b> leer. Egal, wie der Buchungsbestand war. Er wird jetzt <i>gewaltsam</i> auf 0 gebracht.
+//     * Der Bestand abgeschlossen und (wenn gew¸nscht) der neue angebrochen.</li>
+//     * </ul></li>
+//     * <p/>
+//     * <li>Die Packung hat die Form Salben, Cremes. FORMSTATUS = APV_PER_BW. Hierbei passiert es h?ufig, dass die Menge, die bei einer Anwendung
+//     * verbraucht wird individuell vom Bewohner abh?ngt. Der eine braucht viel Salbe, der andere wenig. H?ngt auch vom Krankheitsverlauf ab.
+//     * Sagen wir mal eine Salbe gegen Schuppenflechte. Das kann an einem Tag wenig und an einem anderen Tag viel sein. Somit macht es keinen Sinn,
+//     * hier einen Wert f¸r die Salbe zu speichern. H?chstens einen Mittelwert aus allen Bewohner APVs.
+//     * <ul>
+//     * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Tabelle MPAPV eingetragen und zwar mit
+//     * mit der entsprechenden BWKennung.</li>
+//     * </ul></li>
+//     * <p/>
+//     * <li>Die Packung hat die Form Tropfen, Sirup. FORMSTATUS = APV_PER_DAF. Hier macht es wiederum keinen Sinn einen APV pro BW zu speichern.
+//     * 5 Tropfen sind eben bei allen Bewohnern 5 Tropfen.
+//     * <ul>
+//     * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Tabelle MPAPV eingetragen, hier allerdings mit
+//     * BWKennung = "".</li>
+//     * </ul></li>
+//     * </ul>
+//     * <p/>
+//     * Nach den Berechnungen wird immer (wenn gew¸nscht) ein neuer Bestand angebrochen. Falls ein APV berechnet wurde, wird jeweils der neue Mittelwert
+//     * ¸ber alle APVs einer Darreichung als neuer Anfangs APV dieser Darreichung hinterlegt. Also MPDarreicung.APV = AVG(MPAPV.APV).
+//     *
+//     * @param bestid des Bestandes, f¸r den das Verh?ltnis neu berechnet werden soll.
+//     */
+//    public static double berechneBuchungsWert(long bestid) {
+//
+//        long dafid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "DafID", "BestID", bestid)).longValue();
+//        long formid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPDarreichung", "FormID", "DafID", dafid)).longValue();
+//        long formstatus = ((Integer) op.tools.DBHandling.getSingleValue("MPFormen", "Status", "FormID", formid)).intValue();
+//
+//        double apvNeu = 1d;
+//
+//        if (formstatus != FORMSTATUS_APV1) {
+//            HashMap filter = new HashMap();
+//            filter.put("BestID", new Object[]{bestid, "="});
+//            filter.put("Status", new Object[]{STATUS_EINBUCHEN_ANFANGSBESTAND, "="});
+//            double inhaltReal = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBuchung", "Menge", filter)).doubleValue();
+//            filter.clear();
+//            double inhaltRechnerisch = 0d;
+//            double apvAlt = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
+//
+//            String sqlGetSumme = "" +
+//                    " SELECT SUM(Dosis) FROM BHP bhp " +
+//                    " INNER JOIN MPBuchung buch ON bhp.BHPID = buch.BHPID " +
+//                    " WHERE buch.BestID = ? ";
+//            try {
+//                PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlGetSumme);
+//                stmt.setLong(1, bestid);
+//                ResultSet rs = stmt.executeQuery();
+//                rs.first();
+//                double bhpsumme = rs.getDouble(1);
+//                inhaltRechnerisch = bhpsumme / apvAlt;
+//            } catch (SQLException ex) {
+//                new DlgException(ex);
+//            }
+//
+//            apvNeu = inhaltReal / inhaltRechnerisch * apvAlt;
+//
+//            // Zu gro?e APV Abweichungen verhindern. Siehe Problem 14 in bugs.offene-pflege.de
+//            double apvkorridor = Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")) / 100;
+//            double halbeBreite = apvAlt * apvkorridor;
+//            double korridorUnten = apvAlt - halbeBreite;
+//            double korridorOben = apvAlt + halbeBreite;
+//            // Liegt der neue apv AUSSERHALB des maximalen Korridors, so wird er verworfen
+//            if (apvNeu < korridorUnten || korridorOben < apvNeu) {
+//                apvNeu = apvAlt;
+//            }
+//        }
+//        return apvNeu;
+//    }
 
     public static double getAPV(long dafid, String bwkennung) {
         double apv = 1d;
@@ -998,44 +998,44 @@ public class DBHandling {
         return apv;
     }
 
-    public static void setAPV(long dafid, double apv, boolean tauschen) {
-        // Gibt es schon einen APV Eintrag ?
-        String sqlAverage = "" +
-                " SELECT APVID FROM MPAPV WHERE DafID = ? AND BWKennung = ''";
-        long apvid = 0;
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlAverage);
-            stmt.setLong(1, dafid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                apvid = rs.getLong(1);
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
+//    public static void setAPV(long dafid, double apv, boolean tauschen) {
+//        // Gibt es schon einen APV Eintrag ?
+//        String sqlAverage = "" +
+//                " SELECT APVID FROM MPAPV WHERE DafID = ? AND BWKennung = ''";
+//        long apvid = 0;
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlAverage);
+//            stmt.setLong(1, dafid);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                apvid = rs.getLong(1);
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//
+//        HashMap hm = new HashMap();
+//        hm.put("APV", apv);
+//        hm.put("Tauschen", tauschen);
+//
+//        if (apvid == 0) {
+//            hm.put("BWKennung", "");
+//            hm.put("DafID", dafid);
+//            op.tools.DBHandling.insertRecord("MPAPV", hm);
+//        } else {
+//            op.tools.DBHandling.updateRecord("MPAPV", hm, "APVID", apvid);
+//        }
+//        hm.clear();
+//    }
 
-        HashMap hm = new HashMap();
-        hm.put("APV", apv);
-        hm.put("Tauschen", tauschen);
-
-        if (apvid == 0) {
-            hm.put("BWKennung", "");
-            hm.put("DafID", dafid);
-            op.tools.DBHandling.insertRecord("MPAPV", hm);
-        } else {
-            op.tools.DBHandling.updateRecord("MPAPV", hm, "APVID", apvid);
-        }
-        hm.clear();
-    }
-
-    public static void addAPV(long dafid, String bwkennung, double apv) {
-        HashMap hm = new HashMap();
-        hm.put("APV", apv);
-        hm.put("BWKennung", bwkennung);
-        hm.put("DafID", dafid);
-        op.tools.DBHandling.insertRecord("MPAPV", hm);
-        hm.clear();
-    }
+//    public static void addAPV(long dafid, String bwkennung, double apv) {
+//        HashMap hm = new HashMap();
+//        hm.put("APV", apv);
+//        hm.put("BWKennung", bwkennung);
+//        hm.put("DafID", dafid);
+//        op.tools.DBHandling.insertRecord("MPAPV", hm);
+//        hm.clear();
+//    }
 
     public static boolean betrifftAbgeschlossenenBestand(long bhpid) {
         String sql = " SELECT best.Aus " +
@@ -1217,221 +1217,117 @@ public class DBHandling {
      * @param menge  (Anwendungs Menge) die umgerechnet werden soll
      * @return Umgerechnete wunschmenge. 0d bei Fehler.
      */
-    public static double getPackMenge(long vorid, double menge) {
-        double result = 0d;
-        long dafid = 0;
-        try {
-            ResultSet rs = getDAF2Vorrat(vorid);
-            rs.first();
-            dafid = rs.getLong(1);
-        } catch (SQLException e) {
-            new DlgException(e);
-        }
-        long formid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPDarreichung", "FormID", "DafID", dafid)).longValue();
-        long formstatus = ((Integer) op.tools.DBHandling.getSingleValue("MPFormen", "Status", "FormID", formid)).intValue();
+//    public static double getPackMenge(long vorid, double menge) {
+//        double result = 0d;
+//        long dafid = 0;
+//        try {
+//            ResultSet rs = getDAF2Vorrat(vorid);
+//            rs.first();
+//            dafid = rs.getLong(1);
+//        } catch (SQLException e) {
+//            new DlgException(e);
+//        }
+//        long formid = ((BigInteger) op.tools.DBHandling.getSingleValue("MPDarreichung", "FormID", "DafID", dafid)).longValue();
+//        long formstatus = ((Integer) op.tools.DBHandling.getSingleValue("MPFormen", "Status", "FormID", formid)).intValue();
+//
+//        if (formstatus != FORMSTATUS_APV1) {
+//            String bwkennung = "";
+//            if (formstatus == FORMSTATUS_APV_PER_BW) {
+//                bwkennung = op.tools.DBHandling.getSingleValue("MPVorrat", "BWKennung", "VorID", vorid).toString();
+//            }
+//            long bestid = getBestandImAnbruch(vorid);
+//            double apv = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
+//            result = menge / apv;
+//        } else {
+//            result = menge;
+//        }
+//        return result;
+//    }
 
-        if (formstatus != FORMSTATUS_APV1) {
-            String bwkennung = "";
-            if (formstatus == FORMSTATUS_APV_PER_BW) {
-                bwkennung = op.tools.DBHandling.getSingleValue("MPVorrat", "BWKennung", "VorID", vorid).toString();
-            }
-            long bestid = getBestandImAnbruch(vorid);
-            double apv = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
-            result = menge / apv;
-        } else {
-            result = menge;
-        }
-        return result;
-    }
-
-    public static String getBestandText4Print(long bestid, boolean kurz) {
-        String result = "";
-        String sql = " SELECT vor.BWKennung, best.Ein, best.UKennung, prod.Bezeichnung, daf.Zusatz, pack.PZN, " +
-                " CASE pack.Groesse WHEN 0 THEN 'N1' WHEN 1 THEN 'N2' " +
-                " WHEN 2 THEN 'N3' WHEN 3 THEN 'AP' WHEN 4 THEN 'OP' ELSE '' END Groesse, pack.Inhalt, best.Text," +
-                " f.PackEinheit, f.Zubereitung, f.AnwText " +//, ifnull(b.saldo, 0.00) Bestandsmenge " +
-                " FROM MPBestand best " +
-                " INNER JOIN MPVorrat vor ON vor.VorID = best.VorID " +
-                " INNER JOIN MPDarreichung daf ON daf.DafID = best.DafID " +
-                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
-                " INNER JOIN MPFormen f ON f.FormID = daf.FormID " +
-                " LEFT OUTER JOIN MPackung pack ON best.MPID = pack.MPID " +
-                //                " LEFT OUTER JOIN (" +
-                //                "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
-                //                "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                //                "           GROUP BY VorID " +
-                //                "       ) b ON b.VorID = vor.VorID " +
-                " WHERE best.BestID = ? ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bestid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-                if (kurz) {
-
-                    result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
-                    result += SYSPrint.EPL2_labelformat(57, 19, 3);
-                    result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz"));
-                    if (!SYSTools.catchNull(rs.getString("PZN")).equals("")) {
-                        result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + rs.getString("PZN") + "  Datum:" + sdf.format(rs.getDate("best.Ein")) + " (" + rs.getString("best.UKennung") + ")");
-                    }
-
-                    result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestid));
-                    result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, SYSTools.getBWLabel1(rs.getString("vor.BWKennung")));
-                    result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, SYSTools.getBWLabel2(rs.getString("vor.BWKennung")));
-                    //result += SYSPrint.EPL2_print_ascii(5, 120, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, );
-                    result += SYSPrint.EPL2_PRINT;
-                } else {
-                    result = SYSPrint.reset() + "\n";
-                    result += SYSTools.getWindowTitle("Einbuchungsbeleg") + "\n";
-                    result += "============================\n\n";
-                    //result += OCPrint.doubleHeight(rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz")) + "\n";
-                    result += SYSPrint.doubleStrike(SYSPrint.doubleHeight(rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz") + "\n"));
-                    double inhalt = rs.getDouble("pack.Inhalt");
-                    if (!SYSTools.catchNull(rs.getString("PZN")).equals("")) {
-                        result += "PZN: " + rs.getString("PZN") + "\n";
-                        result += rs.getString("Groesse") + ", " + inhalt + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] + " ";
-                        result += SYSTools.catchNull(rs.getString("f.Zubereitung"));
-                        result += "\n\n";
-                    }
-                    if (!SYSTools.catchNull(rs.getString("Text")).equals("")) {
-                        result += "Bemerkung: " + rs.getString("Text") + "\n";
-                    }
-                    // Das hier ist falsch. Man muss die Buchungsmenge der letzten Buchung nehmen.
-                    // Nicht die Bestandsmenge.
-                    double bestandsmenge = getBestandSumme(bestid);
-                    if (bestandsmenge < inhalt) { // War bei Einbuchung nicht voll. Das sollte man erw?hnen.
-                        result += "Inhalt bei Einbuchung: " + bestandsmenge + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] + "\n";
-                    }
-                    result += SYSPrint.doubleHeight(SYSPrint.doubleStrike(SYSPrint.red("Bestands Nr.: " + bestid + "\n\n")));
-                    result += SYSPrint.doubleStrike("Bewohner: " + SYSTools.getBWLabel(rs.getString("vor.BWKennung")) + "\n");
-                    result += "Datum: " + sdf.format(rs.getDate("best.Ein")) + "\n";
-                    result += "Eingebucht durch: " + rs.getString("best.UKennung") + "\n\n\n";
-                    result += SYSPrint.ESCPOS_PARTIAL_CUT;
-                    result += "\n";
-                }
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        // Konvertierung auf PC850 weg. Umlauten.
-        try {
-            byte[] conv = result.getBytes("Cp850");
-            result = new String(conv);
-        } catch (UnsupportedEncodingException ex) {
-            //ex.printStackTrace();
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    public static String getBestandText4Print(long bestid, boolean kurz) {
+//        String result = "";
+//        String sql = " SELECT vor.BWKennung, best.Ein, best.UKennung, prod.Bezeichnung, daf.Zusatz, pack.PZN, " +
+//                " CASE pack.Groesse WHEN 0 THEN 'N1' WHEN 1 THEN 'N2' " +
+//                " WHEN 2 THEN 'N3' WHEN 3 THEN 'AP' WHEN 4 THEN 'OP' ELSE '' END Groesse, pack.Inhalt, best.Text," +
+//                " f.PackEinheit, f.Zubereitung, f.AnwText " +//, ifnull(b.saldo, 0.00) Bestandsmenge " +
+//                " FROM MPBestand best " +
+//                " INNER JOIN MPVorrat vor ON vor.VorID = best.VorID " +
+//                " INNER JOIN MPDarreichung daf ON daf.DafID = best.DafID " +
+//                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
+//                " INNER JOIN MPFormen f ON f.FormID = daf.FormID " +
+//                " LEFT OUTER JOIN MPackung pack ON best.MPID = pack.MPID " +
+//                //                " LEFT OUTER JOIN (" +
+//                //                "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+//                //                "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+//                //                "           GROUP BY VorID " +
+//                //                "       ) b ON b.VorID = vor.VorID " +
+//                " WHERE best.BestID = ? ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, bestid);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//                if (kurz) {
+//
+//                    result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
+//                    result += SYSPrint.EPL2_labelformat(57, 19, 3);
+//                    result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz"));
+//                    if (!SYSTools.catchNull(rs.getString("PZN")).equals("")) {
+//                        result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + rs.getString("PZN") + "  Datum:" + sdf.format(rs.getDate("best.Ein")) + " (" + rs.getString("best.UKennung") + ")");
+//                    }
+//
+//                    result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestid));
+//                    result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, SYSTools.getBWLabel1(rs.getString("vor.BWKennung")));
+//                    result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, SYSTools.getBWLabel2(rs.getString("vor.BWKennung")));
+//                    //result += SYSPrint.EPL2_print_ascii(5, 120, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, );
+//                    result += SYSPrint.EPL2_PRINT;
+//                } else {
+//                    result = SYSPrint.reset() + "\n";
+//                    result += SYSTools.getWindowTitle("Einbuchungsbeleg") + "\n";
+//                    result += "============================\n\n";
+//                    //result += OCPrint.doubleHeight(rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz")) + "\n";
+//                    result += SYSPrint.doubleStrike(SYSPrint.doubleHeight(rs.getString("prod.Bezeichnung") + " " + rs.getString("daf.Zusatz") + "\n"));
+//                    double inhalt = rs.getDouble("pack.Inhalt");
+//                    if (!SYSTools.catchNull(rs.getString("PZN")).equals("")) {
+//                        result += "PZN: " + rs.getString("PZN") + "\n";
+//                        result += rs.getString("Groesse") + ", " + inhalt + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] + " ";
+//                        result += SYSTools.catchNull(rs.getString("f.Zubereitung"));
+//                        result += "\n\n";
+//                    }
+//                    if (!SYSTools.catchNull(rs.getString("Text")).equals("")) {
+//                        result += "Bemerkung: " + rs.getString("Text") + "\n";
+//                    }
+//                    // Das hier ist falsch. Man muss die Buchungsmenge der letzten Buchung nehmen.
+//                    // Nicht die Bestandsmenge.
+//                    double bestandsmenge = getBestandSumme(bestid);
+//                    if (bestandsmenge < inhalt) { // War bei Einbuchung nicht voll. Das sollte man erw?hnen.
+//                        result += "Inhalt bei Einbuchung: " + bestandsmenge + " " + SYSConst.EINHEIT[rs.getInt("f.PackEinheit")] + "\n";
+//                    }
+//                    result += SYSPrint.doubleHeight(SYSPrint.doubleStrike(SYSPrint.red("Bestands Nr.: " + bestid + "\n\n")));
+//                    result += SYSPrint.doubleStrike("Bewohner: " + SYSTools.getBWLabel(rs.getString("vor.BWKennung")) + "\n");
+//                    result += "Datum: " + sdf.format(rs.getDate("best.Ein")) + "\n";
+//                    result += "Eingebucht durch: " + rs.getString("best.UKennung") + "\n\n\n";
+//                    result += SYSPrint.ESCPOS_PARTIAL_CUT;
+//                    result += "\n";
+//                }
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        // Konvertierung auf PC850 weg. Umlauten.
+//        try {
+//            byte[] conv = result.getBytes("Cp850");
+//            result = new String(conv);
+//        } catch (UnsupportedEncodingException ex) {
+//            //ex.printStackTrace();
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
     /**
      * schlie?t einen Vorrat ab, in dem alles ausgebucht wird, was da drin war.
      */
-    public static boolean closeVorrat(long vorid) {
-        Connection db = OPDE.getDb().db;
-        boolean result = false;
-        boolean doCommit = false;
-        try {
-            if (db.getAutoCommit()) {
-                db.setAutoCommit(false);
-                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                db.commit();
-                doCommit = true;
-            }
-            // Alle Best?nde abschlie?en.
-            long bestid = getBestandImAnbruch(vorid);
-            if (bestid > 0) {
-                closeBestand(bestid, "Abschluss des Bestandes bei Vorratsabschlu?.", false, STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
-            }
-            DefaultComboBoxModel dcbm = getBestandGeschlossen(vorid);
-            if (dcbm.getSize() > 1) { // der erste ist immer "keine"
-                for (int i = 1; i < dcbm.getSize(); i++) {
-                    bestid = (Long) dcbm.getElementAt(i);
-                    closeBestand(bestid, "Abschluss des Bestandes bei Vorratsabschlu?.", false, STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
-                }
-            }
-
-            // Vorrat beenden.
-            HashMap data = new HashMap();
-            data.put("bis", "!NOW!");
-            if (!op.tools.DBHandling.updateRecord("MPVorrat", data, "VorID", vorid)) {
-                throw new SQLException("Fehler bei Update MPVorrat");
-            }
-            data.clear();
-            if (doCommit) {
-                db.commit();
-                db.setAutoCommit(true);
-            }
-            result = true;
-        } catch (SQLException ex) {
-            try {
-                if (doCommit) {
-                    db.rollback();
-                }
-                result = false;
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
-        }
-        return result;
-    }
-
-    public static void deleteVorrat(long vorid) {
-        String sql1 = "DELETE buch.* " +
-                " FROM MPBuchung buch INNER JOIN MPBestand best ON buch.BestID = best.BestID " +
-                " WHERE best.VorID = ? ";
-        String sql2 = "DELETE best.* " +
-                " FROM MPBestand best " +
-                " WHERE best.VorID = ? ";
-        String sql3 = "DELETE " +
-                " FROM MPVorrat " +
-                " WHERE VorID = ? ";
-        Connection db = OPDE.getDb().db;
-        //boolean result = false;
-        boolean doCommit = false;
-        try {
-            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
-            if (db.getAutoCommit()) {
-                db.setAutoCommit(false);
-                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                db.commit();
-                doCommit = true;
-            }
-
-            PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
-            stmt1.setLong(1, vorid);
-            stmt1.executeUpdate();
-
-            PreparedStatement stmt2 = OPDE.getDb().db.prepareStatement(sql2);
-            stmt2.setLong(1, vorid);
-            stmt2.executeUpdate();
-
-            PreparedStatement stmt3 = OPDE.getDb().db.prepareStatement(sql3);
-            stmt3.setLong(1, vorid);
-            stmt3.executeUpdate();
-
-            if (doCommit) {
-                db.commit();
-                db.setAutoCommit(true);
-            }
-
-        } catch (SQLException ex) {
-            try {
-                if (doCommit) {
-                    db.rollback();
-                }
-                //result = false;
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
-        }
-    }
+//
 }

@@ -1,14 +1,19 @@
 package entity.verordnungen;
 
+import entity.Bewohner;
 import op.OPDE;
-import op.tools.DBRetrieve;
+import op.tools.DlgException;
+import op.tools.SYSConst;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,8 +23,6 @@ import java.util.logging.Logger;
  * To change this template use File | Settings | File Templates.
  */
 public class MedVorratTools {
-
-
 
 
     public static BigDecimal getSumme(MedVorrat vorrat) {
@@ -39,91 +42,68 @@ public class MedVorratTools {
      * </ul>
      * Ist keine Packung im Anbruch, dann passiert gar nichts. Der R¸ckgabewert ist dann false.
      *
-     * @param dafid      pk der Darreichungsform
-     * @param menge      gew¸nschte Entnahmemenge
-     * @param bhpid      pk der BHP aufgrund dere dieser Buchungsvorgang erfolgt.
-     * @param anweinheit true, dann wird in der anweinheit ausgebucht. false, in der packeinheit.
+     * @param darreichung das zu entnehmende Präparat
+     * @param menge       gewünschte Entnahmemenge
+     * @param bhp         BHP aufgrund dere dieser Buchungsvorgang erfolgt.
+     * @param anweinheit  true, dann wird in der anweinheit ausgebucht. false, in der packeinheit.
      * @return true, bei Erfolg; false, sonst
      */
-    public static boolean entnahmeVorrat(long dafid, String bwkennung, double menge, boolean anweinheit, long bhpid) {
-        if (dafid <= 0) {
-            return true;
-        }
-        boolean result = true;
-        long vorid = getVorrat2DAF(bwkennung, dafid);
-
-        if (vorid > 0) {
+    public static void entnahmeVorrat(EntityManager em, Darreichung darreichung, Bewohner bewohner, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
+        MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung).get(0);
+        if (vorrat != null) {
             if (anweinheit) { // Umrechnung der Anwendungs Menge in die PackMenge.
-                long bestid = getBestandImAnbruch(vorid);
-                // Das ist der APV aus MPBestand.
-                double apv = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBestand", "APV", "BestID", bestid)).doubleValue();
-                menge = menge / apv;
-            }
-            result &= menge > 0 && entnahmeVorrat(vorid, menge, bhpid);
-        }
-        OPDE.debug(result ? "" : "entnahmeVorrat/5 fehlgeschlagen");
+                MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
+                BigDecimal apv = bestand.getApv();
 
-        return result;
+                if (apv.equals(BigDecimal.ZERO)) {
+                    apv = BigDecimal.ONE;
+                }
+                menge = menge.divide(apv);
+            }
+            entnahmeVorrat(em, vorrat, menge, bhp);
+        }
     }
 
-    private static boolean entnahmeVorrat(long vorid, double wunschmenge, long bhpid) {
-        boolean result = true;
-        long bestid = getBestandImAnbruch(vorid);
+    protected static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
+        MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
 
-        if (bestid > 0 && wunschmenge > 0) {
+        if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
             // ist schon eine Packung festgelegt, die angebrochen werden soll, sobald diese leer ist ?
-            long nextBest = ((Long) DBRetrieve.getSingleValue("MPBestand", "NextBest", "BestID", bestid)).longValue();
-            double entnahme; // wieviel in diesem Durchgang tats?chlich entnommen wird.
-            double restsumme = getBestandSumme(bestid); // wieviel der angebrochene Bestand noch hergibt.
-            entnahme = wunschmenge; // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
-            if (nextBest > 0 && restsumme <= wunschmenge) { // sollte eine Packung aber schon als nachfolger bestimmt sein,
+            //MedBestand nextBestand = bestand.getNaechsterBestand();
+
+
+            BigDecimal restsumme = MedBestandTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
+
+            // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
+            BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
+
+            // sollte eine Packung aber schon als nachfolger bestimmt sein,
+            if (bestand.hasNextBestand() && restsumme.compareTo(wunschmenge) <= 0) {
                 entnahme = restsumme; // dann wird erst diese hier leergebraucht
-            } // und dann der Rest aus der n?chsten Packung genommen.
+            } // und dann der Rest aus der nächsten Packung genommen.
 
-            // Erstmal die Buchung f¸r diesen Durchgang
-            HashMap hm = new HashMap();
-            hm.put("BestID", bestid);
-            hm.put("BHPID", bhpid);
-            hm.put("Menge", entnahme * -1);
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            hm.put("PIT", "!NOW!");
-            hm.put("Status", MedBuchungenTools.STATUS_AUSBUCHEN_NORMAL);
-            result &= op.tools.DBHandling.insertRecord("MPBuchung", hm) > 0;
 
-            if (nextBest > 0) { // Jetzt gibt es direkt noch den Wunsch das n?chste P?ckchen anzubrechen.
+            // Erstmal die Buchung für diesen Durchgang
 
-                if (restsumme <= wunschmenge) { // Es war mehr gew¸nscht, als die angebrochene Packung hergegeben hat.
-                    // Dann m¸ssen wird erstmal den alten Bestand abschlie?en.
-                    try {
-                        // Es war mehr gew¸nscht, als die angebrochene Packung hergegeben hat.
-                        // Dann m¸ssen wird erstmal den alten Bestand abschlie?en.
-                        closeBestand(bestid, "Automatischer Abschluss bei leerer Packung", true, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+            MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
+            em.persist(buchung);
 
-                        // dann den neuen Bestand anbrechen.
-                        result &= anbrechen(nextBest);
-                        Thread.sleep(1000); // Sonst ist die Anzeige im PnlBHP falsch.
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(DBHandling.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
+                if (restsumme.compareTo(wunschmenge) <= 0) {
+                    // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
+                    // Dann müssen wird erstmal den alten Bestand abschließen.
+
+                    APV apv = MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", true, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    // dann den neuen (NextBest) Bestand anbrechen.
+                    // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
+                    MedBestandTools.anbrechen(em, bestand.getNaechsterBestand(), apv.getApv());
                 }
 
-                if (wunschmenge > entnahme) { // Sind wir hier fertig, oder m¸ssen wir noch mehr ausbuchen.
-//                    try {
-                    // Sind wir hier fertig, oder m¸ssen wir noch mehr ausbuchen.
-                    //Thread.sleep(1000); // Ohne diese Warteschleife verschlucken sich die Datenbankanfragen.
-                    // und es kommt zur Exception. :-( Schrecklich !
-                    result &= entnahmeVorrat(vorid, wunschmenge - entnahme, bhpid);
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(DBHandling.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
+                if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
+                    entnahmeVorrat(em, vorrat, wunschmenge.subtract(entnahme), bhp);
                 }
             }
-            hm.clear();
-        } else {
-            result = false;
         }
-        OPDE.debug(result ? "" : "entnahmeVorrat/3 fehlgeschlagen");
-        return result;
     }
 
     /**
@@ -134,25 +114,181 @@ public class MedVorratTools {
      *
      * @return true, bei Erfolg. false, sonst.
      */
-    public static MedBestand einbuchenVorrat(MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) throws Exception {
+    public static MedBestand einbuchenVorrat(EntityManager em, MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) throws Exception {
         MedBestand bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
 
             BigDecimal apv;
             if (darreichung.getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
-                apv = MPAPVTools.getAPV(vorrat.getBewohner(), darreichung);
+                apv = APVTools.getAPVMittelwert(vorrat.getBewohner(), darreichung);
             } else if (darreichung.getMedForm().getStatus() == MedFormenTools.APV_PER_DAF) {
-                apv = MPAPVTools.getAPV(darreichung);
+                apv = APVTools.getAPV(darreichung).getApv();
             } else { //APV1
                 apv = BigDecimal.ONE;
             }
 
             bestand = new MedBestand(apv, vorrat, darreichung, packung, text);
             MedBuchungen buchung = new MedBuchungen(bestand, menge);
-            bestand.getBuchungen().add(buchung);
+
+            em.persist(bestand);
+            em.persist(buchung);
         }
         return bestand;
     }
 
+    public static MedBestand getImAnbruch(MedVorrat vorrat) {
+        MedBestand bestand = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            Query query = em.createNamedQuery("MedBestand.findByVorratImAnbruch");
+            query.setParameter("vorrat", vorrat);
+            bestand = (MedBestand) query.getSingleResult();
+        } catch (NoResultException nre) {
+            OPDE.debug(nre);
+            // durchaus gewünschtes Ergebnis
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return bestand;
+    }
 
+    /**
+     * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die z.Zt. keine
+     * angebrochenen Bestände haben.
+     *
+     * @param vorrat
+     * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
+     */
+    public static MedBestand anbrechenNaechste(MedVorrat vorrat) throws Exception {
+        MedBestand result = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            Query query = em.createQuery(" " +
+                    " SELECT b FROM MedBestand b " +
+                    " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
+                    " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+            query.setParameter("vorrat", vorrat);
+            query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
+            query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
+            query.setMaxResults(1);
+            result = (MedBestand) query.getSingleResult();
+            MedBestandTools.anbrechen(result);
+        } catch (NoResultException nre) {
+            OPDE.debug(nre);
+        } catch (Exception ex) {
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
+
+        return result;
+    }
+
+    public static boolean abschliessen(MedVorrat vorrat) {
+        Connection db = OPDE.getDb().db;
+        boolean result = false;
+        boolean doCommit = false;
+        try {
+            if (db.getAutoCommit()) {
+                db.setAutoCommit(false);
+                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                db.commit();
+                doCommit = true;
+            }
+            // Alle Best?nde abschlie?en.
+            long bestid = getBestandImAnbruch(vorid);
+            if (bestid > 0) {
+                closeBestand(bestid, "Abschluss des Bestandes bei Vorratsabschlu?.", false, STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+            }
+            DefaultComboBoxModel dcbm = getBestandGeschlossen(vorid);
+            if (dcbm.getSize() > 1) { // der erste ist immer "keine"
+                for (int i = 1; i < dcbm.getSize(); i++) {
+                    bestid = (Long) dcbm.getElementAt(i);
+                    closeBestand(bestid, "Abschluss des Bestandes bei Vorratsabschlu?.", false, STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                }
+            }
+
+            // Vorrat beenden.
+            HashMap data = new HashMap();
+            data.put("bis", "!NOW!");
+            if (!op.tools.DBHandling.updateRecord("MPVorrat", data, "VorID", vorid)) {
+                throw new SQLException("Fehler bei Update MPVorrat");
+            }
+            data.clear();
+            if (doCommit) {
+                db.commit();
+                db.setAutoCommit(true);
+            }
+            result = true;
+        } catch (SQLException ex) {
+            try {
+                if (doCommit) {
+                    db.rollback();
+                }
+                result = false;
+            } catch (SQLException ex1) {
+                new DlgException(ex1);
+                ex1.printStackTrace();
+                System.exit(1);
+            }
+            new DlgException(ex);
+        }
+        return result;
+    }
+
+    public static void deleteVorrat(long vorid) {
+        String sql1 = "DELETE buch.* " +
+                " FROM MPBuchung buch INNER JOIN MPBestand best ON buch.BestID = best.BestID " +
+                " WHERE best.VorID = ? ";
+        String sql2 = "DELETE best.* " +
+                " FROM MPBestand best " +
+                " WHERE best.VorID = ? ";
+        String sql3 = "DELETE " +
+                " FROM MPVorrat " +
+                " WHERE VorID = ? ";
+        Connection db = OPDE.getDb().db;
+        //boolean result = false;
+        boolean doCommit = false;
+        try {
+            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
+            if (db.getAutoCommit()) {
+                db.setAutoCommit(false);
+                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                db.commit();
+                doCommit = true;
+            }
+
+            PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
+            stmt1.setLong(1, vorid);
+            stmt1.executeUpdate();
+
+            PreparedStatement stmt2 = OPDE.getDb().db.prepareStatement(sql2);
+            stmt2.setLong(1, vorid);
+            stmt2.executeUpdate();
+
+            PreparedStatement stmt3 = OPDE.getDb().db.prepareStatement(sql3);
+            stmt3.setLong(1, vorid);
+            stmt3.executeUpdate();
+
+            if (doCommit) {
+                db.commit();
+                db.setAutoCommit(true);
+            }
+
+        } catch (SQLException ex) {
+            try {
+                if (doCommit) {
+                    db.rollback();
+                }
+                //result = false;
+            } catch (SQLException ex1) {
+                new DlgException(ex1);
+                ex1.printStackTrace();
+                System.exit(1);
+            }
+            new DlgException(ex);
+        }
+    }
 }

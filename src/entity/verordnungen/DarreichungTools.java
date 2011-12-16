@@ -45,6 +45,8 @@ public class DarreichungTools {
                     text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
 
                     l.setText(text);
+                } else {
+                    l.setText(o.toString());
                 }
                 return l;
             }

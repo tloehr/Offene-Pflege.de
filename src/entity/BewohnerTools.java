@@ -36,6 +36,15 @@ public class BewohnerTools {
         return lblBW;
     }
 
+    public static String getBWLabel1(Bewohner bewohner) {
+        return bewohner.getNachname() + ", " + bewohner.getVorname();
+    }
+
+    public static String getBWLabel2(Bewohner bewohner) {
+        return "(*" + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + ") [" + bewohner.getBWKennung() + "]";
+    }
+
+
     public static void setBWLabel(JLabel lblBW, Bewohner bewohner) {
         lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
         lblBW.setHorizontalAlignment(SwingConstants.LEADING);

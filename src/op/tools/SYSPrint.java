@@ -26,6 +26,8 @@
  */
 package op.tools;
 
+import entity.verordnungen.MedBestand;
+import entity.verordnungen.MedBestandTools;
 import op.OPDE;
 
 import javax.print.*;
@@ -108,19 +110,14 @@ public class SYSPrint {
         return ESCPOS_PRINT_COLOR2 + in + ESCPOS_PRINT_COLOR1;
     }
 
-    public static void printLabel(long bestid) {
+    public static void printLabel(MedBestand bestand) {
         String text = "";
         if (OPDE.getProps().containsKey("labelprinter")) {
             PRINTER = OPDE.getProps().get("labelprinter").toString();
         }
 
-        text = op.care.med.DBHandling.getBestandText4Print(bestid, true);
+        text = MedBestandTools.getBestandText4Print(bestand);
 
-//        if (PRINTER.equalsIgnoreCase("prt0010") || PRINTER.equalsIgnoreCase("prt0010 @ srv0004")) {
-//            text = op.care.med.DBHandling.getBestandText4Print(bestid, true);
-//        } else {
-//            text = op.care.med.DBHandling.getBestandText4Print(bestid, false);
-//        }
         printLabel(text);
     }
 

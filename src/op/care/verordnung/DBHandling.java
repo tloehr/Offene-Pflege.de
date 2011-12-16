@@ -113,107 +113,107 @@ public class DBHandling {
         return result;
     }
 
-    /**
-     * Setzt alle Verordnungen ab, die bis PackungsEnde laufen.
-     *
-     * @param vorid - Vorrat, die zu den Verordnungen gehören.
-     */
-    public static boolean absetzenBisPackEnde2Vorrat(long vorid) {
-        // Das hier sucht alle Verordnungen zu einem bestimmten Vorrat raus,
-        // die bis PackEnde sind.
-        boolean result = true;
-        // #0000042
-        // Korrigierter SQL Ausruck
-        String sql2 = " " +
-                " SELECT DISTINCT bhp.VerID FROM BHPVerordnung bhp " +
-                " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " +
-                " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " +
-                " WHERE b.VorID=? AND bhp.BisPackEnde = 1 " +
-                " AND bhp.AbDatum > now() ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql2);
-            stmt.setLong(1, vorid);
-            ResultSet rs = stmt.executeQuery();
-            rs.beforeFirst();
-            while (rs.next()) {
-                result &= op.care.verordnung.DBHandling.absetzen(rs.getLong("VerID"));
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            result = false;
-        }
-        return result;
-    }
+//    /**
+//     * Setzt alle Verordnungen ab, die bis PackungsEnde laufen.
+//     *
+//     * @param vorid - Vorrat, die zu den Verordnungen gehören.
+//     */
+//    public static boolean absetzenBisPackEnde2Vorrat(long vorid) {
+//        // Das hier sucht alle Verordnungen zu einem bestimmten Vorrat raus,
+//        // die bis PackEnde sind.
+//        boolean result = true;
+//        // #0000042
+//        // Korrigierter SQL Ausruck
+//        String sql2 = " " +
+//                " SELECT DISTINCT bhp.VerID FROM BHPVerordnung bhp " +
+//                " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " +
+//                " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " +
+//                " WHERE b.VorID=? AND bhp.BisPackEnde = 1 " +
+//                " AND bhp.AbDatum > now() ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql2);
+//            stmt.setLong(1, vorid);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.beforeFirst();
+//            while (rs.next()) {
+//                result &= op.care.verordnung.DBHandling.absetzen(rs.getLong("VerID"));
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//            result = false;
+//        }
+//        return result;
+//    }
 
-    public static void copy2tmp(long verid)
-            throws SQLException {
-        String sql = "INSERT INTO BHPPlanung (VerID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitDosis, Uhrzeit, " +
-                " MaxAnzahl, MaxEDosis, Taeglich, Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, LDatum, UKennung," +
-                " tmp)" +
-                " SELECT VerID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitDosis, Uhrzeit, MaxAnzahl, MaxEDosis, Taeglich, " +
-                " Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, LDatum, UKennung, ?" +
-                " FROM BHPPlanung WHERE VerID = ? AND tmp = 0";
-        PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-        stmt.setLong(1, OPDE.getLogin().getLoginID());
-        stmt.setLong(2, verid);
-        stmt.executeUpdate();
-        stmt.close();
-    }
-
-    public static void tmp2real(long verid)
-            throws SQLException {
-
-        Connection db = OPDE.getDb().db;
-        boolean doCommit = false;
-        try {
-            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
-            if (db.getAutoCommit()) {
-                db.setAutoCommit(false);
-                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                db.commit();
-                doCommit = true;
-            }
-
-            String delete = "DELETE FROM BHPPlanung WHERE VerID = ? AND tmp = 0";
-            PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(delete);
-            stmtDel.setLong(1, verid);
-            stmtDel.executeUpdate();
-            stmtDel.close();
-
-            String update = "UPDATE BHPPlanung SET VerID = ?, tmp=0 WHERE tmp = ?";
-            PreparedStatement stmtUpd = OPDE.getDb().db.prepareStatement(update);
-            stmtUpd.setLong(1, verid);
-            stmtUpd.setLong(2, OPDE.getLogin().getLoginID());
-            stmtUpd.executeUpdate();
-            stmtUpd.close();
-
-            if (doCommit) {
-                db.commit();
-                db.setAutoCommit(true);
-            }
-
-        } catch (SQLException ex) {
-            try {
-                if (doCommit) {
-                    db.rollback();
-                }
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
-        }
-    }
-
-    public static void dropTmp()
-            throws SQLException {
-        String delete = "DELETE FROM BHPPlanung WHERE tmp = ?";
-        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(delete);
-        stmtDel.setLong(1, OPDE.getLogin().getLoginID());
-        stmtDel.executeUpdate();
-        stmtDel.close();
-    }
+//    public static void copy2tmp(long verid)
+//            throws SQLException {
+//        String sql = "INSERT INTO BHPPlanung (VerID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitDosis, Uhrzeit, " +
+//                " MaxAnzahl, MaxEDosis, Taeglich, Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, LDatum, UKennung," +
+//                " tmp)" +
+//                " SELECT VerID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitDosis, Uhrzeit, MaxAnzahl, MaxEDosis, Taeglich, " +
+//                " Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, LDatum, UKennung, ?" +
+//                " FROM BHPPlanung WHERE VerID = ? AND tmp = 0";
+//        PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//        stmt.setLong(1, OPDE.getLogin().getLoginID());
+//        stmt.setLong(2, verid);
+//        stmt.executeUpdate();
+//        stmt.close();
+//    }
+//
+//    public static void tmp2real(long verid)
+//            throws SQLException {
+//
+//        Connection db = OPDE.getDb().db;
+//        boolean doCommit = false;
+//        try {
+//            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
+//            if (db.getAutoCommit()) {
+//                db.setAutoCommit(false);
+//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+//                db.commit();
+//                doCommit = true;
+//            }
+//
+//            String delete = "DELETE FROM BHPPlanung WHERE VerID = ? AND tmp = 0";
+//            PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(delete);
+//            stmtDel.setLong(1, verid);
+//            stmtDel.executeUpdate();
+//            stmtDel.close();
+//
+//            String update = "UPDATE BHPPlanung SET VerID = ?, tmp=0 WHERE tmp = ?";
+//            PreparedStatement stmtUpd = OPDE.getDb().db.prepareStatement(update);
+//            stmtUpd.setLong(1, verid);
+//            stmtUpd.setLong(2, OPDE.getLogin().getLoginID());
+//            stmtUpd.executeUpdate();
+//            stmtUpd.close();
+//
+//            if (doCommit) {
+//                db.commit();
+//                db.setAutoCommit(true);
+//            }
+//
+//        } catch (SQLException ex) {
+//            try {
+//                if (doCommit) {
+//                    db.rollback();
+//                }
+//            } catch (SQLException ex1) {
+//                new DlgException(ex1);
+//                ex1.printStackTrace();
+//                System.exit(1);
+//            }
+//            new DlgException(ex);
+//        }
+//    }
+//
+//    public static void dropTmp()
+//            throws SQLException {
+//        String delete = "DELETE FROM BHPPlanung WHERE tmp = ?";
+//        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(delete);
+//        stmtDel.setLong(1, OPDE.getLogin().getLoginID());
+//        stmtDel.executeUpdate();
+//        stmtDel.close();
+//    }
 
     /**
      * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung ab einer bestimmten Tages-Zeit.

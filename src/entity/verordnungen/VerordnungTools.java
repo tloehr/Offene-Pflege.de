@@ -647,6 +647,39 @@ public class VerordnungTools {
         return tmp;
     }
 
+    /**
+     * Setzt alle Verordnungen ab, die bis PackungsEnde laufen.
+     *
+     * @param vorid - Vorrat, die zu den Verordnungen gehören.
+     */
+    public static boolean absetzenBisPackEnde2Vorrat(long vorid) {
+        // Das hier sucht alle Verordnungen zu einem bestimmten Vorrat raus,
+        // die bis PackEnde sind.
+        boolean result = true;
+        // #0000042
+        // Korrigierter SQL Ausruck
+        String sql2 = " " +
+                " SELECT DISTINCT bhp.VerID FROM BHPVerordnung bhp " +
+                " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " +
+                " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " +
+                " WHERE b.VorID=? AND bhp.BisPackEnde = 1 " +
+                " AND bhp.AbDatum > now() ";
+        try {
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql2);
+            stmt.setLong(1, vorid);
+            ResultSet rs = stmt.executeQuery();
+            rs.beforeFirst();
+            while (rs.next()) {
+                result &= op.care.verordnung.DBHandling.absetzen(rs.getLong("VerID"));
+            }
+        } catch (SQLException ex) {
+            new DlgException(ex);
+            result = false;
+        }
+        return result;
+    }
+
+
 
 
 }

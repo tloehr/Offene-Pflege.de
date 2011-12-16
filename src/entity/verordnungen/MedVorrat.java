@@ -164,5 +164,8 @@ public class MedVorrat implements Serializable {
         return "entity.rest.MedVorrat[vorID=" + vorID + "]";
     }
 
+    public Collection<MedBestand> getBestaende() {
+        return bestaende;
+    }
 }
                                        

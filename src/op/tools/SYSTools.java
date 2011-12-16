@@ -494,17 +494,17 @@ public class SYSTools {
         return result;
     }
 
-    public static String getBWLabel1(String currentBW) {
-        HashMap bw = DBHandling.getBW(currentBW);
-        String result = bw.get("nachname") + ", " + bw.get("vorname");
-        return result;
-    }
-
-    public static String getBWLabel2(String currentBW) {
-        HashMap bw = DBHandling.getBW(currentBW);
-        String result = "(*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ") [" + currentBW + "]";
-        return result;
-    }
+//    public static String getBWLabel1(String currentBW) {
+//        HashMap bw = DBHandling.getBW(currentBW);
+//        String result = bw.get("nachname") + ", " + bw.get("vorname");
+//        return result;
+//    }
+//
+//    public static String getBWLabel2(String currentBW) {
+//        HashMap bw = DBHandling.getBW(currentBW);
+//        String result = "(*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ") [" + currentBW + "]";
+//        return result;
+//    }
 
 
     public static String getBWLabel(String currentBW) {

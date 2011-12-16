@@ -41,10 +41,12 @@ public class APV implements Serializable {
     public APV() {
     }
 
-    public APV(Long apvid) {
-        this.apvid = apvid;
+    public APV(BigDecimal apv, boolean tauschen, Bewohner bewohner, Darreichung darreichung) {
+        this.apv = apv;
+        this.tauschen = tauschen;
+        this.bewohner = bewohner;
+        this.darreichung = darreichung;
     }
-
 
     public Long getApvid() {
         return apvid;
@@ -62,7 +64,7 @@ public class APV implements Serializable {
         this.apv = apv;
     }
 
-    public boolean getTauschen() {
+    public boolean isTauschen() {
         return tauschen;
     }
 

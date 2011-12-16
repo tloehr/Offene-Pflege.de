@@ -25,8 +25,6 @@ public class MedBuchungen implements Serializable {
     @Basic(optional = false)
     @Column(name = "BuchID")
     private Long buchID;
-    @Column(name = "BHPID")
-    private BigInteger bhpid;
     @Basic(optional = false)
     @Column(name = "Menge")
     private BigDecimal menge;
@@ -52,20 +50,30 @@ public class MedBuchungen implements Serializable {
         this.user = OPDE.getLogin().getUser();
     }
 
+    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp) {
+        this.bestand = bestand;
+        this.menge = menge;
+        this.pit = new Date();
+        this.bhp = bhp;
+        this.status = MedBuchungenTools.STATUS_AUSBUCHEN_NORMAL;
+        this.user = OPDE.getLogin().getUser();
+    }
+
+    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
+        this.bestand = bestand;
+        this.menge = menge;
+        this.pit = new Date();
+        this.bhp = bhp;
+        this.status = status;
+        this.user = OPDE.getLogin().getUser();
+    }
+
     public Long getBuchID() {
         return buchID;
     }
 
     public void setBuchID(Long buchID) {
         this.buchID = buchID;
-    }
-
-    public BigInteger getBhpid() {
-        return bhpid;
-    }
-
-    public void setBhpid(BigInteger bhpid) {
-        this.bhpid = bhpid;
     }
 
     public BigDecimal getMenge() {
@@ -98,6 +106,22 @@ public class MedBuchungen implements Serializable {
 
     public void setPit(Date pit) {
         this.pit = pit;
+    }
+
+    public BHP getBhp() {
+        return bhp;
+    }
+
+    public void setBhp(BHP bhp) {
+        this.bhp = bhp;
+    }
+
+    public MedBestand getBestand() {
+        return bestand;
+    }
+
+    public void setBestand(MedBestand bestand) {
+        this.bestand = bestand;
     }
 
     // N:1 Relationen

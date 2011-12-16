@@ -31,9 +31,10 @@ import entity.Bewohner;
 import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.care.med.DBHandling;
 import op.care.med.DlgMediAssistent;
-import op.tools.*;
+import op.tools.GuiChecks;
+import op.tools.SYSPrint;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -507,9 +508,8 @@ public class DlgBestand extends javax.swing.JDialog {
         try {
             em.getTransaction().begin();
 
-
             MedPackung packung = null;
-            if (cmbPackung.getSelectedItem() instanceof MedPackung){
+            if (cmbPackung.getSelectedItem() instanceof MedPackung) {
                 packung = (MedPackung) cmbPackung.getSelectedItem();
             }
 
@@ -518,49 +518,28 @@ public class DlgBestand extends javax.swing.JDialog {
             //ListElement le4 = (ListElement) cmbBW.getSelectedItem();
             if (vorrat == null) { // neuen Vorrat anlegen
                 vorrat = new MedVorrat(bewohner, myDarreichung.getMedProdukt().getBezeichnung());
+                em.persist(vorrat);
             }
-            MedBestand bestand = MedVorratTools.einbuchenVorrat(vorrat, packung, darreichung, txtBemerkung.getText(), menge);
+            MedBestand bestand = MedVorratTools.einbuchenVorrat(em, vorrat, packung, darreichung, txtBemerkung.getText(), menge);
 
+            em.getTransaction().commit();
 
-            if (menge.compareTo(packung.getInhalt()) < 0 || cmbPackung.getSelectedIndex() == 0) { // oder Sonderpackung
-                DBHandling.anbrechen(vorid);
-            } else {
-                if (!DBHandling.hasAnbruch(vorid) &&
-                        JOptionPane.showConfirmDialog(this, "Dieser Vorrat enthält bisher nur verschlossene Packungen.\n" +
-                                "Soll die neue Packung direkt als angebrochen markiert werden ?", "Packungs-Anbruch",
-                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                    DBHandling.anbrechenNaechste(vorid);
-                }
+            if (MedVorratTools.getImAnbruch(vorrat) == null &&
+                    JOptionPane.showConfirmDialog(this, "Dieser Vorrat enthält bisher nur verschlossene Packungen.\n" +
+                            "Soll die neue Packung direkt als angebrochen markiert werden ?", "Packungs-Anbruch",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                MedVorratTools.anbrechenNaechste(vorrat);
             }
 
             if (cbDruck.isSelected()) {
-                //SYSPrint.printEpson(op.care.med.DBHandling.getBestandText4Print(bestid));
-                SYSPrint.printLabel(bestid);
+                SYSPrint.printLabel(bestand);
             }
-
-//            // Prüfen, ob BHPs nachimportiert werden müssen.
-//            ResultSet verRS = op.care.med.DBHandling.getVerordnungen2Vorrat(vorid);
-//            if (verRS.first()){
-//                long verid = verRS.getLong(1);
-//                // Gibt es heute für diese VerID noch keine BHPs, dann diesen VerID nachimportieren.
-//                if (!op.care.bhp.DBHandling.isBHPToday(verid)){
-//                    BHPImport.importBHP(verid);
-//                }
-//            }
-
-
-            db.commit();
-            db.setAutoCommit(true);
 
         } catch (Exception ex) {
-            try {
-                db.rollback();
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
+            em.getTransaction().rollback();
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
         }
     }
 
