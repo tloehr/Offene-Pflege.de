@@ -4,10 +4,10 @@
  */
 package entity.verordnungen;
 
-import entity.Bewohner;
-import entity.Einrichtungen;
+import entity.*;
 import op.OPDE;
 import op.tools.*;
+import tablemodels.TMVerordnung;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -440,7 +440,7 @@ public class VerordnungTools {
                         aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung() + " " +
                         (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
                 result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ");
-                result += (result.endsWith(" ") ? "" : " ") +verordnung.getDarreichung().getZusatz() + "</i>";
+                result += (result.endsWith(" ") ? "" : " ") + verordnung.getDarreichung().getZusatz() + "</i>";
             } else {
                 result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
                         " " + verordnung.getDarreichung().getZusatz() + "</b></font>" +
@@ -516,7 +516,11 @@ public class VerordnungTools {
         return result;
     }
 
-    public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, MedVorrat vorrat, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
+    public static String getDosis(Verordnung verordnung) {
+        return getDosis(verordnung, null, null, null, false);
+    }
+
+    public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
         String result = "";
         //OPDE.debug("VerID: "+verid);
 
@@ -562,7 +566,7 @@ public class VerordnungTools {
                         //double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
                         result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
                                 MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm());
-                        result += " (bei einem APV von "+  SYSTools.roundScale2(bestandImAnbruch.getApv()) +" zu 1)";
+                        result += " (bei einem APV von " + SYSTools.roundScale2(bestandImAnbruch.getApv()) + " zu 1)";
                         result += "</i>";
                     }
                     if (bestandImAnbruch != null) {
@@ -647,39 +651,77 @@ public class VerordnungTools {
         return tmp;
     }
 
-    /**
-     * Setzt alle Verordnungen ab, die bis PackungsEnde laufen.
-     *
-     * @param vorid - Vorrat, die zu den Verordnungen gehören.
-     */
-    public static boolean absetzenBisPackEnde2Vorrat(long vorid) {
-        // Das hier sucht alle Verordnungen zu einem bestimmten Vorrat raus,
-        // die bis PackEnde sind.
-        boolean result = true;
-        // #0000042
-        // Korrigierter SQL Ausruck
-        String sql2 = " " +
-                " SELECT DISTINCT bhp.VerID FROM BHPVerordnung bhp " +
-                " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " +
-                " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " +
-                " WHERE b.VorID=? AND bhp.BisPackEnde = 1 " +
-                " AND bhp.AbDatum > now() ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql2);
-            stmt.setLong(1, vorid);
-            ResultSet rs = stmt.executeQuery();
-            rs.beforeFirst();
-            while (rs.next()) {
-                result &= op.care.verordnung.DBHandling.absetzen(rs.getLong("VerID"));
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            result = false;
-        }
+    public static List<Verordnung> getVerordnungenByVorrat(EntityManager em, MedVorrat vorrat, boolean bisPackEnde) throws Exception {
+        List<Verordnung> result = null;
+        Query query = em.createNamedQuery("Verordnung.findActiveByVorratAndPackende");
+        query.setParameter(1, vorrat.getVorID());
+        query.setParameter(2, bisPackEnde);
+        result = query.getResultList();
         return result;
     }
 
+    /**
+     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
+     *
+     * @param verordnung  welche Verordnung soll abgesetzt werden.
+     * @param arzt        welcher Arzt hat sie abgesetzt.
+     * @param krankenhaus welches KH hat sie abgesetzt
+     * @return erfolg
+     */
+    public static void absetzen(EntityManager em, Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) throws Exception {
+        if (arzt == null && krankenhaus == null) {
+            throw new NullPointerException("Arzt und Krankenhaus dürfen nicht beide NULL sein.");
+        }
+        verordnung.setAbDatum(new Date());
+        verordnung.setAbArzt(arzt);
+        verordnung.setAbKH(krankenhaus);
+        verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+
+        verordnung = em.merge(verordnung);
+
+        BHPTools.aufräumen(em, verordnung, new Date());
+
+    }
+
+    /**
+     * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
+     */
+    public static String getVerordnungenAsHTML(List<Verordnung> list) {
+        String result = "";
+
+        if (!list.isEmpty()) {
+
+            Verordnung verordnung = list.get(0);
+//                if (SYSTools.catchNull(bwkennung).equals("")) {
+//                    result += "<h2>Ärztliche Verordnungen</h2>";
+//                } else {
+            result += "<h1>Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(verordnung.getBewohner()) + "</h1>";
+            if (verordnung.getBewohner().getStation() != null) {
+                result += EinrichtungenTools.getAsText(verordnung.getBewohner().getStation().getEinrichtung());
+            }
+
+            result += "<table border=\"1\" cellspacing=\"0\"><tr>" +
+                    "<th style=\"width:30%\">Medikament/Massnahme</th><th style=\"width:50%\">Dosierung / Hinweise</th><th style=\"width:20%\">Angesetzt</th></tr>";
+
+            Iterator<Verordnung> itVerordnung = list.iterator();
+            while (itVerordnung.hasNext()) {
+                verordnung = itVerordnung.next();
+
+                result += "<tr>";
+                result += "<td valign=\"top\">" + SYSTools.unHTML2(getMassnahme(verordnung)) + "</td>";
+                result += "<td valign=\"top\">" + SYSTools.unHTML2(getDosis(verordnung)) + "<br/>";
+                result += SYSTools.unHTML2(getHinweis(verordnung)) + "</td>";
+                result += "<td valign=\"top\">" + SYSTools.unHTML2(getAN(verordnung)) + "</td>";
+                //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
+                result += "</tr>";
 
 
+                result += "</table>";
+            }
+        } else {
+            result += "<h2>Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
+        }
+        return result;
+    }
 
 }

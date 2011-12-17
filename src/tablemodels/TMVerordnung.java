@@ -258,7 +258,7 @@ public class TMVerordnung
         if (cache.containsKey(verordnung)) {
             result = cache.get(verordnung).toString();
         } else {
-            result = VerordnungTools.getDosis(verordnung, bestandImAnbruch, vorrat, bestandSumme, vorratSumme, mitBestand);
+            result = VerordnungTools.getDosis(verordnung, bestandImAnbruch, bestandSumme, vorratSumme, mitBestand);
             cache.put(verordnung, result);
         }
         return result;

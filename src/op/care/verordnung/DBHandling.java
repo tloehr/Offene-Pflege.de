@@ -45,73 +45,73 @@ import java.util.HashMap;
  */
 public class DBHandling {
 
-    /**
-     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
-     *
-     * @param verid   welche Verordnung soll abgesetzt werden.
-     * @param abdatum Ab wann die Verordnung abgesetzt werden soll. <b>NULL bedeutet hier ab JETZT.</b>
-     * @param arztid  welcher Arzt hat sie abgesetzt.
-     * @param khid    welches KH hat sie abgesetzt
-     * @return erfolg
-     */
-    public static boolean absetzen(long verid, long arztid, long khid) {
-        Connection db = OPDE.getDb().db;
-        boolean result = false;
-        boolean doCommit = false;
-        try {
-            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
-            if (db.getAutoCommit()) {
-                db.setAutoCommit(false);
-                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                db.commit();
-                doCommit = true;
-            }
+//    /**
+//     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
+//     *
+//     * @param verid   welche Verordnung soll abgesetzt werden.
+//     * @param abdatum Ab wann die Verordnung abgesetzt werden soll. <b>NULL bedeutet hier ab JETZT.</b>
+//     * @param arztid  welcher Arzt hat sie abgesetzt.
+//     * @param khid    welches KH hat sie abgesetzt
+//     * @return erfolg
+//     */
+//    public static boolean absetzen(long verid, long arztid, long khid) {
+//        Connection db = OPDE.getDb().db;
+//        boolean result = false;
+//        boolean doCommit = false;
+//        try {
+//            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
+//            if (db.getAutoCommit()) {
+//                db.setAutoCommit(false);
+//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+//                db.commit();
+//                doCommit = true;
+//            }
+//
+//            HashMap hm = new HashMap();
+//            hm.put("AbDatum", "!NOW!");
+//            hm.put("AbArztID", arztid);
+//            hm.put("AbKHID", khid);
+//            hm.put("AbUKennung", OPDE.getLogin().getUser().getUKennung());
+//            result = op.tools.DBHandling.updateRecord("BHPVerordnung", hm, "VerID", verid);
+//            hm.clear();
+//            cleanBHP(verid, SYSCalendar.nowDB());
+//
+//            if (doCommit) {
+//                db.commit();
+//                db.setAutoCommit(true);
+//            }
+//
+//            result = true;
+//        } catch (SQLException ex) {
+//            try {
+//                if (doCommit) {
+//                    db.rollback();
+//                }
+//                result = false;
+//            } catch (SQLException ex1) {
+//                new DlgException(ex1);
+//                ex1.printStackTrace();
+//                System.exit(1);
+//            }
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
-            HashMap hm = new HashMap();
-            hm.put("AbDatum", "!NOW!");
-            hm.put("AbArztID", arztid);
-            hm.put("AbKHID", khid);
-            hm.put("AbUKennung", OPDE.getLogin().getUser().getUKennung());
-            result = op.tools.DBHandling.updateRecord("BHPVerordnung", hm, "VerID", verid);
-            hm.clear();
-            cleanBHP(verid, SYSCalendar.nowDB());
-
-            if (doCommit) {
-                db.commit();
-                db.setAutoCommit(true);
-            }
-
-            result = true;
-        } catch (SQLException ex) {
-            try {
-                if (doCommit) {
-                    db.rollback();
-                }
-                result = false;
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
-        }
-        return result;
-    }
-
-    /**
-     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt. Sie wird mit sofortiger
-     * Wirkung abgesetzt. Abgesetzt wird sie durch den ansetzen Arzt bzw. KH.
-     *
-     * @param verid welche Verordnung soll abgesetzt werden.
-     * @return erfolg
-     */
-    public static boolean absetzen(long verid) {
-        boolean result = false;
-        HashMap input = op.tools.DBRetrieve.getSingleRecord("BHPVerordnung", "VerID", verid);
-        result = absetzen(verid, ((BigInteger) input.get("AnArztID")).longValue(), ((BigInteger) input.get("AnKHID")).longValue());
-        input.clear();
-        return result;
-    }
+//    /**
+//     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt. Sie wird mit sofortiger
+//     * Wirkung abgesetzt. Abgesetzt wird sie durch den ansetzen Arzt bzw. KH.
+//     *
+//     * @param verid welche Verordnung soll abgesetzt werden.
+//     * @return erfolg
+//     */
+//    public static boolean absetzen(long verid) {
+//        boolean result = false;
+//        HashMap input = op.tools.DBRetrieve.getSingleRecord("BHPVerordnung", "VerID", verid);
+//        result = absetzen(verid, ((BigInteger) input.get("AnArztID")).longValue(), ((BigInteger) input.get("AnKHID")).longValue());
+//        input.clear();
+//        return result;
+//    }
 
 //    /**
 //     * Setzt alle Verordnungen ab, die bis PackungsEnde laufen.
@@ -215,50 +215,50 @@ public class DBHandling {
 //        stmtDel.close();
 //    }
 
-    /**
-     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung ab einer bestimmten Tages-Zeit.
-     *
-     * @param ts    ist ein bestimmter Zeitpunkt. Das gilt natürlich nur für den aktuellen Tag. Somit ist
-     *              bei ts nur der Uhrzeit anteil relevant. Über diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
-     *              die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> ts sind.
-     * @param verid ist die Verordnung, um die es geht.
-     */
-    public static void cleanBHP(long verid, long ts)
-            throws SQLException {
-        int zeit = SYSCalendar.ermittleZeit(ts);
-        String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
-                " WHERE bhp.VerID = ? AND Status = 0 AND Date(Soll)=Date(now()) AND " +
-                " (" +
-                "   ( " +
-                "       ( SZeit > ? )" +
-                "   ) " +
-                "   OR " +
-                "   (" +
-                "       ( SZeit = 0 AND Time(Soll) >= Time(?) )" +
-                "   )" +
-                " )";
-        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
-        stmtDel.setLong(1, verid);
-        stmtDel.setInt(2, zeit);
-        stmtDel.setTimestamp(3, new Timestamp(ts));
-        stmtDel.executeUpdate();
-        stmtDel.close();
-    }
-
-    /**
-     * Löscht <u>alle</u> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung.
-     *
-     * @param verid ist die Verordnung, um die es geht.
-     */
-    public static void cleanBHP(long verid)
-            throws SQLException {
-        String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
-                " WHERE bhp.VerID = ? AND b.Status = 0";
-        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
-        stmtDel.setLong(1, verid);
-        stmtDel.executeUpdate();
-        stmtDel.close();
-    }
+//    /**
+//     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung ab einer bestimmten Tages-Zeit.
+//     *
+//     * @param ts    ist ein bestimmter Zeitpunkt. Das gilt natürlich nur für den aktuellen Tag. Somit ist
+//     *              bei ts nur der Uhrzeit anteil relevant. Über diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
+//     *              die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> ts sind.
+//     * @param verid ist die Verordnung, um die es geht.
+//     */
+//    public static void cleanBHP(long verid, long ts)
+//            throws SQLException {
+//        int zeit = SYSCalendar.ermittleZeit(ts);
+//        String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
+//                " WHERE bhp.VerID = ? AND Status = 0 AND Date(Soll)=Date(now()) AND " +
+//                " (" +
+//                "   ( " +
+//                "       ( SZeit > ? )" +
+//                "   ) " +
+//                "   OR " +
+//                "   (" +
+//                "       ( SZeit = 0 AND Time(Soll) >= Time(?) )" +
+//                "   )" +
+//                " )";
+//        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
+//        stmtDel.setLong(1, verid);
+//        stmtDel.setInt(2, zeit);
+//        stmtDel.setTimestamp(3, new Timestamp(ts));
+//        stmtDel.executeUpdate();
+//        stmtDel.close();
+//    }
+//
+//    /**
+//     * Löscht <u>alle</u> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung.
+//     *
+//     * @param verid ist die Verordnung, um die es geht.
+//     */
+//    public static void cleanBHP(long verid)
+//            throws SQLException {
+//        String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
+//                " WHERE bhp.VerID = ? AND b.Status = 0";
+//        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
+//        stmtDel.setLong(1, verid);
+//        stmtDel.executeUpdate();
+//        stmtDel.close();
+//    }
 
     /**
      * Löscht <u>alle</u> BHPs für eine bestimmte Verordnung.
@@ -275,46 +275,46 @@ public class DBHandling {
         stmtDel.close();
     }
 
-    /**
-     * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
-     *
-     * @param tmv - TableModel vom Typ TMVerordnungen
-     * @return - HTML Darstellung als String
-     */
-    public static String getVerordnungenAsHTML(TMVerordnung tmv, Bewohner bewohner, int sel[]) {
-        String result = "";
-        String bwkennung = bewohner.getBWKennung();
-        int numVer = tmv.getRowCount();
-        if (numVer > 0) {
-            if (SYSTools.catchNull(bwkennung).equals("")) {
-                result += "<h2>Ärztliche Verordnungen</h2>";
-            } else {
-                result += "<h1>Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(bewohner) + "</h1>";
-                if (bewohner.getStation() != null) {
-                    result += EinrichtungenTools.getAsText(bewohner.getStation().getEinrichtung());
-                }
-            }
-
-            result += "<table border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th style=\"width:30%\">Medikament/Massnahme</th><th style=\"width:50%\">Dosierung / Hinweise</th><th style=\"width:20%\">Angesetzt</th></tr>";
-            for (int v = 0; v < numVer; v++) {
-                if (sel == null || Arrays.binarySearch(sel, v) > -1) {
-                    result += "<tr>";
-                    result += "<td valign=\"top\">" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_MSSN).toString()) + "</td>";
-                    result += "<td valign=\"top\">" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_Dosis).toString()) + "<br/>";
-                    result += SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_Hinweis).toString()) + "</td>";
-                    result += "<td valign=\"top\">" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AN).toString()) + "</td>";
-                    //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
-                    result += "</tr>";
-                }
-            }
-
-            result += "</table>";
-        } else {
-            result += "<h2>Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
-        }
-        return result;
-    }
+//    /**
+//     * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
+//     *
+//     * @param tmv - TableModel vom Typ TMVerordnungen
+//     * @return - HTML Darstellung als String
+//     */
+//    public static String getVerordnungenAsHTML(TMVerordnung tmv, Bewohner bewohner, int sel[]) {
+//        String result = "";
+//        String bwkennung = bewohner.getBWKennung();
+//        int numVer = tmv.getRowCount();
+//        if (numVer > 0) {
+//            if (SYSTools.catchNull(bwkennung).equals("")) {
+//                result += "<h2>Ärztliche Verordnungen</h2>";
+//            } else {
+//                result += "<h1>Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(bewohner) + "</h1>";
+//                if (bewohner.getStation() != null) {
+//                    result += EinrichtungenTools.getAsText(bewohner.getStation().getEinrichtung());
+//                }
+//            }
+//
+//            result += "<table border=\"1\" cellspacing=\"0\"><tr>" +
+//                    "<th style=\"width:30%\">Medikament/Massnahme</th><th style=\"width:50%\">Dosierung / Hinweise</th><th style=\"width:20%\">Angesetzt</th></tr>";
+//            for (int v = 0; v < numVer; v++) {
+//                if (sel == null || Arrays.binarySearch(sel, v) > -1) {
+//                    result += "<tr>";
+//                    result += "<td valign=\"top\">" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_MSSN).toString()) + "</td>";
+//                    result += "<td valign=\"top\">" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_Dosis).toString()) + "<br/>";
+//                    result += SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_Hinweis).toString()) + "</td>";
+//                    result += "<td valign=\"top\">" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AN).toString()) + "</td>";
+//                    //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
+//                    result += "</tr>";
+//                }
+//            }
+//
+//            result += "</table>";
+//        } else {
+//            result += "<h2>Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
+//        }
+//        return result;
+//    }
 
     /**
      * Löscht eine Verordnung und die zugehörigen BHPs .

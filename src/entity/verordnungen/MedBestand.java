@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 
 @Entity
 @Table(name = "MPBestand")
@@ -36,7 +35,7 @@ import java.util.HashMap;
                 " GROUP BY best ")
 })
 
-public class MedBestand implements Serializable {
+public class MedBestand implements Serializable, Comparable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -202,6 +201,14 @@ public class MedBestand implements Serializable {
         this.naechsterBestand = naechsterBestand;
     }
 
+    public boolean isAngebrochen() {
+        return anbruch.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    }
+
+    public boolean isAbgeschlossen() {
+        return aus.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -220,6 +227,15 @@ public class MedBestand implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof MedBestand)) {
+            return -1;
+        }
+        MedBestand other = (MedBestand) o;
+        return this.ein.compareTo(other.getEin());
     }
 
     @Override

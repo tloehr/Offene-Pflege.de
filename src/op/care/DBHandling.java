@@ -29,6 +29,7 @@ package op.care;
 import entity.Bewohner;
 import entity.Einrichtungen;
 import entity.PflegeberichteTools;
+import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import tablemodels.TMVerordnung;
 import op.share.bwinfo.BWInfo;
@@ -213,8 +214,11 @@ public class DBHandling {
         }
 
         if (medi) {
-            TMVerordnung tmv = new TMVerordnung(bewohner, false, false);
-            result += op.care.verordnung.DBHandling.getVerordnungenAsHTML(tmv, bewohner, null);
+            EntityManager em = OPDE.createEM();
+            Query query = em.createNamedQuery("Verordnung.findByBewohnerActiveSorted");
+            query.setParameter("bewohner", bewohner);
+            result += VerordnungTools.getVerordnungenAsHTML(query.getResultList());
+            em.close();
         }
 
         if (bericht) {

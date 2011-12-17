@@ -35,11 +35,16 @@ import java.util.Date;
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
         @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan"),
-        @NamedQuery(name = "Verordnung.findByBewohner", query = "SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum = '9999-12-31 23:59:59'")
+        @NamedQuery(name = "Verordnung.findByBewohnerActiveSorted", query = " " +
+                " SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum = '9999-12-31 23:59:59' " +
+                " ORDER BY b.situation IS NULL, b.darreichung IS NOT NULL, b.darreichung.medProdukt.bezeichnung, b.massnahme.bezeichnung ")
 })
 
 @SqlResultSetMappings({
         @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
+                entities = @EntityResult(entityClass = Verordnung.class)
+        ),
+        @SqlResultSetMapping(name = "Verordnung.findActiveByVorratAndPackendeResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class),
                 columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
         )
@@ -89,7 +94,18 @@ import java.util.Date;
                 // Wenn man als 3. Parameter eine 1 übergibt, dann werden alle
                 // Verordungen angezeigt, wenn nicht, dann nur die aktuellen.
                 " AND (1=? OR date(v.AbDatum) >= current_date())" +
-                " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping")
+                " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping"),
+        /**
+         * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
+         * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+         */
+        @NamedNativeQuery(name = "Verordnung.findActiveByVorratAndPackende", query = " " +
+                " SELECT DISTINCT ver.* FROM BHPVerordnung ver " +
+                " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " + // Verbindung über Bewohner
+                " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
+                " WHERE b.VorID=? AND ver.BisPackEnde = ? " +
+                " AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratAndPackendeResultMapping")
+
 })
 
 public class Verordnung implements Serializable, VorgangElement {

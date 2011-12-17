@@ -480,7 +480,7 @@ public class OPDE {
                     EntityTools.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
 
-                    BHPTools.importBHP(null, null);
+                    BHPTools.erzeugen(null, null);
                 } catch (Exception ex) {
                     logger.fatal("Exception beim BHPImport", ex);
                 }

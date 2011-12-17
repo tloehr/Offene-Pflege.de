@@ -36,9 +36,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
+import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -46,12 +48,12 @@ import java.math.BigDecimal;
 public class DlgBestandAbschliessen extends javax.swing.JDialog {
 
     private MedBestand bestand;
-    private Frame parent;
+    private java.awt.Frame parent;
 
     /**
      * Creates new form DlgBestandAnbruch
      */
-    public DlgBestandAbschliessen(Frame parent, MedBestand bestand) {
+    public DlgBestandAbschliessen(java.awt.Frame parent, MedBestand bestand) {
         super(parent, true);
         this.parent = parent;
         this.bestand = bestand;
@@ -88,6 +90,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+
         Container contentPane = getContentPane();
 
         //---- jLabel1 ----
@@ -393,7 +396,9 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 MedBestandTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
                 //DBHandling.setzeBestand(bestid, inhalt, "Korrekturbuchung zum Packungsabschluss", DBHandling.STATUS_KORREKTUR_AUTO_VORAB);
                 //op.tools.DBHandling.updateRecord("MPBestand", hm, "BestID", bestid);
+                bestand.getVorrat().getBestaende().remove(bestand);
                 bestand = em.merge(bestand);
+                bestand.getVorrat().getBestaende().add(bestand);
 
                 OPDE.info(classname + ": Vorabstellen angeklickt. Sind noch " + inhalt + " in der Packung.");
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
@@ -420,20 +425,27 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 } else {
                     // es wurde kein nächster angebrochen ?
                     // könnte es sein, dass dieser Vorrat keine Packungen mehr hat ?
-                    if (bestand.getVorrat().getBestaende().isEmpty()){
+                    if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null && MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
                         // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                         // Die müssen dann jetzt nämlich abgeschlossen werden.
-                        // TODO: hier gehts weiter
+                        Iterator<Verordnung> itVerordnung = VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat(), true).iterator();
+                        while (itVerordnung.hasNext()){
+                            Verordnung verordnung = itVerordnung.next();
+                            VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+                        }
                     }
                 }
-                if (!DBHandling.hasAnbruch(vorid)) { // Keine mehr im Anbruch ?
-                    // Dann alles absetzen, was zu diesem Vorrat gehörte und bis PackEnde lief.
-                    op.care.verordnung.DBHandling.absetzenBisPackEnde2Vorrat(vorid);
-                }
+//                if (!DBHandling.hasAnbruch(vorid)) { // Keine mehr im Anbruch ?
+//                    // Dann alles absetzen, was zu diesem Vorrat gehörte und bis PackEnde lief.
+//                    op.care.verordnung.DBHandling.absetzenBisPackEnde2Vorrat(vorid);
+//                }
             }
-            OPDE.info(classname + ": Operation beendet.");
+            em.getTransaction().commit();
         } catch (Exception e) {
-            OPDE.info(classname + ":" + e.getMessage());
+            em.getTransaction().rollback();
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
     }
 
