@@ -25,7 +25,9 @@
  */
 package op;
 
-import entity.*;
+import entity.EntityTools;
+import entity.Users;
+import entity.UsersTools;
 import entity.system.*;
 import entity.verordnungen.BHPTools;
 import op.care.DFNImport;
@@ -34,7 +36,6 @@ import op.threads.BackgroundMonitor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
-import org.w3c.dom.Entity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -206,10 +207,13 @@ public class OPDE {
         SyslogTools.info(message.toString());
     }
 
-    public static void fatal(Object message) {
-        logger.fatal(message);
-        SyslogTools.fatal(message.toString());
-        SYSHostsTools.shutdown(1);
+    public static void fatal(Throwable e) {
+        logger.fatal(e.getMessage(), e);
+        SyslogTools.fatal(e.getMessage());
+        e.printStackTrace();
+        if (host != null) {
+            SYSHostsTools.shutdown(1);
+        }
     }
 
     public static void error(Object message) {
@@ -285,9 +289,7 @@ public class OPDE {
 
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                //new DlgException(new Exception(e));
-                e.printStackTrace();
-                OPDE.error(e);
+                OPDE.fatal(e);
             }
         });
 

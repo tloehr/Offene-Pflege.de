@@ -27,31 +27,40 @@
 
 package op.care.verordnung;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
+import entity.Arzt;
+import entity.ArztTools;
+import entity.Krankenhaus;
+import entity.KrankenhausTools;
+import entity.verordnungen.Verordnung;
+import entity.verordnungen.VerordnungTools;
+import op.OPDE;
 import op.tools.ListElement;
 import op.tools.SYSTools;
 
-import java.sql.ResultSet;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author root
  */
 public class DlgAbsetzen extends javax.swing.JDialog {
-    private long verid;
+    private Verordnung verordnung;
 
     /**
      * Creates new form DlgAbsetzen
      */
-    public DlgAbsetzen(java.awt.Frame parent, String text, long verid) {
+    public DlgAbsetzen(java.awt.Frame parent, String text, Verordnung verordnung) {
         super(parent, true);
-        this.verid = verid;
+        this.verordnung = verordnung;
         initComponents();
         lblText.setText(text);
-        fillÄrzte();
+        fillAerzteUndKHs();
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -143,55 +152,55 @@ public class DlgAbsetzen extends javax.swing.JDialog {
         contentPaneLayout.setHorizontalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addGap(12, 12, 12)
-                            .addComponent(lblVital, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jLabel4)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(contentPaneLayout.createParallelGroup()
-                                .addComponent(cmbKHAb, 0, 452, Short.MAX_VALUE)
-                                .addComponent(cmbArztAb, 0, 452, Short.MAX_VALUE)))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(btnOK)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnCancel))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(lblText, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)))
-                    .addContainerGap())
+                        .addGroup(contentPaneLayout.createParallelGroup()
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addGap(12, 12, 12)
+                                        .addComponent(lblVital, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(jLabel4)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(contentPaneLayout.createParallelGroup()
+                                                .addComponent(cmbKHAb, 0, 452, Short.MAX_VALUE)
+                                                .addComponent(cmbArztAb, 0, 452, Short.MAX_VALUE)))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
+                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(btnOK)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnCancel))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(lblText, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)))
+                        .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblVital)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblText)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel4)
-                        .addComponent(cmbArztAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(cmbKHAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(9, 9, 9)
-                    .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnCancel)
-                        .addComponent(btnOK))
-                    .addContainerGap())
+                        .addContainerGap()
+                        .addComponent(lblVital)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblText)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel4)
+                                .addComponent(cmbArztAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbKHAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)
+                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnCancel)
+                                .addComponent(btnOK))
+                        .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -202,9 +211,9 @@ public class DlgAbsetzen extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        long arztid = ((ListElement) cmbArztAb.getSelectedItem()).getPk();
-        long khid = ((ListElement) cmbKHAb.getSelectedItem()).getPk();
-        DBHandling.absetzen(verid, arztid, khid);
+        Arzt arzt = (Arzt) cmbArztAb.getSelectedItem();
+        Krankenhaus krankenhaus = (Krankenhaus) cmbKHAb.getSelectedItem();
+        VerordnungTools.absetzen(verordnung, arzt, krankenhaus);
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
@@ -217,12 +226,27 @@ public class DlgAbsetzen extends javax.swing.JDialog {
     }//GEN-LAST:event_cmbArztAbItemStateChanged
 
 
-    private void fillÄrzte() {
-        ResultSet rs1 = op.tools.DBRetrieve.getResultSet("Arzt", new String[]{"ArztID", "Name", "Vorname", "Ort"}, new String[]{"Name", "Vorname"});
-        cmbArztAb.setModel(SYSTools.rs2cmb(rs1, true));
-        ResultSet rs2 = op.tools.DBRetrieve.getResultSet("KH", new String[]{"KHID", "Name", "Ort"}, new String[]{"Name"});
-        cmbKHAb.setModel(SYSTools.rs2cmb(rs2, true));
+    private void fillAerzteUndKHs() {
+        EntityManager em = OPDE.createEM();
+        Query queryArzt = em.createNamedQuery("Arzt.findAll");
+        java.util.List<Arzt> listAerzte = queryArzt.getResultList();
+        listAerzte.add(0, null);
+
+        Query queryKH = em.createNamedQuery("Krankenhaus.findAll");
+        java.util.List<Krankenhaus> listKH = queryKH.getResultList();
+        listKH.add(0, null);
+
+        cmbArztAb.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
+        cmbArztAb.setRenderer(ArztTools.getArztRenderer());
+        cmbArztAb.setSelectedIndex(0);
+
+        cmbKHAb.setModel(new DefaultComboBoxModel(listKH.toArray()));
+        cmbKHAb.setRenderer(KrankenhausTools.getKHRenderer());
+        cmbKHAb.setSelectedIndex(0);
+
+        em.close();
     }
+
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
     private JSeparator jSeparator1;

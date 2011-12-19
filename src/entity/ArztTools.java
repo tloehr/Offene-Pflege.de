@@ -1,5 +1,7 @@
 package entity;
 
+import op.tools.SYSTools;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,17 +15,27 @@ import java.awt.*;
 public class ArztTools {
 
     public static ListCellRenderer getArztRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
-                if (o == null){
-                    l.setText("<i>Keine Auswahl</i>");
-                } else if (o instanceof Arzt) {
-                    l.setText(((Arzt) o).getName() + ", " + ((Arzt) o).getVorname() + ", " + ((Arzt) o).getOrt());
-                }
-                return l;
+
+
+        class arztListRenderer extends DefaultListCellRenderer {
+            arztListRenderer() {
+                super();
             }
-        };
+
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof Arzt) {
+                    text = ((Arzt) o).getName() + ", " + ((Arzt) o).getVorname() + ", " + ((Arzt) o).getOrt();
+                } else {
+                    text = o.toString();
+                }
+                return super.getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+
+            }
+        }
+        return new arztListRenderer();
     }
 }

@@ -235,7 +235,7 @@ public class DlgDAF extends javax.swing.JDialog {
         hm.put("Zusatz", txtZusatz.getText());
         hm.put("FormID", formid);
         double apv = Double.parseDouble(txtAPV.getText());
-        if (editMode) {
+       /* if (editMode) {
             DBHandling.updateRecord("MPDarreichung", hm, "DafID", dafid);
             op.care.med.DBHandling.setAPV(dafid, apv, false);
         } else {
@@ -244,7 +244,7 @@ public class DlgDAF extends javax.swing.JDialog {
             dafid = DBHandling.insertRecord("MPDarreichung", hm);
             int formStatus = op.care.med.DBHandling.getFormStatusDafID(dafid);
             op.care.med.DBHandling.setAPV(dafid, apv, formStatus == op.care.med.DBHandling.FORMSTATUS_APV_PER_DAF);
-        }
+        }*/
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 

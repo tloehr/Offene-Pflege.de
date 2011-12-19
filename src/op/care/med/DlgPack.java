@@ -54,8 +54,8 @@ public class DlgPack extends javax.swing.JDialog {
         super(parent, true);
         initComponents();
         setTitle(title);
-        cmbGroesse.setModel(new DefaultComboBoxModel(SYSConst.GROESSE));
-        //cmbEinheit.setModel(new DefaultComboBoxModel(SYSConst.EINHEIT));
+//        cmbGroesse.setModel(new DefaultComboBoxModel(SYSConst.GROESSE));
+
         this.editMode = editMode;
         if (editMode) {
             mpid = id;

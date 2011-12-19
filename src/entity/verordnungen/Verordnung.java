@@ -14,8 +14,10 @@ import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author tloehr
@@ -37,14 +39,14 @@ import java.util.Date;
         @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan"),
         @NamedQuery(name = "Verordnung.findByBewohnerActiveSorted", query = " " +
                 " SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum = '9999-12-31 23:59:59' " +
-                " ORDER BY b.situation IS NULL, b.darreichung IS NOT NULL, b.darreichung.medProdukt.bezeichnung, b.massnahme.bezeichnung ")
+                " ORDER BY b.situation.sitID, b.darreichung.dafID, b.darreichung.medProdukt.bezeichnung, b.massnahme.bezeichnung ")
 })
 
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
+        @SqlResultSetMapping(name = "Verordnung.findActiveByVorratAndPackendeResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class)
         ),
-        @SqlResultSetMapping(name = "Verordnung.findActiveByVorratAndPackendeResultMapping",
+        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class),
                 columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
         )
@@ -138,11 +140,11 @@ public class Verordnung implements Serializable, VorgangElement {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
     private Collection<Sysver2file> attachedFiles;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
     private Collection<SYSVER2VORGANG> attachedVorgaenge;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
     private Collection<VerordnungPlanung> planungen;
     // ==
     // N:1 Relationen
@@ -184,6 +186,9 @@ public class Verordnung implements Serializable, VorgangElement {
 
     public Verordnung(Bewohner bewohner) {
         this.bewohner = bewohner;
+        this.attachedFiles = new ArrayList<Sysver2file>();
+        this.attachedVorgaenge = new ArrayList<SYSVER2VORGANG>();
+        this.planungen = new ArrayList<VerordnungPlanung>();
     }
 
     public Long getVerid() {

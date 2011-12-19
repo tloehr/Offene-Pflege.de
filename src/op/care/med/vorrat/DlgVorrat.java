@@ -26,6 +26,16 @@
  */
 package op.care.med.vorrat;
 
+import java.awt.event.*;
+import javax.persistence.EntityManager;
+import javax.swing.border.*;
+import javax.swing.event.*;
+
+import entity.Bewohner;
+import entity.BewohnerTools;
+import entity.verordnungen.MedBestand;
+import entity.verordnungen.MedBuchungenTools;
+import entity.verordnungen.MedVorrat;
 import op.OCSec;
 import op.OPDE;
 import op.tools.*;
@@ -70,11 +80,11 @@ import java.util.HashMap;
  */
 public class DlgVorrat extends javax.swing.JDialog {
 
-    private String bwkennung;
+    private MedVorrat vorrat;
+    private MedBestand bestand;
+    private Bewohner bewohner;
     private Component parent;
     private Component thisDialog;
-    private long vorid;
-    private long bestid;
     private ListSelectionListener lslV;
     private ListSelectionListener lslB;
     private JPopupMenu menuV;
@@ -82,35 +92,39 @@ public class DlgVorrat extends javax.swing.JDialog {
     private JPopupMenu menuBuch;
     private boolean ignoreEvent;
     private OCSec ocs;
+    private long vorid;
+    BigInteger myvorid;
+    private long bestid;
+    private String bwkennung;
 
     /**
      * Creates new form DlgVorrat
      */
-    public DlgVorrat(JDialog parent, String bwkennung) {
+    public DlgVorrat(JDialog parent, Bewohner bewohner) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
         initDialog();
     }
 
-    public DlgVorrat(JFrame parent, String bwkennung) {
+    public DlgVorrat(JFrame parent, Bewohner bewohner) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
         initDialog();
     }
 
     public DlgVorrat(JDialog parent) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = "";
+        this.bewohner = null;
         initDialog();
     }
 
     public DlgVorrat(JFrame parent) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = "";
+        this.bewohner = null;
         initDialog();
     }
 
@@ -120,13 +134,13 @@ public class DlgVorrat extends javax.swing.JDialog {
         thisDialog = this;
         ignoreEvent = false;
         initComponents();
-        txtSuche.setEnabled(bwkennung.equals(""));
-        cmbBW.setEnabled(bwkennung.equals(""));
-        if (bwkennung.equals("")) {
+        txtSuche.setEnabled(bewohner == null);
+        cmbBW.setEnabled(bewohner == null);
+        if (bewohner == null) {
             txtSuche.requestFocus();
             lblBW.setText("");
         } else {
-            SYSTools.setBWLabel(lblBW, bwkennung);
+            BewohnerTools.setBWLabel(lblBW, bewohner);
         }
         reloadVorratTable();
         SYSTools.centerOnParent(parent, this);
@@ -141,307 +155,358 @@ public class DlgVorrat extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        lblFrage = new JLabel();
+        lblBW = new JLabel();
+        jPanel2 = new JPanel();
+        jspVorrat = new JScrollPane();
+        tblVorrat = new JTable();
+        cbClosedVorrat = new JCheckBox();
+        jPanel3 = new JPanel();
+        jspBestand = new JScrollPane();
+        tblBestand = new JTable();
+        cbClosedBestand = new JCheckBox();
+        btnClose = new JButton();
+        pnl123 = new JPanel();
+        jspBuchung = new JScrollPane();
+        tblBuchung = new JTable();
+        jPanel1 = new JPanel();
+        txtSuche = new JTextField();
+        cmbBW = new JComboBox();
+        jSeparator1 = new JSeparator();
+        jToolBar1 = new JToolBar();
+        btnBestandsliste = new JButton();
 
-        lblFrage = new javax.swing.JLabel();
-        lblBW = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jspVorrat = new javax.swing.JScrollPane();
-        tblVorrat = new javax.swing.JTable();
-        cbClosedVorrat = new javax.swing.JCheckBox();
-        jPanel3 = new javax.swing.JPanel();
-        jspBestand = new javax.swing.JScrollPane();
-        tblBestand = new javax.swing.JTable();
-        cbClosedBestand = new javax.swing.JCheckBox();
-        btnClose = new javax.swing.JButton();
-        pnl123 = new javax.swing.JPanel();
-        jspBuchung = new javax.swing.JScrollPane();
-        tblBuchung = new javax.swing.JTable();
-        jPanel1 = new javax.swing.JPanel();
-        txtSuche = new javax.swing.JTextField();
-        cmbBW = new javax.swing.JComboBox();
-        jSeparator1 = new javax.swing.JSeparator();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnBestandsliste = new javax.swing.JButton();
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        lblFrage.setFont(new java.awt.Font("Dialog", 1, 24));
+        //---- lblFrage ----
+        lblFrage.setFont(new Font("Dialog", Font.BOLD, 24));
         lblFrage.setText("Medikamenten Vorrat");
 
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Vorräte"));
+        //======== jPanel2 ========
+        {
+            jPanel2.setBorder(new TitledBorder("Vorr\u00e4te"));
 
-        jspVorrat.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jspVorratMousePressed(evt);
-            }
-        });
+            //======== jspVorrat ========
+            {
+                jspVorrat.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        jspVorratMousePressed(e);
+                    }
+                });
 
-        tblVorrat.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
+                //---- tblVorrat ----
+                tblVorrat.setModel(new DefaultTableModel(
+                    new Object[][] {
                         {null, null, null, null},
                         {null, null, null, null},
                         {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
+                        {null, null, null, null},
+                    },
+                    new String[] {
                         "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+                ));
+                tblVorrat.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblVorratMousePressed(e);
+                    }
+                });
+                jspVorrat.setViewportView(tblVorrat);
+            }
+
+            //---- cbClosedVorrat ----
+            cbClosedVorrat.setText("Abgeschlossene anzeigen");
+            cbClosedVorrat.setBorder(BorderFactory.createEmptyBorder());
+            cbClosedVorrat.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cbClosedVorratItemStateChanged(e);
                 }
-        ));
-        tblVorrat.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblVorratMousePressed(evt);
-            }
-        });
-        jspVorrat.setViewportView(tblVorrat);
+            });
 
-        cbClosedVorrat.setText("Abgeschlossene anzeigen");
-        cbClosedVorrat.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbClosedVorrat.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbClosedVorrat.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cbClosedVorratItemStateChanged(evt);
-            }
-        });
+            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+            jPanel2.setLayout(jPanel2Layout);
+            jPanel2Layout.setHorizontalGroup(
+                jPanel2Layout.createParallelGroup()
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel2Layout.createParallelGroup()
+                            .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                            .addComponent(cbClosedVorrat))
+                        .addContainerGap())
+            );
+            jPanel2Layout.setVerticalGroup(
+                jPanel2Layout.createParallelGroup()
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(cbClosedVorrat)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+        }
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jspVorrat, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-                                        .addComponent(cbClosedVorrat))
-                                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(cbClosedVorrat)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspVorrat, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+        //======== jPanel3 ========
+        {
+            jPanel3.setBorder(new TitledBorder("Best\u00e4nde"));
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bestände"));
+            //======== jspBestand ========
+            {
+                jspBestand.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        jspBestandMousePressed(e);
+                    }
+                });
 
-        jspBestand.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jspBestandMousePressed(evt);
-            }
-        });
-
-        tblBestand.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
+                //---- tblBestand ----
+                tblBestand.setModel(new DefaultTableModel(
+                    new Object[][] {
                         {null, null, null, null},
                         {null, null, null, null},
                         {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
+                        {null, null, null, null},
+                    },
+                    new String[] {
                         "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+                ));
+                tblBestand.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblBestandMousePressed(e);
+                    }
+                });
+                jspBestand.setViewportView(tblBestand);
+            }
+
+            //---- cbClosedBestand ----
+            cbClosedBestand.setText("Abgeschlossene anzeigen");
+            cbClosedBestand.setBorder(BorderFactory.createEmptyBorder());
+            cbClosedBestand.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cbClosedBestandItemStateChanged(e);
                 }
-        ));
-        tblBestand.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblBestandMousePressed(evt);
-            }
-        });
-        jspBestand.setViewportView(tblBestand);
+            });
 
-        cbClosedBestand.setText("Abgeschlossene anzeigen");
-        cbClosedBestand.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        cbClosedBestand.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        cbClosedBestand.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cbClosedBestandItemStateChanged(evt);
-            }
-        });
+            GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
+            jPanel3.setLayout(jPanel3Layout);
+            jPanel3Layout.setHorizontalGroup(
+                jPanel3Layout.createParallelGroup()
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel3Layout.createParallelGroup()
+                            .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                            .addComponent(cbClosedBestand))
+                        .addContainerGap())
+            );
+            jPanel3Layout.setVerticalGroup(
+                jPanel3Layout.createParallelGroup()
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(cbClosedBestand)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+        }
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jspBestand, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-                                        .addComponent(cbClosedBestand))
-                                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(cbClosedBestand)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspBestand, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-
-        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
-        btnClose.setText("Schließen");
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
+        //---- btnClose ----
+        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+        btnClose.setText("Schlie\u00dfen");
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCloseActionPerformed(e);
             }
         });
 
-        pnl123.setBorder(javax.swing.BorderFactory.createTitledBorder("Buchungen"));
+        //======== pnl123 ========
+        {
+            pnl123.setBorder(new TitledBorder("Buchungen"));
 
-        jspBuchung.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jspBuchungMousePressed(evt);
-            }
-        });
+            //======== jspBuchung ========
+            {
+                jspBuchung.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        jspBuchungMousePressed(e);
+                    }
+                });
 
-        tblBuchung.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
+                //---- tblBuchung ----
+                tblBuchung.setModel(new DefaultTableModel(
+                    new Object[][] {
                         {null, null, null, null},
                         {null, null, null, null},
                         {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
+                        {null, null, null, null},
+                    },
+                    new String[] {
                         "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+                ));
+                tblBuchung.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblBuchungMousePressed(e);
+                    }
+                });
+                jspBuchung.setViewportView(tblBuchung);
+            }
+
+            GroupLayout pnl123Layout = new GroupLayout(pnl123);
+            pnl123.setLayout(pnl123Layout);
+            pnl123Layout.setHorizontalGroup(
+                pnl123Layout.createParallelGroup()
+                    .addGroup(pnl123Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+            pnl123Layout.setVerticalGroup(
+                pnl123Layout.createParallelGroup()
+                    .addGroup(pnl123Layout.createSequentialGroup()
+                        .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+        }
+
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new TitledBorder("Suche"));
+
+            //---- txtSuche ----
+            txtSuche.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtSucheCaretUpdate(e);
                 }
-        ));
-        tblBuchung.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblBuchungMousePressed(evt);
-            }
-        });
-        jspBuchung.setViewportView(tblBuchung);
+            });
+            txtSuche.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtSucheActionPerformed(e);
+                }
+            });
+            txtSuche.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtSucheFocusGained(e);
+                }
+            });
 
-        javax.swing.GroupLayout pnl123Layout = new javax.swing.GroupLayout(pnl123);
-        pnl123.setLayout(pnl123Layout);
-        pnl123Layout.setHorizontalGroup(
-                pnl123Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl123Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspBuchung, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
-                                .addContainerGap())
+            //---- cmbBW ----
+            cmbBW.setModel(new DefaultComboBoxModel(new String[] {
+
+            }));
+            cmbBW.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbBWItemStateChanged(e);
+                }
+            });
+
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(cmbBW, GroupLayout.Alignment.LEADING, 0, 771, Short.MAX_VALUE)
+                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE))
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbBW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(22, Short.MAX_VALUE))
+            );
+        }
+
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
+
+            //---- btnBestandsliste ----
+            btnBestandsliste.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
+            btnBestandsliste.setText("Bestandsliste");
+            btnBestandsliste.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBestandslisteActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnBestandsliste);
+        }
+
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(pnl123, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnClose, GroupLayout.Alignment.TRAILING))
+                    .addContainerGap())
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 843, Short.MAX_VALUE)
         );
-        pnl123Layout.setVerticalGroup(
-                pnl123Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl123Layout.createSequentialGroup()
-                                .addComponent(jspBuchung, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblFrage)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblBW)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(pnl123, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnClose)
+                    .addContainerGap())
         );
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Suche"));
-
-        txtSuche.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtSucheCaretUpdate(evt);
-            }
-        });
-        txtSuche.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSucheActionPerformed(evt);
-            }
-        });
-        txtSuche.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtSucheFocusGained(evt);
-            }
-        });
-
-        cmbBW.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbBWItemStateChanged(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(cmbBW, javax.swing.GroupLayout.Alignment.LEADING, 0, 717, Short.MAX_VALUE)
-                                        .addComponent(txtSuche, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbBW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(14, Short.MAX_VALUE))
-        );
-
-        jToolBar1.setFloatable(false);
-
-        btnBestandsliste.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png"))); // NOI18N
-        btnBestandsliste.setText("Bestandsliste");
-        btnBestandsliste.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBestandslisteActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnBestandsliste);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(pnl123, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(btnClose, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblFrage, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblFrage)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addComponent(pnl123, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnClose)
-                                .addContainerGap())
-        );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbClosedBestandItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbClosedBestandItemStateChanged
@@ -515,18 +580,19 @@ public class DlgVorrat extends javax.swing.JDialog {
         if (!txtSuche.getText().equals("")) {
             if (txtSuche.getText().matches("\\d*")) { // Nur Zahlen.. Das ist eine BestID
                 long mybestid = Long.parseLong(txtSuche.getText());
-                BigInteger myvorid = (BigInteger) op.tools.DBHandling.getSingleValue("MPBestand", "VorID", "BestID", mybestid);
-                if (myvorid != null && myvorid.longValue() > 0) {
-                    bwkennung = (String) DBHandling.getSingleValue("MPVorrat", "BWKennung", "VorID", myvorid.longValue());
+                EntityManager em = OPDE.createEM();
+                MedBestand bestand = em.find(MedBestand.class, mybestid);
+                em.close();
+
+                if (bestand != null) {
                     reloadVorratTable();
                     DefaultComboBoxModel dcbm = null;
-                    ResultSet rs = op.tools.DBRetrieve.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum"}, "BWKennung",
-                            bwkennung, "=");
-                    dcbm = SYSTools.rs2cmb(rs);
-                    cmbBW.setModel(dcbm);
+                    cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bestand.getVorrat().getBewohner()}));
                     int i = 0;
                     boolean found = false;
+
                     TMResultSet tm = (TMResultSet) tblVorrat.getModel();
+
                     while (!found && i < tm.getRowCount()) {
                         long thisVorID = ((BigInteger) tm.getPK(i)).longValue();//Long.parseLong(tm.getValueAt(0, i).toString());
                         if (thisVorID == myvorid.longValue()) {
@@ -694,7 +760,7 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    SYSPrint.printLabel(mybestid);
+                    //SYSPrint.printLabel(mybestid);
                 }
             });
             menuV.add(itemPopupPrint);
@@ -704,7 +770,7 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(thisDialog, "Sind sie sicher ?", "Bestand abschließen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        op.care.med.DBHandling.closeBestand(mybestid, "", false, op.care.med.DBHandling.STATUS_KORREKTUR_MANUELL);
+                        //op.care.med.DBHandling.closeBestand(mybestid, "", false, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
                         reloadVorratTable();
                     }
                 }
@@ -739,7 +805,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                     reloadBestandTable();
                 }
             });
-            itemPopupAnbruch.setEnabled(!op.care.med.DBHandling.hasAnbruch(vorid)); // Nur an anbrechen lassen, wenn noch keine im Anbruch ist.
+            //itemPopupAnbruch.setEnabled(!op.care.med.DBHandling.hasAnbruch(vorid)); // Nur an anbrechen lassen, wenn noch keine im Anbruch ist.
             menuV.add(itemPopupAnbruch);
 
             // ---------------
@@ -797,7 +863,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(parent, "Sind sie sicher ?", "Vorrat löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Vorrat löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            op.care.med.DBHandling.deleteVorrat(vorid);
+                            //op.care.med.DBHandling.deleteVorrat(vorid);
                         }
                     }
                     reloadVorratTable();
@@ -810,7 +876,7 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(parent, "Sind sie sicher ?", "Vorrat abschließen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        op.care.med.DBHandling.closeVorrat(vorid);
+                        //op.care.med.DBHandling.closeVorrat(vorid);
                     }
                     reloadVorratTable();
                 }
@@ -957,7 +1023,7 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 lslV = new HandleVorratSelections();
 
-                tblVorrat.setModel(new TMResultSet(rs));
+                //tblVorrat.setModel(new BeanTableModel());
 
                 tblVorrat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
                 lsm.addListSelectionListener(lslV);
@@ -1059,26 +1125,26 @@ public class DlgVorrat extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBestandsliste;
-    private javax.swing.JButton btnClose;
-    private javax.swing.JCheckBox cbClosedBestand;
-    private javax.swing.JCheckBox cbClosedVorrat;
-    private javax.swing.JComboBox cmbBW;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JScrollPane jspBestand;
-    private javax.swing.JScrollPane jspBuchung;
-    private javax.swing.JScrollPane jspVorrat;
-    private javax.swing.JLabel lblBW;
-    private javax.swing.JLabel lblFrage;
-    private javax.swing.JPanel pnl123;
-    private javax.swing.JTable tblBestand;
-    private javax.swing.JTable tblBuchung;
-    private javax.swing.JTable tblVorrat;
-    private javax.swing.JTextField txtSuche;
+    private JLabel lblFrage;
+    private JLabel lblBW;
+    private JPanel jPanel2;
+    private JScrollPane jspVorrat;
+    private JTable tblVorrat;
+    private JCheckBox cbClosedVorrat;
+    private JPanel jPanel3;
+    private JScrollPane jspBestand;
+    private JTable tblBestand;
+    private JCheckBox cbClosedBestand;
+    private JButton btnClose;
+    private JPanel pnl123;
+    private JScrollPane jspBuchung;
+    private JTable tblBuchung;
+    private JPanel jPanel1;
+    private JTextField txtSuche;
+    private JComboBox cmbBW;
+    private JSeparator jSeparator1;
+    private JToolBar jToolBar1;
+    private JButton btnBestandsliste;
     // End of variables declaration//GEN-END:variables
 
     class HandleVorratSelections implements ListSelectionListener {

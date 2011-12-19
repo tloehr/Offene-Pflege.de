@@ -1,5 +1,7 @@
 package entity;
 
+import op.tools.SYSTools;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -15,14 +17,16 @@ public class KrankenhausTools {
     public static ListCellRenderer getKHRenderer() {
         return new ListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
-                if (o == null){
-                    l.setText("<i>Keine Auswahl</i>");
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof Krankenhaus) {
-                    l.setText(((Krankenhaus) o).getName() + ", " + ((Krankenhaus) o).getOrt());
+                    text = ((Krankenhaus) o).getName() + ", " + ((Krankenhaus) o).getOrt();
+                } else {
+                    text = o.toString();
                 }
-                return l;
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         };
     }

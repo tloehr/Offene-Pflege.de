@@ -150,7 +150,7 @@ public class DlgException extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
-        OPDE.fatal("Benutzer hat das Programm nach Exception beendet.");
+        OPDE.fatal(new Exception("Benutzer hat das Programm nach Exception beendet."));
     }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed

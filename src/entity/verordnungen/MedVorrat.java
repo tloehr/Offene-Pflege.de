@@ -16,7 +16,6 @@ import java.util.Date;
         @NamedQuery(name = "MedVorrat.findAll", query = "SELECT m FROM MedVorrat m"),
         @NamedQuery(name = "MedVorrat.findByVorID", query = "SELECT m FROM MedVorrat m WHERE m.vorID = :vorID"),
         @NamedQuery(name = "MedVorrat.findByText", query = "SELECT m FROM MedVorrat m WHERE m.text = :text"),
-        @NamedQuery(name = "MedVorrat.findByUKennung", query = "SELECT m FROM MedVorrat m WHERE m.uKennung = :uKennung"),
         @NamedQuery(name = "MedVorrat.findByVon", query = "SELECT m FROM MedVorrat m WHERE m.von = :von"),
         @NamedQuery(name = "MedVorrat.findByBis", query = "SELECT m FROM MedVorrat m WHERE m.bis = :bis"),
         @NamedQuery(name = "MedVorrat.getSumme", query = " " +

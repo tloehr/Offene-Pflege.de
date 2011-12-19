@@ -51,7 +51,7 @@ public class MedVorratTools {
      * @return true, bei Erfolg; false, sonst
      */
     public static void entnahmeVorrat(EntityManager em, Darreichung darreichung, Bewohner bewohner, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
-        MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung).get(0);
+        MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
         if (vorrat != null) {
             if (anweinheit) { // Umrechnung der Anwendungs Menge in die PackMenge.
                 MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);

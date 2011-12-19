@@ -3,8 +3,6 @@ package entity.verordnungen;
 import entity.Bewohner;
 import entity.EntityTools;
 import op.OPDE;
-import op.tools.Bool;
-import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -13,9 +11,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,22 +77,19 @@ public class DarreichungTools {
      * Es werden Zuordnungen erlaubt, die aufgrund der Äquivalenzen zwischen
      * Formen bestehen. z.B. Tabletten zu Dragees zu Filmtabletten etc.
      */
-    public static List<MedVorrat> getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
-        List<MedVorrat> result = null;
+    public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
+        MedVorrat result = null;
         EntityManager em = OPDE.createEM();
         try {
             Query query = em.createNamedQuery("MedVorrat.findByBewohnerAndDarreichung");
             query.setParameter("bewohner", bewohner);
             query.setParameter("darreichung", darreichung);
 
-            MedVorrat vorrat = (MedVorrat) query.getSingleResult();
-            result = new ArrayList<MedVorrat>();
-            result.add(vorrat);
-
+            result = (MedVorrat) query.getSingleResult();
         } catch (NoResultException nre) {
             result = null;
         } catch (Exception e) {
-            OPDE.fatal(e.getMessage());
+            OPDE.fatal(e);
         } finally {
             em.close();
         }

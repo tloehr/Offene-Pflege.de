@@ -26,7 +26,19 @@
  */
 package op.care.med.vorrat;
 
+import java.awt.event.*;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
+import javax.swing.border.*;
+
+import entity.Bewohner;
+import entity.verordnungen.*;
+import op.OPDE;
 import op.care.med.DBHandling;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import java.awt.*;
@@ -36,15 +48,15 @@ import java.awt.*;
  */
 public class DlgBestandAnbrechen extends javax.swing.JDialog {
 
-    private long vorid;
+    private MedVorrat vorrat;
     private Frame parent;
 
     /**
      * Creates new form DlgBestandAnbrechen
      */
-    public DlgBestandAnbrechen(java.awt.Frame parent, long dafid, String bwkennung) {
+    public DlgBestandAnbrechen(java.awt.Frame parent, Darreichung darreichung, Bewohner bewohner) {
         super(parent, true);
-        this.vorid = DBHandling.getVorrat2DAF(bwkennung, dafid);
+        this.vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
         this.parent = parent;
         initComponents();
         initDialog();
@@ -59,110 +71,123 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jLabel1 = new JLabel();
+        jPanel1 = new JPanel();
+        jLabel2 = new JLabel();
+        cmbBestID = new JComboBox();
+        jLabel3 = new JLabel();
+        btnClose = new JButton();
+        btnOK = new JButton();
 
-        jLabel1 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        cmbBestID = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
-        btnClose = new javax.swing.JButton();
-        btnOK = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+        Container contentPane = getContentPane();
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
+        //---- jLabel1 ----
+        jLabel1.setFont(new Font("Dialog", Font.BOLD, 16));
         jLabel1.setText("Bestand anbrechen");
 
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        jLabel2.setText("Die Packung mit der Nummer:");
+            //---- jLabel2 ----
+            jLabel2.setText("Die Packung mit der Nummer:");
 
-        cmbBestID.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbBestID.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbBestIDItemStateChanged(evt);
+            //---- cmbBestID ----
+            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbBestID.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbBestIDItemStateChanged(e);
+                }
+            });
+
+            //---- jLabel3 ----
+            jLabel3.setText("anbrechen.");
+
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbBestID, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addContainerGap(240, Short.MAX_VALUE))
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(cmbBestID, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+        }
+
+        //---- btnClose ----
+        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+        btnClose.setText("Schlie\u00dfen");
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCloseActionPerformed(e);
             }
         });
 
-        jLabel3.setText("anbrechen.");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbBestID, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(cmbBestID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel3))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
-        btnClose.setText("Schließen");
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
-
-        btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
-        btnOK.setText("Übernehmen");
+        //---- btnOK ----
+        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+        btnOK.setText("\u00dcbernehmen");
         btnOK.setEnabled(false);
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOKActionPerformed(e);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addContainerGap())
-                                                .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(jLabel1)
-                                                        .addContainerGap(272, Short.MAX_VALUE)))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnClose)
-                                                .addContainerGap())))
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnOK)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnClose)))
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(btnOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnClose))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jLabel1)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                        .addComponent(btnOK, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnClose, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addContainerGap(13, Short.MAX_VALUE))
         );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
@@ -171,11 +196,9 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         //String classname = this.getName() + ".btnOKActionPerformed()";
-        long nextbest = 0;
         if (cmbBestID.getSelectedIndex() > 0) {
-            nextbest = (Long) cmbBestID.getSelectedItem();
+            MedBestandTools.anbrechen((MedBestand) cmbBestID.getSelectedItem());
         }
-        DBHandling.anbrechen(nextbest);
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
@@ -187,9 +210,23 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
 
     private void initDialog() {
         this.setTitle(SYSTools.getWindowTitle("Bestand anbrechen"));
-        cmbBestID.setModel(DBHandling.getBestandGeschlossen(vorid));
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(" " +
+                " SELECT b FROM MedBestand b " +
+                " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
+                " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+        query.setParameter("vorrat", vorrat);
+        query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
+        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
+        dcbm.insertElementAt("keine", 0);
+        cmbBestID.setModel(dcbm);
+        cmbBestID.setRenderer(MedBestandTools.getBestandOnlyIDRenderer());
+
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
+
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -198,29 +235,18 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
         if (cmbBestID.getSelectedIndex() == 0) {
             cmbBestID.setToolTipText(null);
         } else {
-            cmbBestID.setToolTipText(SYSTools.toHTML(DBHandling.getBestandTextAsHTML((Long) cmbBestID.getSelectedItem())));
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedBestandTools.getBestandTextAsHTML((MedBestand) cmbBestID.getSelectedItem())));
         }
         btnOK.setEnabled(cmbBestID.getSelectedIndex() > 0);
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JButton btnOk;
-    private javax.swing.JButton btnOk1;
-    private javax.swing.JButton btnOk10;
-    private javax.swing.JButton btnOk2;
-    private javax.swing.JButton btnOk3;
-    private javax.swing.JButton btnOk4;
-    private javax.swing.JButton btnOk5;
-    private javax.swing.JButton btnOk6;
-    private javax.swing.JButton btnOk7;
-    private javax.swing.JButton btnOk8;
-    private javax.swing.JButton btnOk9;
-    private javax.swing.JComboBox cmbBestID;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
+    private JLabel jLabel1;
+    private JPanel jPanel1;
+    private JLabel jLabel2;
+    private JComboBox cmbBestID;
+    private JLabel jLabel3;
+    private JButton btnClose;
+    private JButton btnOK;
     // End of variables declaration//GEN-END:variables
 }

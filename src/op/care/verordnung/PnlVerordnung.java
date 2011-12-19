@@ -28,16 +28,15 @@ package op.care.verordnung;
 
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
-import entity.files.SYSFilesTools;
 import entity.verordnungen.*;
 import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
-import op.care.bhp.PnlBHP;
 import op.care.med.vorrat.*;
 import op.tools.*;
 import tablemodels.TMVerordnung;
@@ -53,9 +52,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author tloehr
@@ -92,7 +90,7 @@ public class PnlVerordnung extends CleanablePanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
 
-        if (myRunningClass != null){
+        if (myRunningClass != null) {
             SYSRunningClassesTools.endModule(myRunningClass);
         }
 
@@ -470,9 +468,9 @@ public class PnlVerordnung extends CleanablePanel {
 
 //            TMVerordnung tm = new TMVerordnung(bwkennung, cbAbgesetzt.isSelected(), cbMedi.isSelected(),
 //                    cbOhneMedi.isSelected(), cbBedarf.isSelected(), cbRegel.isSelected(), false);
-            TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
+            List<Verordnung> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
 
-            String html = SYSTools.htmlUmlautConversion(op.care.verordnung.DBHandling.getVerordnungenAsHTML(tm, bewohner, sel));
+            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getVerordnungenAsHTML(listVerordnung));
 
             out.write(SYSTools.addHTMLTitle(html, BewohnerTools.getBWLabelText(bewohner), true));
 
@@ -573,7 +571,7 @@ public class PnlVerordnung extends CleanablePanel {
             itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), verordnung.getVerid());
+                    new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), verordnung);
                     reloadTable();
                 }
             });
@@ -586,7 +584,7 @@ public class PnlVerordnung extends CleanablePanel {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(parent, "Soll die Verordnung wirklich gelöscht werden.",
                             "Verordnung löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        op.care.verordnung.DBHandling.deleteVerordnung(verordnung);
+                        VerordnungTools.loeschen(verordnung);
                         loadTable();
                     }
                 }
@@ -605,13 +603,8 @@ public class PnlVerordnung extends CleanablePanel {
                 itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        try {
-                            new DlgBestandAbschliessen(parent, bestandImAnbruch);
-                            Thread.sleep(1000);
-                            reloadTable();
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(PnlBHP.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        new DlgBestandAbschliessen(parent, bestandImAnbruch);
+                        reloadTable();
                     }
                 });
                 menu.add(itemPopupCloseBestand);
@@ -621,13 +614,7 @@ public class PnlVerordnung extends CleanablePanel {
                 itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        try {
-                            new DlgBestandAnbrechen(parent, verordnung.getDarreichung().getDafID(), bwkennung);
-                            Thread.sleep(1000);
-                            reloadTable();
-                        } catch (InterruptedException ex) {
-                            OPDE.fatal(ex);
-                        }
+                        new DlgBestandAnbrechen(parent, verordnung.getDarreichung(), verordnung.getBewohner());
                     }
                 });
                 menu.add(itemPopupOpenBestand);
@@ -664,12 +651,11 @@ public class PnlVerordnung extends CleanablePanel {
                     final MedBestand bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
 
                     long dafid = 0;
-                    double apv = 0d;
-                    double apvBest = 0d;
+                    BigDecimal apv = BigDecimal.ZERO;
+                    BigDecimal apvBest = BigDecimal.ZERO;
                     if (bestandImAnbruch != null) {
-                        dafid = bestandImAnbruch.getDarreichung().getDafID();
-                        apv = op.care.med.DBHandling.getAPV(dafid, bewohner,"");
-                        apvBest = bestandImAnbruch.getApv().doubleValue();
+                        apv = APVTools.getAPVMittelwert(bewohner, bestandImAnbruch.getDarreichung());
+                        apvBest = bestandImAnbruch.getApv();
                     }
                     JOptionPane.showMessageDialog(parent, "VerID: " + verordnung.getVerid() + "\nVorID: " + bestandImAnbruch.getVorrat().getVorID() + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -683,8 +669,8 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
-        new DlgVorrat(this.parent, bewohner, "");
-        loadTable();
+        /*new DlgVorrat(this.parent, bewohner.getBWKennung());
+        loadTable();*/
     }//GEN-LAST:event_btnVorratActionPerformed
 
     private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed

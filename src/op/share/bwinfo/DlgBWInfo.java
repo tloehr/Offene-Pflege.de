@@ -426,7 +426,7 @@ public class DlgBWInfo extends javax.swing.JDialog {
         } catch (SQLException ex) {
             try {
                 OPDE.getDb().db.rollback();
-                OPDE.fatal(this.toString() + ": rolling back operation.");
+                OPDE.fatal(ex);
             } catch (SQLException ex1) {
                 ex1.printStackTrace();
                 System.exit(1);

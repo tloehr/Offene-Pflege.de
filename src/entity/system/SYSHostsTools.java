@@ -44,7 +44,7 @@ public class SYSHostsTools {
             // Dann gehen wir davon aus, dass der Host abgestürzt ist.
             // Der Host scheint noch zu leben. Dann können wir nich nochmal starten. Gäb sonst Durcheinander.
             if (SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
-                OPDE.fatal("Es gibt bereits einen aktiven Host mit demselben Hostkey.");
+                OPDE.fatal(new Exception("Es gibt bereits einen aktiven Host mit demselben Hostkey."));
                 host = null;
             } else {
                 // ===================== REPARATUR DEFEKTER HOST EINTRÄGE ======================

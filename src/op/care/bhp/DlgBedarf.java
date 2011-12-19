@@ -222,7 +222,7 @@ public class DlgBedarf extends javax.swing.JDialog {
             long dafid = ((Long) tm.getValueAt(row, TMBedarf.COL_DAFID)).longValue();
             hm.clear();
 
-            op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid);
+//            op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid);
 
             db.commit();
             db.setAutoCommit(true);

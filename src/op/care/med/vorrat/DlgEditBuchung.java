@@ -65,9 +65,9 @@ public class DlgEditBuchung extends javax.swing.JDialog {
 
     private void initDialog() {
         setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
-        bestandsumme = op.care.med.DBHandling.getBestandSumme(bestid);
+//        bestandsumme = op.care.med.DBHandling.getBestandSumme(bestid);
         BigInteger mpid = (BigInteger) DBRetrieve.getSingleValue("MPBestand", "MPID", "BestID", bestid);
-        //long mpid = ((BigInteger) DBRetrieve.getSingleValue("MPBestand","MPID","BestID",bestid)).longValue();
+
         if (mpid != null && mpid.longValue() > 0) {
             packgroesse = ((BigDecimal) DBRetrieve.getSingleValue("MPackung", "Inhalt", "MPID", mpid.longValue())).doubleValue();
         } else {

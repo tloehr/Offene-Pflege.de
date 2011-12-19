@@ -295,9 +295,9 @@ public class DlgBWOut extends javax.swing.JDialog {
         if (rs.first()) {
             rs.beforeFirst();
             while (rs.next()) {
-                if (!op.care.med.DBHandling.closeVorrat(rs.getLong("VorID"))) {
+                /*if (!op.care.med.DBHandling.closeVorrat(rs.getLong("VorID"))) {
                     throw new SQLException("closeVorrat");
-                }
+                }*/
             }
         }
         rs.close();

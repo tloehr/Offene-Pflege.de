@@ -316,47 +316,47 @@ public class DBHandling {
 //        return result;
 //    }
 
-    /**
-     * Löscht eine Verordnung und die zugehörigen BHPs .
-     *
-     * @param verid ist die Verordnung, um die es geht.
-     */
-    public static void deleteVerordnung(long verid) {
-        Connection db = OPDE.getDb().db;
-        try {
-            // Hier beginnt eine Transaktion
-            db.setAutoCommit(false);
-            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-            db.commit();
-
-            if (op.tools.DBHandling.deleteRecords("BHPVerordnung", "VerID", verid) < 0) {
-                throw new SQLException();
-            }
-
-            if (op.tools.DBHandling.deleteRecords("BHPPlanung", "VerID", verid) < 0) {
-                throw new SQLException();
-            }
-
-            String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
-                    " WHERE bhp.VerID = ?";
-            PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
-            stmtDel.setLong(1, verid);
-            stmtDel.executeUpdate();
-            stmtDel.close();
-
-
-            db.commit();
-            db.setAutoCommit(true);
-
-        } catch (SQLException ex) {
-            try {
-                db.rollback();
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
-        }
-    }
+//    /**
+//     * Löscht eine Verordnung und die zugehörigen BHPs .
+//     *
+//     * @param verid ist die Verordnung, um die es geht.
+//     */
+//    public static void deleteVerordnung(long verid) {
+//        Connection db = OPDE.getDb().db;
+//        try {
+//            // Hier beginnt eine Transaktion
+//            db.setAutoCommit(false);
+//            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+//            db.commit();
+//
+//            if (op.tools.DBHandling.deleteRecords("BHPVerordnung", "VerID", verid) < 0) {
+//                throw new SQLException();
+//            }
+//
+//            if (op.tools.DBHandling.deleteRecords("BHPPlanung", "VerID", verid) < 0) {
+//                throw new SQLException();
+//            }
+//
+//            String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
+//                    " WHERE bhp.VerID = ?";
+//            PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
+//            stmtDel.setLong(1, verid);
+//            stmtDel.executeUpdate();
+//            stmtDel.close();
+//
+//
+//            db.commit();
+//            db.setAutoCommit(true);
+//
+//        } catch (SQLException ex) {
+//            try {
+//                db.rollback();
+//            } catch (SQLException ex1) {
+//                new DlgException(ex1);
+//                ex1.printStackTrace();
+//                System.exit(1);
+//            }
+//            new DlgException(ex);
+//        }
+//    }
 }

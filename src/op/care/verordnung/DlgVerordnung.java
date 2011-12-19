@@ -1187,9 +1187,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (tblDosis.getModel().getRowCount() > 0 && cmbSit.getSelectedIndex() < 0) {
             try {
                 if (editMode == CHANGE_MODE) {
-                    BHPTools.importBHP(verordnung, new Date());
+                    BHPTools.erzeugen(verordnung, new Date());
                 } else {
-                    BHPTools.importBHP(verordnung);
+                    BHPTools.erzeugen(verordnung);
                 }
             } catch (Exception e) {
                 new DlgException(e);

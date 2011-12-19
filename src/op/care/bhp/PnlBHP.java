@@ -468,7 +468,7 @@ public class PnlBHP extends CleanablePanel {
         OPDE.debug(changeable ? "changeable" : "NOT changeable");
         if (changeable) {
             // Drückt auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
-            if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) {
+            /*if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) {
 
                 // wenn es ein Medikament ist und der Status offen, dann nur änderbar, wenn es einen angebrochenen Bestand gibt.
                 // Etwas umständlich, aus Optimierungsgründen
@@ -549,7 +549,7 @@ public class PnlBHP extends CleanablePanel {
                         reloadTable();
                     }
                 }
-            }
+            }*/
 
         }
         // Nun noch Menüeinträge
@@ -611,9 +611,9 @@ public class PnlBHP extends CleanablePanel {
                             DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
                             hm.clear();
 
-                            if (!op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid)) {
+                            /*if (!op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid)) {
                                 throw new SQLException("entnahmeVorrat");
-                            }
+                            }*/
                             db.commit();
                             db.setAutoCommit(true);
                         } catch (SQLException ex) {

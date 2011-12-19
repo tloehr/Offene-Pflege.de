@@ -30,8 +30,12 @@ package tablemodels;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungPlanung;
 import entity.verordnungen.VerordnungPlanungTools;
+import op.OPDE;
 
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceUtil;
 import javax.swing.table.AbstractTableModel;
+import java.util.Collection;
 
 
 /**
@@ -52,7 +56,12 @@ public class TMDosis
 
         this.anwendung = anwtext;
         this.verordnung = verordnung;
-        this.planungen = verordnung.getPlanungen().toArray(new VerordnungPlanung[0]);
+        Collection<VerordnungPlanung> t = this.verordnung.getPlanungen();
+
+        PersistenceUtil util = Persistence.getPersistenceUtil();
+        OPDE.debug(util.isLoaded(verordnung));
+
+        this.planungen = t.toArray(new VerordnungPlanung[0]);
 
     }
 

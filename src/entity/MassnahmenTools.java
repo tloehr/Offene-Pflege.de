@@ -56,7 +56,7 @@ public class MassnahmenTools {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Massnahmen m WHERE m.aktiv AND m.massArt = :art " +
+                " SELECT m FROM Massnahmen m WHERE m.aktiv = TRUE AND m.massArt = :art " +
                 (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
                 " ORDER BY m.bezeichnung "
         );

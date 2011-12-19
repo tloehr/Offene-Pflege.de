@@ -45,6 +45,7 @@ import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -651,7 +652,9 @@ public class DlgBestand extends javax.swing.JDialog {
         if (darreichung == null) {
             cmbVorrat.setModel(new DefaultComboBoxModel());
         } else {
-            List<MedVorrat> vorraete = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
+            List<MedVorrat> vorraete = new ArrayList<MedVorrat>();
+            vorraete.add(DarreichungTools.getVorratZurDarreichung(bewohner, darreichung));
+
             foundExactMatch = vorraete != null;
             if (vorraete == null) {
                 vorraete = DarreichungTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);

@@ -623,10 +623,10 @@ public class FrmMed extends javax.swing.JFrame {
             if (rs.first()) {
                 rs.beforeFirst();
                 while (rs.next()) {
-                    String line = SYSConst.GROESSE[rs.getInt("Groesse")] + " (" + rs.getDouble("Inhalt") + " " + SYSConst.EINHEIT[rs.getInt("PackEinheit")] + ") PZN:[" + rs.getString("PZN") + "]";
+                    /*String line = SYSConst.GROESSE[rs.getInt("Groesse")] + " (" + rs.getDouble("Inhalt") + " " + SYSConst.EINHEIT[rs.getInt("PackEinheit")] + ") PZN:[" + rs.getString("PZN") + "]";
                     ListElement leZus = new ListElement(line, rs.getLong("MPID"), NODE_PACKUNG);
                     DefaultMutableTreeNode zus = new DefaultMutableTreeNode(leZus);
-                    result.add(zus);
+                    result.add(zus);*/
                 }
             }
 

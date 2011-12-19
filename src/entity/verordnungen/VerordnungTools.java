@@ -7,7 +7,6 @@ package entity.verordnungen;
 import entity.*;
 import op.OPDE;
 import op.tools.*;
-import tablemodels.TMVerordnung;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -660,6 +659,20 @@ public class VerordnungTools {
         return result;
     }
 
+
+    public static void absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            absetzen(em, verordnung, arzt, krankenhaus);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+    }
+
     /**
      * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
      *
@@ -722,6 +735,37 @@ public class VerordnungTools {
             result += "<h2>Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
         }
         return result;
+    }
+
+    /**
+     * Löscht eine Verordnung und die zugehörigen BHPs und deren Planungen.
+     */
+    public static void loeschen(Verordnung verordnung) {
+
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+
+            Query queryBHP = em.createQuery(" " +
+                    " DELETE FROM BHP bhp " +
+                    " WHERE bhp.verordnungPlanung.verordnung = :verordnung ");
+            queryBHP.executeUpdate();
+
+            Query queryPlanung = em.createQuery(" " +
+                    " DELETE FROM VerordnungPlanung vp" +
+                    " WHERE vp.verordnung = :verordnung ");
+            queryPlanung.executeUpdate();
+
+            em.remove(verordnung);
+
+            em.getTransaction().commit();
+
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
     }
 
 }

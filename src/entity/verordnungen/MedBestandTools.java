@@ -26,6 +26,24 @@ import java.util.Date;
  */
 public class MedBestandTools {
 
+     public static ListCellRenderer getBestandOnlyIDRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+                JLabel l = new JLabel();
+                if (o == null) {
+                    l.setText("<i>Keine Auswahl</i>");
+                } else if (o instanceof MedBestand) {
+                    MedBestand bestand = (MedBestand) o;
+                    l.setText(bestand.getBestID().toString());
+                } else {
+                    l.setText(o.toString());
+                }
+                return l;
+            }
+        };
+    }
+
     public static MedBestand findByVerordnungImAnbruch(Verordnung verordnung) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");

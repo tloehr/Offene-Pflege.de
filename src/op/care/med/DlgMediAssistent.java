@@ -108,10 +108,8 @@ public class DlgMediAssistent extends javax.swing.JDialog {
         form = new HashMap();
         initComponents();
         jtst = new JTabSelectionTool(tabPane);
-        //lblWahl.setVisible(false);
-        //btnClose.setVisible(false);
         cmbForm.setModel(DBRetrieve.getMPFormen());
-        cmbGroesse.setModel(new DefaultComboBoxModel(SYSConst.GROESSE));
+//        cmbGroesse.setModel(new DefaultComboBoxModel(SYSConst.GROESSE));
         if (result.size() > 0) {
             txtName.setText(result.get(0).toString());
         }
@@ -833,7 +831,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                 }
                 dafid = op.tools.DBHandling.insertRecord("MPDarreichung", mpdarreichung);
                 mpdarreichung.clear();
-                DBHandling.setAPV(dafid, apv, cbTauschen.isSelected());
+//                DBHandling.setAPV(dafid, apv, cbTauschen.isSelected());
                 if (dafid < 0) {
                     throw new SQLException();
                 }
@@ -941,9 +939,9 @@ public class DlgMediAssistent extends javax.swing.JDialog {
 //        punchedOutTabs[jtst.getIndex("Form")] = !apvNoetig;
 //        setTabsEnabled();
         txtZusatzCaretUpdate(null);
-        int formstatus = DBHandling.getFormStatusFormID(leFormID.getPk());
+//        int formstatus = DBHandling.getFormStatusFormID(leFormID.getPk());
         cbTauschen.setSelected(false);
-        cbTauschen.setEnabled(formstatus == DBHandling.FORMSTATUS_APV_PER_DAF);
+//        cbTauschen.setEnabled(formstatus == DBHandling.FORMSTATUS_APV_PER_DAF);
         String zubereitung = SYSTools.catchNull(form.get("Zubereitung").toString());
         String anwtext = SYSTools.catchNull(form.get("AnwText").toString());
         String daf = (zubereitung.equals("") ? anwtext : zubereitung);

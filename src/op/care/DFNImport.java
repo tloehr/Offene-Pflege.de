@@ -385,7 +385,7 @@ public class DFNImport {
                     }
                 } catch (SQLException ex1) {
                     ex1.printStackTrace();
-                    OPDE.fatal(ex1.getMessage());
+                    OPDE.fatal(ex1);
                     System.exit(1);
                 }
                 ex.printStackTrace();
