@@ -3,7 +3,6 @@ package entity.verordnungen;
 import entity.BewohnerTools;
 import op.OPDE;
 import op.tools.DlgException;
-import op.tools.SYSConst;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
@@ -26,20 +25,19 @@ import java.util.Date;
  */
 public class MedBestandTools {
 
-     public static ListCellRenderer getBestandOnlyIDRenderer() {
+    public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
                 if (o == null) {
-                    l.setText("<i>Keine Auswahl</i>");
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof MedBestand) {
-                    MedBestand bestand = (MedBestand) o;
-                    l.setText(bestand.getBestID().toString());
+                    text = ((MedBestand) o).getBestID().toString();
                 } else {
-                    l.setText(o.toString());
+                    text = o.toString();
                 }
-                return l;
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         };
     }

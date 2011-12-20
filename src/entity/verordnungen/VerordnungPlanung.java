@@ -100,6 +100,7 @@ public class VerordnungPlanung implements Serializable {
     public VerordnungPlanung(Verordnung verordnung) {
         nachtMo = BigDecimal.ZERO;
         mittags = BigDecimal.ZERO;
+        nachmittags = BigDecimal.ZERO;
         abends = BigDecimal.ZERO;
         nachtAb = BigDecimal.ZERO;
         uhrzeitDosis = BigDecimal.ZERO;
@@ -354,7 +355,7 @@ public class VerordnungPlanung implements Serializable {
      * @return
      */
     public boolean verwendetZeiten() {
-        return nachtMo.doubleValue() + morgens.doubleValue() + mittags.doubleValue() + nachmittags.doubleValue() + abends.doubleValue() + nachtAb.doubleValue() > 0;
+        return nachtMo.add(morgens).add(mittags).add(nachmittags).add(abends).add(nachtAb).compareTo(BigDecimal.ZERO) > 0;
     }
 
     /**

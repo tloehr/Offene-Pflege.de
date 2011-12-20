@@ -1,16 +1,12 @@
 package entity;
 
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -36,13 +32,16 @@ public class MassnahmenTools {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
-                if (o == null){
-                    l.setText("<i>Keine Auswahl</i>");
+
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof Massnahmen) {
-                    l.setText(((Massnahmen) o).getBezeichnung() );
+                    text = ((Massnahmen) o).getBezeichnung();
+                } else {
+                    text = o.toString();
                 }
-                return l;
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
             }
         };
     }
@@ -70,8 +69,8 @@ public class MassnahmenTools {
 
         query.setParameter("art", art);
         if (!SYSTools.catchNull(suche).isEmpty()) {
-                suche = "%" + suche + "%";
-                query.setParameter("suche", suche);
+            suche = "%" + suche + "%";
+            query.setParameter("suche", suche);
         }
 
         List<Massnahmen> list = query.getResultList();

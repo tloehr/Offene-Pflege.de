@@ -23,30 +23,30 @@ import java.util.List;
  */
 public class DarreichungTools {
 
+
     public static ListCellRenderer getDarreichungRenderer() {
         return new ListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
                 if (o == null) {
-                    l.setText("<i>Keine Auswahl</i>");
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof Darreichung) {
                     Darreichung darreichung = (Darreichung) o;
                     String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
                     String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
 
-                    String text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
+                    text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
                     text += zubereitung.isEmpty() ? "" : zubereitung + " ";
                     text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
-
-                    l.setText(text);
                 } else {
-                    l.setText(o.toString());
+                    text = o.toString();
                 }
-                return l;
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         };
     }
+
 
     public static List<Darreichung> findDarreichungByMedProduktText(String suche) {
         suche = "%" + suche + "%";

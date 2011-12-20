@@ -15,13 +15,7 @@ import java.awt.*;
 public class ArztTools {
 
     public static ListCellRenderer getArztRenderer() {
-
-
-        class arztListRenderer extends DefaultListCellRenderer {
-            arztListRenderer() {
-                super();
-            }
-
+        return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
@@ -32,10 +26,8 @@ public class ArztTools {
                 } else {
                     text = o.toString();
                 }
-                return super.getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
-        }
-        return new arztListRenderer();
+        };
     }
 }

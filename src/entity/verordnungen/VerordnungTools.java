@@ -660,17 +660,18 @@ public class VerordnungTools {
     }
 
 
-    public static void absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
+    public static Verordnung absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            absetzen(em, verordnung, arzt, krankenhaus);
+            verordnung = absetzen(em, verordnung, arzt, krankenhaus);
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
         } finally {
             em.close();
         }
+        return verordnung;
     }
 
     /**
@@ -681,7 +682,7 @@ public class VerordnungTools {
      * @param krankenhaus welches KH hat sie abgesetzt
      * @return erfolg
      */
-    public static void absetzen(EntityManager em, Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) throws Exception {
+    public static Verordnung absetzen(EntityManager em, Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) throws Exception {
         if (arzt == null && krankenhaus == null) {
             throw new NullPointerException("Arzt und Krankenhaus dürfen nicht beide NULL sein.");
         }
@@ -693,7 +694,7 @@ public class VerordnungTools {
         verordnung = em.merge(verordnung);
 
         BHPTools.aufräumen(em, verordnung, new Date());
-
+        return verordnung;
     }
 
     /**

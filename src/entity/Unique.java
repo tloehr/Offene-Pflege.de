@@ -23,11 +23,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "UNIQUEID")
 @NamedQueries({
-    @NamedQuery(name = "Uniqueid.findAll", query = "SELECT u FROM Uniqueid u"),
-    @NamedQuery(name = "Uniqueid.findByUniqid", query = "SELECT u FROM Uniqueid u WHERE u.uniqid = :uniqid"),
-    @NamedQuery(name = "Uniqueid.findByUid", query = "SELECT u FROM Uniqueid u WHERE u.uid = :uid"),
-    @NamedQuery(name = "Uniqueid.findByPrefix", query = "SELECT u FROM Uniqueid u WHERE u.prefix = :prefix")})
-public class Uniqueid implements Serializable {
+    @NamedQuery(name = "Uniqueid.findAll", query = "SELECT u FROM Unique u"),
+    @NamedQuery(name = "Uniqueid.findByUniqid", query = "SELECT u FROM Unique u WHERE u.uniqid = :uniqid"),
+    @NamedQuery(name = "Uniqueid.findByUid", query = "SELECT u FROM Unique u WHERE u.uid = :uid"),
+    @NamedQuery(name = "Uniqueid.findByPrefix", query = "SELECT u FROM Unique u WHERE u.prefix = :prefix")})
+public class Unique implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,16 +41,15 @@ public class Uniqueid implements Serializable {
     @Column(name = "PREFIX")
     private String prefix;
 
-    public Uniqueid() {
+    public Unique() {
     }
 
-    public Uniqueid(Long uniqid) {
+    public Unique(Long uniqid) {
         this.uniqid = uniqid;
     }
 
-    public Uniqueid(Long uniqid, long uid, String prefix) {
-        this.uniqid = uniqid;
-        this.uid = uid;
+    public Unique(String prefix) {
+        this.uid = 1l;
         this.prefix = prefix;
     }
 
@@ -78,6 +77,10 @@ public class Uniqueid implements Serializable {
         this.prefix = prefix;
     }
 
+    public void incUID(){
+        this.uid++;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -88,10 +91,10 @@ public class Uniqueid implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Uniqueid)) {
+        if (!(object instanceof Unique)) {
             return false;
         }
-        Uniqueid other = (Uniqueid) object;
+        Unique other = (Unique) object;
         if ((this.uniqid == null && other.uniqid != null) || (this.uniqid != null && !this.uniqid.equals(other.uniqid))) {
             return false;
         }

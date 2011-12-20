@@ -1,5 +1,6 @@
 package entity.verordnungen;
 
+import entity.Arzt;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSTools;
@@ -25,13 +26,16 @@ public class SituationenTools {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
+
+                String text;
                 if (o == null) {
-                    l.setText("<i>Keine Auswahl</i>");
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof Situationen) {
-                    l.setText(((Situationen) o).getText());
+                    text = ((Situationen) o).getText();
+                } else {
+                    text = o.toString();
                 }
-                return l;
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
             }
         };
     }

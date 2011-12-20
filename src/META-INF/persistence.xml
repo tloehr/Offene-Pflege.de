@@ -63,6 +63,7 @@
         <class>entity.verordnungen.MedPackung</class>
         <class>entity.verordnungen.MedProdukte</class>
         <class>entity.MassTermin</class>
+        <class>entity.Unique</class>
         <class>entity.Massnahmen</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PlanKontrolle</class>

@@ -1,5 +1,7 @@
 package entity.verordnungen;
 
+import op.tools.SYSTools;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -17,19 +19,18 @@ public class MedPackungTools {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                JLabel l = new JLabel();
+                String text;
                 if (o == null) {
-                    l.setText("<i>Keine Auswahl</i>");
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof MedPackung) {
                     MedPackung packung = (MedPackung) o;
 
-                    String text = packung.getInhalt().toString() + " " + MedFormenTools.EINHEIT[packung.getDarreichung().getMedForm().getPackEinheit()] + " " + GROESSE[packung.getGroesse()] + " ";
+                    text = packung.getInhalt().toString() + " " + MedFormenTools.EINHEIT[packung.getDarreichung().getMedForm().getPackEinheit()] + " " + GROESSE[packung.getGroesse()] + " ";
                     text += "PZN: " + packung.getPzn();
-                    l.setText(text);
                 } else {
-                    l.setText(o.toString());
+                    text = o.toString();
                 }
-                return l;
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
             }
         };
     }

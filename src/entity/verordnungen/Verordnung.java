@@ -14,10 +14,7 @@ import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -141,11 +138,11 @@ public class Verordnung implements Serializable, VorgangElement {
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
-    private Collection<Sysver2file> attachedFiles;
+    private List<Sysver2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
-    private Collection<SYSVER2VORGANG> attachedVorgaenge;
+    private List<SYSVER2VORGANG> attachedVorgaenge;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
-    private Collection<VerordnungPlanung> planungen;
+    private List<VerordnungPlanung> planungen;
     // ==
     // N:1 Relationen
     // ==
@@ -189,6 +186,9 @@ public class Verordnung implements Serializable, VorgangElement {
         this.attachedFiles = new ArrayList<Sysver2file>();
         this.attachedVorgaenge = new ArrayList<SYSVER2VORGANG>();
         this.planungen = new ArrayList<VerordnungPlanung>();
+        this.anDatum = new Date();
+        this.abDatum = SYSConst.DATE_BIS_AUF_WEITERES;
+
     }
 
     public Long getVerid() {
@@ -323,13 +323,6 @@ public class Verordnung implements Serializable, VorgangElement {
         this.angesetztDurch = angesetztDurch;
     }
 
-    public Collection<Sysver2file> getAttachedFiles() {
-        return attachedFiles;
-    }
-
-    public Collection<SYSVER2VORGANG> getAttachedVorgaenge() {
-        return attachedVorgaenge;
-    }
 
     public Bewohner getBewohner() {
         return bewohner;
@@ -347,7 +340,15 @@ public class Verordnung implements Serializable, VorgangElement {
         return situation != null;
     }
 
-    public Collection<VerordnungPlanung> getPlanungen() {
+    public List<Sysver2file> getAttachedFiles() {
+        return attachedFiles;
+    }
+
+    public List<SYSVER2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
+    }
+
+    public List<VerordnungPlanung> getPlanungen() {
         return planungen;
     }
 

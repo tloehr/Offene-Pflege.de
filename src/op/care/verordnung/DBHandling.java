@@ -260,20 +260,20 @@ public class DBHandling {
 //        stmtDel.close();
 //    }
 
-    /**
-     * Löscht <u>alle</u> BHPs für eine bestimmte Verordnung.
-     *
-     * @param verid ist die Verordnung, um die es geht.
-     */
-    public static void deleteBHP(long verid)
-            throws SQLException {
-        String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
-                " WHERE bhp.VerID = ?";
-        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
-        stmtDel.setLong(1, verid);
-        stmtDel.executeUpdate();
-        stmtDel.close();
-    }
+//    /**
+//     * Löscht <u>alle</u> BHPs für eine bestimmte Verordnung.
+//     *
+//     * @param verid ist die Verordnung, um die es geht.
+//     */
+//    public static void deleteBHP(long verid)
+//            throws SQLException {
+//        String bhp = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
+//                " WHERE bhp.VerID = ?";
+//        PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
+//        stmtDel.setLong(1, verid);
+//        stmtDel.executeUpdate();
+//        stmtDel.close();
+//    }
 
 //    /**
 //     * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.

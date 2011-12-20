@@ -48,7 +48,7 @@ public class TMDosis
     String anwendung;
 
     Verordnung verordnung = null;
-    VerordnungPlanung[] planungen;
+    //VerordnungPlanung[] planungen;
 
 
     public TMDosis(String anwtext, Verordnung verordnung) {
@@ -56,12 +56,12 @@ public class TMDosis
 
         this.anwendung = anwtext;
         this.verordnung = verordnung;
-        Collection<VerordnungPlanung> t = this.verordnung.getPlanungen();
+        //Collection<VerordnungPlanung> t = this.verordnung.getPlanungen();
+//
+//        PersistenceUtil util = Persistence.getPersistenceUtil();
+//        OPDE.debug(util.isLoaded(verordnung));
 
-        PersistenceUtil util = Persistence.getPersistenceUtil();
-        OPDE.debug(util.isLoaded(verordnung));
 
-        this.planungen = t.toArray(new VerordnungPlanung[0]);
 
     }
 
@@ -145,7 +145,7 @@ public class TMDosis
         String result = "";
         switch (c) {
             case COL_Dosis: {
-                result = VerordnungPlanungTools.getDosisAsHTML(planungen[r], null, true);
+                result = VerordnungPlanungTools.getDosisAsHTML(verordnung.getPlanungen().get(r), null, true);
                 break;
             }
             default: {

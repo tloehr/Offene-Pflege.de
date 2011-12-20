@@ -39,32 +39,32 @@ import java.sql.SQLException;
  */
 public class DBHandling {
 
-    /**
-     * Ermittelt, ob es für eine bestimmte Verordnung heute schon Eintrüge in der BHP gibt.
-     *
-     * @param VerID
-     * @return true, wenn ja. False, wenn nicht.
-     */
-    public static boolean isBHPToday(long verid) {
-        boolean result;
-        String sql =
-                " SELECT DISTINCT v.VerID " +
-                        " FROM BHP p " +
-                        " INNER JOIN BHPPlanung pp ON p.BHPPID = pp.BHPPID " +
-                        " INNER JOIN BHPVerordnung v ON v.VerID = pp.VerID " +
-                        " WHERE v.VerID = ?" +
-                        " AND Date(Soll) = Date(now()) ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, verid);
-            ResultSet rs = stmt.executeQuery();
-            result = rs.first();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            result = false;
-        }
-
-        return result;
-    }
+//    /**
+//     * Ermittelt, ob es für eine bestimmte Verordnung heute schon Eintrüge in der BHP gibt.
+//     *
+//     * @param VerID
+//     * @return true, wenn ja. False, wenn nicht.
+//     */
+//    public static boolean isBHPToday(long verid) {
+//        boolean result;
+//        String sql =
+//                " SELECT DISTINCT v.VerID " +
+//                        " FROM BHP p " +
+//                        " INNER JOIN BHPPlanung pp ON p.BHPPID = pp.BHPPID " +
+//                        " INNER JOIN BHPVerordnung v ON v.VerID = pp.VerID " +
+//                        " WHERE v.VerID = ?" +
+//                        " AND Date(Soll) = Date(now()) ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, verid);
+//            ResultSet rs = stmt.executeQuery();
+//            result = rs.first();
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//            result = false;
+//        }
+//
+//        return result;
+//    }
 
 }

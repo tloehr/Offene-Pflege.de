@@ -243,7 +243,7 @@ public class OPDE {
             localProps.store(out, "Lokale Einstellungen für Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {
-            logger.fatal(ex);
+            fatal(ex);
             System.exit(1);
         }
     }
@@ -385,8 +385,7 @@ public class OPDE {
                 FileAppender fileAppender = new FileAppender(layout, opwd + sep + "opde.log", true);
                 logger.addAppender(fileAppender);
             } catch (IOException ex) {
-                logger.fatal(opwd + ": falscher Pfad.");
-                System.exit(1);
+                fatal(ex);
             }
 
 
@@ -424,9 +423,9 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.url", url);
 
 
-//            if (isDebug()){
-//                jpaProps.put("eclipselink.logging.level","FINER");
-//            }
+            if (isDebug()) {
+                jpaProps.put("eclipselink.logging.level", "FINER");
+            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
             // Cache lösche mit
@@ -435,9 +434,7 @@ public class OPDE {
             host = SYSHostsTools.getHost(hostkey);
 
             if (host == null) {
-                logger.fatal("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten.");
-                logger.fatal("Wenn es dann nicht besser wird, fragen Sie den Administrator.");
-                System.exit(1);
+                fatal(new Exception("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten. Wenn es dann nicht besser wird, fragen Sie den Administrator."));
             }
 
             bm = new BackgroundMonitor();
@@ -456,7 +453,7 @@ public class OPDE {
                 try {
                     DFNImport.importDFN();
                 } catch (Exception ex) {
-                    logger.fatal("Exception beim DFNImport", ex);
+                    fatal(ex);
                     System.exit(1);
                 }
                 System.exit(0);
@@ -482,9 +479,18 @@ public class OPDE {
                     EntityTools.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
 
-                    BHPTools.erzeugen(null, null);
+                    EntityManager em = createEM();
+                    try {
+                        em.getTransaction().begin();
+                        BHPTools.erzeugen(null, null);
+                        em.getTransaction().commit();
+                    } catch (Exception e) {
+                        fatal(e);
+                    } finally {
+                        em.close();
+                    }
                 } catch (Exception ex) {
-                    logger.fatal("Exception beim BHPImport", ex);
+                    fatal(ex);
                 }
                 SYSHostsTools.shutdown(0);
             }
@@ -520,7 +526,7 @@ public class OPDE {
             SYSTools.center(frame);
 
         } catch (IOException ex) {
-            logger.fatal(opwd + sep + "local.properties nicht lesbar. Bitte korrigieren Sie das Problem.");
+            fatal(ex);
             System.exit(1);
         }
         return success;
