@@ -39,7 +39,7 @@ import java.util.Date;
                 " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung " +
                 " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
 })
-public class VerordnungPlanung implements Serializable {
+public class VerordnungPlanung implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -135,6 +135,32 @@ public class VerordnungPlanung implements Serializable {
 
     }
 
+    public VerordnungPlanung(BigDecimal nachtMo, BigDecimal morgens, BigDecimal mittags, BigDecimal nachmittags, BigDecimal abends, BigDecimal nachtAb, BigDecimal uhrzeitDosis, Date uhrzeit, Integer maxAnzahl, BigDecimal maxEDosis, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Date lDatum, Users user, Verordnung verordnung) {
+        this.nachtMo = nachtMo;
+        this.morgens = morgens;
+        this.mittags = mittags;
+        this.nachmittags = nachmittags;
+        this.abends = abends;
+        this.nachtAb = nachtAb;
+        this.uhrzeitDosis = uhrzeitDosis;
+        this.uhrzeit = uhrzeit;
+        this.maxAnzahl = maxAnzahl;
+        this.maxEDosis = maxEDosis;
+        this.taeglich = taeglich;
+        this.woechentlich = woechentlich;
+        this.monatlich = monatlich;
+        this.tagNum = tagNum;
+        this.mon = mon;
+        this.die = die;
+        this.mit = mit;
+        this.don = don;
+        this.fre = fre;
+        this.sam = sam;
+        this.son = son;
+        this.lDatum = lDatum;
+        this.user = user;
+        this.verordnung = verordnung;
+    }
 
     public Long getBhppid() {
         return bhppid;
@@ -406,6 +432,11 @@ public class VerordnungPlanung implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Object clone() {
+        return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum,  user, verordnung);
     }
 
     @Override

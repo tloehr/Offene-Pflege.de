@@ -1378,7 +1378,7 @@ public class SYSTools {
                 query.setParameter(param[0].toString(), param[1]);
             }
         }
-        DefaultComboBoxModel lcombo =newComboboxModel(query.getResultList());
+        DefaultComboBoxModel lcombo = newComboboxModel(query.getResultList());
 
         em.close();
 
@@ -1761,5 +1761,29 @@ public class SYSTools {
         col.setPreferredWidth(width);
     }
 
+    public static String getThrowableAsHTML(Throwable exc) {
+        String html = "";
+        StackTraceElement[] stacktrace = exc.getStackTrace();
 
+
+        html += "<h1>Ausnahmezustand aufgetreten</h1>";
+        html += "<h2>" + exc.getClass().getName() + "</h2>";
+        html += "<p>" + exc.getMessage() + "</p>";
+        html += "<table border=\"1\" cellspacing=\"0\"><tr>"
+                + "<th>Methode</th><th>Zeile</th><th>Klasse</th><th>Datei</th></tr>";
+
+
+        for (int exception = 0; exception < stacktrace.length; exception++) {
+            StackTraceElement element = stacktrace[exception];
+            html += "<tr>";
+            html += "<td>" + element.getMethodName() + "</td>";
+            html += "<td>" + element.getLineNumber() + "</td>";
+            html += "<td>" + element.getClassName() + "</td>";
+            html += "<td>" + element.getFileName() + "</td>";
+            html += "</tr>";
+        }
+        html += "</table>";
+
+        return html;
+    }
 }

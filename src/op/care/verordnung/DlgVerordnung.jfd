@@ -886,11 +886,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq l {space :::p, par l {comp jLabel2::l:p::p, comp jLabel1::l:p::p}, space :p:5:p, par l {comp jdcAN::::192:x:1, comp cmbKHAn::l::192:x, comp cmbAN::l::192:x:1, comp lblAN::l::192:x}, space :p::p}}</string> 
+            <string>par l {seq l {space :::p, par l {comp jLabel2::l:p::p, comp jLabel1::l:p::p}, space :p:5:p, par l {comp jdcAN::::208:x:1, comp cmbKHAn::l::208:x, comp cmbAN::l::208:x:1, comp lblAN::l::208:x}, space :p::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq {par l {comp jLabel1:::p::p, comp jdcAN:::p:19:p}, space :p:9:p, par b {comp jLabel2::b:p::p, comp cmbAN::b:p::p}, space :::p, comp cmbKHAn:::p::p, space :::p, comp lblAN:::p::p, space ::66:x}}</string> 
+            <string>par l {seq {par l {comp jLabel1:::p::p, comp jdcAN:::p:22:p}, space :::p, par b {comp jLabel2::b:p::p, comp cmbAN::b:p::p}, space :::p, comp cmbKHAn:::p::p, space :::p, comp lblAN:::p::p, space ::83:x}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 

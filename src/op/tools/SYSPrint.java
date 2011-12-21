@@ -358,42 +358,47 @@ public class SYSPrint {
      *
      * @param parent
      * @param html
-     * @param addPrintJScript. Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
+     * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
      */
     public static void print(Component parent, String html, boolean addPrintJScript) {
         try {
             // Create temp file.
             File temp = File.createTempFile("opde", ".html");
 
-            // Delete temp file when program exits.
-            temp.deleteOnExit();
 
+            String text = "<html><body>";
             if (addPrintJScript) {
-                html = "<html><body><script type=\"text/javascript\">"
-                        + "window.onload = function() {"
+                text += "<script type=\"text/javascript\">" +
+                        "window.onload = function() {"
                         + "window.print();"
-                        + "}</script></head><body>" + SYSTools.htmlUmlautConversion(html)
-                        + "<hr/><b>Ende des Berichtes</b><br/>" + OPDE.getLogin().getUser().getNameUndVorname()
-                        + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                        + "<br/>http://www.offene-pflege.de</body></html>";
+                        + "}</script>";
             }
+            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
+                    + "<hr/><b>Ende des Berichtes</b><br/>" + SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname())
+                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+                    + "<br/>http://www.offene-pflege.de</body></html>";
+
 
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(html);
+            out.write(text);
 
             out.close();
             handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
         }
+
     }
 
-    public static void showFile(Component parent, String filename) {
-        handleFile(parent, filename, Desktop.Action.OPEN);
-    }
+//    public static void showFile(Component parent, String filename) {
+//        handleFile(parent, filename, Desktop.Action.OPEN);
+//    }
 
     public static void handleFile(Component parent, String filename, java.awt.Desktop.Action action) {
         Desktop desktop = null;
+        if (parent == null) {
+            parent = new Frame();
+        }
 
         if (SYSTools.getLocalDefinedApp(filename) != null) {
             try {

@@ -211,6 +211,7 @@ public class OPDE {
         logger.fatal(e.getMessage(), e);
         SyslogTools.fatal(e.getMessage());
         e.printStackTrace();
+        SYSPrint.print(null, SYSTools.getThrowableAsHTML(e), false);
         if (host != null) {
             SYSHostsTools.shutdown(1);
         }

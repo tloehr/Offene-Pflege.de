@@ -11,10 +11,15 @@ import entity.vorgang.SYSVER2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -107,7 +112,7 @@ import java.util.*;
 
 })
 
-public class Verordnung implements Serializable, VorgangElement {
+public class Verordnung implements Serializable, VorgangElement, Cloneable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -189,6 +194,28 @@ public class Verordnung implements Serializable, VorgangElement {
         this.anDatum = new Date();
         this.abDatum = SYSConst.DATE_BIS_AUF_WEITERES;
 
+    }
+
+    public Verordnung(Date anDatum, Date abDatum, Boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Massnahmen massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+        this.anDatum = anDatum;
+        this.abDatum = abDatum;
+        this.bisPackEnde = bisPackEnde;
+        this.verKennung = verKennung;
+        this.bemerkung = bemerkung;
+        this.stellplan = stellplan;
+        this.attachedFiles = attachedFiles;
+        this.attachedVorgaenge = attachedVorgaenge;
+        this.angesetztDurch = angesetztDurch;
+        this.abgesetztDurch = abgesetztDurch;
+        this.bewohner = bewohner;
+        this.massnahme = massnahme;
+        this.darreichung = darreichung;
+        this.situation = situation;
+        this.anKH = anKH;
+        this.abKH = abKH;
+        this.anArzt = anArzt;
+        this.abArzt = abArzt;
+        this.planungen = new ArrayList<VerordnungPlanung>();
     }
 
     public Long getVerid() {
@@ -392,6 +419,20 @@ public class Verordnung implements Serializable, VorgangElement {
             return false;
         }
         return true;
+    }
+
+
+
+    @Override
+    public Object clone() {
+        final Verordnung copy = new Verordnung(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, bewohner, massnahme, darreichung, situation, anKH, abKH, anArzt, abArzt);
+
+        CollectionUtils.forAllDo(planungen, new Closure() {
+            public void execute(Object o) {
+                copy.getPlanungen().add((VerordnungPlanung) ((VerordnungPlanung) o).clone());
+            }
+        });
+        return copy;
     }
 
     @Override

@@ -33,18 +33,24 @@ public class DarreichungTools {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof Darreichung) {
                     Darreichung darreichung = (Darreichung) o;
-                    String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
-                    String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
-
-                    text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
-                    text += zubereitung.isEmpty() ? "" : zubereitung + " ";
-                    text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+                    text = toPrettyString(darreichung);
                 } else {
                     text = o.toString();
                 }
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         };
+    }
+
+
+    public static String toPrettyString(Darreichung darreichung) {
+        String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
+        String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
+
+        String text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
+        text += zubereitung.isEmpty() ? "" : zubereitung + " ";
+        text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+        return text;
     }
 
 
