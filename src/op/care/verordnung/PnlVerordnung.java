@@ -171,26 +171,17 @@ public class PnlVerordnung extends CleanablePanel {
 
             //---- tblVerordnung ----
             tblVerordnung.setModel(new DefaultTableModel(
-                    new Object[][]{
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                    },
-                    new String[]{
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
-            ) {
-                Class<?>[] columnTypes = new Class<?>[]{
-                        Object.class, Object.class, Object.class, Object.class
-                };
-
-                @Override
-                public Class<?> getColumnClass(int columnIndex) {
-                    return columnTypes[columnIndex];
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
                 }
-            });
-            tblVerordnung.setToolTipText("");
+            ));
+            tblVerordnung.setToolTipText(null);
             tblVerordnung.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -275,43 +266,43 @@ public class PnlVerordnung extends CleanablePanel {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addComponent(cbAbgesetzt)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbMedi)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbOhneMedi)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbBedarf)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbRegel))
-                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                    .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addContainerGap(131, Short.MAX_VALUE))
+                                .addComponent(cbAbgesetzt)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbMedi)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbOhneMedi)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbBedarf)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbRegel))
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(191, Short.MAX_VALUE))
             );
             jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(cbAbgesetzt)
-                                            .addComponent(cbMedi)
-                                            .addComponent(cbOhneMedi)
-                                            .addComponent(cbBedarf)
-                                            .addComponent(cbRegel))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel1)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel2)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addContainerGap(20, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbAbgesetzt)
+                            .addComponent(cbMedi)
+                            .addComponent(cbOhneMedi)
+                            .addComponent(cbBedarf)
+                            .addComponent(cbRegel))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(20, Short.MAX_VALUE))
             );
         }
 
@@ -409,36 +400,36 @@ public class PnlVerordnung extends CleanablePanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup()
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
+                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnLock)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 733, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup()
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup()
+                        .addComponent(btnLock)
+                        .addComponent(lblBW))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

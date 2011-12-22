@@ -13,11 +13,11 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {comp jToolBar1::l::755:x, seq t {space :::p, comp lblBW::::697:x, space :::p, comp btnLock:::p::p, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}, seq l {space :::p, comp jspVerordnung::::715:x, space :::p}}</string> 
+        <string>par l {comp jToolBar1::l::755:x, seq t {space :::p, comp lblBW::::707:x, space :::p, comp btnLock:::p::p, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}, seq l {space :::p, comp jspVerordnung::::733:x, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, par l {comp btnLock:::p::p, comp lblBW:::p::p}, space :::p, comp jPanel1:::p::p, space :::p, comp jspVerordnung::::76:x, space :::p}}</string> 
+        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, par l {comp btnLock:::p::p, comp lblBW:::p::p}, space :::p, comp jPanel1:::p::p, space :::p, comp jspVerordnung::::94:x, space :::p}}</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -176,7 +176,7 @@
           </void> 
           <void method="setProperty"> 
            <string>toolTipText</string> 
-           <string></string> 
+           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
           </void> 
           <void property="name"> 
            <string>tblVerordnung</string> 
@@ -200,7 +200,7 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq {space :::p, par l {seq l {comp cbAbgesetzt:::p::p, space :::p, comp cbMedi:::p::p, space :::p, comp cbOhneMedi:::p::p, space :::p, comp cbBedarf:::p::p, space :::p, comp cbRegel:::p::p}, par t:l::p {comp jLabel12::l:::x:1, comp jLabel1::l:::x:1, comp jLabel2::l:::x:1}}, space ::131:x}}</string> 
+          <string>par l {seq {space :::p, par l {seq l {comp cbAbgesetzt:::p::p, space :::p, comp cbMedi:::p::p, space :::p, comp cbOhneMedi:::p::p, space :::p, comp cbBedarf:::p::p, space :::p, comp cbRegel:::p::p}, par t:l::p {comp jLabel12::l:::x:1, comp jLabel1::l:::x:1, comp jLabel2::l:::x:1}}, space ::191:x}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 

@@ -553,7 +553,7 @@ public class VerordnungTools {
                 result += "nur bis Packungs Ende<br/>";
             }
             if (mitBestand && !verordnung.isAbgesetzt()) {
-                if (vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
+                if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
                     result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
                             SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] +
                             "</font></b>";

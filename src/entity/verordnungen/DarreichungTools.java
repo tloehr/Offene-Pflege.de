@@ -48,7 +48,7 @@ public class DarreichungTools {
         String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
 
         String text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
-        text += zubereitung.isEmpty() ? "" : zubereitung + " ";
+        text += zubereitung.isEmpty() ? " " : zubereitung + " ";
         text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
         return text;
     }

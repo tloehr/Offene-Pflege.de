@@ -18,10 +18,56 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
+ * OPDE kann verschiedene Arten von wiederkehrenden Terminen für die Anwendung einer ärztlichen Verordnung
+ * speichern. Dazu sind zwei Entity Classes nötig. Verordnungen und VerordnungPlanung.
+ * <ul>
+ * <li><b>Verordnungen</b> enthält die Angaben über die Medikamente und Maßnahmen. Ärzte und Krankenhäuser, sowie Situationen bei
+ * Bedarfsmedikattion.</li>
+ * <li><b>VerordnungPlanung</b> sind die Termine und die Dosis bzw. Häufigkeit in der ein Medikament oder eine Maßnahme angewendet werden soll.
+ * Ebenso stehen hier drin, die maximale Tagesdosis einer Bedarfsmedikation. Zu jeder Verordnung können unterschiedliche Termin-Muster und Dosen
+ * eingegeben werden. Für jede dieser Einträge gibt es ein Objekt aus dieser Klasse.</li>
+ * </ul>
+ * Folgende Terminarten können in OPDE formuliert werden:
+ * <ul>
+ * <li><b>Regelverordnungen</b>, die einem bestimmten chronologischen Muster folgen
+ * <ul>
+ * <li><b>täglich</b>, bzw. alle <i>n</i> Tage.</li>
+ * <li><b>wöchentlich</b>, bzw. alle <i>n</i> Wochen, an unterschiedlichen Wochentagen.</li>
+ * <li><b>monatlich</b>, bzw. alle <i>n</i> Monate, jeweils am <i>m.</i> Tag des Monats oder am <i>o.</i> Wochentag des Monats.</li>
+ * <li>es kann ein Datum festgelegt werden, ab dem <b>die erste Anwendung</b> dieser Vergabe erfolgen soll. Dies steht normalerweise auf dem aktuellen Tagesdatum.</li>
+ * <li>Die einzelnen Dosisangaben können für vordefinierte Tageszeiten oder für eine Uhrzeit eingegeben werden.
+ * <ul>
+ * <li>Nachts, früh morgens</li>
+ * <li>Morgens</li>
+ * <li>Mittags</li>
+ * <li>Nachmittags</li>
+ * <li>Abends</li>
+ * <li>Nachts, spät abends</li>
+ * <li>Uhrzeit</li>
+ * </ul>
+ * </li>
+ * </ul>
+ * </li>
+ * <li><b>Bedarfsverordnungen</b>, die nur für die Anwendung in <b>bestimmten Situationen</b> gedacht sind.</li>
+ * </ul>
+ * <h2>Beispiele</h2>
+ * <h3>Bedarfsmedikation</h3>
+ * <img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-bedarf1.png" />
+ * <ul>
+ * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situationen[sitID=10], anKH=entity.rest.Krankenhaus[khid=16], abKH=null, anArzt=entity.rest.Arzt[arztID=21], abArzt=null}</code></li>
+ * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4658, ...}}</code></li>
+ * </ul>
+ *
+ * <h3>Regelverordnung mit sehr unterschiedlichen Dosierungen</h3>
+ * <ul>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.Arzt[arztID=1], abArzt=null}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel1.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7406, nachtMo=0, morgens=1, mittags=1, nachmittags=0, abends=1, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 16:12:49 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel2.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7404, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=2.5, uhrzeit=Thu Dec 22 22:00:00 CET 2011, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=1, monatlich=0, tagNum=0, mon=0, die=1, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:10:52 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel3.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7405, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=3, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=0, monatlich=2, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:11:49 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
+ * </ul>
  * @author tloehr
  */
 @Entity
@@ -98,7 +144,7 @@ import java.util.List;
                 // Wenn man als 3. Parameter eine 1 übergibt, dann werden alle
                 // Verordungen angezeigt, wenn nicht, dann nur die aktuellen.
                 " AND (1=? OR date(v.AbDatum) >= current_date())" +
-                " ORDER BY v.SitID = 0, v.DafID <> 0, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping"),
+                " ORDER BY v.SitID IS NULL, v.DafID IS NOT NULL, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping"),
         /**
          * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
          * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
@@ -128,7 +174,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date abDatum;
     @Column(name = "BisPackEnde")
-    private Boolean bisPackEnde;
+    private boolean bisPackEnde;
     @Basic(optional = false)
     @Column(name = "VerKennung")
     private long verKennung;
@@ -196,7 +242,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
 
     }
 
-    public Verordnung(Date anDatum, Date abDatum, Boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Massnahmen massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Verordnung(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Massnahmen massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.anDatum = anDatum;
         this.abDatum = abDatum;
         this.bisPackEnde = bisPackEnde;
@@ -274,11 +320,11 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         this.abArzt = abArzt;
     }
 
-    public Boolean isBisPackEnde() {
+    public boolean isBisPackEnde() {
         return bisPackEnde;
     }
 
-    public void setBisPackEnde(Boolean bisPackEnde) {
+    public void setBisPackEnde(boolean bisPackEnde) {
         this.bisPackEnde = bisPackEnde;
     }
 
@@ -420,7 +466,6 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         }
         return true;
     }
-
 
 
     @Override

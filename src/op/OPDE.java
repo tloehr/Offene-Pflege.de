@@ -424,9 +424,9 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.url", url);
 
 
-            if (isDebug()) {
-                jpaProps.put("eclipselink.logging.level", "FINER");
-            }
+//            if (isDebug()) {
+//                jpaProps.put("eclipselink.logging.level", "FINER");
+//            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
             // Cache lösche mit
@@ -483,7 +483,7 @@ public class OPDE {
                     EntityManager em = createEM();
                     try {
                         em.getTransaction().begin();
-                        BHPTools.erzeugen(null, null);
+                        BHPTools.erzeugen(em);
                         em.getTransaction().commit();
                     } catch (Exception e) {
                         fatal(e);

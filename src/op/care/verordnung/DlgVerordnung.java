@@ -34,7 +34,8 @@ import op.care.med.DlgMediAssistent;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
@@ -58,6 +59,11 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
+ *
+ * Bei einer Verordnungsänderung wird die alte Verordnung abgesetzt und die neue Verordnung statt dessen angesetzt. BHPs werden immer erstellt.
+ * Bei neuen Verordnungen immer für den ganzen Tag. Bei Änderung immer ab dem Moment, ab dem die neue Verordnung gilt.
+ *
+ *
  * @author tloehr
  */
 public class DlgVerordnung extends javax.swing.JDialog {
@@ -360,7 +366,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         .addGroup(jPanel8Layout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(jPanel8Layout.createParallelGroup()
-                                .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+                                .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
                                 .addGroup(jPanel8Layout.createSequentialGroup()
                                     .addComponent(cbPackEnde)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -370,7 +376,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 jPanel8Layout.setVerticalGroup(
                     jPanel8Layout.createParallelGroup()
                         .addGroup(GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                            .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                            .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(jPanel8Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(cbPackEnde)
@@ -393,15 +399,15 @@ public class DlgVerordnung extends javax.swing.JDialog {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel6)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbMass, 0, 485, Short.MAX_VALUE))
+                                .addComponent(cmbMass, 0, 459, Short.MAX_VALUE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                     .addComponent(btnBedarf, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnMed, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup()
-                                    .addComponent(txtSit, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                    .addComponent(txtMed, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
+                                    .addComponent(txtSit, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                                    .addComponent(txtMed, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(cmbSit, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -516,10 +522,10 @@ public class DlgVerordnung extends javax.swing.JDialog {
                                         .addComponent(jLabel3))
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addGroup(jPanel4Layout.createParallelGroup()
-                                        .addComponent(cmbAB, 0, 189, Short.MAX_VALUE)
-                                        .addComponent(cmbKHAb, 0, 189, Short.MAX_VALUE)
-                                        .addComponent(jdcAB, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                                        .addComponent(lblAB, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))))
+                                        .addComponent(cmbAB, 0, 221, Short.MAX_VALUE)
+                                        .addComponent(cmbKHAb, 0, 221, Short.MAX_VALUE)
+                                        .addComponent(jdcAB, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+                                        .addComponent(lblAB, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))))
                             .addContainerGap())
                 );
                 jPanel4Layout.setVerticalGroup(
@@ -618,10 +624,10 @@ public class DlgVerordnung extends javax.swing.JDialog {
                                 .addComponent(jLabel1))
                             .addGap(5, 5, 5)
                             .addGroup(jPanel2Layout.createParallelGroup()
-                                .addComponent(jdcAN, GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
-                                .addComponent(cmbKHAn, 0, 208, Short.MAX_VALUE)
-                                .addComponent(cmbAN, 0, 208, Short.MAX_VALUE)
-                                .addComponent(lblAN, GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE))
+                                .addComponent(jdcAN, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                                .addComponent(cmbKHAn, 0, 224, Short.MAX_VALUE)
+                                .addComponent(cmbAN, 0, 224, Short.MAX_VALUE)
+                                .addComponent(lblAN, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE))
                             .addContainerGap())
                 );
                 jPanel2Layout.setVerticalGroup(
@@ -637,8 +643,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(cmbKHAn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(lblAN)
-                            .addContainerGap(83, Short.MAX_VALUE))
+                            .addComponent(lblAN))
                 );
             }
 
@@ -646,27 +651,27 @@ public class DlgVerordnung extends javax.swing.JDialog {
             jPanel3.setLayout(jPanel3Layout);
             jPanel3Layout.setHorizontalGroup(
                 jPanel3Layout.createParallelGroup()
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel3Layout.createParallelGroup()
-                            .addComponent(jLabel5, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
-                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jPanel4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
+                        .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
+                            .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jPanel4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel5, GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
                         .addContainerGap())
             );
             jPanel3Layout.setVerticalGroup(
                 jPanel3Layout.createParallelGroup()
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 144, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel5)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
                         .addContainerGap())
             );
         }
@@ -752,7 +757,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                         .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE))
+                        .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -848,7 +853,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
             jdcAN.setEnabled(editMode == EDIT_MODE);
             txtBemerkung.setText(SYSTools.catchNull(verordnung.getBemerkung()));
 
-            cmbMed.setModel(new DefaultComboBoxModel(new MedProdukte[]{verordnung.getDarreichung().getMedProdukt()}));
+            cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{verordnung.getDarreichung()}));
 
             cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
             cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
@@ -864,10 +869,10 @@ public class DlgVerordnung extends javax.swing.JDialog {
             cmbSit.setEnabled(this.editMode != CHANGE_MODE);
 
             if (cmbMed.getSelectedItem() != null) {
-                lblVerordnung.setText(cmbMed.getSelectedItem().toString());
+                lblVerordnung.setText(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
                 cbPackEnde.setEnabled(true);
             } else {
-                lblVerordnung.setText(cmbMass.getSelectedItem().toString());
+                lblVerordnung.setText(((Massnahmen) cmbMass.getSelectedItem()).getBezeichnung());
                 cbPackEnde.setEnabled(false);
             }
             if (!verordnung.isAbgesetzt()) {
@@ -987,7 +992,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         cmbMass.setEnabled(false);
         cbStellplan.setEnabled(false);
         cbStellplan.setSelected(false);
-        lblVerordnung.setText(cmbMed.getSelectedItem().toString());
+        lblVerordnung.setText(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
         // Bestand prüfen
         saveOK();
     }//GEN-LAST:event_cmbMedItemStateChanged
@@ -1111,6 +1116,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
             verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
             verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
 
+
             // Sicherung
             if (editMode == NEW_MODE) { // =================== NEU ====================
                 // Bei einer neuen Verordnung kann einfach eingetragen werden. Die BHP spielt hier keine Rolle.
@@ -1134,11 +1140,13 @@ public class DlgVerordnung extends javax.swing.JDialog {
             }
 
 
-            if (verordnung.getSituation() == null) {
+            if (!verordnung.isBedarf()) {
                 if (editMode == CHANGE_MODE) {
-                    BHPTools.erzeugen(em, verordnung, new Date());
+                    // ab der aktuellen Uhrzeit
+                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
                 } else {
-                    BHPTools.erzeugen(em, verordnung);
+                    // für den ganzen Tag
+                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), null);
                 }
             }
 
@@ -1149,6 +1157,39 @@ public class DlgVerordnung extends javax.swing.JDialog {
         } finally {
             em.close();
         }
+        if (OPDE.isDebug()) {
+            if (editMode != CHANGE_MODE) {
+                OPDE.debug("Verordnung wurde neu erstellt bzw. korrigiert");
+                OPDE.debug(verordnung);
+                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        OPDE.debug(o);
+                    }
+                });
+            } else {
+                OPDE.debug("Verordnung wurde neu geändert und gegen eine neue ersetzt.");
+                OPDE.debug("ALT");
+                OPDE.debug("==============");
+                OPDE.debug(oldVerordnung);
+                CollectionUtils.forAllDo(oldVerordnung.getPlanungen(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        OPDE.debug(o);
+                    }
+                });
+                OPDE.debug("==============");
+                OPDE.debug("NEU");
+                OPDE.debug("==============");
+                OPDE.debug(verordnung);
+                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        OPDE.debug(o);
+                    }
+                });
+            }
+        } // DEBUG OUTPUT
     }
 
 

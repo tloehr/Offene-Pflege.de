@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {space :::p, comp lblTitle:::p::p, space :::p, comp lblBW:::p::p, space :::p, comp jSeparator1:::p:10:p, space :::p, comp jPanel5:::p::p:1, space :::p, par t {comp jPanel1:::::x:1, comp jPanel3::t::437:x:1}, space :::p, comp jSeparator2:::p:10:p, space :::p, par b {comp btnClose::b:p::p, comp btnSave::b:p::p}, space :::p}}</string> 
+        <string>par l {seq l {space :::p, comp lblTitle:::p::p, space :::p, comp lblBW:::p::p, space :::p, comp jSeparator1:::p:10:p, space :::p, comp jPanel5:::p::p:1, space :::p, par t {comp jPanel1:::::x:1, comp jPanel3::t:::x:1}, space :::p, comp jSeparator2:::p:10:p, space :::p, par b {comp btnClose::b:p::p, comp btnSave::b:p::p}, space :::p}}</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -96,7 +96,7 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, par l {comp jPanel8::t:::x, seq l {comp jLabel6:::p::p, space :::p, comp cmbMass::::485:x:1}, seq l {par l:::p {comp btnBedarf:::::x:1, comp btnMed::l:::x:1}, space :::p, par l {comp txtSit::::183:x:1, comp txtMed::l::183:x:1}, space :::p, par t:::p {comp cmbSit:::::x:1, comp cmbMed::t:p:275:p:1}}}, space :::p}}</string> 
+          <string>par l {seq l {space :::p, par l {comp jPanel8::t:::x, seq l {comp jLabel6:::p::p, space :::p, comp cmbMass::::459:x:1}, seq l {par l:::p {comp btnBedarf:::::x:1, comp btnMed::l:::x:1}, space :::p, par l {comp txtSit::::157:x:1, comp txtMed::l::157:x:1}, space :::p, par t:::p {comp cmbSit:::::x:1, comp cmbMed::t:p:275:p:1}}}, space :::p}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
@@ -323,11 +323,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq l {space :::p, par l {comp jspDosis::l::519:x:1, seq l {comp cbPackEnde:::p::p, space :::p, comp cbStellplan:::p::p}}, space :::p}}</string> 
+            <string>par l {seq l {space :::p, par l {comp jspDosis::l::493:x:1, seq l {comp cbPackEnde:::p::p, space :::p, comp cbStellplan:::p::p}}, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq t {comp jspDosis::::239:x, space :::p, par b {comp cbPackEnde::b:p::p, comp cbStellplan::b:p::p}, space :::p}}</string> 
+            <string>par l {seq t {comp jspDosis::::304:x, space :::p, par b {comp cbPackEnde::b:p::p, comp cbStellplan::b:p::p}, space :::p}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -620,11 +620,11 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, par l {comp jLabel5::t::291:x, par t:l::p {comp jPanel2::l:::x:1, comp jPanel4::l:::x:1}, comp jScrollPane3::l::291:x:1}, space :::p}}</string> 
+          <string>par l {seq t {space :::p, par t {comp jScrollPane3::l::317:x:1, par t:l::p {comp jPanel4::l:::x:1, comp jPanel2::l:::x:1}, comp jLabel5::t::317:x}, space :::p}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
-          <string>par l {seq l {space :::p, comp jPanel2:::p::p, space :::p, comp jPanel4:::p::p, space :::p, comp jLabel5:::p::p, space :::p, comp jScrollPane3::::25:x, space :::p}}</string> 
+          <string>par l {seq l {space :::p, comp jPanel2:::p:144:p, space :::p, comp jPanel4:::p:184:p, space :::p, comp jLabel5:::p::p, space :::p, comp jScrollPane3::::117:x, space :::p}}</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -647,7 +647,7 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq {space :::p, par l {comp cbAB::l:p::p, seq l {par l {comp jLabel4::l:p::p, comp jLabel3::l:p::p}, space :::p, par l {comp cmbAB::l::189:x:1, comp cmbKHAb::l::189:x:1, comp jdcAB::l::189:x:1, comp lblAB::l::189:x}}}, space :::p}}</string> 
+            <string>par l {seq {space :::p, par l {comp cbAB::l:p::p, seq l {par l {comp jLabel4::l:p::p, comp jLabel3::l:p::p}, space :::p, par l {comp cmbAB::l::221:x:1, comp cmbKHAb::l::221:x:1, comp jdcAB::l::221:x:1, comp lblAB::l::221:x}}}, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
@@ -886,11 +886,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq l {space :::p, par l {comp jLabel2::l:p::p, comp jLabel1::l:p::p}, space :p:5:p, par l {comp jdcAN::::208:x:1, comp cmbKHAn::l::208:x, comp cmbAN::l::208:x:1, comp lblAN::l::208:x}, space :p::p}}</string> 
+            <string>par l {seq l {space :::p, par l {comp jLabel2::l:p::p, comp jLabel1::l:p::p}, space :p:5:p, par l {comp jdcAN::::224:x:1, comp cmbKHAn::l::224:x, comp cmbAN::l::224:x:1, comp lblAN::l::224:x}, space :p::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq {par l {comp jLabel1:::p::p, comp jdcAN:::p:22:p}, space :::p, par b {comp jLabel2::b:p::p, comp cmbAN::b:p::p}, space :::p, comp cmbKHAn:::p::p, space :::p, comp lblAN:::p::p, space ::83:x}}</string> 
+            <string>par l {seq {par l {comp jLabel1:::p::p, comp jdcAN:::p:22:p}, space :::p, par b {comp jLabel2::b:p::p, comp cmbAN::b:p::p}, space :::p, comp cmbKHAn:::p::p, space :::p, comp lblAN:::p::p}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -1165,7 +1165,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>940</int> 
-        <int>655</int> 
+        <int>720</int> 
        </object> 
       </void> 
       <void method="setProperty"> 
