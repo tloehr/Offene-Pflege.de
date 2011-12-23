@@ -85,6 +85,7 @@ public class OPDE {
     protected static boolean animation = false;
     protected static boolean debug;
     protected static String opwd = "";
+    protected static String css = "";
 
     public static String getOpwd() {
         return opwd;
@@ -116,7 +117,10 @@ public class OPDE {
 
     public static void setProp(String key, String value) {
         props.put(key, value);
+    }
 
+    public static String getCSS() {
+        return css;
     }
 
     public static EntityManagerFactory getEMF() {
@@ -496,9 +500,14 @@ public class OPDE {
                 SYSHostsTools.shutdown(0);
             }
 
-
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 
+
+            try {
+                css = SYSTools.readFileAsString(opwd + sep + "standard.css");
+            } catch (IOException ie) {
+                css = "";
+            }
 
             ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

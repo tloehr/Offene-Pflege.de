@@ -39,7 +39,7 @@ import java.util.Date;
                 " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung " +
                 " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
 })
-public class VerordnungPlanung implements Serializable, Cloneable {
+public class VerordnungPlanung implements Serializable, Cloneable, Comparable<VerordnungPlanung> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -437,6 +437,38 @@ public class VerordnungPlanung implements Serializable, Cloneable {
     @Override
     public Object clone() {
         return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum,  user, verordnung);
+    }
+
+    /**
+     * Vergleichsoperator für die Sortierung. Die Sortierung soll in folgender Reihenfolge sein:
+     * <ol>
+     *     <li>Zuerst die Verordnungen mit Zeiten</li>
+     *     <li>Dann die Verordnungen mit Uhrzeiten</li>
+     *     <li>Dann der Rest</li>
+     * </ol>
+     * Innerhalb der Gruppen wird nach dem PK sortiert. Bei den Uhrzeiten wird das compareTo von Date verwendet.
+     * @param that
+     * @return
+     */
+    @Override
+    public int compareTo(VerordnungPlanung that) {
+        int result = 0;
+
+        if (this.verwendetMaximalDosis() == that.verwendetMaximalDosis()){
+            result = this.bhppid.compareTo(that.getBhppid());
+        } else if (this.verwendetZeiten() == that.verwendetZeiten()){
+            result = this.bhppid.compareTo(that.getBhppid());
+        } else if (this.verwendetUhrzeit() == that.verwendetUhrzeit()){
+            result = this.uhrzeit.compareTo(that.getUhrzeit());
+        } else if (this.verwendetZeiten()){ // Zeiten zuerst.
+            result = 1;
+        } else if (this.verwendetUhrzeit() && that.verwendetMaximalDosis()){ // dann Uhrzeiten
+            result = 1;
+        } else {
+            result = -1;
+        }
+
+        return result;
     }
 
     @Override

@@ -18,6 +18,9 @@ import java.io.Serializable;
     @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM MedFormen m WHERE m.stellplan = :stellplan"),
     @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM MedFormen m WHERE m.status = :status"),
     @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM MedFormen m WHERE m.equiv = :equiv")})
+/**
+ *
+ */
 public class MedFormen implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -92,6 +95,13 @@ public class MedFormen implements Serializable {
         this.packEinheit = packEinheit;
     }
 
+    /**
+     * das hier ist einfach eine Sortierungsmöglichkeit, die bei der Stellplanerzeugung berücksichtigt wird.
+     * Da kann man festlegen, was auf dem Plan zusammenstehen soll.
+     * Z.B. für Tropfen oder so. 1 sind hier Tropfen, 2 Spritzen. Der Fantasie sind keine Grenzen gesetzt.
+     * Die Vorlage ist so eingestellt, dass alles über 0 grau hinterlegt wird.
+     * @return
+     */
     public short getStellplan() {
         return stellplan;
     }
@@ -99,6 +109,7 @@ public class MedFormen implements Serializable {
     public void setStellplan(short stellplan) {
         this.stellplan = stellplan;
     }
+
 
     public short getStatus() {
         return status;

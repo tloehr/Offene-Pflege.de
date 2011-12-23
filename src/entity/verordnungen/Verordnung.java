@@ -60,7 +60,7 @@ import java.util.List;
  * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situationen[sitID=10], anKH=entity.rest.Krankenhaus[khid=16], abKH=null, anArzt=entity.rest.Arzt[arztID=21], abArzt=null}</code></li>
  * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4658, ...}}</code></li>
  * </ul>
- *
+ * <p/>
  * <h3>Regelverordnung mit sehr unterschiedlichen Dosierungen</h3>
  * <ul>
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.Arzt[arztID=1], abArzt=null}</code></li>
@@ -68,6 +68,7 @@ import java.util.List;
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel2.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7404, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=2.5, uhrzeit=Thu Dec 22 22:00:00 CET 2011, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=1, monatlich=0, tagNum=0, mon=0, die=1, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:10:52 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel3.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7405, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=3, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=0, monatlich=2, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:11:49 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
  * </ul>
+ *
  * @author tloehr
  */
 @Entity
@@ -94,6 +95,13 @@ import java.util.List;
         @SqlResultSetMapping(name = "Verordnung.findActiveByVorratAndPackendeResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class)
         ),
+
+        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
+                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = MedVorrat.class), @EntityResult(entityClass = Stationen.class),
+                        @EntityResult(entityClass = MedBestand.class), @EntityResult(entityClass = MedFormen.class), @EntityResult(entityClass = MedProdukte.class),
+                        @EntityResult(entityClass = Massnahmen.class), @EntityResult(entityClass = VerordnungPlanung.class)}
+        ),
+
         @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class),
                 columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
@@ -154,7 +162,31 @@ import java.util.List;
                 " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " + // Verbindung über Bewohner
                 " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
                 " WHERE b.VorID=? AND ver.BisPackEnde = ? " +
-                " AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratAndPackendeResultMapping")
+                " AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratAndPackendeResultMapping"),
+        /**
+         *
+         */
+        @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
+                " SELECT v.*, vor.*, st.*, best.*, F.*, M.*, Ms.*, bhp.* " +
+                " FROM BHPVerordnung v " +
+                " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
+                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
+                " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
+                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
+                " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
+                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
+                " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
+                " LEFT OUTER JOIN ( " +
+                "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
+                "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
+                "      WHERE M.Bis = '9999-12-31 23:59:59' " +
+                " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
+                " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
+                " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
+                " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+                " AND st.EKennung = ? AND best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59'" +
+                " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)",
+                resultSetMapping = "Verordnung.findAllForStellplanResultMapping")
 
 })
 

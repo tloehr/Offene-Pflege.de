@@ -1,9 +1,13 @@
 package entity.verordnungen;
 
+import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -42,6 +46,8 @@ public class VerordnungPlanungTools {
         if (planung.isTaeglich()) {
             if (planung.getTaeglich() > 1) {
                 result += "<b>alle " + planung.getTaeglich() + " Tage</b>";
+            } else {
+                result += "<b>täglich</b>";
             }
         } else if (planung.isWoechentlich()) {
             result += "<b>";
@@ -114,18 +120,20 @@ public class VerordnungPlanungTools {
     public static String getDosisAsHTML(VerordnungPlanung planung, VerordnungPlanung vorherigePlanung, boolean singleUsageOnly) {
         String result = "";
 
-
+        // Wenn die vorherige Planung null ist, dann muss das hier der De erste durchlauf sein
+        // gleichzeitig brauchen wir einen Header dann, wenn der Status sich unterscheidet.
+        // Sagen wir, dass vorher eine Verordnungn nach früh, spät, nacht usw. war
+        // und jetzt eine Uhrzeit kommt. Dann ändert sich der Aufbau der Tabellen.
         boolean headerNeeded = vorherigePlanung == null || getTerminStatus(vorherigePlanung) != getTerminStatus(planung);
-        boolean footerNeeded = singleUsageOnly;
+        boolean footerNeeded = vorherigePlanung != null && getTerminStatus(vorherigePlanung) != getTerminStatus(planung) && getTerminStatus(vorherigePlanung) != MAXDOSIS;
 
-        if (vorherigePlanung != null && headerNeeded && getTerminStatus(vorherigePlanung) != MAXDOSIS) {
+        if (footerNeeded) {
             // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
             // der erste Durchlauf, ein Wechsel stattgefunden hat und der
             // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
             result += "</table>";
         }
 
-        vorherigePlanung = planung;
         if (getTerminStatus(planung) == ZEIT) {
             if (headerNeeded) {
                 result += "<table border=\"1\" cellspacing=\"0\">" +
@@ -148,7 +156,7 @@ public class VerordnungPlanungTools {
                     "      <td align=\"center\">" + getValueAsString(planung.getNachtAb()) + "</td>" +
                     "      <td>" + getWiederholung(planung) + "</td>" +
                     "    </tr>";
-            if (footerNeeded) {
+            if (singleUsageOnly) {
                 result += "</table>";
             }
         } else if (getTerminStatus(planung) == MAXDOSIS) {
@@ -172,13 +180,44 @@ public class VerordnungPlanungTools {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             result += "    <tr>" +
                     "      <td align=\"center\">" + sdf.format(planung.getUhrzeit()) + " Uhr</td>" +
-                    "      <td align=\"center\">" + SYSTools.printDouble(planung.getUhrzeitDosis().doubleValue()) + "</td>" +
+                    "      <td align=\"center\">" + planung.getUhrzeitDosis().toPlainString() + "</td>" +
                     "      <td>" + getWiederholung(planung) + "</td>" +
                     "    </tr>";
+            if (singleUsageOnly) {
+                result += "</table>";
+            }
         } else {
             result = "!!FEHLER!!";
         }
         return result;
+    }
+
+
+    public static String getHinweis(VerordnungPlanung planung) {
+        String result = "";
+
+        // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
+        if (planung.verwendetMaximalDosis()) {
+            result += "Maximale Tagesdosis: ";
+            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()];
+            result += "<br/>";
+        } else if (planung.verwendetUhrzeit()) {
+            result += DateFormat.getTimeInstance().format(planung.getUhrzeit()) + " Uhr "
+                    + HTMLTools.printDouble(planung.getUhrzeitDosis()) + " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()];
+            result += "<br/>";
+        }
+
+        String wiederholung = getWiederholung(planung);
+        result += wiederholung;
+
+        if (!SYSTools.catchNull(planung.getVerordnung().getBemerkung()).isEmpty()) {
+            if (!wiederholung.isEmpty()) {
+                result += "<br/>";
+            }
+            result += "<b><u>Bemerkung:</u></b> " + planung.getVerordnung().getBemerkung();
+        }
+
+        return result.equals("") ? "&nbsp;" : result;
     }
 
 }

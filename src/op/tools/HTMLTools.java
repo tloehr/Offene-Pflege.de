@@ -4,6 +4,8 @@
  */
 package op.tools;
 
+import java.math.BigDecimal;
+
 /**
  * @author tloehr
  */
@@ -34,6 +36,13 @@ public class HTMLTools {
         }
         return dbl;
     }
+
+    /**
+     * Erzeugt Bruchdarstellung (für 0.5, 0.25, 0.75, 0.33) in HTML zu dem übergebenen Wert.
+     */
+     public static String printDouble(BigDecimal bd) {
+         return printDouble(bd.doubleValue());
+     }
 
     /**
      * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die

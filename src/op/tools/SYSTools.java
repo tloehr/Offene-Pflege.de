@@ -46,9 +46,7 @@ import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -1786,4 +1784,28 @@ public class SYSTools {
 
         return html;
     }
+
+    /**
+     * @param filePath name of file to open. The file can reside
+     *                 anywhere in the classpath
+     *                 http://snippets.dzone.com/posts/show/4480
+     */
+    public static String readFileAsString(String filePath) throws IOException {
+        StringBuffer fileData = new StringBuffer(1000);
+        FileInputStream fis = new FileInputStream(filePath);
+        InputStreamReader reader = new InputStreamReader(fis, "UTF-8");
+        char[] buf = new char[1024];
+        int numRead = 0;
+        while ((numRead = reader.read(buf)) != -1) {
+            String readData = String.valueOf(buf, 0, numRead);
+            fileData.append(readData);
+            buf = new char[1024];
+        }
+        reader.close();
+        fis.close();
+        return fileData.toString();
+    }
+
+
+
 }

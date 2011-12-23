@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +73,24 @@ public class VerordnungTools {
         return listeVorrat;
     }
 
-    public static String getStellplanAsHTML(Einrichtungen einrichtung) {
+    public static String getStellplanAsHTML(Einrichtungen einrichtungen) {
+        EntityManager em = OPDE.createEM();
+        String html = "";
+
+        try {
+            Query query = em.createNamedQuery("Verordnung.findAllForStellplan");
+            query.setParameter(1, einrichtungen.getEKennung());
+
+            html = getStellplan(query.getResultList());
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return html;
+    }
+
+    @Deprecated
+    public static String getStellplanAsHTML(String ekennung) {
         PreparedStatement stmt;
         ResultSet rs;
         String sql;
@@ -121,10 +139,10 @@ public class VerordnungTools {
                     + " WHERE aa.tmp = 0 " + // Falls noch alte Trümmer existieren, dann die nicht anzeigen.
                     " ORDER BY aa.StatID, aa.BWName, aa.DafID <> 0, aa.FStellplan, CONCAT(aa.mptext, aa.mssntext)";
             stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, einrichtung.getEKennung());
+            stmt.setString(1, ekennung);
             rs = stmt.executeQuery();
 
-            result = getStellplan(rs);
+//            result = getStellplan(rs);
 
 
         } catch (SQLException se) {
@@ -157,11 +175,8 @@ public class VerordnungTools {
      * <li>print.print_unwriteable_margin_top = 25</li>
      * <li>Drucken des Hintergrundes einschalten</li>
      * <ul>
-     *
-     * @param rs
-     * @return
      */
-    public static String getStellplan(ResultSet rs) {
+    private static String getStellplan(List data) {
 
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
 
@@ -170,109 +185,230 @@ public class VerordnungTools {
 
         String header = "Stellplan für den " + DateFormat.getDateInstance().format(new Date());
 
-        String html = "<html>\n"
-                + "<head>\n"
-                + "<title>" + header + "</title>\n"
-                + "<style type=\"text/css\" media=\"all\">\n"
-                + "body { padding:10px; }\n"
-                + "#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}\n"
-                + "#fonth1 { font-size:24px; font-family:Arial,sans-serif;}\n"
-                + "#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}\n"
-                + "#fonttext { font-size:12px; font-family:Arial,sans-serif;}\n"
-                + "#fonttextgrau { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif;}\n"
-                + "</style>\n"
+        String html = "<html>"
+                + "<head>"
+                + "<title>" + header + "</title>"
+                + OPDE.getCSS()
                 + HTMLTools.JSCRIPT_PRINT
-                + "</head>\n"
-                + "<body>\n";
+                + "</head>"
+                + "<body>";
 
         String bwkennung = "";
         long statid = 0;
+        // entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = MedVorrat.class), @EntityResult(entityClass = Stationen.class),
+//                        @EntityResult(entityClass = MedBestand.class), @EntityResult(entityClass = MedFormen.class), @EntityResult(entityClass = MedProdukte.class),
+//                        @EntityResult(entityClass = Massnahmen.class), VerordnungPlanung}
 
-        try {
+        Iterator it = data.iterator();
 
-            rs.beforeFirst();
+        while (it.hasNext()) {
 
-            while (rs.next()) {
+            Object[] objects = (Object[]) it.next();
 
-                boolean stationsWechsel = statid != rs.getLong("aa.StatID");
+            Verordnung verordnung = (Verordnung) objects[0];
+            Stationen station = (Stationen) objects[2];
+            MedBestand bestand = (MedBestand) objects[3];
+            MedFormen form = (MedFormen) objects[4];
+            VerordnungPlanung planung = (VerordnungPlanung) objects[7];
 
-                // Wenn der Plan für eine ganze Einrichtung gedruckt wird, dann beginnt eine
-                // neue Station immer auf einer neuen Seite.
-                if (stationsWechsel) {
-                    elementNumber = 1;
-                    // Beim ersten Mal nur ein H1 Header. Sonst mit Seitenwechsel.
-                    if (statid == 0) {
-                        html += "<h1 align=\"center\" id=\"fonth1\">";
-                    } else {
-                        html += "</table>\n";
-                        html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
-                    }
-                    html += header + " (" + rs.getString("aa.StatBezeichnung") + ")" + "</h1>\n";
-                    html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
-                    statid = rs.getLong("aa.StatID");
+
+            OPDE.debug(verordnung);
+
+
+            boolean stationsWechsel = statid != station.getStatID();
+
+            // Wenn der Plan für eine ganze Einrichtung gedruckt wird, dann beginnt eine
+            // neue Station immer auf einer neuen Seite.
+            if (stationsWechsel) {
+                elementNumber = 1;
+                // Beim ersten Mal nur ein H1 Header. Sonst mit Seitenwechsel.
+                if (statid == 0) {
+                    html += "<h1 align=\"center\" id=\"fonth1\">";
+                } else {
+                    html += "</table>";
+                    html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
                 }
-
-                // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
-                boolean grau = rs.getInt("FStellplan") > 0;
-
-                // Wenn der Bewohnername sich in der Liste ändert, muss
-                // einmal die Überschrift drüber gesetzt werden.
-                boolean bewohnerWechsel = !bwkennung.equals(rs.getString("bwkennung"));
-
-                if (pagebreak || stationsWechsel || bewohnerWechsel) {
-                    // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-                    // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
-                    // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
-                    // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
-                    pagebreak = (elementNumber + 2 + 2) > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-
-                    // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
-                    if (pagebreak || !bwkennung.equals("")) {
-                        html += "</table>\n";
-                    }
-
-                    bwkennung = rs.getString("bwkennung");
-                    html += "<h2 id=\"fonth2\" " + (pagebreak ? "style=\"page-break-before:always\">" : ">") + ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "") + rs.getString("bwname") + " [" + rs.getString("bwkennung") + "]</h2>\n";
-                    html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">\n<tr>"
-                            + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>\n";
-                    elementNumber += 2;
-
-                    if (pagebreak) {
-                        elementNumber = 1;
-                        pagebreak = false;
-                    }
-                }
-
-                html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
-                html += "<td width=\"300\" >" + getMassnahme(rs) + "</td>";
-                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("NachtMo")) + "</td>";
-                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Morgens")) + "</td>";
-                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Mittags")) + "</td>";
-                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Nachmittags")) + "</td>";
-                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Abends")) + "</td>";
-                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("NachtAb")) + "</td>";
-                html += "<td width=\"300\" >" + getHinweis(rs) + "</td>";
-                html += "</tr>\n";
-                elementNumber += 1;
-
-                pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+                html += header + " (" + station.getBezeichnung() + ")" + "</h1>";
+                html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
+                statid = station.getStatID();
             }
 
-            html += "</table>\n"
-                    + "</body>";
-        } catch (SQLException e) {
-            new DlgException(e);
+            // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
+            boolean grau = form.getStellplan() > 0;
+
+            // Wenn der Bewohnername sich in der Liste ändert, muss
+            // einmal die Überschrift drüber gesetzt werden.
+            boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getBewohner().getBWKennung());
+
+            if (pagebreak || stationsWechsel || bewohnerWechsel) {
+                // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
+                // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+                // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
+                // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
+                pagebreak = (elementNumber + 2 + 2) > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+
+                // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+                if (pagebreak || !bwkennung.equals("")) {
+                    html += "</table>";
+                }
+
+                bwkennung = verordnung.getBewohner().getBWKennung();
+
+                html += "<h2 id=\"fonth2\" " +
+                        (pagebreak ? "style=\"page-break-before:always\">" : ">") +
+                        ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
+                        + BewohnerTools.getBWLabelText(verordnung.getBewohner())
+                        + "</h2>";
+                html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
+                        + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>";
+                elementNumber += 2;
+
+                if (pagebreak) {
+                    elementNumber = 1;
+                    pagebreak = false;
+                }
+            }
+
+
+
+
+            html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
+            html += "<td width=\"300\" >" + (verordnung.hasMedi() ? DarreichungTools.toPrettyString(verordnung.getDarreichung()) : verordnung.getMassnahme().getBezeichnung());
+            html += (bestand != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestand.getBestID() + "</i>" : "") + "</td>";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>";
+            html += "<td width=\"300\" >" + VerordnungPlanungTools.getHinweis(planung) + "</td>";
+            html += "</tr>";
+            elementNumber += 1;
+
+            pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
         }
+
+        html += "</table>"
+                + "</body>";
+
 
         return html;
     }
+
+
+//    @Deprecated
+//    public static String getStellplan(ResultSet rs) {
+//
+//        int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
+//
+//        int elementNumber = 1;
+//        boolean pagebreak = false;
+//
+//        String header = "Stellplan für den " + DateFormat.getDateInstance().format(new Date());
+//
+//        String html = "<html>"
+//                + "<head>"
+//                + "<title>" + header + "</title>"
+//                + "<style type=\"text/css\" media=\"all\">"
+//                + "body { padding:10px; }"
+//                + "#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}"
+//                + "#fonth1 { font-size:24px; font-family:Arial,sans-serif;}"
+//                + "#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}"
+//                + "#fonttext { font-size:12px; font-family:Arial,sans-serif;}"
+//                + "#fonttextgrau { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif;}"
+//                + "</style>"
+//                + HTMLTools.JSCRIPT_PRINT
+//                + "</head>"
+//                + "<body>";
+//
+//        String bwkennung = "";
+//        long statid = 0;
+//
+//        try {
+//
+//            rs.beforeFirst();
+//
+//            while (rs.next()) {
+//
+//                boolean stationsWechsel = statid != rs.getLong("aa.StatID");
+//
+//                // Wenn der Plan für eine ganze Einrichtung gedruckt wird, dann beginnt eine
+//                // neue Station immer auf einer neuen Seite.
+//                if (stationsWechsel) {
+//                    elementNumber = 1;
+//                    // Beim ersten Mal nur ein H1 Header. Sonst mit Seitenwechsel.
+//                    if (statid == 0) {
+//                        html += "<h1 align=\"center\" id=\"fonth1\">";
+//                    } else {
+//                        html += "</table>";
+//                        html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
+//                    }
+//                    html += header + " (" + rs.getString("aa.StatBezeichnung") + ")" + "</h1>";
+//                    html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
+//                    statid = rs.getLong("aa.StatID");
+//                }
+//
+//                // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
+//                boolean grau = rs.getInt("FStellplan") > 0;
+//
+//                // Wenn der Bewohnername sich in der Liste ändert, muss
+//                // einmal die Überschrift drüber gesetzt werden.
+//                boolean bewohnerWechsel = !bwkennung.equals(rs.getString("bwkennung"));
+//
+//                if (pagebreak || stationsWechsel || bewohnerWechsel) {
+//                    // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
+//                    // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+//                    // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
+//                    // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
+//                    pagebreak = (elementNumber + 2 + 2) > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+//
+//                    // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+//                    if (pagebreak || !bwkennung.equals("")) {
+//                        html += "</table>";
+//                    }
+//
+//                    bwkennung = rs.getString("bwkennung");
+//                    html += "<h2 id=\"fonth2\" " + (pagebreak ? "style=\"page-break-before:always\">" : ">") + ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "") + rs.getString("bwname") + " [" + rs.getString("bwkennung") + "]</h2>";
+//                    html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
+//                            + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>";
+//                    elementNumber += 2;
+//
+//                    if (pagebreak) {
+//                        elementNumber = 1;
+//                        pagebreak = false;
+//                    }
+//                }
+//
+//                html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
+//                html += "<td width=\"300\" >" + getMassnahme(rs) + "</td>";
+//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("NachtMo")) + "</td>";
+//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Morgens")) + "</td>";
+//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Mittags")) + "</td>";
+//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Nachmittags")) + "</td>";
+//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Abends")) + "</td>";
+//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("NachtAb")) + "</td>";
+//                html += "<td width=\"300\" >" + getHinweis(rs) + "</td>";
+//                html += "</tr>";
+//                elementNumber += 1;
+//
+//                pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+//            }
+//
+//            html += "</table>"
+//                    + "</body>";
+//        } catch (SQLException e) {
+//            new DlgException(e);
+//        }
+//
+//        return html;
+//    }
 
     public static String getEinheit(ResultSet rs) throws SQLException {
         return SYSTools.catchNull(rs.getString("Zubereitung"), "", ", ")
                 + SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
     }
 
-
+    @Deprecated
     public static String getMassnahme(ResultSet rs) throws SQLException {
         String result = "";
 
@@ -290,6 +426,7 @@ public class VerordnungTools {
         return result;
     }
 
+    @Deprecated
     public static String getHinweis(ResultSet rs) throws SQLException {
         String result = "";
 
@@ -322,6 +459,7 @@ public class VerordnungTools {
         return result.equals("") ? "&nbsp;" : result;
     }
 
+    @Deprecated
     public static String getWiederholung(ResultSet rs) throws SQLException {
         String result = "";
 
@@ -449,9 +587,8 @@ public class VerordnungTools {
 
 
         }
-        if (verordnung.isAbgesetzt()) {//if (rs.getDate("AbDatum") != null && rs.getTimestamp("AbDatum").getTime() <=  SYSCalendar.nowDB() ){
+        if (verordnung.isAbgesetzt()) {
             result += "</s>"; // Abgesetzte
-            //OPDE.debug(this.toString() + ": " + result);
         }
 
         return result;
@@ -521,25 +658,23 @@ public class VerordnungTools {
 
     public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
         String result = "";
-        //OPDE.debug("VerID: "+verid);
-
-        // ======================================================================================================
-        // Erster Teil
-        // ======================================================================================================
+        if (verordnung.getPlanungen().size() > 1) {
+            Collections.sort(verordnung.getPlanungen());
+        }
         Iterator<VerordnungPlanung> planungen = verordnung.getPlanungen().iterator();
 
         if (planungen.hasNext()) {
             VerordnungPlanung vorherigePlanung = null;
+            VerordnungPlanung planung = null;
             while (planungen.hasNext()) {
-                VerordnungPlanung planung = planungen.next();
-
+                planung = planungen.next();
                 result += VerordnungPlanungTools.getDosisAsHTML(planung, vorherigePlanung, false);
-
+                vorherigePlanung = planung;
             }
-            if (vorherigePlanung != null && VerordnungPlanungTools.getTerminStatus(vorherigePlanung) != VerordnungPlanungTools.MAXDOSIS) {
-                // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn das hier nicht
-                // der erste Durchlauf ist ODER ein Wechsel stattgefunden hat und der
-                // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
+            if (VerordnungPlanungTools.getTerminStatus(planung) != VerordnungPlanungTools.MAXDOSIS) {
+                // Wenn die letzte Planung eine Tabelle benötigte (das tut sie dann, wenn
+                // es keine Bedarfsverordnung war), dann müssen wir die Tabelle hier noch
+                // schließen.
                 result += "</table>";
             }
         } else {
@@ -585,9 +720,6 @@ public class VerordnungTools {
                     } else {
                         result += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
                     }
-//                                if (rs.getLong("BestellID") > 0){
-//                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
-//                                }
                 } else {
                     result += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
                 }
@@ -595,59 +727,7 @@ public class VerordnungTools {
 
 
         }
-
-
-        // ======================================================================================================
-        // Zweiter Teil
-        // ======================================================================================================
-
-//        if (verordnung.hasMedi()) { // Gilt nur für Medikamente, sonst passt das nicht
-//            if (verordnung.isBisPackEnde()) {
-//                result += "nur bis Packungs Ende<br/>";
-//            }
-//            if (!verordnung.isAbgesetzt() && mitBestand) {
-//
-//            }
-//        }
         return result;
-    }
-
-    public static String getSummen(Verordnung verordnung) {
-        String tmp = "";
-
-//        BigDecimal vorratSumme = MedVorratTools.getSumme(VerordnungTools.)
-//
-//        if (rs.getDouble("saldo") > 0) {
-//            tmp += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("saldo")) + " " +
-//                    SYSConst.EINHEIT[rs.getInt("PackEinheit")] +
-//                    "</font></b>";
-//            if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
-//                double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
-//                tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-//                        (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
-//            }
-//            if (rs.getLong("BestID") > 0) {
-//                tmp += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + rs.getLong("BestID") + "</font></b>";
-//
-//                if (rs.getDouble("bestsumme") != rs.getDouble("saldo")) {
-//                    tmp += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + SYSTools.roundScale2(rs.getDouble("bestsumme")) + " " +
-//                            SYSConst.EINHEIT[rs.getInt("PackEinheit")] + "</font></b>";
-//                    if (rs.getInt("f.PackEinheit") != rs.getInt("f.AnwEinheit")) {
-//                        double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
-//                        tmp += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-//                                (rs.getString("AnwText") == null || rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText")) + "</i>";
-//                    }
-//                }
-//            } else {
-//                tmp += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
-//            }
-////                                if (rs.getLong("BestellID") > 0){
-////                                    tmp += "<br/>Produkt / Medikament wurde nachbestellt";
-////                                }
-//        } else {
-//            tmp += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
-//        }
-        return tmp;
     }
 
     public static List<Verordnung> getVerordnungenByVorrat(EntityManager em, MedVorrat vorrat, boolean bisPackEnde) throws Exception {
