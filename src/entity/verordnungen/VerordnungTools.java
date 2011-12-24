@@ -273,7 +273,7 @@ public class VerordnungTools {
 
 
             html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
-            html += "<td width=\"300\" >" + (verordnung.hasMedi() ? DarreichungTools.toPrettyString(verordnung.getDarreichung()) : verordnung.getMassnahme().getBezeichnung());
+            html += "<td width=\"300\" >" + (verordnung.hasMedi() ? "<b>"+DarreichungTools.toPrettyString(verordnung.getDarreichung())+"</b>" : verordnung.getMassnahme().getBezeichnung());
             html += (bestand != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestand.getBestID() + "</i>" : "") + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>";

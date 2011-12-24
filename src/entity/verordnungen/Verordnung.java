@@ -164,7 +164,7 @@ import java.util.List;
                 " WHERE b.VorID=? AND ver.BisPackEnde = ? " +
                 " AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratAndPackendeResultMapping"),
         /**
-         *
+         * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
          */
         @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
                 " SELECT v.*, vor.*, st.*, best.*, F.*, M.*, Ms.*, bhp.* " +
@@ -184,7 +184,8 @@ import java.util.List;
                 " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
                 " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
                 " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
-                " AND st.EKennung = ? AND best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59'" +
+                " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+                // TODO: Dieser Ausdruck muss geändert werden. Der filter die duch die best.* Filter die Nahrungsergänzungen raus. Soll er nicht.
                 " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)",
                 resultSetMapping = "Verordnung.findAllForStellplanResultMapping")
 
