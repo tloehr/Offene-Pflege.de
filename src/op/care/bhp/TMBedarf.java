@@ -258,7 +258,8 @@ public class TMBedarf
                 }
                 case COL_Dosis: {
                     String tmp = "<html><body>";
-                    tmp += op.care.verordnung.DBRetrieve.getDosis(verid);
+                    // TODO: Das muss wieder rein
+                    // tmp += op.care.verordnung.DBRetrieve.getDosis(verid);
                     double tagesdosis = rs.getDouble("bisher.tagesdosis");
                     tmp += "Bisherige Tagesdosis: " + tagesdosis + "<br/>";
                     if (rs.getLong("DafID") > 0) { // Gilt nur für Medikamente, sonst passt das nicht

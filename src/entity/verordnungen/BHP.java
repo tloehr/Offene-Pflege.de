@@ -1,19 +1,80 @@
 package entity.verordnungen;
 
-import entity.files.Sysbw2file;
+import entity.Stationen;
+import entity.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Date;
 
 @Entity
 @Table(name = "BHP")
+
+@SqlResultSetMappings({
+        @SqlResultSetMapping(name = "BHP.findByBewohnerDatumSchichtKeineMedisResultMapping",
+                entities = @EntityResult(entityClass = BHP.class),
+                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "NextBest")}
+        ),
+
+        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
+                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
+                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "NextBest"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
+                }
+        ),
+//                        v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung
+
+        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
+                entities = @EntityResult(entityClass = Verordnung.class),
+                columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
+        )
+})
+
+@NamedNativeQueries({
+
+        /**
+         * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
+         * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+         */
+        @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtKeineMedis", query = " " +
+                " SELECT bhp.*, 0 BestID, 0 NextBest " +
+                " FROM BHP bhp " +
+                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
+                " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
+                " WHERE Date(Soll)=Date(now()) AND BWKennung=? AND v.DafID IS NULL", resultSetMapping = "BHP.findByBewohnerDatumSchichtKeineMedisResultMapping"),
+        /**
+         * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
+         */
+        @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
+                " SELECT v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
+                " FROM BHPVerordnung v " +
+                " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
+                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
+                " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
+                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
+                " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
+                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
+                " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
+                " LEFT OUTER JOIN ( " +
+                "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
+                "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
+                "      WHERE M.Bis = '9999-12-31 23:59:59' " +
+                " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
+                " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
+                " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
+                " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+                " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+                // TODO: Dieser Ausdruck muss geändert werden. Der filter die duch die best.* Filter die Nahrungsergänzungen raus. Soll er nicht.
+                " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)",
+                resultSetMapping = "Verordnung.findAllForStellplanResultMapping")
+
+})
+
+
 @NamedQueries({
         @NamedQuery(name = "BHP.findAll", query = "SELECT b FROM BHP b"),
         @NamedQuery(name = "BHP.findByBHPid", query = "SELECT b FROM BHP b WHERE b.bhpid = :bhpid"),
-        @NamedQuery(name = "BHP.findByUKennung", query = "SELECT b FROM BHP b WHERE b.uKennung = :uKennung"),
         @NamedQuery(name = "BHP.findBySoll", query = "SELECT b FROM BHP b WHERE b.soll = :soll"),
         @NamedQuery(name = "BHP.findByIst", query = "SELECT b FROM BHP b WHERE b.ist = :ist"),
         @NamedQuery(name = "BHP.findBySZeit", query = "SELECT b FROM BHP b WHERE b.sZeit = :sZeit"),
@@ -31,8 +92,6 @@ public class BHP implements Serializable {
     @Basic(optional = false)
     @Column(name = "BHPID")
     private Long bhpid;
-    @Column(name = "UKennung")
-    private String uKennung;
     @Basic(optional = false)
     @Column(name = "Soll")
     @Temporal(TemporalType.TIMESTAMP)
@@ -78,6 +137,11 @@ public class BHP implements Serializable {
     @ManyToOne
     private VerordnungPlanung verordnungPlanung;
 
+    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
+
+
     public VerordnungPlanung getVerordnungPlanung() {
         return verordnungPlanung;
     }
@@ -86,20 +150,20 @@ public class BHP implements Serializable {
         this.verordnungPlanung = verordnungPlanung;
     }
 
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
     public Long getBHPid() {
         return bhpid;
     }
 
     public void setBHPid(Long bhpid) {
         this.bhpid = bhpid;
-    }
-
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
     }
 
     public Date getSoll() {

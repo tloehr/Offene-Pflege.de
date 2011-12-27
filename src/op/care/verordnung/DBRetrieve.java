@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 /**
  * @author tloehr
  */
+@Deprecated
 public class DBRetrieve {
 
 //    public static long numAffectedBHPs(long verid) {
@@ -63,6 +64,8 @@ public class DBRetrieve {
 //        }
 //        return result;
 //    }
+
+    /*
 
     public static String getDosis(long verid) {
         String result = "";
@@ -623,4 +626,5 @@ public class DBRetrieve {
         }
         return result;
     }
+    */
 }

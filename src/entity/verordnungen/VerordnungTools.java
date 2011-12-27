@@ -6,15 +6,14 @@ package entity.verordnungen;
 
 import entity.*;
 import op.OPDE;
-import op.tools.*;
+import op.tools.HTMLTools;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -73,84 +72,6 @@ public class VerordnungTools {
         return listeVorrat;
     }
 
-    public static String getStellplanAsHTML(Einrichtungen einrichtungen) {
-        EntityManager em = OPDE.createEM();
-        String html = "";
-
-        try {
-            Query query = em.createNamedQuery("Verordnung.findAllForStellplan");
-            query.setParameter(1, einrichtungen.getEKennung());
-
-            html = getStellplan(query.getResultList());
-
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
-        return html;
-    }
-
-    @Deprecated
-    public static String getStellplanAsHTML(String ekennung) {
-        PreparedStatement stmt;
-        ResultSet rs;
-        String sql;
-        String result = "";
-
-        try {
-            sql = " SELECT aa.BWName, ifnull(bb.BestID, 0) BestID, aa.mptext, aa.mssntext, aa.SitID, aa.Bemerkung, aa.BisPackEnde, "
-                    + " aa.Zusatz, aa.Zubereitung, aa.AnwText, aa.PackEinheit, aa.AnwEinheit, aa.Uhrzeit, aa.NachtMo, "
-                    + " aa.Morgens, aa.Mittags, aa.Nachmittags, aa.Abends, aa.NachtAb, aa.UhrzeitDosis, aa.Mon, aa.Die, aa.Mit, "
-                    + " aa.Don, aa.Fre, aa.Sam, aa.Son, aa.Taeglich, aa.Woechentlich, aa.Monatlich, aa.TagNum, aa.MaxAnzahl, aa.MaxEDosis, "
-                    + " aa.VerID, aa.BWKennung, aa.Bemerkung, aa.Stellplan, aa.FStellplan, aa.DafID, aa.VorID, aa.tmp, aa.LDatum, aa.StatID,"
-                    + " aa.StatBezeichnung "
-                    + " FROM ( "
-                    + "       SELECT CONCAT(bw.nachname,', ',bw.vorname) BWName, v.bwkennung, v.VerID, v.AnDatum, v.AbDatum, "
-                    + "       Ms.Bezeichnung mssntext, v.DafID, F.Stellplan FStellplan, v.Stellplan, "
-                    + "       v.SitID, v.Bemerkung, v.BisPackEnde, M.Bezeichnung mptext, D.Zusatz, F.Zubereitung, "
-                    + "       F.AnwText, F.PackEinheit, F.AnwEinheit, bhp.Uhrzeit, bhp.NachtMo, "
-                    + "       bhp.Morgens, bhp.Mittags, bhp.Nachmittags, bhp.Abends, bhp.NachtAb, bhp.UhrzeitDosis, bhp.Mon, bhp.Die, bhp.Mit, "
-                    + "       bhp.Don, bhp.Fre, bhp.Sam, bhp.Son, bhp.Taeglich, bhp.Woechentlich, bhp.Monatlich, bhp.TagNum, bhp.MaxAnzahl, bhp.MaxEDosis, "
-                    + "       vorr.VorID, bhp.tmp, bhp.LDatum, st.StatID, st.Bezeichnung StatBezeichnung "
-                    + "       FROM BHPVerordnung v "
-                    + "       INNER JOIN OCUsers anoc ON anoc.UKennung = v.AnUKennung "
-                    + "       INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  "
-                    + "       INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID "
-                    + "       INNER JOIN Stationen st ON bw.StatID = st.StatID "
-                    + "       LEFT OUTER JOIN OCUsers aboc ON aboc.UKennung = v.AbUKennung "
-                    + "       LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID "
-                    + "       LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID "
-                    + "       LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID "
-                    + "       LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID "
-                    + "       LEFT OUTER JOIN ( "
-                    + "           SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  "
-                    + "           INNER JOIN MPBestand B ON M.VorID = B.VorID "
-                    + "           WHERE M.Bis = '9999-12-31 23:59:59' "
-                    + "       ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung "
-                    + "       WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID = 0 AND (v.DafID <> 0 OR v.Stellplan > 0) "
-                    + "       AND st.EKennung = ? "
-                    + " ) aa "
-                    + " LEFT OUTER JOIN "
-                    + " ( "
-                    + "       SELECT DISTINCT best.DafID, vor.VorID, vor.BWKennung, best.BestID, best.Aus, best.Anbruch "
-                    + "       FROM MPVorrat vor "
-                    + "       INNER JOIN MPBestand best ON vor.VorID = best.VorID "
-                    + "       WHERE vor.Bis = '9999-12-31 23:59:59' AND best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59' "
-                    + " ) bb ON aa.VorID = bb.VorID "
-                    + " WHERE aa.tmp = 0 " + // Falls noch alte Trümmer existieren, dann die nicht anzeigen.
-                    " ORDER BY aa.StatID, aa.BWName, aa.DafID <> 0, aa.FStellplan, CONCAT(aa.mptext, aa.mssntext)";
-            stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, ekennung);
-            rs = stmt.executeQuery();
-
-//            result = getStellplan(rs);
-
-
-        } catch (SQLException se) {
-            new DlgException(se);
-        }
-        return result;
-    }
-
     /**
      * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
      * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
@@ -175,7 +96,26 @@ public class VerordnungTools {
      * <li>print.print_unwriteable_margin_top = 25</li>
      * <li>Drucken des Hintergrundes einschalten</li>
      * <ul>
+     *
+     * @param einrichtungen Die Einrichtung, für die der Stellplan erstellt werden soll. Sortiert nach den Stationen.
      */
+    public static String getStellplanAsHTML(Einrichtungen einrichtungen) {
+        EntityManager em = OPDE.createEM();
+        String html = "";
+
+        try {
+            Query query = em.createNamedQuery("Verordnung.findAllForStellplan");
+            query.setParameter(1, einrichtungen.getEKennung());
+
+            html = getStellplan(query.getResultList());
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return html;
+    }
+
+
     private static String getStellplan(List data) {
 
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
@@ -195,9 +135,6 @@ public class VerordnungTools {
 
         String bwkennung = "";
         long statid = 0;
-        // entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = MedVorrat.class), @EntityResult(entityClass = Stationen.class),
-//                        @EntityResult(entityClass = MedBestand.class), @EntityResult(entityClass = MedFormen.class), @EntityResult(entityClass = MedProdukte.class),
-//                        @EntityResult(entityClass = Massnahmen.class), VerordnungPlanung}
 
         Iterator it = data.iterator();
 
@@ -206,11 +143,12 @@ public class VerordnungTools {
             Object[] objects = (Object[]) it.next();
 
             Verordnung verordnung = (Verordnung) objects[0];
-            Stationen station = (Stationen) objects[2];
-            MedBestand bestand = (MedBestand) objects[3];
-            MedFormen form = (MedFormen) objects[4];
-            VerordnungPlanung planung = (VerordnungPlanung) objects[7];
+            Stationen station = (Stationen) objects[1];
+            VerordnungPlanung planung = (VerordnungPlanung) objects[2];
 
+            BigInteger bestid = (BigInteger) objects[3];
+            //Vorrat wäre objects[4]
+            BigInteger formid = (BigInteger) objects[5];
 
             OPDE.debug(verordnung);
 
@@ -233,8 +171,13 @@ public class VerordnungTools {
                 statid = station.getStatID();
             }
 
+
             // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
-            boolean grau = form.getStellplan() > 0;
+            boolean grau = false;
+            if (formid != null) {
+                MedFormen form = OPDE.createEM().find(MedFormen.class, formid.longValue());
+                grau = form.getStellplan() > 0;
+            }
 
             // Wenn der Bewohnername sich in der Liste ändert, muss
             // einmal die Überschrift drüber gesetzt werden.
@@ -270,18 +213,16 @@ public class VerordnungTools {
             }
 
 
-
-
             html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
-            html += "<td width=\"300\" >" + (verordnung.hasMedi() ? "<b>"+DarreichungTools.toPrettyString(verordnung.getDarreichung())+"</b>" : verordnung.getMassnahme().getBezeichnung());
-            html += (bestand != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestand.getBestID() + "</i>" : "") + "</td>";
+            html += "<td width=\"300\" >" + (verordnung.hasMedi() ? "<b>" + DarreichungTools.toPrettyString(verordnung.getDarreichung()) + "</b>" : verordnung.getMassnahme().getBezeichnung());
+            html += (bestid != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestid + "</i>" : "") + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>";
-            html += "<td width=\"300\" >" + VerordnungPlanungTools.getHinweis(planung) + "</td>";
+            html += "<td width=\"300\" >" + VerordnungPlanungTools.getHinweis(planung, false) + "</td>";
             html += "</tr>";
             elementNumber += 1;
 
@@ -293,270 +234,6 @@ public class VerordnungTools {
 
 
         return html;
-    }
-
-
-//    @Deprecated
-//    public static String getStellplan(ResultSet rs) {
-//
-//        int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
-//
-//        int elementNumber = 1;
-//        boolean pagebreak = false;
-//
-//        String header = "Stellplan für den " + DateFormat.getDateInstance().format(new Date());
-//
-//        String html = "<html>"
-//                + "<head>"
-//                + "<title>" + header + "</title>"
-//                + "<style type=\"text/css\" media=\"all\">"
-//                + "body { padding:10px; }"
-//                + "#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}"
-//                + "#fonth1 { font-size:24px; font-family:Arial,sans-serif;}"
-//                + "#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}"
-//                + "#fonttext { font-size:12px; font-family:Arial,sans-serif;}"
-//                + "#fonttextgrau { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif;}"
-//                + "</style>"
-//                + HTMLTools.JSCRIPT_PRINT
-//                + "</head>"
-//                + "<body>";
-//
-//        String bwkennung = "";
-//        long statid = 0;
-//
-//        try {
-//
-//            rs.beforeFirst();
-//
-//            while (rs.next()) {
-//
-//                boolean stationsWechsel = statid != rs.getLong("aa.StatID");
-//
-//                // Wenn der Plan für eine ganze Einrichtung gedruckt wird, dann beginnt eine
-//                // neue Station immer auf einer neuen Seite.
-//                if (stationsWechsel) {
-//                    elementNumber = 1;
-//                    // Beim ersten Mal nur ein H1 Header. Sonst mit Seitenwechsel.
-//                    if (statid == 0) {
-//                        html += "<h1 align=\"center\" id=\"fonth1\">";
-//                    } else {
-//                        html += "</table>";
-//                        html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
-//                    }
-//                    html += header + " (" + rs.getString("aa.StatBezeichnung") + ")" + "</h1>";
-//                    html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
-//                    statid = rs.getLong("aa.StatID");
-//                }
-//
-//                // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
-//                boolean grau = rs.getInt("FStellplan") > 0;
-//
-//                // Wenn der Bewohnername sich in der Liste ändert, muss
-//                // einmal die Überschrift drüber gesetzt werden.
-//                boolean bewohnerWechsel = !bwkennung.equals(rs.getString("bwkennung"));
-//
-//                if (pagebreak || stationsWechsel || bewohnerWechsel) {
-//                    // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-//                    // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
-//                    // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
-//                    // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
-//                    pagebreak = (elementNumber + 2 + 2) > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-//
-//                    // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
-//                    if (pagebreak || !bwkennung.equals("")) {
-//                        html += "</table>";
-//                    }
-//
-//                    bwkennung = rs.getString("bwkennung");
-//                    html += "<h2 id=\"fonth2\" " + (pagebreak ? "style=\"page-break-before:always\">" : ">") + ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "") + rs.getString("bwname") + " [" + rs.getString("bwkennung") + "]</h2>";
-//                    html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-//                            + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>";
-//                    elementNumber += 2;
-//
-//                    if (pagebreak) {
-//                        elementNumber = 1;
-//                        pagebreak = false;
-//                    }
-//                }
-//
-//                html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
-//                html += "<td width=\"300\" >" + getMassnahme(rs) + "</td>";
-//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("NachtMo")) + "</td>";
-//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Morgens")) + "</td>";
-//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Mittags")) + "</td>";
-//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Nachmittags")) + "</td>";
-//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("Abends")) + "</td>";
-//                html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(rs.getDouble("NachtAb")) + "</td>";
-//                html += "<td width=\"300\" >" + getHinweis(rs) + "</td>";
-//                html += "</tr>";
-//                elementNumber += 1;
-//
-//                pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-//            }
-//
-//            html += "</table>"
-//                    + "</body>";
-//        } catch (SQLException e) {
-//            new DlgException(e);
-//        }
-//
-//        return html;
-//    }
-
-    public static String getEinheit(ResultSet rs) throws SQLException {
-        return SYSTools.catchNull(rs.getString("Zubereitung"), "", ", ")
-                + SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
-    }
-
-    @Deprecated
-    public static String getMassnahme(ResultSet rs) throws SQLException {
-        String result = "";
-
-        if (rs.getLong("DafID") == 0) {
-            result += rs.getString("mssntext");
-        } else {
-            result += "<b>" + rs.getString("mptext")
-                    + SYSTools.catchNull(rs.getString("Zusatz"), ", ", "") + ", "
-                    + getEinheit(rs) + "</b>";
-
-        }
-        if (rs.getLong("BestID") > 0) {
-            result += "<br/><i>Bestand im Anbruch Nr.: " + rs.getLong("BestID") + "</i>";
-        }
-        return result;
-    }
-
-    @Deprecated
-    public static String getHinweis(ResultSet rs) throws SQLException {
-        String result = "";
-
-        // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
-        if (rs.getInt("MaxAnzahl") > 0) {
-            result += "Maximale Tagesdosis: ";
-            result += rs.getInt("MaxAnzahl") + "x " + SYSTools.printDouble4Jasper(rs.getDouble("MaxEDosis")) + " " + SYSConst.EINHEIT[rs.getInt("AnwEinheit")];
-            result += "<br/>";
-        } else if ((rs.getDouble("NachtMo") + rs.getDouble("NachtAb") + rs.getDouble("Morgens")
-                + rs.getDouble("Mittags") + rs.getDouble("Nachmittags") + rs.getDouble("Abends")) == 0) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-            result += sdf.format(rs.getTime("Uhrzeit")) + " Uhr "
-                    + SYSTools.printDouble4Jasper(rs.getDouble("UhrzeitDosis")) + " " + SYSConst.EINHEIT[rs.getInt("AnwEinheit")];
-            result += "<br/>";
-        }
-
-        String wiederholung = getWiederholung(rs);
-        result += wiederholung;
-
-//        if (rs.getLong("SitID") > 0) {
-//            result += "<style isBold=\"true\" isUnderline=\"true\">Nur bei Bedarf:</style> <style isItalic=\"true\">" + rs.getString("sittext") + "</style>";
-//        }
-        if (rs.getString("Bemerkung") != null && !rs.getString("Bemerkung").equals("")) {
-            if (!wiederholung.equals("")) {
-                result += "<br/>";
-            }
-            result += "<b><u>Bemerkung:</u></b> " + rs.getString("Bemerkung");
-        }
-
-        return result.equals("") ? "&nbsp;" : result;
-    }
-
-    @Deprecated
-    public static String getWiederholung(ResultSet rs) throws SQLException {
-        String result = "";
-
-        //ResultSet rs = DBRetrieve.getResultSet("BHPPlanung","VerID",verid,"=");
-        if (rs.getInt("Taeglich") > 0) {
-            if (rs.getInt("Taeglich") > 1) {
-                result += "<b>alle " + rs.getInt("Taeglich") + " Tage</b>";
-            }
-        } else if (rs.getInt("Woechentlich") > 0) {
-            result += "<b>";
-            if (rs.getInt("Woechentlich") == 1) {
-                result += "jede Woche ";
-            } else {
-                result += "alle " + rs.getInt("Woechentlich") + " Wochen ";
-            }
-
-            if (rs.getInt("Mon") > 0) {
-                result += "Mon ";
-            }
-            if (rs.getInt("Die") > 0) {
-                result += "Die ";
-            }
-            if (rs.getInt("Mit") > 0) {
-                result += "Mit ";
-            }
-            if (rs.getInt("Don") > 0) {
-                result += "Don ";
-            }
-            if (rs.getInt("Fre") > 0) {
-                result += "Fre ";
-            }
-            if (rs.getInt("Sam") > 0) {
-                result += "Sam ";
-            }
-            if (rs.getInt("Son") > 0) {
-                result += "Son ";
-            }
-            result += "</b>";
-        } else if (rs.getInt("Monatlich") > 0) {
-            result += "<b>";
-            if (rs.getInt("Monatlich") == 1) {
-                result += "jeden Monat ";
-            } else {
-                result += "alle " + rs.getInt("Monatlich") + " Monate ";
-            }
-
-            if (rs.getInt("TagNum") > 0) {
-                result += "jeweils am " + rs.getInt("TagNum") + ". des Monats";
-            } else {
-                int wtag = 0;
-                String tag = "";
-                if (rs.getInt("Mon") > 0) {
-                    tag += "Montag ";
-                    wtag = rs.getInt("Mon");
-                }
-                if (rs.getInt("Die") > 0) {
-                    tag += "Dienstag ";
-                    wtag = rs.getInt("Die");
-                }
-                if (rs.getInt("Mit") > 0) {
-                    tag += "Mittwoch ";
-                    wtag = rs.getInt("Mit");
-                }
-                if (rs.getInt("Don") > 0) {
-                    tag += "Donnerstag ";
-                    wtag = rs.getInt("Don");
-                }
-                if (rs.getInt("Fre") > 0) {
-                    tag += "Freitag ";
-                    wtag = rs.getInt("Fre");
-                }
-                if (rs.getInt("Sam") > 0) {
-                    tag += "Samstag ";
-                    wtag = rs.getInt("Sam");
-                }
-                if (rs.getInt("Son") > 0) {
-                    tag += "Sonntag ";
-                    wtag = rs.getInt("Son");
-                }
-                result += "jeweils am " + wtag + ". " + tag + " des Monats";
-            }
-            result += "</b>";
-        } else {
-            result = "";
-        }
-
-        if (rs.getInt("Taeglich") != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
-            DateFormat df = DateFormat.getDateInstance();
-            if (SYSCalendar.isInFuture(rs.getDate("LDatum").getTime())) {
-                result += "<br/>erste Anwendung am: ";
-            } else {
-                result += "<br/>Zuletzt eingeplant: ";
-            }
-            result += df.format(rs.getDate("LDatum"));
-        }
-
-        return result;
     }
 
     public static String getMassnahme(Verordnung verordnung) {

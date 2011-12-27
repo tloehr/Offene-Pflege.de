@@ -25,10 +25,12 @@ import java.util.List;
  */
 public class BHPTools {
 
-    public static final int STATUS_OFFEN = 0;
-    public static final int STATUS_ERLEDIGT = 1;
-    public static final int STATUS_VERWEIGERT = 2;
-    public static final int STATUS_VERWEIGERT_VERWORFEN = 3;
+    public static final byte STATUS_OFFEN = 0;
+    public static final byte STATUS_ERLEDIGT = 1;
+    public static final byte STATUS_VERWEIGERT = 2;
+    public static final byte STATUS_VERWEIGERT_VERWORFEN = 3;
+
+    public static final String[] SOLLZEITTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
 
     public static long getNumBHPs(Verordnung verordnung) {
         EntityManager em = OPDE.createEM();

@@ -26,19 +26,19 @@
  */
 package op.care.bhp;
 
+import entity.verordnungen.BHP;
+import entity.verordnungen.BHPTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import tablerenderer.RNDHTML;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import java.awt.*;
 
 /**
  * @author tloehr
  */
-public class RNDBHP
-        extends RNDHTML {
+public class RNDBHP extends RNDHTML {
 
     Color color;
     Font font;
@@ -50,70 +50,47 @@ public class RNDBHP
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component result = null;
 
-//        Color bermuda_sand = new Color(246, 201, 204);
-//        Color melonrindgreen = new Color(223, 255, 165);
-        TableModel tm = table.getModel();
-        int status = ((Integer) tm.getValueAt(row, TMBHP.COL_STATUS)).intValue();
-        long dafid = ((Long) tm.getValueAt(row, TMBHP.COL_DAFID)).longValue();
-        //long bestid = ((Long) tm.getValueAt(row, TMBHP.COL_BESTID)).longValue();
-        String bembhp = SYSTools.catchNull((String) tm.getValueAt(row, TMBHP.COL_BEMBHP));
-        //boolean reichtvorrat = ((Boolean) tm.getValueAt(row, TMBHP.COL_REICHTVORRAT)).booleanValue();
+        Object[] objects = (Object[]) ((TMBHP) table.getModel()).getListeBHP().get(row);
+
+        BHP bhp = (BHP) objects[0];
+
         color = Color.white;
-//        if (status == TMBHP.STATUS_ERLEDIGT) { color = melonrindgreen; }
-//        if (status == TMBHP.STATUS_VERWEIGERT) { color = bermuda_sand; }
-//        if (isSelected) {
-//            color = Color.LIGHT_GRAY;
-//        }
 
         if (isSelected) {
             color = SYSConst.bluegrey;
-            if (status == TMBHP.STATUS_ERLEDIGT) {
+            if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
                 color = SYSConst.darkolivegreen4;
             }
-            if (status == TMBHP.STATUS_VERWEIGERT || status == TMBHP.STATUS_VERWEIGERT_VERWORFEN) {
+            if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
                 color = SYSConst.salmon4;
             }
         } else {
-            if (status == TMBHP.STATUS_ERLEDIGT) {
+            if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
                 color = SYSConst.darkolivegreen2;
             }
-            if (status == TMBHP.STATUS_VERWEIGERT || status == TMBHP.STATUS_VERWEIGERT_VERWORFEN) {
+            if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
                 color = SYSConst.salmon2;
             }
         }
 
-        if (column == TMBHP.COL_DOSIS) {
-            double dosis = ((Double) value).doubleValue();
-            if (dosis == 0) {
-                value = "";
-            } else {
-                value = SYSTools.printDouble(dosis);
-            }
-        }
+//        if (column == TMBHP.COL_DOSIS) {
+//            double dosis = ((Double) value).doubleValue();
+//            if (dosis == 0) {
+//                value = "";
+//            } else {
+//                value = SYSTools.printDouble(dosis);
+//            }
+//        }
 
         if (column == TMBHP.COL_STATUS) {
             JLabel j = new JLabel();
-//            if (dafid > 0) {
-//                //double saldo = ((Double) tm.getValueAt(row, TMBHP.COL_SALDO)).doubleValue();
-//                //double bestsumme = ((Double) tm.getValueAt(row, TMBHP.COL_BESTAND_SALDO)).doubleValue();
-//                int packeinheit = ((Integer) tm.getValueAt(row, TMBHP.COL_PACKEINHEIT)).intValue();
-//                //String tmp = "Vorrat (gesamt): <b>" + SYSTools.roundScale2(saldo) + "</b> " + SYSConst.EINHEIT[packeinheit];
-////                if (saldo != bestsumme) {
-////                    tmp += "<br/>" + "Restmenge in der <u>angebrochenen</u> Packung: <b>" + SYSTools.roundScale2(bestsumme) + "</b> " + SYSConst.EINHEIT[packeinheit];
-////                }
-//                j.setToolTipText(SYSTools.toHTML(tmp));
-//            }
+
             ImageIcon icon;
-            if (status == TMBHP.STATUS_OFFEN) {
-//                if (dafid > 0 && bestid == 0) { // kein Bestand angebrochen
-//                    icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infored.png"));
-//                    j.setToolTipText("Es befindet sich kein Bestand im Anbruch. Um dieses Medikament zu geben, müssen sie erst einen anbrechen.");
-//                } else {
-//                    icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
-//                }
+            if (bhp.getStatus() == BHPTools.STATUS_OFFEN) {
+
 
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
-            } else if (status == TMBHP.STATUS_ERLEDIGT) {
+            } else if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
             } else {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"));
@@ -122,7 +99,7 @@ public class RNDBHP
             j.setOpaque(true);
             j.setBackground(color);
             result = j;
-        } else if (column == TMBHP.COL_BEMBHP && !bembhp.equals("")) {
+        } else if (column == TMBHP.COL_BEMBHP && !SYSTools.catchNull(bhp.getBemerkung()).isEmpty()) {
             JLabel j = new JLabel();
             ImageIcon icon;
             icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/edit.png"));
@@ -131,7 +108,7 @@ public class RNDBHP
             j.setBackground(color);
             // Hier den Code der <p> in eine Table packen für die Zeilenumbrüche.
             String text = "<html><body><table border=\"0\">";
-            text += "    <tr><td align=\"left\" width=\"600\">" + bembhp + "</td></tr>";
+            text += "    <tr><td align=\"left\" width=\"600\">" + bhp.getBemerkung() + "</td></tr>";
             text += "   </table></body></html>";
             j.setToolTipText(text);
             result = j;

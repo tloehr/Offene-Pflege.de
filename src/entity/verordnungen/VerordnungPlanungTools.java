@@ -2,12 +2,9 @@ package entity.verordnungen;
 
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -40,13 +37,19 @@ public class VerordnungPlanungTools {
         return (bd.compareTo(BigDecimal.ZERO) > 0 ? SYSTools.printDouble(bd.doubleValue()) : "--");
     }
 
-    public static String getWiederholung(VerordnungPlanung planung) {
+    /**
+     *
+     * @param planung um die es geht
+     * @param writeTaeglich hiermit kann man festlegen, ob bei den Dosierungen, die jeden Tag gegeben werden sollen, das Wort <i>täglich</i> in die Wiederholungsspalte geschrieben wird oder nicht.
+     * @return
+     */
+    public static String getWiederholung(VerordnungPlanung planung, boolean writeTaeglich) {
         String result = "";
 
         if (planung.isTaeglich()) {
             if (planung.getTaeglich() > 1) {
                 result += "<b>alle " + planung.getTaeglich() + " Tage</b>";
-            } else {
+            } else if (writeTaeglich) {
                 result += "<b>täglich</b>";
             }
         } else if (planung.isWoechentlich()) {
@@ -154,7 +157,7 @@ public class VerordnungPlanungTools {
                     "      <td align=\"center\">" + getValueAsString(planung.getNachmittags()) + "</td>" +
                     "      <td align=\"center\">" + getValueAsString(planung.getAbends()) + "</td>" +
                     "      <td align=\"center\">" + getValueAsString(planung.getNachtAb()) + "</td>" +
-                    "      <td>" + getWiederholung(planung) + "</td>" +
+                    "      <td>" + getWiederholung(planung, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
                 result += "</table>";
@@ -181,7 +184,7 @@ public class VerordnungPlanungTools {
             result += "    <tr>" +
                     "      <td align=\"center\">" + sdf.format(planung.getUhrzeit()) + " Uhr</td>" +
                     "      <td align=\"center\">" + planung.getUhrzeitDosis().toPlainString() + "</td>" +
-                    "      <td>" + getWiederholung(planung) + "</td>" +
+                    "      <td>" + getWiederholung(planung, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
                 result += "</table>";
@@ -193,7 +196,7 @@ public class VerordnungPlanungTools {
     }
 
 
-    public static String getHinweis(VerordnungPlanung planung) {
+    public static String getHinweis(VerordnungPlanung planung, boolean writeTaeglich) {
         String result = "";
 
         // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
@@ -202,12 +205,14 @@ public class VerordnungPlanungTools {
             result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()];
             result += "<br/>";
         } else if (planung.verwendetUhrzeit()) {
-            result += DateFormat.getTimeInstance().format(planung.getUhrzeit()) + " Uhr "
-                    + HTMLTools.printDouble(planung.getUhrzeitDosis()) + " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()];
+
+            result += "<b><ul>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + "</ul></b> Uhr ";
+            result += HTMLTools.printDouble(planung.getUhrzeitDosis());
+            result += planung.getVerordnung().hasMedi() ? " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()] : "x";
             result += "<br/>";
         }
 
-        String wiederholung = getWiederholung(planung);
+        String wiederholung = getWiederholung(planung, writeTaeglich);
         result += wiederholung;
 
         if (!SYSTools.catchNull(planung.getVerordnung().getBemerkung()).isEmpty()) {

@@ -46,8 +46,10 @@ public class DarreichungTools {
     public static String toPrettyString(Darreichung darreichung) {
         String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
         String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
+        String zusatz = SYSTools.catchNull(darreichung.getZusatz());
 
-        String text = darreichung.getMedProdukt().getBezeichnung() + ", " + darreichung.getZusatz();
+        String text = darreichung.getMedProdukt().getBezeichnung();
+        text += zusatz.isEmpty() ? "" : ", " + zusatz;
         text += zubereitung.isEmpty() ? " " : ", "+zubereitung + " ";
         text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
         return text;

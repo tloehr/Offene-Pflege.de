@@ -97,10 +97,11 @@ import java.util.List;
         ),
 
         @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
-                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = MedVorrat.class), @EntityResult(entityClass = Stationen.class),
-                        @EntityResult(entityClass = MedBestand.class), @EntityResult(entityClass = MedFormen.class), @EntityResult(entityClass = MedProdukte.class),
-                        @EntityResult(entityClass = Massnahmen.class), @EntityResult(entityClass = VerordnungPlanung.class)}
+                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
+                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "VorID"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
+                }
         ),
+//                        v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung
 
         @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class),
@@ -167,7 +168,7 @@ import java.util.List;
          * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
          */
         @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
-                " SELECT v.*, vor.*, st.*, best.*, F.*, M.*, Ms.*, bhp.* " +
+                " SELECT v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
                 " FROM BHPVerordnung v " +
                 " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
                 " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +

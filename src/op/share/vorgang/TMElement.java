@@ -42,6 +42,7 @@ import java.util.HashMap;
 /**
  * @author tloehr
  */
+@Deprecated
 public class TMElement extends AbstractTableModel {
 
     private ResultSet rs;
@@ -194,7 +195,7 @@ public class TMElement extends AbstractTableModel {
                                 break;
                             }
                             case TBL_BHPVERORDNUNG: {
-                                cache.set(rs.getRow(), op.care.verordnung.DBRetrieve.getVerordnungAsHTML(rs.getLong("pk")));
+                                //cache.set(rs.getRow(), op.care.verordnung.DBRetrieve.getVerordnungAsHTML(rs.getLong("pk")));
                                 break;
                             }
                             case TBL_BWERTE: {
