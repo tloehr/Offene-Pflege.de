@@ -28,6 +28,8 @@ package op.care.bhp;
 
 import java.awt.event.*;
 import javax.swing.table.*;
+
+import entity.verordnungen.BHPTools;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
@@ -224,7 +226,7 @@ public class DlgBedarf extends javax.swing.JDialog {
         hm.put("Ist", "!NOW!");
         hm.put("SZeit", SYSConst.UZ);
         hm.put("Dosis", dosis);
-        hm.put("Status", TMBHP.STATUS_ERLEDIGT);
+        hm.put("Status", BHPTools.STATUS_ERLEDIGT);
         hm.put("_mdate", "!NOW!");
         hm.put("Dauer", 0);
 

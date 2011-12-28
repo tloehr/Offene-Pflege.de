@@ -110,7 +110,7 @@ public class DBHandling {
 
             stmt.setDate(1, new java.sql.Date(datum.getTime()));
             if (schicht != SYSConst.ZEIT_ALLES) {
-                ArrayList al = SYSCalendar.getZeiten4Schicht(schicht);
+                ArrayList al = SYSCalendar.getZeiten4Schicht((byte) schicht);
                 String zeit1 = al.get(2).toString();
                 String zeit2 = al.get(3).toString();
                 int schicht1 = ((Integer) al.get(0)).intValue();

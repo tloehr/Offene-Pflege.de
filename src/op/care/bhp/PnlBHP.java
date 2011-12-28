@@ -35,6 +35,7 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
+import entity.verordnungen.BHPTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
@@ -459,10 +460,10 @@ public class PnlBHP extends CleanablePanel {
                         // Aus Performance Gründen muss er Ausdruck, der hier bereits ermittelt wurde
                         // an anderer Stelle verarbeitet werden, sonst dauert die SQL Abfrage zu lang
                         // Ursprünglich stand hier:
-                        // (dafid == 0 || status != TMBHP.STATUS_OFFEN || bestid > 0) && // wenn es ein Medikament ist und der Status offen, dann nur änderbar, wenn es einen angebrochenen Bestand gibt.
+                        // (dafid == 0 || status != BHPTools.STATUS_OFFEN || bestid > 0) && // wenn es ein Medikament ist und der Status offen, dann nur änderbar, wenn es einen angebrochenen Bestand gibt.
                         // Diese Abfrage habe ich nach Unten verschoben und das bestid muss nun im Einzelfall ermittelt werden.
                         SYSCalendar.isInFuture(abdatum)
-                        && (status == TMBHP.STATUS_OFFEN
+                        && (status == BHPTools.STATUS_OFFEN
                         || (ukennung.equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung())
                         && SYSCalendar.earlyEnough(mdate, 30) && !op.care.med.DBHandling.betrifftAbgeschlossenenBestand(bhpid))); // damit man nichts rückgängig machen kann, was irgendwie einen abgeschlossenen Bestand betrifft.
         OPDE.debug(changeable ? "changeable" : "NOT changeable");
@@ -474,17 +475,17 @@ public class PnlBHP extends CleanablePanel {
                 // Etwas umständlich, aus Optimierungsgründen
                 long vorid = op.care.med.DBHandling.getVorrat2DAF(bwkennung, dafid);
                 long bestid = op.care.med.DBHandling.getBestandImAnbruch(vorid);
-                boolean changeable_additional = (dafid == 0 || status != TMBHP.STATUS_OFFEN || bestid > 0);
+                boolean changeable_additional = (dafid == 0 || status != BHPTools.STATUS_OFFEN || bestid > 0);
                 if (changeable_additional) {
 
                     boolean fullReloadNecessary = false;
                     status++;
                     if (status > 1) {
-                        status = TMBHP.STATUS_OFFEN;
+                        status = BHPTools.STATUS_OFFEN;
                     }
                     HashMap hm = new HashMap();
                     hm.put("Status", status);
-                    if (status == TMBHP.STATUS_OFFEN) {
+                    if (status == BHPTools.STATUS_OFFEN) {
                         hm.put("UKennung", null);
                         hm.put("Ist", null);
                         hm.put("IZeit", null);
@@ -507,7 +508,7 @@ public class PnlBHP extends CleanablePanel {
                         DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
 
                         if (dafid > 0) { // mit Medikamenten
-                            if (status == TMBHP.STATUS_ERLEDIGT) {
+                            if (status == BHPTools.STATUS_ERLEDIGT) {
                                 if (!op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid)) {
                                     throw new SQLException("entnahmeVorrat");
                                 }
@@ -604,7 +605,7 @@ public class PnlBHP extends CleanablePanel {
                             db.commit();
 
                             HashMap hm = new HashMap();
-                            hm.put("Status", TMBHP.STATUS_VERWEIGERT_VERWORFEN);
+                            hm.put("Status", BHPTools.STATUS_VERWEIGERT_VERWORFEN);
                             hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
                             hm.put("Ist", "!NOW!");
                             hm.put("IZeit", SYSCalendar.ermittleZeit());
@@ -627,12 +628,12 @@ public class PnlBHP extends CleanablePanel {
                             new DlgException(ex);
                         }
 
-                        tm.setUpdate(row, TMBHP.STATUS_VERWEIGERT_VERWORFEN);
+                        //tm.setUpdate(row, BHPTools.STATUS_VERWEIGERT_VERWORFEN);
                         //tm.reload(row);
                     }
                 });
                 menu.add(itemPopupXDiscard);
-                ocs.setEnabled(this, "itemPopupXDiscard", itemPopupXDiscard, changeable && status == TMBHP.STATUS_OFFEN);
+                ocs.setEnabled(this, "itemPopupXDiscard", itemPopupXDiscard, changeable && status == BHPTools.STATUS_OFFEN);
 
                 menu.add(new JSeparator());
             }
@@ -649,18 +650,18 @@ public class PnlBHP extends CleanablePanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     HashMap hm = new HashMap();
-                    hm.put("Status", TMBHP.STATUS_VERWEIGERT);
+                    hm.put("Status", BHPTools.STATUS_VERWEIGERT);
                     hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
                     hm.put("Ist", "!NOW!");
                     hm.put("IZeit", SYSCalendar.ermittleZeit());
                     DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
                     hm.clear();
-                    tm.setUpdate(row, TMBHP.STATUS_VERWEIGERT);
+                    //tm.setUpdate(row, BHPTools.STATUS_VERWEIGERT);
                     //tm.reload(row);
                 }
             });
             menu.add(itemPopupXPreserve);
-            ocs.setEnabled(this, "itemPopupXPreserve", itemPopupXPreserve, changeable && status == TMBHP.STATUS_OFFEN);
+            ocs.setEnabled(this, "itemPopupXPreserve", itemPopupXPreserve, changeable && status == BHPTools.STATUS_OFFEN);
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
@@ -697,7 +698,9 @@ public class PnlBHP extends CleanablePanel {
     }//GEN-LAST:event_jspBHPComponentResized
 
     private void reloadTable() {
-        tblBHP.setModel(new TMBHP(bwkennung, jdcDatum.getDate(), false, cmbSchicht.getSelectedIndex() - 1));
+
+        // das hier muss wieder rein
+        tblBHP.setModel(new TMBHP(bewohner, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
         tblBHP.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspBHP.dispatchEvent(new ComponentEvent(jspBHP, ComponentEvent.COMPONENT_RESIZED));
         tblBHP.getColumnModel().getColumn(TMBHP.COL_BEZEICHNUNG).setCellRenderer(new RNDBHP());

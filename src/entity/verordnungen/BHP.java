@@ -1,7 +1,8 @@
 package entity.verordnungen;
 
-import entity.Stationen;
 import entity.Users;
+import org.eclipse.persistence.annotations.ConversionValue;
+import org.eclipse.persistence.annotations.ObjectTypeConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,63 +13,57 @@ import java.util.Date;
 @Table(name = "BHP")
 
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "BHP.findByBewohnerDatumSchichtKeineMedisResultMapping",
+        @SqlResultSetMapping(name = "BHP.findByBewohnerDatumSchichtResultMapping",
                 entities = @EntityResult(entityClass = BHP.class),
                 columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "NextBest")}
-        ),
-
-        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
-                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
-                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "NextBest"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
-                }
-        ),
-//                        v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung
-
-        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
-                entities = @EntityResult(entityClass = Verordnung.class),
-                columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
         )
 })
 
 @NamedNativeQueries({
-
-        /**
-         * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
-         * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
-         */
         @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtKeineMedis", query = " " +
                 " SELECT bhp.*, 0 BestID, 0 NextBest " +
                 " FROM BHP bhp " +
                 " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
                 " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
                 " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
-                " WHERE Date(Soll)=Date(now()) AND BWKennung=? AND v.DafID IS NULL", resultSetMapping = "BHP.findByBewohnerDatumSchichtKeineMedisResultMapping"),
-        /**
-         * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
-         */
-        @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
-                " SELECT v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
-                " FROM BHPVerordnung v " +
-                " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
-                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
-                " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
-                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
-                " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
-                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
-                " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
-                " LEFT OUTER JOIN ( " +
-                "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
-                "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
-                "      WHERE M.Bis = '9999-12-31 23:59:59' " +
-                " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
-                " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
-                " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
-                " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
-                " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
-                // TODO: Dieser Ausdruck muss geändert werden. Der filter die duch die best.* Filter die Nahrungsergänzungen raus. Soll er nicht.
-                " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)",
-                resultSetMapping = "Verordnung.findAllForStellplanResultMapping")
+                " WHERE Date(Soll)=Date(?) AND BWKennung=? AND v.DafID IS NULL" +
+                // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
+                " AND ((SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping"),
 
+        @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtMitMedis", query = " " +
+                " SELECT bhp.*, bestand.BestID, bestand.NextBest" +
+                " FROM BHP bhp " +
+                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
+                // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
+                // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
+                // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
+                // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
+                // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
+                // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
+                // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
+                " LEFT OUTER JOIN " +
+                " (" +
+                "     SELECT DISTINCT a.VorID, b.DafID FROM (" +
+                "       SELECT best.VorID, best.DafID FROM MPBestand best" +
+                "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+                "       WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+                "       GROUP BY VorID" +
+                "     ) a " +
+                "     INNER JOIN (" +
+                "       SELECT best.VorID, best.DafID FROM MPBestand best " +
+                "     ) b ON a.VorID = b.VorID " +
+                " ) vor ON vor.DafID = v.DafID " +
+                // Das hier sucht passende Bestände im Anbruch raus
+                " LEFT OUTER JOIN( " +
+                "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV " +
+                "       FROM MPBestand best1" +
+                "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+                "       GROUP BY best1.BestID" +
+                " ) bestand ON bestand.VorID = vor.VorID " +
+                " WHERE v.DafID IS NOT NULL AND Date(Soll)=Date(?) AND BWKennung=?" +
+                // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
+                " AND ((SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping")
 })
 
 
@@ -85,6 +80,7 @@ import java.util.Date;
         @NamedQuery(name = "BHP.findByDauer", query = "SELECT b FROM BHP b WHERE b.dauer = :dauer"),
         @NamedQuery(name = "BHP.numByNOTStatusAndVerordnung", query = " " +
                 " SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.verordnungPlanung.verordnung = :verordnung AND bhp.status <> :status ")})
+
 public class BHP implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -133,8 +129,8 @@ public class BHP implements Serializable {
         this.mdate = new Date();
     }
 
-    @JoinColumn(name = "bhppid", referencedColumnName = "BHPPID")
-    @ManyToOne
+    @JoinColumn(name = "BHPPID", referencedColumnName = "BHPPID")
+    @ManyToOne(fetch = FetchType.EAGER)
     private VerordnungPlanung verordnungPlanung;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
@@ -262,7 +258,6 @@ public class BHP implements Serializable {
     public String toString() {
         return "BHP{" +
                 "bhpid=" + bhpid +
-                ", uKennung='" + uKennung + '\'' +
                 ", soll=" + soll +
                 ", ist=" + ist +
                 ", sZeit=" + sZeit +
@@ -275,5 +270,4 @@ public class BHP implements Serializable {
                 ", verordnungPlanung=" + verordnungPlanung +
                 '}';
     }
-
 }

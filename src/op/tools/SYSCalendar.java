@@ -584,13 +584,15 @@ public class SYSCalendar {
     }
 
     /**
-     *
-     *
-     **/
-    public static ArrayList getZeiten4Schicht(int schicht) {
+     * @return Liste mit 4 Elementen. Die ersten beiden sind die byte Kennungen der beteiligten Schichten innerhalb der gewünschten
+     *         Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
+     *         Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
+     *         liegt diese Zeit in dem betreffenden Intervall.
+     */
+    public static ArrayList getZeiten4Schicht(byte schicht) {
         ArrayList result = new ArrayList(4);
         String z1, z2;
-        int s1, s2;
+        byte s1, s2;
         switch (schicht) {
             case SYSConst.ZEIT_NACHT_MO: {
                 z1 = "FM";
@@ -617,7 +619,7 @@ public class SYSCalendar {
                 z1 = "NA";
                 z2 = "FM";
                 s1 = SYSConst.NA;
-                s2 = Integer.MAX_VALUE; // kleiner Trick :-$
+                s2 = Byte.MAX_VALUE; // kleiner Trick :-$
                 break;
             }
             default: {
@@ -630,10 +632,16 @@ public class SYSCalendar {
 
         result.add(s1);
         result.add(s2);
-        result.add(OPDE.getProps().getProperty(z1));
-        GregorianCalendar gc = SYSCalendar.erkenneUhrzeit(OPDE.getProps().getProperty(z2));
-        gc.add(GregorianCalendar.MINUTE, -1);
-        result.add(SYSCalendar.toGermanTime(gc));
+
+        result.add(z1.isEmpty() ? "" : OPDE.getProps().getProperty(z1));
+
+        if (!z2.isEmpty()) {
+            GregorianCalendar gc = SYSCalendar.erkenneUhrzeit(OPDE.getProps().getProperty(z2));
+            gc.add(GregorianCalendar.MINUTE, -1);
+            result.add(SYSCalendar.toGermanTime(gc));
+        } else {
+            result.add("");
+        }
         return result;
     }
 
@@ -963,6 +971,7 @@ public class SYSCalendar {
     public static Date addTime2Date(Date date, Date time) {
         return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
     }
+
     /**
      * Setzt die Zeitkomponente eines GregorianCalendars. Das heisst ganz einfach,
      * wenn man ein Datum hat (in einem GC) und in einem anderen GC steht die Uhrzeit, dann
@@ -1020,6 +1029,7 @@ public class SYSCalendar {
 
     /**
      * Nimmt den aktuellen Zeitpunkt, setzt die Zeit auf 23:59:59 und gibt das Ergebnis zurück.
+     *
      * @return
      */
     public static long endOfDay() {
@@ -1073,7 +1083,6 @@ public class SYSCalendar {
         gc.set(GregorianCalendar.MILLISECOND, 0);
         return gc.getTimeInMillis();
     }
-
 
 
     /**

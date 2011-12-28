@@ -26,13 +26,17 @@
  */
 package op.care.bhp;
 
+import entity.Bewohner;
 import entity.verordnungen.BHP;
 import entity.verordnungen.BHPTools;
 import entity.verordnungen.VerordnungTools;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -78,41 +82,59 @@ public class TMBHP
     /**
      * @param schicht entsprechen OC_Const.ZEIT
      */
-    public TMBHP(String currentBW, Date datum, int schicht) {
+    public TMBHP(Bewohner bewohner, Date datum, int schicht) {
         super();
-        this.withTime = withTime;
-        String filter = "";
-        if (schicht != SYSConst.ZEIT_ALLES) {
-            filter = " WHERE (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?) ";
+
+        listeBHP = new ArrayList<Object[]>();
+
+        ArrayList al = SYSCalendar.getZeiten4Schicht((byte) schicht);
+        String zeit1 = al.get(2).toString();
+        String zeit2 = al.get(3).toString();
+        byte schicht1 = ((Byte) al.get(0)).byteValue();
+        byte schicht2 = ((Byte) al.get(1)).byteValue();
+
+        EntityManager em = OPDE.createEM();
+        try {
+
+            Query queryOHNEmedi = em.createNamedQuery("BHP.findByBewohnerDatumSchichtKeineMedis");
+            queryOHNEmedi.setParameter(1, datum);
+            queryOHNEmedi.setParameter(2, bewohner.getBWKennung());
+
+            //queryOHNEmedi.setParameter(3, schicht == SYSConst.ZEIT_ALLES);
+
+            queryOHNEmedi.setParameter(3, schicht1);
+            queryOHNEmedi.setParameter(4, schicht2);
+            queryOHNEmedi.setParameter(5, zeit1);
+            queryOHNEmedi.setParameter(6, zeit2);
+
+            listeBHP.addAll(queryOHNEmedi.getResultList());
+
+            Query queryMITmedi = em.createNamedQuery("BHP.findByBewohnerDatumSchichtMitMedis");
+            queryMITmedi.setParameter(1, bewohner.getBWKennung());
+            queryMITmedi.setParameter(2, datum);
+            queryMITmedi.setParameter(3, bewohner.getBWKennung());
+
+            //queryMITmedi.setParameter(4, schicht == SYSConst.ZEIT_ALLES);
+
+            queryMITmedi.setParameter(4, schicht1);
+            queryMITmedi.setParameter(5, schicht2);
+            queryMITmedi.setParameter(6, zeit1);
+            queryMITmedi.setParameter(7, zeit2);
+
+            listeBHP.addAll(queryMITmedi.getResultList());
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
-
-
-        //OPDE.debug("------------ TMBHP ---------------");
-        //OPDE.debug(sql);
-        //Date d = new Date(new GregorianCalendar(2006,GregorianCalendar.AUGUST,11).getTimeInMillis());
-        stmt.setString(1, currentBW);
-        stmt.setDate(2, new java.sql.Date(datum.getTime()));
-        stmt.setString(3, currentBW);
-        stmt.setDate(4, new java.sql.Date(datum.getTime()));
-        stmt.setString(5, currentBW);
-
-        if (schicht != SYSConst.ZEIT_ALLES) {
-            ArrayList al = SYSCalendar.getZeiten4Schicht(schicht);
-            String zeit1 = al.get(2).toString();
-            String zeit2 = al.get(3).toString();
-            int schicht1 = ((Integer) al.get(0)).intValue();
-            int schicht2 = ((Integer) al.get(1)).intValue();
-            stmt.setInt(6, schicht1);
-            stmt.setInt(7, schicht2);
-            stmt.setString(8, zeit1);
-            stmt.setString(9, zeit2);
-        }
+        OPDE.debug(listeBHP);
 
     }
 
     @Override
     public int getRowCount() {
-        listeBHP.size();
+        return listeBHP.size();
     }
 
     public int getColumnCount() {
@@ -132,8 +154,9 @@ public class TMBHP
         Object result = null;
         Object[] objects = (Object[]) listeBHP.get(row);
         BHP bhp = (BHP) objects[0];
-        BigInteger bestid = (BigInteger) objects[1];
-        BigInteger nextbest = (BigInteger) objects[2];
+        // TODO: java.lang.ClassCastException: java.lang.Long cannot be cast to java.math.BigInteger
+        BigInteger bestid = (BigInteger) objects[1]; // mal so mal so. Warum ?
+        Long nextbest = (Long) objects[2];
 
         switch (col) {
             case COL_BEZEICHNUNG: {
@@ -172,8 +195,7 @@ public class TMBHP
                         result = result.toString() + "<i>nächster anzubrechender Bestand Nr.: " + nextbest + "<i><br/>";
                     }
                 }
-                if (!SYSTools.catchNull(bhp.getVerordnungPlanung().getVerordnung().getBemerkung()).isEmpty()
-                {
+                if (!SYSTools.catchNull(bhp.getVerordnungPlanung().getVerordnung().getBemerkung()).isEmpty()) {
                     result = result.toString() + "<b>Bemerkung:</b> " + bhp.getVerordnungPlanung().getVerordnung().getBemerkung();
                 }
                 break;
