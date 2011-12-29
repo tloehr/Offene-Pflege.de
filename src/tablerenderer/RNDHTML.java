@@ -39,8 +39,8 @@ public class RNDHTML implements TableCellRenderer {
      */
     private final Map cellSizes = new HashMap();
 
-    JTextPane txt;
-    JPanel panel;
+    protected JTextPane txt;
+    protected JPanel panel;
 
     public RNDHTML() {
 

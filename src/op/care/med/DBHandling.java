@@ -1037,65 +1037,65 @@ public class DBHandling {
 //        hm.clear();
 //    }
 
-    public static boolean betrifftAbgeschlossenenBestand(long bhpid) {
-        String sql = " SELECT best.Aus " +
-                " FROM BHP bhp " +
-                " INNER JOIN MPBuchung buch ON bhp.BHPID = buch.BHPID " +
-                " INNER JOIN MPBestand best ON best.BestID = buch.BestID " +
-                " WHERE bhp.BHPID = ? AND best.Aus < '9999-12-31 23:59:59'";
-        boolean result = false;
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bhpid);
-            ResultSet rs = stmt.executeQuery();
-            result = rs.first();
-        } catch (SQLException ex) {
-            OPDE.getLogger().error(ex);
-            ex.printStackTrace();
-        }
-        return result;
-    }
+//    public static boolean betrifftAbgeschlossenenBestand(long bhpid) {
+//        String sql = " SELECT best.Aus " +
+//                " FROM BHP bhp " +
+//                " INNER JOIN MPBuchung buch ON bhp.BHPID = buch.BHPID " +
+//                " INNER JOIN MPBestand best ON best.BestID = buch.BestID " +
+//                " WHERE bhp.BHPID = ? AND best.Aus < '9999-12-31 23:59:59'";
+//        boolean result = false;
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, bhpid);
+//            ResultSet rs = stmt.executeQuery();
+//            result = rs.first();
+//        } catch (SQLException ex) {
+//            OPDE.getLogger().error(ex);
+//            ex.printStackTrace();
+//        }
+//        return result;
+//    }
 
-    /**
-     * Die R¸ckgabe eines Vorrats bezieht sich auf eine BHPID f¸r die die Buchungen zur¸ckgerechnet werden
-     * sollen.
-     * <ol>
-     * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
-     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
-     * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
-     * </ol>
-     *
-     * @result true bei Erfolg, false sonst.
-     */
-    public static boolean rückgabeVorrat(long bhpid) {
-        boolean result = false;
-        String sql = "" +
-                " SELECT count(*) " +
-                " FROM MPBuchung " +
-                " WHERE BHPID = ? ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bhpid);
-            ResultSet rs = stmt.executeQuery();
-            rs.first();
-            if (rs.getLong(1) == 1) { // es gibt genau eine Buchung.
-                // Weg damit
-                result = (op.tools.DBHandling.deleteRecords("MPBuchung", "BHPID", bhpid) >= 0);
-
-            }
-
-            result |= (rs.getLong(1) == 0); // Auf true, wenn anzahl der Buchungen = 0 ist.
-
-            rs.close();
-            stmt.close();
-
-        } catch (SQLException ex) {
-            OPDE.getLogger().error(ex);
-            ex.printStackTrace();
-            result = false;
-        }
-        return result;
-    }
+//    /**
+//     * Die R¸ckgabe eines Vorrats bezieht sich auf eine BHPID f¸r die die Buchungen zur¸ckgerechnet werden
+//     * sollen.
+//     * <ol>
+//     * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
+//     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
+//     * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
+//     * </ol>
+//     *
+//     * @result true bei Erfolg, false sonst.
+//     */
+//    public static boolean rückgabeVorrat(long bhpid) {
+//        boolean result = false;
+//        String sql = "" +
+//                " SELECT count(*) " +
+//                " FROM MPBuchung " +
+//                " WHERE BHPID = ? ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, bhpid);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.first();
+//            if (rs.getLong(1) == 1) { // es gibt genau eine Buchung.
+//                // Weg damit
+//                result = (op.tools.DBHandling.deleteRecords("MPBuchung", "BHPID", bhpid) >= 0);
+//
+//            }
+//
+//            result |= (rs.getLong(1) == 0); // Auf true, wenn anzahl der Buchungen = 0 ist.
+//
+//            rs.close();
+//            stmt.close();
+//
+//        } catch (SQLException ex) {
+//            OPDE.getLogger().error(ex);
+//            ex.printStackTrace();
+//            result = false;
+//        }
+//        return result;
+//    }
 
 //    /**
 //     * Erstellt einen neuen Vorrat f¸r einen Bewohner zu einer bestimmten DafID.

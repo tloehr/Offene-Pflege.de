@@ -24,13 +24,12 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.bhp;
+package tablerenderer;
 
 import entity.verordnungen.BHP;
 import entity.verordnungen.BHPTools;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
-import tablerenderer.RNDHTML;
+import tablemodels.TMBHP;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,54 +40,58 @@ import java.awt.*;
 public class RNDBHP extends RNDHTML {
 
     Color color;
-    Font font;
 
     public RNDBHP() {
         super();
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        Component result = null;
+        JPanel panel = (JPanel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        Object[] objects = (Object[]) ((TMBHP) table.getModel()).getListeBHP().get(row);
+        Object[] objects = ((TMBHP) table.getModel()).getListeBHP().get(row);
 
         BHP bhp = (BHP) objects[0];
 
-        color = Color.white;
+        color = panel.getBackground();
 
-        if (isSelected) {
-            color = SYSConst.bluegrey;
-            if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
-                color = SYSConst.darkolivegreen4;
+        if (bhp.getStatus() != BHPTools.STATUS_OFFEN) {
+            if (isSelected) {
+                color = SYSConst.bluegrey;
+                if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
+                    color = SYSConst.darkolivegreen4;
+                }
+                if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
+                    color = SYSConst.salmon4;
+                }
+            } else {
+                if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
+                    color = SYSConst.darkolivegreen2;
+                }
+                if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
+                    color = SYSConst.salmon2;
+                }
             }
-            if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
-                color = SYSConst.salmon4;
-            }
-        } else {
-            if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
-                color = SYSConst.darkolivegreen2;
-            }
-            if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
-                color = SYSConst.salmon2;
-            }
+            panel.setBackground(color);
         }
 
-//        if (column == TMBHP.COL_DOSIS) {
-//            double dosis = ((Double) value).doubleValue();
-//            if (dosis == 0) {
-//                value = "";
-//            } else {
-//                value = SYSTools.printDouble(dosis);
-//            }
-//        }
 
         if (column == TMBHP.COL_STATUS) {
-            JLabel j = new JLabel();
+            JLabel j;
+
+            // Sonst werden immer weiter Labels zu dem Panel aus der Super Klasse hinzugefügt.
+            if (panel.getComponent(0) instanceof JLabel) {
+                j = (JLabel) panel.getComponent(0);
+            } else {
+                panel.remove(txt);
+                j = new JLabel();
+                j.setOpaque(false);
+                j.setBackground(new Color(0, 0, 0, 0));
+                panel.setLayout(new BorderLayout());
+                panel.add(j, BorderLayout.CENTER);
+            }
 
             ImageIcon icon;
             if (bhp.getStatus() == BHPTools.STATUS_OFFEN) {
-
-
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
             } else if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
@@ -96,27 +99,9 @@ public class RNDBHP extends RNDHTML {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"));
             }
             j.setIcon(icon);
-            j.setOpaque(true);
-            j.setBackground(color);
-            result = j;
-        } else if (column == TMBHP.COL_BEMBHP && !SYSTools.catchNull(bhp.getBemerkung()).isEmpty()) {
-            JLabel j = new JLabel();
-            ImageIcon icon;
-            icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/edit.png"));
-            j.setIcon(icon);
-            j.setOpaque(true);
-            j.setBackground(color);
-            // Hier den Code der <p> in eine Table packen für die Zeilenumbrüche.
-            String text = "<html><body><table border=\"0\">";
-            text += "    <tr><td align=\"left\" width=\"600\">" + bhp.getBemerkung() + "</td></tr>";
-            text += "   </table></body></html>";
-            j.setToolTipText(text);
-            result = j;
-        } else {
-            result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 
-        return result;
+        return panel;
     }
 
     public Color getBackground() {

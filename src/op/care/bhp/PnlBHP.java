@@ -26,33 +26,33 @@
  */
 package op.care.bhp;
 
-import java.awt.event.*;
-import java.beans.*;
-import javax.swing.border.*;
-
 import com.toedter.calendar.JDateChooser;
+import entity.BWInfo;
+import entity.BWInfoTools;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
-import entity.verordnungen.BHPTools;
+import entity.verordnungen.*;
 import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
-import op.tools.DBHandling;
-import op.tools.*;
+import op.tools.Pair;
+import op.tools.SYSCalendar;
+import op.tools.SYSTools;
+import tablemodels.TMBHP;
+import tablerenderer.RNDBHP;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * @author tloehr
@@ -86,11 +86,11 @@ public class PnlBHP extends CleanablePanel {
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner){
+    public void change2Bewohner(Bewohner bewohner) {
         this.bwkennung = bewohner.getBWKennung();
         this.bewohner = bewohner;
 
-        if (runningClass != null){
+        if (runningClass != null) {
             SYSRunningClassesTools.endModule(runningClass);
         }
 
@@ -110,17 +110,21 @@ public class PnlBHP extends CleanablePanel {
 
         cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
 
-        abwesend = DBRetrieve.getAbwesendSeit(bwkennung) != null;
+        abwesend = BWInfoTools.getAbwesendSeit(bewohner) != null;
 
         ocs.setEnabled(this, "btnBedarf", btnBedarf, !readOnly);
 
         ignoreJDCEvent = true;
         jdcDatum.setDate(SYSCalendar.today_date());
-        ArrayList hauf = DBRetrieve.getHauf(bwkennung);
-        Date[] d = (Date[]) hauf.get(0);
-        jdcDatum.setMinSelectableDate(d[0]);
+
+        java.util.List<BWInfo> listHeimaufenhtalte = BWInfoTools.getHeimaufenthalte(bewohner);
+        if (listHeimaufenhtalte.isEmpty()) {
+            jdcDatum.setMinSelectableDate(new Date());
+        } else {
+            jdcDatum.setMinSelectableDate(listHeimaufenhtalte.get(0).getVon());
+        }
+
         BewohnerTools.setBWLabel(lblBW, bewohner);
-        //SYSTools.setBWLabel(lblBW, bwkennung);
         ignoreJDCEvent = false;
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
     }
@@ -258,39 +262,39 @@ public class PnlBHP extends CleanablePanel {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBack)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnForward)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 407, Short.MAX_VALUE)
-                        .addComponent(btnBedarf)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnBack)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnForward)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 407, Short.MAX_VALUE)
+                                    .addComponent(btnBedarf)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnBedarf))
-                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(btnBedarf))
+                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                    .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
         }
 
@@ -333,42 +337,42 @@ public class PnlBHP extends CleanablePanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 803, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnLock)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 803, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnLock)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addComponent(btnLock)
-                        .addComponent(lblBW))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addComponent(btnLock)
+                                        .addComponent(lblBW))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -429,16 +433,19 @@ public class PnlBHP extends CleanablePanel {
         Point p = evt.getPoint();
         final int col = tblBHP.columnAtPoint(p);
         final int row = tblBHP.rowAtPoint(p);
+
         ListSelectionModel lsm = tblBHP.getSelectionModel();
         lsm.setSelectionInterval(row, row);
-        final long bhpid = ((Long) tm.getValueAt(row, TMBHP.COL_BHPID)).longValue();
-        int status = ((Integer) tm.getValueAt(row, TMBHP.COL_STATUS)).intValue();
-        final double dosis = ((Double) tm.getValueAt(row, TMBHP.COL_DOSIS)).doubleValue();
-        String ukennung = ((String) tm.getValueAt(row, TMBHP.COL_UKENNUNG)).toString();
-        long mdate = ((Long) tm.getValueAt(row, TMBHP.COL_MDATE)).longValue();
-        long abdatum = ((Long) tm.getValueAt(row, TMBHP.COL_ABDATUM)).longValue();
-        final long dafid = ((Long) tm.getValueAt(row, TMBHP.COL_DAFID)).longValue();
-        boolean bedarf = ((Long) tm.getValueAt(row, TMBHP.COL_SITID)).longValue() > 0;
+
+        BHP bhp = tm.getBHP(row);
+
+//        final long bhpid = ((Long) tm.getValueAt(row, TMBHP.COL_BHPID)).longValue();
+//        int status = ((Integer) tm.getValueAt(row, TMBHP.COL_STATUS)).intValue();
+//        final double dosis = ((Double) tm.getValueAt(row, TMBHP.COL_DOSIS)).doubleValue();
+//        long mdate = ((Long) tm.getValueAt(row, TMBHP.COL_MDATE)).longValue();
+//        long abdatum = ((Long) tm.getValueAt(row, TMBHP.COL_ABDATUM)).longValue();
+//        final long dafid = ((Long) tm.getValueAt(row, TMBHP.COL_DAFID)).longValue();
+//        boolean bedarf = ((Long) tm.getValueAt(row, TMBHP.COL_SITID)).longValue() > 0;
         //long verid = ((Long) tm.getValueAt(row, TMBHP.COL_VERID)).longValue();
 
         //boolean bisPackEnde = ((Boolean) tm.getValueAt(row, TMBHP.COL_BISPACKENDE)).booleanValue();
@@ -457,109 +464,99 @@ public class PnlBHP extends CleanablePanel {
                 //          Und auch nur dann, wenn 
                 // )
                 !abwesend && //
-                        // Aus Performance Gründen muss er Ausdruck, der hier bereits ermittelt wurde
+                        // Aus Performance Gründen muss der Ausdruck, der hier bereits ermittelt wurde
                         // an anderer Stelle verarbeitet werden, sonst dauert die SQL Abfrage zu lang
                         // Ursprünglich stand hier:
                         // (dafid == 0 || status != BHPTools.STATUS_OFFEN || bestid > 0) && // wenn es ein Medikament ist und der Status offen, dann nur änderbar, wenn es einen angebrochenen Bestand gibt.
                         // Diese Abfrage habe ich nach Unten verschoben und das bestid muss nun im Einzelfall ermittelt werden.
-                        SYSCalendar.isInFuture(abdatum)
-                        && (status == BHPTools.STATUS_OFFEN
-                        || (ukennung.equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung())
-                        && SYSCalendar.earlyEnough(mdate, 30) && !op.care.med.DBHandling.betrifftAbgeschlossenenBestand(bhpid))); // damit man nichts rückgängig machen kann, was irgendwie einen abgeschlossenen Bestand betrifft.
+
+                        // Absetzdatum in der Zukunft ?
+                        bhp.getVerordnungPlanung().getVerordnung().getAbDatum().after(new Date())
+                        // Offener Status geht immer
+                        && (bhp.getStatus() == BHPTools.STATUS_OFFEN
+                        // Nicht mehr offen ?
+                        // Dann nur wenn derselbe Benutzer dass wieder rückgängig machen will
+                        ||
+                        (bhp.getUser().equals(OPDE.getLogin().getUser())
+                                // und es noch früh genug ist (30 Minuten)
+                                && SYSCalendar.earlyEnough(bhp.getMdate().getTime(), 30)
+                                // und kein abgesetzter Bestand beteiligt ist. Von wegen Rückgabe der Bestände
+                                && !MedBestandTools.hasAbgesetzteBestaende(bhp)
+                        )
+                ); // damit man nichts rückgängig machen kann, was irgendwie einen abgeschlossenen Bestand betrifft.
         OPDE.debug(changeable ? "changeable" : "NOT changeable");
         if (changeable) {
             // Drückt auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
-            /*if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) {
+            if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) {
 
-                // wenn es ein Medikament ist und der Status offen, dann nur änderbar, wenn es einen angebrochenen Bestand gibt.
-                // Etwas umständlich, aus Optimierungsgründen
-                long vorid = op.care.med.DBHandling.getVorrat2DAF(bwkennung, dafid);
-                long bestid = op.care.med.DBHandling.getBestandImAnbruch(vorid);
-                boolean changeable_additional = (dafid == 0 || status != BHPTools.STATUS_OFFEN || bestid > 0);
-                if (changeable_additional) {
+                byte status = bhp.getStatus();
+                Verordnung verordnung = bhp.getVerordnungPlanung().getVerordnung();
+                MedBestand bestandImAnbruch = null;
+                if (verordnung.hasMedi()) {
+                    bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
+                }
 
+                //boolean changeable_additional = (dafid == 0 || status != BHPTools.STATUS_OFFEN || bestid > 0);
+                if (!verordnung.hasMedi() || status != BHPTools.STATUS_OFFEN || bestandImAnbruch != null) {
                     boolean fullReloadNecessary = false;
                     status++;
                     if (status > 1) {
                         status = BHPTools.STATUS_OFFEN;
                     }
-                    HashMap hm = new HashMap();
-                    hm.put("Status", status);
+
+                    bhp.setStatus(status);
                     if (status == BHPTools.STATUS_OFFEN) {
-                        hm.put("UKennung", null);
-                        hm.put("Ist", null);
-                        hm.put("IZeit", null);
-                        hm.put("Bemerkung", null);
+                        bhp.setUser(null);
+                        bhp.setIst(null);
+                        bhp.setiZeit(null);
+                        bhp.setBemerkung(null);
                     } else {
-                        hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-                        hm.put("Ist", "!NOW!");
-                        hm.put("IZeit", SYSCalendar.ermittleZeit());
+                        bhp.setUser(OPDE.getLogin().getUser());
+                        bhp.setIst(new Date());
+                        bhp.setiZeit(SYSCalendar.ermittleZeit());
                     }
 
-                    // Transaktion
-                    Connection db = OPDE.getDb().db;
+                    EntityManager em = OPDE.createEM();
                     try {
+                        em.getTransaction().begin();
+                        bhp = em.merge(bhp);
 
-//                    // Hier beginnt eine Transaktion
-                        db.setAutoCommit(false);
-                        db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                        db.commit();
-
-                        DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
-
-                        if (dafid > 0) { // mit Medikamenten
+                        if (verordnung.hasMedi()) {
                             if (status == BHPTools.STATUS_ERLEDIGT) {
-                                if (!op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid)) {
-                                    throw new SQLException("entnahmeVorrat");
-                                }
+                                MedVorratTools.entnahmeVorrat(em, verordnung.getDarreichung(), verordnung.getBewohner(), bhp.getDosis(), true, bhp);
                             } else {
-                                if (!op.care.med.DBHandling.rückgabeVorrat(bhpid)) {
-                                    throw new SQLException("rückgabeVorrat");
-                                }
+                                MedVorratTools.rueckgabeVorrat(em, bhp);
                             }
                         }
-
                         // Wenn man eine Massnahme aus der Bedarfsmedikation
                         // rückgängig macht, wird sie gelöscht.
-                        if (bedarf && status == 0) {
-                            if (DBHandling.deleteRecords("BHP", "BHPID", bhpid) < 0) {
-                                throw new SQLException("Bedarfsmedikation löschen");
-                            }
+                        if (verordnung.isBedarf() && status == BHPTools.STATUS_OFFEN) {
+                            em.remove(bhp);
                             fullReloadNecessary = true;
                         }
-
-                        db.commit();
-                        db.setAutoCommit(true);
-
-                    } catch (SQLException ex) {
-                        try {
-                            ex.printStackTrace();
-                            db.rollback();
-                        } catch (SQLException ex1) {
-                            new DlgException(ex1);
-                            ex1.printStackTrace();
-                            System.exit(1);
-                        }
-                        new DlgException(ex);
+                        em.getTransaction().commit();
+                    } catch (Exception ex) {
+                        em.getTransaction().rollback();
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
                     }
-
-                    tm.setUpdate(row, status);
-
+                    tm.fireTableRowsUpdated(row, row);
                     if (fullReloadNecessary) {
-                        //OPDE.debug("fullReloadNecessary");
                         reloadTable();
                     }
                 }
-            }*/
-
+            }
         }
+
+
         // Nun noch Menüeinträge
-        if (evt.isPopupTrigger()) {
-            SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
-
-            if (dafid > 0) {
-
+//        if (evt.isPopupTrigger()) {
+//            SYSTools.unregisterListeners(menu);
+//            menu = new JPopupMenu();
+//
+//            if (dafid > 0) {
+//
 //                JMenuItem itemPopupCloseBestand = new JMenuItem("Bestand abschließen");
 //                itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
 //
@@ -591,80 +588,81 @@ public class PnlBHP extends CleanablePanel {
 //                });
 //                menu.add(itemPopupOpenBestand);
 //                ocs.setEnabled(this, "itemPopupOpenBestand", itemPopupOpenBestand, !readOnly && bestid == 0);
-
-                //-----------------------------------------
-                JMenuItem itemPopupXDiscard = new JMenuItem("Verweigert (Medikament wird trotzdem ausgebucht.)");
-                itemPopupXDiscard.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        Connection db = OPDE.getDb().db;
-                        try {
-                            // Hier beginnt eine Transaktion
-                            db.setAutoCommit(false);
-                            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                            db.commit();
-
-                            HashMap hm = new HashMap();
-                            hm.put("Status", BHPTools.STATUS_VERWEIGERT_VERWORFEN);
-                            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-                            hm.put("Ist", "!NOW!");
-                            hm.put("IZeit", SYSCalendar.ermittleZeit());
-                            DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
-                            hm.clear();
-
-                            /*if (!op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid)) {
-                                throw new SQLException("entnahmeVorrat");
-                            }*/
-                            db.commit();
-                            db.setAutoCommit(true);
-                        } catch (SQLException ex) {
-                            try {
-                                db.rollback();
-                            } catch (SQLException ex1) {
-                                new DlgException(ex1);
-                                ex1.printStackTrace();
-                                System.exit(1);
-                            }
-                            new DlgException(ex);
-                        }
-
-                        //tm.setUpdate(row, BHPTools.STATUS_VERWEIGERT_VERWORFEN);
-                        //tm.reload(row);
-                    }
-                });
-                menu.add(itemPopupXDiscard);
-                ocs.setEnabled(this, "itemPopupXDiscard", itemPopupXDiscard, changeable && status == BHPTools.STATUS_OFFEN);
-
-                menu.add(new JSeparator());
-            }
-            //-----------------------------------------
-            String str;
-            if (dafid > 0) {
-                str = "Verweigert (Medikament wird nicht ausgebucht.)";
-            } else {
-                str = "Verweigert";
-            }
-
-            JMenuItem itemPopupXPreserve = new JMenuItem(str);
-            itemPopupXPreserve.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    HashMap hm = new HashMap();
-                    hm.put("Status", BHPTools.STATUS_VERWEIGERT);
-                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-                    hm.put("Ist", "!NOW!");
-                    hm.put("IZeit", SYSCalendar.ermittleZeit());
-                    DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
-                    hm.clear();
-                    //tm.setUpdate(row, BHPTools.STATUS_VERWEIGERT);
-                    //tm.reload(row);
-                }
-            });
-            menu.add(itemPopupXPreserve);
-            ocs.setEnabled(this, "itemPopupXPreserve", itemPopupXPreserve, changeable && status == BHPTools.STATUS_OFFEN);
-
-            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-        }
+//
+//                //-----------------------------------------
+//                JMenuItem itemPopupXDiscard = new JMenuItem("Verweigert (Medikament wird trotzdem ausgebucht.)");
+//                itemPopupXDiscard.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        Connection db = OPDE.getDb().db;
+//                        try {
+//                            // Hier beginnt eine Transaktion
+//                            db.setAutoCommit(false);
+//                            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+//                            db.commit();
+//
+//                            HashMap hm = new HashMap();
+//                            hm.put("Status", BHPTools.STATUS_VERWEIGERT_VERWORFEN);
+//                            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//                            hm.put("Ist", "!NOW!");
+//                            hm.put("IZeit", SYSCalendar.ermittleZeit());
+//                            DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
+//                            hm.clear();
+//
+//                            /*if (!op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid)) {
+//                                throw new SQLException("entnahmeVorrat");
+//                            }*/
+//                            db.commit();
+//                            db.setAutoCommit(true);
+//                        } catch (SQLException ex) {
+//                            try {
+//                                db.rollback();
+//                            } catch (SQLException ex1) {
+//                                new DlgException(ex1);
+//                                ex1.printStackTrace();
+//                                System.exit(1);
+//                            }
+//                            new DlgException(ex);
+//                        }
+//
+//                        //tm.setUpdate(row, BHPTools.STATUS_VERWEIGERT_VERWORFEN);
+//                        //tm.reload(row);
+//                    }
+//                });
+//                menu.add(itemPopupXDiscard);
+//                ocs.setEnabled(this, "itemPopupXDiscard", itemPopupXDiscard, changeable && status == BHPTools.STATUS_OFFEN);
+//
+//                menu.add(new JSeparator());
+//            }
+//            //-----------------------------------------
+//            String str;
+//            if (dafid > 0) {
+//                str = "Verweigert (Medikament wird nicht ausgebucht.)";
+//            } else {
+//                str = "Verweigert";
+//            }
+//
+//            JMenuItem itemPopupXPreserve = new JMenuItem(str);
+//            itemPopupXPreserve.addActionListener(new java.awt.event.ActionListener() {
+//
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    HashMap hm = new HashMap();
+//                    hm.put("Status", BHPTools.STATUS_VERWEIGERT);
+//                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//                    hm.put("Ist", "!NOW!");
+//                    hm.put("IZeit", SYSCalendar.ermittleZeit());
+//                    DBHandling.updateRecord("BHP", hm, "BHPID", bhpid);
+//                    hm.clear();
+//                    //tm.setUpdate(row, BHPTools.STATUS_VERWEIGERT);
+//                    //tm.reload(row);
+//                }
+//            });
+//            menu.add(itemPopupXPreserve);
+//            ocs.setEnabled(this, "itemPopupXPreserve", itemPopupXPreserve, changeable && status == BHPTools.STATUS_OFFEN);
+//
+//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//
+//        }
     }//GEN-LAST:event_tblBHPMousePressed
 
     private void jspBHPComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBHPComponentResized

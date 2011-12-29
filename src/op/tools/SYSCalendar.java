@@ -66,8 +66,9 @@ public class SYSCalendar {
     }
 
     public static boolean isInFuture(long time) {
-        return time > nowDB();
+        return time > new Date().getTime();
     }
+
 
     /**
      * Generiert ein Array aus Uhrzeiten in der Form {"17:00","17:15"...}
@@ -497,8 +498,8 @@ public class SYSCalendar {
      *           sie liegt. Früh morgens, morgens... etc. Das Datum in diesem TS ist egal. Es geht NUR um die Uhrzeit.
      * @return Zeit-Konstante gemäß den Angaben in SYSConst.FM ... SYSConst.NA.
      */
-    public static int ermittleZeit(long ts) {
-        int zeit;
+    public static byte ermittleZeit(long ts) {
+        byte zeit;
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTimeInMillis(ts);
         long fm = erkenneUhrzeit(OPDE.getProps().getProperty("FM"), gc).getTimeInMillis();
@@ -523,12 +524,12 @@ public class SYSCalendar {
         return zeit;
     }
 
-    public static int ermittleZeit() {
-        return ermittleZeit(nowDB());
+    public static byte ermittleZeit() {
+        return ermittleZeit(new Date().getTime());
     }
 
     public static int ermittleSchicht() {
-        return ermittleSchicht(nowDB());
+        return ermittleSchicht(new Date().getTime());
     }
 
     /**

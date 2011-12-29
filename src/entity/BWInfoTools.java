@@ -5,8 +5,12 @@ import op.tools.DlgException;
 import op.tools.Zeitraum;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,4 +52,53 @@ public class BWInfoTools {
     }
 
 
+    /**
+     * Ermittelt, seit wann ein Bewohner abwesend war.
+     *
+     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
+     */
+    public static Date getAbwesendSeit(Bewohner bewohner) {
+
+        Date d = null;
+        EntityManager em = OPDE.createEM();
+        try {
+
+            String jpql = "" +
+                    " SELECT b FROM BWInfo b WHERE b.bwinfotyp.bwinftyp = 'abwe' AND b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis";
+            Query query = em.createQuery(jpql);
+            query.setParameter("bewohner", bewohner);
+            query.setParameter("von", new Date());
+            query.setParameter("bis", new Date());
+            d = (Date) query.getSingleResult();
+        } catch (NoResultException nre) {
+            d = null;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return d;
+    }
+
+    /**
+     * @return Eine ArrayList aus Date[0..1] Arrays mit jeweils Von, Bis, die alle Heimaufenthalte des BW enthalten.
+     */
+    public static List<BWInfo> getHeimaufenthalte(Bewohner bewohner) {
+        List<BWInfo> result = new Vector<BWInfo>();
+        EntityManager em = OPDE.createEM();
+        try {
+            String jpql = "" +
+                    " SELECT b FROM BWInfo b" +
+                    " WHERE b.bwinfotyp.bwinftyp = 'hauf' AND b.bewohner = :bewohner " +
+                    " ORDER BY b.von ";
+            Query query = em.createQuery(jpql);
+            query.setParameter("bewohner", bewohner);
+            result = query.getResultList();
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return result;
+    }
 }

@@ -34,6 +34,7 @@ import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import tablemodels.TMBedarf;
 import tablerenderer.RNDHTML;
 
 import javax.swing.*;

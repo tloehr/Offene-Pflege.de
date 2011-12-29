@@ -2,19 +2,13 @@ package entity.verordnungen;
 
 import entity.Bewohner;
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSConst;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.swing.*;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -36,7 +30,7 @@ public class MedVorratTools {
     }
 
     /**
-     * Bucht eine Menge aus einem Vorrat aus, ggf. zugeh?rig zu einer BHP. ?bersteigt die Entnahme Menge den
+     * Bucht eine Menge aus einem Vorrat aus, ggf. zugehörig zu einer BHP. ?bersteigt die Entnahme Menge den
      * Restbestband, dann wird entweder
      * <ul>
      * <li>wenn NextBest==0 &rarr; der Bestand trotzdem weiter gebucht. Bis ins Negative.</li>
@@ -65,6 +59,30 @@ public class MedVorratTools {
             entnahmeVorrat(em, vorrat, menge, bhp);
         }
     }
+
+    /**
+     * Die Rückgabe eines Vorrats bezieht sich auf eine BHP für die die Buchungen zurückgerechnet werden
+     * sollen.
+     * <ol>
+     * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
+     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
+     * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
+     * </ol>
+     *
+     * @result true bei Erfolg, false sonst.
+     */
+    public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
+
+        Query delQuery = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bhp = :bhp");
+        delQuery.setParameter("bhp", bhp);
+
+
+        if (delQuery.executeUpdate() > 1) { // es gibt genau eine Buchung.
+            throw new Exception("Rueckgabe Vorrat");
+        }
+
+    }
+
 
     protected static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);

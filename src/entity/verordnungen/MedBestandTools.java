@@ -353,19 +353,6 @@ public class MedBestandTools {
 
     public static String getBestandTextAsHTML(MedBestand bestand) {
         String result = "";
-        String sql = " SELECT vor.BWKennung, best.Ein, best.UKennung, prod.Bezeichnung, daf.Zusatz, pack.PZN, " +
-                " CASE pack.Groesse WHEN 0 THEN 'N1' WHEN 1 THEN 'N2' " +
-                " WHEN 2 THEN 'N3' WHEN 3 THEN 'AP' WHEN 4 THEN 'OP' ELSE '' END Groesse, pack.Inhalt, best.Text," +
-                " f.PackEinheit, f.Zubereitung, f.AnwText " +//, ifnull(b.saldo, 0.00) Bestandsmenge " +
-                " FROM MPBestand best " +
-                " INNER JOIN MPVorrat vor ON vor.VorID = best.VorID " +
-                " INNER JOIN MPDarreichung daf ON daf.DafID = best.DafID " +
-                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
-                " INNER JOIN MPFormen f ON f.FormID = daf.FormID " +
-                " LEFT OUTER JOIN MPackung pack ON best.MPID = pack.MPID " +
-                " WHERE best.BestID = ? ";
-
-
         result += "<br/><font color=\"blue\"><b>" + bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
@@ -377,6 +364,27 @@ public class MedBestandTools {
             result += "</b></font><br/>";
         }
 
+        return result;
+    }
+
+    public static boolean hasAbgesetzteBestaende(BHP bhp) {
+        boolean result = false;
+
+        EntityManager em = OPDE.createEM();
+
+        try {
+            Query query = em.createQuery(" " +
+                    " SELECT b FROM MedBestand b " +
+                    " JOIN b.buchungen bu " +
+                    " WHERE bu.bhp = :bhp " +
+                    " AND b.aus < '9999-12-31 23:59:59'");
+            query.setParameter("bhp", bhp);
+            result = !query.getResultList().isEmpty();
+        } catch (Exception ex) {
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
         return result;
     }
 

@@ -8,6 +8,7 @@ import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -95,6 +96,8 @@ public class DarreichungTools {
 
             result = (MedVorrat) query.getSingleResult();
         } catch (NoResultException nre) {
+            result = null;
+        } catch (NonUniqueResultException nure) {
             result = null;
         } catch (Exception e) {
             OPDE.fatal(e);

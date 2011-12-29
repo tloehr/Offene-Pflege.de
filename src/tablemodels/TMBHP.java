@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.bhp;
+package tablemodels;
 
 import entity.Bewohner;
 import entity.verordnungen.BHP;
@@ -34,6 +34,7 @@ import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import sun.security.util.BigInt;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -100,12 +101,12 @@ public class TMBHP
             queryOHNEmedi.setParameter(1, datum);
             queryOHNEmedi.setParameter(2, bewohner.getBWKennung());
 
-            //queryOHNEmedi.setParameter(3, schicht == SYSConst.ZEIT_ALLES);
+            queryOHNEmedi.setParameter(3, schicht == SYSConst.ZEIT_ALLES);
 
-            queryOHNEmedi.setParameter(3, schicht1);
-            queryOHNEmedi.setParameter(4, schicht2);
-            queryOHNEmedi.setParameter(5, zeit1);
-            queryOHNEmedi.setParameter(6, zeit2);
+            queryOHNEmedi.setParameter(4, schicht1);
+            queryOHNEmedi.setParameter(5, schicht2);
+            queryOHNEmedi.setParameter(6, zeit1);
+            queryOHNEmedi.setParameter(7, zeit2);
 
             listeBHP.addAll(queryOHNEmedi.getResultList());
 
@@ -114,12 +115,12 @@ public class TMBHP
             queryMITmedi.setParameter(2, datum);
             queryMITmedi.setParameter(3, bewohner.getBWKennung());
 
-            //queryMITmedi.setParameter(4, schicht == SYSConst.ZEIT_ALLES);
+            queryMITmedi.setParameter(4, schicht == SYSConst.ZEIT_ALLES);
 
-            queryMITmedi.setParameter(4, schicht1);
-            queryMITmedi.setParameter(5, schicht2);
-            queryMITmedi.setParameter(6, zeit1);
-            queryMITmedi.setParameter(7, zeit2);
+            queryMITmedi.setParameter(5, schicht1);
+            queryMITmedi.setParameter(6, schicht2);
+            queryMITmedi.setParameter(7, zeit1);
+            queryMITmedi.setParameter(8, zeit2);
 
             listeBHP.addAll(queryMITmedi.getResultList());
 
@@ -144,6 +145,12 @@ public class TMBHP
     public Class getColumnClass(int c) {
         return String.class;
     }
+
+    public BHP getBHP(int row){
+       return (BHP) listeBHP.get(row)[0];
+    }
+
+
     // Abgesetzt nur dann ausstreichen, wenn HEUTE abgesetzt wurde, aber nicht erst zum Ende des Tages.
 //sdfsdfsdfsdfsdfgesetzt() throws SQLException {
 //        return rs.getDate("AbDatum") != null && SYSCalendar.sameDay(rs.getDate("AbDatum"), SYSCalendar.today_date()) == 0 && rs.getTimestamp("AbDatum").before(SYSCalendar.nowDBDate());
@@ -154,9 +161,8 @@ public class TMBHP
         Object result = null;
         Object[] objects = (Object[]) listeBHP.get(row);
         BHP bhp = (BHP) objects[0];
-        // TODO: java.lang.ClassCastException: java.lang.Long cannot be cast to java.math.BigInteger
-        BigInteger bestid = (BigInteger) objects[1]; // mal so mal so. Warum ?
-        Long nextbest = (Long) objects[2];
+        BigInteger bestid = (BigInteger) objects[1];
+        BigInteger nextbest = BigInteger.valueOf((Long) objects[2]);
 
         switch (col) {
             case COL_BEZEICHNUNG: {
@@ -189,9 +195,9 @@ public class TMBHP
             case COL_BEMPLAN: {
                 result = "";
 
-                if (bestid != null) {
+                if (bestid != null && !bestid.equals(BigInteger.ZERO)) {
                     result = "<i>Bestand im Anbruch Nr.: " + bestid + "</i><br/>";
-                    if (nextbest != null) {
+                    if (nextbest != null && !nextbest.equals(BigInteger.ZERO)) {
                         result = result.toString() + "<i>nächster anzubrechender Bestand Nr.: " + nextbest + "<i><br/>";
                     }
                 }

@@ -17,4 +17,8 @@ public class MedBuchungenTools {
     public static final short STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN = 6;
     public static final short STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_PACKUNGSENDE = 7;
     public static final short STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS = 8;
+
+
+
+
 }

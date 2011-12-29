@@ -21,14 +21,14 @@ import java.util.Date;
 
 @NamedNativeQueries({
         @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtKeineMedis", query = " " +
-                " SELECT bhp.*, 0 BestID, 0 NextBest " +
+                " SELECT bhp.*, NULL BestID, NULL NextBest " +
                 " FROM BHP bhp " +
                 " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
                 " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
                 " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
                 " WHERE Date(Soll)=Date(?) AND BWKennung=? AND v.DafID IS NULL" +
                 // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
-                " AND ((SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping"),
+                " AND ( ? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping"),
 
         @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtMitMedis", query = " " +
                 " SELECT bhp.*, bestand.BestID, bestand.NextBest" +
@@ -63,7 +63,7 @@ import java.util.Date;
                 " ) bestand ON bestand.VorID = vor.VorID " +
                 " WHERE v.DafID IS NOT NULL AND Date(Soll)=Date(?) AND BWKennung=?" +
                 // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
-                " AND ((SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping")
+                " AND (? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping")
 })
 
 
