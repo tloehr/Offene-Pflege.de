@@ -25,11 +25,6 @@ import java.util.Date;
                 " JOIN vor.bestaende best " +
                 " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
                 " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
-        @NamedQuery(name = "MedVorrat.findByBewohnerAndDarreichung", query = " " +
-                " SELECT vor FROM MedVorrat vor " +
-                " JOIN vor.bestaende best " +
-                " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
-                " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
         @NamedQuery(name = "MedVorrat.findByBewohnerMitBestand", query = " " +
                 " SELECT best.vorrat, SUM(buch.menge) FROM MedBestand best " +
                 " JOIN best.buchungen buch " +

@@ -7,9 +7,12 @@ import op.tools.SYSConst;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,22 +33,33 @@ public class MedVorratTools {
     }
 
     /**
-     * Bucht eine Menge aus einem Vorrat aus, ggf. zugehörig zu einer BHP. ?bersteigt die Entnahme Menge den
+     * Bucht eine Menge aus einem Vorrat aus, ggf. zugehörig zu einer BHP. Übersteigt die Entnahme-Menge den
      * Restbestband, dann wird entweder
      * <ul>
-     * <li>wenn NextBest==0 &rarr; der Bestand trotzdem weiter gebucht. Bis ins Negative.</li>
-     * <li>wenn NextBest > 0 &rarr; ein neuer Bestand wird angebrochen.</li>
+     * <li>wenn der nächste Bestand <b>nicht</b> bekannt ist (<code>bestand.hasNextBestand() = <b>false</b></code>) &rarr; der Bestand trotzdem weiter gebucht. Bis ins negative.</li>
+     * <li>wenn der nächste Bestand <b>doch schon</b> bekannt ist (<code>bestand.hasNextBestand() = <b>true</b></code>)  &rarr; ein neuer Bestand wird angebrochen.</li>
      * </ul>
-     * Ist keine Packung im Anbruch, dann passiert gar nichts. Der R¸ckgabewert ist dann false.
+     * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen.
      *
+     * @param em          der EntityManager der verwendet wird
      * @param darreichung das zu entnehmende Präparat
-     * @param menge       gewünschte Entnahmemenge
+     * @param bewohner    der Bewohner, um den es geht
+     * @param menge       die gewünschte Entnahmemenge
+     * @param anweinheit  true, dann wird in der Anwedungseinheit ausgebucht. false, in der Packungseinheit
      * @param bhp         BHP aufgrund dere dieser Buchungsvorgang erfolgt.
-     * @param anweinheit  true, dann wird in der anweinheit ausgebucht. false, in der packeinheit.
-     * @return true, bei Erfolg; false, sonst
      */
     public static void entnahmeVorrat(EntityManager em, Darreichung darreichung, Bewohner bewohner, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
+
+        HIER GEHTS WEITER
         MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
+
+        foundExactMatch = vorraete != null;
+        if (vorraete == null) {
+            vorraete = DarreichungTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
+        }
+        cmbVorrat.setModel(new DefaultComboBoxModel(vorraete.toArray()));
+
+
         if (vorrat != null) {
             if (anweinheit) { // Umrechnung der Anwendungs Menge in die PackMenge.
                 MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);

@@ -51,7 +51,7 @@ public class DarreichungTools {
 
         String text = darreichung.getMedProdukt().getBezeichnung();
         text += zusatz.isEmpty() ? "" : ", " + zusatz;
-        text += zubereitung.isEmpty() ? " " : ", "+zubereitung + " ";
+        text += zubereitung.isEmpty() ? " " : ", " + zubereitung + " ";
         text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
         return text;
     }
@@ -77,14 +77,14 @@ public class DarreichungTools {
     }
 
     /**
-     * Dieses Methode wird vorwiegend bei den Verordnungen eingesetzt.
-     * Der Gedanke ist wie folgt: Eine neue Verordnung eines Medikamentes wird immer
-     * einem aktiven Vorrat zugeordnet, wenn es bereits früher mal eine Zuordnung zu einer
-     * bestimmten DAF gab.
-     * Gibt es keine frühere Zuweisung, dann werden nur Vorräte angezeigt, die zu der FormID der
-     * neuen DAF passen. Notfalls muss man einen Vorrat anlegen.
-     * Es werden Zuordnungen erlaubt, die aufgrund der Äquivalenzen zwischen
-     * Formen bestehen. z.B. Tabletten zu Dragees zu Filmtabletten etc.
+     * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode <code>getPassendeVorraeteZurDarreichung</code>.
+     * Sie implementiert Punkt 1 der dort beschriebenen 2 Antworten.
+     *
+     * @see #getPassendeVorraeteZurDarreichung(entity.Bewohner, Darreichung)
+     * @param bewohner
+     * @param darreichung
+     * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>.
+     *
      */
     public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         MedVorrat result = null;
@@ -105,25 +105,64 @@ public class DarreichungTools {
             em.close();
         }
 
-
         return result;
     }
 
+
+    /**
+     * Um diese Methode zu verstehen muss man sich einige Fakten und Konzepte klar machen,
+     * die wir bei der Entwicklung von OPDE bzgl. der Medikamente angewendet haben. Bitte beachten Sie
+     * dass mit dieser Methode der Punkt 2 der beschrieben Antworten implementiert wird. Punkt 1 finden
+     * sie in der Methode <code>getVorratZurDarreichung</code> umgesetzt.
+     * <p/>
+     * Eine <b>Darreichung</b> ist eine genaue Definition eines Medikaments, bei einer bestimmten Stärke, ein
+     * Hersteller, eine Darreichungsform (bitte vom Begriff Darreichung unterscheiden), eine Anwendungseinheit,
+     * eine Packungseinheit. usw. Das heisst, bei einer Verordnung wird immer eine Darreichung verordnet.
+     * Diese ist ausreichend, ja viel genauer als eine Medikamentenangabe.
+     * <p/>
+     * Über die Zeit kann es immer wieder vorkommen, dass eine Verordnung zwar bestehen bleibt, aber
+     * das Medikament sich verändert. Allerdings nicht beliebig sondern <b>wirkstoffgleich</b>. Das passiert
+     * z.B. wenn zu Beginn, sagen wir Aspirin von Bayer verordnet wurde. Nach einigen Wochen schreibt der
+     * Arzt dann aber statt dessen ASS 100 von ratiopharm auf. Diese Medikament kommt dann an und passt aber
+     * nicht zu der ursprünglichen Verordnung (aus Sicht von OPDE). Es ist ja eine andere <b>Darreichung</b>.
+     * </p>
+     * Trotzdem muss dieses neue Präparat ebenfalls mit auf den Vorrat, der für die Verordnung verwendet wird,
+     * draufgebucht werden. Das einzige auf dem OPDE hier besteht ist, dass die beiden Präparate dieselbe bzw.
+     * eine äquivalente Form haben.So können mit der Zeit die Vorräte Bestände mit ganz unterschiedlichen Darreichungen besessen haben.
+     * <p/>
+     * Bei der täglichen Arbeit, besonders bei dem Einbuchen von neuen Medikamenten stellt sich aber immer wieder die
+     * Frage: <b>auf welchen Vorrat muss ich dieses Produkt buchen ? Wozu gehört es ?</b>
+     * <p/>
+     * Natürlich sind alle nachfolgenden Überlegungen <i>bewohnerbezogen</i>. Ein Vorrat gehört immer <b>genau einem</b> Bewohner.
+     * <p/>
+     * Die Antwort kann ganz unterschiedlich ausfallen:
+     * <ol>
+     * <li>Wenn eine Darreichung zu <b>einem früheren Zeitpunkt</b> schonmal zu einem Vorrat zugeordnet war, <b>dann wird diese jetzt wieder</b> zugeordnet. Fall erledigt.</li>
+     * <li>Trifft Punkt 1 nicht zu, dann suchen wir alle Vorräte, die Darreichungen enthalten mit einer passenden Form. Passend heisst hier entweder dieselbe Form oder eine
+     * äquivalente Form (z.B. Tabletten sind zu Dragees gleichwertig wie zu Filmtabletten etc.).</li>
+     * </ol>
+     *
+     * @see #getVorratZurDarreichung(entity.Bewohner, Darreichung)
+     * @param bewohner
+     * @param darreichung
+     * @return
+     */
     public static List<MedVorrat> getPassendeVorraeteZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         // TODO: das muss noch getestet werden
         EntityManager em = OPDE.createEM();
-        List<MedVorrat> liste = new ArrayList();
+        List<MedVorrat> liste;
 
         // 1. Form der gesuchten darreichung bestimmen.
         MedFormen meineForm = darreichung.getMedForm();
 
         // 2. Alle äquivalenten Formen dazu finden
-        List<MedFormen> aehnlicheFormen = new ArrayList<MedFormen>();
+        List<MedFormen> aehnlicheFormen;
         if (meineForm.getEquiv() != 0) {
             Query query = em.createNamedQuery("MedFormen.findByEquiv");
             query.setParameter("equiv", meineForm.getEquiv());
             aehnlicheFormen = query.getResultList();
         } else {
+            aehnlicheFormen = new ArrayList<MedFormen>();
             aehnlicheFormen.add(meineForm);
         }
 

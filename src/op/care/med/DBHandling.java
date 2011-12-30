@@ -27,17 +27,17 @@
 package op.care.med;
 
 import op.OPDE;
-import op.tools.*;
+import op.tools.Bool;
+import op.tools.DlgException;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.swing.*;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author tloehr
@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 public class DBHandling {
     // Stati für MPBuchung
 
-//    public static final int STATUS_AUSBUCHEN_NORMAL = 0;
+    //    public static final int STATUS_AUSBUCHEN_NORMAL = 0;
 //    public static final int STATUS_EINBUCHEN_ANFANGSBESTAND = 1;
 //    public static final int STATUS_KORREKTUR_MANUELL = 2;
 //    public static final int STATUS_KORREKTUR_AUTO_LEER = 3;
@@ -64,7 +64,6 @@ public class DBHandling {
 //    public static final int FORMSTATUS_APV1 = 0;
 //    public static final int FORMSTATUS_APV_PER_DAF = 1;
 //    public static final int FORMSTATUS_APV_PER_BW = 2;
-
 
 
     /**
@@ -292,14 +291,35 @@ public class DBHandling {
     }
 
     /**
-     * Dieses Methode wird vorwiegend bei den Verordnungen eingesetzt.
-     * Der Gedanke ist wie folgt: Eine neue Verordnung eines Medikamentes wird immer
-     * einem aktiven Vorrat zugeordnet, wenn es bereits fr¸her mal eine Zuordnung zu einer
-     * bestimmten DAF gab.
-     * Gibt es keine fr¸here Zuweisung, dann werden nur Vorr?te angezeigt, die zu der FormID der
-     * neuen DAF passen. Notfalls muss man einen Vorrat anlegen.
-     * ?nderung durch #000028. Es werden Zuordnungen erlaubt, die aufgrund der ?quivalenzen zwischen
-     * Formen bestehen. z.B. Tabletten zu Dragees zu Filmtabletten etc.
+     * Um diese Methode zu verstehen muss man sich einige Fakten und Konzepte klar machen,
+     * die wir bei der Entwicklung von OPDE bzgl. der Medikamente angewendet haben.
+     * <p/>
+     * Eine <b>Darreichung</b> ist eine genaue Definition eines Medikaments, bei einer bestimmten Stärke, ein
+     * Hersteller, eine Darreichungsform (bitte vom Begriff Darreichung unterscheiden), eine Anwendungseinheit,
+     * eine Packungseinheit. usw. Das heisst, bei einer Verordnung wird immer eine Darreichung verordnet.
+     * Diese ist ausreichend, ja viel genauer als eine Medikamentenangabe.
+     * <p/>
+     * Über die Zeit kann es immer wieder vorkommen, dass eine Verordnung zwar bestehen bleibt, aber
+     * das Medikament sich verändert. Allerdings nicht beliebig sondern <i>wirkstoffgleich</i>. Das passiert
+     * z.B. wenn zu Beginn, sagen wir Aspirin von Bayer verordnet wurde. Nach einigen Wochen schreibt der
+     * Arzt dann aber statt dessen ASS 100 von ratiopharm auf. Diese Medikament kommt dann an und passt aber
+     * nicht zu der ursprünglichen Verordnung (aus Sicht von OPDE). Es ist ja eine andere <b>Darreichung</b>.
+     * </p>
+     * Trotzdem muss dieses neue Präparat ebenfalls mit auf den Vorrat, der für die Verordnung verwendet wird,
+     * draufgebucht werden. Das einzige auf dem OPDE hier besteht ist, dass die beiden Präparate dieselbe bzw.
+     * eine äquivalente Form haben.So können mit der Zeit die Vorräte Bestände mit ganz unterschiedlichen Darreichungen besessen haben.
+     * <p/>
+     * Bei der täglichen Arbeit, besonders bei dem Einbuchen von neuen Medikamenten stellt sich aber immer wieder die
+     * Frage: <i>auf welchen Vorrat muss ich dieses Produkt buchen ? Wozu gehört es ?</i>
+     * <p/>
+     * Natürlich sind alle nachfolgenden Überlegungen <i>bewohnerbezogen</i>. Ein Vorrat gehört immer <b>genau einem</b> Bewohner.
+     * <p/>
+     * Die Antwort kann ganz unterschiedlich ausfallen:
+     * <ol>
+     * <li>Wenn eine Darreichung zu <i>einem früheren Zeitpunkt</i> schonmal zu einem Vorrat zugeordnet war, <i>dann wird diese jetzt wieder</i> zugeordnet. Fall erledigt.</li>
+     * <li>Trifft Punkt 1 nicht zu, dann suchen wir alle Vorräte, die Darreichungen enthalten mit einer passenden Form. Passend heisst hier entweder dieselbe Form oder eine
+     * äquivalente Form (z.B. Tabletten sind zu Dragees gleichwertig wie zu Filmtabletten etc.).</li>
+     * </ol>
      *
      * @param dafid PK der Darreichung
      * @return ResultSet mit der gew¸nschten Liste.
@@ -745,7 +765,7 @@ public class DBHandling {
 //        return vorid;
 //    }
 
-//    /**
+    //    /**
 //     * Bucht eine Menge aus einem Vorrat aus, ggf. zugeh?rig zu einer BHP. ?bersteigt die Entnahme Menge den
 //     * Restbestband, dann wird entweder
 //     * <ul>

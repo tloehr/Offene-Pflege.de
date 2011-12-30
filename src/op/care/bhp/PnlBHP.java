@@ -492,6 +492,7 @@ public class PnlBHP extends CleanablePanel {
                 byte status = bhp.getStatus();
                 Verordnung verordnung = bhp.getVerordnungPlanung().getVerordnung();
                 MedBestand bestandImAnbruch = null;
+                DarreichungTools.getPassendeVorraeteZurDarreichung()
                 if (verordnung.hasMedi()) {
                     bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
                 }

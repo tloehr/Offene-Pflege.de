@@ -34,7 +34,6 @@ import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import sun.security.util.BigInt;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -48,9 +47,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class TMBHP
-        extends AbstractTableModel {
-    //public static final int COL_massid = 0;
+public class TMBHP extends AbstractTableModel {
 
     public static final int COL_BEZEICHNUNG = 0;
     public static final int COL_DOSIS = 1;
@@ -59,20 +56,7 @@ public class TMBHP
     public static final int COL_UKENNUNG = 4;
     public static final int COL_BEMPLAN = 5;
     public static final int COL_BEMBHP = 6;
-    public static final int COL_BHPID = 7;
-    public static final int COL_BHPPID = 8;
-    public static final int COL_MDATE = 9;
-    public static final int COL_VERID = 10;
-    public static final int COL_DAFID = 11;
-    public static final int COL_SITID = 12;
-    public static final int COL_BISPACKENDE = 14;
-    public static final int COL_PACKEINHEIT = 16;
-    public static final int COL_ABDATUM = 17;
-    //    public static final int STATUS_OFFEN = 0;
-//    public static final int STATUS_ERLEDIGT = 1;
-//    public static final int STATUS_VERWEIGERT = 2;
-//    public static final int STATUS_VERWEIGERT_VERWORFEN = 3;
-    boolean withTime;
+
 
     public List<Object[]> getListeBHP() {
         return listeBHP;
@@ -146,8 +130,8 @@ public class TMBHP
         return String.class;
     }
 
-    public BHP getBHP(int row){
-       return (BHP) listeBHP.get(row)[0];
+    public BHP getBHP(int row) {
+        return (BHP) listeBHP.get(row)[0];
     }
 
 
@@ -162,7 +146,7 @@ public class TMBHP
         Object[] objects = (Object[]) listeBHP.get(row);
         BHP bhp = (BHP) objects[0];
         BigInteger bestid = (BigInteger) objects[1];
-        BigInteger nextbest = BigInteger.valueOf((Long) objects[2]);
+        BigInteger nextbest = BigInteger.valueOf((Long) objects[2]); // Komisch einmal ist es Long einmal ist es BigInteger.
 
         switch (col) {
             case COL_BEZEICHNUNG: {
