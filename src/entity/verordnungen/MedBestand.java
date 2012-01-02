@@ -74,6 +74,8 @@ public class MedBestand implements Serializable, Comparable {
         this.aus = SYSConst.DATE_BIS_AUF_WEITERES;
         this.user = OPDE.getLogin().getUser();
         this.buchungen = new ArrayList<MedBuchungen>();
+        this.naechsterBestand = null;
+
     }
 
     public Long getBestID() {
@@ -125,6 +127,13 @@ public class MedBestand implements Serializable, Comparable {
     }
 
     // ==
+    // 1:1 Relationen
+    // ==
+    @JoinColumn(name = "nextbest", referencedColumnName = "BestID")
+    @OneToOne
+    private MedBestand naechsterBestand;
+
+    // ==
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand")
@@ -142,10 +151,6 @@ public class MedBestand implements Serializable, Comparable {
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
     private Darreichung darreichung;
-
-    @JoinColumn(name = "nextbest", referencedColumnName = "BestID")
-    @ManyToOne
-    private MedBestand naechsterBestand;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -240,7 +245,19 @@ public class MedBestand implements Serializable, Comparable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedBestand[bestID=" + bestID + "]";
+        return "MedBestand{" +
+                "bestID=" + bestID +
+                ", ein=" + ein +
+                ", anbruch=" + anbruch +
+                ", aus=" + aus +
+                ", text='" + text + '\'' +
+                ", apv=" + apv +
+                ", buchungen=" + buchungen +
+                ", packung=" + packung +
+                ", vorrat=" + vorrat +
+                ", darreichung=" + darreichung +
+                ", naechsterBestand=" + naechsterBestand +
+                ", user=" + user +
+                '}';
     }
-
 }

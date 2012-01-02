@@ -59,13 +59,6 @@ public class TMVerordnung
     public static final int COL_Hinweis = 2;
     public static final int COL_AN = 3;
     public static final int COL_AB = 4;
-
-    public final String[] debug = {"COL_MSSN", "COL_Dosis", "COL_Hinweis", "COL_AN", "COL_AB", "COL_INFO", "COL_DOK", "COL_VERID", "COL_BESTELLID",
-            "COL_ANARZTID", "COL_VORID", "COL_ABGESETZT", "COL_ABDATUM", "COL_SITID", "COL_ABARZTID", "COL_ANKHID", "COL_ABKHID"
-    };
-    //    ResultSet rs;
-//    PreparedStatement stmt;
-//    String sql;
     protected boolean mitBestand, abgesetzt;
     protected Bewohner bewohner;
 

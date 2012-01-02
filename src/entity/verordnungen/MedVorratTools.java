@@ -1,18 +1,16 @@
 package entity.verordnungen;
 
 import entity.Bewohner;
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSConst;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,40 +37,37 @@ public class MedVorratTools {
      * <li>wenn der nächste Bestand <b>nicht</b> bekannt ist (<code>bestand.hasNextBestand() = <b>false</b></code>) &rarr; der Bestand trotzdem weiter gebucht. Bis ins negative.</li>
      * <li>wenn der nächste Bestand <b>doch schon</b> bekannt ist (<code>bestand.hasNextBestand() = <b>true</b></code>)  &rarr; ein neuer Bestand wird angebrochen.</li>
      * </ul>
-     * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen.
+     * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen. Das kann aber eingentlich nicht passieren. Es sei denn jemand hat von Hand
+     * an den Datenbank rumgespielt.
      *
      * @param em          der EntityManager der verwendet wird
-     * @param darreichung das zu entnehmende Präparat
-     * @param bewohner    der Bewohner, um den es geht
      * @param menge       die gewünschte Entnahmemenge
      * @param anweinheit  true, dann wird in der Anwedungseinheit ausgebucht. false, in der Packungseinheit
      * @param bhp         BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
-    public static void entnahmeVorrat(EntityManager em, Darreichung darreichung, Bewohner bewohner, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
+    public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
 
-        HIER GEHTS WEITER
-        MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
+        OPDE.debug("entnahmeVorrat/6: vorrat: "+vorrat);
 
-        foundExactMatch = vorraete != null;
-        if (vorraete == null) {
-            vorraete = DarreichungTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
+        if (vorrat == null) {
+            throw new Exception("Keine Packung im Anbruch");
         }
-        cmbVorrat.setModel(new DefaultComboBoxModel(vorraete.toArray()));
 
+        if (anweinheit) { // Umrechnung der Anwendungs Menge in die Packungs-Menge.
+            MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
+            BigDecimal apv = bestand.getApv();
 
-        if (vorrat != null) {
-            if (anweinheit) { // Umrechnung der Anwendungs Menge in die PackMenge.
-                MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
-                BigDecimal apv = bestand.getApv();
-
-                if (apv.equals(BigDecimal.ZERO)) {
-                    apv = BigDecimal.ONE;
-                }
-                menge = menge.divide(apv);
+            if (apv.equals(BigDecimal.ZERO)) {
+                apv = BigDecimal.ONE;
             }
-            entnahmeVorrat(em, vorrat, menge, bhp);
+            menge = menge.divide(apv, 4, BigDecimal.ROUND_UP);
         }
+
+        OPDE.debug("entnahmeVorrat/6: menge: "+menge);
+
+        entnahmeVorrat(em, vorrat, menge, bhp);
     }
+
 
     /**
      * Die Rückgabe eines Vorrats bezieht sich auf eine BHP für die die Buchungen zurückgerechnet werden
@@ -83,6 +78,8 @@ public class MedVorratTools {
      * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
      * </ol>
      *
+     * @param em    der EntityManager der verwendet wird
+     * @param bhp   die BHP, die zurück genommen wird.
      * @result true bei Erfolg, false sonst.
      */
     public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
@@ -90,7 +87,8 @@ public class MedVorratTools {
         Query delQuery = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bhp = :bhp");
         delQuery.setParameter("bhp", bhp);
 
-
+        // Das hier passiert, wenn bei der Entnahme mehr als ein Bestand betroffen ist.
+        // Dann kann man das nicht mehr rückgängig machen. Und es wird eine Exception geworfen.
         if (delQuery.executeUpdate() > 1) { // es gibt genau eine Buchung.
             throw new Exception("Rueckgabe Vorrat");
         }
@@ -101,10 +99,9 @@ public class MedVorratTools {
     protected static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
 
-        if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-            // ist schon eine Packung festgelegt, die angebrochen werden soll, sobald diese leer ist ?
-            //MedBestand nextBestand = bestand.getNaechsterBestand();
+        OPDE.debug("entnahmeVorrat/4: bestand: "+ bestand);
 
+        if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
 
             BigDecimal restsumme = MedBestandTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
 
@@ -121,6 +118,7 @@ public class MedVorratTools {
 
             MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
             em.persist(buchung);
+            OPDE.debug("entnahmeVorrat/4: buchung1: "+ buchung);
 
             if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
                 if (restsumme.compareTo(wunschmenge) <= 0) {
@@ -202,30 +200,21 @@ public class MedVorratTools {
     }
 
 
+    /**
+     * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
+     *
+     * @param vorrat
+     * @return der angebrochene Bestand. null, wenn es keinen gab.
+     */
     public static MedBestand getImAnbruch(MedVorrat vorrat) {
         MedBestand bestand = null;
         Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
         while (itBestand.hasNext()) {
             bestand = itBestand.next();
-            if (bestand.isAngebrochen()) {
+            if (bestand.isAngebrochen() && !bestand.isAbgeschlossen()) {
                 break;
             }
         }
-//
-//        MedBestand bestand = null;
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            Query query = em.createNamedQuery("MedBestand.findByVorratImAnbruch");
-//            query.setParameter("vorrat", vorrat);
-//            bestand = (MedBestand) query.getSingleResult();
-//        } catch (NoResultException nre) {
-//            OPDE.debug(nre);
-//            // durchaus gewünschtes Ergebnis
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
         return bestand;
     }
 

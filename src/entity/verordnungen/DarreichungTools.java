@@ -90,10 +90,9 @@ public class DarreichungTools {
         MedVorrat result = null;
         EntityManager em = OPDE.createEM();
         try {
-            Query query = em.createNamedQuery("MedVorrat.findByBewohnerAndDarreichung");
+            Query query = em.createNamedQuery("MedVorrat.findActiveByBewohnerAndDarreichung");
             query.setParameter("bewohner", bewohner);
             query.setParameter("darreichung", darreichung);
-
             result = (MedVorrat) query.getSingleResult();
         } catch (NoResultException nre) {
             result = null;

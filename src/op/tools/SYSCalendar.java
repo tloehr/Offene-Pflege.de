@@ -66,7 +66,11 @@ public class SYSCalendar {
     }
 
     public static boolean isInFuture(long time) {
-        return time > new Date().getTime();
+        return isInFuture(new Date(time));
+    }
+
+    public static boolean isInFuture(Date date) {
+        return date.after(new Date());
     }
 
 
@@ -924,7 +928,7 @@ public class SYSCalendar {
      * Bereinigt ein Datum um die Uhrzeitanteile, damit die Vergleichsoperatoren richtig funktionieren, wenn man sich nur auf das
      * Datum beschränken will.
      *
-     * @param Das zu bereinigende Datum
+     * @param date das zu bereinigende Datum
      * @return das bereinigte Datum
      */
     public static Date trimTime(Date date) {

@@ -146,7 +146,7 @@ public class TMBHP extends AbstractTableModel {
         Object[] objects = (Object[]) listeBHP.get(row);
         BHP bhp = (BHP) objects[0];
         BigInteger bestid = (BigInteger) objects[1];
-        BigInteger nextbest = BigInteger.valueOf((Long) objects[2]); // Komisch einmal ist es Long einmal ist es BigInteger.
+        BigInteger nextbest = objects[2] == null ? null : BigInteger.valueOf((Long) objects[2]); // Komisch einmal ist es Long einmal ist es BigInteger.
 
         switch (col) {
             case COL_BEZEICHNUNG: {

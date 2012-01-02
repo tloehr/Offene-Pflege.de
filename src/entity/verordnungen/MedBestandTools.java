@@ -42,27 +42,27 @@ public class MedBestandTools {
         };
     }
 
-    public static MedBestand findByVerordnungImAnbruch(Verordnung verordnung) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
-        query.setParameter("bewohner", verordnung.getBewohner());
-        query.setParameter("darreichung", verordnung.getDarreichung());
-
-        MedBestand result = null;
-
-        try {
-            result = (MedBestand) query.getSingleResult();
-        } catch (NoResultException nre) {
-            result = null;
-        } catch (Exception e) {
-            OPDE.fatal(e);
-            System.exit(1);
-        } finally {
-            em.close();
-        }
-
-        return result;
-    }
+//    public static MedBestand findByVerordnungImAnbruch(Verordnung verordnung) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
+//        query.setParameter("bewohner", verordnung.getBewohner());
+//        query.setParameter("darreichung", verordnung.getDarreichung());
+//
+//        MedBestand result = null;
+//
+//        try {
+//            result = (MedBestand) query.getSingleResult();
+//        } catch (NoResultException nre) {
+//            result = null;
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//            System.exit(1);
+//        } finally {
+//            em.close();
+//        }
+//
+//        return result;
+//    }
 
     /**
      * Bricht einen Bestand an. Berechnet das neue APV selbstständig.
@@ -225,7 +225,7 @@ public class MedBestandTools {
                         OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
                     } else {
                         // der DafID APV wird durch den arithmetischen Mittelwert aus altem und neuem APV ersetzt.
-                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2)));
+                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2),4,BigDecimal.ROUND_UP));
                         OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt.toPlainString() + "  APVneu: " + apv.getApv().toPlainString());
                     }
                     apv = em.merge(apv);
@@ -297,12 +297,12 @@ public class MedBestandTools {
                 querySummeBHPDosis.setParameter("bestand", bestand);
                 BigDecimal summeBHPDosis = (BigDecimal) querySummeBHPDosis.getSingleResult();
 
-                BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt);
+                BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt,4,BigDecimal.ROUND_UP);
 
-                apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch).multiply(apvAlt);
+                apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch,4,BigDecimal.ROUND_UP).multiply(apvAlt);
 
                 // Zu große APV Abweichungen verhindern.
-                BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100));
+                BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100),4,BigDecimal.ROUND_UP);
                 BigDecimal halbeBreite = apvAlt.multiply(apvkorridor);
                 BigDecimal korridorUnten = apvAlt.subtract(halbeBreite);
                 BigDecimal korridorOben = apvAlt.add(halbeBreite);

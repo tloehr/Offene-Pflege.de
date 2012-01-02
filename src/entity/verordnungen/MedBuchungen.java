@@ -6,7 +6,6 @@ import op.OPDE;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
@@ -126,7 +125,7 @@ public class MedBuchungen implements Serializable {
 
     // N:1 Relationen
     @JoinColumn(name = "BestID", referencedColumnName = "BestID")
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private MedBestand bestand;
 
     @JoinColumn(name = "BHPID", referencedColumnName = "BHPID")
@@ -159,7 +158,15 @@ public class MedBuchungen implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedBuchungen[buchID=" + buchID + "]";
+        return "MedBuchungen{" +
+                "buchID=" + buchID +
+                ", menge=" + menge +
+                ", text='" + text + '\'' +
+                ", status=" + status +
+                ", pit=" + pit +
+                ", bestand=" + bestand +
+                ", bhp=" + bhp +
+                ", user=" + user +
+                '}';
     }
-
 }

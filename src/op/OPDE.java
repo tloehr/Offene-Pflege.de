@@ -53,23 +53,15 @@ import java.util.Properties;
 
 public class OPDE {
 
-    //public static final String OCDEBUG = "true";
     public static long uptime;
     protected static Database db;
-    //OPDE.getLogin().getUser().getUKennung()
-    //public static String UKennung; // Zuer Zeit angemeldeter Benutzer.
-    //public static char[] UPW;
     public static OPMain ocmain;
     protected static String url;
-    //public static long ocloginid;
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
-    //private static boolean admin;
-    //public static Properties ocgroups;
     protected static Logger logger;
     private static OCSec ocsec;
-    //private static ArrayList groups;
     public static HashMap[] anonymize = null;
     // Diese listener List ist dazu da, dass wir immer
     // wissen, welchen Fenstern wir bescheid sagen müssen, wenn
@@ -138,7 +130,6 @@ public class OPDE {
         OPDE.getProps().putAll(SYSPropsTools.loadProps(null));
         OPDE.getProps().putAll(SYSPropsTools.loadProps(login.getUser()));
         OPDE.getProps().putAll(OPDE.getLocalProps());
-
     }
 
     public static boolean addNewModule(String internalClassID, ActionListener listener) {
@@ -267,8 +258,6 @@ public class OPDE {
 
     public static void setLogin(SYSLogin login) {
         OPDE.login = login;
-        //ocloginid = (login == null) ? -1 : login.getLoginID();
-        //UKennung = (login == null) ? "" : login.getUser().getUKennung();
     }
 
     /**
@@ -429,7 +418,7 @@ public class OPDE {
 
 
 //            if (isDebug()) {
-//                jpaProps.put("eclipselink.logging.level", "FINER");
+                jpaProps.put("eclipselink.logging.level", "FINER");
 //            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);

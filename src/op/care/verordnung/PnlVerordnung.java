@@ -586,7 +586,7 @@ public class PnlVerordnung extends CleanablePanel {
             if (verordnung.hasMedi()) {
                 menu.add(new JSeparator());
 
-                final MedBestand bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
+                final MedBestand bestandImAnbruch = MedVorratTools.getImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
                 boolean bestandAbschliessenAllowed = !readOnly && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
                 boolean bestandAnbrechenAllowed = !readOnly && bestandImAnbruch == null;
 
@@ -639,7 +639,7 @@ public class PnlVerordnung extends CleanablePanel {
             itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    final MedBestand bestandImAnbruch = MedBestandTools.findByVerordnungImAnbruch(verordnung);
+                    final MedBestand bestandImAnbruch = MedVorratTools.getImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
 
                     long dafid = 0;
                     BigDecimal apv = BigDecimal.ZERO;

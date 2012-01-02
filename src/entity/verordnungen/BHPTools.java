@@ -1,5 +1,6 @@
 package entity.verordnungen;
 
+import entity.EntityTools;
 import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
 import op.OPDE;
@@ -49,10 +50,11 @@ public class BHPTools {
 
     /**
      * verordnung Die Verordnung, auf den sich der Import Vorgang beschränken soll. Steht hier null, dann wird die BHP für alle erstellt.
-     *                   Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
-     *                   Es wird noch geprüft, ob es abgehakte BHPs in dieser Schicht gibt. Wenn ja, wird alles erst ab der nächsten
-     *                   Schicht eingetragen.
+     * Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
+     * Es wird noch geprüft, ob es abgehakte BHPs in dieser Schicht gibt. Wenn ja, wird alles erst ab der nächsten
+     * Schicht eingetragen.
      * zeit       ist ein Date, dessen Uhrzeit-Anteil benutzt wird, um nur die BHPs für diesen Tag <b>ab</b> dieser Uhrzeit zu importieren. <code>null</code>, wenn alle importiert werden sollen.
+     *
      * @return Anzahl der erzeugten BHPs
      */
     public static int erzeugen(EntityManager em) throws Exception {
@@ -306,6 +308,30 @@ public class BHPTools {
         }
         OPDE.debug("Erzeugte BHPs: " + numbhp);
         return numbhp;
+    }
+
+    public static void verweigertUndVerworfen(BHP bhp) {
+
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            bhp.setStatus(BHPTools.STATUS_VERWEIGERT_VERWORFEN);
+            bhp.setUser(OPDE.getLogin().getUser());
+            bhp.setIst(new Date());
+            bhp.setiZeit(SYSCalendar.ermittleZeit());
+            bhp.setMDate(new Date());
+            bhp = EntityTools.merge(bhp);
+
+            MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bhp.getVerordnungPlanung().getVerordnung().getBewohner(), bhp.getVerordnungPlanung().getVerordnung().getDarreichung());
+            MedVorratTools.entnahmeVorrat(em, vorrat, bhp.getDosis(), bhp);
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
     }
 
 }

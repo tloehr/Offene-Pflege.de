@@ -107,7 +107,7 @@ public class BHP implements Serializable {
     @Column(name = "Bemerkung")
     private String bemerkung;
     @Basic(optional = false)
-    @Column(name = "_mdate")
+    @Column(name = "MDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
     @Column(name = "Dauer")
@@ -218,11 +218,11 @@ public class BHP implements Serializable {
         this.bemerkung = bemerkung;
     }
 
-    public Date getMdate() {
+    public Date getMDate() {
         return mdate;
     }
 
-    public void setMdate(Date mdate) {
+    public void setMDate(Date mdate) {
         this.mdate = mdate;
     }
 

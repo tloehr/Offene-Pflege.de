@@ -20,8 +20,8 @@ import java.util.Date;
         @NamedQuery(name = "MedVorrat.findByBis", query = "SELECT m FROM MedVorrat m WHERE m.bis = :bis"),
         @NamedQuery(name = "MedVorrat.getSumme", query = " " +
                 " SELECT SUM(buch.menge) FROM MedVorrat vor JOIN vor.bestaende best JOIN best.buchungen buch WHERE vor = :vorrat "),
-        @NamedQuery(name = "MedVorrat.findByBewohnerAndDarreichung", query = " " +
-                " SELECT vor FROM MedVorrat vor " +
+        @NamedQuery(name = "MedVorrat.findActiveByBewohnerAndDarreichung", query = " " +
+                " SELECT DISTINCT vor FROM MedVorrat vor " +
                 " JOIN vor.bestaende best " +
                 " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
                 " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
@@ -117,7 +117,7 @@ public class MedVorrat implements Serializable {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorrat")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "vorrat")
     private Collection<MedBestand> bestaende;
 
     // ==
