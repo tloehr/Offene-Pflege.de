@@ -38,6 +38,8 @@ import op.tools.SYSTools;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -47,7 +49,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class TMBHP extends AbstractTableModel {
+public class TMBHP extends AbstractTableModel{
 
     public static final int COL_BEZEICHNUNG = 0;
     public static final int COL_DOSIS = 1;
@@ -133,12 +135,6 @@ public class TMBHP extends AbstractTableModel {
     public BHP getBHP(int row) {
         return (BHP) listeBHP.get(row)[0];
     }
-
-
-    // Abgesetzt nur dann ausstreichen, wenn HEUTE abgesetzt wurde, aber nicht erst zum Ende des Tages.
-//sdfsdfsdfsdfsdfgesetzt() throws SQLException {
-//        return rs.getDate("AbDatum") != null && SYSCalendar.sameDay(rs.getDate("AbDatum"), SYSCalendar.today_date()) == 0 && rs.getTimestamp("AbDatum").before(SYSCalendar.nowDBDate());
-//    }
 
     @Override
     public Object getValueAt(int row, int col) {

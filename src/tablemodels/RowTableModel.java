@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package op.tools;
+package tablemodels;
 
 /*
  * http://tips4java.wordpress.com/2008/11/27/bean-table-model/

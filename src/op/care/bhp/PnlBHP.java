@@ -31,10 +31,10 @@ import entity.*;
 import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
 import entity.verordnungen.*;
-import op.OCSec;
 import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
+import op.tools.InternalClassACL;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -62,7 +62,6 @@ public class PnlBHP extends CleanablePanel {
     JPopupMenu menu;
     private FrmPflege parent;
     //private String classname;
-    private OCSec ocs;
     private boolean ignoreJDCEvent;
     //private boolean ignoreSchichtEvent;
     //private long[] ocwo;
@@ -76,7 +75,6 @@ public class PnlBHP extends CleanablePanel {
     public PnlBHP(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
 
-        ocs = OPDE.getOCSec();
         initComponents();
         change2Bewohner(bewohner);
 
@@ -103,13 +101,13 @@ public class PnlBHP extends CleanablePanel {
         } else {
             btnLock.setToolTipText(null);
         }
-
+        btnLock.setEnabled(readOnly);
 
         cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
 
         abwesend = BWInfoTools.getAbwesendSeit(bewohner) != null;
 
-        ocs.setEnabled(this, "btnBedarf", btnBedarf, !readOnly);
+        btnBedarf.setEnabled(!readOnly && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
         ignoreJDCEvent = true;
         jdcDatum.setDate(SYSCalendar.today_date());
@@ -153,8 +151,6 @@ public class PnlBHP extends CleanablePanel {
         btnBedarf = new JButton();
         lblBW = new JLabel();
         btnLock = new JButton();
-        jToolBar1 = new JToolBar();
-        btnLogout = new JButton();
         jLabel12 = new JLabel();
 
         //======== this ========
@@ -271,7 +267,7 @@ public class PnlBHP extends CleanablePanel {
                                     .addComponent(btnForward)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 407, Short.MAX_VALUE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
                                     .addComponent(btnBedarf)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -291,7 +287,7 @@ public class PnlBHP extends CleanablePanel {
                                                     .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                     .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                     .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addContainerGap(10, Short.MAX_VALUE))
             );
         }
 
@@ -312,22 +308,6 @@ public class PnlBHP extends CleanablePanel {
             }
         });
 
-        //======== jToolBar1 ========
-        {
-            jToolBar1.setFloatable(false);
-
-            //---- btnLogout ----
-            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
-            btnLogout.setText("Abmelden");
-            btnLogout.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnLogoutbtnLogoutHandler(e);
-                }
-            });
-            jToolBar1.add(btnLogout);
-        }
-
         //---- jLabel12 ----
         jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
 
@@ -335,38 +315,36 @@ public class PnlBHP extends CleanablePanel {
         setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup()
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 803, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-                                .addContainerGap())
+                                .addGroup(layout.createParallelGroup()
+                                        .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup()
+                                                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(btnLock))
+                                                        .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE))
+                                                .addContainerGap())
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(27, 27, 27))))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup()
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()
+                                .addComponent(lblBW)
+                                .addGroup(layout.createParallelGroup()
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(14, 14, 14)
+                                                .addComponent(btnLock))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                                .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())
@@ -408,7 +386,7 @@ public class PnlBHP extends CleanablePanel {
     }//GEN-LAST:event_jdcDatumPropertyChange
 
     private void btnBedarfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBedarfActionPerformed
-        new DlgBedarf(parent, bwkennung);
+        new DlgBedarf(parent, bewohner);
         reloadTable();
     }//GEN-LAST:event_btnBedarfActionPerformed
 
@@ -420,7 +398,7 @@ public class PnlBHP extends CleanablePanel {
     }//GEN-LAST:event_cmbSchichtItemStateChanged
 
     private void tblBHPMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBHPMousePressed
-        if (readOnly || !ocs.isAccessible(this, "tblBHP")) {
+        if (readOnly || !OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             return;
         } // Hier dürfen nur Examen dran.
         final TMBHP tm = (TMBHP) tblBHP.getModel();
@@ -497,6 +475,7 @@ public class PnlBHP extends CleanablePanel {
                         bhp.setiZeit(SYSCalendar.ermittleZeit());
                     }
 
+                    boolean deleted = false; // für das richtige fireTableRows....
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
@@ -513,7 +492,7 @@ public class PnlBHP extends CleanablePanel {
                         // rückgängig macht, wird sie gelöscht.
                         if (verordnung.isBedarf() && status == BHPTools.STATUS_OFFEN) {
                             em.remove(bhp);
-
+                            deleted = true;
                         }
                         em.getTransaction().commit();
                     } catch (Exception ex) {
@@ -522,10 +501,11 @@ public class PnlBHP extends CleanablePanel {
                     } finally {
                         em.close();
                     }
-                    tm.fireTableRowsUpdated(row, row);
-//                    if (fullReloadNecessary) {
-//                        reloadTable();
-//                    }
+                    if (deleted) {
+                        reloadTable();
+                    } else {
+                        tm.fireTableRowsUpdated(row, row);
+                    }
                 }
             }
         }
@@ -546,7 +526,7 @@ public class PnlBHP extends CleanablePanel {
                     }
                 });
                 menu.add(itemPopupXDiscard);
-                ocs.setEnabled(this, "itemPopupXDiscard", itemPopupXDiscard, changeable && myBHP.getStatus() == BHPTools.STATUS_OFFEN);
+                itemPopupXDiscard.setEnabled(myBHP.getStatus() == BHPTools.STATUS_OFFEN);
 
                 menu.add(new JSeparator());
             }
@@ -560,16 +540,17 @@ public class PnlBHP extends CleanablePanel {
             itemPopupXPreserve.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    myBHP.setStatus(BHPTools.STATUS_VERWEIGERT_VERWORFEN);
+                    myBHP.setStatus(BHPTools.STATUS_VERWEIGERT);
                     myBHP.setUser(OPDE.getLogin().getUser());
                     myBHP.setIst(new Date());
                     myBHP.setiZeit(SYSCalendar.ermittleZeit());
                     myBHP.setMDate(new Date());
                     EntityTools.merge(myBHP);
+                    tm.fireTableRowsUpdated(row, row);
                 }
             });
             menu.add(itemPopupXPreserve);
-            ocs.setEnabled(this, "itemPopupXPreserve", itemPopupXPreserve, changeable && myBHP.getStatus() == BHPTools.STATUS_OFFEN);
+            itemPopupXPreserve.setEnabled(changeable && myBHP.getStatus() == BHPTools.STATUS_OFFEN);
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
 
@@ -636,8 +617,6 @@ public class PnlBHP extends CleanablePanel {
     private JButton btnBedarf;
     private JLabel lblBW;
     private JButton btnLock;
-    private JToolBar jToolBar1;
-    private JButton btnLogout;
     private JLabel jLabel12;
     // End of variables declaration//GEN-END:variables
 }

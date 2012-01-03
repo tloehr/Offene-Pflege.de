@@ -26,27 +26,23 @@
  */
 package op.care.bhp;
 
-import java.awt.event.*;
-import javax.swing.table.*;
-
-import entity.verordnungen.BHPTools;
+import entity.Bewohner;
+import entity.BewohnerTools;
+import entity.verordnungen.*;
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import tablemodels.TMBedarf;
 import tablerenderer.RNDHTML;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.awt.event.*;
+import java.util.Date;
 
 /**
  * @author root
@@ -54,16 +50,28 @@ import java.util.HashMap;
 public class DlgBedarf extends javax.swing.JDialog {
 
     private ListSelectionListener lsl;
-    private String bwkennung;
+    private Bewohner bewohner;
 
     /**
      * Creates new form DlgBedarf
      */
-    public DlgBedarf(java.awt.Frame parent, String bwkennung) {
+    private void tblBedarfMousePressed(MouseEvent e) {
+        Point p = e.getPoint();
+        int row = tblBedarf.rowAtPoint(p);
+        final ListSelectionModel lsm = tblBedarf.getSelectionModel();
+        if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
+            lsm.setSelectionInterval(row, row);
+        }
+        TMBedarf tm = (TMBedarf) tblBedarf.getModel();
+
+        btnOK.setEnabled(!tm.isMaximaleTagesdosisErreicht(row));
+    }
+
+    public DlgBedarf(java.awt.Frame parent, Bewohner bewohner) {
         super(parent, true);
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
         initComponents();
-        SYSTools.setBWLabel(lblBW, bwkennung);
+        BewohnerTools.setBWLabel(lblBW, bewohner);
         loadTable();
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
@@ -109,16 +117,22 @@ public class DlgBedarf extends javax.swing.JDialog {
 
             //---- tblBedarf ----
             tblBedarf.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ));
+            tblBedarf.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblBedarfMousePressed(e);
+                }
+            });
             jspBedarf.setViewportView(tblBedarf);
         }
 
@@ -146,36 +160,36 @@ public class DlgBedarf extends javax.swing.JDialog {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addComponent(btnOK)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnCancel)))
-                    .addContainerGap())
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                                        .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                                        .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                                .addComponent(btnOK)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnCancel)))
+                                .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblTitle)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnCancel)
-                        .addComponent(btnOK))
-                    .addContainerGap())
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblTitle)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblBW)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnCancel)
+                                        .addComponent(btnOK))
+                                .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -186,18 +200,18 @@ public class DlgBedarf extends javax.swing.JDialog {
         Dimension dim = jsp.getSize();
         int textWidth = dim.width - (100);
         TableColumnModel tcm1 = tblBedarf.getColumnModel();
-        if (tcm1.getColumnCount() < 4) {
-            return;
-        }
-        tcm1.getColumn(TMBedarf.COL_SIT).setPreferredWidth(textWidth / 4);
-        tcm1.getColumn(TMBedarf.COL_MSSN).setPreferredWidth(textWidth / 4);
-        tcm1.getColumn(TMBedarf.COL_Dosis).setPreferredWidth(textWidth / 4);
-        tcm1.getColumn(TMBedarf.COL_Hinweis).setPreferredWidth(textWidth / 4);
+//        if (tcm1.getColumnCount() < 4) {
+//            return;
+//        }
+        tcm1.getColumn(TMBedarf.COL_SIT).setPreferredWidth(textWidth / 3);
+        tcm1.getColumn(TMBedarf.COL_MSSN).setPreferredWidth(textWidth / 3);
+        tcm1.getColumn(TMBedarf.COL_Dosis).setPreferredWidth(textWidth / 3);
+//        tcm1.getColumn(TMBedarf.COL_Hinweis).setPreferredWidth(textWidth / 4);
 
         tcm1.getColumn(0).setHeaderValue("Situation");
         tcm1.getColumn(1).setHeaderValue("Massnahme");
         tcm1.getColumn(2).setHeaderValue("Dosis / Häufig.");
-        tcm1.getColumn(3).setHeaderValue("Hinweis");
+//        tcm1.getColumn(3).setHeaderValue("Hinweis");
 
     }//GEN-LAST:event_jspBedarfComponentResized
 
@@ -216,45 +230,33 @@ public class DlgBedarf extends javax.swing.JDialog {
      * ausgebucht.
      */
     private void save() {
-        HashMap hm = new HashMap();
         int row = tblBedarf.getSelectedRow();
         TMBedarf tm = (TMBedarf) tblBedarf.getModel();
-        double dosis = ((Double) tm.getValueAt(row, TMBedarf.COL_MaxEDosis)).doubleValue();
-        //boolean kalkulieren = ((Boolean) tm.getValueAt(row, TMBedarf.COL_KALKULIEREN)).booleanValue();
-        hm.put("BHPPID", tm.getValueAt(row, TMBedarf.COL_BHPPID));
-        hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-        hm.put("Soll", "!NOW!");
-        hm.put("Ist", "!NOW!");
-        hm.put("SZeit", SYSConst.UZ);
-        hm.put("Dosis", dosis);
-        hm.put("Status", BHPTools.STATUS_ERLEDIGT);
-        hm.put("_mdate", "!NOW!");
-        hm.put("Dauer", 0);
+        VerordnungPlanung vp = tm.getVerordnungPlanung(row);
+        MedBestand bestand = tm.getBestand(row);
+        Date now = new Date();
 
-        Connection db = OPDE.getDb().db;
+        BHP bhp = new BHP(vp);
+        bhp.setUser(OPDE.getLogin().getUser());
+        bhp.setIst(now);
+        bhp.setSoll(now);
+        bhp.setSollZeit(SYSConst.UZ);
+        bhp.setDosis(vp.getMaxEDosis());
+        bhp.setStatus(BHPTools.STATUS_ERLEDIGT);
+        bhp.setMDate(now);
+        bhp.setDauer((short) 0);
+
+        EntityManager em = OPDE.createEM();
         try {
-            // Hier beginnt eine Transaktion
-            db.setAutoCommit(false);
-            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-            db.commit();
-
-            long bhpid = op.tools.DBHandling.insertRecord("BHP", hm);
-            long dafid = ((Long) tm.getValueAt(row, TMBedarf.COL_DAFID)).longValue();
-            hm.clear();
-
-//            op.care.med.DBHandling.entnahmeVorrat(dafid, bwkennung, dosis, true, bhpid);
-
-            db.commit();
-            db.setAutoCommit(true);
-        } catch (SQLException ex) {
-            try {
-                db.rollback();
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
+            em.getTransaction().begin();
+            em.persist(bhp);
+            MedVorratTools.entnahmeVorrat(em, bestand.getVorrat(), vp.getMaxEDosis(), true, bhp);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
         }
     }
 
@@ -265,20 +267,14 @@ public class DlgBedarf extends javax.swing.JDialog {
 
 
     private void loadTable() {
-        ListSelectionModel lsm = tblBedarf.getSelectionModel();
-        if (lsl != null) lsm.removeListSelectionListener(lsl);
-        lsl = new HandleSelections();
-
-        tblBedarf.setModel(new TMBedarf(bwkennung));
+        tblBedarf.setModel(new TMBedarf(bewohner));
         tblBedarf.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        lsm.addListSelectionListener(lsl);
 
         jspBedarf.dispatchEvent(new ComponentEvent(jspBedarf, ComponentEvent.COMPONENT_RESIZED));
         tblBedarf.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
         tblBedarf.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
         tblBedarf.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
-        tblBedarf.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
-//        tblBedarf.getColumnModel().getColumn(4).setCellRenderer(new RNDHTML());
+//        tblBedarf.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
     }
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
@@ -291,24 +287,4 @@ public class DlgBedarf extends javax.swing.JDialog {
     private JButton btnCancel;
     // Ende der Variablendeklaration//GEN-END:variables
 
-    class HandleSelections implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent lse) {
-            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-            TableModel tm = tblBedarf.getModel();
-            if (tm.getRowCount() <= 0) {
-                return;
-            }
-            if (!lse.getValueIsAdjusting()) {
-                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-                if (lsm.isSelectionEmpty()) {
-                    btnOK.setEnabled(false);
-                } else {
-                    boolean maxErreicht = ((Boolean) tm.getValueAt(lsm.getLeadSelectionIndex(), TMBedarf.COL_MAXERREICHT)).booleanValue();
-//                    boolean reichtVorrat = ((Boolean) tm.getValueAt(lsm.getLeadSelectionIndex(), TMBedarf.COL_REICHTVORRAT)).booleanValue();
-//                    boolean kalkulieren = ((Boolean) tm.getValueAt(lsm.getLeadSelectionIndex(), TMBedarf.COL_KALKULIEREN)).booleanValue();
-                    btnOK.setEnabled(!maxErreicht);
-                }
-            }
-        }
-    }
 }

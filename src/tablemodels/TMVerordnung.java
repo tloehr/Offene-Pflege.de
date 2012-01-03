@@ -57,8 +57,6 @@ public class TMVerordnung
     public static final int COL_MSSN = 0;
     public static final int COL_Dosis = 1;
     public static final int COL_Hinweis = 2;
-    public static final int COL_AN = 3;
-    public static final int COL_AB = 4;
     protected boolean mitBestand, abgesetzt;
     protected Bewohner bewohner;
 
@@ -118,7 +116,7 @@ public class TMVerordnung
 
     @Override
     public int getColumnCount() {
-        int result = 5;
+        int result = 3;
         return result;
     }
 
@@ -131,7 +129,7 @@ public class TMVerordnung
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
      */
-    protected String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, MedVorrat vorrat, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
+    protected String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
         String result = "";
         if (cache.containsKey(verordnung)) {
             result = cache.get(verordnung).toString();
@@ -161,21 +159,28 @@ public class TMVerordnung
                 break;
             }
             case COL_Dosis: {
-                result = getDosis(verordnung, getBestand(row), getVorrat(row), getBestandSaldo(row), getVorratSaldo(row), mitBestand);
+                result = getDosis(verordnung, getBestand(row),  getBestandSaldo(row), getVorratSaldo(row), mitBestand);
                 break;
             }
             case COL_Hinweis: {
-                result = VerordnungTools.getHinweis(verordnung);
+                String hinweis =  VerordnungTools.getHinweis(verordnung);
+                String an =  VerordnungTools.getAN(verordnung);
+                String ab =  VerordnungTools.getAB(verordnung);
+
+                ab = ab.isEmpty() ? "" : "<br/>"+ab;
+                hinweis = hinweis.isEmpty() ? "" : hinweis + "<br/>";
+
+                result = hinweis + an + ab;
                 break;
             }
-            case COL_AN: {
-                result = VerordnungTools.getAN(verordnung);
-                break;
-            }
-            case COL_AB: {
-                result = VerordnungTools.getAB(verordnung);
-                break;
-            }
+//            case COL_AN: {
+//                result = VerordnungTools.getAN(verordnung);
+//                break;
+//            }
+//            case COL_AB: {
+//                result = VerordnungTools.getAB(verordnung);
+//                break;
+//            }
 
             default: {
                 result = "!!FEHLER!!";

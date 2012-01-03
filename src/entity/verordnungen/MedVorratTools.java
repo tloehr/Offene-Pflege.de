@@ -1,7 +1,5 @@
 package entity.verordnungen;
 
-import entity.Bewohner;
-import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSConst;
 
@@ -40,14 +38,14 @@ public class MedVorratTools {
      * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen. Das kann aber eingentlich nicht passieren. Es sei denn jemand hat von Hand
      * an den Datenbank rumgespielt.
      *
-     * @param em          der EntityManager der verwendet wird
-     * @param menge       die gewünschte Entnahmemenge
-     * @param anweinheit  true, dann wird in der Anwedungseinheit ausgebucht. false, in der Packungseinheit
-     * @param bhp         BHP aufgrund dere dieser Buchungsvorgang erfolgt.
+     * @param em         der EntityManager der verwendet wird
+     * @param menge      die gewünschte Entnahmemenge
+     * @param anweinheit true, dann wird in der Anwedungseinheit ausgebucht. false, in der Packungseinheit
+     * @param bhp        BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
 
-        OPDE.debug("entnahmeVorrat/6: vorrat: "+vorrat);
+        OPDE.debug("entnahmeVorrat/6: vorrat: " + vorrat);
 
         if (vorrat == null) {
             throw new Exception("Keine Packung im Anbruch");
@@ -63,7 +61,7 @@ public class MedVorratTools {
             menge = menge.divide(apv, 4, BigDecimal.ROUND_UP);
         }
 
-        OPDE.debug("entnahmeVorrat/6: menge: "+menge);
+        OPDE.debug("entnahmeVorrat/6: menge: " + menge);
 
         entnahmeVorrat(em, vorrat, menge, bhp);
     }
@@ -78,8 +76,8 @@ public class MedVorratTools {
      * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
      * </ol>
      *
-     * @param em    der EntityManager der verwendet wird
-     * @param bhp   die BHP, die zurück genommen wird.
+     * @param em  der EntityManager der verwendet wird
+     * @param bhp die BHP, die zurück genommen wird.
      * @result true bei Erfolg, false sonst.
      */
     public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
@@ -99,7 +97,7 @@ public class MedVorratTools {
     protected static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
 
-        OPDE.debug("entnahmeVorrat/4: bestand: "+ bestand);
+        OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
 
@@ -118,7 +116,7 @@ public class MedVorratTools {
 
             MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
             em.persist(buchung);
-            OPDE.debug("entnahmeVorrat/4: buchung1: "+ buchung);
+            OPDE.debug("entnahmeVorrat/4: buchung1: " + buchung);
 
             if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
                 if (restsumme.compareTo(wunschmenge) <= 0) {
@@ -208,11 +206,13 @@ public class MedVorratTools {
      */
     public static MedBestand getImAnbruch(MedVorrat vorrat) {
         MedBestand bestand = null;
-        Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
-        while (itBestand.hasNext()) {
-            bestand = itBestand.next();
-            if (bestand.isAngebrochen() && !bestand.isAbgeschlossen()) {
-                break;
+        if (vorrat.getBestaende() != null) {
+            Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
+            while (itBestand.hasNext()) {
+                bestand = itBestand.next();
+                if (bestand.isAngebrochen() && !bestand.isAbgeschlossen()) {
+                    break;
+                }
             }
         }
         return bestand;

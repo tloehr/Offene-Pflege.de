@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2006-2012 Torsten Löhr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -65,7 +65,6 @@ public class PnlVerordnung extends CleanablePanel {
     private Bewohner bewohner;
     private FrmPflege parent;
     private boolean readOnly = false;
-    private OCSec ocs;
     private JPopupMenu menu;
 
     /**
@@ -80,7 +79,7 @@ public class PnlVerordnung extends CleanablePanel {
      */
     public PnlVerordnung(FrmPflege parent, Bewohner bewohner) {
         this.parent = parent;
-        ocs = OPDE.getOCSec();
+
 
         initComponents();
         change2Bewohner(bewohner);
@@ -111,13 +110,11 @@ public class PnlVerordnung extends CleanablePanel {
 
         BewohnerTools.setBWLabel(lblBW, bewohner);
 
-        // SYSTools.setBWLabel(lblBW, bwkennung);
-
-        ocs.setEnabled(this, "btnNew", btnNew, !readOnly);
-        ocs.setEnabled(this, "btnBuchen", btnBuchen, false);
-        ocs.setEnabled(this, "btnVorrat", btnVorrat, false);
-        ocs.setEnabled(this, "btnPrint", btnPrint, false);
-        ocs.setEnabled(this, "btnBestellungen", btnBestellungen, false);
+        btnNew.setEnabled(!readOnly && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+        btnBuchen.setEnabled(false);
+        btnVorrat.setEnabled(false);
+        btnPrint.setEnabled(false);
+        btnBestellungen.setEnabled(false);
 
         standardActionListener = new ActionListener() {
 
@@ -521,16 +518,6 @@ public class PnlVerordnung extends CleanablePanel {
             boolean absetzenAllowed = !readOnly && !verordnung.isAbgesetzt();
             boolean deleteAllowed = !readOnly && num == 0;
 
-
-            //                    editAllowed = ;
-//                    changeAllowed = !readOnly && sitid == 0 && abdatum.equals(SYSConst.TS_BIS_AUF_WEITERES) && num > 0;
-//                    deleteAllowed = !readOnly && num == 0;
-//                    absetzenAllowed = !readOnly && !abgesetzt;
-//                    attachAllowed = !readOnly;
-//                    //orderAllowed = !readOnly && !abgesetzt && vorid > 0 && anarztid > 0 && bestellid == 0;
-//                    //delOrderAllowed = !readOnly && !abgesetzt && vorid > 0 && bestellid > 0;
-//                    documentsAllowed = !readOnly;
-
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
 
@@ -544,7 +531,7 @@ public class PnlVerordnung extends CleanablePanel {
             });
 
             menu.add(itemPopupEdit);
-            ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, editAllowed);
+            itemPopupEdit.setEnabled(editAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
             //ocs.setEnabled(this, "itemPopupEditText", itemPopupEditText, !readOnly && status > 0 && changeable);
             // -------------------------------------------------
             JMenuItem itemPopupChange = new JMenuItem("Verändern");
@@ -556,7 +543,7 @@ public class PnlVerordnung extends CleanablePanel {
                 }
             });
             menu.add(itemPopupChange);
-            ocs.setEnabled(this, "itemPopupChange", itemPopupChange, changeAllowed);
+            itemPopupChange.setEnabled(changeAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
             // -------------------------------------------------
             JMenuItem itemPopupQuit = new JMenuItem("Absetzen");
             itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
@@ -567,7 +554,7 @@ public class PnlVerordnung extends CleanablePanel {
                 }
             });
             menu.add(itemPopupQuit);
-            ocs.setEnabled(this, "itemPopupQuit", itemPopupQuit, absetzenAllowed);
+            itemPopupQuit.setEnabled(absetzenAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
             // -------------------------------------------------
             JMenuItem itemPopupDelete = new JMenuItem("Löschen");
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -581,7 +568,8 @@ public class PnlVerordnung extends CleanablePanel {
                 }
             });
             menu.add(itemPopupDelete);
-            ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, deleteAllowed);
+
+            itemPopupDelete.setEnabled(deleteAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
             if (verordnung.hasMedi()) {
                 menu.add(new JSeparator());
@@ -599,7 +587,7 @@ public class PnlVerordnung extends CleanablePanel {
                     }
                 });
                 menu.add(itemPopupCloseBestand);
-                ocs.setEnabled(this, "itemPopupCloseBestand", itemPopupCloseBestand, bestandAbschliessenAllowed);
+                itemPopupCloseBestand.setEnabled(bestandAbschliessenAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
 
                 JMenuItem itemPopupOpenBestand = new JMenuItem("Bestand anbrechen");
                 itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
@@ -609,7 +597,7 @@ public class PnlVerordnung extends CleanablePanel {
                     }
                 });
                 menu.add(itemPopupOpenBestand);
-                ocs.setEnabled(this, "itemPopupOpenBestand", itemPopupOpenBestand, bestandAnbrechenAllowed);
+                itemPopupOpenBestand.setEnabled(bestandAnbrechenAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
             }
             menu.add(new JSeparator());
 
@@ -651,7 +639,7 @@ public class PnlVerordnung extends CleanablePanel {
                     JOptionPane.showMessageDialog(parent, "VerID: " + verordnung.getVerid() + "\nVorID: " + bestandImAnbruch.getVorrat().getVorID() + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
-            ocs.setEnabled(this, "itemPopupInfo", itemPopupInfo, true);
+            itemPopupInfo.setEnabled(true);
             menu.add(itemPopupInfo);
 
 
@@ -660,8 +648,8 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
-        /*new DlgVorrat(this.parent, bewohner.getBWKennung());
-        loadTable();*/
+        new DlgVorrat(this.parent, bewohner.getBWKennung());
+        loadTable();
     }//GEN-LAST:event_btnVorratActionPerformed
 
     private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
@@ -714,22 +702,21 @@ public class PnlVerordnung extends CleanablePanel {
         Dimension dim = jsp.getSize();
         // Größe der Text Spalten im DFN ändern.
         // Summe der fixen Spalten  = 175 + ein bisschen
-        int textWidth = dim.width - (150 + 150 + 85 + 85 + 25);
-        TableColumnModel tcm1 = tblVerordnung.getColumnModel();
-        if (tcm1.getColumnCount() < 4) {
-            return;
-        }
 
-        tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(150);
-        tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(textWidth);
-        tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(150);
-        tcm1.getColumn(TMVerordnung.COL_AN).setPreferredWidth(85);
-        tcm1.getColumn(TMVerordnung.COL_AB).setPreferredWidth(85);
+        TableColumnModel tcm1 = tblVerordnung.getColumnModel();
+
+
+
+        tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(new Double(dim.width * 0.2d).intValue());  // 1/5 tel der Gesamtbreite
+        tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(new Double(dim.width * 0.6d).intValue());  // 3/5 tel der Gesamtbreite
+        tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(new Double(dim.width * 0.2d).intValue());  // 1/5 tel der Gesamtbreite
+//        tcm1.getColumn(TMVerordnung.COL_AN).setPreferredWidth(85);
+//        tcm1.getColumn(TMVerordnung.COL_AB).setPreferredWidth(85);
         tcm1.getColumn(0).setHeaderValue("Medikament / Massnahme");
         tcm1.getColumn(1).setHeaderValue("Dosierung / Häufigkeit");
         tcm1.getColumn(2).setHeaderValue("Hinweise");
-        tcm1.getColumn(3).setHeaderValue("Angesetzt");
-        tcm1.getColumn(4).setHeaderValue("Abgesetzt");
+//        tcm1.getColumn(3).setHeaderValue("Angesetzt");
+//        tcm1.getColumn(4).setHeaderValue("Abgesetzt");
     }//GEN-LAST:event_jspVerordnungComponentResized
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
@@ -743,27 +730,20 @@ public class PnlVerordnung extends CleanablePanel {
     }
 
     private void loadTable() {
-//        ListSelectionModel lsm = tblVerordnung.getSelectionModel();
-//        if (lsl != null) {
-//            lsm.removeListSelectionListener(lsl);
-//        }
-//        lsl = new HandleSelections();
 
         tblVerordnung.setModel(new TMVerordnung(bewohner, cbAbgesetzt.isSelected(), cbMedi.isSelected()));
         tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        //lsm.addListSelectionListener(lsl);
 
-        ocs.setEnabled(this, "btnBuchen", btnBuchen, !readOnly);// && tblVerordnung.getModel().getRowCount() > 0);
-        ocs.setEnabled(this, "btnVorrat", btnVorrat, !readOnly);// && tblVerordnung.getModel().getRowCount() > 0);
-        ocs.setEnabled(this, "btnPrint", btnPrint, !readOnly && tblVerordnung.getModel().getRowCount() > 0);
-        ocs.setEnabled(this, "btnBestellungen", btnBestellungen, false); //!readOnly && tblVerordnung.getModel().getRowCount() > 0);
+        btnBuchen.setEnabled(!readOnly && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnVorrat.setEnabled(!readOnly && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+        btnPrint.setEnabled(!readOnly && tblVerordnung.getModel().getRowCount() > 0 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
 
         jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
         tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
         tblVerordnung.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
         tblVerordnung.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
-        tblVerordnung.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
-        tblVerordnung.getColumnModel().getColumn(4).setCellRenderer(new RNDHTML());
+//        tblVerordnung.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
+//        tblVerordnung.getColumnModel().getColumn(4).setCellRenderer(new RNDHTML());
     }
 
     private void reloadTable() {
@@ -794,61 +774,5 @@ public class PnlVerordnung extends CleanablePanel {
     private JButton btnLock;
     // End of variables declaration//GEN-END:variables
 
-//    class HandleSelections implements ListSelectionListener {
-//
-//        public void valueChanged(ListSelectionEvent lse) {
-//            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-//            TableModel tm = tblVerordnung.getModel();
-//            if (tm.getRowCount() <= 0) {
-//                return;
-//            }
-//            if (!lse.getValueIsAdjusting()) {
-//                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-//                boolean singleSelection = lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex();
-//                currCol = lsm.getLeadSelectionIndex();
-//                if (lsm.isSelectionEmpty() || !singleSelection) {
-//                    currentVerID = 0;
-//                    editAllowed = false;
-//                    changeAllowed = false;
-//                    deleteAllowed = false;
-//                    absetzenAllowed = false;
-//                    attachAllowed = !singleSelection;
-//                    documentsAllowed = false;
-//                    infosAllowed = false;
-//                } else {
-//                    currentVerID = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_VERID)).longValue();
-//                    anarztid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ANARZTID)).longValue();
-//                    abarztid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABARZTID)).longValue();
-//                    ankhid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ANKHID)).longValue();
-//                    abkhid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABKHID)).longValue();
-//                    vorid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_VORID)).longValue();
-//                    //bestellid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_BESTELLID)).longValue();
-//                    boolean abgesetzt = ((Boolean) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABGESETZT)).booleanValue();
-//                    // Korrektur nur erlauben, wenn es noch keine abgehakten BHPs dazu gibt.
-//                    long num = op.care.verordnung.DBRetrieve.numAffectedBHPs(currentVerID);
-//                    Timestamp abdatum = (Timestamp) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_ABDATUM);
-//                    long sitid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMVerordnung.COL_SITID)).longValue();
-//
-////                    bestaetigungAllowed = !readOnly && ((abgesetzt && abkhid != 0 && abarztid == 0)
-////                            || (!abgesetzt && ankhid != 0 && anarztid == 0));
-//                    editAllowed = !readOnly && num == 0;
-//                    changeAllowed = !readOnly && sitid == 0 && abdatum.equals(SYSConst.TS_BIS_AUF_WEITERES) && num > 0;
-//                    deleteAllowed = !readOnly && num == 0;
-//                    absetzenAllowed = !readOnly && !abgesetzt;
-//                    attachAllowed = !readOnly;
-//                    //orderAllowed = !readOnly && !abgesetzt && vorid > 0 && anarztid > 0 && bestellid == 0;
-//                    //delOrderAllowed = !readOnly && !abgesetzt && vorid > 0 && bestellid > 0;
-//                    documentsAllowed = !readOnly;
-//                    infosAllowed = true;
-//
-////
-////                    ocs.setEnabled(this, "btnEdit", btnEdit, );
-////                    ocs.setEnabled(this, "btnChange", btnChange, );
-////                    ocs.setEnabled(this, "btnAbsetzen", btnAbsetzen, !readOnly && num  > 0);
-////                    ocs.setEnabled(this, "btnDelete", btnDelete, !readOnly && num > 0);
-////                    ocs.setEnabled(this, "btnAttach", btnAttach, !readOnly);
-//                }
-//            }
-//        }
-//    }
+
 }

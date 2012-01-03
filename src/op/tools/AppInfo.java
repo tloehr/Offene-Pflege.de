@@ -98,7 +98,6 @@ public class AppInfo {
             InputSource is = new org.xml.sax.InputSource(OPDE.class.getResourceAsStream("/appinfo.xml"));
             parser.setContentHandler(new HandlerClasses());
             parser.parse(is);
-            OPDE.debug("test");
         } catch (SAXException sAXException) {
             OPDE.fatal(sAXException);
         } catch (IOException iOException) {

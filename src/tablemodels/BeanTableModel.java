@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package op.tools;
+package tablemodels;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

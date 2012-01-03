@@ -72,6 +72,8 @@ public class VerordnungTools {
         return listeVorrat;
     }
 
+
+
     /**
      * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
      * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
@@ -114,6 +116,8 @@ public class VerordnungTools {
         }
         return html;
     }
+
+
 
 
     private static String getStellplan(List data) {
@@ -275,12 +279,13 @@ public class VerordnungTools {
         String result = "";
 
         if (verordnung.isBedarf()) {
-            result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b><br/>";
+            result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
         }
         if (!verordnung.getBemerkung().isEmpty()) {
+            result += result.isEmpty() ? "" : "<br/>";
             result += "<b><u>Bemerkung:</u> </b>" + verordnung.getBemerkung();
         }
-        return (result.equals("") ? "" : "<html><body>" + result + "</body></html>");
+        return result;
     }
 
     public static String getAN(Verordnung verordnung) {
@@ -288,7 +293,7 @@ public class VerordnungTools {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
         String datum = sdf.format(verordnung.getAnDatum());
 
-        result += "<html><body>";
+
         result += "<font color=\"green\">" + datum + "; ";
         if (verordnung.getAnKH() != null) {
             result += verordnung.getAnKH().getName();
@@ -300,7 +305,7 @@ public class VerordnungTools {
             result += verordnung.getAnArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAnArzt().getName(), SYSTools.INDEX_NACHNAME);
         }
         result += "; " + verordnung.getAngesetztDurch().getNameUndVorname() + "</font>";
-        result += "</body></html>";
+
 
         return result;
     }
@@ -312,7 +317,7 @@ public class VerordnungTools {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
             String datum = sdf.format(verordnung.getAbDatum());
 
-            result += "<html><body>";
+
             result += "<font color=\"red\">" + datum + "; ";
 
             result += verordnung.getAbKH() != null ? verordnung.getAbKH().getName() : "";
@@ -324,7 +329,7 @@ public class VerordnungTools {
                 result += verordnung.getAbArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAbArzt().getName(), SYSTools.INDEX_NACHNAME);
             }
             result += "; " + verordnung.getAbgesetztDurch().getNameUndVorname() + "</font>";
-            result += "</body></html>";
+
         }
         return result;
     }
@@ -384,13 +389,13 @@ public class VerordnungTools {
                         result += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + bestandImAnbruch.getBestID() + "</font></b>";
 
                         if (vorratSumme.compareTo(bestandSumme) != 0) {
-                            result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + bestandSumme + " " +
+                            result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + bestandSumme.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] + "</font></b>";
                             if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
                                 //double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
                                 BigDecimal anwmenge = bestandSumme.multiply(bestandImAnbruch.getApv());
 
-                                result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+                                result += " <i>entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
                                         MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm()) + "</i>";
                             }
                         }

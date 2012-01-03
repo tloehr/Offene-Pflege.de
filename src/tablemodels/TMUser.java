@@ -6,7 +6,6 @@
 package tablemodels;
 
 import entity.Users;
-import op.tools.BeanTableModel;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;

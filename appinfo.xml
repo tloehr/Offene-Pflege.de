@@ -24,8 +24,7 @@
             <execute doc="Der Benutzer darf dieses Modul anwählen."/>
             <delete doc="Benutzer kann Verordnungen löschen."/>
             <print doc="Benutzer kann Verordnungen drucken"/>
-            <update doc="Benutzer kann Verordnungen ändern/korrigieren/Dateien anhängen."/>
-            <cancel doc="Benutzer kann Verordnungen absetzen."/>
+            <update doc="Benutzer kann Verordnungen ändern/korrigieren/absetzen/Dateien anhängen/Bestände anbrechen und abschließen."/>
         </class>
         <class name="nursingrecords.files" short="Pflegeakte/Dateien"
         long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Anzeige von Dateien, die dem/der BewohnerIn zugeordnet wurden.">
@@ -47,6 +46,8 @@
         </class>
         <class name="nursingrecords.bhp" short="Pflegeakte/Behandlungspflege" long="">
             <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+            <insert doc="Benutzer kann die Gabe einer Bedarfsmedikation eintragen."/>
+            <update doc="Benutzer kann BHPs abhaken bzw. innerhalb der vorgegebenen Frist auch wieder rückgängig machen."/>
         </class>
         <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         </class>

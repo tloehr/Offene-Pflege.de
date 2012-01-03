@@ -26,26 +26,26 @@
  */
 package op.care.med.vorrat;
 
-import java.awt.event.*;
-import javax.persistence.EntityManager;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedBuchungenTools;
 import entity.verordnungen.MedVorrat;
 import op.OCSec;
 import op.OPDE;
-import op.tools.*;
+import op.tools.SYSTools;
+import tablemodels.BeanTableModel;
 import tablerenderer.RNDStandard;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -204,15 +204,15 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 //---- tblVorrat ----
                 tblVorrat.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblVorrat.addMouseListener(new MouseAdapter() {
                     @Override
@@ -236,21 +236,21 @@ public class DlgVorrat extends javax.swing.JDialog {
             GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
             jPanel2.setLayout(jPanel2Layout);
             jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup()
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel2Layout.createParallelGroup()
-                            .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
-                            .addComponent(cbClosedVorrat))
-                        .addContainerGap())
+                    jPanel2Layout.createParallelGroup()
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel2Layout.createParallelGroup()
+                                            .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                                            .addComponent(cbClosedVorrat))
+                                    .addContainerGap())
             );
             jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup()
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(cbClosedVorrat)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-                        .addContainerGap())
+                    jPanel2Layout.createParallelGroup()
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addComponent(cbClosedVorrat)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
         }
 
@@ -269,15 +269,15 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 //---- tblBestand ----
                 tblBestand.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblBestand.addMouseListener(new MouseAdapter() {
                     @Override
@@ -301,21 +301,21 @@ public class DlgVorrat extends javax.swing.JDialog {
             GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
             jPanel3.setLayout(jPanel3Layout);
             jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup()
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel3Layout.createParallelGroup()
-                            .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
-                            .addComponent(cbClosedBestand))
-                        .addContainerGap())
+                    jPanel3Layout.createParallelGroup()
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel3Layout.createParallelGroup()
+                                            .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                                            .addComponent(cbClosedBestand))
+                                    .addContainerGap())
             );
             jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup()
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(cbClosedBestand)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
-                        .addContainerGap())
+                    jPanel3Layout.createParallelGroup()
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(cbClosedBestand)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
         }
 
@@ -344,15 +344,15 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 //---- tblBuchung ----
                 tblBuchung.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblBuchung.addMouseListener(new MouseAdapter() {
                     @Override
@@ -366,17 +366,17 @@ public class DlgVorrat extends javax.swing.JDialog {
             GroupLayout pnl123Layout = new GroupLayout(pnl123);
             pnl123.setLayout(pnl123Layout);
             pnl123Layout.setHorizontalGroup(
-                pnl123Layout.createParallelGroup()
-                    .addGroup(pnl123Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
-                        .addContainerGap())
+                    pnl123Layout.createParallelGroup()
+                            .addGroup(pnl123Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
             pnl123Layout.setVerticalGroup(
-                pnl123Layout.createParallelGroup()
-                    .addGroup(pnl123Layout.createSequentialGroup()
-                        .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
-                        .addContainerGap())
+                    pnl123Layout.createParallelGroup()
+                            .addGroup(pnl123Layout.createSequentialGroup()
+                                    .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
         }
 
@@ -405,7 +405,7 @@ public class DlgVorrat extends javax.swing.JDialog {
             });
 
             //---- cmbBW ----
-            cmbBW.setModel(new DefaultComboBoxModel(new String[] {
+            cmbBW.setModel(new DefaultComboBoxModel(new String[]{
 
             }));
             cmbBW.addItemListener(new ItemListener() {
@@ -418,21 +418,21 @@ public class DlgVorrat extends javax.swing.JDialog {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(cmbBW, GroupLayout.Alignment.LEADING, 0, 771, Short.MAX_VALUE)
-                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE))
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                            .addComponent(cmbBW, GroupLayout.Alignment.LEADING, 0, 771, Short.MAX_VALUE)
+                                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE))
+                                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbBW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(22, Short.MAX_VALUE))
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cmbBW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addContainerGap(22, Short.MAX_VALUE))
             );
         }
 
@@ -455,55 +455,55 @@ public class DlgVorrat extends javax.swing.JDialog {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                contentPaneLayout.createParallelGroup()
                         .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(pnl123, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(btnClose, GroupLayout.Alignment.TRAILING))
-                    .addContainerGap())
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 843, Short.MAX_VALUE)
+                                .addContainerGap()
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(pnl123, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(btnClose, GroupLayout.Alignment.TRAILING))
+                                .addContainerGap())
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 843, Short.MAX_VALUE)
         );
         contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblFrage)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup()
+                contentPaneLayout.createParallelGroup()
                         .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(pnl123, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnClose)
-                    .addContainerGap())
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblFrage)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblBW)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(pnl123, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnClose)
+                                .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -591,7 +591,9 @@ public class DlgVorrat extends javax.swing.JDialog {
                     int i = 0;
                     boolean found = false;
 
-                    TMResultSet tm = (TMResultSet) tblVorrat.getModel();
+//                    BeanTableModel<>
+//
+//                    TMResultSet tm = (TMResultSet) tblVorrat.getModel();
 
                     while (!found && i < tm.getRowCount()) {
                         long thisVorID = ((BigInteger) tm.getPK(i)).longValue();//Long.parseLong(tm.getValueAt(0, i).toString());
@@ -996,10 +998,6 @@ public class DlgVorrat extends javax.swing.JDialog {
     }
 
     private void reloadVorratTable() {
-        ListSelectionModel lsm = tblVorrat.getSelectionModel();
-        if (lslV != null) {
-            lsm.removeListSelectionListener(lslV);
-        }
 
         if (!bwkennung.equals("")) {
             String sql = "SELECT DISTINCT v.VorID, v.Text 'Name des Vorrats', ifnull(b.saldo, 0.00) Bestandsmenge" +
@@ -1015,26 +1013,26 @@ public class DlgVorrat extends javax.swing.JDialog {
                     (cbClosedVorrat.isSelected() ? "" : " AND v.Bis = '9999-12-31 23:59:59' ") +
                     " ORDER BY v.Text ";
 
-            try {
-                PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-                stmt.setString(1, bwkennung);
-                stmt.setString(2, bwkennung);
-                ResultSet rs = stmt.executeQuery();
 
-                lslV = new HandleVorratSelections();
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+            stmt.setString(1, bwkennung);
+            stmt.setString(2, bwkennung);
+            ResultSet rs = stmt.executeQuery();
 
-                //tblVorrat.setModel(new BeanTableModel());
+            //lslV = new HandleVorratSelections();
 
-                tblVorrat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-                lsm.addListSelectionListener(lslV);
+            // TODO: hier gehts weiter
+            grmpf;
+            tblVorrat.setModel(new BeanTableModel(MedVorrat.class));
 
-                //jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
-                for (int i = 0; i < tblVorrat.getModel().getColumnCount(); i++) {
-                    tblVorrat.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
-                }
-            } catch (SQLException ex) {
-                new DlgException(ex);
+            tblVorrat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+
+
+            //jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
+            for (int i = 0; i < tblVorrat.getModel().getColumnCount(); i++) {
+                tblVorrat.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
             }
+
         } else {
             tblVorrat.setModel(new DefaultTableModel());
         }
