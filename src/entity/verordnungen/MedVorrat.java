@@ -1,6 +1,7 @@
 package entity.verordnungen;
 
 import entity.Bewohner;
+import entity.Stationen;
 import entity.Users;
 import op.OPDE;
 import op.tools.SYSConst;
@@ -32,6 +33,31 @@ import java.util.Date;
                 " GROUP BY best.vorrat ")
 })
 
+@NamedNativeQueries({
+        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
+        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
+        // beigefügt.
+        @NamedNativeQuery(name = "MedVorrat.findVorraeteMitSummen", query = " " +
+                " SELECT DISTINCT v.*, b.saldo" +
+                " FROM MPVorrat v " +
+                " LEFT OUTER JOIN (" +
+                "       SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
+                "       INNER JOIN MPVorrat v ON v.VorID = best.VorID " +
+                "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                "       WHERE v.BWKennung=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
+                "       GROUP BY best.VorID" +
+                " ) b ON b.VorID = v.VorID" +
+                " WHERE v.BWKennung=? " +
+                " AND ( ? = 1 OR v.Bis = '9999-12-31 23:59:59' ) " +
+                " ORDER BY v.Text ", resultSetMapping = "MedVorrat.findVorraeteMitSummenResultMapping")
+})
+
+@SqlResultSetMappings({
+        @SqlResultSetMapping(name = "MedVorrat.findVorraeteMitSummenResultMapping",
+                entities = @EntityResult(entityClass = MedVorrat.class),
+                columns = @ColumnResult(name = "b.saldo")
+        )
+})
 
 public class MedVorrat implements Serializable {
     private static final long serialVersionUID = 1L;

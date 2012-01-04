@@ -648,7 +648,7 @@ public class PnlVerordnung extends CleanablePanel {
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
-        new DlgVorrat(this.parent, bewohner.getBWKennung());
+        new DlgVorrat(this.parent, bewohner);
         loadTable();
     }//GEN-LAST:event_btnVorratActionPerformed
 
@@ -700,23 +700,16 @@ public class PnlVerordnung extends CleanablePanel {
     private void jspVerordnungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVerordnungComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
-        // Größe der Text Spalten im DFN ändern.
-        // Summe der fixen Spalten  = 175 + ein bisschen
 
         TableColumnModel tcm1 = tblVerordnung.getColumnModel();
 
-
-
-        tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(new Double(dim.width * 0.2d).intValue());  // 1/5 tel der Gesamtbreite
-        tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(new Double(dim.width * 0.6d).intValue());  // 3/5 tel der Gesamtbreite
-        tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(new Double(dim.width * 0.2d).intValue());  // 1/5 tel der Gesamtbreite
-//        tcm1.getColumn(TMVerordnung.COL_AN).setPreferredWidth(85);
-//        tcm1.getColumn(TMVerordnung.COL_AB).setPreferredWidth(85);
+        tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(dim.width/5);  // 1/5 tel der Gesamtbreite
+        tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(dim.width/5*3);  // 3/5 tel der Gesamtbreite
+        tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(dim.width/5);  // 1/5 tel der Gesamtbreite
         tcm1.getColumn(0).setHeaderValue("Medikament / Massnahme");
         tcm1.getColumn(1).setHeaderValue("Dosierung / Häufigkeit");
         tcm1.getColumn(2).setHeaderValue("Hinweise");
-//        tcm1.getColumn(3).setHeaderValue("Angesetzt");
-//        tcm1.getColumn(4).setHeaderValue("Abgesetzt");
+
     }//GEN-LAST:event_jspVerordnungComponentResized
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed

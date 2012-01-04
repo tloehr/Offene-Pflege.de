@@ -44,7 +44,7 @@ import java.util.Date;
         @NamedQuery(name = "Bewohner.findAllActiveSorted", query = "SELECT b FROM Bewohner b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname"),
         @NamedQuery(name = "Bewohner.findAllActiveSortedByStationen", query = "SELECT b FROM Bewohner b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
         @NamedQuery(name = "Bewohner.findByBWKennung", query = "SELECT b FROM Bewohner b WHERE b.bWKennung = :bWKennung"),
-        @NamedQuery(name = "Bewohner.findByNachname", query = "SELECT b FROM Bewohner b WHERE b.nachname = :nachname"),
+        @NamedQuery(name = "Bewohner.findByNachname", query = "SELECT b FROM Bewohner b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
         @NamedQuery(name = "Bewohner.findByVorname", query = "SELECT b FROM Bewohner b WHERE b.vorname = :vorname"),
         @NamedQuery(name = "Bewohner.findByGeschlecht", query = "SELECT b FROM Bewohner b WHERE b.geschlecht = :geschlecht"),
         @NamedQuery(name = "Bewohner.findByGebDatum", query = "SELECT b FROM Bewohner b WHERE b.gebDatum = :gebDatum"),

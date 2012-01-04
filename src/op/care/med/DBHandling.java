@@ -66,21 +66,21 @@ public class DBHandling {
 //    public static final int FORMSTATUS_APV_PER_BW = 2;
 
 
-    /**
-     * Setzt für einen Bestand <b>alle</b> Buchungen zur¸ck, bis auf die Anfangsbuchung.
-     *
-     * @param bestid
-     */
-    public static void resetBestand(long bestid) {
-        String sql = "DELETE FROM MPBuchung WHERE BestID = ? AND Status <> 1";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bestid);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-    }
+//    /**
+//     * Setzt für einen Bestand <b>alle</b> Buchungen zur¸ck, bis auf die Anfangsbuchung.
+//     *
+//     * @param bestid
+//     */
+//    public static void resetBestand(long bestid) {
+//        String sql = "DELETE FROM MPBuchung WHERE BestID = ? AND Status <> 1";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, bestid);
+//            stmt.executeUpdate();
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//    }
 
 
 //    public static int getFormStatus(long bestid) {

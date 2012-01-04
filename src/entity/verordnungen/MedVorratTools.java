@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -249,110 +250,36 @@ public class MedVorratTools {
 
         return result;
     }
-//
-//    public static boolean abschliessen(MedVorrat vorrat) {
-//        Connection db = OPDE.getDb().db;
-//        boolean result = false;
-//        boolean doCommit = false;
-//        try {
-//            if (db.getAutoCommit()) {
-//                db.setAutoCommit(false);
-//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//                db.commit();
-//                doCommit = true;
-//            }
-//            // Alle Best?nde abschlie?en.
-//            long bestid = getBestandImAnbruch(vorid);
-//            if (bestid > 0) {
-//                closeBestand(bestid, "Abschluss des Bestandes bei Vorratsabschlu?.", false, STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
-//            }
-//            DefaultComboBoxModel dcbm = getBestandGeschlossen(vorid);
-//            if (dcbm.getSize() > 1) { // der erste ist immer "keine"
-//                for (int i = 1; i < dcbm.getSize(); i++) {
-//                    bestid = (Long) dcbm.getElementAt(i);
-//                    closeBestand(bestid, "Abschluss des Bestandes bei Vorratsabschlu?.", false, STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
-//                }
-//            }
-//
-//            // Vorrat beenden.
-//            HashMap data = new HashMap();
-//            data.put("bis", "!NOW!");
-//            if (!op.tools.DBHandling.updateRecord("MPVorrat", data, "VorID", vorid)) {
-//                throw new SQLException("Fehler bei Update MPVorrat");
-//            }
-//            data.clear();
-//            if (doCommit) {
-//                db.commit();
-//                db.setAutoCommit(true);
-//            }
-//            result = true;
-//        } catch (SQLException ex) {
-//            try {
-//                if (doCommit) {
-//                    db.rollback();
-//                }
-//                result = false;
-//            } catch (SQLException ex1) {
-//                new DlgException(ex1);
-//                ex1.printStackTrace();
-//                System.exit(1);
-//            }
-//            new DlgException(ex);
-//        }
-//        return result;
-//    }
-//
-//    public static void deleteVorrat(long vorid) {
-//        String sql1 = "DELETE buch.* " +
-//                " FROM MPBuchung buch INNER JOIN MPBestand best ON buch.BestID = best.BestID " +
-//                " WHERE best.VorID = ? ";
-//        String sql2 = "DELETE best.* " +
-//                " FROM MPBestand best " +
-//                " WHERE best.VorID = ? ";
-//        String sql3 = "DELETE " +
-//                " FROM MPVorrat " +
-//                " WHERE VorID = ? ";
-//        Connection db = OPDE.getDb().db;
-//        //boolean result = false;
-//        boolean doCommit = false;
-//        try {
-//            // Hier beginnt eine Transaktion, wenn es nicht schon eine gibt.
-//            if (db.getAutoCommit()) {
-//                db.setAutoCommit(false);
-//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//                db.commit();
-//                doCommit = true;
-//            }
-//
-//            PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
-//            stmt1.setLong(1, vorid);
-//            stmt1.executeUpdate();
-//
-//            PreparedStatement stmt2 = OPDE.getDb().db.prepareStatement(sql2);
-//            stmt2.setLong(1, vorid);
-//            stmt2.executeUpdate();
-//
-//            PreparedStatement stmt3 = OPDE.getDb().db.prepareStatement(sql3);
-//            stmt3.setLong(1, vorid);
-//            stmt3.executeUpdate();
-//
-//            if (doCommit) {
-//                db.commit();
-//                db.setAutoCommit(true);
-//            }
-//
-//        } catch (SQLException ex) {
-//            try {
-//                if (doCommit) {
-//                    db.rollback();
-//                }
-//                //result = false;
-//            } catch (SQLException ex1) {
-//                new DlgException(ex1);
-//                ex1.printStackTrace();
-//                System.exit(1);
-//            }
-//            new DlgException(ex);
-//        }
-//    }
+
+
+    /**
+     * Schliesst einen Vorrat und alle zugehörigen, noch vorhandenen Bestände ab. Inklusive der notwendigen Abschlussbuchungen.
+     * @param vorrat
+     */
+    public static void abschliessen(MedVorrat vorrat) {
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+
+            // Alle Bestände abschliessen.
+            for (MedBestand bestand : vorrat.getBestaende()) {
+                if (!bestand.isAbgeschlossen()) {
+                    boolean apvNeuberechnung = true;  // zur Lesbarkeit
+                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", !apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                }
+            }
+
+            // Vorrat abschliessen
+            vorrat.setBis(new Date());
+
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
+    }
+
+
 }

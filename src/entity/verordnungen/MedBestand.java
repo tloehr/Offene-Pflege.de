@@ -35,6 +35,32 @@ import java.util.Date;
                 " GROUP BY best ")
 })
 
+@NamedNativeQueries({
+        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
+        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
+        // beigefügt.
+        @NamedNativeQuery(name = "MedBestand.findByVorratMitRestsumme", query = " " +
+                " SELECT best.*, sum.saldo " +
+                " FROM MPBestand best " +
+                " LEFT OUTER JOIN " +
+                "      ( " +
+                "        SELECT best.BestID, sum(buch.Menge) saldo FROM MPBestand best " +
+                "        INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                "        WHERE best.VorID=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
+                "        GROUP BY best.BestID " +
+                "      ) sum ON sum.BestID = best.BestID " +
+                " WHERE best.VorID = ? " +
+                " AND ( ? = 1 OR best.Aus = '9999-12-31 23:59:59' ) " +
+                " ORDER BY best.anbruch ", resultSetMapping = "MedBestand.findByVorratMitRestsummeResultMapping")
+})
+
+@SqlResultSetMappings({
+        @SqlResultSetMapping(name = "MedBestand.findByVorratMitRestsummeResultMapping",
+                entities = @EntityResult(entityClass = MedBestand.class),
+                columns = @ColumnResult(name = "sum.saldo")
+        )
+})
+
 public class MedBestand implements Serializable, Comparable {
     private static final long serialVersionUID = 1L;
     @Id

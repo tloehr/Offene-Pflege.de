@@ -225,7 +225,7 @@ public class MedBestandTools {
                         OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
                     } else {
                         // der DafID APV wird durch den arithmetischen Mittelwert aus altem und neuem APV ersetzt.
-                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2),4,BigDecimal.ROUND_UP));
+                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2), 4, BigDecimal.ROUND_UP));
                         OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt.toPlainString() + "  APVneu: " + apv.getApv().toPlainString());
                     }
                     apv = em.merge(apv);
@@ -297,12 +297,12 @@ public class MedBestandTools {
                 querySummeBHPDosis.setParameter("bestand", bestand);
                 BigDecimal summeBHPDosis = (BigDecimal) querySummeBHPDosis.getSingleResult();
 
-                BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt,4,BigDecimal.ROUND_UP);
+                BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt, 4, BigDecimal.ROUND_UP);
 
-                apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch,4,BigDecimal.ROUND_UP).multiply(apvAlt);
+                apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch, 4, BigDecimal.ROUND_UP).multiply(apvAlt);
 
                 // Zu große APV Abweichungen verhindern.
-                BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100),4,BigDecimal.ROUND_UP);
+                BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
                 BigDecimal halbeBreite = apvAlt.multiply(apvkorridor);
                 BigDecimal korridorUnten = apvAlt.subtract(halbeBreite);
                 BigDecimal korridorOben = apvAlt.add(halbeBreite);
@@ -353,7 +353,7 @@ public class MedBestandTools {
 
     public static String getBestandTextAsHTML(MedBestand bestand) {
         String result = "";
-        result += "<br/><font color=\"blue\"><b>" + bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz() + ", ";
+        result += "<font color=\"blue\"><b>" + bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
             result += "PZN: " + bestand.getPackung().getPzn() + ", ";
@@ -361,10 +361,61 @@ public class MedBestandTools {
             String zubereitung = SYSTools.catchNull(bestand.getDarreichung().getMedForm().getZubereitung());
             String anwtext = SYSTools.catchNull(bestand.getDarreichung().getMedForm().getAnwText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
-            result += "</b></font><br/>";
+            result += "</b></font>";
         }
 
         return result;
+    }
+
+    public static String getBestandAsHTML(MedBestand bestand) {
+        String result = "";
+
+
+        result += "<font color=\"red\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
+        result += DarreichungTools.toPrettyString(bestand.getDarreichung());
+
+        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).isEmpty()) {
+            result += ", " + MedPackungTools.toPrettyString(bestand.getPackung());
+        }
+
+        if (bestand.hasNextBestand()) {
+            result += ", <b>nächster Bestand: " + bestand.getNaechsterBestand().getBestID() + "</b>";
+        }
+
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+
+        result += "<br/><font color=\"blue\">Eingang: " + df.format(bestand.getEin()) + "</font>";
+        if (bestand.isAngebrochen()) {
+            result += "<br/><font color=\"green\">Anbruch: " + df.format(bestand.getAnbruch()) + "</font>";
+            if (bestand.isAbgeschlossen()) {
+                result += "<br/><font color=\"black\">Ausgebucht: " + df.format(bestand.getAus()) + "</font>";
+            }
+        }
+
+        return result;
+
+    }
+
+    /**
+     * Setzt für einen Bestand <b>alle</b> Buchungen zurück, bis auf die Anfangsbuchung.
+     *
+     * @param bestand
+     */
+    public static void zuruecksetzen(MedBestand bestand) {
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            Query query = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
+            query.setParameter("bestand", bestand);
+            query.setParameter("notStatus", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
+            query.executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
     }
 
     public static boolean hasAbgesetzteBestaende(BHP bhp) {

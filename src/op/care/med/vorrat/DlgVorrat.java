@@ -28,29 +28,28 @@ package op.care.med.vorrat;
 
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedVorrat;
-import op.OCSec;
+import entity.EntityTools;
+import entity.verordnungen.*;
 import op.OPDE;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import tablemodels.BeanTableModel;
-import tablerenderer.RNDStandard;
+import tablemodels.TMBestand;
+import tablemodels.TMVorraete;
+import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.math.BigInteger;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * In OPDE.de gibt es eine Bestandsverwaltung für Medikamente. Bestände werden mit Hilfe von 3 Tabellen
@@ -80,22 +79,16 @@ import java.util.HashMap;
  */
 public class DlgVorrat extends javax.swing.JDialog {
 
-    private MedVorrat vorrat;
-    private MedBestand bestand;
     private Bewohner bewohner;
     private Component parent;
     private Component thisDialog;
-    private ListSelectionListener lslV;
-    private ListSelectionListener lslB;
     private JPopupMenu menuV;
-    private JPopupMenu menuB;
+    //    private JPopupMenu menuB;
     private JPopupMenu menuBuch;
-    private boolean ignoreEvent;
-    private OCSec ocs;
-    private long vorid;
-    BigInteger myvorid;
-    private long bestid;
-    private String bwkennung;
+
+    //    private OCSec ocs;
+    private MedVorrat vorrat;
+    private MedBestand bestand;
 
     /**
      * Creates new form DlgVorrat
@@ -128,11 +121,31 @@ public class DlgVorrat extends javax.swing.JDialog {
         initDialog();
     }
 
+    private void cmbBWPropertyChange(PropertyChangeEvent e) {
+        OPDE.debug("MODEL");
+        cmbBWItemStateChanged(null);
+    }
+
+    private void jspBestandComponentResized(ComponentEvent e) {
+        JScrollPane jsp = (JScrollPane) e.getComponent();
+        Dimension dim = jsp.getSize();
+
+        TableColumnModel tcm1 = tblBestand.getColumnModel();
+
+        if (tcm1.getColumnCount() == 0) {
+            return;
+        }
+
+        tcm1.getColumn(TMBestand.COL_NAME).setPreferredWidth(dim.width / 5 * 4);  // 4/5 tel der Gesamtbreite
+        tcm1.getColumn(TMBestand.COL_MENGE).setPreferredWidth(dim.width / 5);  // 1/5 tel der Gesamtbreite
+        tcm1.getColumn(TMBestand.COL_NAME).setHeaderValue("Bestandsangabe");
+        tcm1.getColumn(TMBestand.COL_MENGE).setHeaderValue("Restsumme");
+    }
+
     private void initDialog() {
-        ocs = OPDE.getOCSec();
         setTitle(SYSTools.getWindowTitle("Medikamentenvorrat"));
         thisDialog = this;
-        ignoreEvent = false;
+
         initComponents();
         txtSuche.setEnabled(bewohner == null);
         cmbBW.setEnabled(bewohner == null);
@@ -240,7 +253,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addGroup(jPanel2Layout.createParallelGroup()
-                                            .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                                            .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
                                             .addComponent(cbClosedVorrat))
                                     .addContainerGap())
             );
@@ -264,6 +277,12 @@ public class DlgVorrat extends javax.swing.JDialog {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         jspBestandMousePressed(e);
+                    }
+                });
+                jspBestand.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspBestandComponentResized(e);
                     }
                 });
 
@@ -305,7 +324,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addGroup(jPanel3Layout.createParallelGroup()
-                                            .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                                            .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
                                             .addComponent(cbClosedBestand))
                                     .addContainerGap())
             );
@@ -314,7 +333,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                     .addComponent(cbClosedBestand)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                                    .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
                                     .addContainerGap())
             );
         }
@@ -375,7 +394,7 @@ public class DlgVorrat extends javax.swing.JDialog {
             pnl123Layout.setVerticalGroup(
                     pnl123Layout.createParallelGroup()
                             .addGroup(pnl123Layout.createSequentialGroup()
-                                    .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
+                                    .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
                                     .addContainerGap())
             );
         }
@@ -414,6 +433,12 @@ public class DlgVorrat extends javax.swing.JDialog {
                     cmbBWItemStateChanged(e);
                 }
             });
+            cmbBW.addPropertyChangeListener("model", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    cmbBWPropertyChange(e);
+                }
+            });
 
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
@@ -422,8 +447,8 @@ public class DlgVorrat extends javax.swing.JDialog {
                             .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                            .addComponent(cmbBW, GroupLayout.Alignment.LEADING, 0, 771, Short.MAX_VALUE)
-                                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE))
+                                            .addComponent(cmbBW, GroupLayout.Alignment.LEADING, 0, 931, Short.MAX_VALUE)
+                                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE))
                                     .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
@@ -432,7 +457,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                                     .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(cmbBW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addContainerGap(22, Short.MAX_VALUE))
+                                    .addContainerGap(46, Short.MAX_VALUE))
             );
         }
 
@@ -459,7 +484,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                         .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                                         .addGroup(contentPaneLayout.createSequentialGroup()
                                                 .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                                         .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -470,17 +495,17 @@ public class DlgVorrat extends javax.swing.JDialog {
                                 .addContainerGap())
                         .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                                 .addContainerGap())
                         .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                                 .addContainerGap())
                         .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addContainerGap())
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 843, Short.MAX_VALUE)
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 1003, Short.MAX_VALUE)
         );
         contentPaneLayout.setVerticalGroup(
                 contentPaneLayout.createParallelGroup()
@@ -536,9 +561,10 @@ public class DlgVorrat extends javax.swing.JDialog {
     }
 
     private void cmbBWItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbBWItemStateChanged
-        ListElement e = (ListElement) cmbBW.getSelectedItem();
-        bwkennung = e.getData();
-        reloadVorratTable();
+        if (cmbBW.getModel().getSize() > 0) {
+            bewohner = (Bewohner) cmbBW.getSelectedItem();
+            reloadVorratTable();
+        }
     }//GEN-LAST:event_cmbBWItemStateChanged
 
     private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
@@ -547,10 +573,10 @@ public class DlgVorrat extends javax.swing.JDialog {
 //        }
 //        if (txtSuche.getText().equals("")) {
 //            cmbBW.setModel(new DefaultComboBoxModel());
-//            bwkennung = "";
+//            bewohner = null;
 //            reloadVorratTable();
 //        } else if (txtSuche.getText().matches("\\d*")) { // Nur Zahlen.. Das ist eine BestID
-//            bwkennung = "";
+//            bewohner = null;
 //            reloadVorratTable();
 //        } else {
 //            DefaultComboBoxModel dcbm = null;
@@ -579,57 +605,41 @@ public class DlgVorrat extends javax.swing.JDialog {
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
         if (!txtSuche.getText().equals("")) {
             if (txtSuche.getText().matches("\\d*")) { // Nur Zahlen.. Das ist eine BestID
-                long mybestid = Long.parseLong(txtSuche.getText());
+                long bestid = Long.parseLong(txtSuche.getText());
                 EntityManager em = OPDE.createEM();
-                MedBestand bestand = em.find(MedBestand.class, mybestid);
+                bestand = em.find(MedBestand.class, bestid);
                 em.close();
 
                 if (bestand != null) {
+                    bewohner = bestand.getVorrat().getBewohner();
                     reloadVorratTable();
-                    DefaultComboBoxModel dcbm = null;
-                    cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bestand.getVorrat().getBewohner()}));
-                    int i = 0;
-                    boolean found = false;
-
-//                    BeanTableModel<>
-//
-//                    TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-
-                    while (!found && i < tm.getRowCount()) {
-                        long thisVorID = ((BigInteger) tm.getPK(i)).longValue();//Long.parseLong(tm.getValueAt(0, i).toString());
-                        if (thisVorID == myvorid.longValue()) {
-                            tblVorrat.getSelectionModel().setSelectionInterval(i, i);
-                            found = true;
-                        }
-                        i++;
-                    }
+                    cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bewohner}));
+                    TMVorraete tm = (TMVorraete) tblVorrat.getModel();
+                    int row = tm.findPositionOf(bestand.getVorrat());
+                    tblVorrat.getSelectionModel().setSelectionInterval(row, row);
                 } else {
                     JOptionPane.showMessageDialog(this, "Der eingegebene Bestand existiert nicht.", "Fehler", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                DefaultComboBoxModel dcbm = null;
-                if (txtSuche.getText().length() == 3) { // Könnte eine Suche nach der Kennung sein
-                    ResultSet rs = op.tools.DBRetrieve.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum"}, "BWKennung",
-                            txtSuche.getText(), "=");
-                    dcbm = SYSTools.rs2cmb(rs);
+                bewohner = null;
+                if (txtSuche.getText().length() == 3) { // Könnte eine Suche nach der Bewohner Kennung sein
+                    bewohner = EntityTools.find(Bewohner.class, txtSuche.getText());
+                    if (bewohner != null) {
+                        cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bewohner}));
+                        cmbBW.setSelectedIndex(0);
+                    }
                 }
-                if (dcbm == null || dcbm.getSize() == 0) {
-                    ResultSet rs = op.tools.DBRetrieve.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum"}, "Nachname",
-                            "%" + txtSuche.getText() + "%", "like");
-                    dcbm = SYSTools.rs2cmb(rs, new String[]{"", "", "", "*"});
-                }
-                if (dcbm != null && dcbm.getSize() > 0) {
-                    cmbBW.setModel(dcbm);
+                if (bewohner == null) {
+                    EntityManager em = OPDE.createEM();
+                    Query query = em.createNamedQuery("Bewohner.findByNachname");
+                    query.setParameter("nachname", "%" + txtSuche.getText() + "%");
+                    cmbBW.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new Bewohner[]{})));
                     cmbBW.setSelectedIndex(0);
-                    cmbBWItemStateChanged(null);
-                } else {
-                    cmbBW.setModel(new DefaultComboBoxModel());
-                    bwkennung = "";
                 }
             }
         } else {
             cmbBW.setModel(new DefaultComboBoxModel());
-            bwkennung = "";
+            bewohner = null;
             reloadVorratTable();
         }
     }//GEN-LAST:event_txtSucheActionPerformed
@@ -643,55 +653,66 @@ public class DlgVorrat extends javax.swing.JDialog {
     }//GEN-LAST:event_jspBuchungMousePressed
 
     private void tblBuchungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBuchungMousePressed
-        if (!evt.isPopupTrigger() || bestid == 0) {
+        final BeanTableModel tm = (BeanTableModel) tblBuchung.getModel();
+        if (tm.getRowCount() == 0) {
+            bestand = null;
             return;
         }
+
         Point p = evt.getPoint();
-        SYSTools.unregisterListeners(menuBuch);
-        menuBuch = new JPopupMenu();
+        final int row = tblBuchung.rowAtPoint(p);
+        ListSelectionModel lsm = tblBuchung.getSelectionModel();
+        lsm.setSelectionInterval(row, row);
 
-        JMenuItem itemPopupNew = new JMenuItem("Neu");
-        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
+        final MedBuchungen buchung = (MedBuchungen) tm.getRow(row);
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newBuchung();
-            }
-        });
-        menuBuch.add(itemPopupNew);
+        if (evt.isPopupTrigger()) {
 
-        if (!(evt.getSource() instanceof JScrollPane)) {
-            final TMResultSet tm = (TMResultSet) tblBuchung.getModel();
-            if (tm.getRowCount() > 0) {
-                //final int col = tblBuchung.columnAtPoint(p);
-                final int row = tblBuchung.rowAtPoint(p);
-                ListSelectionModel lsm = tblBuchung.getSelectionModel();
-                lsm.setSelectionInterval(row, row);
-                final long buchid = ((BigInteger) ((TMResultSet) tblBuchung.getModel()).getPK(row)).longValue();
-                // Menüeinträge
+            SYSTools.unregisterListeners(menuBuch);
+            menuBuch = new JPopupMenu();
 
-                JMenuItem itemPopupDelete = new JMenuItem("Löschen");
-                itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        deleteBuchung(buchid);
+            JMenuItem itemPopupNew = new JMenuItem("Neu");
+            itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    newBuchung();
+                }
+            });
+            menuBuch.add(itemPopupNew);
+
+            // Menüeinträge
+
+            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie die Buchung wirklich löschen ?") == JOptionPane.YES_OPTION) {
+                        EntityTools.delete(buchung);
                         reloadBuchungTable();
-                        TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-                        tm.reload(tblVorrat.getSelectedRow(), tblVorrat.getSelectedColumn());
+//                        TMResultSet tm = (TMResultSet) tblVorrat.getModel();
+//                        tm.reload(tblVorrat.getSelectedRow(), tblVorrat.getSelectedColumn());
+
                     }
-                });
-                menuBuch.add(itemPopupDelete);
-            }
+
+
+                }
+            });
+            menuBuch.add(itemPopupDelete);
+
+
+            JMenuItem itemPopupReset = new JMenuItem("Alle Buchungen zurücksetzen.");
+            itemPopupReset.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    resetBuchung();
+                }
+            });
+            menuBuch.add(itemPopupReset);
+            menuBuch.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
 
-        JMenuItem itemPopupReset = new JMenuItem("Alle Buchungen zurücksetzen.");
-        itemPopupReset.addActionListener(new java.awt.event.ActionListener() {
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resetBuchung();
-            }
-        });
-        menuBuch.add(itemPopupReset);
-        menuBuch.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_tblBuchungMousePressed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
@@ -699,7 +720,7 @@ public class DlgVorrat extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void jspBestandMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jspBestandMousePressed
-        if (!evt.isPopupTrigger() || vorid == 0) {
+        if (!evt.isPopupTrigger() || vorrat == null) {
             return;
         }
         Point p = evt.getPoint();
@@ -718,18 +739,24 @@ public class DlgVorrat extends javax.swing.JDialog {
     }//GEN-LAST:event_jspBestandMousePressed
 
     private void tblBestandMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBestandMousePressed
-        if (!evt.isPopupTrigger() || vorid == 0) {
+        final TMBestand tm = (TMBestand) tblBestand.getModel();
+        if (tm.getRowCount() == 0) {
+            bestand = null;
             return;
         }
-        final TMResultSet tm = (TMResultSet) tblBestand.getModel();
-        if (tm.getRowCount() > 0) {
-            Point p = evt.getPoint();
-            //final int col = tblBestand.columnAtPoint(p);
-            final int row = tblBestand.rowAtPoint(p);
-            ListSelectionModel lsm = tblBestand.getSelectionModel();
-            lsm.setSelectionInterval(row, row);
-            final long mybestid = ((BigInteger) ((TMResultSet) tblBestand.getModel()).getPK(row)).longValue();
-            // Menüeinträge
+
+        Point p = evt.getPoint();
+        final int col = tblBestand.columnAtPoint(p);
+        final int row = tblBestand.rowAtPoint(p);
+        ListSelectionModel lsm = tblBestand.getSelectionModel();
+        lsm.setSelectionInterval(row, row);
+
+        bestand = tm.getBestand(row);
+        reloadBuchungTable();
+
+        // Menüeinträge
+        if (evt.isPopupTrigger()) {
+
             SYSTools.unregisterListeners(menuV);
             menuV = new JPopupMenu();
 
@@ -753,7 +780,10 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    deleteBestand(mybestid);
+                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie den Bestand wirklich löschen ?") == JOptionPane.YES_OPTION) {
+                        EntityTools.delete(bestand);
+                        reloadBestandTable();
+                    }
                 }
             });
             menuV.add(itemPopupDelete);
@@ -772,12 +802,23 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(thisDialog, "Sind sie sicher ?", "Bestand abschließen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        //op.care.med.DBHandling.closeBestand(mybestid, "", false, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            boolean apvNeuberechnung = true;
+                            MedBestandTools.abschliessen(em, bestand, "", !apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+                            em.getTransaction().commit();
+                        } catch (Exception e) {
+                            em.getTransaction().rollback();
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
                         reloadVorratTable();
                     }
                 }
             });
-            itemPopupClose.setEnabled(op.care.med.DBHandling.isAnbruch(mybestid));
+            itemPopupClose.setEnabled(bestand.isAngebrochen());
             menuV.add(itemPopupClose);
 
             // ---------------
@@ -785,14 +826,12 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupEinbuchen.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    HashMap hm = new HashMap();
-                    hm.put("Aus", "!BAW!");
-                    DBHandling.updateRecord("MPBestand", hm, "BestID", mybestid);
-                    hm.clear();
+                    bestand.setAus(SYSConst.DATE_BIS_AUF_WEITERES);
+                    bestand = EntityTools.merge(bestand);
                     reloadBestandTable();
                 }
             });
-            itemPopupEinbuchen.setEnabled(op.care.med.DBHandling.isAusgebucht(mybestid));
+            itemPopupEinbuchen.setEnabled(bestand.isAbgeschlossen());
             menuV.add(itemPopupEinbuchen);
 
             // ---------------
@@ -800,10 +839,7 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupAnbruch.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    HashMap hm = new HashMap();
-                    hm.put("Anbruch", "!NOW!");
-                    DBHandling.updateRecord("MPBestand", hm, "BestID", mybestid);
-                    hm.clear();
+                    bestand = MedBestandTools.anbrechen(bestand);
                     reloadBestandTable();
                 }
             });
@@ -815,44 +851,42 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupVerschließen.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    HashMap hm = new HashMap();
-                    hm.put("Anbruch", "!BAW!");
-                    hm.put("Aus", "!BAW!");
-                    DBHandling.updateRecord("MPBestand", hm, "BestID", mybestid);
-                    hm.clear();
+                    bestand.setAus(SYSConst.DATE_BIS_AUF_WEITERES);
+                    bestand.setAnbruch(SYSConst.DATE_BIS_AUF_WEITERES);
+                    bestand = EntityTools.merge(bestand);
                     reloadBestandTable();
                 }
             });
-            itemPopupVerschließen.setEnabled(op.care.med.DBHandling.isAnbruch(mybestid));
+            itemPopupVerschließen.setEnabled(bestand.isAngebrochen());
             menuV.add(itemPopupVerschließen);
 
-            //ocs.setEnabled(classname, "itemPopupEditVer", itemPopupEditVer, true);
             menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-
-            //ocs.setEnabled(classname, "itemPopupEditVer", itemPopupEditVer, true);
-            //menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }//GEN-LAST:event_tblBestandMousePressed
 
     private void tblVorratMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVorratMousePressed
-        if (!evt.isPopupTrigger()) {
+        final TMVorraete tm = (TMVorraete) tblVorrat.getModel();
+        if (tm.getRowCount() == 0) {
+            vorrat = null;
             return;
         }
-        final TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-        if (tm.getRowCount() > 0) {
-            Point p = evt.getPoint();
-            final int col = tblVorrat.columnAtPoint(p);
-            final int row = tblVorrat.rowAtPoint(p);
-            ListSelectionModel lsm = tblVorrat.getSelectionModel();
-            lsm.setSelectionInterval(row, row);
 
+        Point p = evt.getPoint();
+        final int col = tblVorrat.columnAtPoint(p);
+        final int row = tblVorrat.rowAtPoint(p);
+        ListSelectionModel lsm = tblVorrat.getSelectionModel();
+        lsm.setSelectionInterval(row, row);
+
+        vorrat = tm.getVorrat(row);
+        reloadBestandTable();
+
+        if (evt.isPopupTrigger()) {
             // Menüeinträge
             SYSTools.unregisterListeners(menuV);
             menuV = new JPopupMenu();
 
             JMenuItem itemPopupNew = new JMenuItem("Neu");
             itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
-
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     newVorrat();
                 }
@@ -865,7 +899,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(parent, "Sind sie sicher ?", "Vorrat löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Vorrat löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            //op.care.med.DBHandling.deleteVorrat(vorid);
+                            EntityTools.delete(vorrat);
                         }
                     }
                     reloadVorratTable();
@@ -878,7 +912,7 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     if (JOptionPane.showConfirmDialog(parent, "Sind sie sicher ?", "Vorrat abschließen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        //op.care.med.DBHandling.closeVorrat(vorid);
+                        MedVorratTools.abschliessen(vorrat);
                     }
                     reloadVorratTable();
                 }
@@ -915,35 +949,21 @@ public class DlgVorrat extends javax.swing.JDialog {
      */
     private void newVorrat() {
         String neuerVorrat = JOptionPane.showInputDialog(this, "Bitte geben Sie die Bezeichnung für den neuen Vorrat ein.");
-        if (neuerVorrat != null && !neuerVorrat.equals("")) {
-            HashMap hm = new HashMap();
-            hm.put("Text", neuerVorrat);
-            hm.put("BWKennung", bwkennung);
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            hm.put("Von", "!NOW!");
-            hm.put("Bis", "!BAW!");
-            DBHandling.insertRecord("MPVorrat", hm);
+
+        if (!SYSTools.catchNull(neuerVorrat).isEmpty()) {
+            MedVorrat vorrat = new MedVorrat(bewohner, neuerVorrat);
+            EntityTools.persist(vorrat);
             reloadVorratTable();
         }
     }
 
-    /**
-     * Löscht einen bestimmten Bestand und die zugehörigen Buchungen.
-     */
-    private void deleteBestand(long bestid) {
-        if (JOptionPane.showConfirmDialog(this, "Möchten Sie den Bestand wirklich löschen ?") == JOptionPane.YES_OPTION) {
-            DBHandling.deleteRecords("MPBestand", "BestID", bestid);
-            DBHandling.deleteRecords("MPBuchung", "BestID", bestid);
-            reloadBestandTable();
-        }
-    }
 
     /**
      * Löscht einen bestimmten Bestand und die zugehörigen Buchungen.
      */
 //    private void closeBestand(long bestid){
 //        if (JOptionPane.showConfirmDialog(this, "Möchten Sie den Bestand wirklich abschließen ?") == JOptionPane.YES_OPTION){
-//            
+//
 //            HashMap hm = new HashMap();
 //            hm.put("BestID", bestid);
 //            hm.put("BHPID", 0);
@@ -951,174 +971,118 @@ public class DlgVorrat extends javax.swing.JDialog {
 //            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
 //            hm.put("PIT", "!NOW!");
 //            op.tools.DBHandling.insertRecord("MPBuchung",hm);
-//            
+//
 //            HashMap hm2 = new HashMap();
 //            hm2.put("Aus","!NOW!");
 //            op.tools.DBHandling.updateRecord("MPBestand",hm2,"BestID",bestid);
 //            hm2.clear();
-//            
+//
 //            reloadBestandTable();
 //        }
 //    }
 
-    /**
-     * Löscht eine Buchung.
-     */
-    private void deleteBuchung(long buchid) {
-        if (JOptionPane.showConfirmDialog(this, "Möchten Sie die Buchung wirklich löschen ?") == JOptionPane.YES_OPTION) {
-            DBHandling.deleteRecords("MPBuchung", "BuchID", buchid);
-            reloadBuchungTable();
-        }
-    }
 
     /**
      * Öffnet den Dialog DlgEditBestand.
      */
     private void newBestand() {
-        new DlgEditBestand(this, vorid);
-        reloadBestandTable();
+//        new DlgEditBestand(this, vorid);
+//        reloadBestandTable();
     }
 
     /**
      * Öffnet den Dialog DlgEditBuchung
      */
     private void newBuchung() {
-        new DlgEditBuchung(this, bestid);
-        reloadBuchungTable();
-        TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-        tm.reload(tblVorrat.getSelectedRow(), tblVorrat.getSelectedColumn());
+//        new DlgEditBuchung(this, bestid);
+//        reloadBuchungTable();
+//        TMResultSet tm = (TMResultSet) tblVorrat.getModel();
+//        tm.reload(tblVorrat.getSelectedRow(), tblVorrat.getSelectedColumn());
 
     }
 
     private void resetBuchung() {
         if (JOptionPane.showConfirmDialog(this, "Sind Sie sicher ?") == JOptionPane.YES_OPTION) {
-            op.care.med.DBHandling.resetBestand(bestid);
+            MedBestandTools.zuruecksetzen(bestand);
             reloadVorratTable();
         }
     }
 
     private void reloadVorratTable() {
+        if (bewohner != null) {
+//            String sql = "SELECT DISTINCT v.VorID, v.Text 'Name des Vorrats', ifnull(b.saldo, 0.00) Bestandsmenge" +
+//                    " FROM MPVorrat v " +
+//                    " LEFT OUTER JOIN (" +
+//                    "   SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
+//                    "   INNER JOIN MPVorrat v ON v.VorID = best.VorID " +
+//                    "   INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+//                    "   WHERE v.BWKennung=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
+//                    "   GROUP BY best.VorID" +
+//                    " ) b ON b.VorID = v.VorID" +
+//                    " WHERE v.BWKennung=? " +
+//                    (cbClosedVorrat.isSelected() ? "" : " AND v.Bis = '9999-12-31 23:59:59' ") +
+//                    " ORDER BY v.Text ";
 
-        if (!bwkennung.equals("")) {
-            String sql = "SELECT DISTINCT v.VorID, v.Text 'Name des Vorrats', ifnull(b.saldo, 0.00) Bestandsmenge" +
-                    " FROM MPVorrat v " +
-                    " LEFT OUTER JOIN (" +
-                    "   SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
-                    "   INNER JOIN MPVorrat v ON v.VorID = best.VorID " +
-                    "   INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                    "   WHERE v.BWKennung=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
-                    "   GROUP BY best.VorID" +
-                    " ) b ON b.VorID = v.VorID" +
-                    " WHERE v.BWKennung=? " +
-                    (cbClosedVorrat.isSelected() ? "" : " AND v.Bis = '9999-12-31 23:59:59' ") +
-                    " ORDER BY v.Text ";
+            EntityManager em = OPDE.createEM();
+            Query query = em.createNamedQuery("MedVorrat.findVorraeteMitSummen");
+            query.setParameter(1, bewohner.getBWKennung());
+            query.setParameter(2, bewohner.getBWKennung());
+            query.setParameter(3, cbClosedVorrat.isSelected());
 
-
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            stmt.setString(2, bwkennung);
-            ResultSet rs = stmt.executeQuery();
-
-            //lslV = new HandleVorratSelections();
-
-            // TODO: hier gehts weiter
-            grmpf;
-            tblVorrat.setModel(new BeanTableModel(MedVorrat.class));
-
+            tblVorrat.setModel(new TMVorraete(query.getResultList()));
             tblVorrat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
+            em.close();
 
-            //jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
-            for (int i = 0; i < tblVorrat.getModel().getColumnCount(); i++) {
-                tblVorrat.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
-            }
+//            for (int i = 0; i < tblVorrat.getModel().getColumnCount(); i++) {
+//                tblVorrat.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
+//            }
 
         } else {
             tblVorrat.setModel(new DefaultTableModel());
         }
         ListSelectionModel lsm1 = tblBestand.getSelectionModel();
-        if (lslB != null) {
-            lsm1.removeListSelectionListener(lslB);
-        }
         tblBestand.setModel(new DefaultTableModel());
         tblBuchung.setModel(new DefaultTableModel());
     }
 
     private void reloadBestandTable() {
-        if (vorid == 0) {
+        if (vorrat == null) {
             tblBestand.setModel(new DefaultTableModel());
-            return;
-        }
-        String sql = " SELECT best.BestID, best.BestID, CONCAT(mprd.Bezeichnung,if(daf.Zusatz IS NULL, '', CONCAT(', ', daf.Zusatz)), ', ', " +
-                " F.Zubereitung) Produkt, Date(Ein) Eingang, Date(Anbruch) Anbruch, Date(Aus) Aus, " +
-                " ifnull(best.Text, '') " +
-                " TextBestand, mp.PZN, mp.Inhalt, sum.saldo Rest, APV, NextBest, " +
-                " CASE mp.Groesse WHEN 0 THEN 'N1' WHEN 1 THEN 'N2' " +
-                " WHEN 2 THEN 'N3' WHEN 3 THEN 'AP' WHEN 4 THEN 'OP' ELSE " +
-                " '' END Groesse FROM MPBestand best " +
-                "	INNER JOIN MPDarreichung daf ON daf.DafID = best.DafID " +
-                "   INNER JOIN MProdukte mprd ON mprd.MedPID = daf.MedPID " +
-                "	INNER JOIN MPFormen F ON daf.FormID = F.FormID " +
-                "	LEFT OUTER JOIN MPackung mp ON mp.MPID = best.MPID " +
-                "       LEFT OUTER JOIN " +
-                "           ( " +
-                "               SELECT best.BestID, ifnull(sum(buch.Menge),0) saldo FROM MPBestand best " +
-                "               INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                "               WHERE best.VorID=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
-                "               GROUP BY best.BestID " +
-                "           ) sum ON sum.BestID = best.BestID " +
-                " WHERE best.VorID = ? " +
-                (cbClosedBestand.isSelected() ? "" : " AND best.Aus = '9999-12-31 23:59:59' ") +
-                " ORDER BY Anbruch ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, vorid);
-            stmt.setLong(2, vorid);
-            ResultSet rs = stmt.executeQuery();
+        } else {
 
-            ListSelectionModel lsm = tblBestand.getSelectionModel();
-            if (lslB != null) {
-                lsm.removeListSelectionListener(lslB);
-            }
-            lslB = new HandleBestandSelections();
+            EntityManager em = OPDE.createEM();
+            Query query = em.createNamedQuery("MedBestand.findByVorratMitRestsumme");
+            query.setParameter(1, vorrat.getVorID());
+            query.setParameter(2, vorrat.getVorID());
+            query.setParameter(3, cbClosedBestand.isSelected());
 
-            tblBestand.setModel(new TMResultSet(rs));
+            tblBestand.setModel(new TMBestand(query.getResultList()));
             tblBestand.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-            lsm.addListSelectionListener(lslB);
-            //jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
+
+            em.close();
+
             for (int i = 0; i < tblBestand.getModel().getColumnCount(); i++) {
-                tblBestand.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
+                tblBestand.getColumnModel().getColumn(i).setCellRenderer(new RNDHTML());
             }
-        } catch (SQLException ex) {
-            new DlgException(ex);
+
+            tblBuchung.setModel(new DefaultTableModel());
         }
-        tblBuchung.setModel(new DefaultTableModel());
-        bestid = 0;
+        bestand = null;
+        reloadBuchungTable();
     }
 
     private void reloadBuchungTable() {
-        if (bestid == 0) {
+        if (bestand == null) {
             tblBuchung.setModel(new DefaultTableModel());
-            return;
-        }
-        String sql = "SELECT BuchID, Date(PIT) Datum, IFNULL(Text, '') Text, Menge, UKennung FROM MPBuchung " +
-                " WHERE BestID = ? " +
-                " ORDER BY PIT ";
-        // Hier gehts weiter
+        } else {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createNamedQuery("MedBuchungen.findByBestand");
+            query.setParameter("bestand", bestand);
 
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, bestid);
-            ResultSet rs = stmt.executeQuery();
-
-            tblBuchung.setModel(new TMResultSet(rs));
-            tblBuchung.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-            //jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
-            for (int i = 0; i < tblBuchung.getModel().getColumnCount(); i++) {
-                tblBuchung.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
+            tblBuchung.setModel(new BeanTableModel<MedBuchungen>(MedBuchungen.class, query.getResultList()));
+            tblBestand.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            em.close();
         }
     }
 
@@ -1145,45 +1109,4 @@ public class DlgVorrat extends javax.swing.JDialog {
     private JButton btnBestandsliste;
     // End of variables declaration//GEN-END:variables
 
-    class HandleVorratSelections implements ListSelectionListener {
-
-        public void valueChanged(ListSelectionEvent lse) {
-            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-            TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-            if (tm.getRowCount() <= 0) {
-                return;
-            }
-
-            if (!lse.getValueIsAdjusting()) {
-                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-                if (lsm.isSelectionEmpty()) {
-                    vorid = 0;
-                } else {
-                    vorid = ((BigInteger) tm.getPK(lsm.getLeadSelectionIndex())).longValue();
-                }
-                reloadBestandTable();
-            }
-        }
-    }
-
-    class HandleBestandSelections implements ListSelectionListener {
-
-        public void valueChanged(ListSelectionEvent lse) {
-            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-            TMResultSet tm = (TMResultSet) tblBestand.getModel();
-            if (tm.getRowCount() <= 0) {
-                return;
-            }
-
-            if (!lse.getValueIsAdjusting()) {
-                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-                if (lsm.isSelectionEmpty()) {
-                    bestid = 0;
-                } else {
-                    bestid = ((BigInteger) tm.getPK(lsm.getLeadSelectionIndex())).longValue();
-                    reloadBuchungTable();
-                }
-            }
-        }
-    }
 }

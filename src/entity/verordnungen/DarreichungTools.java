@@ -56,6 +56,10 @@ public class DarreichungTools {
         return text;
     }
 
+    public static String getPackungsEinheit(Darreichung darreichung){
+        return MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()];
+    }
+
 
     public static List<Darreichung> findDarreichungByMedProduktText(String suche) {
         suche = "%" + suche + "%";

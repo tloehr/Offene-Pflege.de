@@ -25,13 +25,18 @@ public class MedPackungTools {
                 } else if (o instanceof MedPackung) {
                     MedPackung packung = (MedPackung) o;
 
-                    text = packung.getInhalt().toString() + " " + MedFormenTools.EINHEIT[packung.getDarreichung().getMedForm().getPackEinheit()] + " " + GROESSE[packung.getGroesse()] + " ";
-                    text += "PZN: " + packung.getPzn();
+                    text = toPrettyString(packung);
                 } else {
                     text = o.toString();
                 }
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
             }
         };
+    }
+
+    public static String toPrettyString(MedPackung packung) {
+        String text = packung.getInhalt().toString() + " " + DarreichungTools.getPackungsEinheit(packung.getDarreichung()) + " " + GROESSE[packung.getGroesse()] + " ";
+        text += "PZN: " + packung.getPzn();
+        return text;
     }
 }

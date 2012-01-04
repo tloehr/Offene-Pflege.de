@@ -13,6 +13,7 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "MedBuchungen.findAll", query = "SELECT m FROM MedBuchungen m"),
         @NamedQuery(name = "MedBuchungen.findByBuchID", query = "SELECT m FROM MedBuchungen m WHERE m.buchID = :buchID"),
+        @NamedQuery(name = "MedBuchungen.findByBestand", query = "SELECT m FROM MedBuchungen m WHERE m.bestand = :bestand ORDER BY m.pit"),
         @NamedQuery(name = "MedBuchungen.findByMenge", query = "SELECT m FROM MedBuchungen m WHERE m.menge = :menge"),
         @NamedQuery(name = "MedBuchungen.findByText", query = "SELECT m FROM MedBuchungen m WHERE m.text = :text"),
         @NamedQuery(name = "MedBuchungen.findByStatus", query = "SELECT m FROM MedBuchungen m WHERE m.status = :status"),

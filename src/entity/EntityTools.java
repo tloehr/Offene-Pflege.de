@@ -32,6 +32,18 @@ public class EntityTools {
         return success;
     }
 
+    public static <T> T find(Class<T> entity, Object id){
+        T foundEntity = null;
+        EntityManager em = OPDE.createEM();
+
+        try {
+            foundEntity = (T) em.find(entity, id);
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return foundEntity;
+    }
+
     public static <T> T merge(T entity) {
         T mergedEntity = null;
         EntityManager em = OPDE.createEM();

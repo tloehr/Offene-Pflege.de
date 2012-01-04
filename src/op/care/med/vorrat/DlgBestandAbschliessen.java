@@ -301,7 +301,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     private void initDialog() {
         this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
         String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getBestID() + "</b></font> abschließen.";
-        text += MedBestandTools.getBestandTextAsHTML(bestand);
+        text += "<br/>" + MedBestandTools.getBestandTextAsHTML(bestand) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(text));
