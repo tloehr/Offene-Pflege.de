@@ -26,6 +26,7 @@
  */
 package op.care.med;
 
+import entity.verordnungen.MedHersteller;
 import op.OPDE;
 import op.tools.*;
 
@@ -114,6 +115,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
             txtName.setText(result.get(0).toString());
         }
         tabPane.setSelectedIndex(0);
+
         SYSTools.centerOnParent(this.parent, this);
         setTabsEnabled();
         setTitle(SYSTools.getWindowTitle("Medikamenten-Assistent"));
@@ -796,11 +798,12 @@ public class DlgMediAssistent extends javax.swing.JDialog {
     }//GEN-LAST:event_cmbHerstellerItemStateChanged
 
     private void btnEditHerstellerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditHerstellerActionPerformed
-        new DlgMedHersteller(this);
-        ResultSet rs1 = op.tools.DBRetrieve.getResultSet("MPHersteller", new String[]{"MPHID", "Firma", "Ort"}, new String[]{"Firma", "Ort"});
-        cmbHersteller.setModel(SYSTools.rs2cmb(rs1, true));
-        okUntilTab = jtst.getIndex("Hersteller");
-        btnNext.setEnabled(false);
+//        MedHersteller hersteller = new MedHersteller()
+//        new DlgMedHersteller(this);
+//        //ResultSet rs1 = op.tools.DBRetrieve.getResultSet("MPHersteller", new String[]{"MPHID", "Firma", "Ort"}, new String[]{"Firma", "Ort"});
+//        cmbHersteller.setModel(SYSTools.rs2cmb(rs1, true));
+//        okUntilTab = jtst.getIndex("Hersteller");
+//        btnNext.setEnabled(false);
 
     }//GEN-LAST:event_btnEditHerstellerActionPerformed
 

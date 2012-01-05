@@ -124,7 +124,7 @@ public class MedVorratTools {
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
 
-                    APV apv = MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", true, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    APV apv = MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
                     MedBestandTools.anbrechen(em, bestand.getNaechsterBestand(), apv.getApv());
@@ -264,8 +264,7 @@ public class MedVorratTools {
             // Alle Bestände abschliessen.
             for (MedBestand bestand : vorrat.getBestaende()) {
                 if (!bestand.isAbgeschlossen()) {
-                    boolean apvNeuberechnung = true;  // zur Lesbarkeit
-                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", !apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
                 }
             }
 

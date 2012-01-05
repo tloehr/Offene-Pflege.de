@@ -37,7 +37,6 @@ import javax.swing.border.*;
 import entity.Bewohner;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.care.med.DBHandling;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 

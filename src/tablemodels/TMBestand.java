@@ -22,6 +22,10 @@ public class TMBestand extends AbstractTableModel{
         this.data = data;
     }
 
+    public List<Object[]> getData() {
+        return data;
+    }
+
     public BigDecimal getBestandsMenge(int row) {
         return (BigDecimal) data.get(row)[1];
     }

@@ -240,6 +240,10 @@ public class MedBestand implements Serializable, Comparable {
         return aus.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
+    public boolean hasPackung(){
+        return packung != null;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

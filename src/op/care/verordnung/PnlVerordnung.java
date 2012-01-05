@@ -114,7 +114,6 @@ public class PnlVerordnung extends CleanablePanel {
         btnBuchen.setEnabled(false);
         btnVorrat.setEnabled(false);
         btnPrint.setEnabled(false);
-        btnBestellungen.setEnabled(false);
 
         standardActionListener = new ActionListener() {
 
@@ -151,7 +150,6 @@ public class PnlVerordnung extends CleanablePanel {
         btnVorrat = new JButton();
         btnPrint = new JButton();
         btnStellplan = new JButton();
-        btnBestellungen = new JButton();
         btnLock = new JButton();
 
         //======== this ========
@@ -367,19 +365,6 @@ public class PnlVerordnung extends CleanablePanel {
                 }
             });
             jToolBar1.add(btnStellplan);
-
-            //---- btnBestellungen ----
-            btnBestellungen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filefind.png")));
-            btnBestellungen.setText("Bestellungen");
-            btnBestellungen.setToolTipText("Bestellungen f\u00fcr alle BewohnerInnen anzeigen.");
-            btnBestellungen.setEnabled(false);
-            btnBestellungen.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBestellungenActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnBestellungen);
         }
 
         //---- btnLock ----
@@ -433,11 +418,6 @@ public class PnlVerordnung extends CleanablePanel {
     private void btnStellplanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStellplanActionPerformed
         printStellplan();
     }//GEN-LAST:event_btnStellplanActionPerformed
-
-    private void btnBestellungenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBestellungenActionPerformed
-        new DlgBestellListe(parent);
-        loadTable();
-    }//GEN-LAST:event_btnBestellungenActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         printVerordnungen(null);
@@ -763,7 +743,6 @@ public class PnlVerordnung extends CleanablePanel {
     private JButton btnVorrat;
     private JButton btnPrint;
     private JButton btnStellplan;
-    private JButton btnBestellungen;
     private JButton btnLock;
     // End of variables declaration//GEN-END:variables
 

@@ -28,7 +28,7 @@ package op.care.med.vorrat;
 
 import entity.verordnungen.*;
 import op.OPDE;
-import op.care.med.DBHandling;
+
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -36,7 +36,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
-import javax.swing.text.html.HTMLDocument;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
@@ -407,15 +407,15 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 APV apv = null;
 
                 if (rbGefallen.isSelected()) {
-                    apv = MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", false, MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
+                    apv = MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     //DBHandling.closeBestand(bestid, "Packung ist runtergefallen.", false, DBHandling.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    apv = MedBestandTools.abschliessen(em, bestand, "Packung ist abgelaufen.", false, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
+                    apv = MedBestandTools.abschliessen(em, bestand, "Packung ist abgelaufen.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     //DBHandling.closeBestand(bestid, "Packung ist abgelaufen.", false, DBHandling.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
-                    apv = MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", true, MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
+                    apv = MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
                     //DBHandling.closeBestand(bestid, "Korrekturbuchung zum Packungsabschluss", true, DBHandling.STATUS_KORREKTUR_AUTO_LEER);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }

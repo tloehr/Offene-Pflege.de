@@ -43,6 +43,7 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -67,6 +68,8 @@ public class SYSTools {
 
     public static final boolean LEFT_UPPER_SIDE = false;
     public static final boolean RIGHT_LOWER_SIDE = true;
+
+    public static final boolean MUST_BE_POSITIVE = true;
 
     /**
      *
@@ -674,6 +677,15 @@ public class SYSTools {
         return dcbm;
     }
 
+
+    public static DefaultListModel list2dlm(List list) {
+        DefaultListModel dlm = new DefaultListModel();
+        for (Object o : list){
+            dlm.addElement(o);
+        }
+        return dlm;
+    }
+
     /**
      * Erstellt aus einem Result Set ein ComboBox Modell. Wobei davon ausgegangen wird, dass in der ersten Spalte immer der PK steht.
      *
@@ -849,7 +861,7 @@ public class SYSTools {
         selectInComboBox(j, pattern, false);
     }
 
-    public static void addAllNodes(DefaultMutableTreeNode root, ArrayList children) {
+    public static void addAllNodes(DefaultMutableTreeNode root, java.util.List children) {
         if (children.size() > 0) {
             Iterator it = children.iterator();
             while (it.hasNext()) {
@@ -887,7 +899,15 @@ public class SYSTools {
         return (in == null ? "" : in);
     }
 
-    public static String catchNull(String in, String prefix, String suffix) {
+    /**
+     * Gibt die toString Ausgabe eines Objektes zurück. Hierbei kann man sicher sein, dass man nicht über
+     * ein <code>null</code> stolpert.
+     * @param in Eingangsobjekt
+     * @param prefix Präfix, der vorangestellt wird, wenn das Objekt nicht null ist.
+     * @param suffix Suffix, der angehangen wird, wenn das Objekt nicht null ist.
+     * @return
+     */
+    public static String catchNull(Object in, String prefix, String suffix) {
         String result = "";
         if (!catchNull(in).equals("")) {
             result = prefix + catchNull(in) + suffix;
@@ -1807,5 +1827,39 @@ public class SYSTools {
     }
 
 
+
+    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean mustBePositive) {
+        BigDecimal bd = null;
+        JTextComponent txt = (JTextComponent) evt.getSource();
+        Action toolTipAction = txt.getActionMap().get("hideTip");
+        if (toolTipAction != null) {
+            ActionEvent hideTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");
+            toolTipAction.actionPerformed(hideTip);
+        }
+        try {
+            bd = BigDecimal.valueOf(Double.parseDouble(txt.getText().replaceAll(",", "\\.")));
+            if (mustBePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
+                txt.setToolTipText("<html><font color=\"red\"><b>Sie können nur Zahlen größer 0 eingeben</b></font></html>");
+                toolTipAction = txt.getActionMap().get("postTip");
+                bd = BigDecimal.ONE;
+            } else {
+                txt.setToolTipText("");
+            }
+
+        } catch (NumberFormatException ex) {
+            if (mustBePositive) {
+                bd = BigDecimal.ONE;
+            } else {
+                bd = BigDecimal.ZERO;
+            }
+            txt.setToolTipText("<html><font color=\"red\"><b>Sie haben eine ungültige Zahl eingegeben.</b></font></html>");
+            toolTipAction = txt.getActionMap().get("postTip");
+            if (toolTipAction != null) {
+                ActionEvent postTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");
+                toolTipAction.actionPerformed(postTip);
+            }
+        }
+        return bd;
+    }
 
 }

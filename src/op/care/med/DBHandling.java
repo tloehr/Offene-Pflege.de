@@ -42,6 +42,7 @@ import java.sql.Statement;
 /**
  * @author tloehr
  */
+@Deprecated
 public class DBHandling {
     // Stati für MPBuchung
 
@@ -242,53 +243,53 @@ public class DBHandling {
         return result;
     }
 
-    /**
-     * Diese Methode liefert ein ResultSet. Dabei ist der Gedanke wie folgt. Wenn einem Vorrat einmal
-     * ein Medizinprodukt zugeordnet wurde. Dann kann man ab diesem Moment nur noch Produkte zuordnen,
-     * welche dieselbe Form haben (Einmal Tablette, immer Tablette).
-     * Wirkstoffe werden nicht gepr¸ft, da uns dazu keine verl?sslichen Tabellen vorliegen. Ist auch
-     * die Verantwortung des Arztes, der Apotheke und des Examens.
-     * <p/>
-     * Gibt es noch keine Zuordnung, dann kann man diesem Vorrat alles zuordnen.
-     *
-     * @param vorid PK des Vorrats
-     * @return ResultSet mit dem Ergebnis. NULL bei exception.
-     */
-    public static ResultSet getDAF2Vorrat(long vorid) {
-        ResultSet result = null;
-        String sql = "SELECT D.FormID FROM MPBestand B " +
-                " INNER JOIN MPDarreichung D ON B.DafID = D.DafID" +
-                " WHERE B.VorID=? " +
-                " LIMIT 0,1";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, vorid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                long formid = rs.getLong("FormID"); // Welche FormID wurde diesem Vorrat bereits zugeordnet.
-                // Es reicht sich immer den ersten anzusehen, sind eh alle gleich.
-                String sql1 = "SELECT D.DafID, M.Bezeichnung, D.Zusatz, F.Zubereitung FROM MPDarreichung D " +
-                        " INNER JOIN MPFormen F ON D.FormID = F.FormID" +
-                        " INNER JOIN MProdukte M ON M.MedPID = D.MedPID" +
-                        " WHERE D.FormID = ?" +
-                        " ORDER BY M.Bezeichnung, D.Zusatz, F.Zubereitung";
-                PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
-                stmt1.setLong(1, formid);
-                result = stmt1.executeQuery();
-            } else {
-                String sql1 = "SELECT D.DafID, M.Bezeichnung, D.Zusatz, F.Zubereitung FROM MPDarreichung D " +
-                        " INNER JOIN MPFormen F ON D.FormID = F.FormID" +
-                        " INNER JOIN MProdukte M ON M.MedPID = D.MedPID" +
-                        " ORDER BY M.Bezeichnung, D.Zusatz, F.Zubereitung";
-                Statement stmt1 = OPDE.getDb().db.createStatement();
-                result = stmt1.executeQuery(sql1);
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-
-        return result;
-    }
+//    /**
+//     * Diese Methode liefert ein ResultSet. Dabei ist der Gedanke wie folgt. Wenn einem Vorrat einmal
+//     * ein Medizinprodukt zugeordnet wurde. Dann kann man ab diesem Moment nur noch Produkte zuordnen,
+//     * welche dieselbe Form haben (Einmal Tablette, immer Tablette).
+//     * Wirkstoffe werden nicht gepr¸ft, da uns dazu keine verl?sslichen Tabellen vorliegen. Ist auch
+//     * die Verantwortung des Arztes, der Apotheke und des Examens.
+//     * <p/>
+//     * Gibt es noch keine Zuordnung, dann kann man diesem Vorrat alles zuordnen.
+//     *
+//     * @param vorid PK des Vorrats
+//     * @return ResultSet mit dem Ergebnis. NULL bei exception.
+//     */
+//    public static ResultSet getDAF2Vorrat(long vorid) {
+//        ResultSet result = null;
+//        String sql = "SELECT D.FormID FROM MPBestand B " +
+//                " INNER JOIN MPDarreichung D ON B.DafID = D.DafID" +
+//                " WHERE B.VorID=? " +
+//                " LIMIT 0,1";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, vorid);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                long formid = rs.getLong("FormID"); // Welche FormID wurde diesem Vorrat bereits zugeordnet.
+//                // Es reicht sich immer den ersten anzusehen, sind eh alle gleich.
+//                String sql1 = "SELECT D.DafID, M.Bezeichnung, D.Zusatz, F.Zubereitung FROM MPDarreichung D " +
+//                        " INNER JOIN MPFormen F ON D.FormID = F.FormID" +
+//                        " INNER JOIN MProdukte M ON M.MedPID = D.MedPID" +
+//                        " WHERE D.FormID = ?" +
+//                        " ORDER BY M.Bezeichnung, D.Zusatz, F.Zubereitung";
+//                PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
+//                stmt1.setLong(1, formid);
+//                result = stmt1.executeQuery();
+//            } else {
+//                String sql1 = "SELECT D.DafID, M.Bezeichnung, D.Zusatz, F.Zubereitung FROM MPDarreichung D " +
+//                        " INNER JOIN MPFormen F ON D.FormID = F.FormID" +
+//                        " INNER JOIN MProdukte M ON M.MedPID = D.MedPID" +
+//                        " ORDER BY M.Bezeichnung, D.Zusatz, F.Zubereitung";
+//                Statement stmt1 = OPDE.getDb().db.createStatement();
+//                result = stmt1.executeQuery(sql1);
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//
+//        return result;
+//    }
 
     /**
      * Um diese Methode zu verstehen muss man sich einige Fakten und Konzepte klar machen,
@@ -399,30 +400,30 @@ public class DBHandling {
 
         return result;
     }
-
-    /**
-     * Ermittelt die Menge (in PackEinheit), die in einem Vorrat noch enthalten ist.
-     *
-     * @param vorid pk des betreffenden Vorrats
-     * @return die Summe in der Packungs Einheit.
-     */
-    public static double getVorratSumme(long vorid) {
-        double result = 0d;
-        String sql = "SELECT IFNULL(SUM(b.Menge), 0) summe " +
-                " FROM MPBestand m " +
-                " INNER JOIN MPBuchung b ON m.BestID = b.BestID " +
-                " WHERE m.VorID=?";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, vorid);
-            ResultSet rs = stmt.executeQuery();
-            rs.first();
-            result = rs.getDouble("summe");
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
+//
+//    /**
+//     * Ermittelt die Menge (in PackEinheit), die in einem Vorrat noch enthalten ist.
+//     *
+//     * @param vorid pk des betreffenden Vorrats
+//     * @return die Summe in der Packungs Einheit.
+//     */
+//    public static double getVorratSumme(long vorid) {
+//        double result = 0d;
+//        String sql = "SELECT IFNULL(SUM(b.Menge), 0) summe " +
+//                " FROM MPBestand m " +
+//                " INNER JOIN MPBuchung b ON m.BestID = b.BestID " +
+//                " WHERE m.VorID=?";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, vorid);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.first();
+//            result = rs.getDouble("summe");
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
 //    public static String getBestandTextAsHTML(long bestid) {
 //        String result = "";

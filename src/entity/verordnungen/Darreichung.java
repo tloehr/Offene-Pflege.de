@@ -10,7 +10,8 @@ import java.util.Collection;
         @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM Darreichung m"),
         @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM Darreichung m WHERE m.dafID = :dafID"),
         @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM Darreichung m WHERE m.zusatz = :zusatz"),
-        @NamedQuery(name = "Darreichung.findByUKennung", query = "SELECT m FROM Darreichung m WHERE m.uKennung = :uKennung")})
+        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM Darreichung m WHERE m.medProdukt = :medProdukt ORDER BY m.medForm.zubereitung")
+})
 public class Darreichung implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -63,7 +64,7 @@ public class Darreichung implements Serializable {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung", fetch = FetchType.EAGER)
     private Collection<MedPackung> packungen;
 
     // N:1 Relationen

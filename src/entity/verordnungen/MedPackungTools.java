@@ -35,7 +35,7 @@ public class MedPackungTools {
     }
 
     public static String toPrettyString(MedPackung packung) {
-        String text = packung.getInhalt().toString() + " " + DarreichungTools.getPackungsEinheit(packung.getDarreichung()) + " " + GROESSE[packung.getGroesse()] + " ";
+        String text = packung.getInhalt().toString() + " " + DarreichungTools.getPackungsEinheit(packung.getDarreichung()) + ", " + GROESSE[packung.getGroesse()] + ", ";
         text += "PZN: " + packung.getPzn();
         return text;
     }

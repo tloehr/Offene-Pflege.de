@@ -418,7 +418,7 @@ public class OPDE {
 
 
 //            if (isDebug()) {
-//                jpaProps.put("eclipselink.logging.level", "FINER");
+                jpaProps.put("eclipselink.logging.level", "FINER");
 //            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);

@@ -27,33 +27,42 @@
 
 package op.care.med;
 
+import entity.EntityTools;
+import entity.verordnungen.MedHersteller;
+import entity.verordnungen.MedHerstellerTools;
+import entity.verordnungen.MedProdukte;
 import op.OPDE;
-import op.tools.DBHandling;
-import op.tools.ListElement;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
-import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author tloehr
  */
 public class DlgProdukt extends javax.swing.JDialog {
-    private AtomicLong mpid;
+
+    private MedProdukte produkt;
 
     /**
      * Creates new form DlgProdukt
      */
-    public DlgProdukt(JFrame parent, AtomicLong mpid, String template) {
+    public DlgProdukt(JFrame parent, MedProdukte produkt, String template) {
         super(parent, true);
-        this.mpid = mpid;
+        this.produkt = produkt;
         initComponents();
         SYSTools.centerOnParent(parent, this);
         txtBezeichnung.setText(template);
-        ResultSet rs1 = op.tools.DBRetrieve.getResultSet("MPHersteller", new String[]{"MPHID", "Firma", "Ort"}, new String[]{"Firma", "Ort"});
-        cmbHersteller.setModel(SYSTools.rs2cmb(rs1, true));
+        cmbHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{produkt.getHersteller()}));
+        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer());
         setVisible(true);
     }
 
@@ -65,121 +74,141 @@ public class DlgProdukt extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
-        txtBezeichnung = new javax.swing.JTextField();
-        jSeparator2 = new javax.swing.JSeparator();
-        btnCancel = new javax.swing.JButton();
-        btnOK = new javax.swing.JButton();
-        cmbHersteller = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
-        btnEditHersteller = new javax.swing.JButton();
+        jLabel1 = new JLabel();
+        jSeparator1 = new JSeparator();
+        jLabel2 = new JLabel();
+        txtBezeichnung = new JTextField();
+        jSeparator2 = new JSeparator();
+        btnCancel = new JButton();
+        btnOK = new JButton();
+        cmbHersteller = new JComboBox();
+        jLabel3 = new JLabel();
+        btnEditHersteller = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14));
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
+
+        //---- jLabel1 ----
+        jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
         jLabel1.setText("Neues Medizinprodukt");
 
+        //---- jLabel2 ----
         jLabel2.setText("Produktname:");
 
-        txtBezeichnung.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtBezeichnungCaretUpdate(evt);
+        //---- txtBezeichnung ----
+        txtBezeichnung.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtBezeichnungCaretUpdate(e);
             }
         });
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+        //---- btnCancel ----
+        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
         btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCancelActionPerformed(e);
             }
         });
 
-        btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+        //---- btnOK ----
+        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
         btnOK.setText("OK");
         btnOK.setEnabled(false);
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOKActionPerformed(e);
             }
         });
 
-        cmbHersteller.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Eintrag 1", "Eintrag 2", "Eintrag 3", "Eintrag 4"}));
-        cmbHersteller.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbHerstellerItemStateChanged(evt);
+        //---- cmbHersteller ----
+        cmbHersteller.setModel(new DefaultComboBoxModel(new String[]{
+                "Eintrag 1",
+                "Eintrag 2",
+                "Eintrag 3",
+                "Eintrag 4"
+        }));
+        cmbHersteller.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbHerstellerItemStateChanged(e);
             }
         });
 
+        //---- jLabel3 ----
         jLabel3.setText("Hersteller:");
 
-        btnEditHersteller.setBackground(java.awt.Color.white);
-        btnEditHersteller.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/edit.png")));
+        //---- btnEditHersteller ----
+        btnEditHersteller.setBackground(Color.white);
+        btnEditHersteller.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/edit.png")));
         btnEditHersteller.setToolTipText("Neuen Hersteller eingeben.");
         btnEditHersteller.setBorderPainted(false);
         btnEditHersteller.setOpaque(false);
-        btnEditHersteller.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditHerstellerActionPerformed(evt);
+        btnEditHersteller.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnEditHerstellerActionPerformed(e);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
-                                        .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
+                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
+                                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
+                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
                                                 .addComponent(btnOK)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(btnCancel))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addGroup(contentPaneLayout.createParallelGroup()
                                                         .addComponent(jLabel2)
                                                         .addComponent(jLabel3))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                .addComponent(cmbHersteller, 0, 307, Short.MAX_VALUE)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(btnEditHersteller, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                                                        .addComponent(txtBezeichnung, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))))
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(contentPaneLayout.createParallelGroup()
+                                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                                                .addComponent(cmbHersteller, 0, 360, Short.MAX_VALUE)
+                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(btnEditHersteller, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(txtBezeichnung, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))))
                                 .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+        contentPaneLayout.setVerticalGroup(
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel2)
-                                        .addComponent(txtBezeichnung, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(txtBezeichnung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                                 .addComponent(jLabel3)
-                                                .addComponent(cmbHersteller, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(cmbHersteller, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                         .addComponent(btnEditHersteller))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                                .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(btnCancel)
                                         .addComponent(btnOK))
                                 .addContainerGap())
         );
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 470) / 2, (screenSize.height - 192) / 2, 470, 192);
+        setSize(490, 220);
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmbHerstellerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbHerstellerItemStateChanged
@@ -187,25 +216,29 @@ public class DlgProdukt extends javax.swing.JDialog {
     }//GEN-LAST:event_cmbHerstellerItemStateChanged
 
     private void btnEditHerstellerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditHerstellerActionPerformed
-        new DlgMedHersteller(this);
-        ResultSet rs1 = op.tools.DBRetrieve.getResultSet("MPHersteller", new String[]{"MPHID", "Firma", "Ort"}, new String[]{"Firma", "Ort"});
-        cmbHersteller.setModel(SYSTools.rs2cmb(rs1, true));
+        MedHersteller hersteller = null;
+        new DlgMedHersteller(this, hersteller);
+        OPDE.debug(hersteller);
+        produkt.setHersteller(hersteller);
+        cmbHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{produkt.getHersteller()}));
+//        ResultSet rs1 = op.tools.DBRetrieve.getResultSet("MPHersteller", new String[]{"MPHID", "Firma", "Ort"}, new String[]{"Firma", "Ort"});
+        //cmbHersteller.setModel(SYSTools.rs2cmb(rs1, true));
+
     }//GEN-LAST:event_btnEditHerstellerActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        HashMap alreadyExist = op.tools.DBRetrieve.getSingleRecord("MProdukte", "Bezeichnung", txtBezeichnung.getText());
-        if (alreadyExist == null) {
-            long mphid = ((ListElement) cmbHersteller.getSelectedItem()).getPk();
-            HashMap hm = new HashMap();
-            hm.put("Bezeichnung", txtBezeichnung.getText());
-            hm.put("MPHID", mphid);
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            long pk = DBHandling.insertRecord("MProdukte", hm);
-            this.mpid.set(pk);
-            hm.clear();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("MedProdukte.findByBezeichnung");
+        query.setParameter("bezeichnung", txtBezeichnung.getText());
+        java.util.List<MedProdukte> list = query.getResultList();
+        em.close();
+
+        if (list.isEmpty()) {
+            MedHersteller hersteller = (MedHersteller) cmbHersteller.getSelectedItem();
+            produkt = new MedProdukte(hersteller, txtBezeichnung.getText());
+            EntityTools.persist(produkt);
             dispose();
-        } else {
-            alreadyExist.clear();
         }
     }//GEN-LAST:event_btnOKActionPerformed
 
@@ -219,16 +252,16 @@ public class DlgProdukt extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnEditHersteller;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JComboBox cmbHersteller;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTextField txtBezeichnung;
+    private JLabel jLabel1;
+    private JSeparator jSeparator1;
+    private JLabel jLabel2;
+    private JTextField txtBezeichnung;
+    private JSeparator jSeparator2;
+    private JButton btnCancel;
+    private JButton btnOK;
+    private JComboBox cmbHersteller;
+    private JLabel jLabel3;
+    private JButton btnEditHersteller;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

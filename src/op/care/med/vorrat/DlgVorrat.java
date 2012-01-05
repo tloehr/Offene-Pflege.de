@@ -26,6 +26,8 @@
  */
 package op.care.med.vorrat;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.EntityTools;
@@ -33,8 +35,8 @@ import entity.verordnungen.*;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import tablemodels.BeanTableModel;
 import tablemodels.TMBestand;
+import tablemodels.TMBuchungen;
 import tablemodels.TMVorraete;
 import tablerenderer.RNDHTML;
 
@@ -42,14 +44,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
 
 /**
  * In OPDE.de gibt es eine Bestandsverwaltung für Medikamente. Bestände werden mit Hilfe von 3 Tabellen
@@ -89,6 +91,7 @@ public class DlgVorrat extends javax.swing.JDialog {
     //    private OCSec ocs;
     private MedVorrat vorrat;
     private MedBestand bestand;
+    private JDialog thisComponent;
 
     /**
      * Creates new form DlgVorrat
@@ -97,6 +100,7 @@ public class DlgVorrat extends javax.swing.JDialog {
         super(parent, true);
         this.parent = parent;
         this.bewohner = bewohner;
+        thisComponent = this;
         initDialog();
     }
 
@@ -104,6 +108,7 @@ public class DlgVorrat extends javax.swing.JDialog {
         super(parent, true);
         this.parent = parent;
         this.bewohner = bewohner;
+        thisComponent = this;
         initDialog();
     }
 
@@ -111,6 +116,7 @@ public class DlgVorrat extends javax.swing.JDialog {
         super(parent, true);
         this.parent = parent;
         this.bewohner = null;
+        thisComponent = this;
         initDialog();
     }
 
@@ -118,6 +124,7 @@ public class DlgVorrat extends javax.swing.JDialog {
         super(parent, true);
         this.parent = parent;
         this.bewohner = null;
+        thisComponent = this;
         initDialog();
     }
 
@@ -140,6 +147,38 @@ public class DlgVorrat extends javax.swing.JDialog {
         tcm1.getColumn(TMBestand.COL_MENGE).setPreferredWidth(dim.width / 5);  // 1/5 tel der Gesamtbreite
         tcm1.getColumn(TMBestand.COL_NAME).setHeaderValue("Bestandsangabe");
         tcm1.getColumn(TMBestand.COL_MENGE).setHeaderValue("Restsumme");
+    }
+
+    private void jspVorratComponentResized(ComponentEvent e) {
+        JScrollPane jsp = (JScrollPane) e.getComponent();
+        Dimension dim = jsp.getSize();
+
+        TableColumnModel tcm1 = tblVorrat.getColumnModel();
+
+        if (tcm1.getColumnCount() == 0) {
+            return;
+        }
+
+        tcm1.getColumn(TMVorraete.COL_NAME).setPreferredWidth(dim.width / 4 * 3);
+        tcm1.getColumn(TMVorraete.COL_MENGE).setPreferredWidth(dim.width / 4);
+        tcm1.getColumn(TMVorraete.COL_NAME).setHeaderValue("Vorratsbezeichnung");
+        tcm1.getColumn(TMVorraete.COL_MENGE).setHeaderValue("Gesamtsumme");
+    }
+
+    private void jspBuchungComponentResized(ComponentEvent e) {
+
+        TableColumnModel tcm1 = tblBuchung.getColumnModel();
+
+        if (tcm1.getColumnCount() == 0) {
+            return;
+        }
+
+        tcm1.getColumn(TMBuchungen.COL_Datum).setHeaderValue("Datum");
+        tcm1.getColumn(TMBuchungen.COL_Text).setHeaderValue("Text");
+        tcm1.getColumn(TMBuchungen.COL_Menge).setHeaderValue("Menge");
+        tcm1.getColumn(TMBuchungen.COL_User).setHeaderValue("MitarbeiterIn");
+
+        SYSTools.packTable(tblBuchung, 2);
     }
 
     private void initDialog() {
@@ -168,16 +207,18 @@ public class DlgVorrat extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnBestandsliste = new JButton();
         lblFrage = new JLabel();
         lblBW = new JLabel();
         jPanel2 = new JPanel();
+        cbClosedVorrat = new JCheckBox();
         jspVorrat = new JScrollPane();
         tblVorrat = new JTable();
-        cbClosedVorrat = new JCheckBox();
         jPanel3 = new JPanel();
+        cbClosedBestand = new JCheckBox();
         jspBestand = new JScrollPane();
         tblBestand = new JTable();
-        cbClosedBestand = new JCheckBox();
         btnClose = new JButton();
         pnl123 = new JPanel();
         jspBuchung = new JScrollPane();
@@ -185,281 +226,13 @@ public class DlgVorrat extends javax.swing.JDialog {
         jPanel1 = new JPanel();
         txtSuche = new JTextField();
         cmbBW = new JComboBox();
-        jSeparator1 = new JSeparator();
-        jToolBar1 = new JToolBar();
-        btnBestandsliste = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
-
-        //---- lblFrage ----
-        lblFrage.setFont(new Font("Dialog", Font.BOLD, 24));
-        lblFrage.setText("Medikamenten Vorrat");
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
-
-        //======== jPanel2 ========
-        {
-            jPanel2.setBorder(new TitledBorder("Vorr\u00e4te"));
-
-            //======== jspVorrat ========
-            {
-                jspVorrat.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        jspVorratMousePressed(e);
-                    }
-                });
-
-                //---- tblVorrat ----
-                tblVorrat.setModel(new DefaultTableModel(
-                        new Object[][]{
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                        },
-                        new String[]{
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
-                ));
-                tblVorrat.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        tblVorratMousePressed(e);
-                    }
-                });
-                jspVorrat.setViewportView(tblVorrat);
-            }
-
-            //---- cbClosedVorrat ----
-            cbClosedVorrat.setText("Abgeschlossene anzeigen");
-            cbClosedVorrat.setBorder(BorderFactory.createEmptyBorder());
-            cbClosedVorrat.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cbClosedVorratItemStateChanged(e);
-                }
-            });
-
-            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
-            jPanel2.setLayout(jPanel2Layout);
-            jPanel2Layout.setHorizontalGroup(
-                    jPanel2Layout.createParallelGroup()
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel2Layout.createParallelGroup()
-                                            .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                                            .addComponent(cbClosedVorrat))
-                                    .addContainerGap())
-            );
-            jPanel2Layout.setVerticalGroup(
-                    jPanel2Layout.createParallelGroup()
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(cbClosedVorrat)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jspVorrat, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-        }
-
-        //======== jPanel3 ========
-        {
-            jPanel3.setBorder(new TitledBorder("Best\u00e4nde"));
-
-            //======== jspBestand ========
-            {
-                jspBestand.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        jspBestandMousePressed(e);
-                    }
-                });
-                jspBestand.addComponentListener(new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        jspBestandComponentResized(e);
-                    }
-                });
-
-                //---- tblBestand ----
-                tblBestand.setModel(new DefaultTableModel(
-                        new Object[][]{
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                        },
-                        new String[]{
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
-                ));
-                tblBestand.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        tblBestandMousePressed(e);
-                    }
-                });
-                jspBestand.setViewportView(tblBestand);
-            }
-
-            //---- cbClosedBestand ----
-            cbClosedBestand.setText("Abgeschlossene anzeigen");
-            cbClosedBestand.setBorder(BorderFactory.createEmptyBorder());
-            cbClosedBestand.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cbClosedBestandItemStateChanged(e);
-                }
-            });
-
-            GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
-            jPanel3.setLayout(jPanel3Layout);
-            jPanel3Layout.setHorizontalGroup(
-                    jPanel3Layout.createParallelGroup()
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel3Layout.createParallelGroup()
-                                            .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                                            .addComponent(cbClosedBestand))
-                                    .addContainerGap())
-            );
-            jPanel3Layout.setVerticalGroup(
-                    jPanel3Layout.createParallelGroup()
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addComponent(cbClosedBestand)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jspBestand, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-        }
-
-        //---- btnClose ----
-        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnClose.setText("Schlie\u00dfen");
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCloseActionPerformed(e);
-            }
-        });
-
-        //======== pnl123 ========
-        {
-            pnl123.setBorder(new TitledBorder("Buchungen"));
-
-            //======== jspBuchung ========
-            {
-                jspBuchung.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        jspBuchungMousePressed(e);
-                    }
-                });
-
-                //---- tblBuchung ----
-                tblBuchung.setModel(new DefaultTableModel(
-                        new Object[][]{
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                        },
-                        new String[]{
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
-                ));
-                tblBuchung.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        tblBuchungMousePressed(e);
-                    }
-                });
-                jspBuchung.setViewportView(tblBuchung);
-            }
-
-            GroupLayout pnl123Layout = new GroupLayout(pnl123);
-            pnl123.setLayout(pnl123Layout);
-            pnl123Layout.setHorizontalGroup(
-                    pnl123Layout.createParallelGroup()
-                            .addGroup(pnl123Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-            pnl123Layout.setVerticalGroup(
-                    pnl123Layout.createParallelGroup()
-                            .addGroup(pnl123Layout.createSequentialGroup()
-                                    .addComponent(jspBuchung, GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-        }
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new TitledBorder("Suche"));
-
-            //---- txtSuche ----
-            txtSuche.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtSucheCaretUpdate(e);
-                }
-            });
-            txtSuche.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSucheActionPerformed(e);
-                }
-            });
-            txtSuche.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtSucheFocusGained(e);
-                }
-            });
-
-            //---- cmbBW ----
-            cmbBW.setModel(new DefaultComboBoxModel(new String[]{
-
-            }));
-            cmbBW.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbBWItemStateChanged(e);
-                }
-            });
-            cmbBW.addPropertyChangeListener("model", new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    cmbBWPropertyChange(e);
-                }
-            });
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                            .addComponent(cmbBW, GroupLayout.Alignment.LEADING, 0, 931, Short.MAX_VALUE)
-                                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE))
-                                    .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(cmbBW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addContainerGap(46, Short.MAX_VALUE))
-            );
-        }
+        contentPane.setLayout(new FormLayout(
+            "$rgap, $lcgap, 308dlu:grow, $lcgap, default:grow(0.5), $lcgap, $rgap",
+            "fill:default, $rgap, 2*(fill:default, $lgap), fill:60dlu, $lgap, fill:215dlu:grow, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jToolBar1 ========
         {
@@ -476,60 +249,199 @@ public class DlgVorrat extends javax.swing.JDialog {
             });
             jToolBar1.add(btnBestandsliste);
         }
+        contentPane.add(jToolBar1, CC.xywh(3, 1, 3, 1, CC.FILL, CC.DEFAULT));
 
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(pnl123, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(btnClose, GroupLayout.Alignment.TRAILING))
-                                .addContainerGap())
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblFrage, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 1003, Short.MAX_VALUE)
-        );
-        contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblFrage)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addComponent(pnl123, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnClose)
-                                .addContainerGap())
-        );
+        //---- lblFrage ----
+        lblFrage.setFont(new Font("Dialog", Font.BOLD, 24));
+        lblFrage.setText("Medikamenten Vorrat");
+        contentPane.add(lblFrage, CC.xywh(3, 3, 3, 1, CC.FILL, CC.DEFAULT));
+
+        //---- lblBW ----
+        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblBW.setForeground(new Color(255, 51, 0));
+        lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
+        contentPane.add(lblBW, CC.xywh(3, 5, 3, 1, CC.FILL, CC.DEFAULT));
+
+        //======== jPanel2 ========
+        {
+            jPanel2.setBorder(new TitledBorder("Vorr\u00e4te"));
+            jPanel2.setLayout(new BoxLayout(jPanel2, BoxLayout.PAGE_AXIS));
+
+            //---- cbClosedVorrat ----
+            cbClosedVorrat.setText("Abgeschlossene anzeigen");
+            cbClosedVorrat.setBorder(BorderFactory.createEmptyBorder());
+            cbClosedVorrat.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cbClosedVorratItemStateChanged(e);
+                }
+            });
+            jPanel2.add(cbClosedVorrat);
+
+            //======== jspVorrat ========
+            {
+                jspVorrat.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        jspVorratMousePressed(e);
+                    }
+                });
+                jspVorrat.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspVorratComponentResized(e);
+                    }
+                });
+
+                //---- tblVorrat ----
+                tblVorrat.setModel(new DefaultTableModel(
+                    new Object[][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                    },
+                    new String[] {
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+                ));
+                tblVorrat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tblVorrat.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblVorratMousePressed(e);
+                    }
+                });
+                jspVorrat.setViewportView(tblVorrat);
+            }
+            jPanel2.add(jspVorrat);
+        }
+        contentPane.add(jPanel2, CC.xy(3, 9));
+
+        //======== jPanel3 ========
+        {
+            jPanel3.setBorder(new TitledBorder("Best\u00e4nde"));
+            jPanel3.setLayout(new BoxLayout(jPanel3, BoxLayout.PAGE_AXIS));
+
+            //---- cbClosedBestand ----
+            cbClosedBestand.setText("Abgeschlossene anzeigen");
+            cbClosedBestand.setBorder(BorderFactory.createEmptyBorder());
+            cbClosedBestand.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cbClosedBestandItemStateChanged(e);
+                }
+            });
+            jPanel3.add(cbClosedBestand);
+
+            //======== jspBestand ========
+            {
+                jspBestand.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspBestandComponentResized(e);
+                    }
+                });
+                jspBestand.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        jspBestandMousePressed(e);
+                    }
+                });
+
+                //---- tblBestand ----
+                tblBestand.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tblBestand.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblBestandMousePressed(e);
+                    }
+                });
+                jspBestand.setViewportView(tblBestand);
+            }
+            jPanel3.add(jspBestand);
+        }
+        contentPane.add(jPanel3, CC.xy(3, 11));
+
+        //---- btnClose ----
+        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+        btnClose.setText("Schlie\u00dfen");
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCloseActionPerformed(e);
+            }
+        });
+        contentPane.add(btnClose, CC.xywh(3, 13, 3, 1));
+
+        //======== pnl123 ========
+        {
+            pnl123.setBorder(new TitledBorder("Buchungen"));
+            pnl123.setLayout(new BoxLayout(pnl123, BoxLayout.PAGE_AXIS));
+
+            //======== jspBuchung ========
+            {
+                jspBuchung.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspBuchungComponentResized(e);
+                    }
+                });
+
+                //---- tblBuchung ----
+                tblBuchung.setModel(new DefaultTableModel(4, 0));
+                tblBuchung.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tblBuchung.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblBuchungMousePressed(e);
+                    }
+                });
+                jspBuchung.setViewportView(tblBuchung);
+            }
+            pnl123.add(jspBuchung);
+        }
+        contentPane.add(pnl123, CC.xywh(5, 9, 1, 3));
+
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new TitledBorder("Suche"));
+            jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.PAGE_AXIS));
+
+            //---- txtSuche ----
+            txtSuche.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtSucheActionPerformed(e);
+                }
+            });
+            txtSuche.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtSucheFocusGained(e);
+                }
+            });
+            jPanel1.add(txtSuche);
+
+            //---- cmbBW ----
+            cmbBW.setModel(new DefaultComboBoxModel(new String[] {
+
+            }));
+            cmbBW.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbBWItemStateChanged(e);
+                }
+            });
+            cmbBW.addPropertyChangeListener("model", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    cmbBWPropertyChange(e);
+                }
+            });
+            jPanel1.add(cmbBW);
+        }
+        contentPane.add(jPanel1, CC.xywh(3, 7, 3, 1));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -567,40 +479,6 @@ public class DlgVorrat extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_cmbBWItemStateChanged
 
-    private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
-//        if (ignoreEvent || !txtSuche.isEnabled()) {
-//            return;
-//        }
-//        if (txtSuche.getText().equals("")) {
-//            cmbBW.setModel(new DefaultComboBoxModel());
-//            bewohner = null;
-//            reloadVorratTable();
-//        } else if (txtSuche.getText().matches("\\d*")) { // Nur Zahlen.. Das ist eine BestID
-//            bewohner = null;
-//            reloadVorratTable();
-//        } else {
-//            DefaultComboBoxModel dcbm = null;
-//            if (txtSuche.getText().length() == 3) { // Könnte eine Suche nach der Kennung sein
-//                ResultSet rs = op.tools.DBRetrieve.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum"}, "BWKennung",
-//                        txtSuche.getText(), "=");
-//                dcbm = SYSTools.rs2cmb(rs);
-//            }
-//            if (dcbm == null || dcbm.getSize() == 0) {
-//                ResultSet rs = op.tools.DBRetrieve.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum"}, "Nachname",
-//                        "%" + txtSuche.getText() + "%", "like");
-//                dcbm = SYSTools.rs2cmb(rs, new String[]{"", "", "", "*"});
-//            }
-//            if (dcbm != null && dcbm.getSize() > 0) {
-//                cmbBW.setModel(dcbm);
-//                cmbBW.setSelectedIndex(0);
-//                cmbBWItemStateChanged(null);
-//            } else {
-//                cmbBW.setModel(new DefaultComboBoxModel());
-//                bwkennung = "";
-//            }
-//
-//        }
-    }//GEN-LAST:event_txtSucheCaretUpdate
 
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
         if (!txtSuche.getText().equals("")) {
@@ -626,7 +504,6 @@ public class DlgVorrat extends javax.swing.JDialog {
                     bewohner = EntityTools.find(Bewohner.class, txtSuche.getText());
                     if (bewohner != null) {
                         cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bewohner}));
-                        cmbBW.setSelectedIndex(0);
                     }
                 }
                 if (bewohner == null) {
@@ -634,7 +511,6 @@ public class DlgVorrat extends javax.swing.JDialog {
                     Query query = em.createNamedQuery("Bewohner.findByNachname");
                     query.setParameter("nachname", "%" + txtSuche.getText() + "%");
                     cmbBW.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new Bewohner[]{})));
-                    cmbBW.setSelectedIndex(0);
                 }
             }
         } else {
@@ -653,7 +529,8 @@ public class DlgVorrat extends javax.swing.JDialog {
     }//GEN-LAST:event_jspBuchungMousePressed
 
     private void tblBuchungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBuchungMousePressed
-        final BeanTableModel tm = (BeanTableModel) tblBuchung.getModel();
+
+        final TMBuchungen tm = (TMBuchungen) tblBuchung.getModel();
         if (tm.getRowCount() == 0) {
             bestand = null;
             return;
@@ -664,18 +541,19 @@ public class DlgVorrat extends javax.swing.JDialog {
         ListSelectionModel lsm = tblBuchung.getSelectionModel();
         lsm.setSelectionInterval(row, row);
 
-        final MedBuchungen buchung = (MedBuchungen) tm.getRow(row);
+        final MedBuchungen buchung = tm.getData().get(row);
 
         if (evt.isPopupTrigger()) {
 
             SYSTools.unregisterListeners(menuBuch);
             menuBuch = new JPopupMenu();
 
-
             JMenuItem itemPopupNew = new JMenuItem("Neu");
             itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    newBuchung();
+                    new DlgEditBuchung(thisComponent, bestand);
+                    reloadBuchungTable();
+                    refreshBothTables();
                 }
             });
             menuBuch.add(itemPopupNew);
@@ -690,12 +568,8 @@ public class DlgVorrat extends javax.swing.JDialog {
                     if (JOptionPane.showConfirmDialog(parent, "Möchten Sie die Buchung wirklich löschen ?") == JOptionPane.YES_OPTION) {
                         EntityTools.delete(buchung);
                         reloadBuchungTable();
-//                        TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-//                        tm.reload(tblVorrat.getSelectedRow(), tblVorrat.getSelectedColumn());
-
+                        refreshBothTables();
                     }
-
-
                 }
             });
             menuBuch.add(itemPopupDelete);
@@ -705,7 +579,11 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupReset.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    resetBuchung();
+                    if (JOptionPane.showConfirmDialog(thisComponent, "Sind Sie sicher ?") == JOptionPane.YES_OPTION) {
+                        MedBestandTools.zuruecksetzen(bestand);
+                        reloadBuchungTable();
+                        refreshBothTables();
+                    }
                 }
             });
             menuBuch.add(itemPopupReset);
@@ -719,23 +597,37 @@ public class DlgVorrat extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
+
+    private void refreshBothTables() {
+        // Tabellen aktualisieren ohne sie komplett neu zu laden.
+        BigDecimal bestandSumme = MedBestandTools.getBestandSumme(bestand);
+        int bestandRow = tblBestand.getSelectedRow();
+        ((TMBestand) tblBestand.getModel()).getData().get(bestandRow)[1] = bestandSumme;
+        ((TMBestand) tblBestand.getModel()).fireTableCellUpdated(bestandRow, TMBestand.COL_MENGE);
+
+        BigDecimal vorratSumme = MedVorratTools.getSumme(vorrat);
+        int vorratRow = tblVorrat.getSelectedRow();// ((TMVorraete) tblVorrat.getModel()).findPositionOf(vorrat);
+        ((TMVorraete) tblVorrat.getModel()).getData().get(vorratRow)[1] = vorratSumme;
+        ((TMVorraete) tblVorrat.getModel()).fireTableCellUpdated(vorratRow, TMVorraete.COL_MENGE);
+    }
+
     private void jspBestandMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jspBestandMousePressed
-        if (!evt.isPopupTrigger() || vorrat == null) {
-            return;
-        }
-        Point p = evt.getPoint();
-        SYSTools.unregisterListeners(menuV);
-        menuV = new JPopupMenu();
-
-        JMenuItem itemPopupNew = new JMenuItem("Neu");
-        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newBestand();
-            }
-        });
-        menuV.add(itemPopupNew);
-        menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//        if (!evt.isPopupTrigger() || vorrat == null) {
+//            return;
+//        }
+//        Point p = evt.getPoint();
+//        SYSTools.unregisterListeners(menuV);
+//        menuV = new JPopupMenu();
+//
+//        JMenuItem itemPopupNew = new JMenuItem("Neu");
+//        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
+//
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                newBestand();
+//            }
+//        });
+//        menuV.add(itemPopupNew);
+//        menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_jspBestandMousePressed
 
     private void tblBestandMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBestandMousePressed
@@ -748,8 +640,7 @@ public class DlgVorrat extends javax.swing.JDialog {
         Point p = evt.getPoint();
         final int col = tblBestand.columnAtPoint(p);
         final int row = tblBestand.rowAtPoint(p);
-        ListSelectionModel lsm = tblBestand.getSelectionModel();
-        lsm.setSelectionInterval(row, row);
+
 
         bestand = tm.getBestand(row);
         reloadBuchungTable();
@@ -757,17 +648,20 @@ public class DlgVorrat extends javax.swing.JDialog {
         // Menüeinträge
         if (evt.isPopupTrigger()) {
 
+            ListSelectionModel lsm = tblBestand.getSelectionModel();
+            lsm.setSelectionInterval(row, row);
+
             SYSTools.unregisterListeners(menuV);
             menuV = new JPopupMenu();
 
-            JMenuItem itemPopupNew = new JMenuItem("Neu");
-            itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    newBestand();
-                }
-            });
-            menuV.add(itemPopupNew);
+//            JMenuItem itemPopupNew = new JMenuItem("Neu");
+//            itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
+//
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    newBestand();
+//                }
+//            });
+//            menuV.add(itemPopupNew);
 
 //            JMenuItem itemPopupEdit = new JMenuItem("Bearbeiten");
 //            itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
@@ -805,8 +699,8 @@ public class DlgVorrat extends javax.swing.JDialog {
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
-                            boolean apvNeuberechnung = true;
-                            MedBestandTools.abschliessen(em, bestand, "", !apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+
+                            MedBestandTools.abschliessen(em, bestand, "", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
                             em.getTransaction().commit();
                         } catch (Exception e) {
                             em.getTransaction().rollback();
@@ -843,7 +737,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                     reloadBestandTable();
                 }
             });
-            //itemPopupAnbruch.setEnabled(!op.care.med.DBHandling.hasAnbruch(vorid)); // Nur an anbrechen lassen, wenn noch keine im Anbruch ist.
+            itemPopupAnbruch.setEnabled(!bestand.isAbgeschlossen() && !bestand.isAngebrochen());
             menuV.add(itemPopupAnbruch);
 
             // ---------------
@@ -857,7 +751,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                     reloadBestandTable();
                 }
             });
-            itemPopupVerschließen.setEnabled(bestand.isAngebrochen());
+            itemPopupVerschließen.setEnabled(!bestand.isAbgeschlossen() && bestand.isAngebrochen());
             menuV.add(itemPopupVerschließen);
 
             menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
@@ -924,23 +818,23 @@ public class DlgVorrat extends javax.swing.JDialog {
     }//GEN-LAST:event_tblVorratMousePressed
 
     private void jspVorratMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jspVorratMousePressed
-        if (!evt.isPopupTrigger()) {
-            return;
-        }
-        Point p = evt.getPoint();
-        SYSTools.unregisterListeners(menuV);
-        menuV = new JPopupMenu();
-
-        JMenuItem itemPopupNew = new JMenuItem("Neu");
-        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newVorrat();
-            }
-        });
-        menuV.add(itemPopupNew);
-
-        menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//        if (!evt.isPopupTrigger()) {
+//            return;
+//        }
+//        Point p = evt.getPoint();
+//        SYSTools.unregisterListeners(menuV);
+//        menuV = new JPopupMenu();
+//
+//        JMenuItem itemPopupNew = new JMenuItem("Neu");
+//        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
+//
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                newVorrat();
+//            }
+//        });
+//        menuV.add(itemPopupNew);
+//
+//        menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_jspVorratMousePressed
 
     /**
@@ -958,70 +852,8 @@ public class DlgVorrat extends javax.swing.JDialog {
     }
 
 
-    /**
-     * Löscht einen bestimmten Bestand und die zugehörigen Buchungen.
-     */
-//    private void closeBestand(long bestid){
-//        if (JOptionPane.showConfirmDialog(this, "Möchten Sie den Bestand wirklich abschließen ?") == JOptionPane.YES_OPTION){
-//
-//            HashMap hm = new HashMap();
-//            hm.put("BestID", bestid);
-//            hm.put("BHPID", 0);
-//            hm.put("Menge", op.care.med.DBHandling.getBestandSumme(bestid) * -1);
-//            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-//            hm.put("PIT", "!NOW!");
-//            op.tools.DBHandling.insertRecord("MPBuchung",hm);
-//
-//            HashMap hm2 = new HashMap();
-//            hm2.put("Aus","!NOW!");
-//            op.tools.DBHandling.updateRecord("MPBestand",hm2,"BestID",bestid);
-//            hm2.clear();
-//
-//            reloadBestandTable();
-//        }
-//    }
-
-
-    /**
-     * Öffnet den Dialog DlgEditBestand.
-     */
-    private void newBestand() {
-//        new DlgEditBestand(this, vorid);
-//        reloadBestandTable();
-    }
-
-    /**
-     * Öffnet den Dialog DlgEditBuchung
-     */
-    private void newBuchung() {
-//        new DlgEditBuchung(this, bestid);
-//        reloadBuchungTable();
-//        TMResultSet tm = (TMResultSet) tblVorrat.getModel();
-//        tm.reload(tblVorrat.getSelectedRow(), tblVorrat.getSelectedColumn());
-
-    }
-
-    private void resetBuchung() {
-        if (JOptionPane.showConfirmDialog(this, "Sind Sie sicher ?") == JOptionPane.YES_OPTION) {
-            MedBestandTools.zuruecksetzen(bestand);
-            reloadVorratTable();
-        }
-    }
-
     private void reloadVorratTable() {
         if (bewohner != null) {
-//            String sql = "SELECT DISTINCT v.VorID, v.Text 'Name des Vorrats', ifnull(b.saldo, 0.00) Bestandsmenge" +
-//                    " FROM MPVorrat v " +
-//                    " LEFT OUTER JOIN (" +
-//                    "   SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
-//                    "   INNER JOIN MPVorrat v ON v.VorID = best.VorID " +
-//                    "   INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-//                    "   WHERE v.BWKennung=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
-//                    "   GROUP BY best.VorID" +
-//                    " ) b ON b.VorID = v.VorID" +
-//                    " WHERE v.BWKennung=? " +
-//                    (cbClosedVorrat.isSelected() ? "" : " AND v.Bis = '9999-12-31 23:59:59' ") +
-//                    " ORDER BY v.Text ";
 
             EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("MedVorrat.findVorraeteMitSummen");
@@ -1032,16 +864,14 @@ public class DlgVorrat extends javax.swing.JDialog {
             tblVorrat.setModel(new TMVorraete(query.getResultList()));
             tblVorrat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-            em.close();
+            jspVorrat.dispatchEvent(new ComponentEvent(jspVorrat, ComponentEvent.COMPONENT_RESIZED));
 
-//            for (int i = 0; i < tblVorrat.getModel().getColumnCount(); i++) {
-//                tblVorrat.getColumnModel().getColumn(i).setCellRenderer(new RNDStandard());
-//            }
+            em.close();
 
         } else {
             tblVorrat.setModel(new DefaultTableModel());
         }
-        ListSelectionModel lsm1 = tblBestand.getSelectionModel();
+
         tblBestand.setModel(new DefaultTableModel());
         tblBuchung.setModel(new DefaultTableModel());
     }
@@ -1060,13 +890,13 @@ public class DlgVorrat extends javax.swing.JDialog {
             tblBestand.setModel(new TMBestand(query.getResultList()));
             tblBestand.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
+            jspBestand.dispatchEvent(new ComponentEvent(jspBestand, ComponentEvent.COMPONENT_RESIZED));
+
             em.close();
 
             for (int i = 0; i < tblBestand.getModel().getColumnCount(); i++) {
                 tblBestand.getColumnModel().getColumn(i).setCellRenderer(new RNDHTML());
             }
-
-            tblBuchung.setModel(new DefaultTableModel());
         }
         bestand = null;
         reloadBuchungTable();
@@ -1080,23 +910,34 @@ public class DlgVorrat extends javax.swing.JDialog {
             Query query = em.createNamedQuery("MedBuchungen.findByBestand");
             query.setParameter("bestand", bestand);
 
-            tblBuchung.setModel(new BeanTableModel<MedBuchungen>(MedBuchungen.class, query.getResultList()));
-            tblBestand.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            tblBuchung.setModel(new TMBuchungen(query.getResultList()));
+            tblBuchung.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            jspBuchung.dispatchEvent(new ComponentEvent(jspBuchung, ComponentEvent.COMPONENT_RESIZED));
+
+            DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+            renderer.setHorizontalAlignment(SwingConstants.RIGHT);
+            DefaultTableCellRenderer renderer2 = new DefaultTableCellRenderer();
+            renderer2.setHorizontalAlignment(SwingConstants.CENTER);
+
+            tblBuchung.getColumnModel().getColumn(TMBuchungen.COL_Menge).setCellRenderer(renderer);
+            tblBuchung.getColumnModel().getColumn(TMBuchungen.COL_Text).setCellRenderer(renderer2);
             em.close();
         }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private JToolBar jToolBar1;
+    private JButton btnBestandsliste;
     private JLabel lblFrage;
     private JLabel lblBW;
     private JPanel jPanel2;
+    private JCheckBox cbClosedVorrat;
     private JScrollPane jspVorrat;
     private JTable tblVorrat;
-    private JCheckBox cbClosedVorrat;
     private JPanel jPanel3;
+    private JCheckBox cbClosedBestand;
     private JScrollPane jspBestand;
     private JTable tblBestand;
-    private JCheckBox cbClosedBestand;
     private JButton btnClose;
     private JPanel pnl123;
     private JScrollPane jspBuchung;
@@ -1104,9 +945,6 @@ public class DlgVorrat extends javax.swing.JDialog {
     private JPanel jPanel1;
     private JTextField txtSuche;
     private JComboBox cmbBW;
-    private JSeparator jSeparator1;
-    private JToolBar jToolBar1;
-    private JButton btnBestandsliste;
     // End of variables declaration//GEN-END:variables
 
 }

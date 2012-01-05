@@ -14,8 +14,8 @@ import java.io.Serializable;
     @NamedQuery(name = "MedHersteller.findByOrt", query = "SELECT m FROM MedHersteller m WHERE m.ort = :ort"),
     @NamedQuery(name = "MedHersteller.findByTel", query = "SELECT m FROM MedHersteller m WHERE m.tel = :tel"),
     @NamedQuery(name = "MedHersteller.findByFax", query = "SELECT m FROM MedHersteller m WHERE m.fax = :fax"),
-    @NamedQuery(name = "MedHersteller.findByWww", query = "SELECT m FROM MedHersteller m WHERE m.www = :www"),
-    @NamedQuery(name = "MedHersteller.findByUKennung", query = "SELECT m FROM MedHersteller m WHERE m.uKennung = :uKennung")})
+    @NamedQuery(name = "MedHersteller.findByWww", query = "SELECT m FROM MedHersteller m WHERE m.www = :www")
+    })
 public class MedHersteller implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -38,11 +38,18 @@ public class MedHersteller implements Serializable {
     private String fax;
     @Column(name = "WWW")
     private String www;
-    @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
 
     public MedHersteller() {
+    }
+
+    public MedHersteller(String firma, String strasse, String plz, String ort, String tel, String fax, String www) {
+        this.firma = firma;
+        this.strasse = strasse;
+        this.plz = plz;
+        this.ort = ort;
+        this.tel = tel;
+        this.fax = fax;
+        this.www = www;
     }
 
     public Long getMphid() {
@@ -109,13 +116,6 @@ public class MedHersteller implements Serializable {
         this.www = www;
     }
 
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
-    }
 
     @Override
     public int hashCode() {
@@ -139,7 +139,15 @@ public class MedHersteller implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedHersteller[mphid=" + mphid + "]";
+        return "MedHersteller{" +
+                "mphid=" + mphid +
+                ", firma='" + firma + '\'' +
+                ", strasse='" + strasse + '\'' +
+                ", plz='" + plz + '\'' +
+                ", ort='" + ort + '\'' +
+                ", tel='" + tel + '\'' +
+                ", fax='" + fax + '\'' +
+                ", www='" + www + '\'' +
+                '}';
     }
-
 }

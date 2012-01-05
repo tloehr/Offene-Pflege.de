@@ -23,7 +23,12 @@ public class TMVorraete extends AbstractTableModel {
     }
 
     public BigDecimal getBestandsMenge(int row) {
-        return (BigDecimal) data.get(row)[1];
+        BigDecimal menge = (BigDecimal) data.get(row)[1];
+        return menge == null ? BigDecimal.ZERO : menge;
+    }
+
+    public List<Object[]> getData() {
+        return data;
     }
 
     public MedVorrat getVorrat(int row) {

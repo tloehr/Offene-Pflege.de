@@ -27,6 +27,12 @@
 
 package op.care.med;
 
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.event.*;
+
+import entity.EntityTools;
+import entity.verordnungen.MedHersteller;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -41,19 +47,23 @@ public class DlgMedHersteller extends javax.swing.JDialog {
     /**
      * Creates new form DlgMedHersteller
      */
-    public DlgMedHersteller(java.awt.Frame parent) {
-        super(parent, true);
-        initDialog();
-        SYSTools.centerOnParent(this, parent);
-        setVisible(true);
-    }
+//    public DlgMedHersteller(java.awt.Frame parent) {
+//        super(parent, true);
+//        initDialog();
+//        SYSTools.centerOnParent(this, parent);
+//        setVisible(true);
+//    }
 
     /**
      * Creates new form DlgMedHersteller
      */
-    public DlgMedHersteller(JDialog parent) {
+
+    private MedHersteller hersteller;
+
+    public DlgMedHersteller(JDialog parent, MedHersteller hersteller) {
         super(parent, true);
         initDialog();
+        this.hersteller = hersteller;
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -78,153 +88,176 @@ public class DlgMedHersteller extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        txtPLZ = new javax.swing.JTextField();
-        txtFirma = new javax.swing.JTextField();
-        txtStrasse = new javax.swing.JTextField();
-        txtTel = new javax.swing.JTextField();
-        txtFax = new javax.swing.JTextField();
-        txtWWW = new javax.swing.JTextField();
-        jSeparator2 = new javax.swing.JSeparator();
-        btnCancel = new javax.swing.JButton();
-        btnOK = new javax.swing.JButton();
-        txtOrt = new javax.swing.JTextField();
+        jLabel1 = new JLabel();
+        jSeparator1 = new JSeparator();
+        jLabel2 = new JLabel();
+        jLabel3 = new JLabel();
+        jLabel4 = new JLabel();
+        jLabel5 = new JLabel();
+        jLabel6 = new JLabel();
+        jLabel7 = new JLabel();
+        txtPLZ = new JTextField();
+        txtFirma = new JTextField();
+        txtStrasse = new JTextField();
+        txtTel = new JTextField();
+        txtFax = new JTextField();
+        txtWWW = new JTextField();
+        jSeparator2 = new JSeparator();
+        btnCancel = new JButton();
+        btnOK = new JButton();
+        txtOrt = new JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14));
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
+
+        //---- jLabel1 ----
+        jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
         jLabel1.setText("Neuen Hersteller eingeben");
 
+        //---- jLabel2 ----
         jLabel2.setText("Firma:");
 
+        //---- jLabel3 ----
         jLabel3.setText("Strasse:");
 
+        //---- jLabel4 ----
         jLabel4.setText("PLZ, Ort:");
 
+        //---- jLabel5 ----
         jLabel5.setText("Telefon:");
 
+        //---- jLabel6 ----
         jLabel6.setText("Fax:");
 
+        //---- jLabel7 ----
         jLabel7.setText("WWW:");
 
+        //---- txtPLZ ----
         txtPLZ.setText("jTextField1");
 
+        //---- txtFirma ----
         txtFirma.setText("jTextField2");
-        txtFirma.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtFirmaCaretUpdate(evt);
+        txtFirma.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtFirmaCaretUpdate(e);
             }
         });
 
+        //---- txtStrasse ----
         txtStrasse.setText("jTextField3");
 
+        //---- txtTel ----
         txtTel.setText("jTextField4");
 
+        //---- txtFax ----
         txtFax.setText("jTextField5");
 
+        //---- txtWWW ----
         txtWWW.setText("jTextField6");
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+        //---- btnCancel ----
+        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
         btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCancelActionPerformed(e);
             }
         });
 
-        btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+        //---- btnOK ----
+        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
         btnOK.setText("OK");
         btnOK.setEnabled(false);
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOKActionPerformed(e);
             }
         });
 
+        //---- txtOrt ----
         txtOrt.setText("jTextField2");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                                        .addComponent(jLabel1)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel4)
-                                                        .addComponent(jLabel2)
-                                                        .addComponent(jLabel3)
-                                                        .addComponent(jLabel5)
-                                                        .addComponent(jLabel6)
-                                                        .addComponent(jLabel7))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(txtFirma, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                                                        .addComponent(txtStrasse, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                                                        .addComponent(txtTel, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                                                        .addComponent(txtFax, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                                                        .addComponent(txtWWW, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(txtPLZ, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(txtOrt, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel)))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel6)
+                                .addComponent(jLabel7))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(txtFirma, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                .addComponent(txtStrasse, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                .addComponent(txtTel, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                .addComponent(txtFax, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                .addComponent(txtWWW, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addComponent(txtPLZ, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtOrt, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnOK)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel)))
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(txtFirma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel3)
-                                        .addComponent(txtStrasse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel4)
-                                        .addComponent(txtPLZ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtOrt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel5)
-                                        .addComponent(txtTel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel6)
-                                        .addComponent(txtFax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel7)
-                                        .addComponent(txtWWW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOK))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jLabel1)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtFirma, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(txtStrasse, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(txtPLZ, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtOrt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(txtTel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(txtFax, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel7)
+                        .addComponent(txtWWW, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnCancel)
+                        .addComponent(btnOK))
+                    .addContainerGap())
         );
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtFirmaCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtFirmaCaretUpdate
@@ -232,16 +265,8 @@ public class DlgMedHersteller extends javax.swing.JDialog {
     }//GEN-LAST:event_txtFirmaCaretUpdate
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        HashMap hm = new HashMap();
-        hm.put("Firma", txtFirma.getText());
-        hm.put("Strasse", txtStrasse.getText());
-        hm.put("PLZ", txtPLZ.getText());
-        hm.put("Ort", txtOrt.getText());
-        hm.put("Tel", txtTel.getText());
-        hm.put("Fax", txtFax.getText());
-        hm.put("WWW", txtWWW.getText());
-        hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-        op.tools.DBHandling.insertRecord("MPHersteller", hm);
+        hersteller = new MedHersteller(txtFirma.getText(), txtStrasse.getText(), txtPLZ.getText(), txtOrt.getText(), txtTel.getText(), txtFax.getText(), txtWWW.getText());
+        EntityTools.persist(hersteller);
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
@@ -256,24 +281,24 @@ public class DlgMedHersteller extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTextField txtFax;
-    private javax.swing.JTextField txtFirma;
-    private javax.swing.JTextField txtOrt;
-    private javax.swing.JTextField txtPLZ;
-    private javax.swing.JTextField txtStrasse;
-    private javax.swing.JTextField txtTel;
-    private javax.swing.JTextField txtWWW;
+    private JLabel jLabel1;
+    private JSeparator jSeparator1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JLabel jLabel4;
+    private JLabel jLabel5;
+    private JLabel jLabel6;
+    private JLabel jLabel7;
+    private JTextField txtPLZ;
+    private JTextField txtFirma;
+    private JTextField txtStrasse;
+    private JTextField txtTel;
+    private JTextField txtFax;
+    private JTextField txtWWW;
+    private JSeparator jSeparator2;
+    private JButton btnCancel;
+    private JButton btnOK;
+    private JTextField txtOrt;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

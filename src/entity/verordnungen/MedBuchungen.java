@@ -124,6 +124,10 @@ public class MedBuchungen implements Serializable {
         this.bestand = bestand;
     }
 
+    public Users getUser() {
+        return user;
+    }
+
     // N:1 Relationen
     @JoinColumn(name = "BestID", referencedColumnName = "BestID")
     @ManyToOne

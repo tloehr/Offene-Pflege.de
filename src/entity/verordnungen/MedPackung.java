@@ -14,8 +14,8 @@ import java.math.BigDecimal;
         @NamedQuery(name = "MedPackung.findByMpid", query = "SELECT m FROM MedPackung m WHERE m.mpid = :mpid"),
         @NamedQuery(name = "MedPackung.findByPzn", query = "SELECT m FROM MedPackung m WHERE m.pzn = :pzn"),
         @NamedQuery(name = "MedPackung.findByGroesse", query = "SELECT m FROM MedPackung m WHERE m.groesse = :groesse"),
-        @NamedQuery(name = "MedPackung.findByInhalt", query = "SELECT m FROM MedPackung m WHERE m.inhalt = :inhalt"),
-        @NamedQuery(name = "MedPackung.findByUKennung", query = "SELECT m FROM MedPackung m WHERE m.uKennung = :uKennung")})
+        @NamedQuery(name = "MedPackung.findByInhalt", query = "SELECT m FROM MedPackung m WHERE m.inhalt = :inhalt")
+})
 public class MedPackung implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -30,15 +30,16 @@ public class MedPackung implements Serializable {
     @Basic(optional = false)
     @Column(name = "Inhalt")
     private BigDecimal inhalt;
-    @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
     private Darreichung darreichung;
 
     public MedPackung() {
+    }
+
+    public MedPackung(Darreichung darreichung) {
+        this.darreichung = darreichung;
     }
 
     public Darreichung getDarreichung() {
@@ -80,14 +81,6 @@ public class MedPackung implements Serializable {
 
     public void setInhalt(BigDecimal inhalt) {
         this.inhalt = inhalt;
-    }
-
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
     }
 
     @Override

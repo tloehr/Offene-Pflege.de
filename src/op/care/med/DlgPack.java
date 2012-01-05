@@ -27,15 +27,19 @@
 
 package op.care.med;
 
+import entity.EntityTools;
+import entity.verordnungen.DarreichungTools;
+import entity.verordnungen.MedPackung;
 import op.OPDE;
-import op.tools.DBHandling;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
@@ -45,43 +49,23 @@ import java.util.HashMap;
 public class DlgPack extends javax.swing.JDialog {
     private boolean editMode;
     private long dafid;
-    private long mpid;
+    private MedPackung packung;
 
     /**
      * Creates new form DlgPack
      */
-    public DlgPack(JFrame parent, String title, long id, boolean editMode) {
+    public DlgPack(JDialog parent, String title, MedPackung packung) {
         super(parent, true);
         initComponents();
         setTitle(title);
-//        cmbGroesse.setModel(new DefaultComboBoxModel(SYSConst.GROESSE));
+        this.packung = packung;
 
-        this.editMode = editMode;
-        if (editMode) {
-            mpid = id;
-            dafid = 0;
-            try {
-                String sql = " SELECT P.PZN, P.Groesse, P.Inhalt, form.PackEinheit" +
-                        " FROM MPackung P " +
-                        " INNER JOIN MPDarreichung daf ON P.DafID = daf.DafID" +
-                        " INNER JOIN MPFormen form ON daf.FormID = form.FormID" +
-                        " WHERE P.MPID = ?";
-                PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-                stmt.setLong(1, mpid);
-                ResultSet rs = stmt.executeQuery();
-                rs.first();
-                txtPZN.setText(rs.getString("PZN"));
-                txtInhalt.setValue(rs.getDouble("Inhalt"));
-                cmbGroesse.setSelectedIndex(rs.getInt("Groesse"));
-                lblPackEinheit.setText(SYSConst.EINHEIT[rs.getInt("PackEinheit")]);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            mpid = 0;
-            dafid = id;
-            lblPackEinheit.setText(op.care.med.DBHandling.getPackEinheit(dafid));
+        if (packung.getMpid() != 0) {
+            txtPZN.setText(SYSTools.catchNull(packung.getPzn()));
+            txtInhalt.setValue(packung.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP));
+            cmbGroesse.setSelectedIndex(packung.getGroesse());
         }
+        lblPackEinheit.setText(DarreichungTools.getPackungsEinheit(packung.getDarreichung()));
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -94,123 +78,146 @@ public class DlgPack extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
-        cmbGroesse = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
-        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));
-        jLabel4 = new javax.swing.JLabel();
-        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));
-        jSeparator2 = new javax.swing.JSeparator();
-        btnCancel = new javax.swing.JButton();
-        btnOK = new javax.swing.JButton();
-        lblPackEinheit = new javax.swing.JLabel();
+        jLabel1 = new JLabel();
+        jSeparator1 = new JSeparator();
+        jLabel2 = new JLabel();
+        cmbGroesse = new JComboBox();
+        jLabel3 = new JLabel();
+        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));;
+        jLabel4 = new JLabel();
+        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));;
+        jSeparator2 = new JSeparator();
+        btnCancel = new JButton();
+        btnOK = new JButton();
+        lblPackEinheit = new JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14));
+        Container contentPane = getContentPane();
+
+        //---- jLabel1 ----
+        jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
         jLabel1.setText("Packung");
 
+        //---- jLabel2 ----
         jLabel2.setText("PZN:");
 
-        cmbGroesse.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
+        //---- cmbGroesse ----
+        cmbGroesse.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
+        }));
 
+        //---- jLabel3 ----
         jLabel3.setText("Gr\u00f6\u00dfe:");
 
-        txtPZN.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtPZNFocusGained(evt);
+        //---- txtPZN ----
+        txtPZN.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtPZNFocusGained(e);
             }
         });
 
+        //---- jLabel4 ----
         jLabel4.setText("Inhalt:");
 
-        txtInhalt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        //---- txtInhalt ----
+        txtInhalt.setHorizontalAlignment(SwingConstants.RIGHT);
         txtInhalt.setText("0");
-        txtInhalt.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtInhaltFocusGained(evt);
+        txtInhalt.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtInhaltFocusGained(e);
             }
         });
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+        //---- btnCancel ----
+        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
         btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCancelActionPerformed(e);
             }
         });
 
-        btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+        //---- btnOK ----
+        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
         btnOK.setText("OK");
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOKActionPerformed(e);
             }
         });
 
+        //---- lblPackEinheit ----
         lblPackEinheit.setText("jLabel5");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel2)
-                                                        .addComponent(jLabel3))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(txtPZN, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
-                                                        .addComponent(cmbGroesse, 0, 389, Short.MAX_VALUE)))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel4)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtInhalt, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblPackEinheit))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel)))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                        .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel3))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(txtPZN, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                                .addComponent(cmbGroesse, 0, 329, Short.MAX_VALUE)))
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addComponent(jLabel4)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtInhalt, GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblPackEinheit))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnOK)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel)))
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(txtPZN, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel3)
-                                        .addComponent(cmbGroesse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel4)
-                                        .addComponent(lblPackEinheit)
-                                        .addComponent(txtInhalt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOK))
-                                .addContainerGap(18, Short.MAX_VALUE))
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jLabel1)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtPZN, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(cmbGroesse, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(lblPackEinheit)
+                        .addComponent(txtInhalt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnCancel)
+                        .addComponent(btnOK))
+                    .addContainerGap(15, Short.MAX_VALUE))
         );
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtInhaltFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtInhaltFocusGained
@@ -222,18 +229,20 @@ public class DlgPack extends javax.swing.JDialog {
     }//GEN-LAST:event_txtPZNFocusGained
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        HashMap hm = new HashMap();
-        Number Inhalt = (Number) txtInhalt.getValue();
-        hm.put("PZN", txtPZN.getText());
-        hm.put("Groesse", cmbGroesse.getSelectedIndex());
-        hm.put("Inhalt", Inhalt.doubleValue());
 
-        if (editMode) {
-            DBHandling.updateRecord("MPackung", hm, "MPID", mpid);
+        packung.setPzn(txtPZN.getText());
+        packung.setGroesse((short) cmbGroesse.getSelectedIndex());
+        packung.setInhalt((BigDecimal) txtInhalt.getValue());
+//        HashMap hm = new HashMap();
+//        Number Inhalt = (Number) txtInhalt.getValue();
+//        hm.put("PZN", txtPZN.getText());
+//        hm.put("Groesse", cmbGroesse.getSelectedIndex());
+//        hm.put("Inhalt", Inhalt.doubleValue());
+
+        if (packung.getMpid() != null) {
+            packung = EntityTools.merge(packung);
         } else {
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            hm.put("DafID", dafid);
-            DBHandling.insertRecord("MPackung", hm);
+            EntityTools.persist(packung);
         }
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
@@ -244,18 +253,18 @@ public class DlgPack extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JComboBox cmbGroesse;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JLabel lblPackEinheit;
-    private javax.swing.JFormattedTextField txtInhalt;
-    private javax.swing.JFormattedTextField txtPZN;
+    private JLabel jLabel1;
+    private JSeparator jSeparator1;
+    private JLabel jLabel2;
+    private JComboBox cmbGroesse;
+    private JLabel jLabel3;
+    private JFormattedTextField txtPZN;
+    private JLabel jLabel4;
+    private JFormattedTextField txtInhalt;
+    private JSeparator jSeparator2;
+    private JButton btnCancel;
+    private JButton btnOK;
+    private JLabel lblPackEinheit;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

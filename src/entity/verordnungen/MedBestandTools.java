@@ -24,6 +24,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class MedBestandTools {
+    public static boolean apvNeuberechnung = true;
 
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
@@ -191,6 +192,7 @@ public class MedBestandTools {
         BigDecimal bestandsumme = getBestandSumme(bestand);
 
         MedBuchungen buchung = new MedBuchungen(bestand, bestandsumme.negate(), null, status);
+        buchung.setText(text);
         em.persist(buchung);
 
         bestand.setAus(new Date());
@@ -370,13 +372,16 @@ public class MedBestandTools {
     public static String getBestandAsHTML(MedBestand bestand) {
         String result = "";
 
+        String htmlcolor = bestand.isAbgeschlossen() ? "gray" : "red";
 
-        result += "<font color=\"red\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
+        result += "<font color=\""+htmlcolor+"\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
         result += DarreichungTools.toPrettyString(bestand.getDarreichung());
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).isEmpty()) {
             result += ", " + MedPackungTools.toPrettyString(bestand.getPackung());
         }
+
+        result += ", APV: " + bestand.getApv().setScale(2, BigDecimal.ROUND_HALF_UP);
 
         if (bestand.hasNextBestand()) {
             result += ", <b>nächster Bestand: " + bestand.getNaechsterBestand().getBestID() + "</b>";

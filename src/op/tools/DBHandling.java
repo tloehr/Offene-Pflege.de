@@ -35,6 +35,7 @@ import java.util.*;
 /**
  * @author tloehr
  */
+@Deprecated
 public class DBHandling {
 
 //    public static DefaultComboBoxModel getDCMBMassnahmen() {

@@ -32,7 +32,6 @@ import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.DlgMediAssistent;
-import op.tools.GuiChecks;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
@@ -558,7 +557,7 @@ public class DlgBestand extends javax.swing.JDialog {
     }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
-        menge = new BigDecimal(GuiChecks.checkDouble(evt, true));
+        menge = SYSTools.checkBigDecimal(evt, true);
         mengeEingegeben = !menge.equals(BigDecimal.ZERO);
         setApply();
     }//GEN-LAST:event_txtMengeCaretUpdate

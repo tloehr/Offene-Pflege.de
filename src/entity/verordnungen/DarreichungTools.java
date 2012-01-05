@@ -3,6 +3,7 @@ package entity.verordnungen;
 import entity.Bewohner;
 import entity.EntityTools;
 import op.OPDE;
+import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -12,6 +13,10 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,59 +190,6 @@ public class DarreichungTools {
         return liste;
     }
 
-//    public static ResultSet getVorrat2DAF(String bwkennung, long dafid, Bool foundMatch) {
-//        ResultSet result = null;
-//        foundMatch.setBool(true);
-//        String sql = " SELECT v.VorID, v.Text " +
-//                " FROM MPVorrat v" +
-//                " INNER JOIN MPBestand b ON v.VorID = b.VorID" +
-//                " WHERE v.BWKennung=? AND b.DafID = ?  " +
-//                " AND v.Bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES;
-//        try {
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-//            stmt.setString(1, bwkennung);
-//            stmt.setLong(2, dafid);
-//            result = stmt.executeQuery();
-//            if (!result.first()) {
-//                // Gibts nicht. Dann zeigen wir alle Vorr?te an, die zumindest dieselbe FormID haben, wie
-//                // die gesuchte DAF.
-//                foundMatch.setBool(false);
-//
-//                String sql1 = " SELECT DISTINCT v.VorID, v.Text " +
-//                        " FROM MPVorrat v" +
-//                        " INNER JOIN MPBestand b ON v.VorID = b.VorID " +
-//                        " INNER JOIN MPDarreichung d ON b.DafID = d.DafID" +
-//                        " WHERE d.FormID IN (" +
-//                        "       SELECT FormID " +
-//                        "       FROM MPFormen " +
-//                        "       WHERE (Equiv IN ( " + // Alle Formen, die gleichwertig sind
-//                        "               SELECT Equiv " +
-//                        "               FROM MPDarreichung d " +
-//                        "               INNER JOIN MPFormen f ON f.FormID = d.FormID " +
-//                        "               WHERE d.DafID = ? " +
-//                        "               ) AND Equiv <> 0 " +
-//                        "           OR " +
-//                        "           ( FormID IN (" + // Falls diese Form keine Gleichwertigen besitzt (Equiv = 0), dann nur die Form selbst.
-//                        "               SELECT FormID FROM MPDarreichung WHERE DafID = ? )" +
-//                        "           )" +
-//                        "       )" +
-//                        " ) " +
-//                        " AND v.BWKennung=? " +
-//                        " AND v.Bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
-//                        " ORDER BY v.Text ";
-//                PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
-//                stmt1.setLong(1, dafid);
-//                stmt1.setLong(2, dafid);
-//                stmt1.setString(3, bwkennung);
-//                result = stmt1.executeQuery();
-//            }
-//        } catch (SQLException ex) {
-//            foundMatch.setBool(false);
-//            new DlgException(ex);
-//        }
-//
-//        return result;
-//    }
 
 
 }
