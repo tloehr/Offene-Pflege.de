@@ -27,46 +27,60 @@
 
 package op.care.med;
 
+import entity.verordnungen.*;
 import op.OPDE;
-import op.tools.DBHandling;
-import op.tools.*;
+import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.awt.*;
+import java.awt.event.*;
+import java.math.BigDecimal;
 
 /**
  * @author root
  */
 public class DlgDAF extends javax.swing.JDialog {
-    private long medpid;
-    private long formid;
-    private long dafid;
+    private Darreichung darreichung;
     private boolean editMode;
 
-    /**
-     * @param long enthält die dafid bei Änderung und die zugehörige medpid bei Neueingabe.
-     */
-    public DlgDAF(JFrame parent, String title, long id, boolean editMode) {
+
+    public DlgDAF(JFrame parent, String title, Darreichung darreichung) {
         super(parent, true);
-        this.editMode = editMode;
         initComponents();
-        cmbForm.setModel(DBRetrieve.getMPFormen());
+        this.darreichung = darreichung;
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("MedFormen.findAll");
+        cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new MedFormen[]{})));
+        cmbForm.setRenderer(MedFormenTools.getMedFormenRenderer());
+        em.close();
+        editMode = darreichung.getDafID() != null;
+
         if (editMode) {
-            this.medpid = 0;
-            this.dafid = id;
-            HashMap daf = DBRetrieve.getSingleRecord("MPDarreichung", new String[]{"Zusatz", "FormID"}, "DafID", dafid);
-            double apv = op.care.med.DBHandling.getAPV(dafid, "");
-            long thisFormID = ((BigInteger) daf.get("FormID")).longValue();
-            SYSTools.selectInComboBox(cmbForm, thisFormID);
-            cmbFormItemStateChanged(null);
-            txtZusatz.setText(daf.get("Zusatz").toString());
-            txtAPV.setText(Double.toString(apv));
-            //cbKalkulieren.setSelected(((Boolean) daf.get("Kalkulieren")).booleanValue());
+
+//            //HashMap daf = DBRetrieve.getSingleRecord("MPDarreichung", new String[]{"Zusatz", "FormID"}, "DafID", dafid);
+////            double apv = op.care.med.DBHandling.getAPV(dafid, "");
+////            long thisFormID = ((BigInteger) daf.get("FormID")).longValue();
+//
+//            apv = APVTools.getAPV(darreichung);
+//            if (apv == null) {
+//                apv = new APV(BigDecimal.ONE, false, null, darreichung);
+//            }
+//
+//            if (darreichung.getMedForm().getStatus() == MedFormenTools.APV1) {
+//                txtAPV.setText("1");
+//                txtAPV.setEnabled(false);
+//            } else {
+//                txtAPV.setText(apv.getApv().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+//                txtAPV.setEnabled(true);
+//            }
+
+            cmbForm.setSelectedItem(darreichung.getMedForm());
+            txtZusatz.setText(SYSTools.catchNull(darreichung.getZusatz()));
+
         } else {
-            this.medpid = id;
-            this.dafid = 0;
+//            apv = new APV(BigDecimal.ONE, false, null, darreichung);
             cmbForm.setSelectedIndex(1);
         }
 
@@ -84,146 +98,132 @@ public class DlgDAF extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jPanel1 = new JPanel();
+        jLabel1 = new JLabel();
+        jSeparator1 = new JSeparator();
+        jLabel2 = new JLabel();
+        txtZusatz = new JTextField();
+        jLabel3 = new JLabel();
+        cmbForm = new JComboBox();
+        jSeparator2 = new JSeparator();
+        btnCancel = new JButton();
+        btnOK = new JButton();
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
-        txtZusatz = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        cmbForm = new javax.swing.JComboBox();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        lblAnw = new javax.swing.JLabel();
-        lblPack = new javax.swing.JLabel();
-        txtAPV = new javax.swing.JTextField();
-        jSeparator2 = new javax.swing.JSeparator();
-        btnCancel = new javax.swing.JButton();
-        btnOK = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+        Container contentPane = getContentPane();
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14));
-        jLabel1.setText("Darreichungsform");
+        //======== jPanel1 ========
+        {
 
-        jLabel2.setText("Zusatzbezeichnung:");
+            //---- jLabel1 ----
+            jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
+            jLabel1.setText("Darreichungsform");
 
-        jLabel3.setText("Form:");
+            //---- jLabel2 ----
+            jLabel2.setText("Zusatzbezeichnung:");
 
-        cmbForm.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbForm.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbFormItemStateChanged(evt);
-            }
-        });
+            //---- jLabel3 ----
+            jLabel3.setText("Form:");
 
-        jLabel4.setText("Verhältnis Anwendungseinheit zu Packungseinheit");
+            //---- cmbForm ----
+            cmbForm.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbForm.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbFormItemStateChanged(e);
+                }
+            });
 
-        jLabel5.setText("entspricht 1");
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+            btnCancel.setText("Abbrechen");
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
 
-        lblAnw.setForeground(java.awt.Color.blue);
-        lblAnw.setText("jLabel8");
+            //---- btnOK ----
+            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+            btnOK.setText("OK");
+            btnOK.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnOKActionPerformed(e);
+                }
+            });
 
-        lblPack.setForeground(java.awt.Color.blue);
-        lblPack.setText("jLabel9");
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jSeparator1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                            .addComponent(jLabel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                                    .addComponent(jLabel3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup()
+                                    .addComponent(cmbForm, 0, 258, Short.MAX_VALUE)
+                                    .addComponent(txtZusatz, GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)))
+                            .addComponent(jSeparator2, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnOK)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnCancel)))
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtZusatz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmbForm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addGap(52, 52, 52)
+                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnCancel)
+                            .addComponent(btnOK))
+                        .addContainerGap(11, Short.MAX_VALUE))
+            );
+        }
 
-        txtAPV.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtAPV.setText("1");
-
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"))); // NOI18N
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-
-        btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"))); // NOI18N
-        btnOK.setText("OK");
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
-                                                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cmbForm, 0, 255, Short.MAX_VALUE)
-                                                        .addComponent(txtZusatz, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)))
-                                        .addComponent(jLabel4)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(txtAPV, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblAnw)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jLabel5)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblPack))
-                                        .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel)))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(txtZusatz, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cmbForm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel3))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblAnw)
-                                        .addComponent(jLabel5)
-                                        .addComponent(lblPack)
-                                        .addComponent(txtAPV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOK))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
         );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -231,49 +231,52 @@ public class DlgDAF extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        HashMap hm = new HashMap();
-        hm.put("Zusatz", txtZusatz.getText());
-        hm.put("FormID", formid);
-        double apv = Double.parseDouble(txtAPV.getText());
-       /* if (editMode) {
-            DBHandling.updateRecord("MPDarreichung", hm, "DafID", dafid);
-            op.care.med.DBHandling.setAPV(dafid, apv, false);
-        } else {
-            hm.put("MedPID", medpid);
-            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            dafid = DBHandling.insertRecord("MPDarreichung", hm);
-            int formStatus = op.care.med.DBHandling.getFormStatusDafID(dafid);
-            op.care.med.DBHandling.setAPV(dafid, apv, formStatus == op.care.med.DBHandling.FORMSTATUS_APV_PER_DAF);
-        }*/
+
+        darreichung.setZusatz(txtZusatz.getText());
+        darreichung.setMedForm((MedFormen) cmbForm.getSelectedItem());
+
+
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            if (editMode) {
+                darreichung = em.merge(darreichung);
+//                apv = em.merge(apv);
+            } else {
+                em.persist(darreichung);
+//                apv.setTauschen(darreichung.getMedForm().getStatus() == MedFormenTools.APV_PER_DAF);
+//                em.persist(apv);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void cmbFormItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbFormItemStateChanged
-        ListElement le = (ListElement) cmbForm.getSelectedItem();
-        ArrayList al = DBRetrieve.getMPForm(le.getPk());
-        formid = le.getPk();
-        int anwEinheit = ((Integer) al.get(1)).intValue();
-        int packEinheit = ((Integer) al.get(2)).intValue();
-        lblAnw.setText(SYSConst.EINHEIT[anwEinheit] + SYSTools.catchNull(al.get(3).toString(), " ", ""));
-        lblPack.setText(SYSConst.EINHEIT[packEinheit]);
+        MedFormen form = (MedFormen) evt.getItem();
+//        lblAnw.setText(MedFormenTools.EINHEIT[form.getAnwEinheit()]);
+//        lblPack.setText(MedFormenTools.EINHEIT[form.getPackEinheit()]);
+//        txtAPV.setText("1");
+//        txtAPV.setEnabled(form.getStatus() != MedFormenTools.APV1);
+//        apv.setApv(BigDecimal.ONE);
     }//GEN-LAST:event_cmbFormItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JComboBox cmbForm;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JLabel lblAnw;
-    private javax.swing.JLabel lblPack;
-    private javax.swing.JTextField txtAPV;
-    private javax.swing.JTextField txtZusatz;
+    private JPanel jPanel1;
+    private JLabel jLabel1;
+    private JSeparator jSeparator1;
+    private JLabel jLabel2;
+    private JTextField txtZusatz;
+    private JLabel jLabel3;
+    private JComboBox cmbForm;
+    private JSeparator jSeparator2;
+    private JButton btnCancel;
+    private JButton btnOK;
     // End of variables declaration//GEN-END:variables
 
 }

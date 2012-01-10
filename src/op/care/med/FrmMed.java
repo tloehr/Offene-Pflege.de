@@ -33,7 +33,6 @@ import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgVorrat;
-import op.tools.ListElement;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -60,6 +59,7 @@ public class FrmMed extends javax.swing.JFrame {
     private boolean ignoreCaret;
     private JPopupMenu menu;
     private JDialog parent;
+    private JFrame thisFrame;
 
     /**
      * Creates new form FrmMed
@@ -75,6 +75,7 @@ public class FrmMed extends javax.swing.JFrame {
      */
     public FrmMed(String template) {
         this.template = template;
+        thisFrame = this;
         initDialog();
     }
 
@@ -414,18 +415,19 @@ public class FrmMed extends javax.swing.JFrame {
 
                 if (dmtn.getUserObject() instanceof Darreichung) {
                     final Darreichung darreichung = (Darreichung) dmtn.getUserObject();
-//                    itemedit = new JMenuItem("Bearbeiten");
-//                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            btnEditDAF(le);
-//                        }
-//                    });
-//                    itemdelete = new JMenuItem("Entfernen");
-//                    itemdelete.addActionListener(new java.awt.event.ActionListener() {
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            btnDeleteDAF(le);
-//                        }
-//                    });
+                    itemedit = new JMenuItem("Bearbeiten");
+                    itemedit.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            new DlgDAF(thisFrame, "", darreichung);
+                            createTree();
+                        }
+                    });
+                    itemdelete = new JMenuItem("Entfernen");
+                    itemdelete.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            btnDeleteDAF(darreichung);
+                        }
+                    });
                     itempack = new JMenuItem("Neue Verpackung");
                     itempack.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -458,17 +460,16 @@ public class FrmMed extends javax.swing.JFrame {
     }//GEN-LAST:event_treeMedMousePressed
 
     private void btnNeuDAF(java.awt.event.ActionEvent evt) {
-        DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) tree.getRoot();
-        // TODO: Hier geths weiter
 
-        ListElement le = (ListElement) dmtn.getUserObject();
-        new DlgDAF(this, le.toString(), le.getPk(), false);
+        Darreichung darreichung = new Darreichung(produkt);
+
+        new DlgDAF(this, "", darreichung);
         createTree();
     }
 
 
-    private void btnEditDAF(ListElement le) {
-        new DlgDAF(this, le.toString(), le.getPk(), true);
+    private void btnEditDAF(Darreichung darreichung) {
+        new DlgDAF(this, "", darreichung);
         createTree();
     }
 

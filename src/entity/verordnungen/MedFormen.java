@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "MPFormen")
 @NamedQueries({
-    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM MedFormen m"),
+    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM MedFormen m ORDER BY m.zubereitung, m.anwText "),
     @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM MedFormen m WHERE m.formID = :formID"),
     @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM MedFormen m WHERE m.zubereitung = :zubereitung"),
     @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM MedFormen m WHERE m.anwText = :anwText"),
@@ -163,7 +163,17 @@ public class MedFormen implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedFormen[formID=" + formID + "]";
+        return "MedFormen{" +
+                "formID=" + formID +
+                ", zubereitung='" + zubereitung + '\'' +
+                ", anwText='" + anwText + '\'' +
+                ", anwEinheit=" + anwEinheit +
+                ", packEinheit=" + packEinheit +
+                ", stellplan=" + stellplan +
+                ", status=" + status +
+                ", equiv=" + equiv +
+                ", massnahme=" + massnahme +
+                '}';
     }
 
 }

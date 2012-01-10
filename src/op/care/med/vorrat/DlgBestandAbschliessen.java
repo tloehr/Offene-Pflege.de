@@ -404,7 +404,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
 
             } else {
-                APV apv = null;
+                BigDecimal apv = null;
 
                 if (rbGefallen.isSelected()) {
                     apv = MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
@@ -420,7 +420,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
                 if (nextBest != null) {
-                    MedBestandTools.anbrechen(em, nextBest, apv.getApv());
+                    MedBestandTools.anbrechen(em, nextBest, apv);
                     OPDE.info(classname + ": Nächste Packung mit Bestands Nr.: " + nextBest.getBestID() + " wird nun angebrochen.");
                 } else {
                     // es wurde kein nächster angebrochen ?

@@ -1,6 +1,16 @@
 package entity.verordnungen;
 
+import op.OPDE;
+import op.tools.DlgException;
+import op.tools.ListElement;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
+
+import javax.swing.*;
+import java.awt.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,6 +26,24 @@ public class MedFormenTools {
 
     public static final String EINHEIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
 
+    public static ListCellRenderer getMedFormenRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof MedFormen) {
+                    MedFormen form = (MedFormen) o;
+                    text = toPrettyString(form);
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
+
     public static String getAnwText(MedFormen form) {
 
         String result = "";
@@ -27,6 +55,10 @@ public class MedFormenTools {
         }
 
         return result;
+    }
+
+    public static String toPrettyString(MedFormen form){
+        return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getZubereitung() + ", " + form.getAnwText());
     }
 
 }

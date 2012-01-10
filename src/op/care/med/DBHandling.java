@@ -988,6 +988,7 @@ public class DBHandling {
 //        return apvNeu;
 //    }
 
+    @Deprecated
     public static double getAPV(long dafid, String bwkennung) {
         double apv = 1d;
         String sqlAverage = "" +

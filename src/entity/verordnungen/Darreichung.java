@@ -1,8 +1,13 @@
 package entity.verordnungen;
 
+import entity.Bewohner;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "MPDarreichung")
@@ -21,17 +26,13 @@ public class Darreichung implements Serializable {
     private Long dafID;
     @Column(name = "Zusatz")
     private String zusatz;
-    @Basic(optional = false)
-    @Column(name = "UKennung")
-    private String uKennung;
 
     public Darreichung() {
     }
 
-    public Darreichung(Long dafID) {
-        this.dafID = dafID;
+    public Darreichung(MedProdukte medProdukt) {
+        this.medProdukt = medProdukt;
     }
-
 
     public Long getDafID() {
         return dafID;
@@ -47,14 +48,6 @@ public class Darreichung implements Serializable {
 
     public void setZusatz(String zusatz) {
         this.zusatz = zusatz;
-    }
-
-    public String getUKennung() {
-        return uKennung;
-    }
-
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
     }
 
     public Collection<MedPackung> getPackungen() {

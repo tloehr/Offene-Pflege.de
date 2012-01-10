@@ -124,10 +124,10 @@ public class MedVorratTools {
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
 
-                    APV apv = MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    BigDecimal apv = MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
-                    MedBestandTools.anbrechen(em, bestand.getNaechsterBestand(), apv.getApv());
+                    MedBestandTools.anbrechen(em, bestand.getNaechsterBestand(), apv);
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
@@ -148,21 +148,12 @@ public class MedVorratTools {
     public static MedBestand einbuchenVorrat(EntityManager em, MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) throws Exception {
         MedBestand bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-
-            BigDecimal apv;
-            if (darreichung.getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
-                apv = APVTools.getAPVMittelwert(vorrat.getBewohner(), darreichung);
-            } else if (darreichung.getMedForm().getStatus() == MedFormenTools.APV_PER_DAF) {
-                apv = APVTools.getAPV(darreichung).getApv();
-            } else { //APV1
-                apv = BigDecimal.ONE;
-            }
-
-            bestand = new MedBestand(apv, vorrat, darreichung, packung, text);
+            bestand = new MedBestand(vorrat, darreichung, packung, text);
+            bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
             MedBuchungen buchung = new MedBuchungen(bestand, menge);
-
+            bestand.getBuchungen().add(buchung);
             em.persist(bestand);
-            em.persist(buchung);
+//            em.persist(buchung);
         }
         return bestand;
     }

@@ -678,6 +678,7 @@ public class SYSTools {
     }
 
 
+
     public static DefaultListModel list2dlm(List list) {
         DefaultListModel dlm = new DefaultListModel();
         for (Object o : list){
@@ -1225,7 +1226,14 @@ public class SYSTools {
         return result;
     }
 
-    public static double parseDouble(String text) {
+    /**
+     * Wrapper Methode für das Parsing eines Doubles. Ersetzt vorher noch alle Kommas durch Punkte.
+     * Außerdem werden Brüche wie 1/4, 1/2 usw.
+     *
+     * @param text
+     * @return
+     */
+    public static double parseDouble(String text) throws NumberFormatException {
         text = text.replace(",", ".");
         text = text.replace("1/4", "0.25");
         text = text.replace("1/2", "0.5");
@@ -1233,15 +1241,7 @@ public class SYSTools {
         text = text.replace("1/3", "0.33");
         text = text.replace("2/3", "0.66");
 
-        Double d;
-
-        try {
-            d = Double.parseDouble(text);
-        } catch (NumberFormatException nfe) {
-            d = 0d;
-        }
-
-        return d;
+        return Double.parseDouble(text);
     }
 
     public static String rs2html(ResultSet rs, boolean markiere0) {

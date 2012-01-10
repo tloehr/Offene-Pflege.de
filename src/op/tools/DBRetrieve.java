@@ -38,6 +38,7 @@ import java.util.Date;
  *
  * @author tloehr
  */
+@Deprecated
 public class DBRetrieve {
 
     public static final int MODE_INTERVAL_OVERLAP = 0;
@@ -811,69 +812,69 @@ public class DBRetrieve {
         return result;
     }
 
-    /**
-     * @return Eine ArrayList mit folgendem Inhalt (Zubereitung, AnwEinheit, PackEinheit, AnwText)
-     */
-    public static ArrayList getMPForm(long formid) {
-        ArrayList result = null;
-        String sql = "SELECT F.Zubereitung, F.AnwEinheit, F.PackEinheit, F.AnwText " +
-                "FROM MPFormen F  " +
-                "WHERE F.FormID = ?";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, formid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                result = new ArrayList(4);
-                result.add(rs.getString("Zubereitung"));
-                result.add(rs.getInt("AnwEinheit"));
-                result.add(rs.getInt("PackEinheit"));
-                result.add(rs.getString("AnwText"));
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            result = null;
-        }
-        return result;
-    }
-
-    public static DefaultComboBoxModel getMPFormen() {
-        DefaultComboBoxModel dcbmMassnahmen = new DefaultComboBoxModel();
-
-        PreparedStatement stmt;
-        ResultSet rs;
-
-        try {
-            String sql = "SELECT F.FormID, F.Zubereitung, F.AnwText, F.AnwEinheit, F.PackEinheit " +
-                    "FROM MPFormen F  " +
-                    "ORDER BY CONCAT(F.Zubereitung, F.AnwText)";
-            stmt = OPDE.getDb().db.prepareStatement(sql);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String text = "";
-                String zub = rs.getString("Zubereitung");
-                String anw = rs.getString("AnwText");
-                int anwein = rs.getInt("AnwEinheit");
-                if (SYSTools.catchNull(anw).equals("")) {
-                    anw = SYSConst.EINHEIT[anwein];
-                }
-
-                text = (SYSTools.catchNull(zub).equals("") ? anw : zub + ", " + anw);
-
-                ListElement le = new ListElement(text, rs.getLong("FormID"));
-                OPDE.debug("getMPFormen:>>" + text + ", " + rs.getLong("FormID"));
-                dcbmMassnahmen.addElement(le);
-            }
-        } // try
-        catch (SQLException se) {
-            new DlgException(se);
-        } // catch
-
-        return dcbmMassnahmen;
-    }
+//    /**
+//     * @return Eine ArrayList mit folgendem Inhalt (Zubereitung, AnwEinheit, PackEinheit, AnwText)
+//     */
+//    public static ArrayList getMPForm(long formid) {
+//        ArrayList result = null;
+//        String sql = "SELECT F.Zubereitung, F.AnwEinheit, F.PackEinheit, F.AnwText " +
+//                "FROM MPFormen F  " +
+//                "WHERE F.FormID = ?";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, formid);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                result = new ArrayList(4);
+//                result.add(rs.getString("Zubereitung"));
+//                result.add(rs.getInt("AnwEinheit"));
+//                result.add(rs.getInt("PackEinheit"));
+//                result.add(rs.getString("AnwText"));
+//            }
+//            rs.close();
+//            stmt.close();
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//            result = null;
+//        }
+//        return result;
+//    }
+//
+//    public static DefaultComboBoxModel getMPFormen() {
+//        DefaultComboBoxModel dcbmMassnahmen = new DefaultComboBoxModel();
+//
+//        PreparedStatement stmt;
+//        ResultSet rs;
+//
+//        try {
+//            String sql = "SELECT F.FormID, F.Zubereitung, F.AnwText, F.AnwEinheit, F.PackEinheit " +
+//                    "FROM MPFormen F  " +
+//                    "ORDER BY CONCAT(F.Zubereitung, F.AnwText)";
+//            stmt = OPDE.getDb().db.prepareStatement(sql);
+//            rs = stmt.executeQuery();
+//
+//            while (rs.next()) {
+//                String text = "";
+//                String zub = rs.getString("Zubereitung");
+//                String anw = rs.getString("AnwText");
+//                int anwein = rs.getInt("AnwEinheit");
+//                if (SYSTools.catchNull(anw).equals("")) {
+//                    anw = SYSConst.EINHEIT[anwein];
+//                }
+//
+//                text = (SYSTools.catchNull(zub).equals("") ? anw : zub + ", " + anw);
+//
+//                ListElement le = new ListElement(text, rs.getLong("FormID"));
+//                OPDE.debug("getMPFormen:>>" + text + ", " + rs.getLong("FormID"));
+//                dcbmMassnahmen.addElement(le);
+//            }
+//        } // try
+//        catch (SQLException se) {
+//            new DlgException(se);
+//        } // catch
+//
+//        return dcbmMassnahmen;
+//    }
 
     /**
      * Ermittelt den echten Benutzernamen zu einer UKennung

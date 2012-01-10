@@ -75,13 +75,7 @@ public class MedBestandTools {
         BigDecimal apv;
         MedBestand result = null;
 
-        if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
-            apv = APVTools.getAPVMittelwert(bestand.getVorrat().getBewohner(), bestand.getDarreichung());
-        } else if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_DAF) {
-            apv = APVTools.getAPV(bestand.getDarreichung()).getApv();
-        } else { //APV1
-            apv = BigDecimal.ONE;
-        }
+        apv = getPassendesAPV(bestand);
 
         EntityManager em = OPDE.createEM();
         try {
@@ -187,9 +181,9 @@ public class MedBestandTools {
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
      */
-    public static APV abschliessen(EntityManager em, MedBestand bestand, String text, boolean mitNeuberechnung, short status) throws Exception {
-        APV apv = null;
+    public static BigDecimal abschliessen(EntityManager em, MedBestand bestand, String text, boolean mitNeuberechnung, short status) throws Exception {
         BigDecimal bestandsumme = getBestandSumme(bestand);
+        BigDecimal apvNeu = bestand.getApv();
 
         MedBuchungen buchung = new MedBuchungen(bestand, bestandsumme.negate(), null, status);
         buchung.setText(text);
@@ -200,75 +194,43 @@ public class MedBestandTools {
         bestand = em.merge(bestand);
 
         if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
+            apvNeu = berechneBuchungsWert(bestand);
 
             OPDE.info("Neuberechnung von DafID:" + bestand.getDarreichung().getDafID() + ", " + bestand.getDarreichung().getMedProdukt().getBezeichnung());
 
-            if (bestand.getDarreichung().getMedForm().getStatus() != MedFormenTools.APV1) {
-                BigDecimal apvNeu = berechneBuchungsWert(bestand);
-                if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
-                    // bei APV_PER_BW werden immer neue APV Objekte gespeichert
-                    // sofern sie in einem bestimmten korridor liegen.
-                    // Der Mittelwert wird dann nachher über alle APV Objekte gerechnet.
-                    apv = new APV(apvNeu, false, bestand.getVorrat().getBewohner(), bestand.getDarreichung());
-                    em.persist(apv);
-                    OPDE.info("FormStatus APV_PER_BW. APVneu: " + apvNeu.toPlainString());
-                } else {
-                    // APV_PER_DAF hier gibt es immer nur ein APV Objekt. Das wird entweder ausgetauscht (nur bei Beginn, wenn man
-                    // noch nicht weiss, wie der Bedarf ist) oder durch das arithmetische Mittel des alten apv und des neuen erstetzt.
-
-                    BigDecimal apvAlt = bestand.getApv();
-                    // Zugehöriges APV Objekt ermitteln.
-
-                    apv = APVTools.getAPV(bestand.getDarreichung());
-
-                    if (apv.isTauschen()) {
-                        apv.setApv(apvNeu);
-                        apv.setTauschen(false);
-                        OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
-                    } else {
-                        // der DafID APV wird durch den arithmetischen Mittelwert aus altem und neuem APV ersetzt.
-                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2), 4, BigDecimal.ROUND_UP));
-                        OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt.toPlainString() + "  APVneu: " + apv.getApv().toPlainString());
-                    }
-                    apv = em.merge(apv);
-                }
-            }
+//            if (bestand.getDarreichung().getMedForm().getStatus() != MedFormenTools.APV1) {
+//                apvNeu = berechneBuchungsWert(bestand);
+//
+//                if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
+//                    apv = new APV(apvNeu, false, bestand.getVorrat().getBewohner(), bestand.getDarreichung());
+//                    em.persist(apv);
+//                    OPDE.info("FormStatus APV_PER_BW. APVneu: " + apvNeu.toPlainString());
+//                } else {
+//                    // APV_PER_DAF hier gibt es immer nur ein APV Objekt. Das wird entweder ausgetauscht (nur bei Beginn, wenn man
+//                    // noch nicht weiss, wie der Bedarf ist) oder durch das arithmetische Mittel des alten apv und des neuen erstetzt.
+//
+//                    BigDecimal apvAlt = bestand.getApv();
+//                    // Zugehöriges APV Objekt ermitteln.
+//
+//                    apv = APVTools.getAPV(bestand.getDarreichung());
+//
+//                    if (apv.isTauschen()) {
+//                        apv.setApv(apvNeu);
+//                        apv.setTauschen(false);
+//                        OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
+//                    } else {
+//                        // der DafID APV wird durch den arithmetischen Mittelwert aus altem und neuem APV ersetzt.
+//                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2), 4, BigDecimal.ROUND_UP));
+//                        OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt.toPlainString() + "  APVneu: " + apv.getApv().toPlainString());
+//                    }
+//                    apv = em.merge(apv);
+//                }
+//            }
         }
-        return apv;
+        return apvNeu;
     }
 
     /**
-     * Die Berechnungsmethode unterscheidet verschiedene Fälle:
-     * <p/>
-     * <ul>
-     * <li>Die betroffene Packung hat die <code>FormStatus = APV1</code>. Das sind z.B. alle Tabletten oder Kapseln. Hier macht es
-     * keinen Sinn, irgendwelche Verhältnismaße neu zu rechnen. Wenn es eine Diskrepanz zwischen gerechnetem und realem Bestandswert
-     * gibt, dann ist irgendeine Tablette runtergefallen und nicht ausgebucht worden. Deshalb wird der Bestand einfach korrgiert und dann
-     * ist das eben so.
-     * <ul><li>Die Packung ist <b>jetzt</b> leer. Egal, wie der Buchungsbestand war. Er wird jetzt <i>gewaltsam</i> auf 0 gebracht.
-     * Der Bestand abgeschlossen und (wenn gew¸nscht) der neue angebrochen.</li>
-     * </ul></li>
-     * <p/>
-     * <li>Die Packung hat die Form Salben, Cremes. <code>FORMSTATUS = APV_PER_BW</code>. Hierbei passiert es häufig, dass die Menge, die bei einer Anwendung
-     * verbraucht wird individuell vom Bewohner abhängt. Der eine braucht viel Salbe, der andere wenig. Hängt auch vom Krankheitsverlauf ab.
-     * Sagen wir mal eine Salbe gegen Schuppenflechte. Das kann an einem Tag wenig und an einem anderen Tag viel sein. Somit macht es keinen Sinn,
-     * hier einen Wert für die Salbe zu speichern. Höchstens einen Mittelwert aus allen Bewohner APVs.
-     * <ul>
-     * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Entity Bean APV eingetragen und zwar für einen bestimmten
-     * BW.</li>
-     * </ul></li>
-     * <p/>
-     * <li>Die Packung hat die Form Tropfen, Sirup. <code>FORMSTATUS = APV_PER_DAF</code>. Hier macht es wiederum keinen Sinn einen APV pro BW zu speichern.
-     * 5 Tropfen sind eben bei allen Bewohnern 5 Tropfen.
-     * <ul>
-     * <li>Der Bestand wird abgeschlossen. Es wird ein neuer APV gerechnet. Dieser wird in der Tabelle MPAPV eingetragen, hier allerdings mit
-     * BWKennung = "".</li>
-     * </ul></li>
-     * </ul>
-     * <p/>
-     * Nach den Berechnungen wird immer (wenn gew¸nscht) ein neuer Bestand angebrochen. Falls ein APV berechnet wurde, wird jeweils der neue Mittelwert
-     * ¸ber alle APVs einer Darreichung als neuer Anfangs APV dieser Darreichung hinterlegt. Also MPDarreicung.APV = AVG(MPAPV.APV).
-     *
      * @param bestand, für den das Verhältnis neu berechnet werden soll.
      */
     public static BigDecimal berechneBuchungsWert(MedBestand bestand) {
@@ -284,10 +246,17 @@ public class MedBestandTools {
                 queryAnfangsBuchung.setParameter("status", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
                 MedBuchungen anfangsBuchung = (MedBuchungen) queryAnfangsBuchung.getSingleResult();
 
-                // Menge in der Packung (in der Packungseinheit)
+                // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
+                // drin war. Meist das, was auf der Packung steht.
                 BigDecimal inhaltZuBeginn = anfangsBuchung.getMenge();
 
+                // Das APV, das bei diesem Bestand angenommen wurde.
                 BigDecimal apvAlt = bestand.getApv();
+
+                // Zur Verhinderung von Division durch 0
+                if (apvAlt.equals(BigDecimal.ZERO)) {
+                    apvAlt = BigDecimal.ONE;
+                }
 
                 // Anzahl der per BHP verabreichten Einzeldosen. (in der Anwendungseinheit)
                 Query querySummeBHPDosis = em.createQuery(" " +
@@ -299,11 +268,30 @@ public class MedBestandTools {
                 querySummeBHPDosis.setParameter("bestand", bestand);
                 BigDecimal summeBHPDosis = (BigDecimal) querySummeBHPDosis.getSingleResult();
 
+                // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
+                // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
+                // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
+                // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
+                // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
+                // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
                 BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt, 4, BigDecimal.ROUND_UP);
+                // Zur Verhinderung von Division durch 0
+                if (inhaltRechnerisch.equals(BigDecimal.ZERO)) {
+                    inhaltRechnerisch = inhaltZuBeginn;
+                }
 
+                // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
+                // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
+                // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
+                // das apvNeu kleiner als das apvAlt.
+                // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
+                // dann 1 und apvNeu ist gleich apvAlt.
+                // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
+                // der apvNeu wird größer als der apvAlt.
                 apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch, 4, BigDecimal.ROUND_UP).multiply(apvAlt);
 
-                // Zu große APV Abweichungen verhindern.
+
+                // Zu große APV Abweichungen verhindern. Alle außerhalb eines 20% Korridors wird ignoriert.
                 BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
                 BigDecimal halbeBreite = apvAlt.multiply(apvkorridor);
                 BigDecimal korridorUnten = apvAlt.subtract(halbeBreite);
@@ -374,7 +362,7 @@ public class MedBestandTools {
 
         String htmlcolor = bestand.isAbgeschlossen() ? "gray" : "red";
 
-        result += "<font color=\""+htmlcolor+"\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
+        result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
         result += DarreichungTools.toPrettyString(bestand.getDarreichung());
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).isEmpty()) {
@@ -443,5 +431,58 @@ public class MedBestandTools {
         }
         return result;
     }
+
+    /**
+     * Ermittelt für einen bestimmten Bestand ein passendes APV.
+     */
+    public static BigDecimal getPassendesAPV(MedBestand bestand) {
+
+        BigDecimal apv = BigDecimal.ONE;
+
+        if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW){
+            apv = getAPVperBW(bestand.getVorrat());
+        } else if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_DAF){
+            apv = getAPVperDAF(bestand.getDarreichung());
+        }
+
+        return apv;
+    }
+
+    public static BigDecimal getAPVperBW(MedVorrat vorrat) {
+        EntityManager em = OPDE.createEM();
+        BigDecimal result = null;
+
+        try {
+            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.vorrat = :vorrat");
+            query.setParameter("vorrat", vorrat);
+            result = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            result = BigDecimal.ONE; // Im Zweifel ist das 1
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return result;
+    }
+
+    public static BigDecimal getAPVperDAF(Darreichung darreichung) {
+        EntityManager em = OPDE.createEM();
+        BigDecimal result = null;
+
+        try {
+            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.darreichung = :darreichung");
+            query.setParameter("darreichung", darreichung);
+            result = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            result = BigDecimal.ONE; // Im Zweifel ist das 1
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return result;
+    }
+
 
 }

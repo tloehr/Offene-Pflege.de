@@ -89,8 +89,8 @@ public class MedBestand implements Serializable, Comparable {
     public MedBestand() {
     }
 
-    public MedBestand(BigDecimal apv, MedVorrat vorrat, Darreichung darreichung, MedPackung packung, String text) {
-        this.apv = apv;
+    public MedBestand(MedVorrat vorrat, Darreichung darreichung, MedPackung packung, String text) {
+        this.apv = BigDecimal.ONE;
         this.vorrat = vorrat;
         this.darreichung = darreichung;
         this.packung = packung;
