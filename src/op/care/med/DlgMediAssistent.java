@@ -227,7 +227,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                         .addGroup(jPanel4Layout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(jPanel4Layout.createParallelGroup()
-                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                                 .addComponent(jLabel5))
                             .addContainerGap())
                 );
@@ -237,7 +237,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                             .addContainerGap()
                             .addComponent(jLabel5)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
                             .addContainerGap())
                 );
             }
@@ -283,7 +283,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addComponent(jLabel16)
                                     .addGap(23, 23, 23)
-                                    .addComponent(txtName, GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)))
+                                    .addComponent(txtName, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)))
                             .addContainerGap())
                 );
                 jPanel1Layout.setVerticalGroup(
@@ -297,7 +297,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                             .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(txtName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(jLabel16))
-                            .addContainerGap(130, Short.MAX_VALUE))
+                            .addContainerGap(127, Short.MAX_VALUE))
                 );
             }
             tabPane.addTab("Name", jPanel1);
@@ -307,7 +307,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
             {
 
                 //---- lblVorhanden ----
-                lblVorhanden.setText("Es gibt bereits Medikamente, die so \u00e4hnlich heissen. Ist es vielleicht eins von diesen ?");
+                lblVorhanden.setText("Es gibt bereits Medikamente,die so \u00e4hnlich heissen. Ist es vielleicht eins von diesen ?");
 
                 //======== jScrollPane2 ========
                 {
@@ -362,7 +362,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                 .addComponent(jScrollPane2, GroupLayout.Alignment.LEADING)
                                 .addComponent(lblVorhanden, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(cbMedNichtVorhanden, GroupLayout.Alignment.LEADING))
-                            .addContainerGap(197, Short.MAX_VALUE))
+                            .addContainerGap(186, Short.MAX_VALUE))
                 );
                 jPanel5Layout.setVerticalGroup(
                     jPanel5Layout.createParallelGroup()
@@ -370,7 +370,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                             .addContainerGap()
                             .addComponent(lblVorhanden)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(cbMedNichtVorhanden)
                             .addContainerGap())
@@ -434,12 +434,12 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                 .addComponent(jLabel4)
                                 .addComponent(jLabel6)
                                 .addComponent(jLabel11)
-                                .addComponent(txtZusatz, GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
-                                .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+                                .addComponent(txtZusatz, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
+                                .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                                 .addGroup(jPanel2Layout.createSequentialGroup()
                                     .addComponent(jLabel12)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(cmbForm, 0, 403, Short.MAX_VALUE)))
+                                    .addComponent(cmbForm, 0, 387, Short.MAX_VALUE)))
                             .addContainerGap())
                 );
                 jPanel2Layout.setVerticalGroup(
@@ -461,7 +461,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                             .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabel12)
                                 .addComponent(cmbForm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap(91, Short.MAX_VALUE))
+                            .addContainerGap(76, Short.MAX_VALUE))
                 );
             }
             tabPane.addTab("Zusatz", jPanel2);
@@ -517,7 +517,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                         .addGroup(jPanel6Layout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(jPanel6Layout.createParallelGroup()
-                                .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+                                .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                                 .addComponent(lblZusatz, GroupLayout.PREFERRED_SIZE, 511, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(cbZusatzNichtVorhanden))
                             .addContainerGap())
@@ -528,7 +528,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                             .addContainerGap()
                             .addComponent(lblZusatz)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(cbZusatzNichtVorhanden)
                             .addContainerGap())
@@ -633,8 +633,8 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                             .addComponent(jLabel15))
                                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(pnlPackungLayout.createParallelGroup()
-                                            .addComponent(cmbGroesse, 0, 628, Short.MAX_VALUE)
-                                            .addComponent(txtPZN, GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
+                                            .addComponent(cmbGroesse, 0, 599, Short.MAX_VALUE)
+                                            .addComponent(txtPZN, GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
                                             .addGroup(pnlPackungLayout.createSequentialGroup()
                                                 .addComponent(txtInhalt, GroupLayout.PREFERRED_SIZE, 94, GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -663,7 +663,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                 .addComponent(lblPack1)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblPack2)
-                                .addContainerGap(65, Short.MAX_VALUE))
+                                .addContainerGap(52, Short.MAX_VALUE))
                     );
                 }
 
@@ -743,7 +743,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                     .addComponent(btnEditHersteller, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jLabel17)
                                 .addComponent(jLabel10))
-                            .addContainerGap(105, Short.MAX_VALUE))
+                            .addContainerGap(96, Short.MAX_VALUE))
                 );
                 jPanel8Layout.setVerticalGroup(
                     jPanel8Layout.createParallelGroup()
@@ -757,7 +757,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                                     .addComponent(jLabel10)
                                     .addGap(32, 32, 32)
                                     .addComponent(cmbHersteller, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                            .addContainerGap(158, Short.MAX_VALUE))
+                            .addContainerGap(155, Short.MAX_VALUE))
                 );
             }
             tabPane.addTab("Hersteller", jPanel8);
@@ -777,14 +777,14 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                     jPanel9Layout.createParallelGroup()
                         .addGroup(jPanel9Layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+                            .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                             .addContainerGap())
                 );
                 jPanel9Layout.setVerticalGroup(
                     jPanel9Layout.createParallelGroup()
                         .addGroup(GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                            .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
                             .addContainerGap())
                 );
             }
@@ -843,7 +843,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                             .addComponent(btnCancel)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(btnApply))
-                        .addComponent(tabPane, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(tabPane, GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
                         .addComponent(jLabel1))
                     .addContainerGap())
         );
@@ -853,7 +853,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                     .addContainerGap()
                     .addComponent(jLabel1)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(tabPane, GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                    .addComponent(tabPane, GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(contentPaneLayout.createParallelGroup()
                         .addComponent(btnApply)
@@ -913,7 +913,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                 }
                 dafid = op.tools.DBHandling.insertRecord("MPDarreichung", mpdarreichung);
                 mpdarreichung.clear();
-                DBHandling.setAPV(dafid, apv, cbTauschen.isSelected());
+//                DBHandling.setAPV(dafid, apv, cbTauschen.isSelected());
                 if (dafid < 0) {
                     throw new SQLException();
                 }
@@ -972,9 +972,9 @@ public class DlgMediAssistent extends javax.swing.JDialog {
 
     private void txtAPVFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAPVFocusLost
         try {
-            apv = Double.parseDouble(txtAPV.getText());
+//            apv = Double.parseDouble(txtAPV.getText());
         } catch (NumberFormatException ex) {
-            txtAPV.setText("1.0");
+//            txtAPV.setText("1.0");
             apv = 1d;
         }
 
@@ -1022,7 +1022,7 @@ public class DlgMediAssistent extends javax.swing.JDialog {
 //        setTabsEnabled();
         txtZusatzCaretUpdate(null);
 //        int formstatus = DBHandling.getFormStatusFormID(leFormID.getPk());
-        cbTauschen.setSelected(false);
+//        cbTauschen.setSelected(false);
 //        cbTauschen.setEnabled(formstatus == DBHandling.FORMSTATUS_APV_PER_DAF);
         String zubereitung = SYSTools.catchNull(form.get("Zubereitung").toString());
         String anwtext = SYSTools.catchNull(form.get("AnwText").toString());
@@ -1249,8 +1249,8 @@ public class DlgMediAssistent extends javax.swing.JDialog {
                 int anwEinheit = ((Integer) form.get("AnwEinheit")).intValue();
                 String anwtext = SYSTools.catchNull(form.get("AnwText").toString());
                 String daf = (anwtext.equals("") ? SYSConst.EINHEIT[anwEinheit] : anwtext);
-                lblAPV.setText(daf + " entsprechen 1 " + SYSConst.EINHEIT[packEinheit]);
-                txtAPV.setText("1");
+//                lblAPV.setText(daf + " entsprechen 1 " + SYSConst.EINHEIT[packEinheit]);
+//                txtAPV.setText("1");
                 okUntilTab = jtst.getIndex("Packung");
                 setTabsEnabled();
                 btnNext.setEnabled(true);

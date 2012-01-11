@@ -613,7 +613,7 @@ public class PnlVerordnung extends CleanablePanel {
                     BigDecimal apv = BigDecimal.ZERO;
                     BigDecimal apvBest = BigDecimal.ZERO;
                     if (bestandImAnbruch != null) {
-                        apv = APVTools.getAPVMittelwert(bewohner, bestandImAnbruch.getDarreichung());
+                        apv = MedBestandTools.getAPVperBW(bestandImAnbruch.getVorrat());
                         apvBest = bestandImAnbruch.getApv();
                     }
                     JOptionPane.showMessageDialog(parent, "VerID: " + verordnung.getVerid() + "\nVorID: " + bestandImAnbruch.getVorrat().getVorID() + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);

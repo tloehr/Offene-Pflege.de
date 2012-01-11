@@ -1486,6 +1486,10 @@ public class SYSTools {
         return showSide(split, pos, 0, null);
     }
 
+    public static double showSide(JSplitPane split, double pos, int speedInMillis) {
+        return showSide(split, pos, speedInMillis, null);
+    }
+
     /**
      * Setzt eine Split Pane (animiert oder nicht animiert) auf eine entsprechende Position (Prozentual zwischen 0 und 1)
      *
@@ -1707,11 +1711,6 @@ public class SYSTools {
         } else {
             textmessageTL.playLoop(times, Timeline.RepeatBehavior.REVERSE);
         }
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
         return textmessageTL;
     }
 
