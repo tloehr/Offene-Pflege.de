@@ -62,7 +62,7 @@ public class DlgProdukt extends javax.swing.JDialog {
         SYSTools.centerOnParent(parent, this);
         txtBezeichnung.setText(template);
         cmbHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{produkt.getHersteller()}));
-        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer());
+        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer(0));
         setVisible(true);
     }
 

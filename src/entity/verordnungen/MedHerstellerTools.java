@@ -1,6 +1,5 @@
 package entity.verordnungen;
 
-import entity.Arzt;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -14,7 +13,8 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class MedHerstellerTools {
-     public static ListCellRenderer getHerstellerRenderer() {
+    public static ListCellRenderer getHerstellerRenderer(int maxlen) {
+        final int max = maxlen;
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -25,6 +25,9 @@ public class MedHerstellerTools {
                     text = ((MedHersteller) o).getFirma() + SYSTools.catchNull(((MedHersteller) o).getOrt(), ", ", "");
                 } else {
                     text = o.toString();
+                }
+                if (max > 0) {
+                    text = SYSTools.left(text, max);
                 }
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }

@@ -1826,6 +1826,16 @@ public class SYSTools {
     }
 
 
+    public static BigDecimal parseBigDecinal(String txt){
+        BigDecimal bd;
+        try {
+            bd = BigDecimal.valueOf(Double.parseDouble(txt.replaceAll(",", "\\.")));
+        } catch (Exception ex) {
+            bd = null;
+        }
+        return bd;
+    }
+
 
     public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean mustBePositive) {
         BigDecimal bd = null;
@@ -1859,6 +1869,16 @@ public class SYSTools {
             }
         }
         return bd;
+    }
+
+    public static String left(String text, int size){
+        int originalLaenge = text.length();
+        int max = Math.min(size, originalLaenge);
+        text = text.substring(0,max-1);
+        if (max < originalLaenge){
+            text += "...";
+        }
+        return text;
     }
 
 }

@@ -814,7 +814,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         cmbMass.setRenderer(MassnahmenTools.getMassnahmenRenderer());
         jdcAN.setMinSelectableDate(new Date());
         jdcAB.setMinSelectableDate(new Date());
-        cmbMed.setRenderer(DarreichungTools.getDarreichungRenderer());
+        cmbMed.setRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
         cmbSit.setRenderer(SituationenTools.getSituationenRenderer());
         if (this.editMode == NEW_MODE) { // NewMode
             lblTitle.setText(lblTitle.getText() + " (Neuer Eintrag)");

@@ -330,7 +330,7 @@ public class FrmMed extends javax.swing.JFrame {
         result.add(txtSuche.getText());
 
         JDialog myDialog = new JDialog(this, "test", true);
-//        myDialog.setSize(1280, 800);
+       myDialog.setSize(1280, 800);
         PnlProdAssistant myPnl = new PnlProdAssistant();
         myDialog.setContentPane(myPnl);
         SYSTools.centerOnParent(this, myDialog);

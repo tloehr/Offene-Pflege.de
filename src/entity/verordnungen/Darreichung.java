@@ -34,6 +34,12 @@ public class Darreichung implements Serializable {
         this.medProdukt = medProdukt;
     }
 
+    public Darreichung(MedProdukte medProdukt, String zusatz, MedFormen medForm) {
+        this.medProdukt = medProdukt;
+        this.zusatz = zusatz;
+        this.medForm = medForm;
+    }
+
     public Long getDafID() {
         return dafID;
     }

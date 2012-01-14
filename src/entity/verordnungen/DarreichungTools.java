@@ -3,7 +3,6 @@ package entity.verordnungen;
 import entity.Bewohner;
 import entity.EntityTools;
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -13,10 +12,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +23,12 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DarreichungTools {
+    public static final int SHORT = 0;
+    public static final int MEDIUM = 1;
+    public static final int LONG = 2;
 
-
-    public static ListCellRenderer getDarreichungRenderer() {
+    public static ListCellRenderer getDarreichungRenderer(int verbosity) {
+        final int v = verbosity;
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -39,7 +37,13 @@ public class DarreichungTools {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof Darreichung) {
                     Darreichung darreichung = (Darreichung) o;
-                    text = toPrettyString(darreichung);
+                    if (v == SHORT) {
+                        text = darreichung.getZusatz();
+                    } else if (v == MEDIUM) {
+                        text = darreichung.getZusatz() + " " + MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()];
+                    } else {
+                        text = toPrettyString(darreichung);
+                    }
                 } else {
                     text = o.toString();
                 }
@@ -61,7 +65,7 @@ public class DarreichungTools {
         return text;
     }
 
-    public static String getPackungsEinheit(Darreichung darreichung){
+    public static String getPackungsEinheit(Darreichung darreichung) {
         return MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()];
     }
 
@@ -89,11 +93,10 @@ public class DarreichungTools {
      * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode <code>getPassendeVorraeteZurDarreichung</code>.
      * Sie implementiert Punkt 1 der dort beschriebenen 2 Antworten.
      *
-     * @see #getPassendeVorraeteZurDarreichung(entity.Bewohner, Darreichung)
      * @param bewohner
      * @param darreichung
      * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>.
-     *
+     * @see #getPassendeVorraeteZurDarreichung(entity.Bewohner, Darreichung)
      */
     public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         MedVorrat result = null;
@@ -150,10 +153,10 @@ public class DarreichungTools {
      * äquivalente Form (z.B. Tabletten sind zu Dragees gleichwertig wie zu Filmtabletten etc.).</li>
      * </ol>
      *
-     * @see #getVorratZurDarreichung(entity.Bewohner, Darreichung)
      * @param bewohner
      * @param darreichung
      * @return
+     * @see #getVorratZurDarreichung(entity.Bewohner, Darreichung)
      */
     public static List<MedVorrat> getPassendeVorraeteZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
         // TODO: das muss noch getestet werden
@@ -189,7 +192,6 @@ public class DarreichungTools {
         em.close();
         return liste;
     }
-
 
 
 }

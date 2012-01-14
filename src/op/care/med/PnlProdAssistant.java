@@ -18,20 +18,21 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlProdAssistant extends JPanel {
-    private double split1pos, split2pos, split3pos, splitProdPos, splitZusatzPos, splitHerstellerPos;
+    private double split1pos, split2pos, split3pos, splitProdPos, splitZusatzPos, splitHerstellerPos, splitPackungPos;
     private static int speedSlow = 700;
     private static int speedFast = 500;
     private MedProdukte produkt;
+    private Darreichung darreichung;
+    private MedPackung packung;
+    private MedHersteller hersteller;
     private List<MedProdukte> listProd;
     private List<Darreichung> listZusatz;
 
@@ -50,7 +51,7 @@ public class PnlProdAssistant extends JPanel {
             listProd = query.getResultList();
             em.close();
 
-            DefaultListModel listModelProd;
+            DefaultListModel lmProd;
 
             if (!listProd.isEmpty()) {
 
@@ -58,10 +59,10 @@ public class PnlProdAssistant extends JPanel {
                     splitProdPos = SYSTools.showSide(splitProd, 0.3d, speedFast);
                 }
 
-                listModelProd = SYSTools.list2dlm(listProd);
-                lblProdMsg.setText("Es gibt bereits Medikamente, die so ähnlich heissen. Ist es vielleicht eins von diesen ?");
-                listModelProd.addElement("<html><b>Nein, das gew&uuml;nschte Medikament ist nicht dabei. Ich m&ouml;chte ein neues eingeben.</b></html>");
-                lstProd.setModel(listModelProd);
+                lmProd = SYSTools.list2dlm(listProd);
+//                lblProdMsg.setText("Es gibt bereits Medikamente, die so ähnlich heissen. Ist es vielleicht eins von diesen ?");
+//                lmProd.addElement("<html><i><b>Nein, das gew&uuml;nschte Medikament ist nicht dabei. Ich m&ouml;chte ein neues eingeben.</b></i></html>");
+                lstProd.setModel(lmProd);
                 lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
             } else {
                 if (splitProdPos != 1d) {
@@ -76,6 +77,10 @@ public class PnlProdAssistant extends JPanel {
                 splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
             }
         }
+        produkt = null;
+        darreichung = null;
+        packung = null;
+        showLabelTop();
     }
 
     private void lstProdValueChanged(ListSelectionEvent e) {
@@ -87,27 +92,37 @@ public class PnlProdAssistant extends JPanel {
             split1pos = SYSTools.showSide(split1, 0.5d, speedFast);
         }
 
-        // letzte Zeile ist immer die "NEIN" Antwort des Anwenders
-        if (lstProd.getSelectedIndex() == lstProd.getModel().getSize()) {
-            produkt = null;
-        } else {
-            produkt = (MedProdukte) lstProd.getModel().getElementAt(lstProd.getSelectedIndex());
-            OPDE.debug(produkt); // muss das MedProdukt sein, dass wir verwenden wollen
-        }
+        darreichung = null;
+        packung = null;
+        hersteller = null;
+        produkt = (MedProdukte) lstProd.getModel().getElementAt(lstProd.getSelectedIndex());
 
+        showLabelTop();
+        txtZusatzCaretUpdate(null);
+        initZusatz();
+    }
+
+    private void showLabelTop() {
+        String top = "";
+        top += produkt == null ? "" : produkt.getBezeichnung();
+        top += darreichung == null ? "" : " " + darreichung.getZusatz();
+        top += packung == null ? "" : ", " + MedPackungTools.toPrettyString(packung);
+        top += hersteller == null ? "" : ", " + hersteller.getFirma() + ", " + hersteller.getOrt();
+        lblTop.setText(top);
     }
 
     private void thisComponentResized(ComponentEvent e) {
 
-        OPDE.debug("PnlProdAssistant resized to: width="+this.getWidth() +" and heigth="+this.getHeight());
+        OPDE.debug("PnlProdAssistant resized to: width=" + this.getWidth() + " and heigth=" + this.getHeight());
 
         split1ComponentResized(e);
         split2ComponentResized(e);
         split3ComponentResized(e);
         splitProdComponentResized(e);
-        SYSTools.showSide(splitZusatz, splitZusatzPos);
+        splitZusatzComponentResized(e);
+        splitPackungComponentResized(e);
+        splitHerstellerComponentResized(e);
 
-        SYSTools.showSide(splitHersteller, splitHerstellerPos);
 
         OPDE.debug(split1pos);
         OPDE.debug(split2pos);
@@ -138,35 +153,184 @@ public class PnlProdAssistant extends JPanel {
         SYSTools.showSide(splitProd, splitProdPos);
     }
 
-    private void txtZusatzCaretUpdate(CaretEvent e) {
-        // Eine Prüfung von vorhandenen Zusätzen ist nur Nötig,
-        // wenn wir uns auf ein bereits bestehendes Medikament beziehen.
-        String zusatz = txtZusatz.getText();
-        if (produkt != null && !zusatz.isEmpty()) {
-            zusatz = "%" + zusatz + "%";
+    private void initZusatz() {
+        if (produkt.getMedPID() != null) {
             EntityManager em = OPDE.createEM();
-            Query query1 = em.createQuery("SELECT d FROM Darreichung d WHERE d.medProdukt = :produkt AND d.medForm = :form AND d.zusatz LIKE :zusatz");
-            query1.setParameter("produkt", produkt);
-            query1.setParameter("form", cmbForm.getSelectedItem());
-            query1.setParameter("zusatz", zusatz);
+            Query query1 = em.createNamedQuery("Darreichung.findByMedProdukt");
+            query1.setParameter("medProdukt", produkt);
             listZusatz = query1.getResultList();
-            lstZusatz.setModel(SYSTools.list2dlm(listZusatz));
-            em.close();
 
             if (!listZusatz.isEmpty()) {
                 if (splitZusatzPos == 1d) {
                     splitZusatzPos = SYSTools.showSide(splitZusatz, 0.3d, speedFast);
                 }
             }
-
-
+            DefaultListModel lmZusatz = SYSTools.list2dlm(listZusatz);
+            lstZusatz.setModel(lmZusatz);
+            lstZusatz.setCellRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.MEDIUM));
+            em.close();
         } else {
-            lstZusatz.setModel(new DefaultComboBoxModel());
+            lstZusatz.setModel(new DefaultListModel());
             listZusatz = null;
             if (splitZusatzPos != 1d) {
                 splitZusatzPos = SYSTools.showSide(splitZusatz, SYSTools.LEFT_UPPER_SIDE, speedFast);
             }
         }
+        txtZusatz.requestFocus();
+    }
+
+    private void txtZusatzCaretUpdate(CaretEvent e) {
+        revertToPanel(2);
+        packung = null;
+    }
+
+    private void btnPackungEintragenItemStateChanged(ItemEvent e) {
+        if (btnPackungEintragen.isSelected()) { // Packung eintragen
+            splitPackungPos = SYSTools.showSide(splitPackung, 0.9d, speedFast);
+            txtPZN.setText("");
+            txtInhalt.setText("1");
+            pnlPackLower.remove(btnPackungEintragen);
+            pnlPackLower.add(btnPackungEintragen, BorderLayout.PAGE_END);
+            btnPackungEintragen.setText("Keine Packung eintragen.");
+            lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
+        } else { // Keine Packung eintragen
+            splitPackungPos = SYSTools.showSide(splitPackung, SYSTools.RIGHT_LOWER_SIDE, speedFast);
+            btnPackungEintragen.setText("Packung eintragen.");
+            pnlPackLower.remove(btnPackungEintragen);
+            pnlPackLower.add(btnPackungEintragen, BorderLayout.PAGE_START);
+
+        }
+        packung = null;
+    }
+
+    private void lstZusatzValueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting() || lstZusatz.getSelectedIndex() < 0) {
+            return;
+        }
+
+        if (split3pos == 1d) {
+            split3pos = SYSTools.showSide(split3, 0.5d, speedFast);
+        }
+
+        if (split2pos == 1d) {
+            split2pos = SYSTools.showSide(split2, 0.33d, speedFast);
+        }
+
+        if (split1pos == 0.5d) {
+            split1pos = SYSTools.showSide(split1, 0.25d, speedFast);
+        }
+
+        darreichung = (Darreichung) lstZusatz.getModel().getElementAt(lstZusatz.getSelectedIndex());
+
+        showLabelTop();
+        btnPackungEintragenItemStateChanged(null);
+        thisComponentResized(null);
+    }
+
+    private void splitPackungComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitPackung, splitPackungPos);
+    }
+
+    private void btnCheckPackungActionPerformed(ActionEvent e) {
+        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim());
+        BigDecimal inhalt = SYSTools.parseBigDecinal(txtInhalt.getText());
+
+        if (pzn == null) {
+            lblPZN.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+        } else {
+            lblPZN.setIcon(null);
+        }
+
+        if (inhalt == null) {
+            lblInhalt.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+        } else {
+            lblInhalt.setIcon(null);
+        }
+
+        if (pzn != null && inhalt != null) {
+            packung = new MedPackung(darreichung);
+            packung.setPzn(pzn);
+            packung.setInhalt(inhalt);
+            packung.setGroesse((short) cmbGroesse.getSelectedIndex());
+        } else {
+            packung = null;
+        }
+        showLabelTop();
+    }
+
+    private void splitZusatzComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitZusatz, splitZusatzPos);
+    }
+
+    private void splitHerstellerComponentResized(ComponentEvent e) {
+        SYSTools.showSide(splitHersteller, splitHerstellerPos);
+    }
+
+    private void btnProdWeiterActionPerformed(ActionEvent e) {
+        // Wenn das Produkt schon gewählt wurde, gar nix machen
+        // wenn nicht, dann darf nicht auch noch das Textfeld leer sein.
+        if (produkt != null || txtProd.getText().trim().isEmpty()) {
+            return;
+        }
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT m FROM MedProdukte m WHERE m.bezeichnung = :bezeichnung");
+        query.setParameter("bezeichnung", txtProd.getText().trim());
+        List<MedProdukte> listeProdukte = query.getResultList();
+        em.close();
+        // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
+        produkt = listeProdukte.isEmpty() ? new MedProdukte(null, txtProd.getText().trim()) : listeProdukte.get(0);
+
+        if (split1pos == 1d) {
+            split1pos = SYSTools.showSide(split1, 0.5d, speedFast);
+        }
+
+        darreichung = null;
+        packung = null;
+        hersteller = null;
+
+        showLabelTop();
+        initZusatz();
+    }
+
+    private void btnZusatzWeiterActionPerformed(ActionEvent e) {
+        // Wenn die Darreichung schon gewählt wurde, gar nix machen
+        // wenn nicht, dann darf nicht auch noch das Textfeld leer sein.
+        if (darreichung != null || txtZusatz.getText().trim().isEmpty()) {
+            return;
+        }
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT m FROM Darreichung m WHERE m.zusatz = :zusatz and m.medProdukt = :produkt and m.medForm = :form");
+        query.setParameter("zusatz", txtZusatz.getText().trim());
+        query.setParameter("produkt", produkt);
+        query.setParameter("form", cmbForm.getSelectedItem());
+        List<Darreichung> listeDarreichungen = query.getResultList();
+        em.close();
+
+        // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
+        darreichung = listeDarreichungen.isEmpty() ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listeDarreichungen.get(0);
+        packung = null;
+
+        if (split3pos == 1d) {
+            split3pos = SYSTools.showSide(split3, 0.5d, speedFast);
+        }
+
+        if (split2pos == 1d) {
+            split2pos = SYSTools.showSide(split2, 0.33d, speedFast);
+        }
+
+        if (split1pos == 0.5d) {
+            split1pos = SYSTools.showSide(split1, 0.25d, speedFast);
+        }
+
+        btnPackungEintragenItemStateChanged(null);
+        hersteller = (MedHersteller) cmbHersteller.getSelectedItem();
+        showLabelTop();
+        thisComponentResized(null);
+    }
+
+    private void cmbHerstellerItemStateChanged(ItemEvent e) {
+        hersteller = (MedHersteller) cmbHersteller.getSelectedItem();
+        showLabelTop();
     }
 
 
@@ -181,6 +345,8 @@ public class PnlProdAssistant extends JPanel {
         panel9 = new JPanel();
         txtProd = new JTextField();
         btnClearProd = new JButton();
+        panel12 = new JPanel();
+        btnProdWeiter = new JButton();
         panel2 = new JPanel();
         lblProdMsg = new JLabel();
         scrollPane1 = new JScrollPane();
@@ -193,20 +359,27 @@ public class PnlProdAssistant extends JPanel {
         txtZusatz = new JTextField();
         btnClearZusatz = new JButton();
         cmbForm = new JComboBox();
+        panel13 = new JPanel();
+        btnZusatzWeiter = new JButton();
         panel4 = new JPanel();
         lblZusatzMsg = new JLabel();
         scrollPane2 = new JScrollPane();
         lstZusatz = new JList();
         split3 = new JSplitPane();
+        splitPackung = new JSplitPane();
         panel5 = new JPanel();
         label4 = new JLabel();
-        label3 = new JLabel();
+        lblPZN = new JLabel();
         txtPZN = new JTextField();
         label6 = new JLabel();
-        comboBox1 = new JComboBox();
-        label5 = new JLabel();
+        cmbGroesse = new JComboBox();
+        lblInhalt = new JLabel();
         txtInhalt = new JTextField();
-        toggleButton1 = new JToggleButton();
+        lblPackEinheit = new JLabel();
+        panel14 = new JPanel();
+        btnCheckPackung = new JButton();
+        pnlPackLower = new JPanel();
+        btnPackungEintragen = new JToggleButton();
         splitHersteller = new JSplitPane();
         panel7 = new JPanel();
         label7 = new JLabel();
@@ -242,15 +415,14 @@ public class PnlProdAssistant extends JPanel {
         //======== panel11 ========
         {
             panel11.setLayout(new FormLayout(
-                "default",
+                "default:grow",
                 "fill:default, fill:default:grow, $lgap, default"));
 
             //---- lblTop ----
-            lblTop.setText("text");
             lblTop.setFont(new Font("sansserif", Font.PLAIN, 18));
-            lblTop.setBackground(new Color(255, 0, 51));
+            lblTop.setBackground(new Color(255, 204, 204));
             lblTop.setOpaque(true);
-            lblTop.setForeground(new Color(255, 255, 51));
+            lblTop.setForeground(new Color(153, 0, 51));
             lblTop.setHorizontalAlignment(SwingConstants.CENTER);
             panel11.add(lblTop, CC.xy(1, 1));
 
@@ -274,6 +446,7 @@ public class PnlProdAssistant extends JPanel {
                     splitProd.setDividerSize(1);
                     splitProd.setEnabled(false);
                     splitProd.setDoubleBuffered(true);
+                    splitProd.setDividerLocation(200);
                     splitProd.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
@@ -283,9 +456,10 @@ public class PnlProdAssistant extends JPanel {
 
                     //======== panel1 ========
                     {
+                        panel1.setMinimumSize(new Dimension(83, 93));
                         panel1.setLayout(new FormLayout(
-                            "default",
-                            "$rgap, 2*($lgap, default)"));
+                            "default:grow",
+                            "$rgap, 2*($lgap, default), $lgap, 30px:grow"));
 
                         //---- label1 ----
                         label1.setText("Medizin-Produkt");
@@ -324,17 +498,38 @@ public class PnlProdAssistant extends JPanel {
                             panel9.add(btnClearProd);
                         }
                         panel1.add(panel9, CC.xy(1, 5));
+
+                        //======== panel12 ========
+                        {
+                            panel12.setLayout(new BorderLayout());
+
+                            //---- btnProdWeiter ----
+                            btnProdWeiter.setText("Weiter");
+                            btnProdWeiter.setFont(new Font("sansserif", Font.PLAIN, 16));
+                            btnProdWeiter.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/1rightarrow.png")));
+                            btnProdWeiter.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    btnProdWeiterActionPerformed(e);
+                                }
+                            });
+                            panel12.add(btnProdWeiter, BorderLayout.PAGE_END);
+                        }
+                        panel1.add(panel12, CC.xy(1, 7, CC.DEFAULT, CC.FILL));
                     }
                     splitProd.setTopComponent(panel1);
 
                     //======== panel2 ========
                     {
+                        panel2.setMinimumSize(new Dimension(83, 93));
+                        panel2.setPreferredSize(new Dimension(83, 93));
                         panel2.setLayout(new FormLayout(
                             "default:grow",
                             "default, $lgap, default:grow"));
 
                         //---- lblProdMsg ----
                         lblProdMsg.setFont(new Font("sansserif", Font.BOLD, 16));
+                        lblProdMsg.setText("Diese \u00e4hnlichen Medis gibt es schon");
                         panel2.add(lblProdMsg, CC.xy(1, 1));
 
                         //======== scrollPane1 ========
@@ -362,6 +557,7 @@ public class PnlProdAssistant extends JPanel {
                     split2.setDividerLocation(400);
                     split2.setMinimumSize(new Dimension(200, 372));
                     split2.setPreferredSize(new Dimension(200, 372));
+                    split2.setDividerSize(0);
                     split2.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
@@ -374,15 +570,22 @@ public class PnlProdAssistant extends JPanel {
                         splitZusatz.setOrientation(JSplitPane.VERTICAL_SPLIT);
                         splitZusatz.setDividerLocation(250);
                         splitZusatz.setDividerSize(0);
+                        splitZusatz.addComponentListener(new ComponentAdapter() {
+                            @Override
+                            public void componentResized(ComponentEvent e) {
+                                splitZusatzComponentResized(e);
+                            }
+                        });
 
                         //======== panel3 ========
                         {
+                            panel3.setMinimumSize(new Dimension(83, 93));
                             panel3.setLayout(new FormLayout(
                                 "default:grow",
-                                "$rgap, 3*($lgap, default)"));
+                                "$rgap, 3*($lgap, default), $lgap, default:grow"));
 
                             //---- label2 ----
-                            label2.setText("Zusatzbezeichnung");
+                            label2.setText("Zusatz und Darreichung");
                             label2.setFont(new Font("sansserif", Font.PLAIN, 18));
                             label2.setBackground(new Color(255, 204, 255));
                             label2.setOpaque(true);
@@ -415,17 +618,38 @@ public class PnlProdAssistant extends JPanel {
                             //---- cmbForm ----
                             cmbForm.setFont(new Font("sansserif", Font.PLAIN, 16));
                             panel3.add(cmbForm, CC.xy(1, 7));
+
+                            //======== panel13 ========
+                            {
+                                panel13.setLayout(new BorderLayout());
+
+                                //---- btnZusatzWeiter ----
+                                btnZusatzWeiter.setText("Weiter");
+                                btnZusatzWeiter.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                btnZusatzWeiter.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/1rightarrow.png")));
+                                btnZusatzWeiter.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        btnZusatzWeiterActionPerformed(e);
+                                    }
+                                });
+                                panel13.add(btnZusatzWeiter, BorderLayout.PAGE_END);
+                            }
+                            panel3.add(panel13, CC.xy(1, 9, CC.DEFAULT, CC.FILL));
                         }
                         splitZusatz.setTopComponent(panel3);
 
                         //======== panel4 ========
                         {
+                            panel4.setMinimumSize(new Dimension(83, 93));
+                            panel4.setPreferredSize(new Dimension(83, 93));
                             panel4.setLayout(new FormLayout(
                                 "default:grow",
                                 "default, $lgap, default:grow"));
 
                             //---- lblZusatzMsg ----
                             lblZusatzMsg.setFont(new Font("sansserif", Font.BOLD, 16));
+                            lblZusatzMsg.setText("Zu diesem Produkt gibt es schon Darreichungen");
                             panel4.add(lblZusatzMsg, CC.xy(1, 1));
 
                             //======== scrollPane2 ========
@@ -433,6 +657,12 @@ public class PnlProdAssistant extends JPanel {
 
                                 //---- lstZusatz ----
                                 lstZusatz.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                lstZusatz.addListSelectionListener(new ListSelectionListener() {
+                                    @Override
+                                    public void valueChanged(ListSelectionEvent e) {
+                                        lstZusatzValueChanged(e);
+                                    }
+                                });
                                 scrollPane2.setViewportView(lstZusatz);
                             }
                             panel4.add(scrollPane2, CC.xy(1, 3, CC.DEFAULT, CC.FILL));
@@ -443,7 +673,8 @@ public class PnlProdAssistant extends JPanel {
 
                     //======== split3 ========
                     {
-                        split3.setDividerLocation(300);
+                        split3.setDividerLocation(400);
+                        split3.setDividerSize(0);
                         split3.addComponentListener(new ComponentAdapter() {
                             @Override
                             public void componentResized(ComponentEvent e) {
@@ -451,56 +682,120 @@ public class PnlProdAssistant extends JPanel {
                             }
                         });
 
-                        //======== panel5 ========
+                        //======== splitPackung ========
                         {
-                            panel5.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "$rgap, 5*($lgap, default)"));
+                            splitPackung.setOrientation(JSplitPane.VERTICAL_SPLIT);
+                            splitPackung.setDividerSize(0);
+                            splitPackung.setDividerLocation(300);
+                            splitPackung.addComponentListener(new ComponentAdapter() {
+                                @Override
+                                public void componentResized(ComponentEvent e) {
+                                    splitPackungComponentResized(e);
+                                }
+                            });
 
-                            //---- label4 ----
-                            label4.setText("Verpackung");
-                            label4.setFont(new Font("sansserif", Font.PLAIN, 18));
-                            label4.setBackground(new Color(255, 255, 204));
-                            label4.setOpaque(true);
-                            label4.setForeground(Color.black);
-                            label4.setHorizontalAlignment(SwingConstants.CENTER);
-                            panel5.add(label4, CC.xywh(1, 3, 3, 1));
+                            //======== panel5 ========
+                            {
+                                panel5.setMinimumSize(new Dimension(83, 93));
+                                panel5.setPreferredSize(new Dimension(83, 93));
+                                panel5.setLayout(new FormLayout(
+                                    "default, $lcgap, default:grow, $lcgap, default",
+                                    "$rgap, 4*($lgap, default), $ugap, default:grow"));
 
-                            //---- label3 ----
-                            label3.setText("PZN");
-                            label3.setFont(new Font("sansserif", Font.PLAIN, 16));
-                            panel5.add(label3, CC.xy(1, 5));
-                            panel5.add(txtPZN, CC.xy(3, 5));
+                                //---- label4 ----
+                                label4.setText("Verpackung");
+                                label4.setFont(new Font("sansserif", Font.PLAIN, 18));
+                                label4.setBackground(new Color(255, 255, 204));
+                                label4.setOpaque(true);
+                                label4.setForeground(Color.black);
+                                label4.setHorizontalAlignment(SwingConstants.CENTER);
+                                panel5.add(label4, CC.xywh(1, 3, 5, 1));
 
-                            //---- label6 ----
-                            label6.setText("Gr\u00f6\u00dfe");
-                            label6.setFont(new Font("sansserif", Font.PLAIN, 16));
-                            panel5.add(label6, CC.xy(1, 7));
+                                //---- lblPZN ----
+                                lblPZN.setText("PZN");
+                                lblPZN.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(lblPZN, CC.xy(1, 5));
 
-                            //---- comboBox1 ----
-                            comboBox1.setFont(new Font("sansserif", Font.PLAIN, 16));
-                            panel5.add(comboBox1, CC.xy(3, 7));
+                                //---- txtPZN ----
+                                txtPZN.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(txtPZN, CC.xywh(3, 5, 3, 1));
 
-                            //---- label5 ----
-                            label5.setText("Inhalt");
-                            label5.setFont(new Font("sansserif", Font.PLAIN, 16));
-                            panel5.add(label5, CC.xy(1, 9));
+                                //---- label6 ----
+                                label6.setText("Gr\u00f6\u00dfe");
+                                label6.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(label6, CC.xy(1, 7));
 
-                            //---- txtInhalt ----
-                            txtInhalt.setFont(new Font("sansserif", Font.PLAIN, 16));
-                            panel5.add(txtInhalt, CC.xy(3, 9));
+                                //---- cmbGroesse ----
+                                cmbGroesse.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(cmbGroesse, CC.xywh(3, 7, 3, 1));
 
-                            //---- toggleButton1 ----
-                            toggleButton1.setText("Keine Packung eintragen");
-                            toggleButton1.setFont(new Font("sansserif", Font.PLAIN, 16));
-                            panel5.add(toggleButton1, CC.xywh(1, 11, 3, 1));
+                                //---- lblInhalt ----
+                                lblInhalt.setText("Inhalt");
+                                lblInhalt.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(lblInhalt, CC.xy(1, 9));
+
+                                //---- txtInhalt ----
+                                txtInhalt.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(txtInhalt, CC.xy(3, 9));
+
+                                //---- lblPackEinheit ----
+                                lblPackEinheit.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                panel5.add(lblPackEinheit, CC.xy(5, 9));
+
+                                //======== panel14 ========
+                                {
+                                    panel14.setLayout(new BorderLayout());
+
+                                    //---- btnCheckPackung ----
+                                    btnCheckPackung.setText("Pr\u00fcfen");
+                                    btnCheckPackung.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                    btnCheckPackung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/viewmag.png")));
+                                    btnCheckPackung.setActionCommand("Weiter");
+                                    btnCheckPackung.addActionListener(new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            btnCheckPackungActionPerformed(e);
+                                        }
+                                    });
+                                    panel14.add(btnCheckPackung, BorderLayout.PAGE_END);
+                                }
+                                panel5.add(panel14, CC.xywh(1, 11, 5, 1, CC.DEFAULT, CC.FILL));
+                            }
+                            splitPackung.setTopComponent(panel5);
+
+                            //======== pnlPackLower ========
+                            {
+                                pnlPackLower.setMinimumSize(new Dimension(83, 93));
+                                pnlPackLower.setPreferredSize(new Dimension(83, 93));
+                                pnlPackLower.setLayout(new BorderLayout());
+
+                                //---- btnPackungEintragen ----
+                                btnPackungEintragen.setText("Keine Packung eintragen");
+                                btnPackungEintragen.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                btnPackungEintragen.setSelected(true);
+                                btnPackungEintragen.addItemListener(new ItemListener() {
+                                    @Override
+                                    public void itemStateChanged(ItemEvent e) {
+                                        btnPackungEintragenItemStateChanged(e);
+                                    }
+                                });
+                                pnlPackLower.add(btnPackungEintragen, BorderLayout.PAGE_END);
+                            }
+                            splitPackung.setBottomComponent(pnlPackLower);
                         }
-                        split3.setLeftComponent(panel5);
+                        split3.setLeftComponent(splitPackung);
 
                         //======== splitHersteller ========
                         {
                             splitHersteller.setOrientation(JSplitPane.VERTICAL_SPLIT);
                             splitHersteller.setDividerLocation(200);
+                            splitHersteller.setDividerSize(0);
+                            splitHersteller.addComponentListener(new ComponentAdapter() {
+                                @Override
+                                public void componentResized(ComponentEvent e) {
+                                    splitHerstellerComponentResized(e);
+                                }
+                            });
 
                             //======== panel7 ========
                             {
@@ -519,12 +814,20 @@ public class PnlProdAssistant extends JPanel {
 
                                 //---- cmbHersteller ----
                                 cmbHersteller.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                cmbHersteller.addItemListener(new ItemListener() {
+                                    @Override
+                                    public void itemStateChanged(ItemEvent e) {
+                                        cmbHerstellerItemStateChanged(e);
+                                    }
+                                });
                                 panel7.add(cmbHersteller, CC.xy(1, 5));
                             }
                             splitHersteller.setTopComponent(panel7);
 
                             //======== panel6 ========
                             {
+                                panel6.setMinimumSize(new Dimension(83, 93));
+                                panel6.setPreferredSize(new Dimension(83, 93));
                                 panel6.setLayout(new FormLayout(
                                     "default, 2*($lcgap, default:grow)",
                                     "7*(fill:default, $lgap), fill:default"));
@@ -566,37 +869,31 @@ public class PnlProdAssistant extends JPanel {
                                 panel6.add(jLabel7, CC.xy(1, 15));
 
                                 //---- txtPLZ ----
-                                txtPLZ.setText("jTextField1");
                                 txtPLZ.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtPLZ, CC.xy(3, 9));
 
                                 //---- txtFirma ----
-                                txtFirma.setText("jTextField2");
                                 txtFirma.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtFirma, CC.xywh(3, 5, 3, 1));
 
                                 //---- txtStrasse ----
-                                txtStrasse.setText("jTextField3");
                                 txtStrasse.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtStrasse, CC.xywh(3, 7, 3, 1));
 
                                 //---- txtTel ----
-                                txtTel.setText("jTextField4");
                                 txtTel.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtTel, CC.xywh(3, 11, 3, 1));
 
                                 //---- txtFax ----
-                                txtFax.setText("jTextField5");
                                 txtFax.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtFax, CC.xywh(3, 13, 3, 1));
 
                                 //---- txtWWW ----
-                                txtWWW.setText("jTextField6");
                                 txtWWW.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtWWW, CC.xywh(3, 15, 3, 1));
 
                                 //---- txtOrt ----
-                                txtOrt.setText("jTextField2");
+                                txtOrt.setFont(new Font("sansserif", Font.PLAIN, 16));
                                 panel6.add(txtOrt, CC.xy(5, 9));
                             }
                             splitHersteller.setBottomComponent(panel6);
@@ -607,7 +904,7 @@ public class PnlProdAssistant extends JPanel {
                 }
                 split1.setRightComponent(split2);
             }
-            panel11.add(split1, CC.xy(1, 2));
+            panel11.add(split1, CC.xy(1, 2, CC.FILL, CC.FILL));
 
             //---- button1 ----
             button1.setText("Fertig, 1.2.3., Fertig");
@@ -623,17 +920,20 @@ public class PnlProdAssistant extends JPanel {
         split2pos = SYSTools.showSide(split2, SYSTools.LEFT_UPPER_SIDE);
         split3pos = SYSTools.showSide(split3, SYSTools.LEFT_UPPER_SIDE);
         splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE);
+        splitPackungPos = SYSTools.showSide(splitPackung, 0.3d);
         splitZusatzPos = SYSTools.showSide(splitZusatz, SYSTools.LEFT_UPPER_SIDE);
         splitHerstellerPos = SYSTools.showSide(splitHersteller, SYSTools.LEFT_UPPER_SIDE);
 
         EntityManager em = OPDE.createEM();
         Query query1 = em.createNamedQuery("MedFormen.findAll");
         cmbForm.setModel(new DefaultComboBoxModel(query1.getResultList().toArray(new MedFormen[]{})));
-        cmbForm.setRenderer(MedFormenTools.getMedFormenRenderer());
+        cmbForm.setRenderer(MedFormenTools.getMedFormenRenderer(25));
         Query query2 = em.createNamedQuery("MedHersteller.findAll");
         cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedHersteller[]{})));
-        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer());
+        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer(25));
         em.close();
+
+        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
 
         thisComponentResized(null);
     }
@@ -662,6 +962,8 @@ public class PnlProdAssistant extends JPanel {
     private JPanel panel9;
     private JTextField txtProd;
     private JButton btnClearProd;
+    private JPanel panel12;
+    private JButton btnProdWeiter;
     private JPanel panel2;
     private JLabel lblProdMsg;
     private JScrollPane scrollPane1;
@@ -674,20 +976,27 @@ public class PnlProdAssistant extends JPanel {
     private JTextField txtZusatz;
     private JButton btnClearZusatz;
     private JComboBox cmbForm;
+    private JPanel panel13;
+    private JButton btnZusatzWeiter;
     private JPanel panel4;
     private JLabel lblZusatzMsg;
     private JScrollPane scrollPane2;
     private JList lstZusatz;
     private JSplitPane split3;
+    private JSplitPane splitPackung;
     private JPanel panel5;
     private JLabel label4;
-    private JLabel label3;
+    private JLabel lblPZN;
     private JTextField txtPZN;
     private JLabel label6;
-    private JComboBox comboBox1;
-    private JLabel label5;
+    private JComboBox cmbGroesse;
+    private JLabel lblInhalt;
     private JTextField txtInhalt;
-    private JToggleButton toggleButton1;
+    private JLabel lblPackEinheit;
+    private JPanel panel14;
+    private JButton btnCheckPackung;
+    private JPanel pnlPackLower;
+    private JToggleButton btnPackungEintragen;
     private JSplitPane splitHersteller;
     private JPanel panel7;
     private JLabel label7;
