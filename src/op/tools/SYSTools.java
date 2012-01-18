@@ -31,6 +31,7 @@ import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
+import org.apache.commons.collections.Closure;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
@@ -1477,18 +1478,35 @@ public class SYSTools {
         return showSide(split, stop, speedInMillis, callback);
     }
 
+//    public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis, Closure whatToDoWhenDone) {
+//        double stop = leftUpper ? 0.0d : 1.0d;
+//        final Closure closure = whatToDoWhenDone;
+//
+//        TimelineCallbackAdapter adapter = new TimelineCallbackAdapter(){
+//            @Override
+//            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                if (newState == Timeline.TimelineState.DONE){
+//                    closure.execute(null);
+//                }
+//            }
+//        };
+//        return showSide(split, stop, speedInMillis, adapter);
+//    }
+
     public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis) {
         double stop = leftUpper ? 0.0d : 1.0d;
         return showSide(split, stop, speedInMillis, null);
     }
 
-    public static double showSide(JSplitPane split, double pos) {
+    public static double showSide(JSplitPane split, Double pos) {
         return showSide(split, pos, 0, null);
     }
 
-    public static double showSide(JSplitPane split, double pos, int speedInMillis) {
+    public static double showSide(JSplitPane split, Double pos, int speedInMillis) {
         return showSide(split, pos, speedInMillis, null);
     }
+
+
 
     /**
      * Setzt eine Split Pane (animiert oder nicht animiert) auf eine entsprechende Position (Prozentual zwischen 0 und 1)
@@ -1498,7 +1516,7 @@ public class SYSTools {
      * @param speedInMillis
      * @return Die neue, relative Position (zwischen 0 und 1)
      */
-    public static double showSide(JSplitPane split, double pos, int speedInMillis, TimelineCallback callback) {
+    public static double showSide(JSplitPane split, Double pos, int speedInMillis, TimelineCallback callback) {
 
         if (OPDE.isAnimation() && speedInMillis > 0) {
             OPDE.debug("ShowSide double-version");
@@ -1534,11 +1552,15 @@ public class SYSTools {
         return pos;
     }
 
-    public static double showSide(JSplitPane split, int pos) {
+    public static double showSide(JSplitPane split, Integer pos, int speedInMillis) {
+        return showSide(split, pos, speedInMillis, null);
+    }
+
+    public static double showSide(JSplitPane split, Integer pos) {
         return showSide(split, pos, 0, null);
     }
 
-    public static double showSide(JSplitPane split, int pos, int speedInMillis, TimelineCallback callback) {
+    public static double showSide(JSplitPane split, Integer pos, int speedInMillis, TimelineCallback callback) {
 
         if (OPDE.isAnimation() && speedInMillis > 0) {
             OPDE.debug("ShowSide int-version");
@@ -1569,7 +1591,7 @@ public class SYSTools {
         } else {
             split.setDividerLocation(pos);
         }
-        return pos;
+        return getDividerInRelativePosition(split, pos);
     }
 
 //    public static double showSide(JSplitPane split, int pos, int speedInMillis) {
@@ -1591,7 +1613,7 @@ public class SYSTools {
 //
 //    }
 
-    public static int getDividerInAbsolutePosition(JSplitPane mysplit, double pos) {
+    public static Integer getDividerInAbsolutePosition(JSplitPane mysplit, double pos) {
         int max;
         if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
             max = mysplit.getWidth();
@@ -1601,14 +1623,14 @@ public class SYSTools {
         return new Double(max * pos).intValue();
     }
 
-    public static double getDividerInRelativePosition(JSplitPane mysplit, int pos) {
+    public static Double getDividerInRelativePosition(JSplitPane mysplit, int pos) {
         int max;
         if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
             max = mysplit.getWidth();
         } else {
             max = mysplit.getHeight();
         }
-        return new Double(max) / new Double(pos);
+        return new Double(pos) / new Double(max);
     }
 
 

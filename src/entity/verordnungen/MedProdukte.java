@@ -3,6 +3,7 @@ package entity.verordnungen;
 import javax.persistence.*;
 import javax.xml.crypto.Data;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
@@ -30,6 +31,7 @@ public class MedProdukte implements Serializable {
     public MedProdukte(MedHersteller hersteller, String bezeichnung) {
         this.hersteller = hersteller;
         this.bezeichnung = bezeichnung;
+        this.darreichungen = new ArrayList<Darreichung>();
     }
 
     public Long getMedPID() {

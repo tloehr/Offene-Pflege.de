@@ -34,6 +34,7 @@ import op.OPDE;
 import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgVorrat;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -58,7 +59,7 @@ public class FrmMed extends javax.swing.JFrame {
     private String template;
     private boolean ignoreCaret;
     private JPopupMenu menu;
-    private JDialog parent;
+    private JDialog parent, myMedAssistantDialog;
     private JFrame thisFrame;
 
     /**
@@ -200,18 +201,18 @@ public class FrmMed extends javax.swing.JFrame {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
         }
 
@@ -239,16 +240,22 @@ public class FrmMed extends javax.swing.JFrame {
                 //---- lstPraep ----
                 lstPraep.setModel(new AbstractListModel() {
                     String[] values = {
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4",
-                        "Item 5"
+                            "Item 1",
+                            "Item 2",
+                            "Item 3",
+                            "Item 4",
+                            "Item 5"
                     };
+
                     @Override
-                    public int getSize() { return values.length; }
+                    public int getSize() {
+                        return values.length;
+                    }
+
                     @Override
-                    public Object getElementAt(int i) { return values[i]; }
+                    public Object getElementAt(int i) {
+                        return values[i];
+                    }
                 });
                 lstPraep.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 lstPraep.addListSelectionListener(new ListSelectionListener() {
@@ -263,52 +270,52 @@ public class FrmMed extends javax.swing.JFrame {
             GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
             jPanel2.setLayout(jPanel2Layout);
             jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup()
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                            .addComponent(jScrollPane2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
-                        .addContainerGap())
+                    jPanel2Layout.createParallelGroup()
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                                            .addComponent(jScrollPane2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
+                                    .addContainerGap())
             );
             jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup()
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-                        .addContainerGap())
+                    jPanel2Layout.createParallelGroup()
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                                    .addContainerGap())
             );
         }
 
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel1)
-                    .addContainerGap(462, Short.MAX_VALUE))
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addContainerGap(462, Short.MAX_VALUE))
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
         );
         contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jLabel1)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addContainerGap())
+                contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -329,12 +336,19 @@ public class FrmMed extends javax.swing.JFrame {
         ArrayList result = new ArrayList();
         result.add(txtSuche.getText());
 
-        JDialog myDialog = new JDialog(this, "test", true);
-       myDialog.setSize(1280, 800);
-        PnlProdAssistant myPnl = new PnlProdAssistant();
-        myDialog.setContentPane(myPnl);
-        SYSTools.centerOnParent(this, myDialog);
-        myDialog.setVisible(true);
+        myMedAssistantDialog = new JDialog(this, "test", true);
+        myMedAssistantDialog.setSize(1280, 800);
+        PnlProdAssistant myPnl = new PnlProdAssistant(new Closure() {
+            @Override
+            public void execute(Object o) {
+                OPDE.debug(o);
+                myMedAssistantDialog.dispose();
+                myMedAssistantDialog = null;
+            }
+        });
+        myMedAssistantDialog.setContentPane(myPnl);
+        SYSTools.centerOnParent(this, myMedAssistantDialog);
+        myMedAssistantDialog.setVisible(true);
 
 //        new DlgMediAssistent(this, result);
 //        if (result.size() > 0) {

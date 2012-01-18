@@ -38,6 +38,7 @@ public class Darreichung implements Serializable {
         this.medProdukt = medProdukt;
         this.zusatz = zusatz;
         this.medForm = medForm;
+        this.packungen = new ArrayList<MedPackung>();
     }
 
     public Long getDafID() {
