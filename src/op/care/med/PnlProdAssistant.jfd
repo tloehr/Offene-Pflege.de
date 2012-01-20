@@ -2314,6 +2314,13 @@
               <int>18</int> 
              </object> 
             </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/32x32/bw/viewmag.png</string> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>btnCheckSave</string> 
             </void> 
@@ -2351,6 +2358,13 @@
               <string>sansserif</string> 
               <int>0</int> 
               <int>16</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/32x32/bw/button_cancel.png</string> 
              </object> 
             </void> 
             <void property="name"> 
