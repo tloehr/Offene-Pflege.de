@@ -5,40 +5,22 @@
 
 package entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "Taschengeld")
 @NamedQueries({
-    @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Taschengeld t"),
-    @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Taschengeld t WHERE t.tgid = :tgid"),
-    @NamedQuery(name = "Taschengeld.findByBWKennung", query = "SELECT t FROM Taschengeld t WHERE t.bWKennung = :bWKennung"),
-    @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Taschengeld t WHERE t.belegDatum = :belegDatum"),
-    @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Taschengeld t WHERE t.belegtext = :belegtext"),
-    @NamedQuery(name = "Taschengeld.findByBetrag", query = "SELECT t FROM Taschengeld t WHERE t.betrag = :betrag"),
-    @NamedQuery(name = "Taschengeld.findByCancel", query = "SELECT t FROM Taschengeld t WHERE t.cancel = :cancel"),
-    @NamedQuery(name = "Taschengeld.findByCreator", query = "SELECT t FROM Taschengeld t WHERE t.creator = :creator"),
-    @NamedQuery(name = "Taschengeld.findByEditor", query = "SELECT t FROM Taschengeld t WHERE t.editor = :editor"),
-    @NamedQuery(name = "Taschengeld.findByEdate", query = "SELECT t FROM Taschengeld t WHERE t.edate = :edate"),
-    @NamedQuery(name = "Taschengeld.findByCdate", query = "SELECT t FROM Taschengeld t WHERE t.cdate = :cdate")})
+        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Taschengeld t"),
+        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Taschengeld t WHERE t.tgid = :tgid"),
+        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Taschengeld t WHERE t.belegDatum = :belegDatum"),
+        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Taschengeld t WHERE t.belegtext = :belegtext")})
 public class Taschengeld implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,9 +28,6 @@ public class Taschengeld implements Serializable {
     @Basic(optional = false)
     @Column(name = "TGID")
     private Long tgid;
-    @Basic(optional = false)
-    @Column(name = "BWKennung")
-    private String bWKennung;
     @Basic(optional = false)
     @Column(name = "BelegDatum")
     @Temporal(TemporalType.DATE)
@@ -59,39 +38,41 @@ public class Taschengeld implements Serializable {
     @Basic(optional = false)
     @Column(name = "Betrag")
     private BigDecimal betrag;
-    @Column(name = "_cancel")
-    private BigInteger cancel;
-    @Basic(optional = false)
-    @Column(name = "_creator")
-    private String creator;
-    @Column(name = "_editor")
-    private String editor;
     @Basic(optional = false)
     @Column(name = "_edate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date edate;
+    private Date bearbeitetAm;
     @Basic(optional = false)
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date cdate;
+    private Date erstelltAm;
 
     public Taschengeld() {
     }
 
-    public Taschengeld(Long tgid) {
-        this.tgid = tgid;
-    }
-
-    public Taschengeld(Long tgid, String bWKennung, Date belegDatum, String belegtext, BigDecimal betrag, String creator, Date edate, Date cdate) {
-        this.tgid = tgid;
-        this.bWKennung = bWKennung;
+    public Taschengeld(Date belegDatum, String belegtext, BigDecimal betrag, Bewohner bewohner, Users erstelltVon) {
         this.belegDatum = belegDatum;
         this.belegtext = belegtext;
         this.betrag = betrag;
-        this.creator = creator;
-        this.edate = edate;
-        this.cdate = cdate;
+        this.bewohner = bewohner;
+        this.erstelltVon = erstelltVon;
+        this.bearbeitetAm = new Date();
+        this.erstelltAm = bearbeitetAm;
     }
+
+    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @ManyToOne
+    private Bewohner bewohner;
+    @JoinColumn(name = "_editor", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users bearbeitetVon;
+    @JoinColumn(name = "_creator", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users erstelltVon;
+    @JoinColumn(name = "_cancel", referencedColumnName = "TGID")
+    @OneToOne
+    private Taschengeld replacedBy;
+
 
     public Long getTgid() {
         return tgid;
@@ -101,13 +82,6 @@ public class Taschengeld implements Serializable {
         this.tgid = tgid;
     }
 
-    public String getBWKennung() {
-        return bWKennung;
-    }
-
-    public void setBWKennung(String bWKennung) {
-        this.bWKennung = bWKennung;
-    }
 
     public Date getBelegDatum() {
         return belegDatum;
@@ -133,44 +107,53 @@ public class Taschengeld implements Serializable {
         this.betrag = betrag;
     }
 
-    public BigInteger getCancel() {
-        return cancel;
+
+    public Bewohner getBewohner() {
+        return bewohner;
     }
 
-    public void setCancel(BigInteger cancel) {
-        this.cancel = cancel;
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
     }
 
-    public String getCreator() {
-        return creator;
+    public Date getBearbeitetAm() {
+        return bearbeitetAm;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public void setBearbeitetAm(Date bearbeitetAm) {
+        this.bearbeitetAm = bearbeitetAm;
     }
 
-    public String getEditor() {
-        return editor;
+    public Date getErstelltAm() {
+        return erstelltAm;
     }
 
-    public void setEditor(String editor) {
-        this.editor = editor;
+    public void setErstelltAm(Date erstelltAm) {
+        this.erstelltAm = erstelltAm;
     }
 
-    public Date getEdate() {
-        return edate;
+    public Users getBearbeitetVon() {
+        return bearbeitetVon;
     }
 
-    public void setEdate(Date edate) {
-        this.edate = edate;
+    public void setBearbeitetVon(Users bearbeitetVon) {
+        this.bearbeitetVon = bearbeitetVon;
     }
 
-    public Date getCdate() {
-        return cdate;
+    public Users getErstelltVon() {
+        return erstelltVon;
     }
 
-    public void setCdate(Date cdate) {
-        this.cdate = cdate;
+    public void setErstelltVon(Users erstelltVon) {
+        this.erstelltVon = erstelltVon;
+    }
+
+    public Taschengeld getReplacedBy() {
+        return replacedBy;
+    }
+
+    public void setReplacedBy(Taschengeld replacedBy) {
+        this.replacedBy = replacedBy;
     }
 
     @Override

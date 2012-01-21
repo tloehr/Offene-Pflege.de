@@ -27,10 +27,12 @@
 
 package op.care.med;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.EntityTools;
 import entity.verordnungen.DarreichungTools;
 import entity.verordnungen.MedPackung;
-import op.OPDE;
+import entity.verordnungen.MedPackungTools;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -41,7 +43,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 
 /**
  * @author tloehr
@@ -54,15 +55,16 @@ public class DlgPack extends javax.swing.JDialog {
     /**
      * Creates new form DlgPack
      */
-    public DlgPack(JDialog parent, String title, MedPackung packung) {
+    public DlgPack(JFrame parent, String title, MedPackung packung) {
         super(parent, true);
         initComponents();
         setTitle(title);
         this.packung = packung;
+        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
 
-        if (packung.getMpid() != 0) {
+        if (packung.getMpid() != null) {
             txtPZN.setText(SYSTools.catchNull(packung.getPzn()));
-            txtInhalt.setValue(packung.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP));
+            txtInhalt.setText(packung.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
             cmbGroesse.setSelectedIndex(packung.getGroesse());
         }
         lblPackEinheit.setText(DarreichungTools.getPackungsEinheit(packung.getDarreichung()));
@@ -80,12 +82,14 @@ public class DlgPack extends javax.swing.JDialog {
     private void initComponents() {
         jLabel1 = new JLabel();
         jSeparator1 = new JSeparator();
-        jLabel2 = new JLabel();
+        lblPZN = new JLabel();
         cmbGroesse = new JComboBox();
         jLabel3 = new JLabel();
-        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));;
-        jLabel4 = new JLabel();
-        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));;
+        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));
+        ;
+        lblInhalt = new JLabel();
+        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));
+        ;
         jSeparator2 = new JSeparator();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -95,24 +99,32 @@ public class DlgPack extends javax.swing.JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+                "$rgap, $lcgap, default, 2*($lcgap, default:grow), $lcgap, default, $lcgap, $rgap",
+                "6*(fill:default, $lgap), fill:default"));
 
         //---- jLabel1 ----
         jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
         jLabel1.setText("Packung");
+        contentPane.add(jLabel1, CC.xywh(3, 1, 7, 1));
+        contentPane.add(jSeparator1, CC.xywh(3, 3, 7, 1));
 
-        //---- jLabel2 ----
-        jLabel2.setText("PZN:");
+        //---- lblPZN ----
+        lblPZN.setText("PZN:");
+        contentPane.add(lblPZN, CC.xy(3, 5));
 
         //---- cmbGroesse ----
-        cmbGroesse.setModel(new DefaultComboBoxModel(new String[] {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4"
+        cmbGroesse.setModel(new DefaultComboBoxModel(new String[]{
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
         }));
+        contentPane.add(cmbGroesse, CC.xywh(5, 7, 5, 1));
 
         //---- jLabel3 ----
         jLabel3.setText("Gr\u00f6\u00dfe:");
+        contentPane.add(jLabel3, CC.xy(3, 7));
 
         //---- txtPZN ----
         txtPZN.addFocusListener(new FocusAdapter() {
@@ -121,9 +133,11 @@ public class DlgPack extends javax.swing.JDialog {
                 txtPZNFocusGained(e);
             }
         });
+        contentPane.add(txtPZN, CC.xywh(5, 5, 5, 1));
 
-        //---- jLabel4 ----
-        jLabel4.setText("Inhalt:");
+        //---- lblInhalt ----
+        lblInhalt.setText("Inhalt:");
+        contentPane.add(lblInhalt, CC.xy(3, 9));
 
         //---- txtInhalt ----
         txtInhalt.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -134,6 +148,8 @@ public class DlgPack extends javax.swing.JDialog {
                 txtInhaltFocusGained(e);
             }
         });
+        contentPane.add(txtInhalt, CC.xywh(5, 9, 3, 1));
+        contentPane.add(jSeparator2, CC.xywh(3, 11, 7, 1));
 
         //---- btnCancel ----
         btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
@@ -144,6 +160,7 @@ public class DlgPack extends javax.swing.JDialog {
                 btnCancelActionPerformed(e);
             }
         });
+        contentPane.add(btnCancel, CC.xywh(7, 13, 3, 1));
 
         //---- btnOK ----
         btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
@@ -154,68 +171,11 @@ public class DlgPack extends javax.swing.JDialog {
                 btnOKActionPerformed(e);
             }
         });
+        contentPane.add(btnOK, CC.xy(5, 13));
 
         //---- lblPackEinheit ----
         lblPackEinheit.setText("jLabel5");
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                        .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addGroup(contentPaneLayout.createParallelGroup()
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel3))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(contentPaneLayout.createParallelGroup()
-                                .addComponent(txtPZN, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-                                .addComponent(cmbGroesse, 0, 329, Short.MAX_VALUE)))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(jLabel4)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtInhalt, GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(lblPackEinheit))
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addComponent(btnOK)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnCancel)))
-                    .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel1)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(txtPZN, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel3)
-                        .addComponent(cmbGroesse, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel4)
-                        .addComponent(lblPackEinheit)
-                        .addComponent(txtInhalt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnCancel)
-                        .addComponent(btnOK))
-                    .addContainerGap(15, Short.MAX_VALUE))
-        );
+        contentPane.add(lblPackEinheit, CC.xy(9, 9));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -230,21 +190,48 @@ public class DlgPack extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        packung.setPzn(txtPZN.getText());
-        packung.setGroesse((short) cmbGroesse.getSelectedIndex());
-        packung.setInhalt((BigDecimal) txtInhalt.getValue());
+        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim());
+        BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
+        if (inhalt.compareTo(BigDecimal.ZERO) <= 0){
+            inhalt = null;
+        }
+
+        String txt = "";
+
+        if (pzn == null) {
+            lblPZN.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+        } else {
+            lblPZN.setIcon(null);
+        }
+
+        if (inhalt == null) {
+            lblInhalt.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+        } else {
+            lblInhalt.setIcon(null);
+        }
+
+
+        if (pzn != null && inhalt != null) {
+            packung.setPzn(txtPZN.getText());
+            packung.setGroesse((short) cmbGroesse.getSelectedIndex());
+            packung.setInhalt(inhalt);
+
+            if (packung.getMpid() != null) {
+                packung = EntityTools.merge(packung);
+            } else {
+                EntityTools.persist(packung);
+
+            }
+            dispose();
+        }
+
+
 //        HashMap hm = new HashMap();
 //        Number Inhalt = (Number) txtInhalt.getValue();
 //        hm.put("PZN", txtPZN.getText());
 //        hm.put("Groesse", cmbGroesse.getSelectedIndex());
 //        hm.put("Inhalt", Inhalt.doubleValue());
 
-        if (packung.getMpid() != null) {
-            packung = EntityTools.merge(packung);
-        } else {
-            EntityTools.persist(packung);
-        }
-        dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -255,12 +242,12 @@ public class DlgPack extends javax.swing.JDialog {
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
     private JLabel jLabel1;
     private JSeparator jSeparator1;
-    private JLabel jLabel2;
+    private JLabel lblPZN;
     private JComboBox cmbGroesse;
     private JLabel jLabel3;
     private JFormattedTextField txtPZN;
-    private JLabel jLabel4;
-    private JFormattedTextField txtInhalt;
+    private JLabel lblInhalt;
+    private JTextField txtInhalt;
     private JSeparator jSeparator2;
     private JButton btnCancel;
     private JButton btnOK;

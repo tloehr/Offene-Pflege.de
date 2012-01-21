@@ -11,7 +11,10 @@ import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.pushingpixels.trident.Timeline;
+import org.pushingpixels.trident.TimelinePropertyBuilder;
+import org.pushingpixels.trident.TridentConfig;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
+import org.pushingpixels.trident.interpolator.PropertyInterpolator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -30,7 +33,6 @@ import java.util.List;
  */
 public class PnlProdAssistant extends JPanel {
     private double split1pos, split2pos, split3pos, splitProdPos, splitZusatzPos, splitHerstellerPos, splitEditorSummaryPos;
-    private static int speedSlow = 700;
     private static int speedFast = 500;
     private MedProdukte produkt;
     private Darreichung darreichung;
@@ -41,52 +43,116 @@ public class PnlProdAssistant extends JPanel {
     private short numOfVisibleFrames = 1;
     private Closure fertig123;
     private Timeline timeline;
+    private SwingWorker worker;
 
     public PnlProdAssistant(Closure fertig123) {
         this.fertig123 = fertig123;
+        worker = null;
         initComponents();
         initPanel();
     }
 
     private void txtProdCaretUpdate(CaretEvent e) {
         revertToPanel(1);
+        if (worker != null && !worker.isDone()) {
+            return;
+        }
+
 
         if (!txtProd.getText().trim().isEmpty()) {
 
             if (timeline == null) {
-                timeline = SYSTools.flashLabel(label1, "Datenbank");
+//                timeline = SYSTools.flashLabel(label1, "Datenbank");
+//                lblHardDisk.setText("Datenbankzugriff");
+                timeline = new Timeline(lblHardDisk);
+                ImageIcon hd1 = new ImageIcon(getClass().getResource("/artwork/32x32/hdd_mount.png"));
+                ImageIcon hd2 = new ImageIcon(getClass().getResource("/artwork/32x32/hdd_unmount.png"));
+//                timeline.addPropertyToInterpolate("icon", new ImageIcon(getClass().getResource("/artwork/32x32/bw/hdd_mount.png")), new ImageIcon(getClass().getResource("/artwork/32x32/bw/hdd_unmount.png")));
+
+                TimelinePropertyBuilder.PropertySetter<ImageIcon> propertySetter = new TimelinePropertyBuilder.PropertySetter<ImageIcon>() {
+                    @Override
+                    public void set(Object obj, String fieldName, ImageIcon value) {
+                        lblHardDisk.setIcon(value);
+                    }
+                };
+
+                PropertyInterpolator<ImageIcon> iconInterpolator = new PropertyInterpolator<ImageIcon>() {
+                    @Override
+                    public Class getBasePropertyClass() {
+                        return ImageIcon.class;
+                    }
+
+                    @Override
+                    public ImageIcon interpolate(ImageIcon imageIcon, ImageIcon imageIcon1, float timelinePosition) {
+
+                        ImageIcon result = null;
+
+                        if (timelinePosition > 0.5f) {
+                            result = imageIcon;
+                        } else {
+                            result = imageIcon1;
+                        }
+
+
+                        return result;
+                    }
+                };
+
+                TridentConfig.getInstance().addPropertyInterpolator(iconInterpolator);
+                timeline.addPropertyToInterpolate(Timeline.<ImageIcon>property("value").from(hd1).to(hd2).setWith(propertySetter));
+                timeline.setDuration(450);
+
+//                timeline.addCallback(new TimelineCallbackAdapter() {
+//                    @Override
+//                    public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                        OPDE.debug(newState);
+//                        if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
+//                            lblHardDisk.setText(null);
+//                            lblHardDisk.setIcon(null);
+//                        }
+//                    }
+//                });
+                timeline.playLoop(Timeline.RepeatBehavior.REVERSE);
             }
 
-            EntityManager em = OPDE.createEM();
-            Query query = em.createNamedQuery("MedProdukte.findByBezeichnungLike");
-            query.setParameter("bezeichnung", "%" + txtProd.getText().trim() + "%");
-            listProd = query.getResultList();
-            em.close();
-
-            DefaultListModel lmProd;
-
-            if (!listProd.isEmpty()) {
-
-                if (splitProdPos == 1d) {
-
-                    splitProdPos = SYSTools.showSide(splitProd, new Integer(150), speedFast);
+            worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    txtProd.setEditable(false);
+                    EntityManager em = OPDE.createEM();
+                    Query query = em.createNamedQuery("MedProdukte.findByBezeichnungLike");
+                    query.setParameter("bezeichnung", "%" + txtProd.getText().trim() + "%");
+                    listProd = query.getResultList();
+                    em.close();
+                    return null;
                 }
 
-                lmProd = SYSTools.list2dlm(listProd);
-//                lblProdMsg.setText("Es gibt bereits Medikamente, die so ähnlich heissen. Ist es vielleicht eins von diesen ?");
-//                lmProd.addElement("<html><i><b>Nein, das gew&uuml;nschte Medikament ist nicht dabei. Ich m&ouml;chte ein neues eingeben.</b></i></html>");
-                lstProd.setModel(lmProd);
-                lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
-            } else {
-                if (splitProdPos != 1d) {
-                    splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
+                @Override
+                protected void done() {
+                    if (!listProd.isEmpty()) {
+                        if (splitProdPos == 1d) {
+                            splitProdPos = SYSTools.showSide(splitProd, new Integer(150), speedFast);
+                        }
+                        DefaultListModel lmProd;
+                        lmProd = SYSTools.list2dlm(listProd);
+                        lstProd.setModel(lmProd);
+                        lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+                    } else {
+                        if (splitProdPos != 1d) {
+                            splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
+                        }
+                    }
+
+                    if (timeline != null) {
+                        timeline.cancel();
+                        timeline = null;
+                    }
+//                    lblProdMsg.setForeground(Color.BLACK);
+                    txtProd.setEditable(true);
+                    txtProd.requestFocus();
                 }
-            }
-
-            if (timeline != null) {
-                timeline.cancel();
-            }
-
+            };
+            worker.execute();
         } else {
             lstProd.setModel(new DefaultListModel());
             listProd = null;
@@ -101,18 +167,17 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void lstProdValueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting() || lstProd.getSelectedIndex() < 0) {
+        if (e.getValueIsAdjusting() || (worker != null && !worker.isDone()) || lstProd.getSelectedIndex() < 0) {
             return;
         }
-        proceedToFrame2();
+
         produkt = (MedProdukte) lstProd.getModel().getElementAt(lstProd.getSelectedIndex());
         darreichung = null;
         packung = null;
         hersteller = produkt.getHersteller();
 
         showLabelTop();
-        txtZusatzCaretUpdate(null);
-        initZusatz();
+        proceedToFrame2();
     }
 
     private void showLabelTop() {
@@ -191,8 +256,27 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void txtZusatzCaretUpdate(CaretEvent e) {
-        proceedToFrame2();
+        if (produkt.getMedPID() != null && numOfVisibleFrames > 2) {
+            revertToPanel(2);
+        }
 //        cmbForm.setEnabled(true);
+
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT m FROM Darreichung m WHERE UPPER(m.zusatz) = :zusatz and m.medProdukt = :produkt and m.medForm = :form");
+        query.setParameter("zusatz", txtZusatz.getText().trim().toUpperCase());
+        query.setParameter("produkt", produkt);
+        query.setParameter("form", cmbForm.getSelectedItem());
+        List<Darreichung> listeDarreichungen = query.getResultList();
+        em.close();
+
+        // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
+        darreichung = listeDarreichungen.isEmpty() ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listeDarreichungen.get(0);
+
+
+//        darreichung = null;
+//        cmbForm.setEnabled(true);
+        showLabelTop();
         packung = null;
     }
 
@@ -228,7 +312,7 @@ public class PnlProdAssistant extends JPanel {
     private void btnProdWeiterActionPerformed(ActionEvent e) {
         // Wenn das Produkt schon gewählt wurde, gar nix machen
         // wenn nicht, dann darf nicht auch noch das Textfeld leer sein.
-        if (produkt != null || txtProd.getText().trim().isEmpty()) {
+        if (produkt != null || (worker != null && !worker.isDone()) || txtProd.getText().trim().isEmpty()) {
             return;
         }
         EntityManager em = OPDE.createEM();
@@ -239,7 +323,6 @@ public class PnlProdAssistant extends JPanel {
         // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
         produkt = listeProdukte.isEmpty() ? new MedProdukte(null, txtProd.getText().trim()) : listeProdukte.get(0);
 
-        proceedToFrame2();
 
         if (splitProdPos != 1d) {
             splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
@@ -250,26 +333,13 @@ public class PnlProdAssistant extends JPanel {
         packung = null;
 
         showLabelTop();
-        initZusatz();
+        proceedToFrame2();
     }
 
     private void btnZusatzWeiterActionPerformed(ActionEvent e) {
-        // Wenn die Darreichung schon gewählt wurde, gar nix machen
-        // wenn nicht, dann darf nicht auch noch das Textfeld leer sein.
-        if (darreichung != null || numOfVisibleFrames > 2) {
+        if (numOfVisibleFrames > 2) {
             return;
         }
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT m FROM Darreichung m WHERE UPPER(m.zusatz) = :zusatz and m.medProdukt = :produkt and m.medForm = :form");
-        query.setParameter("zusatz", txtZusatz.getText().trim().toUpperCase());
-        query.setParameter("produkt", produkt);
-        query.setParameter("form", cmbForm.getSelectedItem());
-        List<Darreichung> listeDarreichungen = query.getResultList();
-        em.close();
-
-        // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
-        darreichung = listeDarreichungen.isEmpty() ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listeDarreichungen.get(0);
-        packung = null;
 
 
         proceedToFrame3();
@@ -292,7 +362,7 @@ public class PnlProdAssistant extends JPanel {
 
 
     private void proceedToFrame2() {
-        cmbForm.setEnabled(true);
+//        cmbForm.setEnabled(true);
         if (numOfVisibleFrames == 1) {
             numOfVisibleFrames = 2;
             split1pos = SYSTools.showSide(split1, 0.5d, speedFast, new TimelineCallbackAdapter() {
@@ -300,6 +370,7 @@ public class PnlProdAssistant extends JPanel {
                 public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                     if (newState == Timeline.TimelineState.DONE) {
                         thisComponentResized(null);
+                        initZusatz();
                     }
                 }
             });
@@ -307,7 +378,7 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void proceedToFrame3() {
-        cmbForm.setEnabled(false);
+//        cmbForm.setEnabled(false);
         if (numOfVisibleFrames >= 2) {
             numOfVisibleFrames = 3;
             split1pos = SYSTools.showSide(split1, 0.33d, speedFast / 3, new TimelineCallbackAdapter() {
@@ -318,7 +389,16 @@ public class PnlProdAssistant extends JPanel {
                             @Override
                             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                                 if (newState == Timeline.TimelineState.DONE) {
-                                    split3pos = SYSTools.showSide(split3, SYSTools.LEFT_UPPER_SIDE, speedFast / 3, new TimelineCallbackAdapter() {
+
+                                    // Wenn das Produkt bereits in der Datenbank steht, dann hat es auch einen
+                                    // Hersteller, den man hier nicht mehr verändern kann.
+                                    // Dann zeigen wir nur noch die Produkte an.
+                                    boolean targetPosition = produkt.getMedPID() != null ? SYSTools.RIGHT_LOWER_SIDE : SYSTools.LEFT_UPPER_SIDE;
+                                    txtPZN.setText("");
+                                    txtInhalt.setText("1");
+                                    lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
+                                    packung = null;
+                                    split3pos = SYSTools.showSide(split3, targetPosition, speedFast / 3, new TimelineCallbackAdapter() {
                                         @Override
                                         public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                                             if (newState == Timeline.TimelineState.DONE) {
@@ -346,6 +426,10 @@ public class PnlProdAssistant extends JPanel {
                             @Override
                             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                                 if (newState == Timeline.TimelineState.DONE) {
+                                    txtPZN.setText("");
+                                    txtInhalt.setText("1");
+                                    lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
+                                    packung = null;
                                     split3pos = SYSTools.showSide(split3, 0.5d, speedFast / 3, new TimelineCallbackAdapter() {
                                         @Override
                                         public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
@@ -383,18 +467,8 @@ public class PnlProdAssistant extends JPanel {
         } else {
             showLabelTop();
             proceedToFrame4();
-
-            txtPZN.setText("");
-            txtInhalt.setText("1");
-            lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
-            packung = null;
         }
     }
-
-    private void button1ActionPerformed(ActionEvent e) {
-
-    }
-
 
     private void save() {
         EntityManager em = OPDE.createEM();
@@ -431,7 +505,13 @@ public class PnlProdAssistant extends JPanel {
 //        split1pos = SYSTools.showSide(split1, 0.33d, speedFast);
 //        split2pos = SYSTools.showSide(split2, 0.5d, speedFast);
 //        split3pos = SYSTools.showSide(split3, SYSTools.LEFT_UPPER_SIDE, speedFast);
-        proceedToFrame3();
+
+        if (produkt.getMedPID() != null) {
+            revertToPanel(2);
+        } else {
+            proceedToFrame3();
+        }
+
         packung = null;
         showLabelTop();
     }
@@ -453,14 +533,26 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void cmbFormItemStateChanged(ItemEvent e) {
-        if (darreichung != null) {
-            darreichung.setMedForm((MedFormen) cmbForm.getSelectedItem());
+        if (produkt.getMedPID() != null && numOfVisibleFrames > 2) {
+            revertToPanel(2);
         }
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT m FROM Darreichung m WHERE UPPER(m.zusatz) = :zusatz and m.medProdukt = :produkt and m.medForm = :form");
+        query.setParameter("zusatz", txtZusatz.getText().trim().toUpperCase());
+        query.setParameter("produkt", produkt);
+        query.setParameter("form", cmbForm.getSelectedItem());
+        List<Darreichung> listeDarreichungen = query.getResultList();
+        em.close();
+
+        // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
+        darreichung = listeDarreichungen.isEmpty() ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listeDarreichungen.get(0);
+        showLabelTop();
     }
 
     private void btnPackungWeiterActionPerformed(ActionEvent e) {
         String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim());
-        BigDecimal inhalt = SYSTools.parseBigDecinal(txtInhalt.getText());
+        BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
         String txt = "";
 
         if (pzn == null) {
@@ -484,7 +576,7 @@ public class PnlProdAssistant extends JPanel {
             packung.setInhalt(inhalt);
             packung.setGroesse((short) cmbGroesse.getSelectedIndex());
             showLabelTop();
-
+            btnCheckSave.doClick();
         } else {
             packung = null;
             showLabelTop();
@@ -498,7 +590,7 @@ public class PnlProdAssistant extends JPanel {
 
             boolean notYetReady = produkt == null || darreichung == null || hersteller == null;
 
-            if (!notYetReady){
+            if (!notYetReady) {
                 btnCheckSave.setText("Eingabe speichern");
             }
 
@@ -506,37 +598,39 @@ public class PnlProdAssistant extends JPanel {
 
             btnCancelBack.setText("Zurück");
             String result = "<html><body><h1>Na dann schaun wir mal...</h1>";
-            result += "<h2>Folgendes haben Sie eingeben:</h2>";
-            result += "<font size=\"14\"><ul>";
 
+            result += "<font size=\"14\"><ul>";
+            result += "Folgendes haben Sie eingeben:<br/>";
+            result += "<ul>";
             if (produkt == null) {
                 result += "<li><font color=\"red\">noch kein Medikament eingegeben</font></li>";
             } else {
-                result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? "<i>wird neu erstellt</i>" : "") + "</li>";
+                result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : "") + "</li>";
             }
 
-            if (darreichung == null){
+            if (darreichung == null) {
                 result += "<li><font color=\"red\">Keinen Darreichung festgelegt</font></li>";
             } else {
-                result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + DarreichungTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? "<i>wird neu erstellt</i>" : "") + "</li>";
+                result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + DarreichungTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : "") + "</li>";
             }
 
             if (hersteller == null) {
                 result += "<li><font color=\"red\">Keinen Hersteller festgelegt</font></li>";
             } else {
-                result += "<li>Hersteller: <b>" + hersteller.getFirma() + "," + hersteller.getOrt() + "</b>" + (hersteller.getMphid() == null ? "<i>wird neu erstellt</i>" : "") + "</li>";
+                result += "<li>Hersteller: <b>" + hersteller.getFirma() + ", " + hersteller.getOrt() + "</b>" + (hersteller.getMphid() == null ? " <i>wird neu erstellt</i>" : "") + "</li>";
             }
 
             if (packung != null) {
                 result += "<li>neue Packung wird eingetragen: <b>" + MedPackungTools.toPrettyString(packung) + "</b></li>";
             }
             result += "</ul>";
-            if (notYetReady)  {
+            if (notYetReady) {
                 result += "<br/>Drücken sie auf ZURÜCK und vervollständigen Sie die Angaben.";
+            } else {
+                result += "<br/>";
+                result += "Wenn Sie sicher sind, dann bestätigen Sie nun die Eingaben.</font>";
             }
 
-            result += "<br/>";
-            result += "Wenn Sie sicher sind, dann bestätigen Sie nun die Eingaben.</font>";
             result += "</body></html>";
             txtSummary.setText(result);
             splitEditorSummaryPos = SYSTools.showSide(splitEditSummary, SYSTools.RIGHT_LOWER_SIDE, speedFast);
@@ -575,6 +669,7 @@ public class PnlProdAssistant extends JPanel {
         panel1 = new JPanel();
         label1 = new JLabel();
         panel9 = new JPanel();
+        lblHardDisk = new JLabel();
         txtProd = new JTextField();
         btnClearProd = new JButton();
         panel2 = new JPanel();
@@ -716,7 +811,7 @@ public class PnlProdAssistant extends JPanel {
                                 panel1.setMinimumSize(new Dimension(83, 93));
                                 panel1.setLayout(new FormLayout(
                                         "default:grow",
-                                        "$rgap, 2*($lgap, default), $lgap, 30px:grow"));
+                                        "$rgap, 2*($lgap, default), $lgap, top:30px:grow"));
 
                                 //---- label1 ----
                                 label1.setText("Medizin-Produkt");
@@ -730,6 +825,11 @@ public class PnlProdAssistant extends JPanel {
                                 //======== panel9 ========
                                 {
                                     panel9.setLayout(new BoxLayout(panel9, BoxLayout.LINE_AXIS));
+
+                                    //---- lblHardDisk ----
+                                    lblHardDisk.setFont(new Font("sansserif", Font.PLAIN, 16));
+                                    lblHardDisk.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/hdd_unmount.png")));
+                                    panel9.add(lblHardDisk);
 
                                     //---- txtProd ----
                                     txtProd.setFont(new Font("sansserif", Font.PLAIN, 16));
@@ -1163,13 +1263,13 @@ public class PnlProdAssistant extends JPanel {
                                     //======== panel3 ========
                                     {
                                         panel3.setLayout(new FormLayout(
-                                                "2*(default)",
+                                                "default, default:grow",
                                                 "default"));
 
                                         //---- btnKeinePackung ----
-                                        btnKeinePackung.setText("Keine Packung eintragen");
+                                        btnKeinePackung.setText("ausblenden");
                                         btnKeinePackung.setFont(new Font("sansserif", Font.PLAIN, 16));
-                                        btnKeinePackung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/1leftarrow.png")));
+                                        btnKeinePackung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev.png")));
                                         btnKeinePackung.addActionListener(new ActionListener() {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
@@ -1263,10 +1363,10 @@ public class PnlProdAssistant extends JPanel {
         EntityManager em = OPDE.createEM();
         Query query1 = em.createNamedQuery("MedFormen.findAll");
         cmbForm.setModel(new DefaultComboBoxModel(query1.getResultList().toArray(new MedFormen[]{})));
-        cmbForm.setRenderer(MedFormenTools.getMedFormenRenderer(40));
+        cmbForm.setRenderer(MedFormenTools.getMedFormenRenderer(30));
         Query query2 = em.createNamedQuery("MedHersteller.findAll");
         cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedHersteller[]{})));
-        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer(40));
+        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer(30));
         em.close();
 
         cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
@@ -1289,6 +1389,7 @@ public class PnlProdAssistant extends JPanel {
 
         if (num < 3 && split2pos != 1d) {
             numOfVisibleFrames = 2;
+            split1pos = 0.5d;
             split2pos = SYSTools.showSide(split2, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
                 @Override
                 public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
@@ -1300,8 +1401,11 @@ public class PnlProdAssistant extends JPanel {
         }
 
         if (num < 2 && split1pos != 1d) {
-            cmbForm.setEnabled(true);
+
             numOfVisibleFrames = 1;
+
+//            cmbForm.setEnabled(true);
+
             split1pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
                 @Override
                 public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
@@ -1323,6 +1427,7 @@ public class PnlProdAssistant extends JPanel {
     private JPanel panel1;
     private JLabel label1;
     private JPanel panel9;
+    private JLabel lblHardDisk;
     private JTextField txtProd;
     private JButton btnClearProd;
     private JPanel panel2;

@@ -66,7 +66,7 @@ public class FrmMed extends javax.swing.JFrame {
      * Creates new form FrmMed
      */
     public FrmMed() {
-        this.parent = parent;
+        thisFrame = this;
         this.template = "";
         initDialog();
     }
@@ -447,9 +447,9 @@ public class FrmMed extends javax.swing.JFrame {
                     itempack = new JMenuItem("Neue Verpackung");
                     itempack.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-
-                            new DlgPack(parent, "Neu", new MedPackung(darreichung));
-
+                            MedPackung mypack = new MedPackung(darreichung);
+                            new DlgPack(thisFrame, "Neu", mypack);
+                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
                             createTree();
                         }
                     });
@@ -458,7 +458,7 @@ public class FrmMed extends javax.swing.JFrame {
                     itemedit = new JMenuItem("Bearbeiten");
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgPack(parent, "Bearbeiten", packung);
+                            new DlgPack(thisFrame, "Bearbeiten", packung);
                             createTree();
                         }
                     });
@@ -583,10 +583,11 @@ public class FrmMed extends javax.swing.JFrame {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
             if (node.getUserObject() instanceof MedProdukte) {
                 setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
-                setText(((MedProdukte) node.getUserObject()).getBezeichnung());
+                MedProdukte myprod = (MedProdukte) node.getUserObject();
+                setText(myprod.getBezeichnung() + ", " + myprod.getHersteller().getFirma() + ", " + myprod.getHersteller().getOrt());
             } else if (node.getUserObject() instanceof Darreichung) {
                 setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
-                setText(DarreichungTools.toPrettyString((Darreichung) node.getUserObject()));
+                setText(DarreichungTools.toPrettyStringMedium((Darreichung) node.getUserObject()));
             } else if (node.getUserObject() instanceof MedPackung) {
                 setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
                 setText(MedPackungTools.toPrettyString((MedPackung) node.getUserObject()));

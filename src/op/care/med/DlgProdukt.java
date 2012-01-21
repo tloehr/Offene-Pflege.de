@@ -28,9 +28,7 @@
 package op.care.med;
 
 import entity.EntityTools;
-import entity.verordnungen.MedHersteller;
-import entity.verordnungen.MedHerstellerTools;
-import entity.verordnungen.MedProdukte;
+import entity.verordnungen.*;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -61,8 +59,17 @@ public class DlgProdukt extends javax.swing.JDialog {
         initComponents();
         SYSTools.centerOnParent(parent, this);
         txtBezeichnung.setText(template);
-        cmbHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{produkt.getHersteller()}));
+
+        EntityManager em = OPDE.createEM();
+        Query query2 = em.createNamedQuery("MedHersteller.findAll");
+        cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedHersteller[]{})));
         cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer(0));
+        em.close();
+
+        if (produkt != null){
+            cmbHersteller.setSelectedItem(produkt.getHersteller());
+        }
+
         setVisible(true);
     }
 

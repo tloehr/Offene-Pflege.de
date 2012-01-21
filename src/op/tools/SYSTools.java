@@ -1630,6 +1630,9 @@ public class SYSTools {
         } else {
             max = mysplit.getHeight();
         }
+        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: "+ pos);
+        OPDE.debug("DIVIDER MAX POSITION: "+ max);
+        OPDE.debug("DIVIDER IN RELATIVE POSITION: "+ new Double(pos) / new Double(max));
         return new Double(pos) / new Double(max);
     }
 
@@ -1848,7 +1851,7 @@ public class SYSTools {
     }
 
 
-    public static BigDecimal parseBigDecinal(String txt){
+    public static BigDecimal parseBigDecimal(String txt){
         BigDecimal bd;
         try {
             bd = BigDecimal.valueOf(Double.parseDouble(txt.replaceAll(",", "\\.")));

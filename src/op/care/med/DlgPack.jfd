@@ -10,14 +10,14 @@
      <object class="com.jformdesigner.model.FormWindow"> 
       <string>javax.swing.JDialog</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>org.jdesktop.layout.GroupLayout</class> 
+       <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
-        <string>$horizontalGroup</string> 
-        <string>par l {seq {space :::p, par l {comp jSeparator2::l::376:x, comp jSeparator1::l::376:x, comp jLabel1::l::376:x, seq l {par l {comp jLabel2:::p::p, comp jLabel3::l:p::p}, space :::p, par l {comp txtPZN::::329:x:1, comp cmbGroesse::l::329:x:1}}, seq l {comp jLabel4:::p::p, space :::p, comp txtInhalt::::282:x, space :::p, comp lblPackEinheit:::p::p}, seq t {comp btnOK:::p::p, space :::p, comp btnCancel:::p::p}}, space :::p}}</string> 
+        <string>$columnSpecs</string> 
+        <string>relgap, labelcompgap, default, labelcompgap, default:grow, labelcompgap, default:grow, labelcompgap, default, labelcompgap, relgap</string> 
        </void> 
        <void method="setProperty"> 
-        <string>$verticalGroup</string> 
-        <string>par l {seq l {space :::p, comp jLabel1:::p::p, space :::p, comp jSeparator1:::p:10:p, space :::p, par b {comp jLabel2::b:p::p, comp txtPZN::b:p:19:p}, space :::p, par b {comp jLabel3::b:p::p, comp cmbGroesse::b:p::p}, space :::p, par b {comp jLabel4::b:p::p, comp lblPackEinheit::b:p::p, comp txtInhalt::b:p::p}, space :::p, comp jSeparator2:::p:10:p, space :::p, par b {comp btnCancel::b:p::p, comp btnOK::b:p::p}, space ::15:x}}</string> 
+        <string>$rowSpecs</string> 
+        <string>fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -47,12 +47,42 @@
          <string>jLabel1</string> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>1</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>7</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JSeparator</string> 
         <void property="name"> 
          <string>jSeparator1</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -64,7 +94,18 @@
          <string>PZN:</string> 
         </void> 
         <void property="name"> 
-         <string>jLabel2</string> 
+         <string>lblPZN</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>5</int> 
         </void> 
        </object> 
       </void> 
@@ -95,6 +136,21 @@
          <string>cmbGroesse</string> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>7</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>5</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
@@ -105,6 +161,17 @@
         </void> 
         <void property="name"> 
          <string>jLabel3</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -129,6 +196,21 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>5</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
@@ -138,13 +220,24 @@
          <string>Inhalt:</string> 
         </void> 
         <void property="name"> 
-         <string>jLabel4</string> 
+         <string>lblInhalt</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>9</int> 
         </void> 
        </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JFormattedTextField</string> 
+        <string>javax.swing.JTextField</string> 
         <void method="setProperty"> 
          <string>horizontalAlignment</string> 
          <int>4</int> 
@@ -171,12 +264,42 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>9</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>3</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JSeparator</string> 
         <void property="name"> 
          <string>jSeparator2</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>11</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -206,6 +329,21 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>7</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>13</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>3</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
@@ -233,6 +371,17 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>13</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
@@ -243,6 +392,17 @@
         </void> 
         <void property="name"> 
          <string>lblPackEinheit</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>9</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>9</int> 
         </void> 
        </object> 
       </void> 
