@@ -8,7 +8,6 @@ package entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -17,11 +16,11 @@ import java.util.Date;
 @Entity
 @Table(name = "Taschengeld")
 @NamedQueries({
-        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Taschengeld t"),
-        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Taschengeld t WHERE t.tgid = :tgid"),
-        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Taschengeld t WHERE t.belegDatum = :belegDatum"),
-        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Taschengeld t WHERE t.belegtext = :belegtext")})
-public class Taschengeld implements Serializable {
+        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Barbetrag t"),
+        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Barbetrag t WHERE t.tgid = :tgid"),
+        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Barbetrag t WHERE t.belegDatum = :belegDatum"),
+        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Barbetrag t WHERE t.belegtext = :belegtext")})
+public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,10 +46,10 @@ public class Taschengeld implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date erstelltAm;
 
-    public Taschengeld() {
+    public Barbetrag() {
     }
 
-    public Taschengeld(Date belegDatum, String belegtext, BigDecimal betrag, Bewohner bewohner, Users erstelltVon) {
+    public Barbetrag(Date belegDatum, String belegtext, BigDecimal betrag, Bewohner bewohner, Users erstelltVon) {
         this.belegDatum = belegDatum;
         this.belegtext = belegtext;
         this.betrag = betrag;
@@ -69,10 +68,6 @@ public class Taschengeld implements Serializable {
     @JoinColumn(name = "_creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users erstelltVon;
-    @JoinColumn(name = "_cancel", referencedColumnName = "TGID")
-    @OneToOne
-    private Taschengeld replacedBy;
-
 
     public Long getTgid() {
         return tgid;
@@ -148,14 +143,6 @@ public class Taschengeld implements Serializable {
         this.erstelltVon = erstelltVon;
     }
 
-    public Taschengeld getReplacedBy() {
-        return replacedBy;
-    }
-
-    public void setReplacedBy(Taschengeld replacedBy) {
-        this.replacedBy = replacedBy;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -165,11 +152,10 @@ public class Taschengeld implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Taschengeld)) {
+        if (!(object instanceof Barbetrag)) {
             return false;
         }
-        Taschengeld other = (Taschengeld) object;
+        Barbetrag other = (Barbetrag) object;
         if ((this.tgid == null && other.tgid != null) || (this.tgid != null && !this.tgid.equals(other.tgid))) {
             return false;
         }
@@ -178,7 +164,21 @@ public class Taschengeld implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Taschengeld[tgid=" + tgid + "]";
+        return "Taschengeld{" +
+                "tgid=" + tgid +
+                ", belegDatum=" + belegDatum +
+                ", belegtext='" + belegtext + '\'' +
+                ", betrag=" + betrag +
+                ", bearbeitetAm=" + bearbeitetAm +
+                ", erstelltAm=" + erstelltAm +
+                ", bewohner=" + bewohner +
+                ", bearbeitetVon=" + bearbeitetVon +
+                ", erstelltVon=" + erstelltVon +
+                '}';
     }
 
+    @Override
+    public int compareTo(Barbetrag other) {
+        return belegDatum.compareTo(other.getBelegDatum());
+    }
 }

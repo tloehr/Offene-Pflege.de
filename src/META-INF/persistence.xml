@@ -69,7 +69,7 @@
         <class>entity.PlanKontrolle</class>
         <class>entity.QSQuery</class>
         <class>entity.verordnungen.Situationen</class>
-        <class>entity.Taschengeld</class>
+        <class>entity.Barbetrag</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>

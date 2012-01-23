@@ -5,13 +5,16 @@
 package entity;
 
 import op.OPDE;
+import op.tools.DlgListSelector;
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -73,5 +76,34 @@ public class BewohnerTools {
         }
         return result;
     }
+
+    /**
+     * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
+     */
+    public static Bewohner findeBW(java.awt.Frame parent, String muster) {
+        Bewohner bewohner = EntityTools.find(Bewohner.class, muster);
+
+        if (bewohner == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
+            muster += "%"; // MySQL Wildcard
+            EntityManager em = OPDE.createEM();
+
+            Query query = em.createNamedQuery("Bewohner.findByNachname");
+            query.setParameter("nachname", muster);
+            List<Bewohner> listBW = query.getResultList();
+
+            DefaultListModel dlm = SYSTools.list2dlm(listBW);
+
+            if (dlm.getSize() > 1) {
+                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
+                bewohner = (Bewohner) dlg.getSelection();
+            } else if (dlm.getSize() == 1) {
+                bewohner = listBW.get(0);
+            } else {
+                bewohner = null;
+            }
+        }
+        return bewohner;
+    }
+
 
 }

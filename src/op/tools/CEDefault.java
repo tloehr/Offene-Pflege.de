@@ -36,6 +36,7 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -65,9 +66,9 @@ public class CEDefault extends JTextField implements TableCellEditor {
 
         if (value instanceof Date) {
             setText(SYSCalendar.printGermanStyle((Date) value));
-        } else if (value instanceof Double) {
+        } else if (value instanceof BigDecimal) {
             NumberFormat nf = NumberFormat.getNumberInstance();
-            setText(nf.format((Double) value));
+            setText(nf.format(value));
         } else {
             setText(value.toString());
         }
@@ -122,14 +123,14 @@ public class CEDefault extends JTextField implements TableCellEditor {
             }
             this.value = new Date(gc.getTimeInMillis());
             valid = true;
-        } else if (this.value instanceof Double) {
+        } else if (this.value instanceof BigDecimal) {
             NumberFormat nf = NumberFormat.getNumberInstance();
             String test = getText();
             test = test.replace(".", ",");
             Number num = null;
             try {
                 num = nf.parse(test);
-                this.value = new Double(num.doubleValue());
+                this.value = num;
                 valid = true;
             } catch (ParseException ex) {
                 valid = false;

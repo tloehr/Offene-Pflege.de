@@ -464,8 +464,9 @@ public class FrmMed extends javax.swing.JFrame {
                     });
                 }
 
-                if (itemedit != null || itemdelete != null || itemnew != null)
+                if (itemedit != null || itemdelete != null || itemnew != null) {
                     menu.add(new JSeparator(JSeparator.HORIZONTAL));
+                }
                 if (itemnew != null) menu.add(itemnew);
                 if (itempack != null) menu.add(itempack);
                 if (itemedit != null) menu.add(itemedit);

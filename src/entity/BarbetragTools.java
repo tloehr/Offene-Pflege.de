@@ -4,18 +4,17 @@
  */
 package entity;
 
-import op.tools.DlgException;
+import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
-import op.tools.SYSTools;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -23,14 +22,13 @@ import java.util.GregorianCalendar;
 public class BarbetragTools {
 
     // TGID, BelegDatum, Belegtext, Betrag, _creator, _editor, _cdate, _edate, _cancel
-    public static String getEinzelnAsHTML(ResultSet rs, double vortrag, Bewohner bewohner) {
+    public static String getEinzelnAsHTML(List<Barbetrag> listTG, BigDecimal vortrag, Bewohner bewohner) {
 
         SimpleDateFormat df = new SimpleDateFormat("MMMM yyyy");
         DecimalFormat currency = new DecimalFormat("######.00");
-        double saldo = vortrag;
+        BigDecimal saldo = vortrag;
 
-        // TODO: Kandidat für SYSProps
-        int BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO = 30;
+        int BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("barbetrag_pagebreak_after_element_no"));
 
         int elementNumber = 1;
         boolean pagebreak = false;
@@ -57,83 +55,77 @@ public class BarbetragTools {
 
         int monat = -1;
 
-        try {
+        for (Barbetrag tg : listTG){
 
-            rs.beforeFirst();
-
-            while (rs.next()) {
-
-                GregorianCalendar belegDatum = SYSCalendar.toGC(rs.getDate("BelegDatum"));
-                boolean monatsWechsel = monat != belegDatum.get(GregorianCalendar.MONTH);
+            GregorianCalendar belegDatum = SYSCalendar.toGC(tg.getBelegDatum());
+            boolean monatsWechsel = monat != belegDatum.get(GregorianCalendar.MONTH);
 
 
-                if (pagebreak || monatsWechsel) {
-                    // Falls zufällig ein weiterer Header (der 3 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-                    // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
-                    // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
-                    // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines Monats-Wechsels durchlaufen wird.
-                    pagebreak = (elementNumber + 3 + 2) > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
+            if (pagebreak || monatsWechsel) {
+                // Falls zufällig ein weiterer Header (der 3 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
+                // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+                // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
+                // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines Monats-Wechsels durchlaufen wird.
+                pagebreak = (elementNumber + 3 + 2) > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
 
-                    // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+                // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
 
 
-                    if (monat != -1) { // beim ersten mal nicht
-                        html += "<tr>";
-                        html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
-                        html += "<td width=\"400\">" + (monatsWechsel ? "Saldo zum Monatsende" : "Zwischensumme") + "</td>";
-                        html += "<td>&nbsp;</td>";
-                        html += "<td width=\"70\" align=\"right\"" + (monatsWechsel ? " id=\"fonth2\">" : ">") + "&euro; " + currency.format(saldo) + "</td>";
-                        html += "</tr>\n";
-                        html += "</table>\n";
-                    }
-
-                    monat = belegDatum.get(GregorianCalendar.MONTH);
-
-                    html += "<h2 id=\"fonth2\" " + (pagebreak ? "style=\"page-break-before:always\">" : ">") + ((pagebreak && !monatsWechsel) ? "<i>(fortgesetzt)</i> " : "") + df.format(new Date(belegDatum.getTimeInMillis())) + "</h2>\n";
-                    html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">\n<tr>"
-                            + "<th>Belegdatum</th><th>Belegtext</th><th>Betrag</th><th>Saldo</th></tr>\n";
-
-                    // Vortragszeile
-                    html += "<tr id=\"fonttextgrau\">";
+                if (monat != -1) { // beim ersten mal nicht
+                    html += "<tr>";
                     html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
-                    html += "<td width=\"400\">" + (pagebreak && !monatsWechsel ? "Übertrag von vorheriger Seite" : "Übertrag aus Vormonat") + "</td>";
+                    html += "<td width=\"400\">" + (monatsWechsel ? "Saldo zum Monatsende" : "Zwischensumme") + "</td>";
                     html += "<td>&nbsp;</td>";
-                    html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(saldo) + "</td>";
+                    html += "<td width=\"70\" align=\"right\"" + (monatsWechsel ? " id=\"fonth2\">" : ">") + "&euro; " + currency.format(saldo) + "</td>";
                     html += "</tr>\n";
-
-                    elementNumber += 3;
-
-                    if (pagebreak) {
-                        elementNumber = 1;
-                        pagebreak = false;
-                    }
+                    html += "</table>\n";
                 }
 
-                saldo += rs.getDouble("Betrag");
+                monat = belegDatum.get(GregorianCalendar.MONTH);
 
-                html += "<tr>";
-                html += "<td width=\"90\"  align=\"center\" >" + DateFormat.getDateInstance().format(new Date(belegDatum.getTimeInMillis())) + "</td>";
-                html += "<td width=\"400\">" + rs.getString("BelegText") + "</td>";
-                html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(rs.getDouble("Betrag")) + "</td>";
+                html += "<h2 id=\"fonth2\" " + (pagebreak ? "style=\"page-break-before:always\">" : ">") + ((pagebreak && !monatsWechsel) ? "<i>(fortgesetzt)</i> " : "") + df.format(new Date(belegDatum.getTimeInMillis())) + "</h2>\n";
+                html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">\n<tr>"
+                        + "<th>Belegdatum</th><th>Belegtext</th><th>Betrag</th><th>Saldo</th></tr>\n";
+
+                // Vortragszeile
+                html += "<tr id=\"fonttextgrau\">";
+                html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
+                html += "<td width=\"400\">" + (pagebreak && !monatsWechsel ? "Übertrag von vorheriger Seite" : "Übertrag aus Vormonat") + "</td>";
+                html += "<td>&nbsp;</td>";
                 html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(saldo) + "</td>";
                 html += "</tr>\n";
-                elementNumber += 1;
 
-                pagebreak = elementNumber > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
+                elementNumber += 3;
+
+                if (pagebreak) {
+                    elementNumber = 1;
+                    pagebreak = false;
+                }
             }
 
-            html += "<tr>";
-            html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
-            html += "<td width=\"400\">Saldo zum Monatsende</td>";
-            html += "<td>&nbsp;</td>";
-            html += "<td width=\"70\" align=\"right\" id=\"fonth2\">&euro; " + currency.format(saldo) + "</td>";
-            html += "</tr>\n";
+            saldo = saldo.add(tg.getBetrag());
 
-            html += "</table>\n"
-                    + "</body>";
-        } catch (SQLException e) {
-            new DlgException(e);
+            html += "<tr>";
+            html += "<td width=\"90\"  align=\"center\" >" + DateFormat.getDateInstance().format(new Date(belegDatum.getTimeInMillis())) + "</td>";
+            html += "<td width=\"400\">" + tg.getBelegtext() + "</td>";
+            html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(tg.getBetrag()) + "</td>";
+            html += "<td width=\"70\" align=\"right\">&euro; " + currency.format(saldo) + "</td>";
+            html += "</tr>\n";
+            elementNumber += 1;
+
+            pagebreak = elementNumber > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
         }
+
+        html += "<tr>";
+        html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
+        html += "<td width=\"400\">Saldo zum Monatsende</td>";
+        html += "<td>&nbsp;</td>";
+        html += "<td width=\"70\" align=\"right\" id=\"fonth2\">&euro; " + currency.format(saldo) + "</td>";
+        html += "</tr>\n";
+
+        html += "</table>\n"
+                + "</body>";
+
 
         return html;
     }

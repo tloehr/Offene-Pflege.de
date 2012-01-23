@@ -26,79 +26,95 @@
  */
 package op.bw.tg;
 
-import java.awt.event.*;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
-import entity.BarbetragTools;
-import entity.BewohnerTools;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import entity.*;
 import op.OCSec;
 import op.OPDE;
 import op.tools.*;
-import tablerenderer.RNDStandard;
+import tablemodels.TMBarbetrag;
+import tablemodels.TMTGStat;
+import tablerenderer.RNDHTML;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.text.html.parser.Entity;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * @author tloehr
  */
 public class FrmTG extends JFrame {
     public static final String internalClassID = "admin.residents.cash";
-
     public static final int TAB_TG = 0;
     public static final int TAB_STAT = 1;
-    private String currentBW;
-    private ListSelectionListener lsl;
+    //    private ListSelectionListener lsl;
     private TableModelListener tml;
-    private ListSelectionListener lslstat;
+    //    private ListSelectionListener lslstat;
     private boolean initPhase;
     private Date von;
     private Date bis;
     private Date min;
     private Date max;
-    private long currentTGID;
-    private double betrag;
+    private BigDecimal betrag;
     private String classname;
     private OCSec ocs;
+    private JPopupMenu menu;
+    private DateFormat timeDF;
+    private Bewohner bewohner;
 
 
     /**
      * Creates new form FrmBWAttr
      */
     private void tblTGMousePressed(MouseEvent e) {
-        // TODO add your code here
+
+        Point p = e.getPoint();
+        int row = tblTG.rowAtPoint(p);
+        final ListSelectionModel lsm = tblTG.getSelectionModel();
+        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+
+        if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
+            lsm.setSelectionInterval(row, row);
+        }
+
+        // Kontext Menü
+        if (singleRowSelected && e.isPopupTrigger()) {
+
+            final Barbetrag mytg = ((TMBarbetrag) tblTG.getModel()).getListData().get(row);
+
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+        }
     }
 
     public FrmTG() {
-
         initPhase = true;
-//        deleteAllowed = false;
-//        updateAllowed = false;
-        currentBW = "";
+        timeDF = DateFormat.getTimeInstance(DateFormat.SHORT);
+        bewohner = null;
         this.classname = this.getClass().getName();
         ocs = OPDE.getOCSec();
         initComponents();
@@ -140,7 +156,6 @@ public class FrmTG extends JFrame {
     private void initComponents() {
         jToolBar1 = new JToolBar();
         btnEdit = new JToggleButton();
-        btnStorno = new JButton();
         btnDelete = new JButton();
         btnPrint = new JButton();
         jtpMain = new JTabbedPane();
@@ -153,9 +168,8 @@ public class FrmTG extends JFrame {
         jPanel2 = new JPanel();
         jLabel3 = new JLabel();
         cmbVon = new JComboBox();
-        cmbBis = new JComboBox();
         jLabel4 = new JLabel();
-        jSeparator1 = new JSeparator();
+        cmbBis = new JComboBox();
         rbZeitraum = new JRadioButton();
         rbMonat = new JRadioButton();
         jPanel3 = new JPanel();
@@ -209,19 +223,6 @@ public class FrmTG extends JFrame {
             });
             jToolBar1.add(btnEdit);
 
-            //---- btnStorno ----
-            btnStorno.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_remove.png")));
-            btnStorno.setMnemonic('s');
-            btnStorno.setText("Storno");
-            btnStorno.setEnabled(false);
-            btnStorno.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnStornoActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnStorno);
-
             //---- btnDelete ----
             btnDelete.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/editdelete.png")));
             btnDelete.setMnemonic('l');
@@ -263,14 +264,14 @@ public class FrmTG extends JFrame {
             {
                 pnlBarbetrag.setLayout(new FormLayout(
                     "default, $lcgap, default:grow, $lcgap, pref",
-                    "2*(fill:default, $lgap), fill:default"));
+                    "fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
 
                 //======== jPanel1 ========
                 {
                     jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                     jPanel1.setLayout(new FormLayout(
-                        "3*(default, $lcgap), default",
-                        "7*(fill:default, $lgap), fill:default"));
+                        "$rgap, 2*($lcgap, default), $lcgap, $rgap",
+                        "$rgap, 7*($lgap, fill:default)"));
 
                     //---- rbAlle ----
                     rbAlle.setMnemonic('a');
@@ -300,7 +301,7 @@ public class FrmTG extends JFrame {
                             txtBWFocusGained(e);
                         }
                     });
-                    jPanel1.add(txtBW, CC.xy(3, 3));
+                    jPanel1.add(txtBW, CC.xy(3, 5));
 
                     //---- btnFind ----
                     btnFind.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/search.png")));
@@ -310,17 +311,17 @@ public class FrmTG extends JFrame {
                             btnFindActionPerformed(e);
                         }
                     });
-                    jPanel1.add(btnFind, CC.xy(5, 3));
+                    jPanel1.add(btnFind, CC.xy(5, 5));
 
                     //---- jLabel2 ----
                     jLabel2.setText("Bewohner(in) suchen");
-                    jPanel1.add(jLabel2, CC.xy(3, 1));
+                    jPanel1.add(jLabel2, CC.xy(3, 3));
 
                     //======== jPanel2 ========
                     {
                         jPanel2.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                         jPanel2.setLayout(new FormLayout(
-                            "default, default:grow, $lcgap, default",
+                            "$rgap, default, default:grow, $lcgap, default",
                             "3*(fill:default, $lgap), fill:default"));
 
                         //---- jLabel3 ----
@@ -340,7 +341,11 @@ public class FrmTG extends JFrame {
                                 cmbVonItemStateChanged(e);
                             }
                         });
-                        jPanel2.add(cmbVon, CC.xy(2, 3));
+                        jPanel2.add(cmbVon, CC.xywh(2, 3, 4, 1));
+
+                        //---- jLabel4 ----
+                        jLabel4.setText("Bis:");
+                        jPanel2.add(jLabel4, CC.xy(2, 5));
 
                         //---- cmbBis ----
                         cmbBis.setModel(new DefaultComboBoxModel(new String[] {
@@ -355,14 +360,9 @@ public class FrmTG extends JFrame {
                                 cmbBisItemStateChanged(e);
                             }
                         });
-                        jPanel2.add(cmbBis, CC.xy(2, 7));
-
-                        //---- jLabel4 ----
-                        jLabel4.setText("Bis:");
-                        jPanel2.add(jLabel4, CC.xy(2, 5));
+                        jPanel2.add(cmbBis, CC.xywh(2, 7, 4, 1));
                     }
-                    jPanel1.add(jPanel2, CC.xywh(3, 11, 3, 1));
-                    jPanel1.add(jSeparator1, CC.xywh(3, 5, 3, 1));
+                    jPanel1.add(jPanel2, CC.xywh(3, 11, 4, 1));
 
                     //---- rbZeitraum ----
                     rbZeitraum.setMnemonic('z');
@@ -394,12 +394,12 @@ public class FrmTG extends JFrame {
                     {
                         jPanel3.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                         jPanel3.setLayout(new FormLayout(
-                            "5*(default, $lcgap), default",
+                            "3*(default, $lcgap), default",
                             "2*(fill:default, $lgap), fill:default"));
 
                         //---- jLabel6 ----
                         jLabel6.setText("Monat:");
-                        jPanel3.add(jLabel6, CC.xy(3, 1));
+                        jPanel3.add(jLabel6, CC.xy(1, 1));
 
                         //---- cmbMonat ----
                         cmbMonat.setModel(new DefaultComboBoxModel(new String[] {
@@ -414,7 +414,7 @@ public class FrmTG extends JFrame {
                                 cmbMonatItemStateChanged(e);
                             }
                         });
-                        jPanel3.add(cmbMonat, CC.xywh(3, 3, 7, 1));
+                        jPanel3.add(cmbMonat, CC.xywh(1, 3, 7, 1));
 
                         //---- btnTop ----
                         btnTop.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png")));
@@ -424,7 +424,7 @@ public class FrmTG extends JFrame {
                                 btnTopActionPerformed(e);
                             }
                         });
-                        jPanel3.add(btnTop, CC.xy(3, 5));
+                        jPanel3.add(btnTop, CC.xy(1, 5));
 
                         //---- btnLeft ----
                         btnLeft.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png")));
@@ -434,7 +434,7 @@ public class FrmTG extends JFrame {
                                 btnLeftActionPerformed(e);
                             }
                         });
-                        jPanel3.add(btnLeft, CC.xy(5, 5));
+                        jPanel3.add(btnLeft, CC.xy(3, 5));
 
                         //---- btnRight ----
                         btnRight.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
@@ -444,7 +444,7 @@ public class FrmTG extends JFrame {
                                 btnRightActionPerformed(e);
                             }
                         });
-                        jPanel3.add(btnRight, CC.xy(7, 5));
+                        jPanel3.add(btnRight, CC.xy(5, 5));
 
                         //---- btnBottom ----
                         btnBottom.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2rightarrow.png")));
@@ -454,9 +454,9 @@ public class FrmTG extends JFrame {
                                 btnBottomActionPerformed(e);
                             }
                         });
-                        jPanel3.add(btnBottom, CC.xy(9, 5));
+                        jPanel3.add(btnBottom, CC.xy(7, 5));
                     }
-                    jPanel1.add(jPanel3, CC.xywh(3, 15, 3, 1));
+                    jPanel1.add(jPanel3, CC.xywh(3, 15, 4, 1));
                 }
                 pnlBarbetrag.add(jPanel1, CC.xywh(1, 3, 1, 3));
 
@@ -704,7 +704,7 @@ public class FrmTG extends JFrame {
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(jLabel5)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
+                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(rbBWAlle)
@@ -750,7 +750,7 @@ public class FrmTG extends JFrame {
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jLabel1)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 593, Short.MAX_VALUE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
@@ -775,12 +775,13 @@ public class FrmTG extends JFrame {
                 tblTG.getCellEditor().cancelCellEditing();
             }
         }
+        ((TMBarbetrag) tblTG.getModel()).setEditable(btnEdit.isSelected());
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void txtBelegtextFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBelegtextFocusLost
-        if (((JTextField) evt.getSource()).getText().trim().equals("")) {
-            ((JTextField) evt.getSource()).setText("Geben Sie einen Belegtext ein.");
-            lblMessage.setText(SYSCalendar.toGermanTime(new Time(SYSCalendar.heute().getTimeInMillis())) + " Uhr : " + "Sie können das Belegtextfeld nicht leer lassen.");
+        if (txtBelegtext.getText().trim().isEmpty()) {
+            txtBelegtext.setText("Geben Sie einen Belegtext ein.");
+            lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Sie können das Belegtextfeld nicht leer lassen.");
         }
     }//GEN-LAST:event_txtBelegtextFocusLost
 
@@ -808,22 +809,22 @@ public class FrmTG extends JFrame {
                     test += " " + SYSConst.eurosymbol;
                     num = nf.parse(test);
                 } catch (ParseException ex2) {
-                    lblMessage.setText(SYSCalendar.toGermanTime(new Time(SYSCalendar.heute().getTimeInMillis())) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
+                    lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
                 }
             }
         }
         if (num != null) {
-            this.betrag = num.doubleValue();
-            if (this.betrag != 0.0d) {
+            betrag = (BigDecimal) num;
+            if (!betrag.equals(BigDecimal.ZERO)) {
                 insert();
                 summeNeuRechnen();
                 setMinMax();
             } else {
-                lblMessage.setText(SYSCalendar.toGermanTime(new Time(SYSCalendar.heute().getTimeInMillis())) + " Uhr : " + "Beträge mit '0,00 " + SYSConst.eurosymbol + "' werden nicht angenommen.");
+                lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Beträge mit '0,00 " + SYSConst.eurosymbol + "' werden nicht angenommen.");
             }
 
         } else {
-            this.betrag = 0.0d;
+            betrag = BigDecimal.ZERO;
         }
         txtBetrag.setText(nf.format(this.betrag));
     }//GEN-LAST:event_txtBetragFocusLost
@@ -845,13 +846,13 @@ public class FrmTG extends JFrame {
         try {
             gc = SYSCalendar.erkenneDatum(((JTextField) evt.getSource()).getText());
         } catch (NumberFormatException ex) {
-            lblMessage.setText(SYSCalendar.toGermanTime(new Time(SYSCalendar.heute().getTimeInMillis())) + " Uhr : Sie haben ein falsches Datum eingegeben. Wurde auf heute zurückgesetzt.");
+            lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie haben ein falsches Datum eingegeben. Wurde auf heute zurückgesetzt.");
             gc = SYSCalendar.today();
         }
         // Datum in der Zukunft ?
         if (SYSCalendar.sameDay(gc, SYSCalendar.today()) > 0) {
             gc = SYSCalendar.today();
-            lblMessage.setText(SYSCalendar.toGermanTime(new Time(SYSCalendar.heute().getTimeInMillis())) + " Uhr : Sie haben ein Datum in der Zukunft eingegeben. Wurde auf heute zurückgesetzt.");
+            lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie haben ein Datum in der Zukunft eingegeben. Wurde auf heute zurückgesetzt.");
         }
         ((JTextField) evt.getSource()).setText(SYSCalendar.printGCGermanStyle(gc));
     }//GEN-LAST:event_txtDatumFocusLost
@@ -880,6 +881,7 @@ public class FrmTG extends JFrame {
         if (initPhase) {
             return;
         }
+        initPhase = true;
         cmbVon.setModel(new DefaultComboBoxModel());
         cmbVon.setEnabled(false);
         cmbBis.setModel(new DefaultComboBoxModel());
@@ -895,18 +897,11 @@ public class FrmTG extends JFrame {
         btnLeft.setEnabled(this.min.compareTo(this.von) < 0);
         btnRight.setEnabled(this.max.compareTo(this.bis) >= 0);
         btnBottom.setEnabled(this.max.compareTo(this.bis) >= 0);
+        initPhase = false;
         reloadDisplay();
     }//GEN-LAST:event_rbMonatActionPerformed
 
     public void dispose() {
-        ListSelectionModel lsm1 = tblStat.getSelectionModel();
-        if (lslstat != null) {
-            lsm1.removeListSelectionListener(lslstat);
-        }
-        ListSelectionModel lsm2 = tblTG.getSelectionModel();
-        if (lsl != null) {
-            lsm2.removeListSelectionListener(lsl);
-        }
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -928,12 +923,11 @@ public class FrmTG extends JFrame {
     }//GEN-LAST:event_cmbMonatItemStateChanged
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-        ResultSet rs = ((TMBarbetrag) tblTG.getModel()).getResultSet();
-        double vortrag = ((TMBarbetrag) tblTG.getModel()).getVortrag();
-        printSingle(rs, vortrag);
+        TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
+        printSingle(tm.getListData(), tm.getVortrag());
     }//GEN-LAST:event_btnPrintActionPerformed
 
-    private void printSingle(ResultSet rs, double vortrag) {
+    private void printSingle(List<Barbetrag> liste, BigDecimal vortrag) {
 
         try {
             // Create temp file.
@@ -944,7 +938,7 @@ public class FrmTG extends JFrame {
 
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            String html = SYSTools.htmlUmlautConversion(BarbetragTools.getEinzelnAsHTML(rs, vortrag, BewohnerTools.findByBWKennung(currentBW)));
+            String html = SYSTools.htmlUmlautConversion(BarbetragTools.getEinzelnAsHTML(liste, vortrag, bewohner));
 
             out.write(html);
 
@@ -967,14 +961,10 @@ public class FrmTG extends JFrame {
             return;
         }
 
-        tcm1.getColumn(0).setHeaderValue("Nachname");
-        tcm1.getColumn(0).setPreferredWidth(textWidth / 4);
-        tcm1.getColumn(1).setHeaderValue("Vorname");
+        tcm1.getColumn(0).setHeaderValue("BewohnerIn");
+        tcm1.getColumn(0).setPreferredWidth(textWidth / 4 * 3);
+        tcm1.getColumn(1).setHeaderValue("Summe");
         tcm1.getColumn(1).setPreferredWidth(textWidth / 4);
-        tcm1.getColumn(2).setHeaderValue("BWKennung");
-        tcm1.getColumn(2).setPreferredWidth(textWidth / 4);
-        tcm1.getColumn(3).setHeaderValue("Summe");
-        tcm1.getColumn(3).setPreferredWidth(textWidth / 4);
     }//GEN-LAST:event_jspStatComponentResized
 
     private void rbAktuellActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbAktuellActionPerformed
@@ -987,106 +977,51 @@ public class FrmTG extends JFrame {
 
     private void tblStatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStatMouseClicked
         if (evt.getClickCount() > 1) {
-            txtBW.setText(currentBW);
+            TMTGStat tm = (TMTGStat) tblStat.getModel();
+            ListSelectionModel lsm = tblStat.getSelectionModel();
+            txtBW.setText(tm.getBewohner(lsm.getLeadSelectionIndex()).getBWKennung());
             jtpMain.setSelectedIndex(TAB_TG);
             btnFind.doClick();
-//            rbAlle.setEnabled(true);
-//            rbMonat.setEnabled(true);
-//            rbZeitraum.setEnabled(true);
-//            rbAlle.doClick();
         }
     }//GEN-LAST:event_tblStatMouseClicked
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        if (JOptionPane.showConfirmDialog(this, "Sie löschen nun den markierten Datensatz.\nAuch ein evtl. vorhandener, zugehöriger Stornodatensatz wird mit entfernt.\n\nMöchten Sie das ?", "Storno eines Taschengeldvorgangs", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        EntityManager em = OPDE.createEM();
-
-        try{
-            em.getTransaction().begin();
-            Query query = em.createQuery("DELETE FROM Taschengeld t WHERE t.replacedBy = :tg ");
-            query.executeUpdate();
-
-            em.remove(currentTG);
-        }
-
-        Connection db = OPDE.getDb().db;
-        String deleteSQL = "DELETE FROM Taschengeld WHERE TGID=? OR _cancel=?";
-
-        try {
-            // Löschen
-            PreparedStatement stmtDelete = db.prepareStatement(deleteSQL);
-            stmtDelete.setLong(1, currentTGID);
-            stmtDelete.setLong(2, currentTGID);
-            stmtDelete.executeUpdate();
-
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            ex.printStackTrace();
-        }
-        // Nach dem Löschen ist erstmal nix gewählt. Daher würden sonst die Knöpfe aktiv bleiben.
-        // Schalten wir sie lieber vorsichtshalber ab.
-        btnDelete.setEnabled(false);
-        btnStorno.setEnabled(false);
-        setMinMax();
-        reloadDisplay();
+//        if (JOptionPane.showConfirmDialog(this, "Sie löschen nun den markierten Datensatz.\nMöchten Sie das ?", "Storno eines Taschengeldvorgangs", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+//            return;
+//        }
+//
+//        EntityManager em = OPDE.createEM();
+//
+//        try{
+//            em.getTransaction().begin();
+//            Query query = em.createQuery("DELETE FROM Barbetrag t WHERE t.replacedBy = :tg ");
+//            query.executeUpdate();
+//
+//            em.remove(currentTG);
+//        }
+//
+//        Connection db = OPDE.getDb().db;
+//        String deleteSQL = "DELETE FROM Taschengeld WHERE TGID=? OR _cancel=?";
+//
+//        try {
+//            // Löschen
+//            PreparedStatement stmtDelete = db.prepareStatement(deleteSQL);
+//            stmtDelete.setLong(1, currentTGID);
+//            stmtDelete.setLong(2, currentTGID);
+//            stmtDelete.executeUpdate();
+//
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//            ex.printStackTrace();
+//        }
+//        // Nach dem Löschen ist erstmal nix gewählt. Daher würden sonst die Knöpfe aktiv bleiben.
+//        // Schalten wir sie lieber vorsichtshalber ab.
+//        btnDelete.setEnabled(false);
+//        btnStorno.setEnabled(false);
+//        setMinMax();
+//        reloadDisplay();
     }//GEN-LAST:event_btnDeleteActionPerformed
 
-    private void btnStornoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStornoActionPerformed
-        if (JOptionPane.showConfirmDialog(this, "Sie stornieren nun den markierten Datensatz\n\nMöchten Sie das ?", "Storno eines Taschengeldvorgangs", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-            return;
-        }
-        Connection db = OPDE.getDb().db;
-        String updateSQL = "UPDATE Taschengeld SET Belegtext = CONCAT('***',Belegtext,'*** (Vorgang storniert)'),"
-                + " _cancel = ?, _editor=?, _edate=now()"
-                + " WHERE TGID=?";
-        String insertSQL = "INSERT INTO Taschengeld (BelegDatum,Belegtext,Betrag,BWKennung,_cancel,_creator,_editor,_cdate,_edate)"
-                + " SELECT BelegDatum, CONCAT('Storno des Vorgangs >>',Belegtext,'<<'),Betrag * -1, BWKennung, TGID, ?, null, now(), now()"
-                + " FROM Taschengeld WHERE TGID = ?";
-
-        try {
-            // Hier beginnt eine Transaktion
-            db.setAutoCommit(false);
-            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-            db.commit();
-
-            // CancelRec einfügen
-            PreparedStatement stmtCancelRec = db.prepareStatement(insertSQL);
-            stmtCancelRec.setString(1, OPDE.getLogin().getUser().getUKennung());
-            stmtCancelRec.setLong(2, currentTGID);
-            stmtCancelRec.executeUpdate();
-
-            long canceltgid = OPDE.getDb().getLastInsertedID();
-
-            // stornierten Record updaten
-            PreparedStatement stmtCancelledRec = db.prepareStatement(updateSQL);
-            stmtCancelledRec.setLong(1, canceltgid);
-            stmtCancelledRec.setString(2, OPDE.getLogin().getUser().getUKennung());
-            stmtCancelledRec.setLong(3, currentTGID);
-            stmtCancelledRec.executeUpdate();
-
-            db.commit();
-            db.setAutoCommit(true);
-
-        } catch (SQLException ex) {
-            try {
-                db.rollback();
-            } catch (SQLException ex1) {
-                new DlgException(ex1);
-                ex1.printStackTrace();
-                System.exit(1);
-            }
-            new DlgException(ex);
-        }
-        // Nach dem Löschen ist erstmal nix gewählt. Daher würden sonst die Knöpfe aktiv bleiben.
-        // Schalten wir sie lieber vorsichtshalber ab.
-        btnDelete.setEnabled(false);
-        btnStorno.setEnabled(false);
-        setMinMax();
-        reloadDisplay();
-    }//GEN-LAST:event_btnStornoActionPerformed
 
     private void cmbBisItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbBisItemStateChanged
         if (initPhase) {
@@ -1176,10 +1111,10 @@ public class FrmTG extends JFrame {
             reloadDisplay();
         } else {
             cmbPast.setEnabled(false);
-            if (currentBW.equals("")) {
+            if (bewohner == null) {
                 btnPrint.setEnabled(false);
             } else {
-                txtBW.setText(currentBW);
+                txtBW.setText(bewohner.getBWKennung());
                 btnFind.doClick();
             }
         }
@@ -1216,14 +1151,13 @@ public class FrmTG extends JFrame {
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void txtBWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBWActionPerformed
-        String prevBW = currentBW;
-        currentBW = SYSTools.findeBW(this, txtBW.getText(), OPDE.isAdmin());
-        if (currentBW.equals("")) {
+        Bewohner prevBW = bewohner;
+        bewohner = BewohnerTools.findeBW(this, txtBW.getText());
+        if (bewohner == null) {
             JOptionPane.showMessageDialog(this, "Keine(n) passende(n) Bewohner(in) gefunden.", "Hinweis", JOptionPane.INFORMATION_MESSAGE);
             //tblTG.setModel(new DefaultTableModel());
-            currentBW = prevBW;
+            bewohner = prevBW;
         } else {
-            //long numRecs = ((Long) DBHandling.getSingleValue("Taschengeld","COUNT(*)","BWKennung",currentBW)).longValue();
             setMinMax();
             rbAlle.setEnabled(true);
             rbZeitraum.setEnabled(true);
@@ -1245,29 +1179,29 @@ public class FrmTG extends JFrame {
      */
     private void setMinMax() {
         // Ermittelt die maximale Ausdehnung (chronologisch gesehen) aller Belege für einen bestimmten BW
-        ResultSet rs = DBHandling.getResultSet("Taschengeld", new String[]{"MIN(BelegDatum)", "Max(BelegDatum)"}, "BWKennung", currentBW, "=");
-        try {
-            this.min = (java.util.Date) rs.getDate(1);
-            if (this.min == null) {
-                this.min = SYSCalendar.today_date();
-            }
-            this.max = SYSCalendar.today_date();
-            //this.von = min;
-            //this.bis = max;
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            ex.printStackTrace();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT MIN(tg.belegDatum) FROM Barbetrag tg WHERE tg.bewohner = :bewohner");
+        query.setParameter("bewohner", bewohner);
+        min = (Date) query.getSingleResult();
+        em.close();
+
+        if (min == null) {
+            min = SYSCalendar.today_date();
         }
+        max = SYSCalendar.today_date();
+
     }
 
     private void summeNeuRechnen() {
-        BigDecimal summe = (BigDecimal) DBHandling.getSingleValue("Taschengeld", "SUM(Betrag)", "BWKennung", currentBW);
-        if (summe == null) {
-            summe = new BigDecimal(0);
-        }
+        TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
+        BigDecimal zeilensaldo = tm.getZeilenSaldo();
+
+//        BigDecimal summe = (BigDecimal) DBHandling.getSingleValue("Taschengeld", "SUM(Betrag)", "BWKennung", currentBW);
+
         NumberFormat nf = NumberFormat.getCurrencyInstance();
-        lblBetrag.setText(nf.format(summe.floatValue()));
-        if (summe.floatValue() < 0) {
+        lblBetrag.setText(nf.format(zeilensaldo));
+        if (zeilensaldo.compareTo(BigDecimal.ZERO) < 0) {
             lblBetrag.setForeground(Color.RED);
         } else {
             lblBetrag.setForeground(Color.BLACK);
@@ -1284,28 +1218,28 @@ public class FrmTG extends JFrame {
                     // Anzuzeigenden Zeitraum ermitteln.
                     if (rbMonat.isSelected()) {
                         ListElement leMonat = (ListElement) cmbMonat.getSelectedItem();
-                        this.von = (Date) leMonat.getObject();
-                        this.bis = SYSCalendar.eom((Date) leMonat.getObject());
+                        von = (Date) leMonat.getObject();
+                        bis = SYSCalendar.eom((Date) leMonat.getObject());
                     } else if (rbZeitraum.isSelected()) {
                         ListElement leVon = (ListElement) cmbVon.getSelectedItem();
                         ListElement leBis = (ListElement) cmbBis.getSelectedItem();
-                        this.von = (Date) leVon.getObject();
-                        this.bis = SYSCalendar.eom((Date) leBis.getObject());
+                        von = (Date) leVon.getObject();
+                        bis = SYSCalendar.eom((Date) leBis.getObject());
                     } else {
                         setMinMax();
-                        this.von = this.min;
-                        this.bis = this.max;
+                        von = min;
+                        bis = max;
                     }
 
-                    if (!currentBW.equals("")) {
+                    if (bewohner != null) {
                         boolean outerPhase = initPhase;
                         initPhase = true;
-                        summeNeuRechnen();
-                        SYSTools.setBWLabel(lblBW, currentBW);
+//                        summeNeuRechnen();
+                        BewohnerTools.setBWLabel(lblBW, bewohner);
                         txtDatum.setText(SYSCalendar.printGermanStyle(SYSCalendar.today_date()));
                         txtBelegtext.setText("Bitte geben Sie einen Belegtext ein.");
                         txtBetrag.setText("0,00 " + SYSConst.eurosymbol);
-                        this.betrag = 0.0d;
+                        this.betrag = BigDecimal.ZERO;
                         txtDatum.setEnabled(true);
                         txtBelegtext.setEnabled(true);
                         txtBetrag.setEnabled(true);
@@ -1314,7 +1248,6 @@ public class FrmTG extends JFrame {
                         rbMonat.setEnabled(true);
                         rbZeitraum.setEnabled(true);
                         btnDelete.setEnabled(false);
-                        btnStorno.setEnabled(false);
                         initPhase = outerPhase;
                     }
                     if (tblTG.getModel().getRowCount() == 0) {
@@ -1331,44 +1264,54 @@ public class FrmTG extends JFrame {
                 }
                 case TAB_STAT: {
                     cmbPast.setEnabled(true);
-                    String sql = "SELECT SUM(Betrag) FROM Taschengeld";
+                    EntityManager em = OPDE.createEM();
+                    Query query = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg ");
+                    BigDecimal summe = BigDecimal.ZERO;
                     try {
-                        PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-                        ResultSet rs = stmt.executeQuery();
-                        rs.first();
-                        float summe = rs.getFloat(1);
-                        NumberFormat nf = NumberFormat.getCurrencyInstance();
-                        String summentext = nf.format(summe);
-
-                        // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
-                        // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
-                        if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
-                            String sqlPast = "SELECT SUM(Betrag) FROM Taschengeld WHERE BelegDatum <= ? ";
-                            PreparedStatement stmtPast = OPDE.getDb().db.prepareStatement(sqlPast);
-                            ListElement le = (ListElement) cmbPast.getSelectedItem();
-                            Date monat = (Date) le.getObject();
-                            stmtPast.setDate(1, new java.sql.Date(SYSCalendar.eom(monat).getTime()));
-                            ResultSet rsPast = stmtPast.executeQuery();
-                            rsPast.first();
-                            float summePast = rsPast.getFloat(1);
-                            summentext += " (" + nf.format(summePast) + ")";
-                            lblSumme.setToolTipText("<html>Die Summe in Klammern bezeichnet den Stand zum Monatsende <b>" + le.toString() + "</b></html>");
-                        } else {
-                            lblSumme.setToolTipText(null);
-                        }
-
-                        lblSumme.setText(summentext);
-                        if (summe < 0) {
-                            lblSumme.setForeground(Color.RED);
-                        } else {
-                            lblSumme.setForeground(Color.BLACK);
-                        }
-                    } catch (SQLException ex) {
-                        new DlgException(ex);
-                        ex.printStackTrace();
+                        summe = (BigDecimal) query.getSingleResult();
+                    } catch (NoResultException nre) {
+                        summe = BigDecimal.ZERO;
+                    } catch (Exception e) {
+                        OPDE.fatal(e);
                     }
+
+
+                    NumberFormat nf = NumberFormat.getCurrencyInstance();
+                    String summentext = nf.format(summe);
+
+                    // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
+                    // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
+                    if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
+                        Query queryPast = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg WHERE tg.belegDatum <= :datum");
+                        ListElement le = (ListElement) cmbPast.getSelectedItem();
+                        Date monat = (Date) le.getObject();
+                        queryPast.setParameter("datum", new Date(SYSCalendar.eom(monat).getTime()));
+
+                        BigDecimal summePast = BigDecimal.ZERO;
+                        try {
+                            summePast = (BigDecimal) query.getSingleResult();
+                        } catch (NoResultException nre) {
+                            summePast = BigDecimal.ZERO;
+                        } catch (Exception e) {
+                            OPDE.fatal(e);
+                        }
+
+                        summentext += " (" + nf.format(summePast) + ")";
+                        lblSumme.setToolTipText("<html>Die Summe in Klammern bezeichnet den Stand zum Monatsende <b>" + le.toString() + "</b></html>");
+                    } else {
+                        lblSumme.setToolTipText(null);
+                    }
+
+                    em.close();
+
+                    lblSumme.setText(summentext);
+                    if (summe.compareTo(BigDecimal.ZERO) < 0) {
+                        lblSumme.setForeground(Color.RED);
+                    } else {
+                        lblSumme.setForeground(Color.BLACK);
+                    }
+
                     btnPrint.setEnabled(false);
-                    btnStorno.setEnabled(false);
                     btnDelete.setEnabled(false);
                     btnEdit.setEnabled(false);
                     reloadStatTable();
@@ -1379,47 +1322,26 @@ public class FrmTG extends JFrame {
     }
 
     private void reloadStatTable() {
-        ListSelectionModel lsm = tblStat.getSelectionModel();
-        if (lslstat != null) {
-            lsm.removeListSelectionListener(lslstat);
-        }
-        lslstat = new HandleStatSelections();
+
         tblStat.setModel(new TMTGStat(rbBWAlle.isSelected()));
         tblStat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tblStat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        lsm.addListSelectionListener(lslstat);
-
-        //if (tblStat.getModel().getRowCount() > 0) lsm.setSelectionInterval(0,0);
 
         jspStat.dispatchEvent(new ComponentEvent(jspStat, ComponentEvent.COMPONENT_RESIZED));
 
-        tblStat.getColumnModel().getColumn(0).setCellRenderer(new RNDStandard());
-        tblStat.getColumnModel().getColumn(1).setCellRenderer(new RNDStandard());
-        tblStat.getColumnModel().getColumn(2).setCellRenderer(new RNDStandard());
-        tblStat.getColumnModel().getColumn(3).setCellRenderer(new StandardCurrencyRenderer());
+        tblStat.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+        tblStat.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
     }
 
     private void insert() {
-        PreparedStatement stmt;
-        java.sql.Date datum = new java.sql.Date(SYSCalendar.erkenneDatum(txtDatum.getText()).getTimeInMillis());
 
-        try {
-            String insertSQL = "INSERT INTO Taschengeld (BelegDatum,Belegtext,Betrag,BWKennung,_creator,_editor,_cdate,_edate)"
-                    + " VALUES (?,?,?,?,?,null,now(),now())";
+        Date datum = new Date(SYSCalendar.erkenneDatum(txtDatum.getText()).getTimeInMillis());
+        TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
 
-            stmt = OPDE.getDb().db.prepareStatement(insertSQL);
-
-            stmt.setDate(1, datum);
-            stmt.setString(2, txtBelegtext.getText());
-            stmt.setDouble(3, this.betrag);
-            stmt.setString(4, currentBW);
-            stmt.setString(5, OPDE.getLogin().getUser().getUKennung());
-
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            ex.printStackTrace();
-        }
+        Barbetrag barbetrag = new Barbetrag(datum, txtBelegtext.getText().trim(), betrag, bewohner, OPDE.getLogin().getUser());
+        EntityTools.persist(barbetrag);
+        tm.getListData().add(barbetrag);
+        Collections.sort(tm.getListData());
 
         // schaltet auf den Monat um, in dem der letzte Beleg eingegeben wurde.
         // Sofern die ein bestimmter Monat eingestellt war.
@@ -1432,15 +1354,13 @@ public class FrmTG extends JFrame {
         reloadTable();
         txtBelegtext.setText("Bitte geben Sie einen Belegtext ein.");
         txtBetrag.setText("0.00 " + SYSConst.eurosymbol);
-        this.betrag = 0.0d;
+        betrag = BigDecimal.ZERO;
         txtDatum.requestFocus();
-        lblMessage.setText(SYSCalendar.toGermanTime(new Time(SYSCalendar.heute().getTimeInMillis())) + " Uhr : " + "Neuen Datensatz eingefügt.");
-
-        TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
+        lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Neuen Datensatz eingefügt.");
 
 
         // Das hier markiert den zuletzt eingefügten Datensatz.
-        int index = tm.getRow(OPDE.getDb().getLastInsertedID());
+        int index = tm.getListData().indexOf(barbetrag);
         ListSelectionModel lsm = tblTG.getSelectionModel();
         lsm.setSelectionInterval(index, index);
         // Das hier rollt auf den zuletzt eingefügten Datensatz.
@@ -1450,20 +1370,7 @@ public class FrmTG extends JFrame {
     }
 
     private void reloadTable() {
-        // ScrollPosition merken
-        //Point oldpos = jspData.getViewport().getViewPosition();
-
-        // Tagesbericht Liste aktualisieren
-        ListSelectionModel lsm = tblTG.getSelectionModel();
-        if (lsl != null) {
-            lsm.removeListSelectionListener(lsl);
-        }
-        if (tml != null) {
-            tblTG.getModel().removeTableModelListener(tml);
-        }
-        lsl = new HandleSelections();
         tml = new TableModelListener() {
-
             public void tableChanged(TableModelEvent e) {
                 if (e.getColumn() == 2) { // Betrag hat sich geändert
                     summeNeuRechnen();
@@ -1471,20 +1378,17 @@ public class FrmTG extends JFrame {
             }
         };
         boolean subset = rbMonat.isSelected() || rbZeitraum.isSelected();
-        tblTG.setModel(new TMBarbetrag(this.currentBW, subset, this.von, this.bis, btnEdit));
+        tblTG.setModel(new TMBarbetrag(bewohner, subset, von, bis, btnEdit.isSelected()));
         tblTG.getModel().addTableModelListener(tml);
         tblTG.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tblTG.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        lsm.addListSelectionListener(lsl);
-
-        //if (tblTG.getModel().getRowCount() > 0) lsm.setSelectionInterval(0,0);
 
         jspData.dispatchEvent(new ComponentEvent(jspData, ComponentEvent.COMPONENT_RESIZED));
 
-        tblTG.getColumnModel().getColumn(0).setCellRenderer(new RNDStandard());
-        tblTG.getColumnModel().getColumn(1).setCellRenderer(new RNDStandard());
-        tblTG.getColumnModel().getColumn(2).setCellRenderer(new StandardCurrencyRenderer());
-        tblTG.getColumnModel().getColumn(3).setCellRenderer(new StandardCurrencyRenderer());
+//        tblTG.getColumnModel().getColumn(0).setCellRenderer(new RNDStandard());
+//        tblTG.getColumnModel().getColumn(1).setCellRenderer(new RNDStandard());
+//        tblTG.getColumnModel().getColumn(2).setCellRenderer(new StandardCurrencyRenderer());
+//        tblTG.getColumnModel().getColumn(3).setCellRenderer(new StandardCurrencyRenderer());
 
         tblTG.getColumnModel().getColumn(0).setCellEditor(new CEDefault());
         tblTG.getColumnModel().getColumn(1).setCellEditor(new CEDefault());
@@ -1494,7 +1398,6 @@ public class FrmTG extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JToolBar jToolBar1;
     private JToggleButton btnEdit;
-    private JButton btnStorno;
     private JButton btnDelete;
     private JButton btnPrint;
     private JTabbedPane jtpMain;
@@ -1507,9 +1410,8 @@ public class FrmTG extends JFrame {
     private JPanel jPanel2;
     private JLabel jLabel3;
     private JComboBox cmbVon;
-    private JComboBox cmbBis;
     private JLabel jLabel4;
-    private JSeparator jSeparator1;
+    private JComboBox cmbBis;
     private JRadioButton rbZeitraum;
     private JRadioButton rbMonat;
     private JPanel jPanel3;
@@ -1568,22 +1470,22 @@ public class FrmTG extends JFrame {
 //        }
 //    } // class HandleTBSelections
 
-    class HandleStatSelections implements ListSelectionListener {
-
-        public void valueChanged(ListSelectionEvent lse) {
-            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-            TableModel tm = tblStat.getModel();
-            if (tm.getRowCount() <= 1) {
-                return;
-            }
-            ListSelectionModel lsm = tblStat.getSelectionModel();
-            if (!lse.getValueIsAdjusting()) {
-                if (lsm.isSelectionEmpty()) {
-                    currentBW = "";
-                } else {
-                    currentBW = ((String) tm.getValueAt(lsm.getLeadSelectionIndex(), 3 - 1));
-                }
-            }
-        }
-    } // class HandleTBSelections
+//    class HandleStatSelections implements ListSelectionListener {
+//
+//        public void valueChanged(ListSelectionEvent lse) {
+//            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
+//            TableModel tm = tblStat.getModel();
+//            if (tm.getRowCount() <= 1) {
+//                return;
+//            }
+//            ListSelectionModel lsm = tblStat.getSelectionModel();
+//            if (!lse.getValueIsAdjusting()) {
+//                if (lsm.isSelectionEmpty()) {
+//                    currentBW = "";
+//                } else {
+//                    currentBW = ((String) tm.getValueAt(lsm.getLeadSelectionIndex(), 3 - 1));
+//                }
+//            }
+//        }
+//    } // class HandleTBSelections
 }

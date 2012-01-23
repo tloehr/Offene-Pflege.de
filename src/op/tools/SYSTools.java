@@ -535,6 +535,7 @@ public class SYSTools {
     /**
      * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
      */
+    @Deprecated
     public static String findeBW(java.awt.Frame parent, String muster, boolean admin) {
         String result = "";
 
