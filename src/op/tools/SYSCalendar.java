@@ -885,8 +885,7 @@ public class SYSCalendar {
     }
 
     /*
-     * Erstellt ein ComboBox Modell, das eine Liste von Monaten mit Jahreszahlen enthält.
-     * "Januar 2007, Februar 2007, ...."
+     * Erstellt ein ComboBox Modell, dass eine Liste mit Dates zwischen den Begrenzungs-Zeitpunkten enthält.
      *
      * @param start Beginn der Liste
      * @param end Ende der Liste
@@ -900,11 +899,13 @@ public class SYSCalendar {
         } else {
             Date runner = start;
             do {
-                Format formatter;
-                formatter = new SimpleDateFormat("MMMM yyyy");
-                dcbm.addElement(new ListElement(formatter.format(runner), runner.clone()));
-                //System.out.println(printGermanStyle(runner) + ", " + runner.compareTo(end) + ", " + formatter.format(runner));
+//                Format formatter;
+//                formatter = new SimpleDateFormat("MMMM yyyy");
+//                dcbm.addElement(new ListElement(formatter.format(runner), runner.clone()));
+//                //System.out.println(printGermanStyle(runner) + ", " + runner.compareTo(end) + ", " + formatter.format(runner));
+                dcbm.addElement(runner.clone());
                 runner = addField(runner, 1, GregorianCalendar.MONTH);
+
             } while (runner.compareTo(end) <= 0);
 
         }

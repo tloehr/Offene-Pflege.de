@@ -31,6 +31,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 
 /**
@@ -64,7 +65,7 @@ public class StandardCurrencyRenderer
             }
         }
 
-        if (value instanceof Double) {
+        if (value instanceof BigDecimal) {
 
             if (((Double) value).doubleValue() < 0) {
                 fontcolor = Color.RED;

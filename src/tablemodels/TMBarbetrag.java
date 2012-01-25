@@ -61,17 +61,21 @@ public class TMBarbetrag extends AbstractTableModel {
     boolean editable = false;
 
 
-    public TMBarbetrag(Bewohner bewohner, boolean subset, Date von, Date bis, boolean editable) {
+    public TMBarbetrag(Bewohner bewohner, Date von, Date bis, boolean editable) {
         super();
-        this.von = SYSCalendar.bom(von); // Bottom Of Month
-        this.bis = SYSCalendar.eom(bis); // End Of Month
-        this.subset = subset;
+
+        this.subset = von != null;
+        if (subset) {
+            this.von = SYSCalendar.bom(von); // Bottom Of Month
+            this.bis = SYSCalendar.eom(bis); // End Of Month
+        }
+
         this.bewohner = bewohner;
         this.editable = editable;
 
         EntityManager em = OPDE.createEM();
 
-        String jpql = " SELECT tg FROM Barbetrag tg WHERE tg.bewohner = :bewohner AND tg.belegDatum >= :von AND tg.belegDatum <= :bis ";
+        String jpql = " SELECT tg FROM Barbetrag tg WHERE tg.bewohner = :bewohner ";
 
         if (!subset) {
             vortrag = BigDecimal.ZERO;
@@ -93,8 +97,11 @@ public class TMBarbetrag extends AbstractTableModel {
 
         Query queryList = em.createQuery(jpql);
         queryList.setParameter("bewohner", bewohner);
-        queryList.setParameter("von", von);
-        queryList.setParameter("bis", bis);
+
+        if (subset) {
+            queryList.setParameter("von", this.von);
+            queryList.setParameter("bis", this.bis);
+        }
 
         listData = queryList.getResultList();
 
@@ -171,19 +178,16 @@ public class TMBarbetrag extends AbstractTableModel {
      * @return
      */
     public BigDecimal getZeilenSaldo() {
-        OPDE.debug("getZeilenSaldo("+getRowCount()+"-1)");
-        return getZeilenSaldo(getRowCount()-1);
+        return getZeilenSaldo(subset ? getRowCount() - 3 : getRowCount() - 1);
     }
 
     public BigDecimal getZeilenSaldo(int row) {
         BigDecimal zeilensaldo;
-        OPDE.debug("row:"+row);
-        int listRow = subset ? row - 1 : row;
 
-        if (row == 0) { // erste Zeile
+        if (row == -1) { // erste Zeile
             zeilensaldo = vortrag; // Anker
         } else {
-            zeilensaldo = getZeilenSaldo(listRow-1).add(listData.get(listRow).getBetrag());
+            zeilensaldo = getZeilenSaldo(row - 1).add(listData.isEmpty() ? BigDecimal.ZERO : listData.get(row).getBetrag());
         }
         return zeilensaldo;
     }
@@ -206,7 +210,7 @@ public class TMBarbetrag extends AbstractTableModel {
                     break;
                 }
                 case COL_Zeilensaldo: {
-                    result = getZeilenSaldo(row);
+                    result = vortrag;
                     break;
                 }
                 default: {
@@ -229,7 +233,7 @@ public class TMBarbetrag extends AbstractTableModel {
                     break;
                 }
                 case COL_Zeilensaldo: {
-                    result = BigDecimal.ZERO; //getZeilenSaldo();
+                    result = getZeilenSaldo();
                     break;
                 }
                 default: {
@@ -282,6 +286,7 @@ public class TMBarbetrag extends AbstractTableModel {
                 break;
             }
             default: {
+                break;
             }
         } // switch
 

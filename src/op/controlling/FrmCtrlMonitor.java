@@ -176,12 +176,13 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 
         Date von = SYSCalendar.bom(SYSCalendar.addField(new Date(), -3, GregorianCalendar.YEAR));
         Date bis = SYSCalendar.eom(new Date());
-        DefaultComboBoxModel monthmodel1 = SYSCalendar.createMonthList(von, bis);
-        DefaultComboBoxModel monthmodel2 = SYSCalendar.createMonthList(von, bis);
 
-        cmbBilanzMonat.setModel(monthmodel1);
+//        DefaultComboBoxModel monthmodel1 = SYSCalendar.createMonthList(von, bis);
+//        DefaultComboBoxModel monthmodel2 = SYSCalendar.createMonthList(von, bis);
+
+//        cmbBilanzMonat.setModel(monthmodel1);
         cmbBilanzMonat.setSelectedIndex(cmbBilanzMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
-        cmbPEAMonat.setModel(monthmodel2);
+//        cmbPEAMonat.setModel(monthmodel2);
         cmbPEAMonat.setSelectedIndex(cmbPEAMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
         //cmbBilanzMonat.setModel(monthmodel);
         //cmbBilanzMonat.setSelectedIndex(cmbBilanzMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.

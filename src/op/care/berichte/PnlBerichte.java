@@ -544,15 +544,7 @@ public class PnlBerichte extends CleanablePanel {
                             new String[] {
                                 "Title 1", "Title 2", "Title 3", "Title 4"
                             }
-                        ) {
-                            Class<?>[] columnTypes = new Class<?>[] {
-                                Object.class, Object.class, Object.class, Object.class
-                            };
-                            @Override
-                            public Class<?> getColumnClass(int columnIndex) {
-                                return columnTypes[columnIndex];
-                            }
-                        });
+                        ));
                         tblTB.addMouseListener(new MouseAdapter() {
                             @Override
                             public void mousePressed(MouseEvent e) {
@@ -925,7 +917,7 @@ public class PnlBerichte extends CleanablePanel {
     }//GEN-LAST:event_tblTBMousePressed
 
 
-    protected void prepareSearchArea() {
+    private void prepareSearchArea() {
         addByTime();
         addByTags();
         addBySearchText();
@@ -1102,13 +1094,6 @@ public class PnlBerichte extends CleanablePanel {
             }
         });
 
-//        txtSearch = new JTextField();
-//        txtSearch.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                reloadTable();
-//            }
-//        });
         panelSpecials.add(cbShowEdits);
         panelSpecials.add(cbShowIDs);
         panelSpecials.setCollapsed(false);
