@@ -31,7 +31,6 @@ import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
-import org.apache.commons.collections.Closure;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
@@ -58,6 +57,9 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 
@@ -680,10 +682,9 @@ public class SYSTools {
     }
 
 
-
     public static DefaultListModel list2dlm(List list) {
         DefaultListModel dlm = new DefaultListModel();
-        for (Object o : list){
+        for (Object o : list) {
             dlm.addElement(o);
         }
         return dlm;
@@ -905,7 +906,8 @@ public class SYSTools {
     /**
      * Gibt die toString Ausgabe eines Objektes zurück. Hierbei kann man sicher sein, dass man nicht über
      * ein <code>null</code> stolpert.
-     * @param in Eingangsobjekt
+     *
+     * @param in     Eingangsobjekt
      * @param prefix Präfix, der vorangestellt wird, wenn das Objekt nicht null ist.
      * @param suffix Suffix, der angehangen wird, wenn das Objekt nicht null ist.
      * @return
@@ -1455,15 +1457,16 @@ public class SYSTools {
     public static Color getTableCellBackgroundColor(boolean isSelected, int row) {
         Color color;
         Color selectionBackground = UIManager.getColor("Table.selectionBackground");
+//        Color selectionBackground = new Color(57,105,138);  // Nimbus Background Selection Color
         Color alternate = UIManager.getColor("Table.alternateRowColor");
 
         if (isSelected) {
             color = selectionBackground;
         } else {
             if (row % 2 == 0) {
-                color = Color.white;
-            } else {
                 color = alternate;
+            } else {
+                color = Color.white;
             }
         }
         return color;
@@ -1506,7 +1509,6 @@ public class SYSTools {
     public static double showSide(JSplitPane split, Double pos, int speedInMillis) {
         return showSide(split, pos, speedInMillis, null);
     }
-
 
 
     /**
@@ -1631,9 +1633,9 @@ public class SYSTools {
         } else {
             max = mysplit.getHeight();
         }
-        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: "+ pos);
-        OPDE.debug("DIVIDER MAX POSITION: "+ max);
-        OPDE.debug("DIVIDER IN RELATIVE POSITION: "+ new Double(pos) / new Double(max));
+        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
+        OPDE.debug("DIVIDER MAX POSITION: " + max);
+        OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
         return new Double(pos) / new Double(max);
     }
 
@@ -1852,7 +1854,7 @@ public class SYSTools {
     }
 
 
-    public static BigDecimal parseBigDecimal(String txt){
+    public static BigDecimal parseBigDecimal(String txt) {
         BigDecimal bd;
         try {
             bd = BigDecimal.valueOf(Double.parseDouble(txt.replaceAll(",", "\\.")));
@@ -1897,14 +1899,52 @@ public class SYSTools {
         return bd;
     }
 
-    public static String left(String text, int size){
+    public static String left(String text, int size) {
         int originalLaenge = text.length();
         int max = Math.min(size, originalLaenge);
-        text = text.substring(0,max-1);
-        if (max < originalLaenge){
+        text = text.substring(0, max - 1);
+        if (max < originalLaenge) {
             text += "...";
         }
         return text;
+    }
+
+    public static BigDecimal parseCurrency(String test) {
+        NumberFormat nf = DecimalFormat.getCurrencyInstance();
+        test = test.replace(".", ",");
+        Number num;
+        try {
+            num = nf.parse(test);
+        } catch (ParseException ex) {
+            try {
+                String test1 = test + " " + SYSConst.eurosymbol;
+                num = nf.parse(test1);
+            } catch (ParseException ex1) {
+                num = null;
+//                try {
+//                    test += " " + SYSConst.eurosymbol;
+//                    num = nf.parse(test);
+//                } catch (ParseException ex2) {
+//                    lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
+//                }
+            }
+        }
+
+        BigDecimal betrag = null;
+        if (num != null) {
+            if (num instanceof Long) {
+                betrag = new BigDecimal(num.longValue());
+            } else if (num instanceof Double) {
+                betrag = new BigDecimal(num.doubleValue());
+            } else if (num instanceof BigDecimal) {
+                betrag = (BigDecimal) num;
+            } else {
+                betrag = null;
+            }
+        }
+
+
+        return betrag;
     }
 
 }

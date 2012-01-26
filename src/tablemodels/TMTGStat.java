@@ -57,24 +57,13 @@ public class TMTGStat extends AbstractTableModel {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT tg.bewohner, SUM(tg.betrag) FROM Barbetrag tg " +
-                " WHERE tg.bewohner.station IS NOT NULL " +
-                " GROUP BY tg.bewohner " +
-                " ORDER BY tg.bewohner.nachname, tg.bewohner.vorname, tg.bewohner.bWKennung ");
+                " SELECT b, SUM(k.betrag) FROM Bewohner b " +
+                " LEFT JOIN b.konto k " +
+                " WHERE b.station IS NOT NULL " +
+                " GROUP BY b " +
+                " ORDER BY b.nachname, b.vorname, b.bWKennung ");
 
         listData = query.getResultList();
-//        if (!alle) {
-//            sql += " INNER JOIN (" +
-//                    " SELECT BWKennung, Von, Bis FROM BWInfo " +
-//                    " WHERE BWINFTYP = 'hauf' AND " +
-//                    " ((von <= now() AND bis >= now()) OR (von <= now() AND" +
-//                    " bis >= now()) OR (von > now() AND bis < now()))" +
-//                    " ) AS bwattr ON b.BWKennung = bwattr.BWKennung ";
-//        }
-//        //
-//        sql += " LEFT OUTER JOIN (SELECT SUM(Betrag) summe, BWKennung FROM Taschengeld GROUP BY BWKennung) AS tg ON b.BWKennung = tg.BWKennung" +
-//                " ORDER BY b.nachname, b.vorname, b.bwkennung";
-
     }
 
     @Override
@@ -102,14 +91,14 @@ public class TMTGStat extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         Object result;
         Bewohner bewohner = getBewohner(row);
-        BigDecimal saldo = (BigDecimal) listData.get(row)[1];
+        BigDecimal saldo = listData.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) listData.get(row)[1];
         switch (col) {
             case COL_BW: {
                 result = SYSTools.htmlUmlautConversion(SYSTools.toHTML("<b>"+BewohnerTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getBWKennung()+"]"));
                 break;
             }
             case COL_SALDO: {
-                result = SYSTools.toHTML(saldo.setScale(2, BigDecimal.ROUND_HALF_UP).toString() + " &euro;");
+                result = saldo.setScale(2, BigDecimal.ROUND_HALF_UP);
                 break;
             }
             default: {

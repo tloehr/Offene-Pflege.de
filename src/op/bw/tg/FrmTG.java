@@ -26,7 +26,6 @@
  */
 package op.bw.tg;
 
-import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.*;
@@ -45,6 +44,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -62,7 +63,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.*;
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -96,7 +100,7 @@ public class FrmTG extends JFrame {
     private void tblTGMousePressed(MouseEvent e) {
 
         Point p = e.getPoint();
-        int row = tblTG.rowAtPoint(p);
+        final int row = tblTG.rowAtPoint(p);
         final ListSelectionModel lsm = tblTG.getSelectionModel();
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
@@ -107,10 +111,25 @@ public class FrmTG extends JFrame {
         // Kontext Menü
         if (singleRowSelected && e.isPopupTrigger()) {
 
-            final Barbetrag mytg = ((TMBarbetrag) tblTG.getModel()).getListData().get(row);
-
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
+            JMenuItem itemPopupPrint = new JMenuItem("Eintrag löschen");
+            itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
+                    Barbetrag mytg = tm.getListData().get(tm.getModelRow(row));  // Rechnet die Zeile um. Berücksichtigt die Zusammenfassungszeile
+                    if (JOptionPane.showConfirmDialog(thisComponent, "Sie löschen nun den Datensatz '"+mytg.getBelegtext()+"'.\nMöchten Sie das ?", "Löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        EntityTools.delete(mytg);
+                        tm.getListData().remove(mytg);
+                        tm.fireTableRowsDeleted(row, row);
+                        summeNeuRechnen();
+                        lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Datensatz '"+mytg.getBelegtext()+"' gelöscht.");
+                    }
+                }
+            });
+            menu.add(itemPopupPrint);
+            itemPopupPrint.setEnabled(OPDE.isAdmin() && ((TMBarbetrag) tblTG.getModel()).isReal(row));
+            menu.show(e.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }
 
@@ -130,6 +149,7 @@ public class FrmTG extends JFrame {
         cmbPast.setSelectedIndex(cmbPast.getModel().getSize() - 1);
         cmbPast.setRenderer(new ListCellRenderer() {
             Format formatter = new SimpleDateFormat("MMMM yyyy");
+
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text = formatter.format(o);
@@ -139,7 +159,7 @@ public class FrmTG extends JFrame {
         cmbPast.setEnabled(false);
         ignoreDateComboEvent = false;
 
-        txtBW.requestFocus();
+//        txtBW.requestFocus();
         jtpMain.setSelectedIndex(TAB_TG);
         jtpMain.setEnabledAt(TAB_STAT, OPDE.isAdmin());
     }
@@ -154,7 +174,6 @@ public class FrmTG extends JFrame {
     private void initComponents() {
         jToolBar1 = new JToolBar();
         btnEdit = new JToggleButton();
-        btnDelete = new JButton();
         btnPrint = new JButton();
         jtpMain = new JTabbedPane();
         pnlBarbetrag = new JPanel();
@@ -203,19 +222,6 @@ public class FrmTG extends JFrame {
                 }
             });
             jToolBar1.add(btnEdit);
-
-            //---- btnDelete ----
-            btnDelete.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/editdelete.png")));
-            btnDelete.setMnemonic('l');
-            btnDelete.setText("L\u00f6schen");
-            btnDelete.setEnabled(false);
-            btnDelete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnDeleteActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnDelete);
 
             //---- btnPrint ----
             btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer.png")));
@@ -407,6 +413,7 @@ public class FrmTG extends JFrame {
                             "Title 1", "Title 2", "Title 3", "Title 4"
                         }
                     ));
+                    tblStat.setFont(new Font("sansserif", Font.PLAIN, 14));
                     tblStat.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -498,7 +505,7 @@ public class FrmTG extends JFrame {
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(jLabel5)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
+                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(rbBWAlle)
@@ -521,6 +528,7 @@ public class FrmTG extends JFrame {
 
             //---- lblMessage ----
             lblMessage.setHorizontalAlignment(SwingConstants.RIGHT);
+            lblMessage.setText(" ");
             pnlStatus.add(lblMessage);
         }
 
@@ -544,7 +552,7 @@ public class FrmTG extends JFrame {
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jLabel1)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
@@ -582,28 +590,9 @@ public class FrmTG extends JFrame {
     }//GEN-LAST:event_txtBetragFocusGained
 
     private void txtBetragFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBetragFocusLost
-        NumberFormat nf = DecimalFormat.getCurrencyInstance();
-        String test = txtBetrag.getText();
-        test = test.replace(".", ",");
-        Number num = null;
-        try {
-            num = nf.parse(test);
-        } catch (ParseException ex) {
-            try {
-                String test1 = test + " " + SYSConst.eurosymbol;
-                num = nf.parse(test1);
-            } catch (ParseException ex1) {
-                try {
-                    test += " " + SYSConst.eurosymbol;
-                    num = nf.parse(test);
-                } catch (ParseException ex2) {
-                    lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
-                }
-            }
-        }
-        if (num != null) {
-            betrag = BigDecimal.valueOf(num.doubleValue());
 
+        betrag = SYSTools.parseCurrency(txtBetrag.getText());
+        if (betrag != null) {
             if (!betrag.equals(BigDecimal.ZERO)) {
                 insert();
                 summeNeuRechnen();
@@ -612,9 +601,10 @@ public class FrmTG extends JFrame {
             }
 
         } else {
+            lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
             betrag = BigDecimal.ZERO;
         }
-        txtBetrag.setText(nf.format(this.betrag));
+        txtBetrag.setText(NumberFormat.getCurrencyInstance().format(betrag));
     }//GEN-LAST:event_txtBetragFocusLost
 
     private void txtBetragActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBetragActionPerformed
@@ -853,10 +843,10 @@ public class FrmTG extends JFrame {
     }//GEN-LAST:event_jspDataComponentResized
 
     private void cmbPastItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPastItemStateChanged
-        if (ignoreDateComboEvent){
+        if (ignoreDateComboEvent) {
             return;
         }
-        reloadDisplay();
+        updateSummenAngabe();
     }//GEN-LAST:event_cmbPastItemStateChanged
 
     /**
@@ -914,7 +904,6 @@ public class FrmTG extends JFrame {
                     txtBelegtext.setEnabled(true);
                     txtBetrag.setEnabled(true);
                     reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
-                    btnDelete.setEnabled(false);
                 }
                 if (tblTG.getModel().getRowCount() == 0) {
                     btnPrint.setEnabled(false);
@@ -929,57 +918,9 @@ public class FrmTG extends JFrame {
                 break;
             }
             case TAB_STAT: {
-                cmbPast.setEnabled(true);
-                EntityManager em = OPDE.createEM();
-                Query query = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg ");
-                BigDecimal summe = BigDecimal.ZERO;
-                try {
-                    summe = (BigDecimal) query.getSingleResult();
-                } catch (NoResultException nre) {
-                    summe = BigDecimal.ZERO;
-                } catch (Exception e) {
-                    OPDE.fatal(e);
-                }
-
-
-                NumberFormat nf = NumberFormat.getCurrencyInstance();
-                String summentext = nf.format(summe);
-
-                // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
-                // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
-                if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
-                    Query queryPast = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg WHERE tg.belegDatum <= :datum");
-                    ListElement le = (ListElement) cmbPast.getSelectedItem();
-                    Date monat = (Date) le.getObject();
-                    queryPast.setParameter("datum", new Date(SYSCalendar.eom(monat).getTime()));
-
-                    BigDecimal summePast = BigDecimal.ZERO;
-                    try {
-                        summePast = (BigDecimal) query.getSingleResult();
-                    } catch (NoResultException nre) {
-                        summePast = BigDecimal.ZERO;
-                    } catch (Exception e) {
-                        OPDE.fatal(e);
-                    }
-
-                    summentext += " (" + nf.format(summePast) + ")";
-                    lblSumme.setToolTipText("<html>Die Summe in Klammern bezeichnet den Stand zum Monatsende <b>" + le.toString() + "</b></html>");
-                } else {
-                    lblSumme.setToolTipText(null);
-                }
-
-                em.close();
-
-                lblSumme.setText(summentext);
-                if (summe.compareTo(BigDecimal.ZERO) < 0) {
-                    lblSumme.setForeground(Color.RED);
-                } else {
-                    lblSumme.setForeground(Color.BLACK);
-                }
-
                 btnPrint.setEnabled(false);
-                btnDelete.setEnabled(false);
                 btnEdit.setEnabled(false);
+                updateSummenAngabe();
                 reloadStatTable();
                 break;
             }
@@ -996,7 +937,52 @@ public class FrmTG extends JFrame {
         jspStat.dispatchEvent(new ComponentEvent(jspStat, ComponentEvent.COMPONENT_RESIZED));
 
         tblStat.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-        tblStat.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+        tblStat.getColumnModel().getColumn(1).setCellRenderer(new CurrencyRenderer());
+    }
+
+    private void updateSummenAngabe() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg ");
+        BigDecimal summe = BigDecimal.ZERO;
+        try {
+            summe = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            summe = BigDecimal.ZERO;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        String summentext = nf.format(summe);
+
+        // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
+        // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
+        if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
+            Query queryPast = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg WHERE tg.belegDatum <= :datum");
+            queryPast.setParameter("datum", SYSCalendar.eom((Date) cmbPast.getSelectedItem()));
+
+            BigDecimal summePast = BigDecimal.ZERO;
+            try {
+                summePast = (BigDecimal) queryPast.getSingleResult();
+            } catch (NoResultException nre) {
+                summePast = BigDecimal.ZERO;
+            } catch (Exception e) {
+                OPDE.fatal(e);
+            }
+
+            summentext += " (" + nf.format(summePast) + ")";
+        }
+
+        em.close();
+
+        lblSumme.setText(summentext);
+
+        if (summe.compareTo(BigDecimal.ZERO) < 0) {
+            lblSumme.setForeground(Color.RED);
+        } else {
+            lblSumme.setForeground(Color.BLACK);
+        }
+
     }
 
     private void insert() {
@@ -1013,7 +999,7 @@ public class FrmTG extends JFrame {
 //        Sofern die ein bestimmter Monat eingestellt war.
         if (!panelTime.isCollapsed()) {
             GregorianCalendar gcDatum = SYSCalendar.toGC(datum);
-            if (min.after(datum)){
+            if (min.after(datum)) {
                 // Neuer Eintrag liegt ausserhalb des bisherigen Intervals.
                 min = SYSCalendar.bom(datum);
                 initSearchTime();
@@ -1067,7 +1053,6 @@ public class FrmTG extends JFrame {
 
         tblTG.getColumnModel().getColumn(2).setCellRenderer(new CurrencyRenderer());
         tblTG.getColumnModel().getColumn(3).setCellRenderer(new CurrencyRenderer());
-//        tblTG.getColumnModel().getColumn(3).setCellRenderer(new StandardCurrencyRenderer());
 
         tblTG.getColumnModel().getColumn(0).setCellEditor(new CEDefault());
         tblTG.getColumnModel().getColumn(1).setCellEditor(new CEDefault());
@@ -1077,7 +1062,6 @@ public class FrmTG extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JToolBar jToolBar1;
     private JToggleButton btnEdit;
-    private JButton btnDelete;
     private JButton btnPrint;
     private JTabbedPane jtpMain;
     private JPanel pnlBarbetrag;
@@ -1145,15 +1129,6 @@ public class FrmTG extends JFrame {
         panelText.setSpecial(true);
         panelText.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_group.png")));
         taskSearch.add((JPanel) panelText);
-
-//        panelText.addPropertyChangeListener(new PropertyChangeListener() {
-//            @Override
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                if (evt.getPropertyName().equals("collapsed")) {
-//                    reloadTable();
-//                }
-//            }
-//        });
 
     }
 
@@ -1242,7 +1217,7 @@ public class FrmTG extends JFrame {
 
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                OPDE.debug(o.toString());
+//                OPDE.debug(o.toString());
                 String text = formatter.format(o);
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
@@ -1264,6 +1239,57 @@ public class FrmTG extends JFrame {
         panelTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/date.png")));
         panelTime.add(cmbMonat);
 
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() > 0) {
+                    cmbMonat.setSelectedIndex(0);
+                }
+            }
+        });
+//        homeButton.setBorder(new EmptyBorder(0,0,0,0));
+        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/back.png")));
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() > 0) {
+                    cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() - 1);
+                }
+            }
+        });
+//        backButton.setBorder(new EmptyBorder(0,0,0,0));
+        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/forward.png")));
+        fwdButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
+                    cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() + 1);
+                }
+            }
+        });
+//        fwdButton.setBorder(new EmptyBorder(0,0,0,0));
+        JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
+        endButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
+                    cmbMonat.setSelectedIndex(cmbMonat.getModel().getSize() - 1);
+                }
+            }
+        });
+//        endButton.setBorder(new EmptyBorder(0,0,0,0));
+
+        buttonPanel.add(homeButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(fwdButton);
+        buttonPanel.add(endButton);
+        panelTime.add(buttonPanel);
+
         taskSearch.add((JPanel) panelTime);
 
         panelTime.addPropertyChangeListener(new PropertyChangeListener() {
@@ -1281,70 +1307,6 @@ public class FrmTG extends JFrame {
         });
     }
 
-    /**
-     * basiert auf dem Post von "hilz" aus http://www.velocityreviews.com/forums/t134773-disabling-jcombobox-options.html
-     */
-    private class DisEnableListCellRenderer extends JLabel implements ListCellRenderer {
-        boolean[] enabled;
-        boolean enableAll;
-        Format formatter = new SimpleDateFormat("MMMM yyyy");
-
-        public DisEnableListCellRenderer(boolean[] enabled) {
-            setEnabled(enabled);
-            setOpaque(true);
-        }
-
-        public DisEnableListCellRenderer() {
-            setEnabled(true);
-            setOpaque(true);
-        }
-
-        public DisEnableListCellRenderer(int enableFrom, int enableTo, int maxlength) {
-            setEnabled(enableFrom, enableTo, maxlength);
-            setOpaque(true);
-        }
-
-        public void setEnabled(boolean[] enabled) {
-            this.enabled = Arrays.copyOf(enabled, enabled.length);
-            enableAll = false;
-        }
-
-        public void setEnabled(int enableFrom, int enableTo, int maxlength) {
-            enabled = new boolean[maxlength];
-            enableAll = false;
-            for (int i = 0; i < maxlength; i++) {
-                enabled[i] = enableFrom <= i && i <= enableTo;
-            }
-        }
-
-        public void setEnabled(boolean enable) {
-            enableAll = enable;
-            enabled = null;
-        }
-
-        protected boolean isEnabled(int i) {
-            boolean result = enableAll;
-            if (enabled != null) {
-                result = enabled[i];
-            }
-            return result;
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            setText(formatter.format(value));
-            setEnabled(index < 0 || isEnabled(index));
-            if (isSelected && isEnabled()) {
-                setBackground(list.getSelectionBackground());
-                setForeground(list.getSelectionForeground());
-            } else {
-                setBackground(list.getBackground());
-                setForeground(list.getForeground());
-            }
-            return this;
-        }
-    }
-
     private class CurrencyRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable jTable, Object value, boolean b, boolean b1, int i, int i1) {
@@ -1360,7 +1322,6 @@ public class FrmTG extends JFrame {
                 NumberFormat nf = NumberFormat.getCurrencyInstance();
                 text = nf.format(value);
                 setHorizontalAlignment(JLabel.RIGHT);
-
             }
             return super.getTableCellRendererComponent(jTable, text, b, b1, i, i1);    //To change body of overridden methods use File | Settings | File Templates.
         }

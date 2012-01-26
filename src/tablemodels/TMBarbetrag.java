@@ -141,6 +141,16 @@ public class TMBarbetrag extends AbstractTableModel {
         return allowed;
     }
 
+    /**
+     * ermittelt ob eine bestimmte Zeile errechnet oder aus der Datenbank stammt. Errechnet heisst,
+     * ob der betreffende auf dem Vortrag oder der Zusammenfassung steht.
+     * @param row
+     * @return
+     */
+    public boolean isReal(int row){
+        return !subset || (row != 0 && row < getRowCount()-1);
+    }
+
     @Override
     public Class getColumnClass(int columnIndex) {
         Class c;
@@ -170,6 +180,10 @@ public class TMBarbetrag extends AbstractTableModel {
 
     public List<Barbetrag> getListData() {
         return listData;
+    }
+
+    public int getModelRow(int row){
+        return subset ? row - 1 : row;
     }
 
     /**
@@ -271,7 +285,7 @@ public class TMBarbetrag extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        Barbetrag tg2edit = listData.get(subset ? rowIndex - 2 : rowIndex);
+        Barbetrag tg2edit = listData.get(subset ? rowIndex - 1 : rowIndex);
         switch (columnIndex) {
             case COL_Datum: {
                 tg2edit.setBelegDatum((Date) aValue);

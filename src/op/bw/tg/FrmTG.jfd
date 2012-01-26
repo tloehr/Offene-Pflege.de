@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq {comp jToolBar1:::p::p, space :::p, comp jLabel1:::p::p, space :::p, comp jtpMain::::585:x, space :::p, comp pnlStatus:::p::p}}</string> 
+        <string>par l {seq {comp jToolBar1:::p::p, space :::p, comp jLabel1:::p::p, space :::p, comp jtpMain::::570:x, space :::p, comp pnlStatus:::p::p}}</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -75,41 +75,6 @@
             <string>java.awt.event.ActionListener</string> 
             <string>actionPerformed</string> 
             <string>btnEditActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/22x22/editdelete.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>mnemonic</string> 
-           <int>108</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Löschen</string> 
-          </void> 
-          <void method="setProperty"> 
-           <string>enabled</string> 
-           <boolean>false</boolean> 
-          </void> 
-          <void property="name"> 
-           <string>btnDelete</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnDeleteActionPerformed</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
@@ -746,7 +711,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq l {space :::p, par b {comp lbl1::b:p:22:p, comp lblSumme::b:p:22:p, comp cmbPast::b:p::p}, space :::p, comp jSeparator2:::p:10:p, space :::p, comp jLabel5:::p::p, space :::p, comp jspStat::::439:x, space :::p, par b {comp rbBWAlle::b:p::p, comp rbAktuell::b:p::p}, space :::p}}</string> 
+            <string>par l {seq l {space :::p, par b {comp lbl1::b:p:22:p, comp lblSumme::b:p:22:p, comp cmbPast::b:p::p}, space :::p, comp jSeparator2:::p:10:p, space :::p, comp jLabel5:::p::p, space :::p, comp jspStat::::424:x, space :::p, par b {comp rbBWAlle::b:p::p, comp rbAktuell::b:p::p}, space :::p}}</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -926,6 +891,14 @@
                   <null/> 
                  </void> 
                 </object> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>sansserif</string> 
+                <int>0</int> 
+                <int>14</int> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1183,6 +1156,10 @@
           <void method="setProperty"> 
            <string>horizontalAlignment</string> 
            <int>4</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string> </string> 
           </void> 
           <void property="name"> 
            <string>lblMessage</string> 

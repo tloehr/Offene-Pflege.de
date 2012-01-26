@@ -74,11 +74,7 @@ public class RNDHTML implements TableCellRenderer {
             table.setRowHeight(row, Math.max(1, height_wanted));
         }
 
-        //setBackground();
-
         panel.setBackground(SYSTools.getTableCellBackgroundColor(isSelected, row));
-
-        //setBackground(Color.BLUE);
 
         return panel;
     }

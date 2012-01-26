@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2006-2012 Torsten Löhr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -25,20 +25,20 @@
  */
 
 package op.tools;
-//
-// Inspiriert von "VolumeEditor.java"
-// aus O'Reilly Java Swing, 2.Auflage
-// ISBN: 0-596-00408-7
-//
-
+/**
+ * Inspiriert von "VolumeEditor.java"
+ * aus O'Reilly Java Swing, 2.Auflage
+ * ISBN: 0-596-00408-7
+ * Verfeinert für Nimbus PLAF
+ */
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
@@ -52,6 +52,13 @@ public class CEDefault extends JTextField implements TableCellEditor {
 
     public CEDefault() {
         super(SwingConstants.HORIZONTAL);
+
+        // Das hier ist wichtig für den Nimbus PLAF
+        Border border = UIManager.getBorder("Table.cellNoFocusBorder");
+        if (border != null) {
+            setBorder(border);
+        }
+
         listeners = new Vector();
     }
 
@@ -89,12 +96,12 @@ public class CEDefault extends JTextField implements TableCellEditor {
 
     // CellEditor methods
     public void cancelCellEditing() {
-        this.value = originalValue;
+        value = originalValue;
         fireEditingCanceled();
     }
 
     public Object getCellEditorValue() {
-        return this.value;
+        return value;
 //        GregorianCalendar gc;
 //        try {
 //            gc = SYSCalendar.erkenneDatum(getText());
@@ -114,32 +121,31 @@ public class CEDefault extends JTextField implements TableCellEditor {
 
     public boolean stopCellEditing() {
         boolean valid = false;
-        if (this.value instanceof Date) {
+         if (value instanceof Date) {
             GregorianCalendar gc;
             try {
                 gc = SYSCalendar.erkenneDatum(getText());
             } catch (NumberFormatException ex) {
                 gc = SYSCalendar.heute();
             }
-            this.value = new Date(gc.getTimeInMillis());
-            valid = true;
-        } else if (this.value instanceof BigDecimal) {
-            NumberFormat nf = NumberFormat.getNumberInstance();
-            String test = getText();
-            test = test.replace(".", ",");
-            Number num = null;
-            try {
-                num = nf.parse(test);
-                this.value = num;
-                valid = true;
-            } catch (ParseException ex) {
-                valid = false;
+            if (SYSCalendar.isInFuture(gc.getTimeInMillis())){
+                gc = SYSCalendar.heute();
             }
+            value = new Date(gc.getTimeInMillis());
+            valid = true;
+        } else if (value instanceof BigDecimal) {
+
+             BigDecimal betrag = SYSTools.parseCurrency(getText());
+             valid = betrag != null && !betrag.equals(BigDecimal.ZERO);
+             value = valid ? betrag : originalValue;
         } else {
-            this.value = getText();
-            valid = !this.value.equals("");
+            value = getText();
+            valid = !value.toString().isEmpty();
         }
-        if (valid) fireEditingStopped();
+        if (valid) {
+            fireEditingStopped();
+        }
+
         return valid;
     }
 

@@ -81,8 +81,12 @@ public class Bewohner implements Serializable {
     @Basic(optional = false)
     @Column(name = "adminonly")
     private short adminonly;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
     private Collection<Sysbw2file> bwFilesCollection;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
+    private Collection<Barbetrag> konto;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<Pflegeberichte> pflegeberichteCollection;
@@ -208,6 +212,10 @@ public class Bewohner implements Serializable {
 
     public void setAdminonly(short adminonly) {
         this.adminonly = adminonly;
+    }
+
+    public Collection<Barbetrag> getKonto() {
+        return konto;
     }
 
     @Override
