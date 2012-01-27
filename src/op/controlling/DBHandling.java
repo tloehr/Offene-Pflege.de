@@ -26,11 +26,15 @@
  */
 package op.controlling;
 
+import entity.Bewohner;
+import entity.Users;
 import op.OPDE;
 import op.care.vital.DlgVital;
 import op.share.bwinfo.BWInfo;
 import op.tools.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import java.sql.*;
 import java.text.DateFormat;
@@ -43,88 +47,7 @@ import java.util.Date;
  */
 public class DBHandling {
 
-    /**
-     * Erstellt einen HTML Abschnitt, die die BV Aktivitäten in den angegebenen Grenzen ausliest.
-     *
-     * @param bwkennung
-     * @param ukennung
-     * @param headertiefe - ist einfach die Zahl, die hinter das HTML HeaderTag gesetzt werden soll.
-     * @param von
-     * @param bis
-     * @return
-     */
-    public static String getBVBerichte(String bwkennung, String ukennung, int headertiefe, int bvwochen) {
-        StringBuilder html = new StringBuilder(1000);
-        String sql = "" +
-                " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, Date(tb.PIT) Datum, tb.UKennung, bwi.XML " +
-                " FROM Bewohner b " +
-                " INNER JOIN BWInfo ba ON b.BWKennung = ba.BWKennung  " +
-                " LEFT OUTER JOIN (" +
-                "       SELECT BWKennung, XML FROM BWInfo WHERE BWINFTYP='BV1' AND von <= now() AND bis >= now() " +
-                " ) bwi ON bwi.BWKennung = b.BWKennung " +
-                " LEFT OUTER JOIN (" +
-                "       SELECT BWKennung, UKennung, Text, PIT FROM Tagesberichte WHERE BV > 0 " +
-                "       AND Date(PIT) >= DATE_ADD(now(), INTERVAL ? WEEK) AND Date(PIT) <= Date(now()) " +
-                " ) tb ON tb.BWKennung = b.BWKennung " +
-                " WHERE " +
-                (bwkennung.equals("") ? "" : " BWKennung = ? AND ") +
-                (ukennung.equals("") ? "" : " UKennung = ? AND ") +
-                " ba.BWINFTYP = 'hauf' AND ba.von <= NOW() AND ba.bis >= NOW() AND b.AdminOnly <> 2 " +
-                " ORDER BY b.BWKennung, tb.PIT ";
 
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setInt(1, bvwochen * -1);
-            if (!bwkennung.equals("")) {
-                stmt.setString(2, bwkennung);
-                if (!ukennung.equals("")) {
-                    stmt.setString(3, ukennung);
-                }
-            } else if (!ukennung.equals("")) {
-                stmt.setString(2, ukennung);
-            }
-            ResultSet rs = stmt.executeQuery();
-            DateFormat df = DateFormat.getDateInstance();
-            if (rs.first()) {
-                html.append("<h" + headertiefe + ">");
-                html.append("Berichte der BV-Tätigkeiten");
-                html.append("</h" + headertiefe + ">");
-                html.append("<table border=\"1\"><tr>" +
-                        "<th>BewohnerIn</th><th>Datum</th><th>Text</th><th>UKennung</th><th>BV</th></tr>");
-                rs.beforeFirst();
-                while (rs.next()) {
-                    html.append("<tr>");
-                    String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-                    String text = rs.getString("text");
-                    String xml = rs.getString("xml");
-                    String uk = rs.getString("ukennung");
-                    Date datum = rs.getDate("Datum");
-                    html.append("<td>" + name + "</td>");
-                    if (SYSTools.catchNull(uk).equals("")) {
-                        html.append("<td align=\"center\">--</td>");
-                        html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
-                        html.append("<td align=\"center\">--</td>");
-                    } else {
-                        html.append("<td>" + df.format(datum) + "</td>");
-                        html.append("<td>" + text + "</td>");
-                        html.append("<td>" + uk + "</td>");
-                    }
-                    if (SYSTools.catchNull(xml).equals("")) {
-                        html.append("<td><b>kein BV zugeordnet</b></td>");
-                    } else {
-                        xml = xml.substring(11, xml.length() - 3);
-                        html.append("<td>" + xml + "</td>");
-                    }
-                    html.append("</tr>");
-                }
-                html.append("</table>");
-            }
-
-        } catch (SQLException sQLException) {
-            new DlgException(sQLException);
-        }
-        return html.toString();
-    }
 
     /**
      * Durchsucht die Pflegeberichte nach einem oder mehreren Suchbegriffen

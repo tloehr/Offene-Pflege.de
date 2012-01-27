@@ -847,16 +847,16 @@ public class SYSCalendar {
         return new Date(gc.getTimeInMillis());
     }
 
-    // Das hier ist noch nicht ganz richtig. Vertut sich an den Rändern schon mal.
-    public static Date addDate(Date date, int amount, Date min, Date max) {
-        GregorianCalendar gc = toGC(date);
-        gc.add(GregorianCalendar.DATE, amount);
-        Date result = new Date(gc.getTimeInMillis());
-        if (!(trimTime(min).before(trimTime(result)) && trimTime(max).after(trimTime(result)))) {
-            result = date;
-        }
-        return result;
-    }
+//    // Das hier ist noch nicht ganz richtig. Vertut sich an den Rändern schon mal.
+//    public static Date addDate(Date date, int amount, Date min, Date max) {
+//        GregorianCalendar gc = toGC(date);
+//        gc.add(GregorianCalendar.DATE, amount);
+//        Date result = new Date(gc.getTimeInMillis());
+//        if (!(trimTime(min).before(trimTime(result)) && trimTime(max).after(trimTime(result)))) {
+//            result = date;
+//        }
+//        return result;
+//    }
 
     public static Date addField(Date date, int amount, int field) {
         GregorianCalendar gc = toGC(date);

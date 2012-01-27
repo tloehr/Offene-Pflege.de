@@ -94,13 +94,26 @@ public class Bewohner implements Serializable {
 //    private Collection<Verordnung> verordnungCollection;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<BWInfo> bwinfoCollection;
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
-//    private Collection<Pflegeberichte> pflegberichte;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
+    private Collection<Pflegeberichte> pflegberichte;
 
     // Bewohner, die keiner Pflegestation zugeordnet sind, gelten als inaktiv.
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
     @ManyToOne
     private Stationen station;
+    @JoinColumn(name = "BV1UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users bv1;
+    @JoinColumn(name = "BV2UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users bv2;
+    @JoinColumn(name = "ArztID", referencedColumnName = "ArztID")
+    @ManyToOne
+    private Arzt hausarzt;
+    @JoinColumn(name = "BetrID1", referencedColumnName = "BetrID")
+    @ManyToOne
+    private Betreuer betreuer1;
 
     public Bewohner() {
     }
@@ -216,6 +229,38 @@ public class Bewohner implements Serializable {
 
     public Collection<Barbetrag> getKonto() {
         return konto;
+    }
+
+    public Users getBv1() {
+        return bv1;
+    }
+
+    public void setBv1(Users bv1) {
+        this.bv1 = bv1;
+    }
+
+    public Users getBv2() {
+        return bv2;
+    }
+
+    public void setBv2(Users bv2) {
+        this.bv2 = bv2;
+    }
+
+    public Arzt getHausarzt() {
+        return hausarzt;
+    }
+
+    public void setHausarzt(Arzt hausarzt) {
+        this.hausarzt = hausarzt;
+    }
+
+    public Betreuer getBetreuer1() {
+        return betreuer1;
+    }
+
+    public void setBetreuer1(Betreuer betreuer1) {
+        this.betreuer1 = betreuer1;
     }
 
     @Override

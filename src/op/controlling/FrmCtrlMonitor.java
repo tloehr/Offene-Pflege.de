@@ -26,6 +26,17 @@
  */
 package op.controlling;
 
+import java.awt.*;
+import java.awt.Component;
+import java.awt.event.*;
+import javax.persistence.Query;
+import javax.persistence.EntityManager;
+import javax.swing.border.*;
+import javax.swing.event.*;
+
+import entity.PBerichtTAGS;
+import entity.PBerichtTAGSTools;
+import entity.PflegeberichteTools;
 import entity.system.SYSPropsTools;
 import entity.StationenTools;
 import op.OPDE;
@@ -35,6 +46,8 @@ import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import javax.swing.*;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.ExecutionException;
@@ -180,21 +193,39 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 //        DefaultComboBoxModel monthmodel1 = SYSCalendar.createMonthList(von, bis);
 //        DefaultComboBoxModel monthmodel2 = SYSCalendar.createMonthList(von, bis);
 
-//        cmbBilanzMonat.setModel(monthmodel1);
+        cmbBilanzMonat.setModel(SYSCalendar.createMonthList(von, bis));
+        cmbBilanzMonat.setRenderer(new ListCellRenderer() {
+            Format formatter = new SimpleDateFormat("MMMM yyyy");
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text = formatter.format(o);
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        });
+
         cmbBilanzMonat.setSelectedIndex(cmbBilanzMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
-//        cmbPEAMonat.setModel(monthmodel2);
+
+        cmbPEAMonat.setModel(SYSCalendar.createMonthList(von, bis));
+        cmbPEAMonat.setRenderer(new ListCellRenderer() {
+            Format formatter = new SimpleDateFormat("MMMM yyyy");
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text = formatter.format(o);
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        });
         cmbPEAMonat.setSelectedIndex(cmbPEAMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
-        //cmbBilanzMonat.setModel(monthmodel);
-        //cmbBilanzMonat.setSelectedIndex(cmbBilanzMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
 
         StationenTools.setComboBox(cmbStation);
 
         // Leeren Kopf vor die Liste setzen.
-        ListElement[] headtag = new ListElement[]{new ListElement("Keine Auswahl", "")};
-// TODO: muss noch gefixt werden.
-        //        ListElement[] mytags = SYSTools.merge(headtag, PnlBerichte.tags);
-//        cmbTags.setModel(new DefaultComboBoxModel(mytags));
-//        SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
+//        ListElement[] headtag = new ListElement[]{new ListElement("Keine Auswahl", "")};
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
+        cmbTags.setModel(SYSTools.lst2cmb(SYSTools.list2dlm(query.getResultList())));
+        SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
+        em.close();
 
         txtBerichte.setText(SYSTools.catchNull(OPDE.getProps().getProperty(this.getClass().getName() + "::txtBerichte")));
 
@@ -218,6 +249,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 
         StringBuilder html = new StringBuilder(1000);
         int progress = 0;
+        EntityManager em = OPDE.createEM();
         pbMain.setMaximum(anzahlGewuenschterAuswertungen());
         pbMain.setMinimum(0);
         pbPart.setMinimum(0);
@@ -259,7 +291,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             lblProgress.setText("BV Aktivitäten");
             pbPart.setValue(0);
             int bvwochen = Integer.parseInt(spinBVWochen.getValue().toString());
-            html.append(DBHandling.getBVBerichte("", "", 1, bvwochen));
+            html.append(PflegeberichteTools.getBVBerichte(em, 1, bvwochen));
             progress++;
             pbMain.setValue(progress);
         }
@@ -420,6 +452,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             pbMain.setValue(progress);
         }
 
+        em.close();
 
         pbMain.setValue(0);
         pbPart.setValue(0);
@@ -445,597 +478,707 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jPanel1 = new JPanel();
+        jPanel2 = new JPanel();
+        cbBVAktivitaet = new JCheckBox();
+        cbNichtAbgehakteBHPs = new JCheckBox();
+        cbPlanung = new JCheckBox();
+        cbVerordnungenOhneAnbruch = new JCheckBox();
+        spinBHPTage = new JSpinner();
+        spinBVWochen = new JSpinner();
+        spinPlanungenTage = new JSpinner();
+        cbGeringeVorraete = new JCheckBox();
+        spinVorratProzent = new JSpinner();
+        cbBerichte = new JCheckBox();
+        txtBerichte = new JTextField();
+        spinBerichteMonate = new JSpinner();
+        cbInko = new JCheckBox();
+        cbBeschwerden = new JCheckBox();
+        spinBeschwerdenMonate = new JSpinner();
+        cmbTags = new JComboBox();
+        jPanel3 = new JPanel();
+        cbBilanz = new JCheckBox();
+        cbGewicht = new JCheckBox();
+        spinGewichtMonate = new JSpinner();
+        cmbBilanzMonat = new JComboBox();
+        cbMediControl = new JCheckBox();
+        cmbStation = new JComboBox();
+        cbWunden = new JCheckBox();
+        spinWundenMonate = new JSpinner();
+        jPanel5 = new JPanel();
+        cbSozialBerichte = new JCheckBox();
+        spinSozialWochen = new JSpinner();
+        cbSozialZeiten = new JCheckBox();
+        cmbPEAMonat = new JComboBox();
+        jPanel6 = new JPanel();
+        cbSturzAnonym = new JCheckBox();
+        spinSturzAMonate = new JSpinner();
+        cbSturz = new JCheckBox();
+        spinSturzMonate = new JSpinner();
+        jLabel1 = new JLabel();
+        jToolBar1 = new JToolBar();
+        btnPrint = new JButton();
+        pbMain = new JProgressBar();
+        pbPart = new JProgressBar();
+        lblProgress = new JLabel();
+        btnStop = new JButton();
+        jPanel4 = new JPanel();
 
-        jPanel4 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        cbBVAktivitaet = new javax.swing.JCheckBox();
-        cbNichtAbgehakteBHPs = new javax.swing.JCheckBox();
-        cbPlanung = new javax.swing.JCheckBox();
-        cbVerordnungenOhneAnbruch = new javax.swing.JCheckBox();
-        spinBHPTage = new javax.swing.JSpinner();
-        spinBVWochen = new javax.swing.JSpinner();
-        spinPlanungenTage = new javax.swing.JSpinner();
-        cbGeringeVorraete = new javax.swing.JCheckBox();
-        spinVorratProzent = new javax.swing.JSpinner();
-        cbBerichte = new javax.swing.JCheckBox();
-        txtBerichte = new javax.swing.JTextField();
-        spinBerichteMonate = new javax.swing.JSpinner();
-        cbInko = new javax.swing.JCheckBox();
-        cbBeschwerden = new javax.swing.JCheckBox();
-        spinBeschwerdenMonate = new javax.swing.JSpinner();
-        cmbTags = new javax.swing.JComboBox();
-        jPanel3 = new javax.swing.JPanel();
-        cbBilanz = new javax.swing.JCheckBox();
-        cbGewicht = new javax.swing.JCheckBox();
-        spinGewichtMonate = new javax.swing.JSpinner();
-        cmbBilanzMonat = new javax.swing.JComboBox();
-        cbMediControl = new javax.swing.JCheckBox();
-        cmbStation = new javax.swing.JComboBox();
-        cbWunden = new javax.swing.JCheckBox();
-        spinWundenMonate = new javax.swing.JSpinner();
-        jPanel5 = new javax.swing.JPanel();
-        cbSozialBerichte = new javax.swing.JCheckBox();
-        spinSozialWochen = new javax.swing.JSpinner();
-        cbSozialZeiten = new javax.swing.JCheckBox();
-        cmbPEAMonat = new javax.swing.JComboBox();
-        jPanel6 = new javax.swing.JPanel();
-        cbSturzAnonym = new javax.swing.JCheckBox();
-        spinSturzAMonate = new javax.swing.JSpinner();
-        cbSturz = new javax.swing.JCheckBox();
-        spinSturzMonate = new javax.swing.JSpinner();
-        jLabel1 = new javax.swing.JLabel();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnPrint = new javax.swing.JButton();
-        pbMain = new javax.swing.JProgressBar();
-        pbPart = new javax.swing.JProgressBar();
-        lblProgress = new javax.swing.JLabel();
-        btnStop = new javax.swing.JButton();
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+            //======== jPanel2 ========
+            {
+                jPanel2.setBorder(new TitledBorder("Organisatorisch / Pflegerisch"));
 
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+                //---- cbBVAktivitaet ----
+                cbBVAktivitaet.setText("BV Aktivit\u00e4ten");
+                cbBVAktivitaet.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbBVAktivitaet.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbBVAktivitaetActionPerformed(e);
+                    }
+                });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Organisatorisch / Pflegerisch"));
+                //---- cbNichtAbgehakteBHPs ----
+                cbNichtAbgehakteBHPs.setText("Nicht abgehakte BHPs");
+                cbNichtAbgehakteBHPs.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbNichtAbgehakteBHPs.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbNichtAbgehakteBHPsActionPerformed(e);
+                    }
+                });
 
-        cbBVAktivitaet.setText("BV Aktivitäten");
-        cbBVAktivitaet.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbBVAktivitaet.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBVAktivitaetActionPerformed(evt);
-            }
-        });
+                //---- cbPlanung ----
+                cbPlanung.setText("Planungen, die bald enden / abgelaufen sind");
+                cbPlanung.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbPlanung.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbPlanungActionPerformed(e);
+                    }
+                });
 
-        cbNichtAbgehakteBHPs.setText("Nicht abgehakte BHPs");
-        cbNichtAbgehakteBHPs.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbNichtAbgehakteBHPs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbNichtAbgehakteBHPsActionPerformed(evt);
-            }
-        });
+                //---- cbVerordnungenOhneAnbruch ----
+                cbVerordnungenOhneAnbruch.setText("Verordnungen ohne Medikamente im Anbruch");
+                cbVerordnungenOhneAnbruch.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbVerordnungenOhneAnbruch.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbVerordnungenOhneAnbruchActionPerformed(e);
+                    }
+                });
 
-        cbPlanung.setText("Planungen, die bald enden / abgelaufen sind");
-        cbPlanung.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbPlanung.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbPlanungActionPerformed(evt);
-            }
-        });
+                //---- spinBHPTage ----
+                spinBHPTage.setToolTipText("In den letzten n Tagen");
+                spinBHPTage.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinBHPTageStateChanged(e);
+                    }
+                });
 
-        cbVerordnungenOhneAnbruch.setText("Verordnungen ohne Medikamente im Anbruch");
-        cbVerordnungenOhneAnbruch.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbVerordnungenOhneAnbruch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbVerordnungenOhneAnbruchActionPerformed(evt);
-            }
-        });
+                //---- spinBVWochen ----
+                spinBVWochen.setToolTipText("In den letzten n Wochen");
+                spinBVWochen.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinBVWochenStateChanged(e);
+                    }
+                });
 
-        spinBHPTage.setToolTipText("In den letzten n Tagen");
-        spinBHPTage.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinBHPTageStateChanged(evt);
-            }
-        });
+                //---- spinPlanungenTage ----
+                spinPlanungenTage.setToolTipText("In den letzten n Tagen");
+                spinPlanungenTage.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinPlanungenTageStateChanged(e);
+                    }
+                });
 
-        spinBVWochen.setToolTipText("In den letzten n Wochen");
-        spinBVWochen.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinBVWochenStateChanged(evt);
-            }
-        });
+                //---- cbGeringeVorraete ----
+                cbGeringeVorraete.setText("geringe Vorr\u00e4te / ohne Anbruch");
+                cbGeringeVorraete.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbGeringeVorraete.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbGeringeVorraeteActionPerformed(e);
+                    }
+                });
 
-        spinPlanungenTage.setToolTipText("In den letzten n Tagen");
-        spinPlanungenTage.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinPlanungenTageStateChanged(evt);
-            }
-        });
+                //---- spinVorratProzent ----
+                spinVorratProzent.setToolTipText("Prozent des Bestandes");
+                spinVorratProzent.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinVorratProzentStateChanged(e);
+                    }
+                });
 
-        cbGeringeVorraete.setText("geringe Vorräte / ohne Anbruch");
-        cbGeringeVorraete.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbGeringeVorraete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbGeringeVorraeteActionPerformed(evt);
-            }
-        });
+                //---- cbBerichte ----
+                cbBerichte.setText("Berichte durchsuchen");
+                cbBerichte.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbBerichte.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbBerichteActionPerformed(e);
+                    }
+                });
 
-        spinVorratProzent.setToolTipText("Prozent des Bestandes");
-        spinVorratProzent.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinVorratProzentStateChanged(evt);
-            }
-        });
+                //---- txtBerichte ----
+                txtBerichte.setToolTipText("Suchbegriffe durch Leerzeichen getrennt. % als Wildcard.");
+                txtBerichte.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtBerichteFocusLost(e);
+                    }
+                });
 
-        cbBerichte.setText("Berichte durchsuchen");
-        cbBerichte.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbBerichte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBerichteActionPerformed(evt);
-            }
-        });
+                //---- spinBerichteMonate ----
+                spinBerichteMonate.setToolTipText("Berichte der letzten n Monate durchsuchen");
+                spinBerichteMonate.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinBerichteMonateStateChanged(e);
+                    }
+                });
 
-        txtBerichte.setToolTipText("Suchbegriffe durch Leerzeichen getrennt. % als Wildcard.");
-        txtBerichte.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtBerichteFocusLost(evt);
-            }
-        });
+                //---- cbInko ----
+                cbInko.setText("Inkontinenz-Liste");
+                cbInko.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbInko.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbInkoActionPerformed(e);
+                    }
+                });
 
-        spinBerichteMonate.setToolTipText("Berichte der letzten n Monate durchsuchen");
-        spinBerichteMonate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinBerichteMonateStateChanged(evt);
-            }
-        });
+                //---- cbBeschwerden ----
+                cbBeschwerden.setText("Auswertungen Beschwerden");
+                cbBeschwerden.setBorder(new EmptyBorder(1, 1, 1, 1));
+                cbBeschwerden.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbBeschwerdenActionPerformed(e);
+                    }
+                });
 
-        cbInko.setText("Inkontinenz-Liste");
-        cbInko.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbInko.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbInkoActionPerformed(evt);
-            }
-        });
+                //---- spinBeschwerdenMonate ----
+                spinBeschwerdenMonate.setToolTipText("In den letzten n Monaten");
+                spinBeschwerdenMonate.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinBeschwerdenMonateStateChanged(e);
+                    }
+                });
 
-        cbBeschwerden.setText("Auswertungen Beschwerden");
-        cbBeschwerden.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        cbBeschwerden.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBeschwerdenActionPerformed(evt);
-            }
-        });
+                //---- cmbTags ----
+                cmbTags.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbTags.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbTagsItemStateChanged(e);
+                    }
+                });
 
-        spinBeschwerdenMonate.setToolTipText("In den letzten n Monaten");
-        spinBeschwerdenMonate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinBeschwerdenMonateStateChanged(evt);
-            }
-        });
-
-        cmbTags.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbTags.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbTagsItemStateChanged(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+                jPanel2.setLayout(jPanel2Layout);
+                jPanel2Layout.setHorizontalGroup(
+                    jPanel2Layout.createParallelGroup()
                         .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addComponent(cbBVAktivitaet)
-                                                .addGap(224, 224, 224)
-                                                .addComponent(spinBVWochen, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
-                                        .addComponent(cbVerordnungenOhneAnbruch)
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cbPlanung)
-                                                        .addComponent(cbNichtAbgehakteBHPs))
-                                                .addGap(34, 34, 34)
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(spinBHPTage, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
-                                                        .addComponent(spinPlanungenTage, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)))
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                                .addComponent(cbBerichte)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(txtBerichte, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
-                                                        .addComponent(cbGeringeVorraete))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(spinBerichteMonate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(spinVorratProzent, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)))
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cbInko)
-                                                        .addComponent(cbBeschwerden))
-                                                .addGap(139, 139, 139)
-                                                .addComponent(spinBeschwerdenMonate, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE))
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGap(25, 25, 25)
-                                                .addComponent(cmbTags, 0, 366, Short.MAX_VALUE)))
-                                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbBVAktivitaet)
-                                        .addComponent(spinBVWochen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbNichtAbgehakteBHPs)
-                                        .addComponent(spinBHPTage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbPlanung)
-                                        .addComponent(spinPlanungenTage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addContainerGap()
+                            .addGroup(jPanel2Layout.createParallelGroup()
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addComponent(cbBVAktivitaet)
+                                    .addGap(224, 224, 224)
+                                    .addComponent(spinBVWochen, GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))
                                 .addComponent(cbVerordnungenOhneAnbruch)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(spinVorratProzent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cbGeringeVorraete))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                .addComponent(cbBerichte)
-                                                .addComponent(txtBerichte, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(spinBerichteMonate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbTags, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(jPanel2Layout.createParallelGroup()
+                                        .addComponent(cbPlanung)
+                                        .addComponent(cbNichtAbgehakteBHPs))
+                                    .addGap(34, 34, 34)
+                                    .addGroup(jPanel2Layout.createParallelGroup()
+                                        .addComponent(spinBHPTage)
+                                        .addComponent(spinPlanungenTage)))
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(jPanel2Layout.createParallelGroup()
                                         .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addComponent(cbInko)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cbBeschwerden))
-                                        .addComponent(spinBeschwerdenMonate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap())
-        );
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Medizinisch"));
-
-        cbBilanz.setText("Ein- und Ausfuhr / Bilanzen");
-        cbBilanz.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbBilanzActionPerformed(evt);
+                                            .addComponent(cbBerichte)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtBerichte, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))
+                                        .addComponent(cbGeringeVorraete))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(spinBerichteMonate, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(spinVorratProzent, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)))
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(jPanel2Layout.createParallelGroup()
+                                        .addComponent(cbInko)
+                                        .addComponent(cbBeschwerden))
+                                    .addGap(139, 139, 139)
+                                    .addComponent(spinBeschwerdenMonate))
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGap(25, 25, 25)
+                                    .addComponent(cmbTags, 0, 350, Short.MAX_VALUE)))
+                            .addContainerGap())
+                );
+                jPanel2Layout.setVerticalGroup(
+                    jPanel2Layout.createParallelGroup()
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbBVAktivitaet)
+                                .addComponent(spinBVWochen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbNichtAbgehakteBHPs)
+                                .addComponent(spinBHPTage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbPlanung)
+                                .addComponent(spinPlanungenTage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cbVerordnungenOhneAnbruch)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel2Layout.createParallelGroup()
+                                .addComponent(spinVorratProzent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cbGeringeVorraete))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel2Layout.createParallelGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(cbBerichte)
+                                    .addComponent(txtBerichte, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(spinBerichteMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cmbTags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addComponent(cbInko)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cbBeschwerden))
+                                .addComponent(spinBeschwerdenMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap())
+                );
             }
-        });
 
-        cbGewicht.setText("Gewichtsstatistik / BMI");
-        cbGewicht.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbGewichtActionPerformed(evt);
-            }
-        });
+            //======== jPanel3 ========
+            {
+                jPanel3.setBorder(new TitledBorder("Medizinisch"));
 
-        spinGewichtMonate.setToolTipText("In den letzten n Monaten");
-        spinGewichtMonate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinGewichtMonateStateChanged(evt);
-            }
-        });
+                //---- cbBilanz ----
+                cbBilanz.setText("Ein- und Ausfuhr / Bilanzen");
+                cbBilanz.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbBilanzActionPerformed(e);
+                    }
+                });
 
-        cmbBilanzMonat.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbBilanzMonat.setToolTipText("Auswertung ab Monat");
+                //---- cbGewicht ----
+                cbGewicht.setText("Gewichtsstatistik / BMI");
+                cbGewicht.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbGewichtActionPerformed(e);
+                    }
+                });
 
-        cbMediControl.setText("Medikamenten Prüfliste");
-        cbMediControl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbMediControlActionPerformed(evt);
-            }
-        });
+                //---- spinGewichtMonate ----
+                spinGewichtMonate.setToolTipText("In den letzten n Monaten");
+                spinGewichtMonate.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinGewichtMonateStateChanged(e);
+                    }
+                });
 
-        cmbStation.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbStation.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbStationItemStateChanged(evt);
-            }
-        });
+                //---- cmbBilanzMonat ----
+                cmbBilanzMonat.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbBilanzMonat.setToolTipText("Auswertung ab Monat");
 
-        cbWunden.setText("Wund-Berichte / Doku");
-        cbWunden.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbWundenActionPerformed(evt);
-            }
-        });
+                //---- cbMediControl ----
+                cbMediControl.setText("Medikamenten Pr\u00fcfliste");
+                cbMediControl.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbMediControlActionPerformed(e);
+                    }
+                });
 
-        spinWundenMonate.setToolTipText("In den letzten n Monaten");
-        spinWundenMonate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinWundenMonateStateChanged(evt);
-            }
-        });
+                //---- cmbStation ----
+                cmbStation.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbStation.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbStationItemStateChanged(e);
+                    }
+                });
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                //---- cbWunden ----
+                cbWunden.setText("Wund-Berichte / Doku");
+                cbWunden.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbWundenActionPerformed(e);
+                    }
+                });
+
+                //---- spinWundenMonate ----
+                spinWundenMonate.setToolTipText("In den letzten n Monaten");
+                spinWundenMonate.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinWundenMonateStateChanged(e);
+                    }
+                });
+
+                GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
+                jPanel3.setLayout(jPanel3Layout);
+                jPanel3Layout.setHorizontalGroup(
+                    jPanel3Layout.createParallelGroup()
                         .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addComponent(cbGewicht)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
-                                                .addComponent(spinGewichtMonate, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cbBilanz)
-                                                        .addComponent(cbMediControl, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cmbStation, 0, 189, Short.MAX_VALUE)
-                                                        .addComponent(cmbBilanzMonat, 0, 189, Short.MAX_VALUE)))
-                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addComponent(cbWunden)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
-                                                .addComponent(spinWundenMonate, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addContainerGap()
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(cbGewicht)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
+                                    .addComponent(spinGewichtMonate, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addGroup(jPanel3Layout.createParallelGroup()
                                         .addComponent(cbBilanz)
-                                        .addComponent(cmbBilanzMonat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbGewicht)
-                                        .addComponent(spinGewichtMonate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addGap(2, 2, 2)
-                                                .addComponent(cmbStation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cbMediControl)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(cbWunden)
-                                        .addComponent(spinWundenMonate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(160, Short.MAX_VALUE))
-        );
-
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Sozialer Dienst")));
-
-        cbSozialBerichte.setText("Berichte Sozialer Dienst");
-        cbSozialBerichte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSozialBerichteActionPerformed(evt);
+                                        .addComponent(cbMediControl, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel3Layout.createParallelGroup()
+                                        .addComponent(cmbStation, 0, 107, Short.MAX_VALUE)
+                                        .addComponent(cmbBilanzMonat, 0, 107, Short.MAX_VALUE)))
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(cbWunden)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
+                                    .addComponent(spinWundenMonate, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)))
+                            .addContainerGap())
+                );
+                jPanel3Layout.setVerticalGroup(
+                    jPanel3Layout.createParallelGroup()
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(cbBilanz)
+                                .addComponent(cmbBilanzMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbGewicht)
+                                .addComponent(spinGewichtMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addGap(2, 2, 2)
+                                    .addComponent(cmbStation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cbMediControl)))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                .addComponent(cbWunden)
+                                .addComponent(spinWundenMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap(181, Short.MAX_VALUE))
+                );
             }
-        });
 
-        spinSozialWochen.setToolTipText("In den letzten n Wochen");
-        spinSozialWochen.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinSozialWochenStateChanged(evt);
-            }
-        });
+            //======== jPanel5 ========
+            {
+                jPanel5.setBorder(new TitledBorder(new TitledBorder("Sozialer Dienst"), ""));
 
-        cbSozialZeiten.setText("Zeiten Sozialer Dienst");
-        cbSozialZeiten.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSozialZeitenActionPerformed(evt);
-            }
-        });
+                //---- cbSozialBerichte ----
+                cbSozialBerichte.setText("Berichte Sozialer Dienst");
+                cbSozialBerichte.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSozialBerichteActionPerformed(e);
+                    }
+                });
 
-        cmbPEAMonat.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbPEAMonat.setToolTipText("Auswertung ab Monat");
+                //---- spinSozialWochen ----
+                spinSozialWochen.setToolTipText("In den letzten n Wochen");
+                spinSozialWochen.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinSozialWochenStateChanged(e);
+                    }
+                });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                //---- cbSozialZeiten ----
+                cbSozialZeiten.setText("Zeiten Sozialer Dienst");
+                cbSozialZeiten.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSozialZeitenActionPerformed(e);
+                    }
+                });
+
+                //---- cmbPEAMonat ----
+                cmbPEAMonat.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbPEAMonat.setToolTipText("Auswertung ab Monat");
+
+                GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
+                jPanel5.setLayout(jPanel5Layout);
+                jPanel5Layout.setHorizontalGroup(
+                    jPanel5Layout.createParallelGroup()
                         .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                                .addComponent(cbSozialBerichte)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 151, Short.MAX_VALUE)
-                                                .addComponent(spinSozialWochen, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                                .addComponent(cbSozialZeiten)
-                                                .addGap(54, 54, 54)
-                                                .addComponent(cmbPEAMonat, 0, 160, Short.MAX_VALUE)))
-                                .addContainerGap())
-        );
-        jPanel5Layout.setVerticalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addContainerGap()
+                            .addGroup(jPanel5Layout.createParallelGroup()
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(cbSozialBerichte)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
+                                    .addComponent(spinSozialWochen, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(cbSozialZeiten)
+                                    .addGap(54, 54, 54)
+                                    .addComponent(cmbPEAMonat, 0, 146, Short.MAX_VALUE)))
+                            .addContainerGap())
+                );
+                jPanel5Layout.setVerticalGroup(
+                    jPanel5Layout.createParallelGroup()
                         .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbSozialBerichte)
-                                        .addComponent(spinSozialWochen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbSozialZeiten)
-                                        .addComponent(cmbPEAMonat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(108, Short.MAX_VALUE))
-        );
-
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Statistik"));
-
-        cbSturzAnonym.setText("Sturzstatistik anonym");
-        cbSturzAnonym.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSturzAnonymActionPerformed(evt);
+                            .addGroup(jPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbSozialBerichte)
+                                .addComponent(spinSozialWochen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbSozialZeiten)
+                                .addComponent(cmbPEAMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap(39, Short.MAX_VALUE))
+                );
             }
-        });
 
-        spinSturzAMonate.setToolTipText("In den letzten n Monaten");
-        spinSturzAMonate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinSturzAMonateStateChanged(evt);
-            }
-        });
+            //======== jPanel6 ========
+            {
+                jPanel6.setBorder(new TitledBorder("Statistik"));
 
-        cbSturz.setText("Sturzstatistik BW bezogen");
-        cbSturz.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSturzActionPerformed(evt);
-            }
-        });
+                //---- cbSturzAnonym ----
+                cbSturzAnonym.setText("Sturzstatistik anonym");
+                cbSturzAnonym.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSturzAnonymActionPerformed(e);
+                    }
+                });
 
-        spinSturzMonate.setToolTipText("In den letzten n Monaten");
-        spinSturzMonate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                spinSturzMonateStateChanged(evt);
-            }
-        });
+                //---- spinSturzAMonate ----
+                spinSturzAMonate.setToolTipText("In den letzten n Monaten");
+                spinSturzAMonate.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinSturzAMonateStateChanged(e);
+                    }
+                });
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                //---- cbSturz ----
+                cbSturz.setText("Sturzstatistik BW bezogen");
+                cbSturz.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSturzActionPerformed(e);
+                    }
+                });
+
+                //---- spinSturzMonate ----
+                spinSturzMonate.setToolTipText("In den letzten n Monaten");
+                spinSturzMonate.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinSturzMonateStateChanged(e);
+                    }
+                });
+
+                GroupLayout jPanel6Layout = new GroupLayout(jPanel6);
+                jPanel6.setLayout(jPanel6Layout);
+                jPanel6Layout.setHorizontalGroup(
+                    jPanel6Layout.createParallelGroup()
                         .addGroup(jPanel6Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel6Layout.createSequentialGroup()
-                                                .addComponent(cbSturzAnonym)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
-                                                .addComponent(spinSturzAMonate, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel6Layout.createSequentialGroup()
-                                                .addComponent(cbSturz)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
-                                                .addComponent(spinSturzMonate, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap())
-        );
-        jPanel6Layout.setVerticalGroup(
-                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addContainerGap()
+                            .addGroup(jPanel6Layout.createParallelGroup()
+                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                    .addComponent(cbSturzAnonym)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
+                                    .addComponent(spinSturzAMonate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                    .addComponent(cbSturz)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                                    .addComponent(spinSturzMonate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
+                            .addContainerGap())
+                );
+                jPanel6Layout.setVerticalGroup(
+                    jPanel6Layout.createParallelGroup()
                         .addGroup(jPanel6Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbSturzAnonym)
-                                        .addComponent(spinSturzAMonate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbSturz)
-                                        .addComponent(spinSturzMonate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(109, Short.MAX_VALUE))
-        );
+                            .addContainerGap()
+                            .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbSturzAnonym)
+                                .addComponent(spinSturzAMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbSturz)
+                                .addComponent(spinSturzMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap(26, Short.MAX_VALUE))
+                );
+            }
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
+            );
+            jPanel1Layout.linkSize(SwingConstants.VERTICAL, new Component[] {jPanel2, jPanel3});
+        }
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{jPanel2, jPanel3});
-
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 18));
+        //---- jLabel1 ----
+        jLabel1.setFont(new Font("Dialog", Font.BOLD, 18));
         jLabel1.setText("Controlling");
 
-        jToolBar1.setFloatable(false);
-        jToolBar1.setRollover(true);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
+            jToolBar1.setRollover(true);
 
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png"))); // NOI18N
-        btnPrint.setText("Drucken");
-        btnPrint.setFocusable(false);
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnPrint);
+            //---- btnPrint ----
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
+            btnPrint.setText("Drucken");
+            btnPrint.setFocusable(false);
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnPrintActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnPrint);
+        }
 
-        pbPart.setForeground(new java.awt.Color(255, 102, 102));
+        //---- pbPart ----
+        pbPart.setForeground(new Color(255, 102, 102));
 
-        lblProgress.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        //---- lblProgress ----
+        lblProgress.setHorizontalAlignment(SwingConstants.RIGHT);
         lblProgress.setText(" ");
 
-        btnStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
+        //---- btnStop ----
+        btnStop.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
         btnStop.setText("STOP");
         btnStop.setEnabled(false);
-        btnStop.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStopActionPerformed(evt);
+        btnStop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnStopActionPerformed(e);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 878, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(pbPart, javax.swing.GroupLayout.DEFAULT_SIZE, 790, Short.MAX_VALUE)
-                                        .addComponent(pbMain, javax.swing.GroupLayout.DEFAULT_SIZE, 790, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnStop)
-                                .addContainerGap())
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addGap(18, 18, 18)
-                                .addComponent(lblProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 878, Short.MAX_VALUE)
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(pbPart, GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)
+                        .addComponent(pbMain, GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnStop)
+                    .addContainerGap())
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jLabel1)
+                    .addGap(18, 18, 18)
+                    .addComponent(lblProgress, GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1)
-                                        .addComponent(lblProgress))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(pbMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(pbPart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(lblProgress))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addComponent(pbMain, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(pbPart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
+                    .addGap(18, 18, 18)
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
         );
+        setSize(878, 697);
+        setLocationRelativeTo(null);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 878) / 2, (screenSize.height - 697) / 2, 878, 697);
+        //======== jPanel4 ========
+        {
+
+            GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
+            jPanel4.setLayout(jPanel4Layout);
+            jPanel4Layout.setHorizontalGroup(
+                jPanel4Layout.createParallelGroup()
+                    .addGap(0, 100, Short.MAX_VALUE)
+            );
+            jPanel4Layout.setVerticalGroup(
+                jPanel4Layout.createParallelGroup()
+                    .addGap(0, 100, Short.MAX_VALUE)
+            );
+        }
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbBVAktivitaetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBVAktivitaetActionPerformed
@@ -1235,50 +1378,50 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_cmbTagsItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnPrint;
-    private javax.swing.JButton btnStop;
-    private javax.swing.JCheckBox cbBVAktivitaet;
-    private javax.swing.JCheckBox cbBerichte;
-    private javax.swing.JCheckBox cbBeschwerden;
-    private javax.swing.JCheckBox cbBilanz;
-    private javax.swing.JCheckBox cbGeringeVorraete;
-    private javax.swing.JCheckBox cbGewicht;
-    private javax.swing.JCheckBox cbInko;
-    private javax.swing.JCheckBox cbMediControl;
-    private javax.swing.JCheckBox cbNichtAbgehakteBHPs;
-    private javax.swing.JCheckBox cbPlanung;
-    private javax.swing.JCheckBox cbSozialBerichte;
-    private javax.swing.JCheckBox cbSozialZeiten;
-    private javax.swing.JCheckBox cbSturz;
-    private javax.swing.JCheckBox cbSturzAnonym;
-    private javax.swing.JCheckBox cbVerordnungenOhneAnbruch;
-    private javax.swing.JCheckBox cbWunden;
-    private javax.swing.JComboBox cmbBilanzMonat;
-    private javax.swing.JComboBox cmbPEAMonat;
-    private javax.swing.JComboBox cmbStation;
-    private javax.swing.JComboBox cmbTags;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JLabel lblProgress;
-    private javax.swing.JProgressBar pbMain;
-    private javax.swing.JProgressBar pbPart;
-    private javax.swing.JSpinner spinBHPTage;
-    private javax.swing.JSpinner spinBVWochen;
-    private javax.swing.JSpinner spinBerichteMonate;
-    private javax.swing.JSpinner spinBeschwerdenMonate;
-    private javax.swing.JSpinner spinGewichtMonate;
-    private javax.swing.JSpinner spinPlanungenTage;
-    private javax.swing.JSpinner spinSozialWochen;
-    private javax.swing.JSpinner spinSturzAMonate;
-    private javax.swing.JSpinner spinSturzMonate;
-    private javax.swing.JSpinner spinVorratProzent;
-    private javax.swing.JSpinner spinWundenMonate;
-    private javax.swing.JTextField txtBerichte;
+    private JPanel jPanel1;
+    private JPanel jPanel2;
+    private JCheckBox cbBVAktivitaet;
+    private JCheckBox cbNichtAbgehakteBHPs;
+    private JCheckBox cbPlanung;
+    private JCheckBox cbVerordnungenOhneAnbruch;
+    private JSpinner spinBHPTage;
+    private JSpinner spinBVWochen;
+    private JSpinner spinPlanungenTage;
+    private JCheckBox cbGeringeVorraete;
+    private JSpinner spinVorratProzent;
+    private JCheckBox cbBerichte;
+    private JTextField txtBerichte;
+    private JSpinner spinBerichteMonate;
+    private JCheckBox cbInko;
+    private JCheckBox cbBeschwerden;
+    private JSpinner spinBeschwerdenMonate;
+    private JComboBox cmbTags;
+    private JPanel jPanel3;
+    private JCheckBox cbBilanz;
+    private JCheckBox cbGewicht;
+    private JSpinner spinGewichtMonate;
+    private JComboBox cmbBilanzMonat;
+    private JCheckBox cbMediControl;
+    private JComboBox cmbStation;
+    private JCheckBox cbWunden;
+    private JSpinner spinWundenMonate;
+    private JPanel jPanel5;
+    private JCheckBox cbSozialBerichte;
+    private JSpinner spinSozialWochen;
+    private JCheckBox cbSozialZeiten;
+    private JComboBox cmbPEAMonat;
+    private JPanel jPanel6;
+    private JCheckBox cbSturzAnonym;
+    private JSpinner spinSturzAMonate;
+    private JCheckBox cbSturz;
+    private JSpinner spinSturzMonate;
+    private JLabel jLabel1;
+    private JToolBar jToolBar1;
+    private JButton btnPrint;
+    private JProgressBar pbMain;
+    private JProgressBar pbPart;
+    private JLabel lblProgress;
+    private JButton btnStop;
+    private JPanel jPanel4;
     // End of variables declaration//GEN-END:variables
 }

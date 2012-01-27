@@ -127,7 +127,6 @@ public class PBerichtTAGSTools {
      *
      * @param listener  Ein ItemListener, der sagt, was geschehen soll, wenn man auf die Checkboxen klickt.
      * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
-     * @param layout    Ein Layoutmanager für das Panel.
      * @return das Panel zur weiteren Verwendung.
      */
     public static void addCheckBoxPanelForTags(JXTaskPane panel, ItemListener listener, Collection<PBerichtTAGS> preselect) {

@@ -51,15 +51,13 @@
         <class>entity.ICD</class>
         <class>entity.Krankenhaus</class>
         <class>entity.KKasse</class>
-        <class>entity.verordnungen.APV</class>
+        <class>entity.Betreuer</class>
         <class>entity.verordnungen.MedBestand</class>
         <class>entity.verordnungen.MedBuchungen</class>
         <class>entity.verordnungen.Darreichung</class>
         <class>entity.verordnungen.MedFormen</class>
         <class>entity.verordnungen.MedHersteller</class>
-        <class>entity.verordnungen.MedStoffe</class>
         <class>entity.verordnungen.MedVorrat</class>
-        <class>entity.verordnungen.MedZusammensetzung</class>
         <class>entity.verordnungen.MedPackung</class>
         <class>entity.verordnungen.MedProdukte</class>
         <class>entity.MassTermin</class>

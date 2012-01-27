@@ -87,7 +87,10 @@ import java.util.Iterator;
 @SqlResultSetMappings({
         @SqlResultSetMapping(name = "Pflegeberichte.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
         @EntityResult(entityClass = Pflegeberichte.class), columns =
-        @ColumnResult(name = "num"))
+        @ColumnResult(name = "num")),
+        @SqlResultSetMapping(name = "Pflegeberichte.findBVAktivitaetResultMapping", entities =
+        @EntityResult(entityClass = Bewohner.class), columns =
+        @ColumnResult(name = "mypbid"))
 })
 @NamedNativeQueries({
         /**
@@ -111,7 +114,22 @@ import java.util.Iterator;
                 + "     AND tag.PBTAGID = 1 "
                 + "     AND p.editBy IS NULL "
                 + " GROUP BY p.PBID "
-                + " ORDER BY p.PIT DESC", resultSetMapping = "Pflegeberichte.findByEinrichtungAndDatumAndAckUserResultMapping")
+                + " ORDER BY p.PIT DESC", resultSetMapping = "Pflegeberichte.findByEinrichtungAndDatumAndAckUserResultMapping"),
+        /**
+         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) Pflegeberichte
+         * seit dem angegebenen Datum heraus.
+         */
+        @NamedNativeQuery(name = "Pflegeberichte.findBVAktivitaet", query = ""
+                + " SELECT b.*, a.PBID mypbid " +
+                " FROM Bewohner b " +
+                " LEFT OUTER JOIN ( " +
+                "    SELECT pb.* FROM Pflegeberichte pb " +
+                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
+                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
+                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
+                " ) a ON a.BWKennung = b.BWKennung " +
+                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
+                " ORDER BY b.BWKennung, a.pit ", resultSetMapping = "Pflegeberichte.findBVAktivitaetResultMapping")
 })
 public class Pflegeberichte implements Serializable, VorgangElement {
 

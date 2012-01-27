@@ -15,9 +15,11 @@ import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -338,5 +340,83 @@ public class PflegeberichteTools {
         String result = "";
         result = bericht.getBewohner().getNachname() + ", " + bericht.getBewohner().getVorname();
         return "<font " + getHTMLColor(bericht) + ">" + result + "</font>";
+    }
+
+    /**
+     * @param em
+     * @param headertiefe
+     * @param bvwochen
+     * @return
+     */
+    public static String getBVBerichte(EntityManager em, int headertiefe, int bvwochen) {
+        StringBuilder html = new StringBuilder(1000);
+//        String jpql = "" +
+//                " SELECT  b, pb " +
+//                " FROM Bewohner b " +
+//                " LEFT JOIN b.pflegberichte pb " +
+//                " LEFT JOIN pb.tags pbt " +
+//                " WHERE pb.pit >= :datum AND pbt.kurzbezeichnung = 'BV' AND b.station IS NOT NULL AND b.adminonly <> 2 " +
+//                " ORDER BY b.bWKennung, pb.pit ";
+
+
+        String sql = " SELECT b.*, a.PBID " +
+                " FROM Bewohner b " +
+                " LEFT OUTER JOIN ( " +
+                "    SELECT pb.* FROM Pflegeberichte pb " +
+                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
+                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
+                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
+                " ) a ON a.BWKennung = b.BWKennung " +
+                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
+                " ORDER BY b.BWKennung, a.pit ";
+        Query query = em.createNamedQuery("Pflegeberichte.findBVAktivitaet");
+        query.setParameter(1, SYSCalendar.addField(new Date(SYSCalendar.startOfDay()), bvwochen * -1, GregorianCalendar.WEEK_OF_MONTH));
+
+//        Query query2 = em.createQuery("SELECT b FROM Bewohner b LEFT JOIN b.pflegberichte pb WHERE pb IS NULL ");
+//        query.setParameter("datum", SYSCalendar.addField(new Date(SYSCalendar.startOfDay()), bvwochen * -1, GregorianCalendar.WEEK_OF_MONTH));
+
+
+        List<Object[]> list = query.getResultList();
+        DateFormat df = DateFormat.getDateInstance();
+        html.append("<h" + headertiefe + ">");
+        html.append("Berichte der BV-Tätigkeiten");
+        html.append("</h" + headertiefe + ">");
+        html.append("<table border=\"1\"><tr>" +
+                "<th>BewohnerIn</th><th>Datum</th><th>Text</th><th>UKennung</th><th>BV</th></tr>");
+
+        for (Object[] paar : list) {
+            Bewohner bewohner = (Bewohner) paar[0];
+            BigInteger pbid = (BigInteger) paar[1];
+
+            // Bei Bedarf den Pflegebericht "einsammeln"
+            Pflegeberichte bericht = pbid == null ? null : em.find(Pflegeberichte.class, pbid.longValue());
+
+            html.append("<tr>");
+
+            html.append("<td>" + BewohnerTools.getBWLabelText(bewohner) + "</td>");
+            if (bericht == null) {
+                html.append("<td align=\"center\">--</td>");
+                html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
+                html.append("<td align=\"center\">--</td>");
+            } else {
+                html.append("<td>" + df.format(bericht.getPit()) + "</td>");
+                html.append("<td>" + bericht.getText() + "</td>");
+                html.append("<td>" + bericht.getUser().getUKennung() + "</td>");
+            }
+            if (bewohner.getBv1() == null) {
+                html.append("<td><b>kein BV zugeordnet</b></td>");
+            } else {
+                html.append("<td>" + bewohner.getBv1().getUKennung() + "</td>");
+            }
+            html.append("</tr>");
+        }
+        html.append("</table>");
+
+//        if (rs.first()) {
+
+//        }
+
+
+        return html.toString();
     }
 }
