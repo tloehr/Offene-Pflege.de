@@ -2,10 +2,13 @@ package entity.verordnungen;
 
 import op.OPDE;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -20,6 +23,23 @@ import java.util.Iterator;
  */
 public class MedVorratTools {
 
+    public static ListCellRenderer getMedVorratRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof MedVorrat) {
+                    MedVorrat vorrat = (MedVorrat) o;
+                    text = vorrat.getText();
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
 
     public static BigDecimal getSumme(MedVorrat vorrat) {
         EntityManager em = OPDE.createEM();

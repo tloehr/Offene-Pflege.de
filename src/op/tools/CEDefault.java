@@ -38,6 +38,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.EventObject;
@@ -74,7 +75,7 @@ public class CEDefault extends JTextField implements TableCellEditor {
         if (value instanceof Date) {
             setText(SYSCalendar.printGermanStyle((Date) value));
         } else if (value instanceof BigDecimal) {
-            NumberFormat nf = NumberFormat.getNumberInstance();
+            NumberFormat nf = DecimalFormat.getCurrencyInstance();
             setText(nf.format(value));
         } else {
             setText(value.toString());

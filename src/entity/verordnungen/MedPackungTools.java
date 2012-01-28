@@ -47,23 +47,44 @@ public class MedPackungTools {
      * Testet ob eine neue PZN gültig ist. Also ob sie genau 7 Zeichen lang ist. Führende 'ß' Zeichen (kommt bei den Barcodes vor)
      * werden abgeschnitten. Und es wird anhand der Datenbank geprüft, ob die PZN noch frei ist oder nicht.
      *
-     * @param pzn die geprüfte und bereinigte PZN. <code>null</code> bei falscher oder belegter PZN.
+     * @param pzn      die geprüfte und bereinigte PZN. <code>null</code> bei falscher oder belegter PZN.
+     * @param ignoreMe lässt die betreffende Packung bei der Suche ausser acht. Null, wenn nict gewünscht.
      * @return
      */
-    public static String checkNewPZN(String pzn){
-        if (pzn.matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
+    public static String checkNewPZN(String pzn, MedPackung ignoreMe) {
+        pzn = parsePZN(pzn);
 
-            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn); // Führendes ß abschneiden
-
+        if (pzn != null) {
             // PZN's darfs nur einmal geben. Gibts die hier schon ?
             // Dann ist die Packung falsch.
             EntityManager em = OPDE.createEM();
-            Query query = em.createNamedQuery("MedPackung.findByPzn");
+            String jpql = "SELECT m FROM MedPackung m WHERE m.pzn = :pzn " + (ignoreMe != null ? " AND m <> :packung " : "");
+            Query query = em.createQuery(jpql);
             query.setParameter("pzn", pzn);
-            if (!query.getResultList().isEmpty()){
+            if (ignoreMe != null) {
+                query.setParameter("packung", ignoreMe);
+            }
+            if (!query.getResultList().isEmpty()) {
                 pzn = null;
             }
             em.close();
+        }
+
+        return pzn;
+    }
+
+    /**
+     * Diese Methode prüft ob ein String einem PZN String entspricht. Dabei wird berücksichtigt, dass bei einer PZN
+     * die von einem Barcode Scanner erkannt wird, immer ein "ß" zu Beginn der Zeichenkette steht. Diese wird dann
+     * direkt abgeschnitten.
+     *
+     * @param pzn die, ggf. gesäuberte PZN. null, wenn der String unpassend war.
+     * @return
+     */
+    public static String parsePZN(String pzn) {
+        pzn = pzn.trim();
+        if (pzn.matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
+            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
         } else {
             pzn = null;
         }

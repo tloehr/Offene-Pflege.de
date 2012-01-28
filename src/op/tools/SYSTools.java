@@ -62,6 +62,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 public class SYSTools {
 
@@ -1895,6 +1896,27 @@ public class SYSTools {
                 ActionEvent postTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");
                 toolTipAction.actionPerformed(postTip);
             }
+        }
+        return bd;
+    }
+
+    public static BigDecimal checkBigDecimal(String txt) {
+        BigDecimal bd = null;
+        try {
+            NumberFormat nf = DecimalFormat.getNumberInstance();
+            Number number = nf.parse(txt);
+
+            if (number instanceof Long) {
+                bd = BigDecimal.valueOf(number.longValue());
+            } else if (number instanceof Double) {
+                bd = BigDecimal.valueOf(number.doubleValue());
+            } else if (number instanceof BigDecimal) {
+                bd = (BigDecimal) number;
+            }
+
+        } catch (ParseException ex) {
+            OPDE.debug(ex);
+            // Pech
         }
         return bd;
     }

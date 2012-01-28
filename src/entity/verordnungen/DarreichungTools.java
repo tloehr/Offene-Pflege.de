@@ -82,7 +82,7 @@ public class DarreichungTools {
 
 
     public static List<Darreichung> findDarreichungByMedProduktText(String suche) {
-        suche = "%" + suche + "%";
+        suche = "%" + suche.trim() + "%";
 
         EntityManager em = OPDE.createEM();
 

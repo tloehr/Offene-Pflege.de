@@ -48,8 +48,6 @@ import java.text.DecimalFormat;
  * @author tloehr
  */
 public class DlgPack extends javax.swing.JDialog {
-    private boolean editMode;
-    private long dafid;
     private MedPackung packung;
 
     /**
@@ -69,6 +67,7 @@ public class DlgPack extends javax.swing.JDialog {
         }
         lblPackEinheit.setText(DarreichungTools.getPackungsEinheit(packung.getDarreichung()));
         SYSTools.centerOnParent(parent, this);
+        pack();
         setVisible(true);
     }
 
@@ -85,11 +84,9 @@ public class DlgPack extends javax.swing.JDialog {
         lblPZN = new JLabel();
         cmbGroesse = new JComboBox();
         jLabel3 = new JLabel();
-        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));
-        ;
+        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));;
         lblInhalt = new JLabel();
-        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));
-        ;
+        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));;
         jSeparator2 = new JSeparator();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -100,8 +97,8 @@ public class DlgPack extends javax.swing.JDialog {
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, 2*($lcgap, default:grow), $lcgap, default, $lcgap, $rgap",
-                "6*(fill:default, $lgap), fill:default"));
+            "$rgap, $lcgap, default, 2*($lcgap, default:grow), $lcgap, default, $lcgap, $rgap",
+            "6*(fill:default, $lgap), fill:default"));
 
         //---- jLabel1 ----
         jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -114,11 +111,11 @@ public class DlgPack extends javax.swing.JDialog {
         contentPane.add(lblPZN, CC.xy(3, 5));
 
         //---- cmbGroesse ----
-        cmbGroesse.setModel(new DefaultComboBoxModel(new String[]{
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+        cmbGroesse.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
         }));
         contentPane.add(cmbGroesse, CC.xywh(5, 7, 5, 1));
 
@@ -190,7 +187,7 @@ public class DlgPack extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim());
+        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim(), packung.getMpid() != null ? packung : null);
         BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
         if (inhalt.compareTo(BigDecimal.ZERO) <= 0){
             inhalt = null;

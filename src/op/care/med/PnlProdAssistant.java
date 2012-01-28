@@ -27,6 +27,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Torsten Löhr
@@ -44,10 +45,13 @@ public class PnlProdAssistant extends JPanel {
     private Closure fertig123;
     private Timeline timeline;
     private SwingWorker worker;
+    private String template, pzn;
 
-    public PnlProdAssistant(Closure fertig123) {
+    public PnlProdAssistant(Closure fertig123, String template) {
         this.fertig123 = fertig123;
         worker = null;
+        this.template = template;
+        pzn = null;
         initComponents();
         initPanel();
     }
@@ -500,6 +504,22 @@ public class PnlProdAssistant extends JPanel {
         }
     }
 
+    public MedPackung getPackung() {
+        return packung;
+    }
+
+    public Darreichung getDarreichung() {
+        return darreichung;
+    }
+
+    public MedProdukte getProdukt() {
+        return produkt;
+    }
+
+    public MedHersteller getHersteller() {
+        return hersteller;
+    }
+
     private void btnKeinePackungActionPerformed(ActionEvent e) {
 //        numOfVisibleFrames = 3;
 //        split1pos = SYSTools.showSide(split1, 0.33d, speedFast);
@@ -551,7 +571,7 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void btnPackungWeiterActionPerformed(ActionEvent e) {
-        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim());
+        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim(), null);
         BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
         String txt = "";
 
@@ -636,7 +656,7 @@ public class PnlProdAssistant extends JPanel {
             splitEditorSummaryPos = SYSTools.showSide(splitEditSummary, SYSTools.RIGHT_LOWER_SIDE, speedFast);
         } else {// steht auf summary
             save();
-            fertig123.execute(produkt);
+            fertig123.execute(packung != null ? packung : darreichung);
         }
 
 
@@ -749,8 +769,8 @@ public class PnlProdAssistant extends JPanel {
         //======== panel11 ========
         {
             panel11.setLayout(new FormLayout(
-                    "default:grow",
-                    "fill:default, $lgap, default:grow, $lgap, default"));
+                "default:grow",
+                "fill:default, $lgap, default:grow, $lgap, default"));
 
             //---- lblTop ----
             lblTop.setFont(new Font("sansserif", Font.PLAIN, 18));
@@ -789,8 +809,8 @@ public class PnlProdAssistant extends JPanel {
                     //======== pnlSplitProd ========
                     {
                         pnlSplitProd.setLayout(new FormLayout(
-                                "default:grow",
-                                "fill:default:grow, fill:default"));
+                            "default:grow",
+                            "fill:default:grow, fill:default"));
 
                         //======== splitProd ========
                         {
@@ -810,8 +830,8 @@ public class PnlProdAssistant extends JPanel {
                             {
                                 panel1.setMinimumSize(new Dimension(83, 93));
                                 panel1.setLayout(new FormLayout(
-                                        "default:grow",
-                                        "$rgap, 2*($lgap, default), $lgap, top:30px:grow"));
+                                    "default:grow",
+                                    "$rgap, 2*($lgap, default), $lgap, top:30px:grow"));
 
                                 //---- label1 ----
                                 label1.setText("Medizin-Produkt");
@@ -863,8 +883,8 @@ public class PnlProdAssistant extends JPanel {
                                 panel2.setMinimumSize(new Dimension(83, 93));
                                 panel2.setPreferredSize(new Dimension(83, 93));
                                 panel2.setLayout(new FormLayout(
-                                        "default:grow",
-                                        "default, $lgap, default:grow"));
+                                    "default:grow",
+                                    "default, $lgap, default:grow"));
 
                                 //---- lblProdMsg ----
                                 lblProdMsg.setFont(new Font("sansserif", Font.BOLD, 16));
@@ -921,8 +941,8 @@ public class PnlProdAssistant extends JPanel {
                         //======== pnlSplitZusatz ========
                         {
                             pnlSplitZusatz.setLayout(new FormLayout(
-                                    "default:grow",
-                                    "fill:default:grow, $lgap, default"));
+                                "default:grow",
+                                "fill:default:grow, $lgap, default"));
 
                             //======== splitZusatz ========
                             {
@@ -940,8 +960,8 @@ public class PnlProdAssistant extends JPanel {
                                 {
                                     pnlSplitTop.setMinimumSize(new Dimension(83, 93));
                                     pnlSplitTop.setLayout(new FormLayout(
-                                            "default:grow",
-                                            "$rgap, 3*($lgap, default), $lgap, default:grow"));
+                                        "default:grow",
+                                        "$rgap, 3*($lgap, default), $lgap, default:grow"));
 
                                     //---- label2 ----
                                     label2.setText("Zusatz und Darreichung");
@@ -991,8 +1011,8 @@ public class PnlProdAssistant extends JPanel {
                                     pnlSplitBottom.setMinimumSize(new Dimension(83, 93));
                                     pnlSplitBottom.setPreferredSize(new Dimension(83, 93));
                                     pnlSplitBottom.setLayout(new FormLayout(
-                                            "default:grow",
-                                            "default, $lgap, default:grow"));
+                                        "default:grow",
+                                        "default, $lgap, default:grow"));
 
                                     //---- lblZusatzMsg ----
                                     lblZusatzMsg.setFont(new Font("sansserif", Font.BOLD, 16));
@@ -1046,8 +1066,8 @@ public class PnlProdAssistant extends JPanel {
                             //======== pnlSplitHersteller ========
                             {
                                 pnlSplitHersteller.setLayout(new FormLayout(
-                                        "default:grow",
-                                        "fill:default:grow, $lgap, default"));
+                                    "default:grow",
+                                    "fill:default:grow, $lgap, default"));
 
                                 //======== splitHersteller ========
                                 {
@@ -1064,8 +1084,8 @@ public class PnlProdAssistant extends JPanel {
                                     //======== panel7 ========
                                     {
                                         panel7.setLayout(new FormLayout(
-                                                "default:grow",
-                                                "$rgap, 3*($lgap, default)"));
+                                            "default:grow",
+                                            "$rgap, 3*($lgap, default)"));
 
                                         //---- label7 ----
                                         label7.setText("Hersteller");
@@ -1110,8 +1130,8 @@ public class PnlProdAssistant extends JPanel {
                                         panel6.setMinimumSize(new Dimension(83, 93));
                                         panel6.setPreferredSize(new Dimension(83, 93));
                                         panel6.setLayout(new FormLayout(
-                                                "default, 2*($lcgap, default:grow)",
-                                                "7*(fill:default, $lgap), fill:default"));
+                                            "default, 2*($lcgap, default:grow)",
+                                            "7*(fill:default, $lgap), fill:default"));
 
                                         //---- jLabel1 ----
                                         jLabel1.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -1199,8 +1219,8 @@ public class PnlProdAssistant extends JPanel {
                                 pnlPackung.setMinimumSize(new Dimension(83, 93));
                                 pnlPackung.setPreferredSize(new Dimension(83, 93));
                                 pnlPackung.setLayout(new FormLayout(
-                                        "default, $lcgap, default:grow, $lcgap, default",
-                                        "$rgap, 4*($lgap, default), $ugap, default:grow"));
+                                    "default, $lcgap, default:grow, $lcgap, default",
+                                    "$rgap, 4*($lgap, default), $ugap, default:grow"));
 
                                 //---- label4 ----
                                 label4.setText("Verpackung");
@@ -1245,8 +1265,8 @@ public class PnlProdAssistant extends JPanel {
                                 //======== panel14 ========
                                 {
                                     panel14.setLayout(new FormLayout(
-                                            "left:default:grow",
-                                            "fill:default:grow, 2*(fill:default)"));
+                                        "left:default:grow",
+                                        "fill:default:grow, 2*(fill:default)"));
 
                                     //======== scrollPane3 ========
                                     {
@@ -1263,8 +1283,8 @@ public class PnlProdAssistant extends JPanel {
                                     //======== panel3 ========
                                     {
                                         panel3.setLayout(new FormLayout(
-                                                "default, default:grow",
-                                                "default"));
+                                            "default, default:grow",
+                                            "default"));
 
                                         //---- btnKeinePackung ----
                                         btnKeinePackung.setText("ausblenden");
@@ -1318,8 +1338,8 @@ public class PnlProdAssistant extends JPanel {
             //======== panel4 ========
             {
                 panel4.setLayout(new FormLayout(
-                        "default:grow, $lcgap, default:grow",
-                        "default:grow"));
+                    "default:grow, $lcgap, default:grow",
+                    "default:grow"));
 
                 //---- btnCheckSave ----
                 btnCheckSave.setText("Eingaben pr\u00fcfen");
@@ -1352,6 +1372,16 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void initPanel() {
+
+        if (template != null && !template.isEmpty()){
+            pzn = MedPackungTools.parsePZN(template);
+            if (pzn != null){
+                txtPZN.setText(pzn);
+            } else {
+                txtProd.setText(template.trim());
+            }
+        }
+
         splitEditorSummaryPos = SYSTools.showSide(splitEditSummary, SYSTools.LEFT_UPPER_SIDE);
         split1pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
         split2pos = SYSTools.showSide(split2, SYSTools.LEFT_UPPER_SIDE);
@@ -1370,6 +1400,8 @@ public class PnlProdAssistant extends JPanel {
         em.close();
 
         cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
+
+
 
         thisComponentResized(null);
     }
