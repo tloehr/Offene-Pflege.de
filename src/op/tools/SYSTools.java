@@ -1969,4 +1969,14 @@ public class SYSTools {
         return betrag;
     }
 
+
+    public static void removeSearchPanels(JPanel panelSearch, int positionToAddPanels){
+        if (panelSearch.getComponentCount() > positionToAddPanels){
+            int count = panelSearch.getComponentCount();
+            for (int i = count-1; i >= positionToAddPanels; i--){
+                panelSearch.remove(positionToAddPanels);
+            }
+        }
+    }
+
 }

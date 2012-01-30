@@ -343,7 +343,7 @@
                     </void> 
                     <void method="add"> 
                      <object class="com.jformdesigner.model.FormComponent"> 
-                      <string>javax.swing.JTextField</string> 
+                      <string>org.jdesktop.swingx.JXSearchField</string> 
                       <void method="setProperty"> 
                        <string>font</string> 
                        <object class="java.awt.Font"> 
@@ -352,14 +352,18 @@
                         <int>16</int> 
                        </object> 
                       </void> 
+                      <void method="setProperty"> 
+                       <string>instantSearchDelay</string> 
+                       <int>500</int> 
+                      </void> 
                       <void property="name"> 
                        <string>txtProd</string> 
                       </void> 
                       <void method="addEvent"> 
                        <object class="com.jformdesigner.model.FormEvent"> 
-                        <string>javax.swing.event.CaretListener</string> 
-                        <string>caretUpdate</string> 
-                        <string>txtProdCaretUpdate</string> 
+                        <string>java.awt.event.ActionListener</string> 
+                        <string>actionPerformed</string> 
+                        <string>txtProdActionPerformed</string> 
                         <boolean>true</boolean> 
                        </object> 
                       </void> 

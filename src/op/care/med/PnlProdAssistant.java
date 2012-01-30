@@ -10,6 +10,7 @@ import entity.verordnungen.*;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.*;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.TimelinePropertyBuilder;
 import org.pushingpixels.trident.TridentConfig;
@@ -57,117 +58,7 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void txtProdCaretUpdate(CaretEvent e) {
-        revertToPanel(1);
-        if (worker != null && !worker.isDone()) {
-            return;
-        }
 
-
-        if (!txtProd.getText().trim().isEmpty()) {
-
-            if (timeline == null) {
-//                timeline = SYSTools.flashLabel(label1, "Datenbank");
-//                lblHardDisk.setText("Datenbankzugriff");
-                timeline = new Timeline(lblHardDisk);
-                ImageIcon hd1 = new ImageIcon(getClass().getResource("/artwork/32x32/hdd_mount.png"));
-                ImageIcon hd2 = new ImageIcon(getClass().getResource("/artwork/32x32/hdd_unmount.png"));
-//                timeline.addPropertyToInterpolate("icon", new ImageIcon(getClass().getResource("/artwork/32x32/bw/hdd_mount.png")), new ImageIcon(getClass().getResource("/artwork/32x32/bw/hdd_unmount.png")));
-
-                TimelinePropertyBuilder.PropertySetter<ImageIcon> propertySetter = new TimelinePropertyBuilder.PropertySetter<ImageIcon>() {
-                    @Override
-                    public void set(Object obj, String fieldName, ImageIcon value) {
-                        lblHardDisk.setIcon(value);
-                    }
-                };
-
-                PropertyInterpolator<ImageIcon> iconInterpolator = new PropertyInterpolator<ImageIcon>() {
-                    @Override
-                    public Class getBasePropertyClass() {
-                        return ImageIcon.class;
-                    }
-
-                    @Override
-                    public ImageIcon interpolate(ImageIcon imageIcon, ImageIcon imageIcon1, float timelinePosition) {
-
-                        ImageIcon result = null;
-
-                        if (timelinePosition > 0.5f) {
-                            result = imageIcon;
-                        } else {
-                            result = imageIcon1;
-                        }
-
-
-                        return result;
-                    }
-                };
-
-                TridentConfig.getInstance().addPropertyInterpolator(iconInterpolator);
-                timeline.addPropertyToInterpolate(Timeline.<ImageIcon>property("value").from(hd1).to(hd2).setWith(propertySetter));
-                timeline.setDuration(450);
-
-//                timeline.addCallback(new TimelineCallbackAdapter() {
-//                    @Override
-//                    public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-//                        OPDE.debug(newState);
-//                        if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
-//                            lblHardDisk.setText(null);
-//                            lblHardDisk.setIcon(null);
-//                        }
-//                    }
-//                });
-                timeline.playLoop(Timeline.RepeatBehavior.REVERSE);
-            }
-
-            worker = new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    txtProd.setEditable(false);
-                    EntityManager em = OPDE.createEM();
-                    Query query = em.createNamedQuery("MedProdukte.findByBezeichnungLike");
-                    query.setParameter("bezeichnung", "%" + txtProd.getText().trim() + "%");
-                    listProd = query.getResultList();
-                    em.close();
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    if (!listProd.isEmpty()) {
-                        if (splitProdPos == 1d) {
-                            splitProdPos = SYSTools.showSide(splitProd, new Integer(150), speedFast);
-                        }
-                        DefaultListModel lmProd;
-                        lmProd = SYSTools.list2dlm(listProd);
-                        lstProd.setModel(lmProd);
-                        lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
-                    } else {
-                        if (splitProdPos != 1d) {
-                            splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
-                        }
-                    }
-
-                    if (timeline != null) {
-                        timeline.cancel();
-                        timeline = null;
-                    }
-//                    lblProdMsg.setForeground(Color.BLACK);
-                    txtProd.setEditable(true);
-                    txtProd.requestFocus();
-                }
-            };
-            worker.execute();
-        } else {
-            lstProd.setModel(new DefaultListModel());
-            listProd = null;
-            if (splitProdPos != 1d) {
-                splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
-            }
-        }
-        produkt = null;
-        darreichung = null;
-        packung = null;
-        showLabelTop();
     }
 
     private void lstProdValueChanged(ListSelectionEvent e) {
@@ -249,14 +140,18 @@ public class PnlProdAssistant extends JPanel {
             lstZusatz.setModel(lmZusatz);
             lstZusatz.setCellRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.MEDIUM));
             em.close();
+
         } else {
             lstZusatz.setModel(new DefaultListModel());
             listZusatz = null;
             if (splitZusatzPos != 1d) {
                 splitZusatzPos = SYSTools.showSide(splitZusatz, SYSTools.LEFT_UPPER_SIDE, speedFast);
             }
+
+//            darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem());
         }
         txtZusatz.requestFocus();
+        darreichung = (listZusatz == null || listZusatz.isEmpty()) ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listZusatz.get(0);
     }
 
     private void txtZusatzCaretUpdate(CaretEvent e) {
@@ -271,11 +166,11 @@ public class PnlProdAssistant extends JPanel {
         query.setParameter("zusatz", txtZusatz.getText().trim().toUpperCase());
         query.setParameter("produkt", produkt);
         query.setParameter("form", cmbForm.getSelectedItem());
-        List<Darreichung> listeDarreichungen = query.getResultList();
+        listZusatz = query.getResultList();
         em.close();
 
         // Wenn es eine genaue Übereinstimmung schon gab, dann reden wir nicht lange sondern verwenden diese direkt.
-        darreichung = listeDarreichungen.isEmpty() ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listeDarreichungen.get(0);
+        darreichung = listZusatz.isEmpty() ? new Darreichung(produkt, txtZusatz.getText().trim(), (MedFormen) cmbForm.getSelectedItem()) : listZusatz.get(0);
 
 
 //        darreichung = null;
@@ -345,9 +240,11 @@ public class PnlProdAssistant extends JPanel {
             return;
         }
 
-
         proceedToFrame3();
         cmbHersteller.setEnabled(hersteller == null);
+        if (hersteller == null){
+            hersteller = (MedHersteller) cmbHersteller.getSelectedItem();
+        }
         showLabelTop();
         thisComponentResized(null);
     }
@@ -375,6 +272,7 @@ public class PnlProdAssistant extends JPanel {
                     if (newState == Timeline.TimelineState.DONE) {
                         thisComponentResized(null);
                         initZusatz();
+
                     }
                 }
             });
@@ -677,6 +575,120 @@ public class PnlProdAssistant extends JPanel {
         SYSTools.showSide(splitEditSummary, splitEditorSummaryPos);
     }
 
+    private void txtProdActionPerformed(ActionEvent e) {
+        revertToPanel(1);
+        if (worker != null && !worker.isDone()) {
+            return;
+        }
+
+
+        if (!txtProd.getText().trim().isEmpty()) {
+
+            if (timeline == null) {
+//                timeline = SYSTools.flashLabel(label1, "Datenbank");
+//                lblHardDisk.setText("Datenbankzugriff");
+                timeline = new Timeline(lblHardDisk);
+                ImageIcon hd1 = new ImageIcon(getClass().getResource("/artwork/32x32/hdd_mount.png"));
+                ImageIcon hd2 = new ImageIcon(getClass().getResource("/artwork/32x32/hdd_unmount.png"));
+//                timeline.addPropertyToInterpolate("icon", new ImageIcon(getClass().getResource("/artwork/32x32/bw/hdd_mount.png")), new ImageIcon(getClass().getResource("/artwork/32x32/bw/hdd_unmount.png")));
+
+                TimelinePropertyBuilder.PropertySetter<ImageIcon> propertySetter = new TimelinePropertyBuilder.PropertySetter<ImageIcon>() {
+                    @Override
+                    public void set(Object obj, String fieldName, ImageIcon value) {
+                        lblHardDisk.setIcon(value);
+                    }
+                };
+
+                PropertyInterpolator<ImageIcon> iconInterpolator = new PropertyInterpolator<ImageIcon>() {
+                    @Override
+                    public Class getBasePropertyClass() {
+                        return ImageIcon.class;
+                    }
+
+                    @Override
+                    public ImageIcon interpolate(ImageIcon imageIcon, ImageIcon imageIcon1, float timelinePosition) {
+
+                        ImageIcon result = null;
+
+                        if (timelinePosition > 0.5f) {
+                            result = imageIcon;
+                        } else {
+                            result = imageIcon1;
+                        }
+
+
+                        return result;
+                    }
+                };
+
+                TridentConfig.getInstance().addPropertyInterpolator(iconInterpolator);
+                timeline.addPropertyToInterpolate(Timeline.<ImageIcon>property("value").from(hd1).to(hd2).setWith(propertySetter));
+                timeline.setDuration(450);
+
+//                timeline.addCallback(new TimelineCallbackAdapter() {
+//                    @Override
+//                    public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                        OPDE.debug(newState);
+//                        if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
+//                            lblHardDisk.setText(null);
+//                            lblHardDisk.setIcon(null);
+//                        }
+//                    }
+//                });
+                timeline.playLoop(Timeline.RepeatBehavior.REVERSE);
+            }
+
+            worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+//                    txtProd.setEditable(false);
+                    EntityManager em = OPDE.createEM();
+                    Query query = em.createNamedQuery("MedProdukte.findByBezeichnungLike");
+                    query.setParameter("bezeichnung", "%" + txtProd.getText().trim() + "%");
+                    listProd = query.getResultList();
+                    em.close();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    if (!listProd.isEmpty()) {
+                        if (splitProdPos == 1d) {
+                            splitProdPos = SYSTools.showSide(splitProd, new Integer(150), speedFast);
+                        }
+                        DefaultListModel lmProd;
+                        lmProd = SYSTools.list2dlm(listProd);
+                        lstProd.setModel(lmProd);
+                        lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+                    } else {
+                        if (splitProdPos != 1d) {
+                            splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
+                        }
+                    }
+
+                    if (timeline != null) {
+                        timeline.cancel();
+                        timeline = null;
+                    }
+//                    lblProdMsg.setForeground(Color.BLACK);
+//                    txtProd.setEditable(true);
+                    txtProd.requestFocus();
+                }
+            };
+            worker.execute();
+        } else {
+            lstProd.setModel(new DefaultListModel());
+            listProd = null;
+            if (splitProdPos != 1d) {
+                splitProdPos = SYSTools.showSide(splitProd, SYSTools.LEFT_UPPER_SIDE, speedFast);
+            }
+        }
+        produkt = null;
+        darreichung = null;
+        packung = null;
+        showLabelTop();
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -690,7 +702,7 @@ public class PnlProdAssistant extends JPanel {
         label1 = new JLabel();
         panel9 = new JPanel();
         lblHardDisk = new JLabel();
-        txtProd = new JTextField();
+        txtProd = new JXSearchField();
         btnClearProd = new JButton();
         panel2 = new JPanel();
         lblProdMsg = new JLabel();
@@ -853,10 +865,11 @@ public class PnlProdAssistant extends JPanel {
 
                                     //---- txtProd ----
                                     txtProd.setFont(new Font("sansserif", Font.PLAIN, 16));
-                                    txtProd.addCaretListener(new CaretListener() {
+                                    txtProd.setInstantSearchDelay(500);
+                                    txtProd.addActionListener(new ActionListener() {
                                         @Override
-                                        public void caretUpdate(CaretEvent e) {
-                                            txtProdCaretUpdate(e);
+                                        public void actionPerformed(ActionEvent e) {
+                                            txtProdActionPerformed(e);
                                         }
                                     });
                                     panel9.add(txtProd);
@@ -1401,9 +1414,16 @@ public class PnlProdAssistant extends JPanel {
 
         cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
 
+//        thisComponentResized(null);
 
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            OPDE.debug(e);
+        }
 
         thisComponentResized(null);
+
     }
 
     private void revertToPanel(int num) {
@@ -1460,7 +1480,7 @@ public class PnlProdAssistant extends JPanel {
     private JLabel label1;
     private JPanel panel9;
     private JLabel lblHardDisk;
-    private JTextField txtProd;
+    private JXSearchField txtProd;
     private JButton btnClearProd;
     private JPanel panel2;
     private JLabel lblProdMsg;

@@ -290,7 +290,7 @@
                  <class>com.jformdesigner.runtime.GenericIndexLayout</class> 
                 </object> 
                 <void property="name"> 
-                 <string>taskBWContainer</string> 
+                 <string>panelSearch</string> 
                 </void> 
                </object> 
               </void> 

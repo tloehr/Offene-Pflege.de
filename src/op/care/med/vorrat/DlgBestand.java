@@ -244,9 +244,9 @@ public class DlgBestand extends javax.swing.JDialog {
         }
 
         ignoreEvent = false;
-        if (!txtMedSuche.getText().equals("")) {
-            txtMedSucheCaretUpdate(null);
-        }
+//        if (!txtMedSuche.getText().equals("")) {
+//            txt
+//        }
 
         SYSTools.centerOnParent(parent, this);
         setTitle(SYSTools.getWindowTitle("Medikamente buchen"));
@@ -294,8 +294,8 @@ public class DlgBestand extends javax.swing.JDialog {
         setMinimumSize(new Dimension(640, 425));
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, 28dlu, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
-                "$rgap, $lgap, fill:default, $lgap, default, 8*($lgap, fill:default), $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+            "$rgap, $lcgap, default, $lcgap, 28dlu, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
+            "$rgap, $lgap, fill:default, $lgap, default, 8*($lgap, fill:default), $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //---- lblFrage ----
         lblFrage.setFont(new Font("Dialog", Font.BOLD, 24));
@@ -348,7 +348,7 @@ public class DlgBestand extends javax.swing.JDialog {
         contentPane.add(jLabel3, CC.xy(3, 9));
 
         //---- cmbMProdukt ----
-        cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+        cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbMProdukt.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -366,7 +366,7 @@ public class DlgBestand extends javax.swing.JDialog {
         contentPane.add(lblVorrat, CC.xy(3, 15));
 
         //---- cmbVorrat ----
-        cmbVorrat.setModel(new DefaultComboBoxModel(new String[]{
+        cmbVorrat.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbVorrat.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -394,7 +394,7 @@ public class DlgBestand extends javax.swing.JDialog {
         contentPane.add(txtBWSuche, CC.xy(5, 19));
 
         //---- cmbBW ----
-        cmbBW.setModel(new DefaultComboBoxModel(new String[]{
+        cmbBW.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbBW.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -433,7 +433,7 @@ public class DlgBestand extends javax.swing.JDialog {
         contentPane.add(jLabel6, CC.xy(3, 11));
 
         //---- cmbPackung ----
-        cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+        cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbPackung.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -673,7 +673,7 @@ public class DlgBestand extends javax.swing.JDialog {
     }//GEN-LAST:event_txtMengeCaretUpdate
 
     private void txtBWSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBWSucheCaretUpdate
-        if (ignoreEvent) {
+        if (ignoreEvent || !txtBWSuche.isEnabled()) {
             return;
         }
         if (txtBWSuche.getText().equals("")) {
@@ -828,12 +828,6 @@ public class DlgBestand extends javax.swing.JDialog {
         btnApply.setEnabled(medEingegeben && (mengeEingegeben || packungEingegeben) && bwEingegeben && txtEntry);
     }
 
-    private void txtMedSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMedSucheCaretUpdate
-        if (ignoreEvent) {
-            return;
-        }
-
-    }//GEN-LAST:event_txtMedSucheCaretUpdate
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -13,7 +13,7 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>relgap, 0dlu, 148dlu, relgap, 316dlu:grow, 0dlu, relgap</string> 
+        <string>relgap, 0dlu, 136dlu, relgap, 316dlu:grow, 0dlu, relgap</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
@@ -71,6 +71,10 @@
         <void method="setProperty"> 
          <string>gridHeight</string> 
          <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>vAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
         </void> 
        </object> 
       </void> 
@@ -408,11 +412,11 @@
              <class>com.jgoodies.forms.layout.FormLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>0dlu, labelcompgap, 70dlu, labelcompgap, default:grow, labelcompgap, default, labelcompgap, default, labelcompgap, 0dlu</string> 
+              <string>0dlu, labelcompgap, 70dlu, labelcompgap, default:grow, labelcompgap, default, labelcompgap, 0dlu</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>0dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, default, linegap, default, linegap, default, linegap, default</string> 
+              <string>0dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default</string> 
              </void> 
             </object> 
             <void property="name"> 
@@ -480,7 +484,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -650,7 +654,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
@@ -689,7 +693,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -724,7 +728,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -759,7 +763,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -829,13 +833,13 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JButton</string> 
+              <string>javax.swing.JToggleButton</string> 
               <void method="setProperty"> 
                <string>font</string> 
                <object id="Font0" class="java.awt.Font"> 
@@ -846,55 +850,13 @@
               </void> 
               <void method="setProperty"> 
                <string>toolTipText</string> 
-               <string>Vorgang übernehmen</string> 
-              </void> 
-              <void method="setProperty"> 
-               <string>icon</string> 
-               <object class="com.jformdesigner.model.SwingIcon"> 
-                <int>0</int> 
-                <string>/artwork/16x16/1leftarrow.png</string> 
-               </object> 
-              </void> 
-              <void property="name"> 
-               <string>btnTakeOver</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>btnTakeOverActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jgoodies.forms.layout.CellConstraints</class> 
-              <void method="setProperty"> 
-               <string>gridX</string> 
-               <int>7</int> 
-              </void> 
-              <void method="setProperty"> 
-               <string>gridY</string> 
-               <int>15</int> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JToggleButton</string> 
-              <void method="setProperty"> 
-               <string>font</string> 
-               <object idref="Font0"/> 
-              </void> 
-              <void method="setProperty"> 
-               <string>toolTipText</string> 
                <string>Vorgang an anderen Benutzer überweisen</string> 
               </void> 
               <void method="setProperty"> 
                <string>icon</string> 
                <object class="com.jformdesigner.model.SwingIcon"> 
                 <int>0</int> 
-                <string>/artwork/16x16/1rightarrow.png</string> 
+                <string>/artwork/22x22/bw/1rightarrow.png</string> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -922,7 +884,7 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridX</string> 
-               <int>9</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
@@ -1000,7 +962,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
@@ -1058,7 +1020,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>3</int> 
+               <int>2</int> 
               </void> 
              </object> 
             </void> 
@@ -1069,7 +1031,7 @@
                <string>icon</string> 
                <object class="com.jformdesigner.model.SwingIcon"> 
                 <int>0</int> 
-                <string>/artwork/16x16/addgreanbuble.png</string> 
+                <string>/artwork/22x22/bw/add.png</string> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -1092,7 +1054,7 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridX</string> 
-               <int>9</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
@@ -1163,6 +1125,10 @@
          <string>gridY</string> 
          <int>5</int> 
         </void> 
+        <void method="setProperty"> 
+         <string>vAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -1181,7 +1147,7 @@
            <string>icon</string> 
            <object class="com.jformdesigner.model.SwingIcon"> 
             <int>0</int> 
-            <string>/artwork/22x22/edit_add.png</string> 
+            <string>/artwork/22x22/bw/add.png</string> 
            </object> 
           </void> 
           <void method="setProperty"> 
@@ -1267,7 +1233,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/edit_add.png</string> 
+              <string>/artwork/22x22/bw/add.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -1298,7 +1264,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/graphic-design.png</string> 
+              <string>/artwork/22x22/bw/edit.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -1329,7 +1295,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/printer1.png</string> 
+              <string>/artwork/22x22/bw/printer.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -1360,7 +1326,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/shutdown.png</string> 
+              <string>/artwork/22x22/bw/exit.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -1391,7 +1357,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/info.png</string> 
+              <string>/artwork/22x22/bw/idea.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -1436,7 +1402,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/apply.png</string> 
+              <string>/artwork/22x22/bw/apply.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -1511,7 +1477,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/cancel.png</string> 
+              <string>/artwork/22x22/bw/editdelete.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 

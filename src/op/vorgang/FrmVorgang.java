@@ -15,4 +15,6 @@ public class FrmVorgang extends JFrame {
         setSize(1024, 768);
         getContentPane().add(new PnlVorgang(this));
     }
+
+
 }

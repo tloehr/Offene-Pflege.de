@@ -100,6 +100,7 @@ public class SYSHostsTools {
         } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
             OPDE.debug(e);
             host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
+            // TODO: Exception bei doppeltem Host abfangen.
             EntityTools.persist(host);
         } finally {
             em.close();

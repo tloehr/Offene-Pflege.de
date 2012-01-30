@@ -103,6 +103,7 @@ public class FrmPflege extends javax.swing.JFrame {
     private boolean initPhase;
     private HeapStat hs;
     public JLabel bwlabel;
+    private int positionToAddPanels;
 
     /**
      * Creates new form FrmPflege
@@ -115,6 +116,7 @@ public class FrmPflege extends javax.swing.JFrame {
         initPhase = true;
         initComponents();
         bwlabel = null;
+        positionToAddPanels = 0;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
         this.setVisible(true);
 
@@ -179,7 +181,7 @@ public class FrmPflege extends javax.swing.JFrame {
         btnVerlegung = new JButton();
         btnLogout = new JButton();
         jspBW = new JScrollPane();
-        taskBWContainer = new JXTaskPaneContainer();
+        panelSearch = new JXTaskPaneContainer();
         jtpPflegeakte = new JTabbedPane();
         pnlUeber = new JPanel();
         pnlTB = new JPanel();
@@ -293,7 +295,7 @@ public class FrmPflege extends javax.swing.JFrame {
                                 jspBWComponentResized(e);
                             }
                         });
-                        jspBW.setViewportView(taskBWContainer);
+                        jspBW.setViewportView(panelSearch);
                     }
                     pnlBW.add(jspBW, CC.xy(1, 5, CC.FILL, CC.FILL));
                 }
@@ -549,7 +551,8 @@ public class FrmPflege extends javax.swing.JFrame {
                 currentStationsPane = new JXTaskPane(station.getBezeichnung());
                 currentStationsPane.setSpecial(station.equals(meineStation));
                 currentStationsPane.setCollapsed(!currentStationsPane.isSpecial());
-                taskBWContainer.add((JPanel) currentStationsPane);
+                panelSearch.add((JPanel) currentStationsPane);
+                positionToAddPanels++; // Damit ich weiss, wo ich nachher die anderen Suchfelder dranhängen kann.
             }
 
             currentStationsPane.add(new AbstractAction() {
@@ -572,6 +575,8 @@ public class FrmPflege extends javax.swing.JFrame {
                 }
             });
         }
+
+
         em.close();
     }
 
@@ -626,7 +631,7 @@ public class FrmPflege extends javax.swing.JFrame {
             }
             case MAINTAB_BW: {
                 if (bewohner != null) {
-
+                    SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
                     switch (jtpPflegeakte.getSelectedIndex()) {
                         case TAB_UEBERSICHT: {
                             jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(this, bewohner));
@@ -634,7 +639,7 @@ public class FrmPflege extends javax.swing.JFrame {
                             break;
                         }
                         case TAB_PB: {
-                            jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(this, bewohner));
+                            jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(this, bewohner, panelSearch));
                             jtpPflegeakte.setTitleAt(TAB_PB, "Pflegeberichte");
                             break;
                         }
@@ -669,8 +674,9 @@ public class FrmPflege extends javax.swing.JFrame {
                             break;
                         }
                         case TAB_VORGANG: {
-                            final PnlVorgang pnlVorgang = new PnlVorgang(this, bewohner);
+                            final PnlVorgang pnlVorgang = new PnlVorgang(this, bewohner, panelSearch);
                             CleanablePanel cp = new CleanablePanel() {
+
                                 @Override
                                 public void cleanup() {
                                     pnlVorgang.cleanup();
@@ -678,11 +684,16 @@ public class FrmPflege extends javax.swing.JFrame {
 
                                 @Override
                                 public void change2Bewohner(Bewohner bewohner) {
-                                    //To change body of implemented methods use File | Settings | File Templates.
+                                    BewohnerTools.setBWLabel(bwlabel, bewohner);
+                                    pnlVorgang.change2Bewohner(bewohner);
+                                    validate();
                                 }
                             };
-                            cp.setLayout(new VerticalLayout(10));
-                            cp.add(BewohnerTools.getBWLabel(bewohner));
+                            bwlabel = BewohnerTools.getBWLabel(bewohner);
+//                            bwlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                            BoxLayout boxLayout = new BoxLayout(cp, BoxLayout.PAGE_AXIS);
+                            cp.setLayout(boxLayout);
+                            cp.add(bwlabel);
                             cp.add(pnlVorgang);
 
                             jtpPflegeakte.setComponentAt(TAB_VORGANG, cp);
@@ -703,9 +714,16 @@ public class FrmPflege extends javax.swing.JFrame {
             default: {
             }
         }
-
-
     }
+
+//    private void removeSearchPanels(){
+//        if (panelSearch.getComponentCount() > positionToAddPanels){
+//            int count = panelSearch.getComponentCount();
+//            for (int i = count-1; i >= positionToAddPanels; i--){
+//                panelSearch.remove(positionToAddPanels);
+//            }
+//        }
+//    }
 
 //    private void reloadTable(Bewohner bewohner) {
 //        // Bewohner-Liste
@@ -741,7 +759,7 @@ public class FrmPflege extends javax.swing.JFrame {
     private JButton btnVerlegung;
     private JButton btnLogout;
     private JScrollPane jspBW;
-    private JXTaskPaneContainer taskBWContainer;
+    private JXTaskPaneContainer panelSearch;
     private JTabbedPane jtpPflegeakte;
     private JPanel pnlUeber;
     private JPanel pnlTB;

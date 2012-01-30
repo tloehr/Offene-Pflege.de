@@ -26,11 +26,10 @@
  */
 package op.care.berichte;
 
-import javax.persistence.EntityManager;
-import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.Sizes;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.files.SYSFilesTools;
@@ -40,18 +39,17 @@ import op.OPDE;
 import op.care.CleanablePanel;
 import op.care.FrmPflege;
 import op.tools.*;
-import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.JXTaskPane;
-import org.jdesktop.swingx.JXTaskPaneContainer;
-import org.jdesktop.swingx.JXTitledSeparator;
+import org.jdesktop.swingx.*;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import tablemodels.TMPflegeberichte;
 import tablerenderer.RNDHTML;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -89,7 +87,10 @@ public class PnlBerichte extends CleanablePanel {
 
     private int laufendeOperation;
     private double splitTEPercent, splitBCPercent;
-    private boolean searchAreaVisible, singleRowSelected;
+    private boolean singleRowSelected;
+
+    private JXTaskPaneContainer panelSearch;
+    private int positionToAddPanels;
 
     /**
      * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
@@ -99,7 +100,7 @@ public class PnlBerichte extends CleanablePanel {
 
     private JDateChooser jdcVon, jdcBis;
     private JXSearchField txtSearch;
-    private JXTaskPane panelTime, panelText, panelTags, panelSpecials;
+    private JXTaskPane panelTime, panelText, panelTags;
     private JCheckBox cbShowEdits, cbShowIDs;
 
     private Timeline textmessageTL, textUpperLabelTL, lblMessage2Timeline;
@@ -125,7 +126,7 @@ public class PnlBerichte extends CleanablePanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(FrmPflege pflege, Bewohner bewohner) {
+    public PnlBerichte(FrmPflege pflege, Bewohner bewohner, JXTaskPaneContainer panelSearch) {
         this.initPhase = true;
         this.parent = pflege;
         this.laufendeOperation = LAUFENDE_OPERATION_NICHTS;
@@ -138,6 +139,12 @@ public class PnlBerichte extends CleanablePanel {
 
         initComponents();
 
+        btnSystemInfo.setSelected(SYSPropsTools.isBoolean(internalClassID + ":btnSystemInfo"));
+
+        this.panelSearch = panelSearch;
+        this.panelSearch.add(new JXHeader("Berichte", "", new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
+        positionToAddPanels = this.panelSearch.getComponentCount();
+
         standardActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 reloadTable();
@@ -148,13 +155,10 @@ public class PnlBerichte extends CleanablePanel {
         prepareSearchArea();
 
         btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-
+        btnSystemInfo.setEnabled(true);
 
         splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
         splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
-
-        this.searchAreaVisible = SYSPropsTools.isBoolean(internalClassID + "::searchAreaVisible");
-        splitSearchEditComponentResized(null);
 
         this.initPhase = false;
 
@@ -165,10 +169,6 @@ public class PnlBerichte extends CleanablePanel {
 
     private void btnAddBerichtActionPerformed(ActionEvent e) {
         initPhase = true;
-
-        if (searchAreaVisible) {
-            toggleSearchArea(speedFast);
-        }
 
         Date now = new Date();
         laufendeOperation = LAUFENDE_OPERATION_BERICHT_EINGABE;
@@ -200,14 +200,7 @@ public class PnlBerichte extends CleanablePanel {
         initPhase = false;
         textmessageTL = SYSTools.flashLabel(lblMessage, "Neuen Bericht speichern ?");
         splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
-        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.4d, speedFast, new TimelineCallbackAdapter() {
-            @Override
-            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                if (newState == Timeline.TimelineState.DONE) {
-                    btnSearch.setEnabled(false);
-                }
-            }
-        });
+        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.4d, speedFast);
         txtBericht.requestFocus();
     }
 
@@ -217,7 +210,7 @@ public class PnlBerichte extends CleanablePanel {
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                 if (newState == Timeline.TimelineState.DONE) {
-                    btnSearch.setEnabled(true);
+//                    btnSearch.setEnabled(true);
                     btnAddBericht.setEnabled(true);
                 }
             }
@@ -366,44 +359,36 @@ public class PnlBerichte extends CleanablePanel {
         txtBericht.requestFocus();
     }
 
-    private void btnSearchActionPerformed(ActionEvent e) {
-        toggleSearchArea(speedSlow);
-    }
+//    private void btnSearchActionPerformed(ActionEvent e) {
+//        toggleSearchArea(speedSlow);
+//    }
 
-    private void toggleSearchArea(int speed) {
-        btnSearch.setEnabled(false);
-        if (searchAreaVisible) {
-            SYSTools.showSide(splitSearchEdit, SYSTools.RIGHT_LOWER_SIDE, speed, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-                    if (timelineState == Timeline.TimelineState.DONE) {
-                        btnSearch.setEnabled(true);
-                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2rightarrow.png")));
-                    }
-                }
-            });
-        } else {
-            SYSTools.showSide(splitSearchEdit, panelSearch.getPreferredSize().width, speedSlow, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-                    if (timelineState == Timeline.TimelineState.DONE) {
-                        btnSearch.setEnabled(true);
-                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2leftarrow.png")));
-                    }
-                }
-            });
-        }
-        searchAreaVisible = !searchAreaVisible;
-        SYSPropsTools.storeBoolean(internalClassID + "::searchAreaVisible", searchAreaVisible);
-    }
-
-    private void splitSearchEditComponentResized(ComponentEvent e) {
-        if (searchAreaVisible) {
-            SYSTools.showSide(splitSearchEdit, panelSearch.getPreferredSize().width);
-        } else {
-            SYSTools.showSide(splitSearchEdit, SYSTools.RIGHT_LOWER_SIDE);
-        }
-    }
+//    private void toggleSearchArea(int speed) {
+//        btnSearch.setEnabled(false);
+//        if (searchAreaVisible) {
+//            SYSTools.showSide(splitSearchEdit, SYSTools.RIGHT_LOWER_SIDE, speed, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+//                    if (timelineState == Timeline.TimelineState.DONE) {
+//                        btnSearch.setEnabled(true);
+//                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2rightarrow.png")));
+//                    }
+//                }
+//            });
+//        } else {
+//            SYSTools.showSide(splitSearchEdit, panelSearch.getPreferredSize().width, speedSlow, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+//                    if (timelineState == Timeline.TimelineState.DONE) {
+//                        btnSearch.setEnabled(true);
+//                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2leftarrow.png")));
+//                    }
+//                }
+//            });
+//        }
+//        searchAreaVisible = !searchAreaVisible;
+//        SYSPropsTools.storeBoolean(internalClassID + "::searchAreaVisible", searchAreaVisible);
+//    }
 
     private void tblTBMouseReleased(MouseEvent e) {
         ListSelectionModel lsm = tblTB.getSelectionModel();
@@ -412,13 +397,25 @@ public class PnlBerichte extends CleanablePanel {
         btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
     }
 
+    private void thisComponentResized(ComponentEvent e) {
+        splitButtonsCenterComponentResized(e);
+        splitTableEditorComponentResized(e);
+    }
+
+    private void btnSystemInfoItemStateChanged(ItemEvent e) {
+        if (initPhase){
+            return;
+        }
+        SYSPropsTools.storeBoolean(internalClassID + ":btnSystemInfo", btnSystemInfo.isSelected());
+        reloadTable();
+    }
+
     private void btnCancelActionPerformed(ActionEvent e) {
 
         TimelineCallbackAdapter standardCancelAdapter = new TimelineCallbackAdapter() {
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
                 if (newState == Timeline.TimelineState.DONE) {
-                    btnSearch.setEnabled(true);
                     btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
                 }
             }
@@ -453,9 +450,8 @@ public class PnlBerichte extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        splitSearchEdit = new JSplitPane();
-        panelSearch = new JScrollPane();
-        taskSearch = new JXTaskPaneContainer();
+        panel2 = new JPanel();
+        lblBW = new JLabel();
         pnlContent = new JPanel();
         splitTableEditor = new JSplitPane();
         jspTblTB = new JScrollPane();
@@ -472,11 +468,11 @@ public class PnlBerichte extends CleanablePanel {
         txtBericht = new JTextArea();
         splitButtonsCenter = new JSplitPane();
         pnlUpper = new JPanel();
-        btnSearch = new JButton();
         btnAddBericht = new JButton();
         btnDelete = new JButton();
         btnEdit = new JButton();
         btnPrint = new JButton();
+        btnSystemInfo = new JToggleButton();
         pnlLower = new JPanel();
         btnApply = new JButton();
         btnCancel = new JButton();
@@ -484,290 +480,284 @@ public class PnlBerichte extends CleanablePanel {
         hSpacer1 = new JPanel(null);
         lblMessage2 = new JLabel();
         hSpacer2 = new JPanel(null);
-        lblBW = new JLabel();
 
         //======== this ========
-        setLayout(new FormLayout(
-            "default:grow, 0dlu, $rgap",
-            "fill:default, $lgap, fill:default:grow, $lgap, 0dlu"));
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                thisComponentResized(e);
+            }
+        });
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        //======== splitSearchEdit ========
+        //======== panel2 ========
         {
-            splitSearchEdit.setDividerSize(0);
-            splitSearchEdit.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    splitSearchEditComponentResized(e);
-                }
-            });
+            panel2.setLayout(new HorizontalLayout());
 
-            //======== panelSearch ========
-            {
-                panelSearch.setViewportView(taskSearch);
-            }
-            splitSearchEdit.setLeftComponent(panelSearch);
-
-            //======== pnlContent ========
-            {
-                pnlContent.setLayout(new FormLayout(
-                    "pref:grow",
-                    "fill:default:grow, 20dlu"));
-
-                //======== splitTableEditor ========
-                {
-                    splitTableEditor.setDividerSize(0);
-                    splitTableEditor.setDividerLocation(600);
-                    splitTableEditor.addComponentListener(new ComponentAdapter() {
-                        @Override
-                        public void componentResized(ComponentEvent e) {
-                            splitTableEditorComponentResized(e);
-                        }
-                    });
-
-                    //======== jspTblTB ========
-                    {
-                        jspTblTB.addComponentListener(new ComponentAdapter() {
-                            @Override
-                            public void componentResized(ComponentEvent e) {
-                                jspTblTBComponentResized(e);
-                            }
-                        });
-
-                        //---- tblTB ----
-                        tblTB.setModel(new DefaultTableModel(
-                            new Object[][] {
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                            },
-                            new String[] {
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
-                        ));
-                        tblTB.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mousePressed(MouseEvent e) {
-                                tblTBMousePressed(e);
-                            }
-                            @Override
-                            public void mouseReleased(MouseEvent e) {
-                                tblTBMouseReleased(e);
-                            }
-                        });
-                        jspTblTB.setViewportView(tblTB);
-                    }
-                    splitTableEditor.setLeftComponent(jspTblTB);
-
-                    //======== panel1 ========
-                    {
-                        panel1.setLayout(new FormLayout(
-                            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
-                            "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
-
-                        //---- label1 ----
-                        label1.setText("Datum");
-                        panel1.add(label1, CC.xy(3, 3));
-
-                        //---- jdcDatum ----
-                        jdcDatum.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                        jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
-                            @Override
-                            public void propertyChange(PropertyChangeEvent e) {
-                                jdcDatumPropertyChange(e);
-                            }
-                        });
-                        panel1.add(jdcDatum, CC.xy(5, 3));
-                        panel1.add(pnlTags, CC.xywh(7, 3, 1, 7));
-
-                        //---- label2 ----
-                        label2.setText("Uhrzeit");
-                        panel1.add(label2, CC.xy(3, 5));
-
-                        //---- txtUhrzeit ----
-                        txtUhrzeit.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                        txtUhrzeit.addFocusListener(new FocusAdapter() {
-                            @Override
-                            public void focusLost(FocusEvent e) {
-                                txtUhrzeitFocusLost(e);
-                            }
-                        });
-                        txtUhrzeit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                txtUhrzeitActionPerformed(e);
-                            }
-                        });
-                        panel1.add(txtUhrzeit, CC.xy(5, 5));
-
-                        //---- label3 ----
-                        label3.setText("Dauer");
-                        panel1.add(label3, CC.xy(3, 7));
-
-                        //---- txtDauer ----
-                        txtDauer.setText("3");
-                        txtDauer.setToolTipText("Dauer in Minuten");
-                        txtDauer.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                        txtDauer.addFocusListener(new FocusAdapter() {
-                            @Override
-                            public void focusGained(FocusEvent e) {
-                                txtDauerFocusGained(e);
-                            }
-                            @Override
-                            public void focusLost(FocusEvent e) {
-                                txtDauerFocusLost(e);
-                            }
-                        });
-                        panel1.add(txtDauer, CC.xy(5, 7));
-
-                        //======== scrollPane1 ========
-                        {
-
-                            //---- txtBericht ----
-                            txtBericht.addCaretListener(new CaretListener() {
-                                @Override
-                                public void caretUpdate(CaretEvent e) {
-                                    txtBerichtCaretUpdate(e);
-                                }
-                            });
-                            scrollPane1.setViewportView(txtBericht);
-                        }
-                        panel1.add(scrollPane1, CC.xywh(3, 9, 3, 1, CC.FILL, CC.FILL));
-                    }
-                    splitTableEditor.setRightComponent(panel1);
-                }
-                pnlContent.add(splitTableEditor, CC.xy(1, 1));
-
-                //======== splitButtonsCenter ========
-                {
-                    splitButtonsCenter.setOrientation(JSplitPane.VERTICAL_SPLIT);
-                    splitButtonsCenter.setDividerSize(0);
-                    splitButtonsCenter.setDividerLocation(30);
-                    splitButtonsCenter.setBorder(null);
-                    splitButtonsCenter.addComponentListener(new ComponentAdapter() {
-                        @Override
-                        public void componentResized(ComponentEvent e) {
-                            splitButtonsCenterComponentResized(e);
-                        }
-                    });
-
-                    //======== pnlUpper ========
-                    {
-                        pnlUpper.setLayout(new BoxLayout(pnlUpper, BoxLayout.X_AXIS));
-
-                        //---- btnSearch ----
-                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2leftarrow.png")));
-                        btnSearch.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnSearchActionPerformed(e);
-                            }
-                        });
-                        pnlUpper.add(btnSearch);
-
-                        //---- btnAddBericht ----
-                        btnAddBericht.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
-                        btnAddBericht.setToolTipText("Neuen Bericht schreiben");
-                        btnAddBericht.setEnabled(false);
-                        btnAddBericht.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnAddBerichtActionPerformed(e);
-                            }
-                        });
-                        pnlUpper.add(btnAddBericht);
-
-                        //---- btnDelete ----
-                        btnDelete.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-                        btnDelete.setToolTipText("Vorgang abschlie\u00dfen");
-                        btnDelete.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_remove.png")));
-                        btnDelete.setEnabled(false);
-                        btnDelete.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnDeleteActionPerformed(e);
-                            }
-                        });
-                        pnlUpper.add(btnDelete);
-
-                        //---- btnEdit ----
-                        btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/graphic-design.png")));
-                        btnEdit.setToolTipText("Details anzeigen / \u00e4ndern");
-                        btnEdit.setEnabled(false);
-                        btnEdit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnEditActionPerformed(e);
-                            }
-                        });
-                        pnlUpper.add(btnEdit);
-
-                        //---- btnPrint ----
-                        btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer1.png")));
-                        btnPrint.setEnabled(false);
-                        btnPrint.setToolTipText("Berichte drucken");
-                        btnPrint.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnPrintActionPerformed(e);
-                            }
-                        });
-                        pnlUpper.add(btnPrint);
-                    }
-                    splitButtonsCenter.setTopComponent(pnlUpper);
-
-                    //======== pnlLower ========
-                    {
-                        pnlLower.setLayout(new BoxLayout(pnlLower, BoxLayout.X_AXIS));
-
-                        //---- btnApply ----
-                        btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                        btnApply.setToolTipText("\u00c4nderungen sichern");
-                        btnApply.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-                        btnApply.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnApplyActionPerformed(e);
-                            }
-                        });
-                        pnlLower.add(btnApply);
-
-                        //---- btnCancel ----
-                        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                        btnCancel.setToolTipText("\u00c4nderungen verwerfen");
-                        btnCancel.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnCancelActionPerformed(e);
-                            }
-                        });
-                        pnlLower.add(btnCancel);
-
-                        //---- lblMessage ----
-                        lblMessage.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                        lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
-                        lblMessage.setText(" ");
-                        pnlLower.add(lblMessage);
-                        pnlLower.add(hSpacer1);
-
-                        //---- lblMessage2 ----
-                        lblMessage2.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                        pnlLower.add(lblMessage2);
-                        pnlLower.add(hSpacer2);
-                    }
-                    splitButtonsCenter.setBottomComponent(pnlLower);
-                }
-                pnlContent.add(splitButtonsCenter, CC.xy(1, 2));
-            }
-            splitSearchEdit.setRightComponent(pnlContent);
+            //---- lblBW ----
+            lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
+            lblBW.setForeground(new Color(255, 51, 0));
+            lblBW.setText("jLabel3");
+            lblBW.setAlignmentX(0.5F);
+            panel2.add(lblBW);
         }
-        add(splitSearchEdit, CC.xy(1, 3));
+        add(panel2);
 
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("jLabel3");
-        add(lblBW, new CellConstraints(1, 1, 1, 1, CC.DEFAULT, CC.DEFAULT, new Insets(0, 5, 0, 0)));
+        //======== pnlContent ========
+        {
+            pnlContent.setLayout(new FormLayout(
+                "pref:grow",
+                "fill:default:grow, 20dlu"));
+
+            //======== splitTableEditor ========
+            {
+                splitTableEditor.setDividerSize(0);
+                splitTableEditor.setDividerLocation(600);
+                splitTableEditor.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        splitTableEditorComponentResized(e);
+                    }
+                });
+
+                //======== jspTblTB ========
+                {
+                    jspTblTB.addComponentListener(new ComponentAdapter() {
+                        @Override
+                        public void componentResized(ComponentEvent e) {
+                            jspTblTBComponentResized(e);
+                        }
+                    });
+
+                    //---- tblTB ----
+                    tblTB.setModel(new DefaultTableModel(
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
+                    ));
+                    tblTB.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            tblTBMousePressed(e);
+                        }
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            tblTBMouseReleased(e);
+                        }
+                    });
+                    jspTblTB.setViewportView(tblTB);
+                }
+                splitTableEditor.setLeftComponent(jspTblTB);
+
+                //======== panel1 ========
+                {
+                    panel1.setLayout(new FormLayout(
+                        "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
+                        "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
+
+                    //---- label1 ----
+                    label1.setText("Datum");
+                    panel1.add(label1, CC.xy(3, 3));
+
+                    //---- jdcDatum ----
+                    jdcDatum.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent e) {
+                            jdcDatumPropertyChange(e);
+                        }
+                    });
+                    panel1.add(jdcDatum, CC.xy(5, 3));
+                    panel1.add(pnlTags, CC.xywh(7, 3, 1, 7));
+
+                    //---- label2 ----
+                    label2.setText("Uhrzeit");
+                    panel1.add(label2, CC.xy(3, 5));
+
+                    //---- txtUhrzeit ----
+                    txtUhrzeit.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    txtUhrzeit.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtUhrzeitFocusLost(e);
+                        }
+                    });
+                    txtUhrzeit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtUhrzeitActionPerformed(e);
+                        }
+                    });
+                    panel1.add(txtUhrzeit, CC.xy(5, 5));
+
+                    //---- label3 ----
+                    label3.setText("Dauer");
+                    panel1.add(label3, CC.xy(3, 7));
+
+                    //---- txtDauer ----
+                    txtDauer.setText("3");
+                    txtDauer.setToolTipText("Dauer in Minuten");
+                    txtDauer.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    txtDauer.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            txtDauerFocusGained(e);
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDauerFocusLost(e);
+                        }
+                    });
+                    panel1.add(txtDauer, CC.xy(5, 7));
+
+                    //======== scrollPane1 ========
+                    {
+
+                        //---- txtBericht ----
+                        txtBericht.addCaretListener(new CaretListener() {
+                            @Override
+                            public void caretUpdate(CaretEvent e) {
+                                txtBerichtCaretUpdate(e);
+                            }
+                        });
+                        scrollPane1.setViewportView(txtBericht);
+                    }
+                    panel1.add(scrollPane1, CC.xywh(3, 9, 3, 1, CC.FILL, CC.FILL));
+                }
+                splitTableEditor.setRightComponent(panel1);
+            }
+            pnlContent.add(splitTableEditor, CC.xy(1, 1));
+
+            //======== splitButtonsCenter ========
+            {
+                splitButtonsCenter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+                splitButtonsCenter.setDividerSize(0);
+                splitButtonsCenter.setDividerLocation(30);
+                splitButtonsCenter.setBorder(null);
+                splitButtonsCenter.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        splitButtonsCenterComponentResized(e);
+                    }
+                });
+
+                //======== pnlUpper ========
+                {
+                    pnlUpper.setLayout(new BoxLayout(pnlUpper, BoxLayout.X_AXIS));
+
+                    //---- btnAddBericht ----
+                    btnAddBericht.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                    btnAddBericht.setToolTipText("Neuen Bericht schreiben");
+                    btnAddBericht.setEnabled(false);
+                    btnAddBericht.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnAddBerichtActionPerformed(e);
+                        }
+                    });
+                    pnlUpper.add(btnAddBericht);
+
+                    //---- btnDelete ----
+                    btnDelete.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                    btnDelete.setToolTipText("Bericht l\u00f6schen");
+                    btnDelete.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
+                    btnDelete.setEnabled(false);
+                    btnDelete.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnDeleteActionPerformed(e);
+                        }
+                    });
+                    pnlUpper.add(btnDelete);
+
+                    //---- btnEdit ----
+                    btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
+                    btnEdit.setToolTipText("Details anzeigen / \u00e4ndern");
+                    btnEdit.setEnabled(false);
+                    btnEdit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnEditActionPerformed(e);
+                        }
+                    });
+                    pnlUpper.add(btnEdit);
+
+                    //---- btnPrint ----
+                    btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
+                    btnPrint.setEnabled(false);
+                    btnPrint.setToolTipText("Berichte drucken");
+                    btnPrint.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnPrintActionPerformed(e);
+                        }
+                    });
+                    pnlUpper.add(btnPrint);
+
+                    //---- btnSystemInfo ----
+                    btnSystemInfo.setToolTipText("System Berichte anzeigen / verbergen");
+                    btnSystemInfo.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/idea.png")));
+                    btnSystemInfo.setEnabled(false);
+                    btnSystemInfo.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent e) {
+                            btnSystemInfoItemStateChanged(e);
+                        }
+                    });
+                    pnlUpper.add(btnSystemInfo);
+                }
+                splitButtonsCenter.setTopComponent(pnlUpper);
+
+                //======== pnlLower ========
+                {
+                    pnlLower.setLayout(new BoxLayout(pnlLower, BoxLayout.X_AXIS));
+
+                    //---- btnApply ----
+                    btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/apply.png")));
+                    btnApply.setToolTipText("\u00c4nderungen sichern");
+                    btnApply.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                    btnApply.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnApplyActionPerformed(e);
+                        }
+                    });
+                    pnlLower.add(btnApply);
+
+                    //---- btnCancel ----
+                    btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+                    btnCancel.setToolTipText("\u00c4nderungen verwerfen");
+                    btnCancel.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnCancelActionPerformed(e);
+                        }
+                    });
+                    pnlLower.add(btnCancel);
+
+                    //---- lblMessage ----
+                    lblMessage.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMessage.setText(" ");
+                    pnlLower.add(lblMessage);
+                    pnlLower.add(hSpacer1);
+
+                    //---- lblMessage2 ----
+                    lblMessage2.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                    pnlLower.add(lblMessage2);
+                    pnlLower.add(hSpacer2);
+                }
+                splitButtonsCenter.setBottomComponent(pnlLower);
+            }
+            pnlContent.add(splitButtonsCenter, CC.xy(1, 2));
+        }
+        add(pnlContent);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspTblTBComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspTblTBComponentResized
@@ -811,7 +801,7 @@ public class PnlBerichte extends CleanablePanel {
 //        lsl = null;
         jdcVon.cleanup();
         jdcBis.cleanup();
-        taskSearch.removeAll();
+        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
     }
 
     @Override
@@ -821,7 +811,10 @@ public class PnlBerichte extends CleanablePanel {
         }
 
         this.bewohner = bewohner;
+        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
+        prepareSearchArea();
         BewohnerTools.setBWLabel(lblBW, bewohner);
+        panelSearch.validate();
         reloadTable();
     }
 
@@ -921,7 +914,7 @@ public class PnlBerichte extends CleanablePanel {
         addByTime();
         addByTags();
         addBySearchText();
-        addSpecials();
+//        addSpecials();
     }
 
 
@@ -945,7 +938,7 @@ public class PnlBerichte extends CleanablePanel {
         }, new ArrayList<PBerichtTAGS>());
 
         panelTags.setCollapsed(true);
-        taskSearch.add((JPanel) panelTags);
+        panelSearch.add((JPanel) panelTags);
 
         panelTags.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -961,6 +954,7 @@ public class PnlBerichte extends CleanablePanel {
     private void addBySearchText() {
         panelText = new JXTaskPane("nach Suchbegriff");
         txtSearch = new JXSearchField("Suchbegriff");
+        txtSearch.setInstantSearchDelay(500);
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -970,7 +964,7 @@ public class PnlBerichte extends CleanablePanel {
 
         panelText.add(txtSearch);
         panelText.setCollapsed(true);
-        taskSearch.add((JPanel) panelText);
+        panelSearch.add((JPanel) panelText);
 
         panelText.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -1062,7 +1056,7 @@ public class PnlBerichte extends CleanablePanel {
             }
         });
 
-        taskSearch.add((JPanel) panelTime);
+        panelSearch.add((JPanel) panelTime);
 
         panelTime.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -1074,35 +1068,35 @@ public class PnlBerichte extends CleanablePanel {
         });
     }
 
-    private void addSpecials() {
-        panelSpecials = new JXTaskPane("Sonstiges");
-
-        cbShowEdits = new JCheckBox("Änderungen anzeigen");
-        cbShowEdits.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
-                reloadTable();
-            }
-        });
-        cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
-        cbShowIDs.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
-                reloadTable();
-            }
-        });
-
-        panelSpecials.add(cbShowEdits);
-        panelSpecials.add(cbShowIDs);
-        panelSpecials.setCollapsed(false);
-        taskSearch.add((JPanel) panelSpecials);
-
-        SYSPropsTools.restoreState(internalClassID + ":cbShowEdits", cbShowEdits);
-        SYSPropsTools.restoreState(internalClassID + ":cbShowIDs", cbShowIDs);
-
-    }
+//    private void addSpecials() {
+//        panelSpecials = new JXTaskPane("Sonstiges");
+//
+//        cbShowEdits = new JCheckBox("Änderungen anzeigen");
+//        cbShowEdits.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                SYSPropsTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
+//                reloadTable();
+//            }
+//        });
+//        cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
+//        cbShowIDs.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                SYSPropsTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
+//                reloadTable();
+//            }
+//        });
+//
+//        panelSpecials.add(cbShowEdits);
+//        panelSpecials.add(cbShowIDs);
+//        panelSpecials.setCollapsed(false);
+//        panelSearch.add((JPanel) panelSpecials);
+//
+//        SYSPropsTools.restoreState(internalClassID + ":cbShowEdits", cbShowEdits);
+//        SYSPropsTools.restoreState(internalClassID + ":cbShowIDs", cbShowIDs);
+//
+//    }
 
     private void reloadTable() {
         if (initPhase) {
@@ -1118,7 +1112,6 @@ public class PnlBerichte extends CleanablePanel {
         if (laufendeOperation != LAUFENDE_OPERATION_NICHTS) {
             btnCancel.doClick();
         }
-
 
 
         String tags = "";
@@ -1146,7 +1139,7 @@ public class PnlBerichte extends CleanablePanel {
                 + " AND p.pit >= :von AND p.pit <= :bis "
                 + (search.isEmpty() ? "" : " AND p.text like :search ")
                 + (tags.isEmpty() ? "" : " AND t.pbtagid IN (" + tags + " ) ")
-                + (cbShowEdits.isSelected() ? "" : " AND p.editedBy is null ")
+                + (btnSystemInfo.isSelected() ? "" : " AND p.editedBy is null ")
                 + " ORDER BY p.pit DESC ");
         query.setParameter("bewohner", bewohner);
         query.setParameter("von", new Date(SYSCalendar.startOfDay(von)));
@@ -1159,7 +1152,7 @@ public class PnlBerichte extends CleanablePanel {
         ArrayList<Pflegeberichte> listBerichte = new ArrayList<Pflegeberichte>(query.getResultList());
         em.close();
 
-        tblTB.setModel(new TMPflegeberichte(listBerichte, cbShowIDs.isSelected()));
+        tblTB.setModel(new TMPflegeberichte(listBerichte, btnSystemInfo.isSelected()));
 
 
         //OPDE.debug("tl: "+tl.getState());
@@ -1186,9 +1179,8 @@ public class PnlBerichte extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JSplitPane splitSearchEdit;
-    private JScrollPane panelSearch;
-    private JXTaskPaneContainer taskSearch;
+    private JPanel panel2;
+    private JLabel lblBW;
     private JPanel pnlContent;
     private JSplitPane splitTableEditor;
     private JScrollPane jspTblTB;
@@ -1205,11 +1197,11 @@ public class PnlBerichte extends CleanablePanel {
     private JTextArea txtBericht;
     private JSplitPane splitButtonsCenter;
     private JPanel pnlUpper;
-    private JButton btnSearch;
     private JButton btnAddBericht;
     private JButton btnDelete;
     private JButton btnEdit;
     private JButton btnPrint;
+    private JToggleButton btnSystemInfo;
     private JPanel pnlLower;
     private JButton btnApply;
     private JButton btnCancel;
@@ -1217,6 +1209,5 @@ public class PnlBerichte extends CleanablePanel {
     private JPanel hSpacer1;
     private JLabel lblMessage2;
     private JPanel hSpacer2;
-    private JLabel lblBW;
     // End of variables declaration//GEN-END:variables
 }

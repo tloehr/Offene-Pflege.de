@@ -90,7 +90,6 @@ public class DlgProdukt extends javax.swing.JDialog {
         btnOK = new JButton();
         cmbHersteller = new JComboBox();
         jLabel3 = new JLabel();
-        btnEditHersteller = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -133,11 +132,11 @@ public class DlgProdukt extends javax.swing.JDialog {
         });
 
         //---- cmbHersteller ----
-        cmbHersteller.setModel(new DefaultComboBoxModel(new String[]{
-                "Eintrag 1",
-                "Eintrag 2",
-                "Eintrag 3",
-                "Eintrag 4"
+        cmbHersteller.setModel(new DefaultComboBoxModel(new String[] {
+            "Eintrag 1",
+            "Eintrag 2",
+            "Eintrag 3",
+            "Eintrag 4"
         }));
         cmbHersteller.addItemListener(new ItemListener() {
             @Override
@@ -149,70 +148,52 @@ public class DlgProdukt extends javax.swing.JDialog {
         //---- jLabel3 ----
         jLabel3.setText("Hersteller:");
 
-        //---- btnEditHersteller ----
-        btnEditHersteller.setBackground(Color.white);
-        btnEditHersteller.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/edit.png")));
-        btnEditHersteller.setToolTipText("Neuen Hersteller eingeben.");
-        btnEditHersteller.setBorderPainted(false);
-        btnEditHersteller.setOpaque(false);
-        btnEditHersteller.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnEditHerstellerActionPerformed(e);
-            }
-        });
-
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-                                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel))
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addGroup(contentPaneLayout.createParallelGroup()
-                                                        .addComponent(jLabel2)
-                                                        .addComponent(jLabel3))
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(contentPaneLayout.createParallelGroup()
-                                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                                                .addComponent(cmbHersteller, 0, 360, Short.MAX_VALUE)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(btnEditHersteller, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(txtBezeichnung, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))))
-                                .addContainerGap())
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
+                                .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
+                                .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
+                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                        .addComponent(btnOK)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnCancel))
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                        .addGroup(contentPaneLayout.createParallelGroup()
+                                                .addComponent(jLabel2)
+                                                .addComponent(jLabel3))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(contentPaneLayout.createParallelGroup()
+                                                .addComponent(cmbHersteller, 0, 377, Short.MAX_VALUE)
+                                                .addComponent(txtBezeichnung, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE))))
+                        .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(txtBezeichnung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(jLabel3)
-                                                .addComponent(cmbHersteller, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(btnEditHersteller))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                                .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOK))
-                                .addContainerGap())
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel2)
+                                .addComponent(txtBezeichnung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel3)
+                                .addComponent(cmbHersteller, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnCancel)
+                                .addComponent(btnOK))
+                        .addContainerGap())
         );
         setSize(490, 220);
         setLocationRelativeTo(null);
@@ -221,17 +202,6 @@ public class DlgProdukt extends javax.swing.JDialog {
     private void cmbHerstellerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbHerstellerItemStateChanged
         btnOK.setEnabled(!txtBezeichnung.getText().equals("") && cmbHersteller.getSelectedIndex() > 0);
     }//GEN-LAST:event_cmbHerstellerItemStateChanged
-
-    private void btnEditHerstellerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditHerstellerActionPerformed
-        MedHersteller hersteller = null;
-        new DlgMedHersteller(this, hersteller);
-        OPDE.debug(hersteller);
-        produkt.setHersteller(hersteller);
-        cmbHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{produkt.getHersteller()}));
-//        ResultSet rs1 = op.tools.DBRetrieve.getResultSet("MPHersteller", new String[]{"MPHID", "Firma", "Ort"}, new String[]{"Firma", "Ort"});
-        //cmbHersteller.setModel(SYSTools.rs2cmb(rs1, true));
-
-    }//GEN-LAST:event_btnEditHerstellerActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
@@ -249,7 +219,12 @@ public class DlgProdukt extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnOKActionPerformed
 
+    public MedProdukte getProdukt() {
+        return produkt;
+    }
+
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        produkt = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
@@ -268,7 +243,6 @@ public class DlgProdukt extends javax.swing.JDialog {
     private JButton btnOK;
     private JComboBox cmbHersteller;
     private JLabel jLabel3;
-    private JButton btnEditHersteller;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }
