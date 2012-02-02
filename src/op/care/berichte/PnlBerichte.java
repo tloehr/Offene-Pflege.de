@@ -27,9 +27,7 @@
 package op.care.berichte;
 
 import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.Sizes;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.files.SYSFilesTools;
@@ -96,7 +94,7 @@ public class PnlBerichte extends CleanablePanel {
      * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
      * Bericht ausgewählt wurde, steht hier immer der Verweis auf den ERSTEN Bericht der Auswahl.
      */
-    private Pflegeberichte aktuellerBericht, editBericht;
+    private Pflegeberichte aktuellerBericht, oldBericht;
 
     private JDateChooser jdcVon, jdcBis;
     private JXSearchField txtSearch;
@@ -132,7 +130,7 @@ public class PnlBerichte extends CleanablePanel {
         this.laufendeOperation = LAUFENDE_OPERATION_NICHTS;
         this.textmessageTL = null;
         this.aktuellerBericht = null;
-        this.editBericht = null;
+        this.oldBericht = null;
         this.dauerChanged = false;
         this.singleRowSelected = false;
 
@@ -233,8 +231,8 @@ public class PnlBerichte extends CleanablePanel {
                         lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
                     }
                 } else {
-                    success = PflegeberichteTools.changeBericht(aktuellerBericht, editBericht);
-                    editBericht = null;
+                    success = PflegeberichteTools.changeBericht(oldBericht, aktuellerBericht);
+                    oldBericht = null;
                     splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
                 }
                 break;
@@ -320,7 +318,10 @@ public class PnlBerichte extends CleanablePanel {
     }
 
     private void btnDeleteActionPerformed(ActionEvent e) {
-
+        // Darf ich das ?
+        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE))){
+            return;
+        }
         laufendeOperation = LAUFENDE_OPERATION_BERICHT_LOESCHEN;
 
         textmessageTL = SYSTools.flashLabel(lblMessage, "Bericht löschen ?");
@@ -328,10 +329,16 @@ public class PnlBerichte extends CleanablePanel {
     }
 
     private void btnEditActionPerformed(ActionEvent e) {
+        // Darf ich das ?
+        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE))) {
+            return;
+        }
+
         initPhase = true;
         Date now = new Date();
         laufendeOperation = LAUFENDE_OPERATION_BERICHT_BEARBEITEN;
-        editBericht = PflegeberichteTools.copyBericht(aktuellerBericht);
+        oldBericht = aktuellerBericht;
+        aktuellerBericht = PflegeberichteTools.copyBericht(aktuellerBericht);
 
         pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
             @Override
@@ -339,18 +346,18 @@ public class PnlBerichte extends CleanablePanel {
                 JCheckBox cb = (JCheckBox) e.getSource();
                 PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    editBericht.getTags().remove(tag);
+                    aktuellerBericht.getTags().remove(tag);
                 } else {
-                    editBericht.getTags().add(tag);
+                    aktuellerBericht.getTags().add(tag);
                 }
             }
-        }, editBericht.getTags(), new GridLayout(0, 1)));
+        }, aktuellerBericht.getTags(), new GridLayout(0, 1)));
 
         DateFormat df = DateFormat.getTimeInstance();
-        jdcDatum.setDate(editBericht.getPit());
+        jdcDatum.setDate(aktuellerBericht.getPit());
         jdcDatum.setMaxSelectableDate(now);
-        txtUhrzeit.setText(df.format(editBericht.getPit()));
-        txtBericht.setText(editBericht.getText());
+        txtUhrzeit.setText(df.format(aktuellerBericht.getPit()));
+        txtBericht.setText(aktuellerBericht.getText());
 
         initPhase = false;
         textmessageTL = SYSTools.flashLabel(lblMessage, "Geänderten Bericht speichern ?");
@@ -393,8 +400,8 @@ public class PnlBerichte extends CleanablePanel {
     private void tblTBMouseReleased(MouseEvent e) {
         ListSelectionModel lsm = tblTB.getSelectionModel();
         singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+//        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+
     }
 
     private void thisComponentResized(ComponentEvent e) {
@@ -403,7 +410,7 @@ public class PnlBerichte extends CleanablePanel {
     }
 
     private void btnSystemInfoItemStateChanged(ItemEvent e) {
-        if (initPhase){
+        if (initPhase) {
             return;
         }
         SYSPropsTools.storeBoolean(internalClassID + ":btnSystemInfo", btnSystemInfo.isSelected());
@@ -435,7 +442,8 @@ public class PnlBerichte extends CleanablePanel {
 
             }
         }
-        editBericht = null;
+        aktuellerBericht = null;
+        oldBericht = null;
         lblMessage.setText(null);
         textmessageTL.cancel();
         splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
@@ -654,7 +662,6 @@ public class PnlBerichte extends CleanablePanel {
                     //---- btnAddBericht ----
                     btnAddBericht.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
                     btnAddBericht.setToolTipText("Neuen Bericht schreiben");
-                    btnAddBericht.setEnabled(false);
                     btnAddBericht.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -667,7 +674,6 @@ public class PnlBerichte extends CleanablePanel {
                     btnDelete.setFont(new Font("Lucida Grande", Font.BOLD, 14));
                     btnDelete.setToolTipText("Bericht l\u00f6schen");
                     btnDelete.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-                    btnDelete.setEnabled(false);
                     btnDelete.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -679,7 +685,6 @@ public class PnlBerichte extends CleanablePanel {
                     //---- btnEdit ----
                     btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
                     btnEdit.setToolTipText("Details anzeigen / \u00e4ndern");
-                    btnEdit.setEnabled(false);
                     btnEdit.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -690,7 +695,6 @@ public class PnlBerichte extends CleanablePanel {
 
                     //---- btnPrint ----
                     btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
-                    btnPrint.setEnabled(false);
                     btnPrint.setToolTipText("Berichte drucken");
                     btnPrint.addActionListener(new ActionListener() {
                         @Override
@@ -703,7 +707,6 @@ public class PnlBerichte extends CleanablePanel {
                     //---- btnSystemInfo ----
                     btnSystemInfo.setToolTipText("System Berichte anzeigen / verbergen");
                     btnSystemInfo.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/idea.png")));
-                    btnSystemInfo.setEnabled(false);
                     btnSystemInfo.addItemListener(new ItemListener() {
                         @Override
                         public void itemStateChanged(ItemEvent e) {
@@ -862,8 +865,8 @@ public class PnlBerichte extends CleanablePanel {
             btnCancel.doClick();
         }
 
-        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+//        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+//        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
         if (evt.isPopupTrigger()) {
             /**

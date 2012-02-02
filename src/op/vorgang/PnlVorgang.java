@@ -1029,8 +1029,8 @@ public class PnlVorgang extends CleanablePanel {
             }
         });
         setLayout(new FormLayout(
-                "$rgap, 0dlu, 136dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
-                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
+            "$rgap, 0dlu, 136dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
 
         //======== scrollPane2 ========
         {
@@ -1082,15 +1082,15 @@ public class PnlVorgang extends CleanablePanel {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ));
                     tblElements.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                     tblElements.addMouseListener(new MouseAdapter() {
@@ -1120,8 +1120,8 @@ public class PnlVorgang extends CleanablePanel {
                 //======== pnlDetails ========
                 {
                     pnlDetails.setLayout(new FormLayout(
-                            "0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 0dlu",
-                            "0dlu, 9*($lgap, fill:default)"));
+                        "0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 0dlu",
+                        "0dlu, 9*($lgap, fill:default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");

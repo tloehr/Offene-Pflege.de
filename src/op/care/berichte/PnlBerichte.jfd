@@ -659,10 +659,6 @@
                <string>toolTipText</string> 
                <string>Neuen Bericht schreiben</string> 
               </void> 
-              <void method="setProperty"> 
-               <string>enabled</string> 
-               <boolean>false</boolean> 
-              </void> 
               <void property="name"> 
                <string>btnAddBericht</string> 
               </void> 
@@ -698,10 +694,6 @@
                 <string>/artwork/22x22/bw/trashcan_empty.png</string> 
                </object> 
               </void> 
-              <void method="setProperty"> 
-               <string>enabled</string> 
-               <boolean>false</boolean> 
-              </void> 
               <void property="name"> 
                <string>btnDelete</string> 
               </void> 
@@ -729,10 +721,6 @@
                <string>toolTipText</string> 
                <string>Details anzeigen / ändern</string> 
               </void> 
-              <void method="setProperty"> 
-               <string>enabled</string> 
-               <boolean>false</boolean> 
-              </void> 
               <void property="name"> 
                <string>btnEdit</string> 
               </void> 
@@ -755,10 +743,6 @@
                 <int>0</int> 
                 <string>/artwork/22x22/bw/printer.png</string> 
                </object> 
-              </void> 
-              <void method="setProperty"> 
-               <string>enabled</string> 
-               <boolean>false</boolean> 
               </void> 
               <void method="setProperty"> 
                <string>toolTipText</string> 
@@ -790,10 +774,6 @@
                 <int>0</int> 
                 <string>/artwork/22x22/bw/idea.png</string> 
                </object> 
-              </void> 
-              <void method="setProperty"> 
-               <string>enabled</string> 
-               <boolean>false</boolean> 
               </void> 
               <void property="name"> 
                <string>btnSystemInfo</string> 

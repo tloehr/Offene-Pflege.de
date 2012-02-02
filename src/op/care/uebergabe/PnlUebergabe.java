@@ -26,6 +26,12 @@
  */
 package op.care.uebergabe;
 
+import java.awt.event.*;
+import java.beans.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.system.SYSLoginTools;
@@ -37,6 +43,7 @@ import op.tools.HTMLTools;
 import op.tools.InternalClassACL;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
@@ -106,243 +113,267 @@ public class PnlUebergabe extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnNew = new JButton();
+        btnConfirmAll = new JButton();
+        btnLogout = new JButton();
+        lblFrage = new JLabel();
+        jspUebergabe = new JScrollPane();
+        tblUebergabe = new JTable();
+        pnlFilter = new JTabbedPane();
+        jPanel4 = new JPanel();
+        jLabel2 = new JLabel();
+        btnToday = new JButton();
+        btnBack = new JButton();
+        btnLastLogin = new JButton();
+        cmbEinrichtung = new JComboBox();
+        jdcDatum = new JDateChooser();
+        jPanel5 = new JPanel();
+        txtSuche1 = new JTextField();
+        btnSearch = new JButton();
 
-        bgSuche = new javax.swing.ButtonGroup();
-        bgSortierung = new javax.swing.ButtonGroup();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnNew = new javax.swing.JButton();
-        btnConfirmAll = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        lblFrage = new javax.swing.JLabel();
-        jspUebergabe = new javax.swing.JScrollPane();
-        tblUebergabe = new javax.swing.JTable();
-        pnlFilter = new javax.swing.JTabbedPane();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        btnToday = new javax.swing.JButton();
-        btnBack = new javax.swing.JButton();
-        btnLastLogin = new javax.swing.JButton();
-        cmbEinrichtung = new javax.swing.JComboBox();
-        jdcDatum = new com.toedter.calendar.JDateChooser();
-        jPanel5 = new javax.swing.JPanel();
-        txtSuche1 = new javax.swing.JTextField();
-        btnSearch = new javax.swing.JButton();
+        //======== this ========
+        setLayout(new FormLayout(
+            "default:grow",
+            "3*(fill:default, $lgap), fill:default"));
 
-        jToolBar1.setFloatable(false);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filenew.png"))); // NOI18N
-        btnNew.setText("Neue Eingabe");
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnNew);
-
-        btnConfirmAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply-all.png"))); // NOI18N
-        btnConfirmAll.setText("Alle Bestätigen");
-        btnConfirmAll.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConfirmAllActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnConfirmAll);
-
-        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/lock.png"))); // NOI18N
-        btnLogout.setText("Abmelden");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnLogout);
-
-        lblFrage.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblFrage.setText("Übergabeprotokoll");
-
-        jspUebergabe.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspUebergabeComponentResized(evt);
-            }
-        });
-
-        tblUebergabe.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+            //---- btnNew ----
+            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
+            btnNew.setText("Neue Eingabe");
+            btnNew.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNewActionPerformed(e);
                 }
-        ));
-        tblUebergabe.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tblUebergabeMousePressed(evt);
-            }
-        });
-        tblUebergabe.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                tblUebergabePropertyChange(evt);
-            }
-        });
-        jspUebergabe.setViewportView(tblUebergabe);
+            });
+            jToolBar1.add(btnNew);
 
-        pnlFilter.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                pnlFilterStateChanged(evt);
-            }
-        });
+            //---- btnConfirmAll ----
+            btnConfirmAll.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply-all.png")));
+            btnConfirmAll.setText("Alle Best\u00e4tigen");
+            btnConfirmAll.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnConfirmAllActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnConfirmAll);
 
-        jLabel2.setText("Berichte anzeigen vom:");
+            //---- btnLogout ----
+            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
+            btnLogout.setText("Abmelden");
+            btnLogout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnLogoutActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnLogout);
+        }
+        add(jToolBar1, CC.xy(1, 1));
 
-        btnToday.setText("Heute");
-        btnToday.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnTodayActionPerformed(evt);
-            }
-        });
+        //---- lblFrage ----
+        lblFrage.setFont(new Font("Dialog", Font.BOLD, 18));
+        lblFrage.setText("\u00dcbergabeprotokoll");
+        add(lblFrage, CC.xy(1, 3));
 
-        btnBack.setText("einen Tag zurück");
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
-            }
-        });
+        //======== jspUebergabe ========
+        {
+            jspUebergabe.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    jspUebergabeComponentResized(e);
+                }
+            });
 
-        btnLastLogin.setText("letzte Abmeldung");
-        btnLastLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLastLoginActionPerformed(evt);
-            }
-        });
+            //---- tblUebergabe ----
+            tblUebergabe.setModel(new DefaultTableModel(
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
+            ));
+            tblUebergabe.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    tblUebergabeMousePressed(e);
+                }
+            });
+            tblUebergabe.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    tblUebergabePropertyChange(e);
+                }
+            });
+            jspUebergabe.setViewportView(tblUebergabe);
+        }
+        add(jspUebergabe, CC.xy(1, 7));
 
-        cmbEinrichtung.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbEinrichtung.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbEinrichtungItemStateChanged(evt);
-            }
-        });
+        //======== pnlFilter ========
+        {
+            pnlFilter.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    pnlFilterStateChanged(e);
+                }
+            });
 
-        jdcDatum.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jdcDatumPropertyChange(evt);
-            }
-        });
+            //======== jPanel4 ========
+            {
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                //---- jLabel2 ----
+                jLabel2.setText("Berichte anzeigen vom:");
+
+                //---- btnToday ----
+                btnToday.setText("Heute");
+                btnToday.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnTodayActionPerformed(e);
+                    }
+                });
+
+                //---- btnBack ----
+                btnBack.setText("einen Tag zur\u00fcck");
+                btnBack.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnBackActionPerformed(e);
+                    }
+                });
+
+                //---- btnLastLogin ----
+                btnLastLogin.setText("letzte Abmeldung");
+                btnLastLogin.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnLastLoginActionPerformed(e);
+                    }
+                });
+
+                //---- cmbEinrichtung ----
+                cmbEinrichtung.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbEinrichtung.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbEinrichtungItemStateChanged(e);
+                    }
+                });
+
+                //---- jdcDatum ----
+                jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent e) {
+                        jdcDatumPropertyChange(e);
+                    }
+                });
+
+                GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
+                jPanel4.setLayout(jPanel4Layout);
+                jPanel4Layout.setHorizontalGroup(
+                    jPanel4Layout.createParallelGroup()
                         .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jdcDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnBack)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLastLogin)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnToday)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbEinrichtung, 0, 137, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-        jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                                        .addComponent(jdcDatum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel4Layout.createSequentialGroup()
-                                                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(2, 2, 2))
-                                        .addGroup(jPanel4Layout.createSequentialGroup()
-                                                .addComponent(btnLastLogin)
-                                                .addGap(1, 1, 1))
-                                        .addComponent(btnToday, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel4Layout.createSequentialGroup()
-                                                .addComponent(cmbEinrichtung, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(3, 3, 3)))
-                                .addGap(62, 62, 62))
-        );
-
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{cmbEinrichtung, jdcDatum});
-
-        pnlFilter.addTab("Zeiraum", jPanel4);
-
-        txtSuche1.setFont(new java.awt.Font("Lucida Grande", 0, 18));
-        txtSuche1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSuche1ActionPerformed(evt);
+                            .addContainerGap()
+                            .addComponent(jLabel2)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnBack)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnLastLogin)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnToday)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cmbEinrichtung, 0, 0, Short.MAX_VALUE)
+                            .addContainerGap())
+                );
+                jPanel4Layout.setVerticalGroup(
+                    jPanel4Layout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel4Layout.createParallelGroup()
+                                .addComponent(jLabel2, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                                .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                    .addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+                                    .addGap(2, 2, 2))
+                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                    .addComponent(btnLastLogin)
+                                    .addGap(1, 1, 1))
+                                .addComponent(btnToday, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                    .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addGap(3, 3, 3)))
+                            .addGap(62, 62, 62))
+                );
+                jPanel4Layout.linkSize(SwingConstants.VERTICAL, new Component[] {cmbEinrichtung, jdcDatum});
             }
-        });
+            pnlFilter.addTab("Zeiraum", jPanel4);
 
-        btnSearch.setText("Los gehts");
-        btnSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchActionPerformed(evt);
-            }
-        });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(txtSuche1, javax.swing.GroupLayout.DEFAULT_SIZE, 752, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnSearch)
-                                .addContainerGap())
-        );
-        jPanel5Layout.setVerticalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            //======== jPanel5 ========
+            {
+
+                //---- txtSuche1 ----
+                txtSuche1.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+                txtSuche1.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtSuche1ActionPerformed(e);
+                    }
+                });
+
+                //---- btnSearch ----
+                btnSearch.setText("Los gehts");
+                btnSearch.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnSearchActionPerformed(e);
+                    }
+                });
+
+                GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
+                jPanel5.setLayout(jPanel5Layout);
+                jPanel5Layout.setHorizontalGroup(
+                    jPanel5Layout.createParallelGroup()
+                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(txtSuche1, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnSearch)
+                            .addContainerGap())
+                );
+                jPanel5Layout.setVerticalGroup(
+                    jPanel5Layout.createParallelGroup()
                         .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                                .addComponent(txtSuche1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                                                .addGap(3, 3, 3))
-                                        .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                            .addContainerGap()
+                            .addGroup(jPanel5Layout.createParallelGroup()
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(txtSuche1, GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                                    .addGap(3, 3, 3))
+                                .addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE))
+                            .addContainerGap(52, Short.MAX_VALUE))
+                );
+                jPanel5Layout.linkSize(SwingConstants.VERTICAL, new Component[] {btnSearch, txtSuche1});
+            }
+            pnlFilter.addTab("Suchbegriff", jPanel5);
 
-        jPanel5Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{btnSearch, txtSuche1});
-
-        pnlFilter.addTab("Suchbegriff", jPanel5);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 964, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblFrage, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jspUebergabe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
-                                        .addComponent(pnlFilter, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblFrage)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(pnlFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspUebergabe, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+        }
+        add(pnlFilter, CC.xy(1, 5));
     }// </editor-fold>//GEN-END:initComponents
 
     private void tblUebergabePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tblUebergabePropertyChange
@@ -459,12 +490,12 @@ public class PnlUebergabe extends CleanablePanel {
         tcm1.getColumn(TMUebergabe.COL_PIT).setPreferredWidth(200);
         tcm1.getColumn(TMUebergabe.COL_INFO).setPreferredWidth(200);
         tcm1.getColumn(TMUebergabe.COL_HTML).setPreferredWidth(textWidth);
-        tcm1.getColumn(TMUebergabe.COL_ACKN).setPreferredWidth(50);
+//        tcm1.getColumn(TMUebergabe.COL_ACKN).setPreferredWidth(50);
 
         tcm1.getColumn(TMUebergabe.COL_PIT).setHeaderValue("Datum");
         tcm1.getColumn(TMUebergabe.COL_INFO).setHeaderValue("Info");
         tcm1.getColumn(TMUebergabe.COL_HTML).setHeaderValue("Bericht");
-        tcm1.getColumn(TMUebergabe.COL_ACKN).setHeaderValue("Gesehen");
+//        tcm1.getColumn(TMUebergabe.COL_ACKN).setHeaderValue("Gesehen");
 
     }//GEN-LAST:event_jspUebergabeComponentResized
 
@@ -619,34 +650,33 @@ public class PnlUebergabe extends CleanablePanel {
 
         jspUebergabe.dispatchEvent(new ComponentEvent(jspUebergabe, ComponentEvent.COMPONENT_RESIZED));
 
-        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_PIT).setCellRenderer(new RNDUbergabe());
-        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_INFO).setCellRenderer(new RNDUbergabe());
-        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_HTML).setCellRenderer(new RNDUbergabe());
-        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_ACKN).setCellRenderer(new RNDUbergabe());
+        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_PIT).setCellRenderer(new RNDHTML());
+
+        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_INFO).setCellRenderer(new RNDHTML());
+        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_HTML).setCellRenderer(new RNDHTML());
+//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_ACKN).setCellRenderer(new RNDUbergabe());
 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgSortierung;
-    private javax.swing.ButtonGroup bgSuche;
-    private javax.swing.JButton btnBack;
-    private javax.swing.JButton btnConfirmAll;
-    private javax.swing.JButton btnLastLogin;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnNew;
-    private javax.swing.JButton btnSearch;
-    private javax.swing.JButton btnToday;
-    private javax.swing.JComboBox cmbEinrichtung;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JToolBar jToolBar1;
-    private com.toedter.calendar.JDateChooser jdcDatum;
-    private javax.swing.JScrollPane jspUebergabe;
-    private javax.swing.JLabel lblFrage;
-    private javax.swing.JTabbedPane pnlFilter;
-    private javax.swing.JTable tblUebergabe;
-    private javax.swing.JTextField txtSuche1;
+    private JToolBar jToolBar1;
+    private JButton btnNew;
+    private JButton btnConfirmAll;
+    private JButton btnLogout;
+    private JLabel lblFrage;
+    private JScrollPane jspUebergabe;
+    private JTable tblUebergabe;
+    private JTabbedPane pnlFilter;
+    private JPanel jPanel4;
+    private JLabel jLabel2;
+    private JButton btnToday;
+    private JButton btnBack;
+    private JButton btnLastLogin;
+    private JComboBox cmbEinrichtung;
+    private JDateChooser jdcDatum;
+    private JPanel jPanel5;
+    private JTextField txtSuche1;
+    private JButton btnSearch;
     // End of variables declaration//GEN-END:variables
 
     class HandleSelections implements ListSelectionListener {

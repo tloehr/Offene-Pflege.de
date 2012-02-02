@@ -36,7 +36,6 @@ public class PflegeberichteTools {
      * @return
      */
     public static boolean deleteBericht(Pflegeberichte bericht) {
-        grmpf;
         boolean success = false;
         EntityManager em = OPDE.createEM();
         em.getTransaction().begin();

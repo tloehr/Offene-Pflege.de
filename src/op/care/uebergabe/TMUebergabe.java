@@ -32,6 +32,7 @@ import op.tools.SYSCalendar;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,10 +53,14 @@ public class TMUebergabe
     public static final int LIST_BERICHT = 0;
     public static final int LIST_ACKNOWLEDGED = 1;
 
-    protected ArrayList berichte;
+    private ArrayList berichte;
+//    private ImageIcon iconOK, iconQuestion;
 
     public TMUebergabe(Date datum, Einrichtungen einrichtung) {
         super();
+
+//        iconOK = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
+
         EntityManager em = OPDE.createEM();
         Query queryUB = em.createNamedQuery("Uebergabebuch.findByEinrichtungAndDatumAndAckUser");
         queryUB.setParameter(1, OPDE.getLogin().getUser().getUKennung());
@@ -84,7 +89,7 @@ public class TMUebergabe
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 3;
     }
 
     public ArrayList getBerichte() {
@@ -118,11 +123,17 @@ public class TMUebergabe
                     break;
                 }
                 case COL_HTML: {
-                    result = UebergabebuchTools.getAsHTML((Uebergabebuch) bericht[LIST_BERICHT]);
+                    if (((Long) bericht[LIST_ACKNOWLEDGED]).longValue() == 0){
+                        result = "<font color=\"red\"><b>?</b> ";
+                    } else {
+                        result = "<font color=\"green\"><b>OK</b> ";
+                    }
+
+                    result = result + UebergabebuchTools.getAsHTML((Uebergabebuch) bericht[LIST_BERICHT]) + "</font>";
                     break;
                 }
                 case COL_ACKN: { // Vom aktuellen User bereits gesehen ?
-                    result = ((Long) bericht[LIST_ACKNOWLEDGED]).longValue() > 0;
+                    result = ((Long) bericht[LIST_ACKNOWLEDGED]).longValue() == 0;
                     break;
                 }
                 default: {
@@ -141,11 +152,18 @@ public class TMUebergabe
                     break;
                 }
                 case COL_HTML: {
-                    result = PflegeberichteTools.getAsHTML((Pflegeberichte) bericht[LIST_BERICHT]);
+                    if (((Long) bericht[LIST_ACKNOWLEDGED]).longValue() == 0){
+                                           result = "<font color=\"red\"><b>?</b> ";
+                                       } else {
+                                           result = "<font color=\"green\"><b>OK</b> ";
+                                       }
+
+                    result = result + PflegeberichteTools.getAsHTML((Pflegeberichte) bericht[LIST_BERICHT]) + "</font>";
+//                    result = ;
                     break;
                 }
                 case COL_ACKN: { // Vom aktuellen User bereits gesehen ?
-                    result = ((Long) bericht[LIST_ACKNOWLEDGED]).longValue() > 0;
+                    result = ((Long) bericht[LIST_ACKNOWLEDGED]).longValue() == 0;
                     break;
                 }
                 default: {
