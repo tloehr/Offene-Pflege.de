@@ -26,11 +26,8 @@
  */
 package op.tools;
 
-import entity.Bewohner;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.share.bwinfo.BWInfo;
-import op.share.bwinfo.TMBWInfo;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
@@ -62,7 +59,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
-import java.util.zip.DeflaterOutputStream;
 
 public class SYSTools {
 
@@ -259,128 +255,128 @@ public class SYSTools {
         }
     }
 
-    public static void setBWLabel(JLabel bwlabel, Bewohner bewohner) {
-        setBWLabel(bwlabel, bewohner.getBWKennung());
-    }
+//    public static void setBWLabel(JLabel bwlabel, Bewohner bewohner) {
+//        setBWLabel(bwlabel, bewohner.getBWKennung());
+//    }
 
-    public static void setBWLabel(JLabel bwlabel, String currentBW) {
-        HashMap bw = DBHandling.getBW(currentBW);
-        String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
-        result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
-
-        // Diese bwinfo5 ist für die besonderheiten bzgl. Vitalwerten. Da steht was über Allergien usw. drin.
-        BWInfo bwinfo5 = new BWInfo(currentBW, SYSCalendar.today_date(), BWInfo.ART_ALLES, 8, false);
-
-        String tooltipvorab = "";
-        // ======================== Besonderheiten =======================
-        boolean besonderheiten = false;
-        if (bwinfo5.getAttribute().size() > 0) {
-            ArrayList attribs = bwinfo5.getAttribute();
-            TMBWInfo tmbwi5 = new TMBWInfo(bwinfo5.getAttribute(), true, false, false);
-            for (int i = 0; i < attribs.size(); i++) {
-                besonderheiten = true;
-                tooltipvorab += "<li>";
-                tooltipvorab += SYSTools.unHTML2(tmbwi5.getValueAt(i, TMBWInfo.COL_HTML).toString());
-                tooltipvorab += "</li>";
-            }
-        }
-
-        if (besonderheiten) {
-            result += " <font color=\"blue\">&#9679;</font> ";
-        }
-        if (DBRetrieve.getAbwesendSeit(currentBW) != null) {
-            result += " &rarr; ";
-        }
-        if (op.share.vorgang.DBHandling.hatVorgang(currentBW)) {
-            result += " <font color=\"red\">&#9679;</font> ";
-        }
-        if (bwinfo5.isVerstorben()) {
-            result += " <font color=\"black\">&dagger;</font> ";
-        }
-        if (bwinfo5.isAusgezogen()) {
-            result += " &darr; ";
-        }
-
-
-        String tooltip = "<ul>";
-
-        bwlabel.setText(SYSTools.toHTML(result));
-
-        // =============== BVs ==============================
-        ArrayList bwa1 = DBRetrieve.getLetztesBWAttribut(currentBW, "BV1");
-        ArrayList bwa2 = DBRetrieve.getLetztesBWAttribut(currentBW, "BV2");
-        if (bwa1 != null || bwa2 != null) {
-            if (bwa1 != null && (bwa1.get(0).toString().equalsIgnoreCase("<unbeantwortet value=\"true\"/>") || ((Date) bwa1.get(2)).before(SYSCalendar.nowDBDate()))) {
-                bwa1 = null;
-            }
-            if (bwa2 != null && (bwa2.get(0).toString().equalsIgnoreCase("<unbeantwortet value=\"true\"/>") || ((Date) bwa2.get(2)).before(SYSCalendar.nowDBDate()))) {
-                bwa2 = null;
-            }
-            if (bwa1 != null) {
-                // Etwas unorthodox mit dem Tokenizer einen XML Schnipsel zu zerschneiden. Geht aber. ;-)
-                StringTokenizer st = new StringTokenizer(bwa1.get(0).toString(), "\"");
-                st.nextToken();
-                String pk = st.nextToken();
-                HashMap hm = DBRetrieve.getSingleRecord("OCUsers", new String[]{"Nachname", "Vorname"}, "UKennung", pk);
-                tooltip += "<li>BV1: " + hm.get("Nachname") + ", " + hm.get("Vorname") + "</li>";
-            }
-            if (bwa2 != null) {
-                // Etwas unorthodox mit dem Tokenizer einen XML Schnipsel zu zerschneiden. Geht aber. ;-)
-                StringTokenizer st = new StringTokenizer(bwa2.get(0).toString(), "\"");
-                st.nextToken();
-                String pk = st.nextToken();
-                HashMap hm = DBRetrieve.getSingleRecord("OCUsers", new String[]{"Nachname", "Vorname"}, "UKennung", pk);
-                tooltip += "<li>BV2: " + hm.get("Nachname") + ", " + hm.get("Vorname") + "</li>";
-            }
-
-        } else {
-            tooltip += "<li><i>kein BV zugeordnet</i></li>";
-        }
-
-        BWInfo bwinfo1 = new BWInfo(currentBW, "HAUSARZT", SYSCalendar.nowDBDate());
-        BWInfo bwinfo2 = new BWInfo(currentBW, "FACHARZT", SYSCalendar.nowDBDate());
-        BWInfo bwinfo3 = new BWInfo(currentBW, "BETREUER1", SYSCalendar.nowDBDate());
-        BWInfo bwinfo4 = new BWInfo(currentBW, "ANGEH", SYSCalendar.nowDBDate());
-
-        tooltip += tooltipvorab;
-
-        // ======================== Ärzte =======================
-        if (bwinfo1.getAttribute().size() > 0) {
-            TMBWInfo tmbwi1 = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
-            tooltip += "<li>";
-            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi1.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-            tooltip += "</li>";
-        }
-
-        if (bwinfo2.getAttribute().size() > 0) {
-            TMBWInfo tmbwi2 = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
-            tooltip += "<li>";
-            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi2.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-            tooltip += "</li>";
-        }
-
-        // ======================= Betreuer ======================
-        if (bwinfo3.getAttribute().size() > 0) {
-            TMBWInfo tmbwi3 = new TMBWInfo(bwinfo3.getAttribute(), true, false, false);
-            tooltip += "<li>";
-            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi3.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-            tooltip += "</li>";
-        }
-
-        // ======================= Angehörige =====================
-        if (bwinfo4.getAttribute().size() > 0) {
-            TMBWInfo tmbwi4 = new TMBWInfo(bwinfo4.getAttribute(), true, false, false);
-            tooltip += "<li>";
-            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi4.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-            tooltip += "</li>";
-        }
-
-        bwlabel.setToolTipText(SYSTools.toHTML(tooltip + "</ul>"));
-        bwinfo1.cleanup();
-        bwinfo2.cleanup();
-        bwinfo3.cleanup();
-        bwinfo4.cleanup();
-    }
+//    public static void setBWLabel(JLabel bwlabel, String currentBW) {
+//        HashMap bw = DBHandling.getBW(currentBW);
+//        String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
+//        result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
+//
+//        // Diese bwinfo5 ist für die besonderheiten bzgl. Vitalwerten. Da steht was über Allergien usw. drin.
+//        BWInfo bwinfo5 = new BWInfo(currentBW, SYSCalendar.today_date(), BWInfo.ART_ALLES, 8, false);
+//
+//        String tooltipvorab = "";
+//        // ======================== Besonderheiten =======================
+//        boolean besonderheiten = false;
+//        if (bwinfo5.getAttribute().size() > 0) {
+//            ArrayList attribs = bwinfo5.getAttribute();
+//            TMBWInfo tmbwi5 = new TMBWInfo(bwinfo5.getAttribute(), true, false, false);
+//            for (int i = 0; i < attribs.size(); i++) {
+//                besonderheiten = true;
+//                tooltipvorab += "<li>";
+//                tooltipvorab += SYSTools.unHTML2(tmbwi5.getValueAt(i, TMBWInfo.COL_HTML).toString());
+//                tooltipvorab += "</li>";
+//            }
+//        }
+//
+//        if (besonderheiten) {
+//            result += " <font color=\"blue\">&#9679;</font> ";
+//        }
+//        if (DBRetrieve.getAbwesendSeit(currentBW) != null) {
+//            result += " &rarr; ";
+//        }
+//        if (op.share.vorgang.DBHandling.hatVorgang(currentBW)) {
+//            result += " <font color=\"red\">&#9679;</font> ";
+//        }
+//        if (bwinfo5.isVerstorben()) {
+//            result += " <font color=\"black\">&dagger;</font> ";
+//        }
+//        if (bwinfo5.isAusgezogen()) {
+//            result += " &darr; ";
+//        }
+//
+//
+//        String tooltip = "<ul>";
+//
+//        bwlabel.setText(SYSTools.toHTML(result));
+//
+//        // =============== BVs ==============================
+//        ArrayList bwa1 = DBRetrieve.getLetztesBWAttribut(currentBW, "BV1");
+//        ArrayList bwa2 = DBRetrieve.getLetztesBWAttribut(currentBW, "BV2");
+//        if (bwa1 != null || bwa2 != null) {
+//            if (bwa1 != null && (bwa1.get(0).toString().equalsIgnoreCase("<unbeantwortet value=\"true\"/>") || ((Date) bwa1.get(2)).before(SYSCalendar.nowDBDate()))) {
+//                bwa1 = null;
+//            }
+//            if (bwa2 != null && (bwa2.get(0).toString().equalsIgnoreCase("<unbeantwortet value=\"true\"/>") || ((Date) bwa2.get(2)).before(SYSCalendar.nowDBDate()))) {
+//                bwa2 = null;
+//            }
+//            if (bwa1 != null) {
+//                // Etwas unorthodox mit dem Tokenizer einen XML Schnipsel zu zerschneiden. Geht aber. ;-)
+//                StringTokenizer st = new StringTokenizer(bwa1.get(0).toString(), "\"");
+//                st.nextToken();
+//                String pk = st.nextToken();
+//                HashMap hm = DBRetrieve.getSingleRecord("OCUsers", new String[]{"Nachname", "Vorname"}, "UKennung", pk);
+//                tooltip += "<li>BV1: " + hm.get("Nachname") + ", " + hm.get("Vorname") + "</li>";
+//            }
+//            if (bwa2 != null) {
+//                // Etwas unorthodox mit dem Tokenizer einen XML Schnipsel zu zerschneiden. Geht aber. ;-)
+//                StringTokenizer st = new StringTokenizer(bwa2.get(0).toString(), "\"");
+//                st.nextToken();
+//                String pk = st.nextToken();
+//                HashMap hm = DBRetrieve.getSingleRecord("OCUsers", new String[]{"Nachname", "Vorname"}, "UKennung", pk);
+//                tooltip += "<li>BV2: " + hm.get("Nachname") + ", " + hm.get("Vorname") + "</li>";
+//            }
+//
+//        } else {
+//            tooltip += "<li><i>kein BV zugeordnet</i></li>";
+//        }
+//
+//        BWInfo bwinfo1 = new BWInfo(currentBW, "HAUSARZT", SYSCalendar.nowDBDate());
+//        BWInfo bwinfo2 = new BWInfo(currentBW, "FACHARZT", SYSCalendar.nowDBDate());
+//        BWInfo bwinfo3 = new BWInfo(currentBW, "BETREUER1", SYSCalendar.nowDBDate());
+//        BWInfo bwinfo4 = new BWInfo(currentBW, "ANGEH", SYSCalendar.nowDBDate());
+//
+//        tooltip += tooltipvorab;
+//
+//        // ======================== Ärzte =======================
+//        if (bwinfo1.getAttribute().size() > 0) {
+//            TMBWInfo tmbwi1 = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
+//            tooltip += "<li>";
+//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi1.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+//            tooltip += "</li>";
+//        }
+//
+//        if (bwinfo2.getAttribute().size() > 0) {
+//            TMBWInfo tmbwi2 = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
+//            tooltip += "<li>";
+//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi2.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+//            tooltip += "</li>";
+//        }
+//
+//        // ======================= Betreuer ======================
+//        if (bwinfo3.getAttribute().size() > 0) {
+//            TMBWInfo tmbwi3 = new TMBWInfo(bwinfo3.getAttribute(), true, false, false);
+//            tooltip += "<li>";
+//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi3.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+//            tooltip += "</li>";
+//        }
+//
+//        // ======================= Angehörige =====================
+//        if (bwinfo4.getAttribute().size() > 0) {
+//            TMBWInfo tmbwi4 = new TMBWInfo(bwinfo4.getAttribute(), true, false, false);
+//            tooltip += "<li>";
+//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi4.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+//            tooltip += "</li>";
+//        }
+//
+//        bwlabel.setToolTipText(SYSTools.toHTML(tooltip + "</ul>"));
+//        bwinfo1.cleanup();
+//        bwinfo2.cleanup();
+//        bwinfo3.cleanup();
+//        bwinfo4.cleanup();
+//    }
 
     //    public static String anonymizeUser(String ukennung) {
 //        String result = ukennung;
@@ -1679,7 +1675,7 @@ public class SYSTools {
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
                 if (timelineState1 == Timeline.TimelineState.DONE) {
-                    lbl1.setText("");
+                    lbl1.setText(null);
                     lbl1.setForeground(foreground);
                     lbl1.setIcon(null);
                 }
@@ -1695,13 +1691,37 @@ public class SYSTools {
 
     public static void fadein(JLabel lbl, String text) {
         final JLabel lbl1 = lbl;
-        final Color foreground = Color.black;
-        lbl1.setForeground(lbl1.getBackground());
-        lbl1.setText(text);
-        Timeline timeline1 = new Timeline(lbl1);
-        timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
-        timeline1.setDuration(500);
-        timeline1.play();
+        final String text1 = text;
+        final Color foreground = lbl1.getForeground();
+        final Color background = lbl1.getBackground();
+
+        if (!SYSTools.catchNull(lbl.getText()).isEmpty()) {
+            Timeline timeline1 = new Timeline(lbl1);
+            timeline1.addPropertyToInterpolate("foreground", foreground, background);
+            timeline1.setDuration(500);
+            timeline1.addCallback(new TimelineCallbackAdapter() {
+                @Override
+                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+                    if (timelineState1 == Timeline.TimelineState.DONE) {
+                        lbl1.setIcon(null);
+                        lbl1.setForeground(background);
+                        lbl1.setText(text1);
+                        Timeline timeline2 = new Timeline(lbl1);
+                        timeline2.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
+                        timeline2.setDuration(700);
+                        timeline2.play();
+                    }
+                }
+            });
+            timeline1.play();
+        } else {
+            lbl1.setForeground(background);
+            lbl1.setText(text);
+            Timeline timeline1 = new Timeline(lbl1);
+            timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
+            timeline1.setDuration(700);
+            timeline1.play();
+        }
     }
 
     public static Timeline flashLabel(JLabel lbl1, String text) {
@@ -1970,10 +1990,10 @@ public class SYSTools {
     }
 
 
-    public static void removeSearchPanels(JPanel panelSearch, int positionToAddPanels){
-        if (panelSearch.getComponentCount() > positionToAddPanels){
+    public static void removeSearchPanels(JPanel panelSearch, int positionToAddPanels) {
+        if (panelSearch.getComponentCount() > positionToAddPanels) {
             int count = panelSearch.getComponentCount();
-            for (int i = count-1; i >= positionToAddPanels; i--){
+            for (int i = count - 1; i >= positionToAddPanels; i--) {
                 panelSearch.remove(positionToAddPanels);
             }
         }

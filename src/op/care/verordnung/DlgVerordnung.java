@@ -802,7 +802,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
     public void initDialog() {
         initComponents();
         prepareTMPData();
-        SYSTools.setBWLabel(lblBW, verordnung.getBewohner());
+
+        BewohnerTools.setBWLabel(lblBW, verordnung.getBewohner());
         setTitle(SYSTools.getWindowTitle("Ärztliche Verordnungen, Detailansicht"));
         fillAerzteUndKHs();
 

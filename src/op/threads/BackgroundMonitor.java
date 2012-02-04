@@ -47,7 +47,7 @@ public class BackgroundMonitor extends Thread {
     //long loginid;
     boolean interrupted;
 
-    int zyklen = 0;
+    long zyklen = 0;
 
 
     public BackgroundMonitor() {

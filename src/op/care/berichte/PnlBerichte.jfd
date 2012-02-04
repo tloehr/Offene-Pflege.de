@@ -31,50 +31,6 @@
        <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JPanel</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>org.jdesktop.swingx.HorizontalLayout</class> 
-        </object> 
-        <void property="name"> 
-         <string>panel2</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Dialog</string> 
-            <int>1</int> 
-            <int>18</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>foreground</string> 
-           <object class="java.awt.Color"> 
-            <int>255</int> 
-            <int>51</int> 
-            <int>0</int> 
-            <int>255</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>jLabel3</string> 
-          </void> 
-          <void method="setProperty"> 
-           <string>alignmentX</string> 
-           <float>0.5</float> 
-          </void> 
-          <void property="name"> 
-           <string>lblBW</string> 
-          </void> 
-         </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 

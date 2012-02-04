@@ -26,6 +26,8 @@
  */
 package op.bw.admin;
 
+import com.sun.xml.internal.bind.v2.TODO;
+import entity.vorgang.VorgaengeTools;
 import op.OPDE;
 import op.tools.*;
 
@@ -302,8 +304,11 @@ public class DlgBWOut extends javax.swing.JDialog {
         }
         rs.close();
 
-        op.share.vorgang.DBHandling.endAllVorgaenge(bwkennung);
+        //TODO: das hier muss wieder rein
+//        VorgaengeTools.endVorgang();
+//        op.share.vorgang.DBHandling.endAllVorgaenge(bwkennung);
 
+        // Das hier war draussen
 //        String sql4 = "UPDATE BWInfo SET Bis=?, AbUKennung=?, XML=REPLACE(XML, '<abwe value=\"normal\"/>', '<abwe value=\"gegangen\"/>')" +
 //                " WHERE BWKennung=? AND BWINFTYP='abwe' AND Bis='9999-12-31 23:59:59'";
 //        PreparedStatement stmt4 = OPDE.getDb().db.prepareStatement(sql4);

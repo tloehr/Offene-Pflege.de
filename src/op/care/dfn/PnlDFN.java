@@ -60,7 +60,7 @@ public class PnlDFN extends CleanablePanel {
     String bwkennung;
     Bewohner bewohner;
     JPopupMenu menu;
-    private FrmPflege parent;
+    private JFrame parent;
     //private String classname;
     private OCSec ocs;
     private boolean ignoreJDCEvent;
@@ -71,7 +71,7 @@ public class PnlDFN extends CleanablePanel {
     /**
      * Creates new form PnlDFN
      */
-    public PnlDFN(FrmPflege parent, Bewohner bewohner) {
+    public PnlDFN(JFrame parent, Bewohner bewohner) {
         this.parent = parent;
         ocs = OPDE.getOCSec();
         initComponents();

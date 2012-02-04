@@ -83,7 +83,7 @@ public class PnlVitalwerte extends CleanablePanel {
     public boolean editMode = false;
     public boolean newMode = false;
     private boolean[] filter = {false, false, false, false, false, false, false, false, false, false, false, false};
-    private FrmPflege parent;
+    private JFrame parent;
     private FocusAdapter fa;
     private boolean initPhase;
     private JPopupMenu menu;
@@ -94,7 +94,7 @@ public class PnlVitalwerte extends CleanablePanel {
     /**
      * Creates new form pnlVitalwerte
      */
-    public PnlVitalwerte(FrmPflege parent, Bewohner bewohner) {
+    public PnlVitalwerte(JFrame parent, Bewohner bewohner) {
         initPhase = true;
 
         this.parent = parent;

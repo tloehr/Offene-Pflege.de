@@ -33,39 +33,22 @@ import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
 import op.OPDE;
-import op.care.berichte.PnlBerichte;
-import op.care.bhp.PnlBHP;
-import op.care.dfn.PnlDFN;
-import op.care.planung.PnlPlanung;
-import op.care.schichtleitung.PnlSchichtleitung;
-import op.care.sysfiles.PnlFiles;
-import op.care.uebergabe.PnlUebergabe;
-import op.care.verordnung.PnlVerordnung;
-import op.care.vital.PnlVitalwerte;
 import op.threads.HeapStat;
-import op.tools.InternalClassACL;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
-import op.vorgang.PnlVorgang;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.jdesktop.swingx.VerticalLayout;
+import org.jdesktop.swingx.border.DropShadowBorder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -73,37 +56,18 @@ import java.util.Iterator;
  */
 public class FrmPflege extends javax.swing.JFrame {
 
-    public static final String internalClassID = "nursingrecords.main";
-    public static final int MAINTAB_UEBERSICHT = 0;
-    public static final int UE_UEBERGABE = 0;
-    public static final int UE_SCHICHTLEITUNG = 1;
-    public static final int MAINTAB_BW = 1;
-    public static final int TAB_UEBERSICHT = 0;
-    public static final int TAB_PB = 1;
-    public static final int TAB_DFN = 2;
-    public static final int TAB_BHP = 3;
-    public static final int TAB_VITAL = 4;
-    public static final int TAB_VERORDNUNG = 5;
-    public static final int TAB_INFO = 6;
-    public static final int TAB_PPLANUNG = 7;
-    public static final int TAB_VORGANG = 8;
-    public static final int TAB_FILES = 9;
-    public static final int SOZ_BERICHTE = 0;
-    public static final int SOZ_NY = 1;
-    //private String currentBW = "";
-    private Bewohner currentBewohner = null;
-    public String currentTBDatum;
-    public String currentTBUhrzeit;
-    public String currentTBText;
-    public long currentAnamID;
-    public HashMap hmC;
-    public HashMap fragen;
-    public HashMap dfnplanung;
+    public static final String internaalClassID = "opde.mainframe";
+
 
     private boolean initPhase;
     private HeapStat hs;
-    public JLabel bwlabel;
+    private JPanel currentVisiblePanel;
+    private Bewohner currentBewohner;
+    private JFrame thisFrame;
+
     private int positionToAddPanels;
+
+    private java.util.List<JXTaskPane> bewohnerPanes, programPanes, currentAdditionalSearchPanes;
 
     /**
      * Creates new form FrmPflege
@@ -115,8 +79,10 @@ public class FrmPflege extends javax.swing.JFrame {
     public FrmPflege() {
         initPhase = true;
         initComponents();
-        bwlabel = null;
         positionToAddPanels = 0;
+        currentVisiblePanel = null;
+        currentBewohner = null;
+        thisFrame = this;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
         this.setVisible(true);
 
@@ -127,39 +93,39 @@ public class FrmPflege extends javax.swing.JFrame {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        //lblServer.setText(OPDE.getUrl());
-        //lblUser.setText("Benutzer: " + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()));
+//        btnVerlegung = new JButton("Verlegung");
+//        btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
+//        btnVerlegung.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                if (currentBewohner != null) {
+//                    SYSPrint.print(thisFrame, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+//                }
+//            }
+//        });
 
         createBewohnerListe();
 
-        hs = new HeapStat(pbHeap);
+        hs = new HeapStat(pbMsg, lblMainMsg, lblSubMsg);
         hs.start();
 
-
-        jtpMain.setSelectedIndex(MAINTAB_BW);
-        jtpPflegeakte.setSelectedIndex(TAB_UEBERSICHT);
-
-        // Zugriffe
-        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlBerichte.internalClassID, InternalClassACL.EXECUTE));
-        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
-
         btnLogout.setText("<html>" + OPDE.getLogin().getUser().getNameUndVorname() + "<br/>Abmelden</html>");
-
 
         JLabel lbl = new JLabel("Bitte wählen Sie eine(n) BewohnerIn aus.");
         lbl.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/agt_back.png")));
         lbl.setFont(new java.awt.Font("Lucida Grande", 1, 42));
         lbl.setHorizontalAlignment(SwingConstants.CENTER);
         lbl.setForeground(Color.blue);
-        JPanel pnl = new JPanel();
-        pnl.setLayout(new BorderLayout());
-        pnl.add(lbl, BorderLayout.CENTER);
+        currentVisiblePanel = new JPanel();
+        currentVisiblePanel.setLayout(new BorderLayout());
+        currentVisiblePanel.add(lbl, BorderLayout.CENTER);
+        scrollMain.setViewportView(currentVisiblePanel);
 
-        jtpPflegeakte.setComponentAt(jtpPflegeakte.getSelectedIndex(), pnl);
-        for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
-            jtpPflegeakte.setEnabledAt(i, false);
-        }
-
+//        jtpPflegeakte.setComponentAt(jtpPflegeakte.getSelectedIndex(), pnl);
+//        for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
+//            jtpPflegeakte.setEnabledAt(i, false);
+//        }
+//
         initPhase = false;
 
     }
@@ -172,337 +138,113 @@ public class FrmPflege extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jtpMain = new JTabbedPane();
-        jtpUebersicht = new JTabbedPane();
-        pnlUebergabe = new JPanel();
-        pnlSchichtleitung = new JPanel();
-        pnlPflegeakte = new JPanel();
-        pnlBW = new JPanel();
         btnVerlegung = new JButton();
+        pnlMain = new JPanel();
+        pnlMainMessage = new JPanel();
+        lblMainMsg = new JLabel();
+        lblSubMsg = new JLabel();
+        pbMsg = new JProgressBar();
+        pnlTopRight = new JPanel();
         btnLogout = new JButton();
-        jspBW = new JScrollPane();
+        jspSearch = new JScrollPane();
         panelSearch = new JXTaskPaneContainer();
-        jtpPflegeakte = new JTabbedPane();
-        pnlUeber = new JPanel();
-        pnlTB = new JPanel();
-        pnlDFN = new JPanel();
-        pnlBHP = new JPanel();
-        pnlVitalDummy = new JPanel();
-        pnlVer = new JPanel();
-        pnlInfo = new JPanel();
-        pnlPPlanung = new JPanel();
-        pnlVorgang = new JPanel();
-        pnlFiles = new JPanel();
-        pbHeap = new JProgressBar();
+        scrollMain = new JScrollPane();
+
+        //---- btnVerlegung ----
+        btnVerlegung.setText("Verlegung");
+        btnVerlegung.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+        btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/infored.png")));
+        btnVerlegung.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnVerlegungActionPerformed(e);
+            }
+        });
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Offene-Pflege.de");
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-            "default:grow",
-            "fill:default:grow"));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-        //======== jtpMain ========
+        //======== pnlMain ========
         {
-            jtpMain.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    jtpMainStateChanged(e);
-                }
-            });
+            pnlMain.setLayout(new FormLayout(
+                    "$rgap, $lcgap, default, $lcgap, left:default:grow, $ugap, default, $lcgap, $rgap",
+                    "$rgap, default, $rgap, default:grow, $lgap, $rgap"));
 
-            //======== jtpUebersicht ========
+            //======== pnlMainMessage ========
             {
-                jtpUebersicht.setTabPlacement(SwingConstants.BOTTOM);
-                jtpUebersicht.addChangeListener(new ChangeListener() {
+                pnlMainMessage.setBackground(new Color(234, 237, 223));
+                pnlMainMessage.setBorder(new DropShadowBorder(Color.black, 5, 0.3f, 12, true, true, true, true));
+                pnlMainMessage.setLayout(new FormLayout(
+                        "default, $lcgap, default:grow, $lcgap, default",
+                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
+
+                //---- lblMainMsg ----
+                lblMainMsg.setText("Main Message Line for Main Text");
+                lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
+                lblMainMsg.setForeground(new Color(105, 80, 69));
+                lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
+                pnlMainMessage.add(lblMainMsg, CC.xy(3, 3));
+
+                //---- lblSubMsg ----
+                lblSubMsg.setText("Main Message Line for Main Text");
+                lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblSubMsg.setForeground(new Color(105, 80, 69));
+                lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
+                pnlMainMessage.add(lblSubMsg, CC.xy(3, 5));
+
+                //---- pbMsg ----
+                pbMsg.setValue(50);
+                pnlMainMessage.add(pbMsg, CC.xy(3, 7, CC.FILL, CC.DEFAULT));
+            }
+            pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 3, 1));
+
+            //======== pnlTopRight ========
+            {
+                pnlTopRight.setLayout(new VerticalLayout());
+
+                //---- btnLogout ----
+                btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/gpg.png")));
+                btnLogout.setText("<html>L\u00f6hr, Torsten<br/>Abmelden</html>");
+                btnLogout.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+                btnLogout.addActionListener(new ActionListener() {
                     @Override
-                    public void stateChanged(ChangeEvent e) {
-                        jtpUebersichtStateChanged(e);
+                    public void actionPerformed(ActionEvent e) {
+                        btnLogoutHandler(e);
                     }
                 });
-
-                //======== pnlUebergabe ========
-                {
-                    pnlUebergabe.setLayout(new BoxLayout(pnlUebergabe, BoxLayout.X_AXIS));
-                }
-                jtpUebersicht.addTab("\u00dcbergabe", pnlUebergabe);
-
-
-                //======== pnlSchichtleitung ========
-                {
-
-                    GroupLayout pnlSchichtleitungLayout = new GroupLayout(pnlSchichtleitung);
-                    pnlSchichtleitung.setLayout(pnlSchichtleitungLayout);
-                    pnlSchichtleitungLayout.setHorizontalGroup(
-                        pnlSchichtleitungLayout.createParallelGroup()
-                            .addGap(0, 849, Short.MAX_VALUE)
-                    );
-                    pnlSchichtleitungLayout.setVerticalGroup(
-                        pnlSchichtleitungLayout.createParallelGroup()
-                            .addGap(0, 541, Short.MAX_VALUE)
-                    );
-                }
-                jtpUebersicht.addTab("Schichtleitung", pnlSchichtleitung);
-
+                pnlTopRight.add(btnLogout);
             }
-            jtpMain.addTab("\u00dcbersicht", jtpUebersicht);
+            pnlMain.add(pnlTopRight, CC.xy(7, 2));
 
-
-            //======== pnlPflegeakte ========
+            //======== jspSearch ========
             {
-                pnlPflegeakte.setLayout(new FormLayout(
-                    "pref, $lcgap, default:grow",
-                    "default:grow, $lgap, default"));
-
-                //======== pnlBW ========
-                {
-                    pnlBW.setLayout(new FormLayout(
-                        "default:grow",
-                        "fill:default, $rgap, default, $lgap, default:grow"));
-
-                    //---- btnVerlegung ----
-                    btnVerlegung.setForeground(new Color(255, 51, 0));
-                    btnVerlegung.setText("Verlegungsbericht");
-                    btnVerlegung.setToolTipText("");
-                    btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
-                    btnVerlegung.setFont(new Font("Lucida Grande", Font.BOLD, 13));
-                    btnVerlegung.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnVerlegungActionPerformed(e);
-                        }
-                    });
-                    pnlBW.add(btnVerlegung, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
-
-                    //---- btnLogout ----
-                    btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/gpg.png")));
-                    btnLogout.setText("<html>L\u00f6hr, Torsten<br/>Abmelden</html>");
-                    btnLogout.setFont(new Font("Lucida Grande", Font.BOLD, 13));
-                    btnLogout.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnLogoutHandler(e);
-                        }
-                    });
-                    pnlBW.add(btnLogout, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
-
-                    //======== jspBW ========
-                    {
-                        jspBW.addComponentListener(new ComponentAdapter() {
-                            @Override
-                            public void componentResized(ComponentEvent e) {
-                                jspBWComponentResized(e);
-                            }
-                        });
-                        jspBW.setViewportView(panelSearch);
+                jspSearch.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspBWComponentResized(e);
                     }
-                    pnlBW.add(jspBW, CC.xy(1, 5, CC.FILL, CC.FILL));
-                }
-                pnlPflegeakte.add(pnlBW, CC.xy(1, 1, CC.FILL, CC.FILL));
-
-                //======== jtpPflegeakte ========
-                {
-                    jtpPflegeakte.setTabPlacement(SwingConstants.BOTTOM);
-                    jtpPflegeakte.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            jtpPflegeakteStateChanged(e);
-                        }
-                    });
-
-                    //======== pnlUeber ========
-                    {
-
-                        GroupLayout pnlUeberLayout = new GroupLayout(pnlUeber);
-                        pnlUeber.setLayout(pnlUeberLayout);
-                        pnlUeberLayout.setHorizontalGroup(
-                            pnlUeberLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlUeberLayout.setVerticalGroup(
-                            pnlUeberLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("\u00dcbersicht", pnlUeber);
-
-
-                    //======== pnlTB ========
-                    {
-
-                        GroupLayout pnlTBLayout = new GroupLayout(pnlTB);
-                        pnlTB.setLayout(pnlTBLayout);
-                        pnlTBLayout.setHorizontalGroup(
-                            pnlTBLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlTBLayout.setVerticalGroup(
-                            pnlTBLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Pflegeberichte", pnlTB);
-
-
-                    //======== pnlDFN ========
-                    {
-
-                        GroupLayout pnlDFNLayout = new GroupLayout(pnlDFN);
-                        pnlDFN.setLayout(pnlDFNLayout);
-                        pnlDFNLayout.setHorizontalGroup(
-                            pnlDFNLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlDFNLayout.setVerticalGroup(
-                            pnlDFNLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("DFN", pnlDFN);
-
-
-                    //======== pnlBHP ========
-                    {
-
-                        GroupLayout pnlBHPLayout = new GroupLayout(pnlBHP);
-                        pnlBHP.setLayout(pnlBHPLayout);
-                        pnlBHPLayout.setHorizontalGroup(
-                            pnlBHPLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlBHPLayout.setVerticalGroup(
-                            pnlBHPLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("BHP", pnlBHP);
-
-
-                    //======== pnlVitalDummy ========
-                    {
-
-                        GroupLayout pnlVitalDummyLayout = new GroupLayout(pnlVitalDummy);
-                        pnlVitalDummy.setLayout(pnlVitalDummyLayout);
-                        pnlVitalDummyLayout.setHorizontalGroup(
-                            pnlVitalDummyLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlVitalDummyLayout.setVerticalGroup(
-                            pnlVitalDummyLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Werte", pnlVitalDummy);
-
-
-                    //======== pnlVer ========
-                    {
-
-                        GroupLayout pnlVerLayout = new GroupLayout(pnlVer);
-                        pnlVer.setLayout(pnlVerLayout);
-                        pnlVerLayout.setHorizontalGroup(
-                            pnlVerLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlVerLayout.setVerticalGroup(
-                            pnlVerLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Verordnungen", pnlVer);
-
-
-                    //======== pnlInfo ========
-                    {
-
-                        GroupLayout pnlInfoLayout = new GroupLayout(pnlInfo);
-                        pnlInfo.setLayout(pnlInfoLayout);
-                        pnlInfoLayout.setHorizontalGroup(
-                            pnlInfoLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlInfoLayout.setVerticalGroup(
-                            pnlInfoLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Informationen", pnlInfo);
-
-
-                    //======== pnlPPlanung ========
-                    {
-
-                        GroupLayout pnlPPlanungLayout = new GroupLayout(pnlPPlanung);
-                        pnlPPlanung.setLayout(pnlPPlanungLayout);
-                        pnlPPlanungLayout.setHorizontalGroup(
-                            pnlPPlanungLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlPPlanungLayout.setVerticalGroup(
-                            pnlPPlanungLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Planung", pnlPPlanung);
-
-
-                    //======== pnlVorgang ========
-                    {
-
-                        GroupLayout pnlVorgangLayout = new GroupLayout(pnlVorgang);
-                        pnlVorgang.setLayout(pnlVorgangLayout);
-                        pnlVorgangLayout.setHorizontalGroup(
-                            pnlVorgangLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlVorgangLayout.setVerticalGroup(
-                            pnlVorgangLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Vorg\u00e4nge", pnlVorgang);
-
-
-                    //======== pnlFiles ========
-                    {
-
-                        GroupLayout pnlFilesLayout = new GroupLayout(pnlFiles);
-                        pnlFiles.setLayout(pnlFilesLayout);
-                        pnlFilesLayout.setHorizontalGroup(
-                            pnlFilesLayout.createParallelGroup()
-                                .addGap(0, 663, Short.MAX_VALUE)
-                        );
-                        pnlFilesLayout.setVerticalGroup(
-                            pnlFilesLayout.createParallelGroup()
-                                .addGap(0, 521, Short.MAX_VALUE)
-                        );
-                    }
-                    jtpPflegeakte.addTab("Dokumente", pnlFiles);
-
-                }
-                pnlPflegeakte.add(jtpPflegeakte, CC.xywh(3, 1, 1, 3, CC.DEFAULT, CC.FILL));
-
-                //---- pbHeap ----
-                pbHeap.setToolTipText("Java Speicher");
-                pnlPflegeakte.add(pbHeap, CC.xy(1, 3));
+                });
+                jspSearch.setViewportView(panelSearch);
             }
-            jtpMain.addTab("Pflegeakte", pnlPflegeakte);
-
+            pnlMain.add(jspSearch, CC.xy(3, 4, CC.FILL, CC.FILL));
+            pnlMain.add(scrollMain, CC.xywh(5, 4, 3, 1, CC.FILL, CC.FILL));
         }
-        contentPane.add(jtpMain, CC.xy(1, 1, CC.FILL, CC.FILL));
-        setSize(851, 623);
+        contentPane.add(pnlMain);
+        setSize(945, 695);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
-        reloadDisplay(currentBewohner);
+//        reloadDisplay(currentBewohner);
     }//GEN-LAST:event_jtpMainStateChanged
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
-        if (currentBewohner == null) return;
-        //print(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false));
-        SYSPrint.print(this, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+        if (currentBewohner != null) {
+            SYSPrint.print(thisFrame, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+        }
     }//GEN-LAST:event_btnVerlegungActionPerformed
 
     private void jspBWComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBWComponentResized
@@ -510,31 +252,37 @@ public class FrmPflege extends javax.swing.JFrame {
     }//GEN-LAST:event_jspBWComponentResized
 
     private void jtpPflegeakteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpPflegeakteStateChanged
-        reloadDisplay(currentBewohner);
+//        reloadDisplay(currentBewohner);
     }//GEN-LAST:event_jtpPflegeakteStateChanged
 
     private void jtpUebersichtStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpUebersichtStateChanged
-        reloadDisplay(currentBewohner);
+//        reloadDisplay(currentBewohner);
     }//GEN-LAST:event_jtpUebersichtStateChanged
 
-    private void print(String html) {
-        try {
-            // Create temp file.
-            File temp = File.createTempFile("ueberleitung", ".html");
 
-            // Delete temp file when program exits.
-            temp.deleteOnExit();
+    private void createProgrammListe() {
 
-            // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(SYSTools.htmlUmlautConversion(html));
+           menuStructure.add(new String[]{"Pflege/Pflegeakte", "op.care.FrmPflege", "pflegeakte.png"});
+        menuStructure.add(new String[]{"Pflege/Medikamente", "op.care.med.FrmMed", "agt_virussafe.png"});
+        menuStructure.add(new String[]{"Pflege/Massnahmen", "op.care.planung.massnahmen.FrmMassnahmen", "work.png"});
+        menuStructure.add(new String[]{"Bewohner/Bewohnerdaten", "op.bw.admin.FrmBWAttr", "groupevent.png"});
+        menuStructure.add(new String[]{"Bewohner/Barbeträge", "op.bw.tg.FrmTG", "coins.png"});
+        menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});
+        menuStructure.add(new String[]{"System/Datei-Manager", "op.sysfiles.FrmFilesManager", "kfm.png"});
+        menuStructure.add(new String[]{"Controlling/Controlling", "op.controlling.FrmCtrlMonitor", "kfind.png"});
+        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.vorgang.FrmVorgang", "utilities-file-archiver.png"});
+    }
 
-            out.close();
-            //DlgFilesAssign.handleFile(this, temp.getAbsolutePath(), Desktop.Action.OPEN);
-        } catch (IOException e) {
+
+    private void collapseBewohner() {
+        for (JXTaskPane pane : bewohnerPanes) {
+            pane.setCollapsed(true);
         }
     }
 
+    /**
+     * Das erstellt eine Liste aller Bewohner mit direktem Verweis auf die jeweilige Pflegeakte.
+     */
     private void createBewohnerListe() {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Bewohner.findAllActiveSortedByStationen");
@@ -563,14 +311,12 @@ public class FrmPflege extends javax.swing.JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (currentBewohner == null) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
-                        for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
-                            jtpPflegeakte.setEnabledAt(i, true);
-                        }
-                        reloadDisplay(innerbewohner);
+                    hs.setMainMessage(BewohnerTools.getBWLabelText(innerbewohner));
+                    if (currentVisiblePanel instanceof PnlPflege) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
+                        ((CleanablePanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
-                        currentBewohner = innerbewohner;
-                        ((CleanablePanel) jtpPflegeakte.getSelectedComponent()).change2Bewohner(currentBewohner);
+                        currentVisiblePanel = new PnlPflege(thisFrame, panelSearch, innerbewohner);
+                        setPanelTo(currentVisiblePanel);
                     }
                 }
             });
@@ -580,6 +326,19 @@ public class FrmPflege extends javax.swing.JFrame {
         em.close();
     }
 
+    private void setPanelTo(JPanel pnl) {
+        currentVisiblePanel = pnl;
+        pnlTopRight = new JPanel(new VerticalLayout(0));
+        if (currentVisiblePanel instanceof PnlPflege) {
+            pnlTopRight.add(btnVerlegung);
+        } else {
+            collapseBewohner();
+        }
+        pnlTopRight.add(btnLogout);
+
+        scrollMain.setViewportView(currentVisiblePanel);
+    }
+
     public void dispose() {
         hs.interrupt();
         cleanup();
@@ -587,134 +346,23 @@ public class FrmPflege extends javax.swing.JFrame {
     }
 
     private void cleanup() {
-        for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
-            if (jtpPflegeakte.getComponentAt(i) != null && jtpPflegeakte.getComponentAt(i) instanceof CleanablePanel) {
-                CleanablePanel cp = (CleanablePanel) jtpPflegeakte.getComponentAt(i);
-                cp.cleanup();
-                SYSTools.unregisterListeners((JComponent) jtpPflegeakte.getComponentAt(i));
-            }
-            jtpPflegeakte.setComponentAt(i, null);
+
+        if (currentVisiblePanel instanceof CleanablePanel) {
+            ((CleanablePanel) currentVisiblePanel).cleanup();
         }
-        if (jtpMain.getComponentAt(MAINTAB_UEBERSICHT) != null && jtpMain.getComponentAt(MAINTAB_UEBERSICHT) instanceof CleanablePanel) {
-            CleanablePanel cp = (CleanablePanel) jtpMain.getComponentAt(MAINTAB_UEBERSICHT);
-            cp.cleanup();
-            SYSTools.unregisterListeners((JComponent) jtpMain.getComponentAt(MAINTAB_UEBERSICHT));
-            jtpMain.setComponentAt(MAINTAB_UEBERSICHT, null);
-        }
+
     }
 
-    private void reloadDisplay(Bewohner bewohner) {
-        if (initPhase) {
-            return;
-        }
-        currentBewohner = bewohner;
-
-        cleanup();
-        switch (jtpMain.getSelectedIndex()) {
-            case MAINTAB_UEBERSICHT: {
-                switch (jtpUebersicht.getSelectedIndex()) {
-                    case UE_UEBERGABE: {
-                        jtpUebersicht.setComponentAt(UE_UEBERGABE, new PnlUebergabe(this));
-                        jtpUebersicht.setTitleAt(UE_UEBERGABE, "Übergabe");
-                        break;
-                    }
-                    case UE_SCHICHTLEITUNG: {
-                        jtpUebersicht.setComponentAt(UE_SCHICHTLEITUNG, new PnlSchichtleitung(this));
-                        jtpUebersicht.setTitleAt(UE_SCHICHTLEITUNG, "Schichtleitung");
-                        break;
-                    }
-                    default: {
-                    }
-                }
-
-                break;
-            }
-            case MAINTAB_BW: {
-                if (bewohner != null) {
-                    SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
-                    switch (jtpPflegeakte.getSelectedIndex()) {
-                        case TAB_UEBERSICHT: {
-                            jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
-                            break;
-                        }
-                        case TAB_PB: {
-                            jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(this, bewohner, panelSearch));
-                            jtpPflegeakte.setTitleAt(TAB_PB, "Pflegeberichte");
-                            break;
-                        }
-                        case TAB_DFN: {
-                            jtpPflegeakte.setComponentAt(TAB_DFN, new PnlDFN(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_DFN, "DFN");
-                            break;
-                        }
-                        case TAB_VITAL: {
-                            jtpPflegeakte.setComponentAt(TAB_VITAL, new PnlVitalwerte(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_VITAL, "Werte");
-                            break;
-                        }
-                        case TAB_INFO: {
-                            jtpPflegeakte.setComponentAt(TAB_INFO, new op.care.bwinfo.PnlInfo(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_INFO, "Informationen");
-                            break;
-                        }
-                        case TAB_BHP: {
-                            jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_BHP, "BHP");
-                            break;
-                        }
-                        case TAB_PPLANUNG: {
-                            jtpPflegeakte.setComponentAt(TAB_PPLANUNG, new PnlPlanung(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_PPLANUNG, "Planung");
-                            break;
-                        }
-                        case TAB_VERORDNUNG: {
-                            jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, new PnlVerordnung(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_VERORDNUNG, "Verordnungen");
-                            break;
-                        }
-                        case TAB_VORGANG: {
-                            final PnlVorgang pnlVorgang = new PnlVorgang(this, bewohner, panelSearch);
-                            CleanablePanel cp = new CleanablePanel() {
-
-                                @Override
-                                public void cleanup() {
-                                    pnlVorgang.cleanup();
-                                }
-
-                                @Override
-                                public void change2Bewohner(Bewohner bewohner) {
-                                    BewohnerTools.setBWLabel(bwlabel, bewohner);
-                                    pnlVorgang.change2Bewohner(bewohner);
-                                    validate();
-                                }
-                            };
-                            bwlabel = BewohnerTools.getBWLabel(bewohner);
-//                            bwlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-                            BoxLayout boxLayout = new BoxLayout(cp, BoxLayout.PAGE_AXIS);
-                            cp.setLayout(boxLayout);
-                            cp.add(bwlabel);
-                            cp.add(pnlVorgang);
-
-                            jtpPflegeakte.setComponentAt(TAB_VORGANG, cp);
-                            jtpPflegeakte.setTitleAt(TAB_VORGANG, "Vorgänge");
-                            break;
-                        }
-                        case TAB_FILES: {
-                            jtpPflegeakte.setComponentAt(TAB_FILES, new PnlFiles(this, bewohner));
-                            jtpPflegeakte.setTitleAt(TAB_FILES, "Dokumente");
-                            break;
-                        }
-                        default: {
-                        }
-                    }
-                }
-                break;
-            }
-            default: {
-            }
-        }
-    }
+//    private void reloadDisplay(Bewohner bewohner) {
+//        if (initPhase) {
+//            return;
+//        }
+//        currentBewohner = bewohner;
+//
+//        cleanup();
+//
+//
+//    }
 
 //    private void removeSearchPanels(){
 //        if (panelSearch.getComponentCount() > positionToAddPanels){
@@ -750,28 +398,17 @@ public class FrmPflege extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JTabbedPane jtpMain;
-    private JTabbedPane jtpUebersicht;
-    private JPanel pnlUebergabe;
-    private JPanel pnlSchichtleitung;
-    private JPanel pnlPflegeakte;
-    private JPanel pnlBW;
     private JButton btnVerlegung;
+    private JPanel pnlMain;
+    private JPanel pnlMainMessage;
+    private JLabel lblMainMsg;
+    private JLabel lblSubMsg;
+    private JProgressBar pbMsg;
+    private JPanel pnlTopRight;
     private JButton btnLogout;
-    private JScrollPane jspBW;
+    private JScrollPane jspSearch;
     private JXTaskPaneContainer panelSearch;
-    private JTabbedPane jtpPflegeakte;
-    private JPanel pnlUeber;
-    private JPanel pnlTB;
-    private JPanel pnlDFN;
-    private JPanel pnlBHP;
-    private JPanel pnlVitalDummy;
-    private JPanel pnlVer;
-    private JPanel pnlInfo;
-    private JPanel pnlPPlanung;
-    private JPanel pnlVorgang;
-    private JPanel pnlFiles;
-    private JProgressBar pbHeap;
+    private JScrollPane scrollMain;
     // End of variables declaration//GEN-END:variables
 
 

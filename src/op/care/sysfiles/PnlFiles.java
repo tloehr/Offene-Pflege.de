@@ -64,7 +64,7 @@ public class PnlFiles extends CleanablePanel {
     /**
      * Creates new form PnlFiles
      */
-    public PnlFiles(FrmPflege pflege, Bewohner bewohner) {
+    public PnlFiles(JFrame pflege, Bewohner bewohner) {
         initComponents();
         this.bewohner = bewohner;
         EntityManager em = OPDE.createEM();

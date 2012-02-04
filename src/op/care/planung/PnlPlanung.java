@@ -57,7 +57,7 @@ public class PnlPlanung extends CleanablePanel {
     public static final String internalClassID = "nursingrecords.planning";
     private JPopupMenu menu;
     //private int mode;
-    private FrmPflege parent;
+    private JFrame parent;
     private String bwkennung;
     private Bewohner bewohner;
     private ListSelectionListener lsl;
@@ -67,7 +67,7 @@ public class PnlPlanung extends CleanablePanel {
     /**
      * Creates new form PnlPlanung
      */
-    public PnlPlanung(FrmPflege parent, Bewohner bewohner) {
+    public PnlPlanung(JFrame parent, Bewohner bewohner) {
         this.parent = parent;
 
         ocs = OPDE.getOCSec();
@@ -289,7 +289,7 @@ public class PnlPlanung extends CleanablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        new DlgPlanung(parent, bwkennung);
+        new DlgPlanung(parent, bewohner);
         reloadTable();
     }//GEN-LAST:event_btnNewActionPerformed
 
@@ -334,7 +334,7 @@ public class PnlPlanung extends CleanablePanel {
         itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new DlgPlanung(parent, bwkennung, planid, DlgPlanung.EDIT_MODE);
+                new DlgPlanung(parent, bewohner, planid, DlgPlanung.EDIT_MODE);
                 reloadTable();
             }
         });
@@ -345,7 +345,7 @@ public class PnlPlanung extends CleanablePanel {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 try {
-                    new DlgPlanung(parent, bwkennung, planid, DlgPlanung.CHANGE_MODE);
+                    new DlgPlanung(parent, bewohner, planid, DlgPlanung.CHANGE_MODE);
                     Thread.sleep(1000);// Sonst, falsche Darstellung in Tabelle
                     reloadTable();
                 } catch (InterruptedException ex) {
@@ -483,7 +483,7 @@ public class PnlPlanung extends CleanablePanel {
     private void btnVorlageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorlageActionPerformed
         long template = DlgVorlage.showDialog(parent);
         if (template > 0) {
-            new DlgPlanung(parent, bwkennung, template, DlgPlanung.TEMPLATE_MODE);
+            new DlgPlanung(parent, bewohner, template, DlgPlanung.TEMPLATE_MODE);
             reloadTable();
         }
     }//GEN-LAST:event_btnVorlageActionPerformed

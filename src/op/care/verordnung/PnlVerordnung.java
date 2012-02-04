@@ -63,7 +63,7 @@ public class PnlVerordnung extends CleanablePanel {
     public static final String internalClassID = "nursingrecords.prescription";
 
     private Bewohner bewohner;
-    private FrmPflege parent;
+    private JFrame parent;
     private boolean readOnly = false;
     private JPopupMenu menu;
 
@@ -77,7 +77,7 @@ public class PnlVerordnung extends CleanablePanel {
     /**
      * Creates new form PnlVerordnung
      */
-    public PnlVerordnung(FrmPflege parent, Bewohner bewohner) {
+    public PnlVerordnung(JFrame parent, Bewohner bewohner) {
         this.parent = parent;
 
 

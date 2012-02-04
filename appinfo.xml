@@ -9,14 +9,20 @@
 
 <app>
 
-
     <classes>
         <!--
             Module, Erklärungen und ACLs, die von OPDE unterstützt werden. Hier steht drin, welche Klasse welche Fähigkeiten hat.
             Die einzelnen Rechte (hier ACLs) genannt, werden direkt im Programm-Code unterstützt. Bei der Vergabe von Zugriffsrechten
             werden diese Rechte als Mögliche Zuordnungen zu Gruppen angeboten.
         -->
-
+        <class name="admin.residents.cash" short="Barbetragsverwaltung" long="Dieses Programm dient der Verwaltung der sog. Taschengelde der BewohnerInnen">
+            <execute doc="Der Benutzer erhält Zugriff auf die Pflegeakte."/>
+            <delete doc="Benutzer kann Belege löschen."/>
+            <insert doc="Benutzer kann Belege eintragen."/>
+        </class>
+        <class name="nursingrecords.main" short="Pflegeakte" long="Das Hauptmodul zur Pflegeakte.">
+            <execute doc="Der Benutzer erhält Zugriff auf die Pflegeakte."/>
+        </class>
         <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
         long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
             <insert doc="Benutzer kann neue Verordnungen für den/die BewohnerIn hinzufügen."/>
@@ -51,7 +57,7 @@
         </class>
         <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         </class>
-        <class name="opde.tickets" short="Vorgangsverwaltung" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen.">
+        <class name="opde.tickets" short="Vorgangsverwaltung" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true">
             <manager doc="Man darf auf die Vorgänge anderer Mitarbeiter zugreifen."/>
             <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
         </class>

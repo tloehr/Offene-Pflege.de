@@ -614,7 +614,8 @@ public class PnlBWInfo extends CleanablePanel {
                                 ((Integer) entry.get("katart")).intValue() == BWInfo.ART_VERWALTUNG))) {
                     menu.add(new JSeparator());
 
-                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, fileActionListener));
+                    // TODO: Das hier muss wieder rein
+//                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, fileActionListener));
 
                     long bwinfoid = ((Long) entry.get("bwinfoid")).longValue();
                     EntityManager em = OPDE.createEM();

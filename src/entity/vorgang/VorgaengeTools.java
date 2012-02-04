@@ -104,6 +104,11 @@ public class VorgaengeTools {
         return elements;
     }
 
+    public static void endAllVorgaenge(Bewohner bewohner) {
+
+
+    }
+
     public static void endVorgang(Vorgaenge vorgang) {
         EntityManager em = OPDE.createEM();
         try {

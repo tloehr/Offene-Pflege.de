@@ -26,6 +26,8 @@
  */
 package op.care.planung;
 
+import entity.Bewohner;
+import entity.BewohnerTools;
 import op.OPDE;
 import op.care.DFNImport;
 import op.share.bwinfo.BWInfo;
@@ -53,7 +55,7 @@ public class DlgPlanung extends javax.swing.JDialog {
     public static final int EDIT_MODE = 2; // Korrigieren
     public static final int CHANGE_MODE = 3; // Ändern
     public static final int TEMPLATE_MODE = 4; // Verwendung von Vorlagen
-    private String bwkennung;
+    private Bewohner bewohner;
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
     private long planid;
@@ -67,20 +69,20 @@ public class DlgPlanung extends javax.swing.JDialog {
     /**
      * Creates new form DlgPlanung
      */
-    public DlgPlanung(java.awt.Frame parent, String bwkennung, long planid, int mode) {
+    public DlgPlanung(java.awt.Frame parent, Bewohner bewohner, long planid, int mode) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
         this.planid = planid;
         this.editMode = mode;
         initComponents();
         initDialog();
     }
 
-    public DlgPlanung(java.awt.Frame parent, String bwkennung) {
+    public DlgPlanung(java.awt.Frame parent, Bewohner bewohner) {
         super(parent, true);
         this.parent = parent;
-        this.bwkennung = bwkennung;
+        this.bewohner = bewohner;
         this.planid = 0;
         this.plankenn = 0;
         this.editMode = NEW_MODE;
@@ -92,7 +94,7 @@ public class DlgPlanung extends javax.swing.JDialog {
         doDeleteTmp = true;
         this.setTitle(SYSTools.getWindowTitle("Bearbeitung einer Pflegeplanung"));
         cmbKategorie.setModel(op.share.bwinfo.DBHandling.ladeKategorien(BWInfo.ART_PFLEGE, false, false));
-        SYSTools.setBWLabel(lblBW, bwkennung);
+        BewohnerTools.setBWLabel(lblBW, bewohner);
 
         myPropertyChangeListener = new java.beans.PropertyChangeListener() {
 
@@ -196,7 +198,7 @@ public class DlgPlanung extends javax.swing.JDialog {
     }
 
     private void reloadMeinePlanung() {
-        ArrayList plan = DBHandling.loadPlanung(bwkennung, planid, OPDE.getLogin().getLoginID(), editMode != CHANGE_MODE);
+        ArrayList plan = DBHandling.loadPlanung(bewohner.getBWKennung(), planid, OPDE.getLogin().getLoginID(), editMode != CHANGE_MODE);
 
         tblPlanung.setModel(new TMPlanung(plan));
         tblPlanung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -207,7 +209,7 @@ public class DlgPlanung extends javax.swing.JDialog {
     }
 
     private void reloadBibliothek() {
-        ArrayList bib = DBHandling.loadBibliothek(txtSuche.getText(), bwkennung);
+        ArrayList bib = DBHandling.loadBibliothek(txtSuche.getText(), bewohner.getBWKennung());
 
         tblBib.setModel(new TMPlanung(bib));
         tblBib.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -816,7 +818,7 @@ public class DlgPlanung extends javax.swing.JDialog {
 
     private void saveTEMPLATE() {
         HashMap hm = new HashMap();
-        hm.put("BWKennung", bwkennung);
+        hm.put("BWKennung", bewohner.getBWKennung());
         hm.put("Stichwort", txtStichwort.getText());
         hm.put("Situation", txtSituation.getText());
         hm.put("Ziel", txtZiele.getText());
@@ -862,7 +864,7 @@ public class DlgPlanung extends javax.swing.JDialog {
     private void saveCHANGE() {
         // Daten für die NEUE Planung
         HashMap hm = new HashMap();
-        hm.put("BWKennung", bwkennung);
+        hm.put("BWKennung", bewohner.getBWKennung());
         hm.put("Stichwort", txtStichwort.getText());
         hm.put("Situation", txtSituation.getText());
         hm.put("Ziel", txtZiele.getText());
@@ -909,7 +911,7 @@ public class DlgPlanung extends javax.swing.JDialog {
 
     private void saveNEW() {
         HashMap hm = new HashMap();
-        hm.put("BWKennung", bwkennung);
+        hm.put("BWKennung", bewohner.getBWKennung());
         hm.put("Stichwort", txtStichwort.getText());
         hm.put("Situation", txtSituation.getText());
         hm.put("Ziel", txtZiele.getText());

@@ -49,7 +49,7 @@ public class PnlBWUebersicht extends CleanablePanel {
     /**
      * Creates new form PnlBWUebersicht
      */
-    public PnlBWUebersicht(FrmPflege pflege, Bewohner bewohner) {
+    public PnlBWUebersicht(Bewohner bewohner) {
         initComponents();
         txtUebersicht.setContentType("text/html");
         change2Bewohner(bewohner);

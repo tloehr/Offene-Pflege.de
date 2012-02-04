@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.share.vorgang;
+package tablemodels;
 
 import op.OPDE;
 import op.tools.DlgException;

@@ -43,13 +43,8 @@ public class StationenTools {
 
 
     public static Stationen getStation4ThisHost(){
-        EntityManager em = OPDE.createEM();
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
-        Query query = em.createNamedQuery("Stationen.findByStatID");
-        query.setParameter("statID", statid);
-        Stationen s = (Stationen) query.getSingleResult();
-        em.close();
-        return s;
+        return EntityTools.find(Stationen.class, statid);
     }
 
 

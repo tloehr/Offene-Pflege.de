@@ -107,7 +107,7 @@ public class PnlBerichte extends CleanablePanel {
     private Bewohner bewohner;
     private JPopupMenu menu;
     private boolean initPhase;
-    private javax.swing.JFrame parent;
+    private JFrame parent;
 
     /**
      * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
@@ -124,9 +124,9 @@ public class PnlBerichte extends CleanablePanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(FrmPflege pflege, Bewohner bewohner, JXTaskPaneContainer panelSearch) {
+    public PnlBerichte(JFrame parent, Bewohner bewohner, JXTaskPaneContainer panelSearch) {
         this.initPhase = true;
-        this.parent = pflege;
+        this.parent = parent;
         this.laufendeOperation = LAUFENDE_OPERATION_NICHTS;
         this.textmessageTL = null;
         this.aktuellerBericht = null;
@@ -458,8 +458,6 @@ public class PnlBerichte extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        panel2 = new JPanel();
-        lblBW = new JLabel();
         pnlContent = new JPanel();
         splitTableEditor = new JSplitPane();
         jspTblTB = new JScrollPane();
@@ -497,19 +495,6 @@ public class PnlBerichte extends CleanablePanel {
             }
         });
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-        //======== panel2 ========
-        {
-            panel2.setLayout(new HorizontalLayout());
-
-            //---- lblBW ----
-            lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-            lblBW.setForeground(new Color(255, 51, 0));
-            lblBW.setText("jLabel3");
-            lblBW.setAlignmentX(0.5F);
-            panel2.add(lblBW);
-        }
-        add(panel2);
 
         //======== pnlContent ========
         {
@@ -816,7 +801,7 @@ public class PnlBerichte extends CleanablePanel {
         this.bewohner = bewohner;
         SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         prepareSearchArea();
-        BewohnerTools.setBWLabel(lblBW, bewohner);
+//        BewohnerTools.setBWLabel(lblBW, bewohner);
         panelSearch.validate();
         reloadTable();
     }
@@ -1182,8 +1167,6 @@ public class PnlBerichte extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JPanel panel2;
-    private JLabel lblBW;
     private JPanel pnlContent;
     private JSplitPane splitTableEditor;
     private JScrollPane jspTblTB;
