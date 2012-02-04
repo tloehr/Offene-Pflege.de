@@ -29,9 +29,10 @@ package op.care.bwinfo;
 
 import entity.Bewohner;
 import op.OPDE;
-import op.care.CleanablePanel;
+import op.tools.CleanablePanel;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.PnlBWInfo;
+import op.tools.NursingRecordsPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +42,7 @@ import java.awt.event.ActionListener;
 /**
  * @author tloehr
  */
-public class PnlInfo extends CleanablePanel {
+public class PnlInfo extends NursingRecordsPanel {
     private JPanel pnlMain;
     private Frame panel;
 

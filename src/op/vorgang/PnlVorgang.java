@@ -21,15 +21,16 @@ import entity.EntityTools;
 import entity.Users;
 import entity.vorgang.*;
 import op.OPDE;
-import op.care.CleanablePanel;
+import op.events.TaskPaneContentChangedEvent;
+import op.events.TaskPaneContentChangedListener;
+import op.tools.CleanablePanel;
 import op.share.tools.PnlEditor;
-import op.tools.InternalClassACL;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
+import org.jdesktop.swingx.JXTitledSeparator;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.pushingpixels.trident.Timeline;
 import tablemodels.TMElement;
 import tablerenderer.RNDHTML;
@@ -57,7 +58,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class PnlVorgang extends CleanablePanel {
+public class PnlVorgang extends NursingRecordsPanel {
 
     public static final String internalClassID = "opde.tickets";
     private static int speedSlow = 700;
@@ -80,40 +81,28 @@ public class PnlVorgang extends CleanablePanel {
     protected boolean pdcaChanged = false, ignoreEvents = false;
     //protected IconFlash iconflasher;
     protected JComboBox cmbBW, cmbMA;
-    private JXTaskPaneContainer panelSearch;
-    private int positionToAddPanels;
+    private ArrayList<JXTaskPane> panelSearch;
+//    private int positionToAddPanels;
 //    protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
-
+    private TaskPaneContentChangedListener taskPaneContentChangedListener;
     private Timeline textmessageTL;
 
-
-    /**
-     * Creates new form PnlVorgang
-     */
-    public PnlVorgang(JFrame parent) {
-        this(null, null, parent, null);
-    }
-
-    /**
-     * Creates new form PnlVorgang
-     */
-    public PnlVorgang(JFrame parent, Bewohner bewohner, JXTaskPaneContainer panelSearch) {
-        this(null, bewohner, parent, panelSearch);
-    }
-
-    public PnlVorgang(Vorgaenge vorgang, Bewohner bewohner, JFrame parent, JXTaskPaneContainer panelSearch) {
+    public PnlVorgang(Vorgaenge vorgang, Bewohner bewohner, JFrame parent, TaskPaneContentChangedListener taskPaneContentChangedListener) {
         ignoreEvents = true;
         initComponents();
+        this.taskPaneContentChangedListener = taskPaneContentChangedListener;
 
-        if (panelSearch == null) {
-            this.panelSearch = taskContainer;
-        } else {
-            this.panelSearch = panelSearch;
-            this.panelSearch.add(new JXHeader("Vorgänge", "", new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
-            FormLayout fl = (FormLayout) getLayout();
-            fl.setColumnSpec(3, new ColumnSpec(ColumnSpec.FILL, Sizes.dluX(0), ColumnSpec.NO_GROW));
-        }
-        positionToAddPanels = this.panelSearch.getComponentCount();
+        panelSearch = new ArrayList<JXTaskPane>();
+
+//        if (panelSearch == null) {
+//            this.panelSearch = taskContainer;
+//        } else {
+//            this.panelSearch = panelSearch;
+////            this.panelSearch.add(new JXTitledSeparator("Vorgänge", SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
+////            FormLayout fl = (FormLayout) getLayout();
+////            fl.setColumnSpec(3, new ColumnSpec(ColumnSpec.FILL, Sizes.dluX(0), ColumnSpec.NO_GROW));
+//        }
+//        positionToAddPanels = this.panelSearch.getComponentCount();
 
         laufendeOperation = LAUFENDE_OPERATION_NICHTS;
 
@@ -148,17 +137,22 @@ public class PnlVorgang extends CleanablePanel {
         });
 
         if (aktuellerBewohner != null) {
-            ((Container) panelSearch).add(addVorgaengeFuerBW(aktuellerBewohner));
+            panelSearch.add(addVorgaengeFuerBW(aktuellerBewohner));
+            taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Vorgänge"));
         } else {
             addMeineVorgaenge();
             addMeineAbgelaufenenVorgaenge();
             //addAlleVorgaenge();
-            addVorgaengeFuerBW();
+//            addVorgaengeFuerBW();
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
                 addVorgaengeFuerMA();
                 addAblaufendeVorgaenge();
             }
+            taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.TOP, "Vorgänge"));
+
         }
+
+
 
 
         //
@@ -203,7 +197,7 @@ public class PnlVorgang extends CleanablePanel {
                 }
             }
         });
-        ((Container) panelSearch).add(pnlVorgaengeRunningOut);
+        panelSearch.add(pnlVorgaengeRunningOut);
 
     }
 
@@ -223,28 +217,28 @@ public class PnlVorgang extends CleanablePanel {
                 }
             }
         });
-        ((Container) panelSearch).add(pnlMeineAltenVorgaenge);
+        panelSearch.add(pnlMeineAltenVorgaenge);
 
     }
 
 
-    protected void addAlleVorgaenge() {
-        pnlAlleVorgaenge = new JXTaskPane("Alle aktiven Vorgänge");
-        pnlAlleVorgaenge.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/groupevent.png")));
-        pnlAlleVorgaenge.setCollapsed(true);
-
-        pnlAlleVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!(Boolean) evt.getNewValue()) {
-                    loadAllVorgaenge();
-                } else {
-                    pnlAlleVorgaenge.removeAll();
-                }
-            }
-        });
-        ((Container) panelSearch).add(pnlAlleVorgaenge);
-    }
+//    protected void addAlleVorgaenge() {
+//        pnlAlleVorgaenge = new JXTaskPane("Alle aktiven Vorgänge");
+//        pnlAlleVorgaenge.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/groupevent.png")));
+//        pnlAlleVorgaenge.setCollapsed(true);
+//
+//        pnlAlleVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                if (!(Boolean) evt.getNewValue()) {
+//                    loadAllVorgaenge();
+//                } else {
+//                    pnlAlleVorgaenge.removeAll();
+//                }
+//            }
+//        });
+//        panelSearch.add(pnlAlleVorgaenge);
+//    }
 
     protected JXTaskPane addVorgaengeFuerBW(Bewohner bewohner) {
         EntityManager em = OPDE.createEM();
@@ -279,49 +273,49 @@ public class PnlVorgang extends CleanablePanel {
     }
 
 
-    protected void addVorgaengeFuerBW() {
-        //((Container) taskContainer).add(new JLabel("Bewohner"));
-        EntityManager em = OPDE.createEM();
-        List<Bewohner> bewohner = em.createNamedQuery("Bewohner.findAllActiveSorted").getResultList();
-
-        JXTaskPane allbwpanel = new JXTaskPane("nach BewohnerInnen");
-        allbwpanel.setCollapsed(true);
-
-        for (Bewohner bw : bewohner) {
-
-            Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
-            query.setParameter("bewohner", bw);
-            List<Vorgaenge> listVorgaenge = query.getResultList();
-            Iterator<Vorgaenge> it = listVorgaenge.iterator();
-
-            if (!listVorgaenge.isEmpty()) {
-                JXTaskPane bwpanel = new JXTaskPane(bw.getNachname() + ", " + bw.getVorname());
-                bwpanel.setCollapsed(true);
-
-                while (it.hasNext()) {
-                    final Vorgaenge innervorgang = it.next();
-                    bwpanel.add(new AbstractAction() {
-                        {
-                            putValue(Action.NAME, innervorgang.getTitel());
-                        }
-
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            loadTable(innervorgang);
-                            loadDetails(innervorgang);
-                        }
-                    });
-                }
-
-                allbwpanel.add(bwpanel);
-            }
-
-        }
-
-        ((Container) panelSearch).add(allbwpanel);
-
-        em.close();
-    }
+//    protected void addVorgaengeFuerBW() {
+//        //((Container) taskContainer).add(new JLabel("Bewohner"));
+//        EntityManager em = OPDE.createEM();
+//        List<Bewohner> bewohner = em.createNamedQuery("Bewohner.findAllActiveSorted").getResultList();
+//
+//        JXTaskPane allbwpanel = new JXTaskPane("nach BewohnerInnen");
+//        allbwpanel.setCollapsed(true);
+//
+//        for (Bewohner bw : bewohner) {
+//
+//            Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
+//            query.setParameter("bewohner", bw);
+//            List<Vorgaenge> listVorgaenge = query.getResultList();
+//            Iterator<Vorgaenge> it = listVorgaenge.iterator();
+//
+//            if (!listVorgaenge.isEmpty()) {
+//                JXTaskPane bwpanel = new JXTaskPane(bw.getNachname() + ", " + bw.getVorname());
+//                bwpanel.setCollapsed(true);
+//
+//                while (it.hasNext()) {
+//                    final Vorgaenge innervorgang = it.next();
+//                    bwpanel.add(new AbstractAction() {
+//                        {
+//                            putValue(Action.NAME, innervorgang.getTitel());
+//                        }
+//
+//                        @Override
+//                        public void actionPerformed(ActionEvent e) {
+//                            loadTable(innervorgang);
+//                            loadDetails(innervorgang);
+//                        }
+//                    });
+//                }
+//
+//                allbwpanel.add(bwpanel);
+//            }
+//
+//        }
+//
+//        panelSearch.add(allbwpanel);
+//
+//        em.close();
+//    }
 
 
 //    protected Object[] getTableButtons() {
@@ -416,7 +410,7 @@ public class PnlVorgang extends CleanablePanel {
 
         }
 
-        ((Container) panelSearch).add(allmapanel);
+        panelSearch.add(allmapanel);
         em.close();
     }
 
@@ -438,7 +432,7 @@ public class PnlVorgang extends CleanablePanel {
                 }
             }
         });
-        ((Container) panelSearch).add(pnlMyVorgaenge);
+        panelSearch.add(pnlMyVorgaenge);
     }
 
 
@@ -973,8 +967,6 @@ public class PnlVorgang extends CleanablePanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        scrollPane2 = new JScrollPane();
-        taskContainer = new JXTaskPaneContainer();
         lblVorgang = new JLabel();
         splitTableDetails = new JSplitPane();
         splitTableEditor = new JSplitPane();
@@ -1004,8 +996,6 @@ public class PnlVorgang extends CleanablePanel {
         btnPDCAPlus = new JButton();
         scrollPane1 = new JScrollPane();
         listOwner = new JList();
-        pnlButtonsLeft = new JPanel();
-        btnAddVorgang = new JButton();
         splitButtonsCenter = new JSplitPane();
         panel5 = new JPanel();
         btnAddBericht = new JButton();
@@ -1029,21 +1019,15 @@ public class PnlVorgang extends CleanablePanel {
             }
         });
         setLayout(new FormLayout(
-            "$rgap, 0dlu, 136dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+            "$rgap, 0dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
             "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
-
-        //======== scrollPane2 ========
-        {
-            scrollPane2.setViewportView(taskContainer);
-        }
-        add(scrollPane2, CC.xywh(3, 3, 1, 3, CC.DEFAULT, CC.FILL));
 
         //---- lblVorgang ----
         lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
         lblVorgang.setForeground(Color.blue);
         lblVorgang.setHorizontalAlignment(SwingConstants.CENTER);
         lblVorgang.setText(" ");
-        add(lblVorgang, CC.xy(5, 3));
+        add(lblVorgang, CC.xy(4, 3));
 
         //======== splitTableDetails ========
         {
@@ -1265,24 +1249,7 @@ public class PnlVorgang extends CleanablePanel {
             }
             splitTableDetails.setRightComponent(splitDetailsOwner);
         }
-        add(splitTableDetails, CC.xy(5, 5, CC.DEFAULT, CC.FILL));
-
-        //======== pnlButtonsLeft ========
-        {
-            pnlButtonsLeft.setLayout(new BoxLayout(pnlButtonsLeft, BoxLayout.X_AXIS));
-
-            //---- btnAddVorgang ----
-            btnAddVorgang.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-            btnAddVorgang.setToolTipText("Neuen Vorgang erstellen (nicht Bewohnerbezogen)");
-            btnAddVorgang.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAddVorgangActionPerformed(e);
-                }
-            });
-            pnlButtonsLeft.add(btnAddVorgang);
-        }
-        add(pnlButtonsLeft, CC.xy(3, 7));
+        add(splitTableDetails, CC.xy(4, 5, CC.DEFAULT, CC.FILL));
 
         //======== splitButtonsCenter ========
         {
@@ -1395,7 +1362,7 @@ public class PnlVorgang extends CleanablePanel {
             }
             splitButtonsCenter.setBottomComponent(pnlButtonsRight);
         }
-        add(splitButtonsCenter, CC.xy(5, 7));
+        add(splitButtonsCenter, CC.xy(4, 7));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspElementsComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspElementsComponentResized
@@ -1419,7 +1386,7 @@ public class PnlVorgang extends CleanablePanel {
     }//GEN-LAST:event_pnlMyVorgaengeMousePressed
 
     protected void setLowerMiddleButtons(boolean enabled) {
-        btnAddVorgang.setEnabled(enabled);
+//        btnAddVorgang.setEnabled(enabled);
         btnAddBericht.setEnabled(enabled);
         btnSystemInfo.setEnabled(enabled);
         btnDetails.setEnabled(enabled);
@@ -1435,9 +1402,10 @@ public class PnlVorgang extends CleanablePanel {
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         aktuellerBewohner = bewohner;
-        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
-        ((Container) panelSearch).add(addVorgaengeFuerBW(aktuellerBewohner));
-        panelSearch.validate();
+//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
+        panelSearch.clear();
+        panelSearch.add(addVorgaengeFuerBW(aktuellerBewohner));
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Vorgänge"));
     }
 
     private void btnAddBerichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBerichtActionPerformed
@@ -1477,8 +1445,6 @@ public class PnlVorgang extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JScrollPane scrollPane2;
-    private JXTaskPaneContainer taskContainer;
     private JLabel lblVorgang;
     private JSplitPane splitTableDetails;
     private JSplitPane splitTableEditor;
@@ -1508,8 +1474,6 @@ public class PnlVorgang extends CleanablePanel {
     private JButton btnPDCAPlus;
     private JScrollPane scrollPane1;
     private JList listOwner;
-    private JPanel pnlButtonsLeft;
-    private JButton btnAddVorgang;
     private JSplitPane splitButtonsCenter;
     private JPanel panel5;
     private JButton btnAddBericht;

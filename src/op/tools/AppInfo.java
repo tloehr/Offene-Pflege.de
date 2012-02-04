@@ -16,7 +16,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * Die AppInfo dient dazu Informationen bzgl. der Module innerhalb von OPDE
@@ -38,15 +40,9 @@ import java.util.*;
  */
 public class AppInfo {
 
-    /**
-     * Ein Lookup Table, der zu einer internen Klassenbezeichnung die Informationen als InternalClass liefert.
-     */
     private HashMap<String, InternalClass> internalClasses;
-    /*
-     * Damit man nachher schnell suchen kann, welche Klassen "sich gegenseitig" ins Gehege kommen
-     * könnten, benötige ich diese Listen.
-     */
-    private HashMap<String, List<String>> signedCollisionByClass, unsignedCollisionByClass, classByUnsignedCollision, classBySignedCollision, mainClassByUnsignedCollision;
+
+    private ArrayList<InternalClass> mainClasses;
 
     /**
      * Angabe darüber, welches Datenbank Schema diese Version des Programms unbedingt braucht.
@@ -74,11 +70,7 @@ public class AppInfo {
 
         appinfo = new Properties();
         internalClasses = new HashMap();
-        signedCollisionByClass = new HashMap();
-        unsignedCollisionByClass = new HashMap();
-        classByUnsignedCollision = new HashMap();
-        classBySignedCollision = new HashMap();
-        mainClassByUnsignedCollision = new HashMap();
+        mainClasses = new ArrayList<InternalClass>();
         dbschema = new ArrayList<Integer>();
         defaultProperties = new SortedProperties();
 
@@ -106,91 +98,16 @@ public class AppInfo {
 
     }
 
-    public boolean hasCollisions(String internalClassName) {
-        return !(getClassesWithSignedCollisions(internalClassName) + getClassesWithUnsignedCollisions(internalClassName)).equals("");
+    /**
+     * Welche Klassen können als Unterprogramm aufgerufen werden ?  Stehen dann links oben auf der Startleiste.
+     */
+    public ArrayList<InternalClass> getMainClasses() {
+        return mainClasses;
     }
 
     /**
-     * Diese Methode erzeugt eine Liste von Klassen, die mit der übergebenen Klasse kollidieren würden.
-     * In diesem Fall geht es um die Kollisionen <b>ohne</b> Signaturen. Dabei wird der Fall unterschieden,
-     * ob die übergebene Klasse eine MainClass ist oder nicht. Demnach unterscheidet sich die zurückgegebene
-     * Liste.
-     * <p/>
-     * Eine MainClass erhält alle Klassen innerhalb der Collision Domains als Antwort zurück, außer sich selbst.
-     * Eine normale Klasse erhält immer nur die Main Classes zurück, weil sich normale Klassen gegenseitig nicht behindern
-     * (jedenfalls nicht im Falle von unsigned). Eine laufende MainClass hingegen blockt alle anderen weg.
-     *
-     * @param internalClassName
-     * @return Dies ist die Liste der kollidierenden Klassen. Die einzelnen Klassen sind durch Kommata getrennt. Dadurch kann man diesen
-     *         String in eine JPQL Ausdruck einbauen. Also in der Art: <code>s.class IN ('A','B','C')</code>
+     * Ein Lookup Table, der zu einer internen Klassenbezeichnung die Informationen als InternalClass liefert.
      */
-    public String getClassesWithUnsignedCollisions(String internalClassName) {
-        String list = "";
-
-        if (unsignedCollisionByClass.containsKey(internalClassName)) {
-            Iterator<String> collisionIDs = unsignedCollisionByClass.get(internalClassName).iterator();
-
-
-            while (collisionIDs.hasNext()) {
-                String collisionID = collisionIDs.next();
-
-                // Ist die übergebene Klasse eine MainClass der aktuell betrachten Collision ID ?
-                boolean mainClass = mainClassByUnsignedCollision.containsKey(collisionID) && mainClassByUnsignedCollision.get(collisionID).contains(internalClassName);
-
-                // Wenn eine MainClass starten will, dann geht das nur, wenn KEIN anderer aus der CollisionDomain läuft.
-                // Daher enthält die Liste dann alle möglichen Konflikte
-                if (mainClass) {
-                    // Wenn ich eine MainClass bin, dann interessieren mich alle anderen Klassen,
-                    Iterator<String> conflicitingClasses = classByUnsignedCollision.get(collisionID).iterator();
-
-                    while (conflicitingClasses.hasNext()) {
-                        String classname = conflicitingClasses.next();
-                        list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
-                    }
-
-                } else {
-                    // Wenn ich eine normale Klasse bin, dann starte ich nur, wenn keine MainClass läuft
-                    Iterator<String> conflicitingClasses = mainClassByUnsignedCollision.get(collisionID).iterator();
-
-                    while (conflicitingClasses.hasNext()) {
-                        String classname = conflicitingClasses.next();
-                        list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
-                    }
-                }
-
-
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Diese Methode erzeugt eine Liste von Klassen, die mit der übergebenen Klasse kollidieren würden.
-     * In diesem Fall geht es um die Kollisionen <b>mit</b> Signaturen.
-     *
-     * @param internalClassName
-     * @return Dies ist die Liste der kollidierenden Klassen. Die einzelnen Klassen sind durch Kommata getrennt. Dadurch kann man diesen
-     *         String in eine JPQL Ausdruck einbauen. Also in der Art: <code>s.class IN ('A','B','C')</code>
-     */
-    public String getClassesWithSignedCollisions(String internalClassName) {
-        String list = "";
-
-        if (signedCollisionByClass.containsKey(internalClassName)) {
-            Iterator<String> collisionIDs = signedCollisionByClass.get(internalClassName).iterator();
-
-            while (collisionIDs.hasNext()) {
-                Iterator<String> conflicitingClasses = classBySignedCollision.get(collisionIDs.next()).iterator();
-
-                while (conflicitingClasses.hasNext()) {
-                    String classname = conflicitingClasses.next();
-                    list += "'" + classname + "'" + (conflicitingClasses.hasNext() ? "," : "");
-                }
-            }
-        }
-        return list;
-    }
-
-
     public HashMap<String, InternalClass> getInternalClasses() {
         return internalClasses;
     }
@@ -260,7 +177,7 @@ public class AppInfo {
             } else if (environment.equalsIgnoreCase("classes")) { // oder wir sind schon in einer Umgebung.
 
                 if (tagName.equalsIgnoreCase("class")) {
-                    thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"));
+                    thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"), SYSTools.catchNull(attributes.getValue("main")).equalsIgnoreCase("true"), attributes.getValue("javaclass"));
                 } else if (tagName.equalsIgnoreCase("insert")) {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.INSERT));
                 } else if (tagName.equalsIgnoreCase("select")) {
@@ -289,42 +206,6 @@ public class AppInfo {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER3));
                 } else if (tagName.equalsIgnoreCase("user4")) {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER4));
-//                } else if (tagName.equalsIgnoreCase("collideswith")) {
-//                    String collisionDomain = attributes.getValue("id");
-//                    boolean signed = attributes.getValue("signature").equalsIgnoreCase("true");
-//                    boolean mainClass = SYSTools.catchNull(attributes.getValue("mainClass")).equalsIgnoreCase("true");
-//
-//                    if (signed) {
-//                        // Wenn nötig leere Listen erzeugen.
-//                        if (!signedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
-//                            signedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
-//                        }
-//                        if (!classBySignedCollision.containsKey(collisionDomain)) {
-//                            classBySignedCollision.put(collisionDomain, new ArrayList<String>());
-//                        }
-//
-//                        signedCollisionByClass.get(thisClass.getInternalClassname()).add(collisionDomain);
-//                        classBySignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
-//
-//                    } else {
-//
-//                        if (!unsignedCollisionByClass.containsKey(thisClass.getInternalClassname())) {
-//                            unsignedCollisionByClass.put(thisClass.getInternalClassname(), new ArrayList<String>());
-//                        }
-//                        if (!classByUnsignedCollision.containsKey(collisionDomain)) {
-//                            classByUnsignedCollision.put(collisionDomain, new ArrayList<String>());
-//                        }
-//
-//                        unsignedCollisionByClass.get(thisClass.getInternalClassname()).add(collisionDomain);
-//                        classByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
-//
-//                        if (mainClass) {
-//                            if (!mainClassByUnsignedCollision.containsKey(thisClass.getInternalClassname())) {
-//                                mainClassByUnsignedCollision.put(collisionDomain, new ArrayList<String>());
-//                            }
-//                            mainClassByUnsignedCollision.get(collisionDomain).add(thisClass.getInternalClassname());
-//                        }
-//                    }
                 }
 
             } else if (environment.equalsIgnoreCase("database")) {
@@ -342,6 +223,9 @@ public class AppInfo {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if (localName.equalsIgnoreCase("class")) {
                 internalClasses.put(thisClass.getInternalClassname(), thisClass);
+                if (thisClass.isMainClass()) {
+                    mainClasses.add(thisClass);
+                }
                 thisClass = null;
             }
         }

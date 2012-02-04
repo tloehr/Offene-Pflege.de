@@ -22,16 +22,20 @@ public class InternalClass implements Comparable<InternalClass> {
     private String internalClassname;
     private String shortDescription;
     private String longDescription;
+    private String javaClass;
+    private boolean mainClass;
     // Enthält die möglichen acls für diese Klasse
     // inklusive der Beschreibungen (wenn vorhanden).
     private List<InternalClassACL> acls;
 
     private IntClasses intClass;
 
-    public InternalClass(String internalClassname, String shortDescription, String longDescription) {
+    public InternalClass(String internalClassname, String shortDescription, String longDescription, boolean mainClass, String javaClass) {
         this.internalClassname = internalClassname;
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
+        this.mainClass = mainClass;
+        this.javaClass = javaClass;
         acls = new ArrayList();
         this.intClass = null;
     }
@@ -79,6 +83,22 @@ public class InternalClass implements Comparable<InternalClass> {
 
     public String getInternalClassname() {
         return internalClassname;
+    }
+
+    /**
+     * String Bezeichnung, anhand der sich diese Klasse mittels der Reflection API laden lässt.
+     * @return
+     */
+    public String getJavaClass() {
+        return javaClass;
+    }
+
+    /**
+     * Kann diese Klasse direkt als eingenständiges Modul aufegrufen werden ?
+     * @return
+     */
+    public boolean isMainClass() {
+        return mainClass;
     }
 
     @Override

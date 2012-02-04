@@ -34,8 +34,9 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
+import op.tools.CleanablePanel;
+import op.events.TaskPaneContentChangedEvent;
+import op.events.TaskPaneContentChangedListener;
 import op.tools.*;
 import org.jdesktop.swingx.*;
 import org.pushingpixels.trident.Timeline;
@@ -70,7 +71,7 @@ import java.util.Iterator;
 /**
  * @author root
  */
-public class PnlBerichte extends CleanablePanel {
+public class PnlBerichte extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.reports";
     public static final int DEFAULT_DAUER = 3;
@@ -87,8 +88,8 @@ public class PnlBerichte extends CleanablePanel {
     private double splitTEPercent, splitBCPercent;
     private boolean singleRowSelected;
 
-    private JXTaskPaneContainer panelSearch;
-    private int positionToAddPanels;
+    private ArrayList<JXTaskPane> panelSearch;
+    private TaskPaneContentChangedListener taskPaneContentChangedListener;
 
     /**
      * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
@@ -124,10 +125,11 @@ public class PnlBerichte extends CleanablePanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(JFrame parent, Bewohner bewohner, JXTaskPaneContainer panelSearch) {
+    public PnlBerichte(JFrame parent, Bewohner bewohner, TaskPaneContentChangedListener taskPaneContentChangedListener) {
         this.initPhase = true;
         this.parent = parent;
         this.laufendeOperation = LAUFENDE_OPERATION_NICHTS;
+        this.taskPaneContentChangedListener = taskPaneContentChangedListener;
         this.textmessageTL = null;
         this.aktuellerBericht = null;
         this.oldBericht = null;
@@ -140,8 +142,8 @@ public class PnlBerichte extends CleanablePanel {
         btnSystemInfo.setSelected(SYSPropsTools.isBoolean(internalClassID + ":btnSystemInfo"));
 
         this.panelSearch = panelSearch;
-        this.panelSearch.add(new JXHeader("Berichte", "", new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
-        positionToAddPanels = this.panelSearch.getComponentCount();
+//        this.panelSearch.add(new JXHeader("Berichte", "", new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
+//        positionToAddPanels = this.panelSearch.getComponentCount();
 
         standardActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -789,7 +791,7 @@ public class PnlBerichte extends CleanablePanel {
 //        lsl = null;
         jdcVon.cleanup();
         jdcBis.cleanup();
-        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
+//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
     }
 
     @Override
@@ -799,10 +801,10 @@ public class PnlBerichte extends CleanablePanel {
         }
 
         this.bewohner = bewohner;
-        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
+//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         prepareSearchArea();
 //        BewohnerTools.setBWLabel(lblBW, bewohner);
-        panelSearch.validate();
+//        panelSearch.validate();
         reloadTable();
     }
 
@@ -899,10 +901,11 @@ public class PnlBerichte extends CleanablePanel {
 
 
     private void prepareSearchArea() {
+        panelSearch = new ArrayList<JXTaskPane>();
         addByTime();
         addByTags();
         addBySearchText();
-//        addSpecials();
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Pflegeberichte"));
     }
 
 
@@ -926,7 +929,7 @@ public class PnlBerichte extends CleanablePanel {
         }, new ArrayList<PBerichtTAGS>());
 
         panelTags.setCollapsed(true);
-        panelSearch.add((JPanel) panelTags);
+        panelSearch.add(panelTags);
 
         panelTags.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -952,7 +955,7 @@ public class PnlBerichte extends CleanablePanel {
 
         panelText.add(txtSearch);
         panelText.setCollapsed(true);
-        panelSearch.add((JPanel) panelText);
+        panelSearch.add(panelText);
 
         panelText.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -1044,7 +1047,7 @@ public class PnlBerichte extends CleanablePanel {
             }
         });
 
-        panelSearch.add((JPanel) panelTime);
+        panelSearch.add(panelTime);
 
         panelTime.addPropertyChangeListener(new PropertyChangeListener() {
             @Override

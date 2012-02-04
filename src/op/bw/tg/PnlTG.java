@@ -30,6 +30,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.*;
 import op.OPDE;
+import op.events.TaskPaneContentChangedEvent;
+import op.events.TaskPaneContentChangedListener;
 import op.tools.*;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTaskPane;
@@ -73,7 +75,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class FrmTG extends JFrame {
+public class PnlTG extends JPanel {
     public static final String internalClassID = "admin.residents.cash";
     public static final int TAB_TG = 0;
     public static final int TAB_STAT = 1;
@@ -88,11 +90,14 @@ public class FrmTG extends JFrame {
     private DateFormat timeDF;
     private Bewohner bewohner;
     private JXTaskPane panelTime, panelText;
+    private ArrayList<JXTaskPane> panelSearch;
     //    private JDateChooser jdcVon, jdcBis;
     private JComboBox cmbVon, cmbBis, cmbMonat;
     private JXSearchField txtBW;
-    private JFrame thisComponent;
+    private JFrame parent;
     private boolean ignoreDateComboEvent;
+    private TaskPaneContentChangedListener taskPaneContentChangedListener;
+
 
     /**
      * Creates new form FrmBWAttr
@@ -103,6 +108,7 @@ public class FrmTG extends JFrame {
         final int row = tblTG.rowAtPoint(p);
         final ListSelectionModel lsm = tblTG.getSelectionModel();
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+
 
         if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
             lsm.setSelectionInterval(row, row);
@@ -118,7 +124,7 @@ public class FrmTG extends JFrame {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
                     Barbetrag mytg = tm.getListData().get(tm.getModelRow(row));  // Rechnet die Zeile um. Berücksichtigt die Zusammenfassungszeile
-                    if (JOptionPane.showConfirmDialog(thisComponent, "Sie löschen nun den Datensatz '"+mytg.getBelegtext()+"'.\nMöchten Sie das ?", "Löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    if (JOptionPane.showConfirmDialog(parent, "Sie löschen nun den Datensatz '"+mytg.getBelegtext()+"'.\nMöchten Sie das ?", "Löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         EntityTools.delete(mytg);
                         tm.getListData().remove(mytg);
                         tm.fireTableRowsDeleted(row, row);
@@ -133,12 +139,14 @@ public class FrmTG extends JFrame {
         }
     }
 
-    public FrmTG() {
-        thisComponent = this;
+    public PnlTG(JFrame parent, TaskPaneContentChangedListener taskPaneContentChangedListener) {
+        this.parent = parent;
+        this.taskPaneContentChangedListener = taskPaneContentChangedListener;
+        panelSearch = new ArrayList<JXTaskPane>();
         timeDF = DateFormat.getTimeInstance(DateFormat.SHORT);
         bewohner = null;
         initComponents();
-        this.setTitle(SYSTools.getWindowTitle("Barbetragsverwaltung"));
+//        this.setTitle(SYSTools.getWindowTitle("Barbetragsverwaltung"));
         setVisible(true);
         tblTG.setModel(new DefaultTableModel());
         ignoreDateComboEvent = true;
@@ -177,8 +185,6 @@ public class FrmTG extends JFrame {
         btnPrint = new JButton();
         jtpMain = new JTabbedPane();
         pnlBarbetrag = new JPanel();
-        scrollPane1 = new JScrollPane();
-        taskSearch = new JXTaskPaneContainer();
         lblBW = new JLabel();
         lblBetrag = new JLabel();
         jPanel4 = new JPanel();
@@ -203,8 +209,6 @@ public class FrmTG extends JFrame {
         lblMessage = new JLabel();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container contentPane = getContentPane();
 
         //======== jToolBar1 ========
         {
@@ -250,25 +254,19 @@ public class FrmTG extends JFrame {
             //======== pnlBarbetrag ========
             {
                 pnlBarbetrag.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $lcgap, pref",
-                    "fill:default, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
-
-                //======== scrollPane1 ========
-                {
-                    scrollPane1.setViewportView(taskSearch);
-                }
-                pnlBarbetrag.add(scrollPane1, CC.xywh(1, 3, 1, 3));
+                        "default:grow, $lcgap, pref",
+                        "fill:default, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
                 //---- lblBW ----
                 lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
                 lblBW.setForeground(new Color(51, 51, 255));
                 lblBW.setText("Kein(e) Bewohner(in) ausgew\u00e4hlt.");
-                pnlBarbetrag.add(lblBW, CC.xywh(1, 1, 3, 1));
+                pnlBarbetrag.add(lblBW, CC.xy(1, 1));
 
                 //---- lblBetrag ----
                 lblBetrag.setFont(new Font("Dialog", Font.BOLD, 18));
                 lblBetrag.setHorizontalAlignment(SwingConstants.RIGHT);
-                pnlBarbetrag.add(lblBetrag, CC.xy(5, 1));
+                pnlBarbetrag.add(lblBetrag, CC.xy(3, 1));
 
                 //======== jPanel4 ========
                 {
@@ -309,7 +307,7 @@ public class FrmTG extends JFrame {
                     }
                     jPanel4.add(jspData, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
                 }
-                pnlBarbetrag.add(jPanel4, CC.xywh(3, 3, 3, 1));
+                pnlBarbetrag.add(jPanel4, CC.xywh(1, 3, 3, 1));
 
                 //======== jPanel5 ========
                 {
@@ -379,7 +377,7 @@ public class FrmTG extends JFrame {
                     });
                     jPanel5.add(txtBetrag, CC.xy(5, 1, CC.FILL, CC.DEFAULT));
                 }
-                pnlBarbetrag.add(jPanel5, CC.xywh(3, 5, 3, 1));
+                pnlBarbetrag.add(jPanel5, CC.xywh(1, 5, 3, 1));
             }
             jtpMain.addTab("Barbetrag", pnlBarbetrag);
 
@@ -477,9 +475,9 @@ public class FrmTG extends JFrame {
                         .addGroup(GroupLayout.Alignment.TRAILING, pnlStatLayout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jspStat, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 833, Short.MAX_VALUE)
-                                .addComponent(jSeparator2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 833, Short.MAX_VALUE)
-                                .addComponent(jLabel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 833, Short.MAX_VALUE)
+                                .addComponent(jspStat, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 848, Short.MAX_VALUE)
+                                .addComponent(jSeparator2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 848, Short.MAX_VALUE)
+                                .addComponent(jLabel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 848, Short.MAX_VALUE)
                                 .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
                                     .addComponent(rbBWAlle)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -489,7 +487,7 @@ public class FrmTG extends JFrame {
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(lblSumme, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)))
+                                    .addComponent(lblSumme, GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)))
                             .addContainerGap())
                 );
                 pnlStatLayout.setVerticalGroup(
@@ -505,7 +503,7 @@ public class FrmTG extends JFrame {
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(jLabel5)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(rbBWAlle)
@@ -532,32 +530,30 @@ public class FrmTG extends JFrame {
             pnlStatus.add(lblMessage);
         }
 
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
-                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
-                .addGroup(contentPaneLayout.createSequentialGroup()
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
+                .addComponent(pnlStatus, GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 855, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup()
+                        .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 860, Short.MAX_VALUE)
                         .addComponent(jLabel1))
                     .addContainerGap())
         );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
+        layout.setVerticalGroup(
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
                     .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jLabel1)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(pnlStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
-        setSize(872, 693);
-        setLocationRelativeTo(null);
 
         //---- bgBWFilter ----
         ButtonGroup bgBWFilter = new ButtonGroup();
@@ -639,67 +635,6 @@ public class FrmTG extends JFrame {
         ((JTextField) evt.getSource()).selectAll();
     }//GEN-LAST:event_txtDatumFocusGained
 
-//    private void btnBottomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBottomActionPerformed
-//        cmbMonat.setSelectedIndex(cmbMonat.getModel().getSize() - 1);
-//    }//GEN-LAST:event_btnBottomActionPerformed
-//
-//    private void btnRightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightActionPerformed
-//        cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() + 1);
-//    }//GEN-LAST:event_btnRightActionPerformed
-//
-//    private void btnLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeftActionPerformed
-//        cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() - 1);
-//    }//GEN-LAST:event_btnLeftActionPerformed
-//
-//    private void btnTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTopActionPerformed
-//        cmbMonat.setSelectedIndex(0);
-//    }//GEN-LAST:event_btnTopActionPerformed
-//
-//    private void rbMonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbMonatActionPerformed
-//        if (initPhase) {
-//            return;
-//        }
-//        initPhase = true;
-//        cmbVon.setModel(new DefaultComboBoxModel());
-//        cmbVon.setEnabled(false);
-//        cmbBis.setModel(new DefaultComboBoxModel());
-//        cmbBis.setEnabled(false);
-//        setMinMax();
-//        cmbMonat.setModel(SYSCalendar.createMonthList(min, max));
-//        cmbMonat.setSelectedIndex(cmbMonat.getModel().getSize() - 1);
-//        cmbMonat.setEnabled(true);
-//        ListElement leMonat = (ListElement) cmbMonat.getSelectedItem();
-//        this.von = (Date) leMonat.getObject();
-//        this.bis = SYSCalendar.eom((Date) leMonat.getObject());
-//        btnTop.setEnabled(this.min.compareTo(this.von) < 0);
-//        btnLeft.setEnabled(this.min.compareTo(this.von) < 0);
-//        btnRight.setEnabled(this.max.compareTo(this.bis) >= 0);
-//        btnBottom.setEnabled(this.max.compareTo(this.bis) >= 0);
-//        initPhase = false;
-//        reloadDisplay();
-//    }//GEN-LAST:event_rbMonatActionPerformed
-//
-//    public void dispose() {
-//        SYSTools.unregisterListeners(this);
-//        super.dispose();
-//    }
-//
-//    private void cmbMonatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMonatItemStateChanged
-//        if (initPhase) {
-//            return;
-//        }
-//        initPhase = true; // damit die andere combobox nicht auch noch auf die Änderungen reagiert.
-//        ListElement leMonat = (ListElement) cmbMonat.getSelectedItem();
-//        this.von = (Date) leMonat.getObject();
-//        this.bis = SYSCalendar.eom((Date) leMonat.getObject());
-//        btnTop.setEnabled(this.min.compareTo(this.von) < 0);
-//        btnLeft.setEnabled(this.min.compareTo(this.von) < 0);
-//        btnRight.setEnabled(this.max.compareTo(this.bis) >= 0);
-//        btnBottom.setEnabled(this.max.compareTo(this.bis) >= 0);
-//        initPhase = false;
-//        reloadDisplay();
-//    }//GEN-LAST:event_cmbMonatItemStateChanged
-
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
         printSingle(tm.getListData(), tm.getVortrag());
@@ -763,43 +698,6 @@ public class FrmTG extends JFrame {
             txtBW.postActionEvent();
         }
     }//GEN-LAST:event_tblStatMouseClicked
-
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-//        if (JOptionPane.showConfirmDialog(this, "Sie löschen nun den markierten Datensatz.\nMöchten Sie das ?", "Storno eines Taschengeldvorgangs", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-//            return;
-//        }
-//
-//        EntityManager em = OPDE.createEM();
-//
-//        try{
-//            em.getTransaction().begin();
-//            Query query = em.createQuery("DELETE FROM Barbetrag t WHERE t.replacedBy = :tg ");
-//            query.executeUpdate();
-//
-//            em.remove(currentTG);
-//        }
-//
-//        Connection db = OPDE.getDb().db;
-//        String deleteSQL = "DELETE FROM Taschengeld WHERE TGID=? OR _cancel=?";
-//
-//        try {
-//            // Löschen
-//            PreparedStatement stmtDelete = db.prepareStatement(deleteSQL);
-//            stmtDelete.setLong(1, currentTGID);
-//            stmtDelete.setLong(2, currentTGID);
-//            stmtDelete.executeUpdate();
-//
-//        } catch (SQLException ex) {
-//            new DlgException(ex);
-//            ex.printStackTrace();
-//        }
-//        // Nach dem Löschen ist erstmal nix gewählt. Daher würden sonst die Knöpfe aktiv bleiben.
-//        // Schalten wir sie lieber vorsichtshalber ab.
-//        btnDelete.setEnabled(false);
-//        btnStorno.setEnabled(false);
-//        setMinMax();
-//        reloadDisplay();
-    }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
         if (jtpMain.getSelectedIndex() == TAB_STAT) {
@@ -1065,8 +963,6 @@ public class FrmTG extends JFrame {
     private JButton btnPrint;
     private JTabbedPane jtpMain;
     private JPanel pnlBarbetrag;
-    private JScrollPane scrollPane1;
-    private JXTaskPaneContainer taskSearch;
     private JLabel lblBW;
     private JLabel lblBetrag;
     private JPanel jPanel4;
@@ -1095,6 +991,7 @@ public class FrmTG extends JFrame {
     private void prepareSearchArea() {
         addBySearchBW();
         addByTime();
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.TOP, "Barbeträge"));
 //        addSpecials();
     }
 
@@ -1113,9 +1010,9 @@ public class FrmTG extends JFrame {
                     return;
                 }
                 Bewohner prevBW = bewohner;
-                bewohner = BewohnerTools.findeBW(thisComponent, txtBW.getText());
+                bewohner = BewohnerTools.findeBW(parent, txtBW.getText());
                 if (bewohner == null) {
-                    JOptionPane.showMessageDialog(thisComponent, "Keine(n) passende(n) Bewohner(in) gefunden.", "Hinweis", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, "Keine(n) passende(n) Bewohner(in) gefunden.", "Hinweis", JOptionPane.INFORMATION_MESSAGE);
                     //tblTG.setModel(new DefaultTableModel());
                     bewohner = prevBW;
                 } else {
@@ -1128,7 +1025,7 @@ public class FrmTG extends JFrame {
         panelText.setCollapsed(false);
         panelText.setSpecial(true);
         panelText.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_group.png")));
-        taskSearch.add((JPanel) panelText);
+        panelSearch.add(panelText);
 
     }
 
@@ -1290,7 +1187,7 @@ public class FrmTG extends JFrame {
         buttonPanel.add(endButton);
         panelTime.add(buttonPanel);
 
-        taskSearch.add((JPanel) panelTime);
+        panelSearch.add(panelTime);
 
         panelTime.addPropertyChangeListener(new PropertyChangeListener() {
             @Override

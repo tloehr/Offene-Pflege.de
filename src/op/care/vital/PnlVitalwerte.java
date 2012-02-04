@@ -35,12 +35,8 @@ import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
-import op.tools.InternalClassACL;
-import op.tools.SYSCalendar;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
+import op.tools.CleanablePanel;
+import op.tools.*;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -64,7 +60,7 @@ import java.util.HashMap;
 /**
  * @author tloehr
  */
-public class PnlVitalwerte extends CleanablePanel {
+public class PnlVitalwerte extends NursingRecordsPanel {
 
     public static final int RR = 0;
     public static final int BZ = 1;

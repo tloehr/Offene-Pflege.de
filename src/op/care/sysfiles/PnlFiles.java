@@ -33,9 +33,9 @@ import entity.BewohnerTools;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
+import op.tools.CleanablePanel;
 import op.tools.InternalClassACL;
+import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 import tablemodels.TMSYSFiles;
 import tablerenderer.RNDHTML;
@@ -50,7 +50,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class PnlFiles extends CleanablePanel {
+public class PnlFiles extends NursingRecordsPanel {
     // Wird für die Zuordnung beim Rechtesystem innerhalb
     // OCRights Tabelle benötigt.
 

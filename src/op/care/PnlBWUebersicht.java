@@ -34,27 +34,35 @@ import javax.swing.border.*;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
+import op.events.TaskPaneContentChangedEvent;
+import op.events.TaskPaneContentChangedListener;
+import op.tools.CleanablePanel;
+import op.tools.NursingRecordsPanel;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * @author tloehr
  */
-public class PnlBWUebersicht extends CleanablePanel {
+public class PnlBWUebersicht extends NursingRecordsPanel {
 
     private Bewohner bewohner;
+    private TaskPaneContentChangedListener taskPaneContentChangedListener;
 
     /**
      * Creates new form PnlBWUebersicht
      */
-    public PnlBWUebersicht(Bewohner bewohner) {
+    public PnlBWUebersicht(Bewohner bewohner, TaskPaneContentChangedListener taskPaneContentChangedListener) {
         initComponents();
         txtUebersicht.setContentType("text/html");
+        this.taskPaneContentChangedListener = taskPaneContentChangedListener;
         change2Bewohner(bewohner);
     }
 
+    @Override
     public void cleanup() {
         SYSTools.unregisterListeners(this);
     }
@@ -219,6 +227,7 @@ public class PnlBWUebersicht extends CleanablePanel {
     public void reloadDisplay() {
         txtUebersicht.setText(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, true, cbBWInfo.isSelected()));
         jspHTML.getViewport().setViewPosition(new Point(0, 0));
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, null, TaskPaneContentChangedEvent.BOTTOM, ""));
     }
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed

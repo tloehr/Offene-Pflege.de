@@ -30,8 +30,7 @@ import entity.*;
 import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
+import op.tools.CleanablePanel;
 import op.tools.*;
 
 import javax.persistence.EntityManager;
@@ -53,7 +52,7 @@ import java.util.logging.Logger;
 /**
  * @author tloehr
  */
-public class PnlPlanung extends CleanablePanel {
+public class PnlPlanung extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.planning";
     private JPopupMenu menu;
     //private int mode;

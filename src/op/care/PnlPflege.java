@@ -16,19 +16,17 @@ import op.care.planung.PnlPlanung;
 import op.care.sysfiles.PnlFiles;
 import op.care.verordnung.PnlVerordnung;
 import op.care.vital.PnlVitalwerte;
+import op.events.TaskPaneContentChangedListener;
+import op.tools.CleanablePanel;
 import op.tools.InternalClassACL;
-import op.tools.SYSPrint;
+import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 import op.vorgang.PnlVorgang;
-import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXTaskPaneContainer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -37,7 +35,7 @@ import java.io.IOException;
 /**
  * @author Torsten Löhr
  */
-public class PnlPflege extends CleanablePanel {
+public class PnlPflege extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.main";
     public static final int TAB_UEBERSICHT = 0;
@@ -55,21 +53,21 @@ public class PnlPflege extends CleanablePanel {
     private Bewohner currentBewohner = null;
     private JXTaskPaneContainer panelSearch;
     private JFrame parent;
-    private int positionToAddPanels;
+    private TaskPaneContentChangedListener taskPaneContentChangedListener;
 
     public JLabel bwlabel;
 
 
-    public PnlPflege(JFrame frame, JXTaskPaneContainer panelSearch, Bewohner bewohner) {
+    public PnlPflege(JFrame frame, Bewohner bewohner, TaskPaneContentChangedListener taskPaneContentChangedListener) {
         initPhase = true;
         initComponents();
         this.parent = frame;
-        this.panelSearch = panelSearch;
-        positionToAddPanels = panelSearch.getComponentCount();
+        this.taskPaneContentChangedListener = taskPaneContentChangedListener;
         initPanel();
         initPhase = false;
         change2Bewohner(bewohner);
     }
+
 
     @Override
     public void cleanup() {
@@ -99,15 +97,15 @@ public class PnlPflege extends CleanablePanel {
         }
 
         currentBewohner = bewohner;
-        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
+//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         switch (jtpPflegeakte.getSelectedIndex()) {
             case TAB_UEBERSICHT: {
-                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner));
+                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner, taskPaneContentChangedListener));
                 jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 break;
             }
             case TAB_PB: {
-                jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(parent, bewohner, panelSearch));
+                jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(parent, bewohner, taskPaneContentChangedListener));
                 jtpPflegeakte.setTitleAt(TAB_PB, "Pflegeberichte");
                 break;
             }
@@ -142,30 +140,30 @@ public class PnlPflege extends CleanablePanel {
                 break;
             }
             case TAB_VORGANG: {
-                final PnlVorgang pnlVorgang = new PnlVorgang(parent, bewohner, panelSearch);
-                CleanablePanel cp = new CleanablePanel() {
-
-                    @Override
-                    public void cleanup() {
-                        pnlVorgang.cleanup();
-                    }
-
-                    @Override
-                    public void change2Bewohner(Bewohner bewohner) {
-                        BewohnerTools.setBWLabel(bwlabel, bewohner);
-                        pnlVorgang.change2Bewohner(bewohner);
-                        validate();
-                    }
-                };
-                bwlabel = BewohnerTools.getBWLabel(bewohner);
-//                            bwlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-                BoxLayout boxLayout = new BoxLayout(cp, BoxLayout.PAGE_AXIS);
-                cp.setLayout(boxLayout);
-                cp.add(bwlabel);
-                cp.add(pnlVorgang);
-
-                jtpPflegeakte.setComponentAt(TAB_VORGANG, cp);
-                jtpPflegeakte.setTitleAt(TAB_VORGANG, "Vorgänge");
+//                final PnlVorgang pnlVorgang = new PnlVorgang(parent, bewohner);
+//                NursingRecordsPanel cp = new CleanablePanel() {
+//
+//                    @Override
+//                    public void cleanup() {
+//                        pnlVorgang.cleanup();
+//                    }
+//
+//                    @Override
+//                    public void change2Bewohner(Bewohner bewohner) {
+//                        BewohnerTools.setBWLabel(bwlabel, bewohner);
+//                        pnlVorgang.change2Bewohner(bewohner);
+//                        validate();
+//                    }
+//                };
+//                bwlabel = BewohnerTools.getBWLabel(bewohner);
+////                            bwlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//                BoxLayout boxLayout = new BoxLayout(cp, BoxLayout.PAGE_AXIS);
+//                cp.setLayout(boxLayout);
+//                cp.add(bwlabel);
+//                cp.add(pnlVorgang);
+//
+//                jtpPflegeakte.setComponentAt(TAB_VORGANG, cp);
+//                jtpPflegeakte.setTitleAt(TAB_VORGANG, "Vorgänge");
                 break;
             }
             case TAB_FILES: {

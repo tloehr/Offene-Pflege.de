@@ -16,7 +16,7 @@
       <void method="setProperty"> 
        <string>font</string> 
        <object class="java.awt.Font"> 
-        <string>Lucida Grande</string> 
+        <string>Arial Rounded MT Bold</string> 
         <int>1</int> 
         <int>13</int> 
        </object> 
@@ -76,7 +76,7 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>relgap, labelcompgap, default, labelcompgap, left:default:grow, unrelgap, default, labelcompgap, relgap</string> 
+          <string>relgap, labelcompgap, default, labelcompgap, left:default:grow, relgap, default, labelcompgap, relgap</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -215,6 +215,23 @@
              <string>value</string> 
              <int>50</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="java.awt.Font"> 
+              <string>Arial Rounded MT Bold</string> 
+              <int>0</int> 
+              <int>12</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>foreground</string> 
+             <object class="java.awt.Color"> 
+              <int>105</int> 
+              <int>80</int> 
+              <int>69</int> 
+              <int>255</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>pbMsg</string> 
             </void> 
@@ -278,7 +295,7 @@
             <void method="setProperty"> 
              <string>font</string> 
              <object class="java.awt.Font"> 
-              <string>Lucida Grande</string> 
+              <string>Arial Rounded MT Bold</string> 
               <int>1</int> 
               <int>13</int> 
              </object> 
@@ -306,6 +323,10 @@
           <void method="setProperty"> 
            <string>gridY</string> 
            <int>2</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>vAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
           </void> 
          </object> 
         </void> 

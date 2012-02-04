@@ -32,7 +32,7 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OCSec;
 import op.OPDE;
-import op.care.CleanablePanel;
+import op.tools.CleanablePanel;
 import op.tools.*;
 
 import javax.persistence.EntityManager;
@@ -55,7 +55,7 @@ import java.util.logging.Logger;
 /**
  * @author root
  */
-public class PnlBWInfo extends CleanablePanel {
+public class PnlBWInfo extends NursingRecordsPanel {
 
     private JPopupMenu menu;
     private int mode;

@@ -25,14 +25,15 @@
  * 
  */
 
-package op.care;
+package op.tools;
 
 import entity.Bewohner;
+import op.events.TaskPaneContentChangedListener;
 
 /**
  * @author tloehr
  */
 public abstract class CleanablePanel extends javax.swing.JPanel {
     public abstract void cleanup();
-    public abstract void change2Bewohner(Bewohner bewohner);
+//    public abstract void setTaskPaneContentChangeListener(TaskPaneContentChangedListener taskPaneContentChangeListener);
 }

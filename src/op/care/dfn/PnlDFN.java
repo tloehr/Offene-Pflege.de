@@ -33,8 +33,7 @@ import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
 import op.OCSec;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
+import op.tools.CleanablePanel;
 import op.care.planung.DlgMassSelect;
 import op.tools.*;
 
@@ -53,7 +52,7 @@ import java.util.HashMap;
 /**
  * @author root
  */
-public class PnlDFN extends CleanablePanel {
+public class PnlDFN extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.dfn";
 

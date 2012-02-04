@@ -33,10 +33,8 @@ import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
 import entity.verordnungen.*;
 import entity.vorgang.VorgaengeTools;
-import op.OCSec;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
+import op.tools.CleanablePanel;
 import op.care.med.vorrat.*;
 import op.tools.*;
 import tablemodels.TMVerordnung;
@@ -58,7 +56,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class PnlVerordnung extends CleanablePanel {
+public class PnlVerordnung extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.prescription";
 

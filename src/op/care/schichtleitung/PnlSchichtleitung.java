@@ -30,7 +30,7 @@ package op.care.schichtleitung;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.EinrichtungenTools;
-import op.care.CleanablePanel;
+import op.tools.CleanablePanel;
 import op.tools.*;
 
 import java.awt.*;
@@ -205,11 +205,6 @@ public class PnlSchichtleitung extends CleanablePanel {
     @Override
     public void cleanup() {
         SYSTools.unregisterListeners(this);
-    }
-
-    @Override
-    public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private String getAuswertung() {

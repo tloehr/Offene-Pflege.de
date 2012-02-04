@@ -32,12 +32,8 @@ import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
-import op.tools.InternalClassACL;
-import op.tools.Pair;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.tools.CleanablePanel;
+import op.tools.*;
 import tablemodels.TMBHP;
 import tablerenderer.RNDBHP;
 
@@ -54,7 +50,7 @@ import java.util.Date;
 /**
  * @author tloehr
  */
-public class PnlBHP extends CleanablePanel {
+public class PnlBHP extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.bhp";
     String bwkennung;

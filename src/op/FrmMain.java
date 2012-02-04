@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care;
+package op;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -32,12 +32,16 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
-import op.OPDE;
+import op.bw.tg.PnlTG;
+import op.care.PnlPflege;
+import op.events.TaskPaneContentChangedEvent;
+import op.events.TaskPaneContentChangedListener;
 import op.threads.HeapStat;
-import op.tools.SYSPrint;
-import op.tools.SYSTools;
+import op.tools.*;
+import op.vorgang.PnlVorgang;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.JXTaskPaneContainer;
+import org.jdesktop.swingx.JXTitledSeparator;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.border.DropShadowBorder;
 
@@ -49,12 +53,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
  * @author __USER__
  */
-public class FrmPflege extends javax.swing.JFrame {
+public class FrmMain extends javax.swing.JFrame {
 
     public static final String internaalClassID = "opde.mainframe";
 
@@ -67,7 +72,9 @@ public class FrmPflege extends javax.swing.JFrame {
 
     private int positionToAddPanels;
 
-    private java.util.List<JXTaskPane> bewohnerPanes, programPanes, currentAdditionalSearchPanes;
+    private java.util.List<JXTaskPane> bewohnerPanes, additionalSearchPanes;
+    private JXTaskPane programPane;
+    private TaskPaneContentChangedListener tpccl;
 
     /**
      * Creates new form FrmPflege
@@ -76,12 +83,15 @@ public class FrmPflege extends javax.swing.JFrame {
         OPDE.ocmain.lockOC();
     }
 
-    public FrmPflege() {
+    public FrmMain() {
         initPhase = true;
         initComponents();
         positionToAddPanels = 0;
         currentVisiblePanel = null;
         currentBewohner = null;
+        bewohnerPanes = new ArrayList<JXTaskPane>();
+        additionalSearchPanes = new ArrayList<JXTaskPane>();
+        programPane = null;
         thisFrame = this;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
         this.setVisible(true);
@@ -92,6 +102,43 @@ public class FrmPflege extends javax.swing.JFrame {
         } else {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
+
+        tpccl = new TaskPaneContentChangedListener() {
+            @Override
+            public void contentChanged(TaskPaneContentChangedEvent evt) {
+                panelSearch.removeAll();
+                panelSearch.add((JPanel) programPane);
+
+                if (evt.getWhereToPut() == TaskPaneContentChangedEvent.TOP) {
+                    if (!evt.getTitle().isEmpty()){
+                        panelSearch.add(new JXTitledSeparator(evt.getTitle(), SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
+                    }
+                    if (evt.getTaskPanes() != null) {
+                        for (JXTaskPane pane : evt.getTaskPanes()) {
+                            panelSearch.add((JPanel) pane);
+                        }
+                    }
+                    panelSearch.add(new JXTitledSeparator("Pflegeakte", SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/pflegeakte.png"))));
+                    for (JXTaskPane pane : bewohnerPanes) {
+                        panelSearch.add((JPanel) pane);
+                    }
+                } else {
+                    panelSearch.add(new JXTitledSeparator("Pflegeakte", SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/pflegeakte.png"))));
+                    for (JXTaskPane pane : bewohnerPanes) {
+                        panelSearch.add((JPanel) pane);
+                    }
+                    if (!evt.getTitle().isEmpty()){
+                        panelSearch.add(new JXTitledSeparator(evt.getTitle(), SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
+                    }
+                    if (evt.getTaskPanes() != null) {
+                        for (JXTaskPane pane : evt.getTaskPanes()) {
+                            panelSearch.add((JPanel) pane);
+                        }
+                    }
+                }
+                panelSearch.validate();
+            }
+        };
 
 //        btnVerlegung = new JButton("Verlegung");
 //        btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
@@ -104,6 +151,7 @@ public class FrmPflege extends javax.swing.JFrame {
 //            }
 //        });
 
+        createProgramList();
         createBewohnerListe();
 
         hs = new HeapStat(pbMsg, lblMainMsg, lblSubMsg);
@@ -152,7 +200,7 @@ public class FrmPflege extends javax.swing.JFrame {
 
         //---- btnVerlegung ----
         btnVerlegung.setText("Verlegung");
-        btnVerlegung.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+        btnVerlegung.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 13));
         btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/infored.png")));
         btnVerlegung.addActionListener(new ActionListener() {
             @Override
@@ -170,16 +218,16 @@ public class FrmPflege extends javax.swing.JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "$rgap, $lcgap, default, $lcgap, left:default:grow, $ugap, default, $lcgap, $rgap",
-                    "$rgap, default, $rgap, default:grow, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, left:default:grow, $rgap, default, $lcgap, $rgap",
+                "$rgap, default, $rgap, default:grow, $lgap, $rgap"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(234, 237, 223));
                 pnlMainMessage.setBorder(new DropShadowBorder(Color.black, 5, 0.3f, 12, true, true, true, true));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default",
-                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
+                    "default, $lcgap, default:grow, $lcgap, default",
+                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("Main Message Line for Main Text");
@@ -197,6 +245,8 @@ public class FrmPflege extends javax.swing.JFrame {
 
                 //---- pbMsg ----
                 pbMsg.setValue(50);
+                pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
+                pbMsg.setForeground(new Color(105, 80, 69));
                 pnlMainMessage.add(pbMsg, CC.xy(3, 7, CC.FILL, CC.DEFAULT));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 3, 1));
@@ -208,7 +258,7 @@ public class FrmPflege extends javax.swing.JFrame {
                 //---- btnLogout ----
                 btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/gpg.png")));
                 btnLogout.setText("<html>L\u00f6hr, Torsten<br/>Abmelden</html>");
-                btnLogout.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+                btnLogout.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 13));
                 btnLogout.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -217,7 +267,7 @@ public class FrmPflege extends javax.swing.JFrame {
                 });
                 pnlTopRight.add(btnLogout);
             }
-            pnlMain.add(pnlTopRight, CC.xy(7, 2));
+            pnlMain.add(pnlTopRight, CC.xy(7, 2, CC.DEFAULT, CC.FILL));
 
             //======== jspSearch ========
             {
@@ -260,17 +310,52 @@ public class FrmPflege extends javax.swing.JFrame {
     }//GEN-LAST:event_jtpUebersichtStateChanged
 
 
-    private void createProgrammListe() {
+    private void createProgramList() {
+        programPane = new JXTaskPane("Programme");
+        programPane.setSpecial(true);
+        programPane.setCollapsed(false);
 
-           menuStructure.add(new String[]{"Pflege/Pflegeakte", "op.care.FrmPflege", "pflegeakte.png"});
-        menuStructure.add(new String[]{"Pflege/Medikamente", "op.care.med.FrmMed", "agt_virussafe.png"});
-        menuStructure.add(new String[]{"Pflege/Massnahmen", "op.care.planung.massnahmen.FrmMassnahmen", "work.png"});
-        menuStructure.add(new String[]{"Bewohner/Bewohnerdaten", "op.bw.admin.FrmBWAttr", "groupevent.png"});
-        menuStructure.add(new String[]{"Bewohner/Barbeträge", "op.bw.tg.FrmTG", "coins.png"});
-        menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});
-        menuStructure.add(new String[]{"System/Datei-Manager", "op.sysfiles.FrmFilesManager", "kfm.png"});
-        menuStructure.add(new String[]{"Controlling/Controlling", "op.controlling.FrmCtrlMonitor", "kfind.png"});
-        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.vorgang.FrmVorgang", "utilities-file-archiver.png"});
+        panelSearch.add((JPanel) programPane);
+        for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
+
+
+            final String shortDescription = ic.getShortDescription();
+            final String javaclass = ic.getJavaClass();
+
+            programPane.add(new AbstractAction() {
+                {
+                    putValue(Action.NAME, shortDescription);
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    hs.setMainMessage(shortDescription);
+                    setPanelTo(loadPanel(javaclass));
+                }
+            });
+        }
+    }
+
+    private JPanel loadPanel(String classname) {
+//        Class c;
+//        JPanel panel = null;
+//        try {
+//            c = Class.forName(classname);
+//            panel = (JPanel) c.newInstance();
+//        } catch (Exception ex) {
+//            OPDE.debug(ex);
+//        }
+
+
+        JPanel panel = null;
+
+        if (classname.equals("op.bw.tg.PnlTG")) {
+            panel = new PnlTG(this, tpccl);
+        } else if (classname.equals("op.vorgang.PnlVorgang")) {
+            panel = new PnlVorgang(null, null, this, tpccl);
+        }
+
+        return panel;
     }
 
 
@@ -292,14 +377,19 @@ public class FrmPflege extends javax.swing.JFrame {
         Stationen meineStation = StationenTools.getStation4ThisHost();
         JXTaskPane currentStationsPane = null;
 
+        panelSearch.add(new JXTitledSeparator("Pflegeakte", SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/pflegeakte.png"))));
+
         while (it.hasNext()) {
             final Bewohner innerbewohner = it.next();
+
+            // Neue Stationspanel ist nötig.
             if (station != innerbewohner.getStation()) {
                 station = innerbewohner.getStation();
                 currentStationsPane = new JXTaskPane(station.getBezeichnung());
                 currentStationsPane.setSpecial(station.equals(meineStation));
                 currentStationsPane.setCollapsed(!currentStationsPane.isSpecial());
                 panelSearch.add((JPanel) currentStationsPane);
+                bewohnerPanes.add(currentStationsPane);
                 positionToAddPanels++; // Damit ich weiss, wo ich nachher die anderen Suchfelder dranhängen kann.
             }
 
@@ -312,29 +402,32 @@ public class FrmPflege extends javax.swing.JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     hs.setMainMessage(BewohnerTools.getBWLabelText(innerbewohner));
-                    if (currentVisiblePanel instanceof PnlPflege) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
-                        ((CleanablePanel) currentVisiblePanel).change2Bewohner(innerbewohner);
+                    if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
+                        ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
-                        currentVisiblePanel = new PnlPflege(thisFrame, panelSearch, innerbewohner);
+                        programPane.setCollapsed(true);
+                        currentVisiblePanel = new PnlPflege(thisFrame, innerbewohner, tpccl);
                         setPanelTo(currentVisiblePanel);
                     }
                 }
             });
         }
 
-
         em.close();
     }
 
     private void setPanelTo(JPanel pnl) {
         currentVisiblePanel = pnl;
-        pnlTopRight = new JPanel(new VerticalLayout(0));
+        pnlTopRight = new JPanel(new VerticalLayout());
         if (currentVisiblePanel instanceof PnlPflege) {
             pnlTopRight.add(btnVerlegung);
         } else {
             collapseBewohner();
         }
         pnlTopRight.add(btnLogout);
+        pnlMain.remove(pnlTopRight);
+        pnlMain.add(pnlTopRight, CC.xy(7, 2, CC.DEFAULT, CC.FILL));
+        pnlTopRight.validate();
 
         scrollMain.setViewportView(currentVisiblePanel);
     }
@@ -352,50 +445,6 @@ public class FrmPflege extends javax.swing.JFrame {
         }
 
     }
-
-//    private void reloadDisplay(Bewohner bewohner) {
-//        if (initPhase) {
-//            return;
-//        }
-//        currentBewohner = bewohner;
-//
-//        cleanup();
-//
-//
-//    }
-
-//    private void removeSearchPanels(){
-//        if (panelSearch.getComponentCount() > positionToAddPanels){
-//            int count = panelSearch.getComponentCount();
-//            for (int i = count-1; i >= positionToAddPanels; i--){
-//                panelSearch.remove(positionToAddPanels);
-//            }
-//        }
-//    }
-
-//    private void reloadTable(Bewohner bewohner) {
-//        // Bewohner-Liste
-//
-//        if (cbArchiv.isSelected()) { // Archivmodus gewünscht.
-//            tblBW.setModel(new TMBW());
-//            initPhase = true;
-//            //cmbStation.setSelectedItem("Alle");
-//            cmbStation.setEnabled(false);
-//            initPhase = false;
-//        } else {
-//            tblBW.setModel(new TMBW((Stationen) cmbStation.getSelectedItem()));
-//        }
-//
-//        tblBW.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-//        lsmbw.addListSelectionListener(lslBW);
-//        if (tblBW.getModel().getRowCount() > 0) {
-//            tblBW.setRowSelectionInterval(0, 0);
-//        }
-//        TableColumnModel tcm1 = tblBW.getColumnModel();
-////        tcm1.getColumn(0).setHeaderValue("Name");
-////        tcm1.getColumn(1).setHeaderValue("Info");
-//        jspBW.dispatchEvent(new ComponentEvent(jspBW, ComponentEvent.COMPONENT_RESIZED));
-//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JButton btnVerlegung;

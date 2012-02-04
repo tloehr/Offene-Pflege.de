@@ -34,15 +34,11 @@ import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
-import entity.system.SYSLoginTools;
 import op.OCSec;
 import op.OPDE;
-import op.care.CleanablePanel;
-import op.care.FrmPflege;
-import op.tools.HTMLTools;
-import op.tools.InternalClassACL;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.tools.CleanablePanel;
+import op.FrmMain;
+import op.tools.*;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -72,7 +68,7 @@ public class PnlUebergabe extends CleanablePanel {
     private ListSelectionListener lsl;
     private boolean initPhase;
     private long selectedTBID = 0;
-    private FrmPflege pflege;
+    private FrmMain pflege;
     private String classname;
     private OCSec ocs;
     private javax.swing.JFrame parent;
@@ -81,7 +77,7 @@ public class PnlUebergabe extends CleanablePanel {
     /**
      * Creates new form PnlUebergabe
      */
-    public PnlUebergabe(FrmPflege pflege) {
+    public PnlUebergabe(FrmMain pflege) {
         this.pflege = pflege;
         this.initPhase = true;
         this.classname = this.getClass().getName();
@@ -96,14 +92,10 @@ public class PnlUebergabe extends CleanablePanel {
         reloadTable();
     }
 
-    public FrmPflege getPflege() {
+    public FrmMain getPflege() {
         return pflege;
     }
 
-    @Override
-    public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     /**
      * This method is called from within the constructor to

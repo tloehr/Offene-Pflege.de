@@ -13,7 +13,7 @@ import java.awt.*;
 public class FrmVorgang extends JFrame {
     public FrmVorgang() throws HeadlessException {
         setSize(1024, 768);
-        getContentPane().add(new PnlVorgang(this));
+        getContentPane().add(new PnlVorgang(null, null, this, null));
     }
 
 
