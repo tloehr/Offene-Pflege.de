@@ -28,6 +28,8 @@
 
 package op.care.med;
 
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import entity.EntityTools;
 import entity.verordnungen.*;
 import op.OPDE;
@@ -109,14 +111,11 @@ public class FrmMed extends javax.swing.JFrame {
         btnMed = new JButton();
         btnBuchen = new JButton();
         btnVorrat = new JButton();
-        jLabel1 = new JLabel();
-        jPanel1 = new JPanel();
-        jScrollPane1 = new JScrollPane();
-        treeMed = new JTree();
-        jPanel2 = new JPanel();
         txtSuche = new JTextField();
         jScrollPane2 = new JScrollPane();
         lstPraep = new JList();
+        jScrollPane1 = new JScrollPane();
+        treeMed = new JTree();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -127,6 +126,9 @@ public class FrmMed extends javax.swing.JFrame {
             }
         });
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "pref, $lcgap, default:grow",
+            "2*(fill:default, $lgap), fill:default:grow"));
 
         //======== jToolBar1 ========
         {
@@ -176,147 +178,67 @@ public class FrmMed extends javax.swing.JFrame {
             });
             jToolBar1.add(btnVorrat);
         }
+        contentPane.add(jToolBar1, CC.xywh(1, 1, 3, 1));
 
-        //---- jLabel1 ----
-        jLabel1.setFont(new Font("Dialog", Font.BOLD, 24));
-        jLabel1.setText("Medikamente");
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
-
-            //======== jScrollPane1 ========
-            {
-
-                //---- treeMed ----
-                treeMed.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        treeMedMousePressed(e);
-                    }
-                });
-                jScrollPane1.setViewportView(treeMed);
+        //---- txtSuche ----
+        txtSuche.setFont(new Font("Arial", Font.PLAIN, 16));
+        txtSuche.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtSucheCaretUpdate(e);
             }
+        });
+        txtSuche.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtSucheActionPerformed(e);
+            }
+        });
+        contentPane.add(txtSuche, CC.xy(1, 3));
 
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-        }
-
-        //======== jPanel2 ========
+        //======== jScrollPane2 ========
         {
-            jPanel2.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-            //---- txtSuche ----
-            txtSuche.addCaretListener(new CaretListener() {
+            //---- lstPraep ----
+            lstPraep.setModel(new AbstractListModel() {
+                String[] values = {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4",
+                    "Item 5"
+                };
                 @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtSucheCaretUpdate(e);
+                public int getSize() { return values.length; }
+                @Override
+                public Object getElementAt(int i) { return values[i]; }
+            });
+            lstPraep.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            lstPraep.setFont(new Font("Arial", Font.PLAIN, 16));
+            lstPraep.addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    lstPraepValueChanged(e);
                 }
             });
-            txtSuche.addActionListener(new ActionListener() {
+            jScrollPane2.setViewportView(lstPraep);
+        }
+        contentPane.add(jScrollPane2, CC.xy(1, 5));
+
+        //======== jScrollPane1 ========
+        {
+
+            //---- treeMed ----
+            treeMed.setFont(new Font("Arial", Font.PLAIN, 16));
+            treeMed.addMouseListener(new MouseAdapter() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSucheActionPerformed(e);
+                public void mousePressed(MouseEvent e) {
+                    treeMedMousePressed(e);
                 }
             });
-
-            //======== jScrollPane2 ========
-            {
-
-                //---- lstPraep ----
-                lstPraep.setModel(new AbstractListModel() {
-                    String[] values = {
-                            "Item 1",
-                            "Item 2",
-                            "Item 3",
-                            "Item 4",
-                            "Item 5"
-                    };
-
-                    @Override
-                    public int getSize() {
-                        return values.length;
-                    }
-
-                    @Override
-                    public Object getElementAt(int i) {
-                        return values[i];
-                    }
-                });
-                lstPraep.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                lstPraep.addListSelectionListener(new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        lstPraepValueChanged(e);
-                    }
-                });
-                jScrollPane2.setViewportView(lstPraep);
-            }
-
-            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
-            jPanel2.setLayout(jPanel2Layout);
-            jPanel2Layout.setHorizontalGroup(
-                    jPanel2Layout.createParallelGroup()
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                            .addComponent(jScrollPane2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
-                                    .addContainerGap())
-            );
-            jPanel2Layout.setVerticalGroup(
-                    jPanel2Layout.createParallelGroup()
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
+            jScrollPane1.setViewportView(treeMed);
         }
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addContainerGap(462, Short.MAX_VALUE))
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
-        );
-        contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
+        contentPane.add(jScrollPane1, CC.xywh(3, 3, 1, 3));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -563,14 +485,11 @@ public class FrmMed extends javax.swing.JFrame {
     private JButton btnMed;
     private JButton btnBuchen;
     private JButton btnVorrat;
-    private JLabel jLabel1;
-    private JPanel jPanel1;
-    private JScrollPane jScrollPane1;
-    private JTree treeMed;
-    private JPanel jPanel2;
     private JTextField txtSuche;
     private JScrollPane jScrollPane2;
     private JList lstPraep;
+    private JScrollPane jScrollPane1;
+    private JTree treeMed;
     // End of variables declaration//GEN-END:variables
 
     private class TreeRenderer extends JLabel implements TreeCellRenderer {

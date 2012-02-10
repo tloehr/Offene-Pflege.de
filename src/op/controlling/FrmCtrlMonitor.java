@@ -26,26 +26,25 @@
  */
 package op.controlling;
 
-import java.awt.*;
-import java.awt.Component;
-import java.awt.event.*;
-import javax.persistence.Query;
-import javax.persistence.EntityManager;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
 import entity.PBerichtTAGS;
-import entity.PBerichtTAGSTools;
 import entity.PflegeberichteTools;
-import entity.system.SYSPropsTools;
 import entity.StationenTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.tools.ListElement;
 import op.tools.SYSCalendar;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -105,7 +104,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         int planungentage;
         int bvwochen;
         int gewichtmonate;
-        int sozialwochen;
+        int sozialmonate;
         int sozialzeitenwochen;
         int vorratprozent;
         int sturzamonate;
@@ -134,9 +133,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             gewichtmonate = 6;
         }
         try {
-            sozialwochen = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSozialWochen"));
+            sozialmonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSozialMonate"));
         } catch (NumberFormatException nfe) {
-            sozialwochen = 1;
+            sozialmonate = 1;
         }
         try {
             sozialzeitenwochen = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSozialZeitenWochen"));
@@ -180,7 +179,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         spinBerichteMonate.setModel(new SpinnerNumberModel(berichtemonate, 1, 12, 1));
         spinWundenMonate.setModel(new SpinnerNumberModel(wundenmonate, 1, 12, 1));
         spinGewichtMonate.setModel(new SpinnerNumberModel(gewichtmonate, 1, 12, 1));
-        spinSozialWochen.setModel(new SpinnerNumberModel(sozialwochen, 1, 52, 1));
+        spinSozialMonate.setModel(new SpinnerNumberModel(sozialmonate, 1, 12, 1));
         //spinSozialZeitenWochen.setModel(new SpinnerNumberModel(sozialzeitenwochen, 1, 52, 1));
         spinVorratProzent.setModel(new SpinnerNumberModel(vorratprozent, 0, 90, 5));
         spinSturzAMonate.setModel(new SpinnerNumberModel(sturzamonate, 1, 12, 1));
@@ -196,6 +195,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         cmbBilanzMonat.setModel(SYSCalendar.createMonthList(von, bis));
         cmbBilanzMonat.setRenderer(new ListCellRenderer() {
             Format formatter = new SimpleDateFormat("MMMM yyyy");
+
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text = formatter.format(o);
@@ -208,6 +208,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         cmbPEAMonat.setModel(SYSCalendar.createMonthList(von, bis));
         cmbPEAMonat.setRenderer(new ListCellRenderer() {
             Format formatter = new SimpleDateFormat("MMMM yyyy");
+
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text = formatter.format(o);
@@ -224,6 +225,13 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         cmbTags.setModel(SYSTools.lst2cmb(SYSTools.list2dlm(query.getResultList())));
+        cmbTags.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PBerichtTAGS) o).getBezeichnung(), i, isSelected, cellHasFocus);
+            }
+        });
         SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
         em.close();
 
@@ -248,6 +256,8 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     private String createHTML() {
 
         StringBuilder html = new StringBuilder(1000);
+        html.append("<div id=\"fonttext\">");
+
         int progress = 0;
         EntityManager em = OPDE.createEM();
         pbMain.setMaximum(anzahlGewuenschterAuswertungen());
@@ -265,7 +275,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             }
             lblProgress.setText("Ein-/Ausfuhr/Bilanz");
             pbPart.setValue(0);
-            Date monat = (Date) ((ListElement) cmbBilanzMonat.getSelectedItem()).getObject();
+            Date monat = (Date) cmbBilanzMonat.getSelectedItem();
             html.append(DBHandling.getBilanzen(1, monat, o));
             progress++;
             pbMain.setValue(progress);
@@ -363,7 +373,8 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             lblProgress.setText("Pflegeberichte durchsuchen");
             pbPart.setValue(0);
             int berichtemonate = Integer.parseInt(spinBerichteMonate.getValue().toString());
-            html.append(DBHandling.getBerichte(txtBerichte.getText(), (ListElement) cmbTags.getSelectedItem(), 1, berichtemonate, o));
+//            html.append(DBHandling.getBerichte(txtBerichte.getText(), (ListElement) cmbTags.getSelectedItem(), 1, berichtemonate, o));
+            html.append(PflegeberichteTools.getBerichteASHTML(em, txtBerichte.getText(), (PBerichtTAGS) cmbTags.getSelectedItem(), 1, berichtemonate));
             progress++;
             pbMain.setValue(progress);
         }
@@ -410,8 +421,13 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             }
             lblProgress.setText("Berichte Sozialer Dienst");
             pbPart.setValue(0);
-            int sozialwochen = Integer.parseInt(spinSozialWochen.getValue().toString());
-            html.append(DBHandling.getSozialBerichte("", "", 1, sozialwochen));
+            int sozialmonate = Integer.parseInt(spinSozialMonate.getValue().toString());
+            Query query = em.createNamedQuery("PBerichtTAGS.findByKurzbezeichnung");
+            query.setParameter("kurzbezeichnung", "soz");
+            PBerichtTAGS sozTag = (PBerichtTAGS) query.getSingleResult();
+
+            html.append(PflegeberichteTools.getBerichteASHTML(em, "", sozTag, 1, sozialmonate));
+//            html.append(DBHandling.getSozialBerichte("", "", 1, sozialmonate));
             progress++;
             pbMain.setValue(progress);
         }
@@ -422,8 +438,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             }
             lblProgress.setText("Zeiten Sozialer Dienst");
             pbPart.setValue(0);
-            Date monat = (Date) ((ListElement) cmbPEAMonat.getSelectedItem()).getObject();
-            html.append(DBHandling.getSozialZeiten(1, monat));
+            Date monat = (Date) cmbPEAMonat.getSelectedItem();
+//            html.append(DBHandling.getSozialZeiten(1, monat));
+            html.append(PflegeberichteTools.getSozialZeiten(em, 1, monat));
             progress++;
             pbMain.setValue(progress);
         }
@@ -460,7 +477,8 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 
         String result = "";
         if (!isCancelled) {
-            result = SYSTools.toHTML(html.toString());
+            html.append("</div>");
+            result = html.toString();
         }
         return result;
     }
@@ -507,7 +525,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         spinWundenMonate = new JSpinner();
         jPanel5 = new JPanel();
         cbSozialBerichte = new JCheckBox();
-        spinSozialWochen = new JSpinner();
+        spinSozialMonate = new JSpinner();
         cbSozialZeiten = new JCheckBox();
         cmbPEAMonat = new JComboBox();
         jPanel6 = new JPanel();
@@ -680,11 +698,11 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 });
 
                 //---- cmbTags ----
-                cmbTags.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbTags.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbTags.addItemListener(new ItemListener() {
                     @Override
@@ -696,81 +714,81 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
                 jPanel2.setLayout(jPanel2Layout);
                 jPanel2Layout.setHorizontalGroup(
-                    jPanel2Layout.createParallelGroup()
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel2Layout.createParallelGroup()
+                        jPanel2Layout.createParallelGroup()
                                 .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(cbBVAktivitaet)
-                                    .addGap(224, 224, 224)
-                                    .addComponent(spinBVWochen, GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))
-                                .addComponent(cbVerordnungenOhneAnbruch)
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addGroup(jPanel2Layout.createParallelGroup()
-                                        .addComponent(cbPlanung)
-                                        .addComponent(cbNichtAbgehakteBHPs))
-                                    .addGap(34, 34, 34)
-                                    .addGroup(jPanel2Layout.createParallelGroup()
-                                        .addComponent(spinBHPTage)
-                                        .addComponent(spinPlanungenTage)))
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addGroup(jPanel2Layout.createParallelGroup()
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                            .addComponent(cbBerichte)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(txtBerichte, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))
-                                        .addComponent(cbGeringeVorraete))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(spinBerichteMonate, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(spinVorratProzent, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)))
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addGroup(jPanel2Layout.createParallelGroup()
-                                        .addComponent(cbInko)
-                                        .addComponent(cbBeschwerden))
-                                    .addGap(139, 139, 139)
-                                    .addComponent(spinBeschwerdenMonate))
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addGap(25, 25, 25)
-                                    .addComponent(cmbTags, 0, 350, Short.MAX_VALUE)))
-                            .addContainerGap())
+                                        .addContainerGap()
+                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addComponent(cbBVAktivitaet)
+                                                        .addGap(224, 224, 224)
+                                                        .addComponent(spinBVWochen, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
+                                                .addComponent(cbVerordnungenOhneAnbruch)
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                                .addComponent(cbPlanung)
+                                                                .addComponent(cbNichtAbgehakteBHPs))
+                                                        .addGap(34, 34, 34)
+                                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                                .addComponent(spinBHPTage, GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
+                                                                .addComponent(spinPlanungenTage, GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)))
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                                        .addComponent(cbBerichte)
+                                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(txtBerichte, GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))
+                                                                .addComponent(cbGeringeVorraete))
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                                .addComponent(spinBerichteMonate, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(spinVorratProzent, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)))
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                                .addComponent(cbInko)
+                                                                .addComponent(cbBeschwerden))
+                                                        .addGap(139, 139, 139)
+                                                        .addComponent(spinBeschwerdenMonate, GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE))
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addGap(25, 25, 25)
+                                                        .addComponent(cmbTags, 0, 376, Short.MAX_VALUE)))
+                                        .addContainerGap())
                 );
                 jPanel2Layout.setVerticalGroup(
-                    jPanel2Layout.createParallelGroup()
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbBVAktivitaet)
-                                .addComponent(spinBVWochen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbNichtAbgehakteBHPs)
-                                .addComponent(spinBHPTage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbPlanung)
-                                .addComponent(spinPlanungenTage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(cbVerordnungenOhneAnbruch)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel2Layout.createParallelGroup()
-                                .addComponent(spinVorratProzent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(cbGeringeVorraete))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel2Layout.createParallelGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(cbBerichte)
-                                    .addComponent(txtBerichte, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addComponent(spinBerichteMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(cmbTags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                            .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        jPanel2Layout.createParallelGroup()
                                 .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(cbInko)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(cbBeschwerden))
-                                .addComponent(spinBeschwerdenMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap())
+                                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbBVAktivitaet)
+                                                .addComponent(spinBVWochen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbNichtAbgehakteBHPs)
+                                                .addComponent(spinBHPTage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbPlanung)
+                                                .addComponent(spinPlanungenTage, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbVerordnungenOhneAnbruch)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                .addComponent(spinVorratProzent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(cbGeringeVorraete))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel2Layout.createParallelGroup()
+                                                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(cbBerichte)
+                                                        .addComponent(txtBerichte, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(spinBerichteMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cmbTags, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addComponent(cbInko)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(cbBeschwerden))
+                                                .addComponent(spinBeschwerdenMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addContainerGap())
                 );
             }
 
@@ -806,11 +824,11 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 });
 
                 //---- cmbBilanzMonat ----
-                cmbBilanzMonat.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbBilanzMonat.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbBilanzMonat.setToolTipText("Auswertung ab Monat");
 
@@ -824,11 +842,11 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 });
 
                 //---- cmbStation ----
-                cmbStation.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbStation.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbStation.addItemListener(new ItemListener() {
                     @Override
@@ -858,50 +876,50 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
                 jPanel3.setLayout(jPanel3Layout);
                 jPanel3Layout.setHorizontalGroup(
-                    jPanel3Layout.createParallelGroup()
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel3Layout.createParallelGroup()
+                        jPanel3Layout.createParallelGroup()
                                 .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addComponent(cbGewicht)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
-                                    .addComponent(spinGewichtMonate, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addGroup(jPanel3Layout.createParallelGroup()
-                                        .addComponent(cbBilanz)
-                                        .addComponent(cbMediControl, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel3Layout.createParallelGroup()
-                                        .addComponent(cmbStation, 0, 107, Short.MAX_VALUE)
-                                        .addComponent(cmbBilanzMonat, 0, 107, Short.MAX_VALUE)))
-                                .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addComponent(cbWunden)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
-                                    .addComponent(spinWundenMonate, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)))
-                            .addContainerGap())
+                                        .addContainerGap()
+                                        .addGroup(jPanel3Layout.createParallelGroup()
+                                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                                        .addComponent(cbGewicht)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
+                                                        .addComponent(spinGewichtMonate, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                                        .addGroup(jPanel3Layout.createParallelGroup()
+                                                                .addComponent(cbBilanz)
+                                                                .addComponent(cbMediControl, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE))
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addGroup(jPanel3Layout.createParallelGroup()
+                                                                .addComponent(cmbStation, 0, 133, Short.MAX_VALUE)
+                                                                .addComponent(cmbBilanzMonat, 0, 133, Short.MAX_VALUE)))
+                                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                                        .addComponent(cbWunden)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
+                                                        .addComponent(spinWundenMonate, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)))
+                                        .addContainerGap())
                 );
                 jPanel3Layout.setVerticalGroup(
-                    jPanel3Layout.createParallelGroup()
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(cbBilanz)
-                                .addComponent(cmbBilanzMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbGewicht)
-                                .addComponent(spinGewichtMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createParallelGroup()
+                        jPanel3Layout.createParallelGroup()
                                 .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addGap(2, 2, 2)
-                                    .addComponent(cmbStation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(cbMediControl)))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel3Layout.createParallelGroup()
-                                .addComponent(cbWunden)
-                                .addComponent(spinWundenMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap(181, Short.MAX_VALUE))
+                                        .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                .addComponent(cbBilanz)
+                                                .addComponent(cmbBilanzMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbGewicht)
+                                                .addComponent(spinGewichtMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(jPanel3Layout.createParallelGroup()
+                                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                                        .addGap(2, 2, 2)
+                                                        .addComponent(cmbStation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(cbMediControl)))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel3Layout.createParallelGroup()
+                                                .addComponent(cbWunden)
+                                                .addComponent(spinWundenMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addContainerGap(197, Short.MAX_VALUE))
                 );
             }
 
@@ -918,9 +936,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                     }
                 });
 
-                //---- spinSozialWochen ----
-                spinSozialWochen.setToolTipText("In den letzten n Wochen");
-                spinSozialWochen.addChangeListener(new ChangeListener() {
+                //---- spinSozialMonate ----
+                spinSozialMonate.setToolTipText("In den letzten n Monaten");
+                spinSozialMonate.addChangeListener(new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e) {
                         spinSozialWochenStateChanged(e);
@@ -937,42 +955,42 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 });
 
                 //---- cmbPEAMonat ----
-                cmbPEAMonat.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbPEAMonat.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbPEAMonat.setToolTipText("Auswertung ab Monat");
 
                 GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
                 jPanel5.setLayout(jPanel5Layout);
                 jPanel5Layout.setHorizontalGroup(
-                    jPanel5Layout.createParallelGroup()
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel5Layout.createParallelGroup()
+                        jPanel5Layout.createParallelGroup()
                                 .addGroup(jPanel5Layout.createSequentialGroup()
-                                    .addComponent(cbSozialBerichte)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
-                                    .addComponent(spinSozialWochen, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel5Layout.createSequentialGroup()
-                                    .addComponent(cbSozialZeiten)
-                                    .addGap(54, 54, 54)
-                                    .addComponent(cmbPEAMonat, 0, 146, Short.MAX_VALUE)))
-                            .addContainerGap())
+                                        .addContainerGap()
+                                        .addGroup(jPanel5Layout.createParallelGroup()
+                                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                                        .addComponent(cbSozialBerichte)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 202, Short.MAX_VALUE)
+                                                        .addComponent(spinSozialMonate, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                                        .addComponent(cbSozialZeiten)
+                                                        .addGap(54, 54, 54)
+                                                        .addComponent(cmbPEAMonat, 0, 211, Short.MAX_VALUE)))
+                                        .addContainerGap())
                 );
                 jPanel5Layout.setVerticalGroup(
-                    jPanel5Layout.createParallelGroup()
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addGroup(jPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbSozialBerichte)
-                                .addComponent(spinSozialWochen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbSozialZeiten)
-                                .addComponent(cmbPEAMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap(39, Short.MAX_VALUE))
+                        jPanel5Layout.createParallelGroup()
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addGroup(jPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbSozialBerichte)
+                                                .addComponent(spinSozialMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbSozialZeiten)
+                                                .addComponent(cmbPEAMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addContainerGap(52, Short.MAX_VALUE))
                 );
             }
 
@@ -1019,64 +1037,64 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                 GroupLayout jPanel6Layout = new GroupLayout(jPanel6);
                 jPanel6.setLayout(jPanel6Layout);
                 jPanel6Layout.setHorizontalGroup(
-                    jPanel6Layout.createParallelGroup()
-                        .addGroup(jPanel6Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel6Layout.createParallelGroup()
+                        jPanel6Layout.createParallelGroup()
                                 .addGroup(jPanel6Layout.createSequentialGroup()
-                                    .addComponent(cbSturzAnonym)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
-                                    .addComponent(spinSturzAMonate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel6Layout.createSequentialGroup()
-                                    .addComponent(cbSturz)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
-                                    .addComponent(spinSturzMonate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
-                            .addContainerGap())
+                                        .addContainerGap()
+                                        .addGroup(jPanel6Layout.createParallelGroup()
+                                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                                        .addComponent(cbSturzAnonym)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 135, Short.MAX_VALUE)
+                                                        .addComponent(spinSturzAMonate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                                        .addComponent(cbSturz)
+                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+                                                        .addComponent(spinSturzMonate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
+                                        .addContainerGap())
                 );
                 jPanel6Layout.setVerticalGroup(
-                    jPanel6Layout.createParallelGroup()
-                        .addGroup(jPanel6Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbSturzAnonym)
-                                .addComponent(spinSturzAMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cbSturz)
-                                .addComponent(spinSturzMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap(26, Short.MAX_VALUE))
+                        jPanel6Layout.createParallelGroup()
+                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbSturzAnonym)
+                                                .addComponent(spinSturzAMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cbSturz)
+                                                .addComponent(spinSturzMonate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addContainerGap(38, Short.MAX_VALUE))
                 );
             }
 
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(jPanel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jPanel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel1Layout.createParallelGroup()
+                                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addContainerGap())
             );
-            jPanel1Layout.linkSize(SwingConstants.VERTICAL, new Component[] {jPanel2, jPanel3});
+            jPanel1Layout.linkSize(SwingConstants.VERTICAL, new Component[]{jPanel2, jPanel3});
         }
 
         //---- jLabel1 ----
@@ -1122,45 +1140,45 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 878, Short.MAX_VALUE)
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(pbPart, GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)
-                        .addComponent(pbMain, GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnStop)
-                    .addContainerGap())
-                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel1)
-                    .addGap(18, 18, 18)
-                    .addComponent(lblProgress, GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
+                contentPaneLayout.createParallelGroup()
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addComponent(pbPart, GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
+                                        .addComponent(pbMain, GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnStop)
+                                .addContainerGap())
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(lblProgress, GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(lblProgress))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup()
+                contentPaneLayout.createParallelGroup()
                         .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addComponent(pbMain, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(pbPart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
-                    .addGap(18, 18, 18)
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(lblProgress))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(contentPaneLayout.createParallelGroup()
+                                        .addGroup(contentPaneLayout.createSequentialGroup()
+                                                .addComponent(pbMain, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(pbPart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         setSize(878, 697);
         setLocationRelativeTo(null);
@@ -1171,12 +1189,12 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
             jPanel4.setLayout(jPanel4Layout);
             jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup()
-                    .addGap(0, 100, Short.MAX_VALUE)
+                    jPanel4Layout.createParallelGroup()
+                            .addGap(0, 100, Short.MAX_VALUE)
             );
             jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup()
-                    .addGap(0, 100, Short.MAX_VALUE)
+                    jPanel4Layout.createParallelGroup()
+                            .addGap(0, 100, Short.MAX_VALUE)
             );
         }
     }// </editor-fold>//GEN-END:initComponents
@@ -1201,9 +1219,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             protected void done() {
                 try {
                     String get = SYSTools.catchNull(get());
-                    String result = SYSTools.htmlUmlautConversion(SYSTools.catchNull(get()));
-                    if (!SYSTools.catchNull(result).equals("")) {
-                        SYSPrint.print(parent, result, false);
+//                    String result = SYSTools.htmlUmlautConversion(SYSTools.catchNull(get()));
+                    if (!SYSTools.catchNull(get).isEmpty()) {
+                        SYSPrint.print(parent, get, false);
                     }
                     btnPrint.setEnabled(true);
                     btnStop.setEnabled(false);
@@ -1224,6 +1242,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 
     private void cbSozialBerichteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSozialBerichteActionPerformed
         SYSPropsTools.storeState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
+        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
     }//GEN-LAST:event_cbSozialBerichteActionPerformed
 
     private void spinBVWochenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinBVWochenStateChanged
@@ -1239,8 +1258,8 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     }//GEN-LAST:event_spinBHPTageStateChanged
 
     private void spinSozialWochenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSozialWochenStateChanged
-        spinSozialWochen.setToolTipText("In den letzten " + spinSozialWochen.getValue().toString() + " Wochen");
-        SYSPropsTools.storeProp(this.getClass().getName() + "::spinSozialWochen", spinSozialWochen.getValue().toString(), OPDE.getLogin().getUser());
+        spinSozialMonate.setToolTipText("In den letzten " + spinSozialMonate.getValue().toString() + " Monaten");
+        SYSPropsTools.storeProp(this.getClass().getName() + "::spinSozialMonate", spinSozialMonate.getValue().toString(), OPDE.getLogin().getUser());
         //SYSTools.putProps(this.getClass().getName() + "::spinSozialWochen", spinBHPTage.getValue().toString(), false, "");
     }//GEN-LAST:event_spinSozialWochenStateChanged
 
@@ -1407,7 +1426,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
     private JSpinner spinWundenMonate;
     private JPanel jPanel5;
     private JCheckBox cbSozialBerichte;
-    private JSpinner spinSozialWochen;
+    private JSpinner spinSozialMonate;
     private JCheckBox cbSozialZeiten;
     private JComboBox cmbPEAMonat;
     private JPanel jPanel6;

@@ -17,7 +17,7 @@ public class DBHandling {
 
 
     public static String getBerichtAsHTML(long tbid) {
-        HashMap hm = DBRetrieve.getSingleRecord("Tagesberichte", "TBID", tbid);
+        HashMap hm = DBRetrieve.getSingleRecord("Pflegeberichte", "PBID", tbid);
         return getBerichtAsHTML(hm.get("Text").toString(), hm.get("UKennung").toString(), hm.get("BWKennung").toString(), hm.get("EKennung").toString(), false, (Date) hm.get("PIT"));
     }
 

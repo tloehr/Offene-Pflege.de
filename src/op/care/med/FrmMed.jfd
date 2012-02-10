@@ -10,14 +10,14 @@
      <object class="com.jformdesigner.model.FormWindow"> 
       <string>javax.swing.JFrame</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>org.jdesktop.layout.GroupLayout</class> 
+       <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
-        <string>$horizontalGroup</string> 
-        <string>par l {seq l {space :::p, comp jLabel1:::p::p, space ::462:x}, seq l {space :::p, comp jPanel2:::p::p:1, space :::p, comp jPanel1:::::x, space :::p}, comp jToolBar1::l::638:x}</string> 
+        <string>$columnSpecs</string> 
+        <string>pref, labelcompgap, default:grow</string> 
        </void> 
        <void method="setProperty"> 
-        <string>$verticalGroup</string> 
-        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, comp jLabel1:::p::p, space :::p, par l {comp jPanel2:::::x, comp jPanel1::l:::x}, space :::p}}</string> 
+        <string>$rowSpecs</string> 
+        <string>fill:default, linegap, fill:default, linegap, fill:default:grow</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -154,184 +154,178 @@
          </object> 
         </void> 
        </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>1</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>1</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>3</int> 
+        </void> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JLabel</string> 
+        <string>javax.swing.JTextField</string> 
         <void method="setProperty"> 
          <string>font</string> 
          <object class="java.awt.Font"> 
-          <string>Dialog</string> 
-          <int>1</int> 
-          <int>24</int> 
+          <string>Arial</string> 
+          <int>0</int> 
+          <int>16</int> 
          </object> 
         </void> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>Medikamente</string> 
-        </void> 
         <void property="name"> 
-         <string>jLabel1</string> 
+         <string>txtSuche</string> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>javax.swing.event.CaretListener</string> 
+          <string>caretUpdate</string> 
+          <string>txtSucheCaretUpdate</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtSucheActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>1</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
+        <string>javax.swing.JScrollPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>org.jdesktop.layout.GroupLayout</class> 
-         <void method="setProperty"> 
-          <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, comp jScrollPane1::::377:x, space :::p}}</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$verticalGroup</string> 
-          <string>par l {seq t {space :::p, comp jScrollPane1::::256:x, space :::p}}</string> 
-         </void> 
+         <class>javax.swing.JScrollPane</class> 
         </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="javax.swing.border.SoftBevelBorder"> 
-          <int>0</int> 
-          <null/> 
-          <null/> 
-          <null/> 
-          <null/> 
-         </object> 
-        </void> 
         <void property="name"> 
-         <string>jPanel1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormContainer"> 
-          <string>javax.swing.JScrollPane</string> 
-          <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>javax.swing.JScrollPane</class> 
-          </object> 
-          <void property="name"> 
-           <string>jScrollPane1</string> 
-          </void> 
-          <void method="add"> 
-           <object class="com.jformdesigner.model.FormComponent"> 
-            <string>javax.swing.JTree</string> 
-            <void property="name"> 
-             <string>treeMed</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.MouseListener</string> 
-              <string>mousePressed</string> 
-              <string>treeMedMousePressed</string> 
-              <boolean>true</boolean> 
-             </object> 
-            </void> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>org.jdesktop.layout.GroupLayout</class> 
-         <void method="setProperty"> 
-          <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, par t {comp txtSuche::l::183:x:1, comp jScrollPane2::l::183:x:1}, space :::p}}</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$verticalGroup</string> 
-          <string>par l {seq l {space :::p, comp txtSuche:::p:21:p, space :::p, comp jScrollPane2::::229:x, space :::p}}</string> 
-         </void> 
-        </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="javax.swing.border.SoftBevelBorder"> 
-          <int>0</int> 
-          <null/> 
-          <null/> 
-          <null/> 
-          <null/> 
-         </object> 
-        </void> 
-        <void property="name"> 
-         <string>jPanel2</string> 
+         <string>jScrollPane2</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTextField</string> 
-          <void property="name"> 
-           <string>txtSuche</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>javax.swing.event.CaretListener</string> 
-            <string>caretUpdate</string> 
-            <string>txtSucheCaretUpdate</string> 
-            <boolean>true</boolean> 
+          <string>javax.swing.JList</string> 
+          <void method="setProperty"> 
+           <string>model</string> 
+           <object class="javax.swing.DefaultListModel"> 
+            <void method="addElement"> 
+             <string>Item 1</string> 
+            </void> 
+            <void method="addElement"> 
+             <string>Item 2</string> 
+            </void> 
+            <void method="addElement"> 
+             <string>Item 3</string> 
+            </void> 
+            <void method="addElement"> 
+             <string>Item 4</string> 
+            </void> 
+            <void method="addElement"> 
+             <string>Item 5</string> 
+            </void> 
            </object> 
           </void> 
+          <void method="setProperty"> 
+           <string>selectionMode</string> 
+           <int>0</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>16</int> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>lstPraep</string> 
+          </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>txtSucheActionPerformed</string> 
+            <string>javax.swing.event.ListSelectionListener</string> 
+            <string>valueChanged</string> 
+            <string>lstPraepValueChanged</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
          </object> 
         </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>5</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormContainer"> 
+        <string>javax.swing.JScrollPane</string> 
+        <object class="com.jformdesigner.model.FormLayoutManager"> 
+         <class>javax.swing.JScrollPane</class> 
+        </object> 
+        <void property="name"> 
+         <string>jScrollPane1</string> 
+        </void> 
         <void method="add"> 
-         <object class="com.jformdesigner.model.FormContainer"> 
-          <string>javax.swing.JScrollPane</string> 
-          <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>javax.swing.JScrollPane</class> 
-          </object> 
-          <void property="name"> 
-           <string>jScrollPane2</string> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JTree</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>16</int> 
+           </object> 
           </void> 
-          <void method="add"> 
-           <object class="com.jformdesigner.model.FormComponent"> 
-            <string>javax.swing.JList</string> 
-            <void method="setProperty"> 
-             <string>model</string> 
-             <object class="javax.swing.DefaultListModel"> 
-              <void method="addElement"> 
-               <string>Item 1</string> 
-              </void> 
-              <void method="addElement"> 
-               <string>Item 2</string> 
-              </void> 
-              <void method="addElement"> 
-               <string>Item 3</string> 
-              </void> 
-              <void method="addElement"> 
-               <string>Item 4</string> 
-              </void> 
-              <void method="addElement"> 
-               <string>Item 5</string> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="setProperty"> 
-             <string>selectionMode</string> 
-             <int>0</int> 
-            </void> 
-            <void property="name"> 
-             <string>lstPraep</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>javax.swing.event.ListSelectionListener</string> 
-              <string>valueChanged</string> 
-              <string>lstPraepValueChanged</string> 
-              <boolean>true</boolean> 
-             </object> 
-            </void> 
+          <void property="name"> 
+           <string>treeMed</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.MouseListener</string> 
+            <string>mousePressed</string> 
+            <string>treeMedMousePressed</string> 
+            <boolean>true</boolean> 
            </object> 
           </void> 
          </object> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridHeight</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -351,8 +345,8 @@
       <void method="setProperty"> 
        <string>location</string> 
        <object class="java.awt.Point"> 
-        <int>0</int> 
-        <int>0</int> 
+        <int>5</int> 
+        <int>5</int> 
        </object> 
       </void> 
      </object> 

@@ -27,6 +27,8 @@
 package op.controlling;
 
 import entity.Bewohner;
+import entity.PBerichtTAGS;
+import entity.PflegeberichteTools;
 import entity.Users;
 import op.OPDE;
 import op.care.vital.DlgVital;
@@ -45,125 +47,12 @@ import java.util.Date;
 /**
  * @author tloehr
  */
+@Deprecated
 public class DBHandling {
 
 
 
-    /**
-     * Durchsucht die Pflegeberichte nach einem oder mehreren Suchbegriffen
-     *
-     * @param suche
-     * @param headertiefe - ist einfach die Zahl, die hinter das HTML HeaderTag gesetzt werden soll.
-     * @param monate
-     * @param o
-     * @return
-     */
-    public static String getBerichte(String suche, ListElement tag, int headertiefe, int monate, Object[] o) {
-        StringBuilder html = new StringBuilder(1000);
-        String where = "";
-        String htmlbeschreibung = "";
 
-        if (suche.equals("") && tag.getData().equals("")) {
-            html.append("<h" + headertiefe + ">");
-            html.append("Berichtsuche nicht möglich.");
-            html.append("</h" + headertiefe + ">");
-        } else {
-
-            if (!suche.equals("")) {
-                // Suchausdruck vorbereiten.
-                StringTokenizer st = new StringTokenizer(suche);
-                where = " ( tb.Text like '" + st.nextToken() + "'";
-                while (st.hasMoreTokens()) {
-                    where += " OR tb.Text like '" + st.nextToken() + "'";
-                }
-                where += ") AND ";
-
-                htmlbeschreibung += "Suchbegriff(e): '" + suche + "'<br/>";
-            }
-
-            if (!tag.getData().equals("")) {
-                // Suchausdruck vorbereiten.
-                where += " " + tag.getData() + ">0 AND ";
-
-                htmlbeschreibung += "Markierung: '" + tag.getValue() + "'<br/>";
-            }
-
-            int progress = 0;
-            boolean isCancelled = false;
-            JProgressBar pb = null;
-            JLabel lbl = null;
-            if (o != null) {
-                pb = (JProgressBar) o[0];
-                lbl = (JLabel) o[1];
-                isCancelled = (Boolean) o[2];
-                pb.setIndeterminate(true);
-                lbl.setText("Berichtssuche: Datenbankzugriff");
-            }
-
-            String sql = "" +
-                    " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, tb.PIT, tb.UKennung " +
-                    " FROM Tagesberichte tb " +
-                    " INNER JOIN Bewohner b ON tb.BWKennung = b.BWKennung " +
-                    " WHERE Date(tb.PIT) >= DATE_ADD(now(), INTERVAL ? MONTH) " +
-                    " AND " + where +
-                    " b.AdminOnly <> 2 " +
-                    " ORDER BY b.BWKennung, tb.PIT ";
-
-            try {
-                PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-                stmt.setInt(1, monate * -1);
-                ResultSet rs = stmt.executeQuery();
-                pb.setIndeterminate(false);
-                DateFormat df = DateFormat.getDateTimeInstance();
-                if (rs.last()) {
-                    pb.setMaximum(rs.getRow() - 1);
-                    pb.setMinimum(1);
-                }
-                html.append("<h" + headertiefe + ">");
-                html.append("Suchergebnisse in den Berichten der letzten " + monate + " Monate");
-                html.append("</h" + headertiefe + ">");
-                html.append(htmlbeschreibung);
-                if (rs.first()) {
-                    html.append("<table border=\"1\"><tr>" +
-                            "<th>BewohnerIn</th><th>Datum/Uhrzeit</th><th>Text</th><th>UKennung</th></tr>");
-                    rs.beforeFirst();
-                    while (rs.next()) {
-                        html.append("<tr>");
-                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-                        String text = rs.getString("text");
-
-                        if (pb != null) {
-                            progress++;
-                            pb.setValue(progress);
-                        }
-
-//                    // Suchtreffer hervorheben
-//                    suche = SYSTools.replace(suche, "%", "");
-//                    st = new StringTokenizer(suche);
-//                    while (st.hasMoreTokens()) {
-//                        String token = st.nextToken();
-//                        text = SYSTools.replace(text, token, "<b>" + token + "</b>");
-//                    }
-
-                        String uk = rs.getString("ukennung");
-                        Date datum = rs.getTimestamp("PIT");
-                        html.append("<td>" + name + "</td>");
-                        html.append("<td>" + df.format(datum) + "</td>");
-                        html.append("<td>" + text + "</td>");
-                        html.append("<td>" + uk + "</td>");
-                        html.append("</tr>");
-                    }
-                    html.append("</table>");
-                } else {
-                    html.append("<br/>keine Treffer gefunden...");
-                }
-            } catch (SQLException sQLException) {
-                new DlgException(sQLException);
-            }
-        }
-
-        return html.toString();
-    }
 
     public static String getAnonymSturz(int headertiefe, int monate) {
         StringBuilder html = new StringBuilder(1000);
@@ -377,86 +266,95 @@ public class DBHandling {
         return html.toString();
     }
 
-    public static String getSozialBerichte(String bwkennung, String ukennung, int headertiefe, int sozialwochen) {
-        StringBuilder html = new StringBuilder(1000);
-        String sql = "" +
-                " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, Date(tb.PIT) Datum, tb.UKennung, tb.Dauer " +
-                " FROM Bewohner b " +
-                " INNER JOIN BWInfo ba ON b.BWKennung = ba.BWKennung  " +
-                " LEFT OUTER JOIN (" +
-                "       SELECT BWKennung, UKennung, Text, PIT, Dauer FROM Tagesberichte WHERE Sozial > 0 " +
-                "       AND Date(PIT) >= DATE_ADD(now(), INTERVAL ? WEEK) AND Date(PIT) <= Date(now()) " +
-                " ) tb ON tb.BWKennung = b.BWKennung " +
-                " WHERE " +
-                (bwkennung.equals("") ? "" : " BWKennung = ? AND ") +
-                (ukennung.equals("") ? "" : " UKennung = ? AND ") +
-                " ba.BWINFTYP = 'hauf' AND ba.von <= NOW() AND ba.bis >= NOW() AND b.AdminOnly <> 2 " +
-                " ORDER BY b.BWKennung, tb.PIT ";
-
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setInt(1, sozialwochen * -1);
-            if (!bwkennung.equals("")) {
-                stmt.setString(2, bwkennung);
-                if (!ukennung.equals("")) {
-                    stmt.setString(3, ukennung);
-                }
-            } else if (!ukennung.equals("")) {
-                stmt.setString(3, ukennung);
-            }
-            ResultSet rs = stmt.executeQuery();
-            DateFormat df = DateFormat.getDateInstance();
-            if (rs.first()) {
-                html.append("<h" + headertiefe + ">");
-                html.append("Aktivitäten des Sozialen Dienstes");
-                html.append("</h" + headertiefe + ">");
-                rs.beforeFirst();
-                String prevBW = "";
-                int summeMinuten = 0;
-                while (rs.next()) {
-                    String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-                    String bwk = rs.getString("bwkennung");
-                    String text = rs.getString("text");
-                    int min = rs.getInt("Dauer");
-                    String uk = rs.getString("ukennung");
-                    Date datum = rs.getDate("Datum");
-                    if (rs.isFirst() || !prevBW.equalsIgnoreCase(bwk)) {
-                        if (!rs.isFirst()) {
-                            // Zusammenfassung des letzten Durchgangs.
-                            html.append("<tr><td></td><td align=\"right\"><b>Summe Minuten:</b></td><td><b>" + summeMinuten + "</b></td><td></td></tr>");
-                            html.append("</table>");
-                            summeMinuten = 0;
-                        }
-                        html.append("<h" + (headertiefe + 1) + ">");
-                        html.append(name + " [" + bwk + "]");
-                        html.append("</h" + (headertiefe + 1) + ">");
-                        html.append("<table border=\"1\"><tr><th>Datum</th><th>Text</th><th>Dauer</th><th>UKennung</th></tr>");
-                        prevBW = bwk;
-                    }
-                    html.append("<tr>");
-                    if (SYSTools.catchNull(uk).equals("")) {
-                        html.append("<td align=\"center\">--</td>");
-                        html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
-                        html.append("<td align=\"center\">--</td>");
-                        html.append("<td align=\"center\">--</td>");
-                    } else {
-                        summeMinuten += min;
-                        html.append("<td>" + df.format(datum) + "</td>");
-                        html.append("<td>" + text + "</td>");
-                        html.append("<td>" + min + "</td>");
-                        html.append("<td>" + uk + "</td>");
-                    }
-                    html.append("</tr>");
-                }
-                html.append("<tr><td></td><td align=\"right\"><b>Summe Minuten:</b></td><td><b>" + summeMinuten + "</b></td><td></td></tr>");
-                html.append("</table>");
-            }
-
-        } catch (SQLException sQLException) {
-            new DlgException(sQLException);
-        }
-        return html.toString();
-    }
+//    public static String getSozialBerichte(EntityManager em, String bwkennung, String ukennung, int headertiefe, int sozialwochen) {
+//
+//        try {
+//
+////        Query query = em.createNamedQuery("PBerichtTAGS.findByKurzbezeichnung");
+////        query.setParameter("kurzbezeichnung", "soz");
+////        PBerichtTAGS sozTag = (PBerichtTAGS) query.getSingleResult();
+////
+////        PflegeberichteTools.getBerichteASHTML(em, "", sozTag, headertiefe,sozialwochen );
+//
+//        StringBuilder html = new StringBuilder(1000);
+//        String sql = "" +
+//                " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, Date(tb.PIT) Datum, tb.UKennung, tb.Dauer " +
+//                " FROM Bewohner b " +
+//                " INNER JOIN BWInfo ba ON b.BWKennung = ba.BWKennung  " +
+//                " LEFT OUTER JOIN (" +
+//                "       SELECT BWKennung, UKennung, Text, PIT, Dauer FROM Tagesberichte WHERE Sozial > 0 " +
+//                "       AND Date(PIT) >= DATE_ADD(now(), INTERVAL ? WEEK) AND Date(PIT) <= Date(now()) " +
+//                " ) tb ON tb.BWKennung = b.BWKennung " +
+//                " WHERE " +
+//                (bwkennung.equals("") ? "" : " BWKennung = ? AND ") +
+//                (ukennung.equals("") ? "" : " UKennung = ? AND ") +
+//                " ba.BWINFTYP = 'hauf' AND ba.von <= NOW() AND ba.bis >= NOW() AND b.AdminOnly <> 2 " +
+//                " ORDER BY b.BWKennung, tb.PIT ";
+//
+//
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setInt(1, sozialwochen * -1);
+//            if (!bwkennung.equals("")) {
+//                stmt.setString(2, bwkennung);
+//                if (!ukennung.equals("")) {
+//                    stmt.setString(3, ukennung);
+//                }
+//            } else if (!ukennung.equals("")) {
+//                stmt.setString(3, ukennung);
+//            }
+//            ResultSet rs = stmt.executeQuery();
+//            DateFormat df = DateFormat.getDateInstance();
+//            if (rs.first()) {
+//                html.append("<h" + headertiefe + ">");
+//                html.append("Aktivitäten des Sozialen Dienstes");
+//                html.append("</h" + headertiefe + ">");
+//                rs.beforeFirst();
+//                String prevBW = "";
+//                int summeMinuten = 0;
+//                while (rs.next()) {
+//                    String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+//                    String bwk = rs.getString("bwkennung");
+//                    String text = rs.getString("text");
+//                    int min = rs.getInt("Dauer");
+//                    String uk = rs.getString("ukennung");
+//                    Date datum = rs.getDate("Datum");
+//                    if (rs.isFirst() || !prevBW.equalsIgnoreCase(bwk)) {
+//                        if (!rs.isFirst()) {
+//                            // Zusammenfassung des letzten Durchgangs.
+//                            html.append("<tr><td></td><td align=\"right\"><b>Summe Minuten:</b></td><td><b>" + summeMinuten + "</b></td><td></td></tr>");
+//                            html.append("</table>");
+//                            summeMinuten = 0;
+//                        }
+//                        html.append("<h" + (headertiefe + 1) + ">");
+//                        html.append(name + " [" + bwk + "]");
+//                        html.append("</h" + (headertiefe + 1) + ">");
+//                        html.append("<table border=\"1\"><tr><th>Datum</th><th>Text</th><th>Dauer</th><th>UKennung</th></tr>");
+//                        prevBW = bwk;
+//                    }
+//                    html.append("<tr>");
+//                    if (SYSTools.catchNull(uk).equals("")) {
+//                        html.append("<td align=\"center\">--</td>");
+//                        html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
+//                        html.append("<td align=\"center\">--</td>");
+//                        html.append("<td align=\"center\">--</td>");
+//                    } else {
+//                        summeMinuten += min;
+//                        html.append("<td>" + df.format(datum) + "</td>");
+//                        html.append("<td>" + text + "</td>");
+//                        html.append("<td>" + min + "</td>");
+//                        html.append("<td>" + uk + "</td>");
+//                    }
+//                    html.append("</tr>");
+//                }
+//                html.append("<tr><td></td><td align=\"right\"><b>Summe Minuten:</b></td><td><b>" + summeMinuten + "</b></td><td></td></tr>");
+//                html.append("</table>");
+//            }
+//
+//        } catch (SQLException sQLException) {
+//            new DlgException(sQLException);
+//        }
+//        return html.toString();
+//    }
 
     public static String getGewichtsverlauf(int gewichtmonate, int headertiefe, Object[] o) {
         int progress = 0;
@@ -619,104 +517,104 @@ public class DBHandling {
 
     }
 
-    public static String getSozialZeiten(int headertiefe, Date monat) {
-        StringBuilder html = new StringBuilder(1000);
-        SimpleDateFormat df = new SimpleDateFormat("MMMM yyyy");
-
-        String sql = "" +
-                " SELECT s.Name, s.BWKennung, " +
-                "               s.dauer 'Dauer (Minuten)', ROUND(s.dauer/60, 2) 'Dauer (Stunden)', ROUND(s.dauer/60/?,2) '(Stunden-Schnitt pro Tag)', " +
-                "               p.dauer 'PEA (Minuten)', ROUND(p.dauer/60,2) 'PEA (Stunden)', ROUND(p.dauer/60/?,2) '(Stunden-Schnitt pro Tag)' " +
-                " FROM ( " +
-                "   SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, ifnull(SUM(sdauer), 0) dauer " +
-                "   FROM Bewohner b " +
-                "   INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung " +
-                "   LEFT OUTER JOIN ( " +
-                "       SELECT BWKennung, Date(PIT) Datum, UKennung, Text, Dauer sdauer FROM Tagesberichte " +
-                "       WHERE Sozial=1 AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
-                "   ) s ON s.BWKennung = b.BWKennung " +
-                "   WHERE ba1.BWINFTYP = 'hauf' AND ( " +
-                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?)) " +
-                "       OR " +
-                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?))  " +
-                "       OR " +
-                "       (DATE(ba1.von) > DATE(?) AND DATE(ba1.bis) < DATE(?))  " +
-                "   ) " +
-                "   AND b.AdminOnly <> 2 " +
-                "   GROUP BY BWKennung " +
-                " ) s INNER JOIN (" +
-                "   SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, ifnull(SUM(sdauer), 0) dauer " +
-                "   FROM Bewohner b " +
-                "   INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung " +
-                "   LEFT OUTER JOIN ( " +
-                "       SELECT BWKennung, Date(PIT) Datum, UKennung, Text, Dauer sdauer FROM Tagesberichte  " +
-                "       WHERE PEA=1 AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?)  " +
-                "   ) s ON s.BWKennung = b.BWKennung  " +
-                "   WHERE ba1.BWINFTYP = 'hauf' AND ( " +
-                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?)) " +
-                "       OR " +
-                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?))  " +
-                "       OR " +
-                "       (DATE(ba1.von) > DATE(?) AND DATE(ba1.bis) < DATE(?))  " +
-                "   ) " +
-                "   AND b.AdminOnly <> 2   " +
-                "   GROUP BY BWKennung   " +
-                " ) p ON s.BWKennung = p.BWKennung" +
-                " order by s.Name ";
-
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            java.sql.Date von = new java.sql.Date(SYSCalendar.bom(monat).getTime());
-            java.sql.Date bis = new java.sql.Date(SYSCalendar.eom(monat).getTime());
-            int daysinmonth = SYSCalendar.eom(SYSCalendar.toGC(monat));
-
-            stmt.setInt(1, daysinmonth);
-            stmt.setInt(2, daysinmonth);
-
-            stmt.setDate(3, von);
-            stmt.setDate(4, bis);
-            stmt.setDate(5, von);
-            stmt.setDate(6, von);
-            stmt.setDate(7, bis);
-            stmt.setDate(8, bis);
-            stmt.setDate(9, von);
-            stmt.setDate(10, bis);
-
-            stmt.setDate(11, von);
-            stmt.setDate(12, bis);
-            stmt.setDate(13, von);
-            stmt.setDate(14, von);
-            stmt.setDate(15, bis);
-            stmt.setDate(16, bis);
-            stmt.setDate(17, von);
-            stmt.setDate(18, bis);
-
-            ResultSet rs = stmt.executeQuery();
-            //DateFormat df = DateFormat.getDateInstance();
-            if (rs.first()) {
-                html.append("<h" + headertiefe + ">");
-                html.append("Zeiten des Sozialen Dienstes je BewohnerIn");
-                html.append("</h" + headertiefe + ">");
-
-                headertiefe++;
-
-                html.append("<h" + headertiefe + ">");
-                html.append("Zeitraum: " + df.format(monat));
-                html.append("</h" + headertiefe + ">");
-
-                html.append(SYSTools.rs2html(rs, true));
-
-                html.append("<p><b>PEA:</b> Personen mit erheblich eingeschränkter Alltagskompetenz (gemäß §87b SGB XI)." +
-                        " Der hier errechnete Wert ist der <b>Anteil</b> für die PEA Leistungen, die in den allgemeinen Sozialzeiten" +
-                        " mit enthalten sind.</p>");
-
-            }
-
-        } catch (SQLException sQLException) {
-            new DlgException(sQLException);
-        }
-        return html.toString();
-    }
+//    public static String getSozialZeiten(int headertiefe, Date monat) {
+//        StringBuilder html = new StringBuilder(1000);
+//        SimpleDateFormat df = new SimpleDateFormat("MMMM yyyy");
+//
+//        String sql = "" +
+//                " SELECT s.Name, s.BWKennung, " +
+//                "               s.dauer 'Dauer (Minuten)', ROUND(s.dauer/60, 2) 'Dauer (Stunden)', ROUND(s.dauer/60/?,2) '(Stunden-Schnitt pro Tag)', " +
+//                "               p.dauer 'PEA (Minuten)', ROUND(p.dauer/60,2) 'PEA (Stunden)', ROUND(p.dauer/60/?,2) '(Stunden-Schnitt pro Tag)' " +
+//                " FROM ( " +
+//                "   SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, ifnull(SUM(sdauer), 0) dauer " +
+//                "   FROM Bewohner b " +
+//                "   INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung " +
+//                "   LEFT OUTER JOIN ( " +
+//                "       SELECT BWKennung, Date(PIT) Datum, UKennung, Text, Dauer sdauer FROM Tagesberichte " +
+//                "       WHERE Sozial=1 AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+//                "   ) s ON s.BWKennung = b.BWKennung " +
+//                "   WHERE ba1.BWINFTYP = 'hauf' AND ( " +
+//                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?)) " +
+//                "       OR " +
+//                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?))  " +
+//                "       OR " +
+//                "       (DATE(ba1.von) > DATE(?) AND DATE(ba1.bis) < DATE(?))  " +
+//                "   ) " +
+//                "   AND b.AdminOnly <> 2 " +
+//                "   GROUP BY BWKennung " +
+//                " ) s INNER JOIN (" +
+//                "   SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, ifnull(SUM(sdauer), 0) dauer " +
+//                "   FROM Bewohner b " +
+//                "   INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung " +
+//                "   LEFT OUTER JOIN ( " +
+//                "       SELECT BWKennung, Date(PIT) Datum, UKennung, Text, Dauer sdauer FROM Tagesberichte  " +
+//                "       WHERE PEA=1 AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?)  " +
+//                "   ) s ON s.BWKennung = b.BWKennung  " +
+//                "   WHERE ba1.BWINFTYP = 'hauf' AND ( " +
+//                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?)) " +
+//                "       OR " +
+//                "       (DATE(ba1.von) <= DATE(?) AND DATE(ba1.bis) >= DATE(?))  " +
+//                "       OR " +
+//                "       (DATE(ba1.von) > DATE(?) AND DATE(ba1.bis) < DATE(?))  " +
+//                "   ) " +
+//                "   AND b.AdminOnly <> 2   " +
+//                "   GROUP BY BWKennung   " +
+//                " ) p ON s.BWKennung = p.BWKennung" +
+//                " order by s.Name ";
+//
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            java.sql.Date von = new java.sql.Date(SYSCalendar.bom(monat).getTime());
+//            java.sql.Date bis = new java.sql.Date(SYSCalendar.eom(monat).getTime());
+//            int daysinmonth = SYSCalendar.eom(SYSCalendar.toGC(monat));
+//
+//            stmt.setInt(1, daysinmonth);
+//            stmt.setInt(2, daysinmonth);
+//
+//            stmt.setDate(3, von);
+//            stmt.setDate(4, bis);
+//            stmt.setDate(5, von);
+//            stmt.setDate(6, von);
+//            stmt.setDate(7, bis);
+//            stmt.setDate(8, bis);
+//            stmt.setDate(9, von);
+//            stmt.setDate(10, bis);
+//
+//            stmt.setDate(11, von);
+//            stmt.setDate(12, bis);
+//            stmt.setDate(13, von);
+//            stmt.setDate(14, von);
+//            stmt.setDate(15, bis);
+//            stmt.setDate(16, bis);
+//            stmt.setDate(17, von);
+//            stmt.setDate(18, bis);
+//
+//            ResultSet rs = stmt.executeQuery();
+//            //DateFormat df = DateFormat.getDateInstance();
+//            if (rs.first()) {
+//                html.append("<h" + headertiefe + ">");
+//                html.append("Zeiten des Sozialen Dienstes je BewohnerIn");
+//                html.append("</h" + headertiefe + ">");
+//
+//                headertiefe++;
+//
+//                html.append("<h" + headertiefe + ">");
+//                html.append("Zeitraum: " + df.format(monat));
+//                html.append("</h" + headertiefe + ">");
+//
+//                html.append(SYSTools.rs2html(rs, true));
+//
+//                html.append("<p><b>PEA:</b> Personen mit erheblich eingeschränkter Alltagskompetenz (gemäß §87b SGB XI)." +
+//                        " Der hier errechnete Wert ist der <b>Anteil</b> für die PEA Leistungen, die in den allgemeinen Sozialzeiten" +
+//                        " mit enthalten sind.</p>");
+//
+//            }
+//
+//        } catch (SQLException sQLException) {
+//            new DlgException(sQLException);
+//        }
+//        return html.toString();
+//    }
 
     public static String getAktiveVorraeteOhneBestandImAnbruch(int headertiefe) {
         StringBuilder html = new StringBuilder(1000);
@@ -1219,15 +1117,18 @@ public class DBHandling {
         }
         String sql = "" +
                 " SELECT c.pit, c.pk, c.bwkennung, c.tbl, c.UKennung, c.sort FROM ( " +
-                "   SELECT tb.PIT pit, tb.TBID pk, tb.bwkennung, 'Tagesberichte' tbl, tb.UKennung, '' sort FROM Tagesberichte tb" +
-                "   WHERE ReplacedBy = 0 AND (Wunde > 0 OR BEAWUND > 0) AND tb.PIT > ? " +
-                " UNION " +
-                "   SELECT bwi.Von pit, bwi.BWInfoID pk, bwi.bwkennung, 'BWInfo' tbl, bwi.AnUKennung, bwi.BWINFTYP sort FROM BWInfo bwi " +
-                "   WHERE bwi.BWINFTYP LIKE 'WUND%' AND bwi.Von >= ? " +
+                "  SELECT pb.PIT pit, pb.PBID pk, pb.bwkennung, 'Pflegeberichte' tbl, pb.UKennung, '' sort" +
+                "  FROM Pflegeberichte pb " +
+                "  INNER JOIN PB2TAGS pbt ON pb.PBID = pbt.PBID" +
+                "  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pbt.PBTAGID" +
+                "  WHERE ReplacedBy IS NULL AND pb.PIT > ? AND (pt.Kurzbezeichnung='Wun' OR pt.Kurzbezeichnung='BeaWun')" +
+                "  UNION " +
+                "  SELECT bwi.Von pit, bwi.BWInfoID pk, bwi.bwkennung, 'BWInfo' tbl, bwi.AnUKennung, bwi.BWINFTYP sort FROM BWInfo bwi " +
+                "  WHERE bwi.BWINFTYP LIKE 'WUND%' AND bwi.Von >= ? " +
                 " ) c " +
                 " INNER JOIN Bewohner bw ON bw.BWKennung = c.BWKennung " +
-                " WHERE bw.AdminOnly <> 2 " +
-                " ORDER BY c.bwkennung, c.pit, sort ";
+                " WHERE bw.AdminOnly <> 2 AND bw.StatID IS NOT NULL" +
+                " ORDER BY c.bwkennung, c.pit, sort; ";
 
         long von = SYSCalendar.bom(SYSCalendar.addField(new Date(), monate * -1, GregorianCalendar.MONTH)).getTime();
 
@@ -1281,7 +1182,7 @@ public class DBHandling {
 
                     html.append("<td>" + datum + " " + rs.getString("c.UKennung") + "</td>");
 
-                    if (rs.getString("c.tbl").equals("Tagesberichte")) {
+                    if (rs.getString("c.tbl").equals("Pflegeberichte")) {
                         html.append("<td>" + op.care.berichte.DBHandling.getBerichtAsHTML(rs.getLong("c.pk")) + "</td>");
                     } else {
                         BWInfo bwinfo = new BWInfo(rs.getLong("c.pk"));
@@ -1306,10 +1207,8 @@ public class DBHandling {
         StringBuilder html = new StringBuilder(1000);
         String sql = "" +
                 " SELECT GebDatum, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM Bewohner b " +
-                " INNER JOIN BWInfo ba ON b.BWKennung = ba.BWKennung " +
-                " WHERE ba.BWINFTYP = 'hauf' AND " +
-                " ba.von <= NOW() AND ba.bis >= NOW() AND " +
-                " b.AdminOnly <> 2 " +
+                " WHERE " +
+                " b.AdminOnly <> 2 AND b.StatID IS NOT NULL " +
                 " AND " +
                 " ( " +
                 "   DAYOFYEAR(now()) <= dayofyear(GebDatum) " +

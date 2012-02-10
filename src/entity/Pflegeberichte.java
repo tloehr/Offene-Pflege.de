@@ -90,7 +90,10 @@ import java.util.Iterator;
         @ColumnResult(name = "num")),
         @SqlResultSetMapping(name = "Pflegeberichte.findBVAktivitaetResultMapping", entities =
         @EntityResult(entityClass = Bewohner.class), columns =
-        @ColumnResult(name = "mypbid"))
+        @ColumnResult(name = "mypbid")),
+        @SqlResultSetMapping(name = "Pflegeberichte.findSozialZeitenResultMapping", entities =
+        @EntityResult(entityClass = Bewohner.class), columns =
+                {@ColumnResult(name = "sdauer"), @ColumnResult(name = "peadauer")})
 })
 @NamedNativeQueries({
         /**
@@ -129,7 +132,30 @@ import java.util.Iterator;
                 "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
                 " ) a ON a.BWKennung = b.BWKennung " +
                 " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
-                " ORDER BY b.BWKennung, a.pit ", resultSetMapping = "Pflegeberichte.findBVAktivitaetResultMapping")
+                " ORDER BY b.BWKennung, a.pit ", resultSetMapping = "Pflegeberichte.findBVAktivitaetResultMapping"),
+        /**
+         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) Pflegeberichte
+         * seit dem angegebenen Datum heraus.
+         */
+        @NamedNativeQuery(name = "Pflegeberichte.findSozialZeiten", query = ""
+                + " SELECT b.*, ifnull(soz.dauer,0) sdauer, ifnull(pea.dauer,0) peadauer FROM Bewohner b " +
+                " LEFT OUTER JOIN (" +
+                "                  SELECT p.BWKennung, ifnull(SUM(p.Dauer), 0) dauer " +
+                "                  FROM Pflegeberichte p" +
+                "                  INNER JOIN PB2TAGS pb ON p.PBID = pb.PBID" +
+                "                  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pb.PBTAGID" +
+                "                  WHERE pt.Kurzbezeichnung='soz' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+                "                  GROUP BY BWKennung " +
+                " ) soz ON soz.BWKennung = b.BWKennung" +
+                " LEFT OUTER JOIN (" +
+                "                  SELECT p.BWKennung, ifnull(SUM(p.Dauer), 0) dauer " +
+                "                  FROM Pflegeberichte p" +
+                "                  INNER JOIN PB2TAGS pb ON p.PBID = pb.PBID" +
+                "                  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pb.PBTAGID" +
+                "                  WHERE pt.Kurzbezeichnung='pea' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+                "                  GROUP BY BWKennung " +
+                " ) pea ON pea.BWKennung = b.BWKennung" +
+                " WHERE b.StatID IS NOT NULL ", resultSetMapping = "Pflegeberichte.findSozialZeitenResultMapping")
 })
 public class Pflegeberichte implements Serializable, VorgangElement {
 
@@ -248,10 +274,10 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     /**
      * Dieses Date ist aus technischen Gründen vorhanden. Es gibt mehrere Möglichkeiten, wie diese PIT zu verstehen ist:
      * <ul>
-     *      <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Lösung drin.</li>
-     *      <li> Wurde dieser Eintrag durch einen anderen ersetzt, steht hier drin wann das passiert ist.</li>
-     *      <li> Ist dies ein Eintrag, der einen anderen ersetzt hat dann steht hier <code>null</code>.</li>
-     *      <li> Wurde der Eintrag nicht geändert, dann steht hier ebenfalls <code>null</code>.</li>
+     * <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Lösung drin.</li>
+     * <li> Wurde dieser Eintrag durch einen anderen ersetzt, steht hier drin wann das passiert ist.</li>
+     * <li> Ist dies ein Eintrag, der einen anderen ersetzt hat dann steht hier <code>null</code>.</li>
+     * <li> Wurde der Eintrag nicht geändert, dann steht hier ebenfalls <code>null</code>.</li>
      * <ul>
      *
      * @return
@@ -297,11 +323,11 @@ public class Pflegeberichte implements Serializable, VorgangElement {
         this.attachedFiles = attachedFiles;
     }
 
-    public boolean isBesonders(){
+    public boolean isBesonders() {
         boolean found = false;
 
         Iterator<PBerichtTAGS> it = tags.iterator();
-        while (!found && it.hasNext()){
+        while (!found && it.hasNext()) {
             found = it.next().isBesonders();
         }
         return found;

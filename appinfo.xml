@@ -15,7 +15,7 @@
             Die einzelnen Rechte (hier ACLs) genannt, werden direkt im Programm-Code unterstützt. Bei der Vergabe von Zugriffsrechten
             werden diese Rechte als Mögliche Zuordnungen zu Gruppen angeboten.
         -->
-        <class name="admin.residents.cash" short="Barbetragsverwaltung" long="Dieses Programm dient der Verwaltung der sog. Taschengelde der BewohnerInnen" main="true" javaclass="op.bw.tg.PnlTG">
+        <class name="admin.residents.cash" short="Barbetragsverwaltung" long="Dieses Programm dient der Verwaltung der sog. Taschengelde der BewohnerInnen" main="false" javaclass="op.bw.tg.PnlTG">
             <execute doc="Der Benutzer erhält Zugriff auf die Pflegeakte."/>
             <delete doc="Benutzer kann Belege löschen."/>
             <insert doc="Benutzer kann Belege eintragen."/>

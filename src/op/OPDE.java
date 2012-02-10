@@ -177,6 +177,7 @@ public class OPDE {
      *
      * @throws SQLException
      */
+    @Deprecated
     public static void initDB() throws SQLException {
         if (db != null) return;
         String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
@@ -192,6 +193,7 @@ public class OPDE {
         SyslogTools.warn(message.toString());
     }
 
+    @Deprecated
     public static void closeDB() throws SQLException {
         db.db.close();
         db = null;

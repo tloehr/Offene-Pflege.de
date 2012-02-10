@@ -1,7 +1,7 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+*/
 package entity;
 
 import entity.files.SYSFiles;
@@ -15,6 +15,7 @@ import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -359,16 +360,16 @@ public class PflegeberichteTools {
 //                " ORDER BY b.bWKennung, pb.pit ";
 
 
-        String sql = " SELECT b.*, a.PBID " +
-                " FROM Bewohner b " +
-                " LEFT OUTER JOIN ( " +
-                "    SELECT pb.* FROM Pflegeberichte pb " +
-                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
-                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
-                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
-                " ) a ON a.BWKennung = b.BWKennung " +
-                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
-                " ORDER BY b.BWKennung, a.pit ";
+//        String sql = " SELECT b.*, a.PBID " +
+//                " FROM Bewohner b " +
+//                " LEFT OUTER JOIN ( " +
+//                "    SELECT pb.* FROM Pflegeberichte pb " +
+//                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
+//                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
+//                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
+//                " ) a ON a.BWKennung = b.BWKennung " +
+//                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
+//                " ORDER BY b.BWKennung, a.pit ";
         Query query = em.createNamedQuery("Pflegeberichte.findBVAktivitaet");
         query.setParameter(1, SYSCalendar.addField(new Date(SYSCalendar.startOfDay()), bvwochen * -1, GregorianCalendar.WEEK_OF_MONTH));
 
@@ -393,7 +394,7 @@ public class PflegeberichteTools {
 
             html.append("<tr>");
 
-            html.append("<td>" + BewohnerTools.getBWLabelText(bewohner) + "</td>");
+            html.append("<td>" + BewohnerTools.getBWLabel1(bewohner) + "</td>");
             if (bericht == null) {
                 html.append("<td align=\"center\">--</td>");
                 html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
@@ -419,4 +420,148 @@ public class PflegeberichteTools {
 
         return html.toString();
     }
+
+
+    /**
+     * Durchsucht die Pflegeberichte nach einem oder mehreren Suchbegriffen
+     */
+
+    public static String getBerichteASHTML(EntityManager em, String suche, PBerichtTAGS tag, int headertiefe, int monate) {
+        StringBuilder html = new StringBuilder(1000);
+        String where = "";
+        String htmlbeschreibung = "";
+        String jpql = "";
+        String order = " ORDER BY p.bewohner.bWKennung, p.pit ";
+
+        if (suche.trim().isEmpty() && tag == null) {
+            html.append("<h" + headertiefe + ">");
+            html.append("Berichtsuche nicht möglich.");
+            html.append("</h" + headertiefe + ">");
+        } else {
+            jpql = "SELECT p FROM Pflegeberichte p JOIN p.tags t WHERE p.pit >= :date AND t = :tag";
+
+            if (!suche.trim().isEmpty()) {
+                where = " AND p.text like :search ";
+                htmlbeschreibung += "Suchbegriff: '" + suche + "'<br/>";
+            }
+
+            if (tag != null) {
+                // Suchausdruck vorbereiten.
+                where += " AND t = :tag ";
+                htmlbeschreibung += "Markierung: '" + tag.getBezeichnung() + "'<br/>";
+            }
+
+//            String sql = "" +
+//                    " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, tb.PIT, tb.UKennung " +
+//                    " FROM Tagesberichte tb " +
+//                    " INNER JOIN Bewohner b ON tb.BWKennung = b.BWKennung " +
+//                    " WHERE Date(tb.PIT) >= DATE_ADD(now(), INTERVAL ? MONTH) " +
+//                    " AND " + where +
+//                    " b.AdminOnly <> 2 " +
+//                    " ORDER BY b.BWKennung, tb.PIT ";
+
+            try {
+                Query query = em.createQuery(jpql + where + order);
+                if (!suche.trim().isEmpty()) {
+                    query.setParameter("search", "%" + suche + "%");
+                }
+                if (tag != null) {
+                    query.setParameter("tag", tag);
+                }
+
+                query.setParameter("date", SYSCalendar.addField(new Date(), monate * -1, GregorianCalendar.MONTH));
+                List<Pflegeberichte> list = query.getResultList();
+                html.append("<h" + headertiefe + ">");
+                html.append("Suchergebnisse in den Berichten der letzten " + monate + " Monate");
+                html.append("</h" + headertiefe + ">");
+                html.append(htmlbeschreibung);
+
+                if (!list.isEmpty()) {
+                    DateFormat df = DateFormat.getDateTimeInstance();
+                    html.append("<table border=\"1\"><tr>" +
+                            "<th>BewohnerIn</th><th>Datum/Uhrzeit</th><th>Text</th><th>UKennung</th></tr>");
+                    for (Pflegeberichte bericht : list) {
+                        html.append("<tr>");
+
+                        html.append("<td>" + BewohnerTools.getBWLabel1(bericht.getBewohner()) + "</td>");
+                        html.append("<td>" + df.format(bericht.getPit()) + "</td>");
+                        html.append("<td>" + bericht.getText() + "</td>");
+                        html.append("<td>" + bericht.getUser().getUKennung() + "</td>");
+                        html.append("</tr>");
+                    }
+                    html.append("</table>");
+                } else {
+                    html.append("<br/>keine Treffer gefunden...");
+                }
+            } catch (Exception e) {
+                OPDE.fatal(e);
+            }
+        }
+
+        return html.toString();
+    }
+
+
+    public static String getSozialZeiten(EntityManager em, int headertiefe, Date monat) {
+        StringBuilder html = new StringBuilder(1000);
+        SimpleDateFormat df = new SimpleDateFormat("MMMM yyyy");
+
+        try {
+
+            Date von = new Date(SYSCalendar.bom(monat).getTime());
+            Date bis = new Date(SYSCalendar.eom(monat).getTime());
+//            int daysinmonth = SYSCalendar.eom(SYSCalendar.toGC(monat));
+
+            Query query = em.createNamedQuery("Pflegeberichte.findSozialZeiten");
+            query.setParameter(1, von);
+            query.setParameter(2, bis);
+            query.setParameter(3, von);
+            query.setParameter(4, bis);
+
+            List list = query.getResultList();
+            BigDecimal daysinmonth = new BigDecimal(SYSCalendar.eom(SYSCalendar.toGC(monat)));
+
+            html.append("<h" + headertiefe + ">");
+            html.append("Zeiten des Sozialen Dienstes je BewohnerIn");
+            html.append("</h" + headertiefe + ">");
+
+            headertiefe++;
+
+            html.append("<h" + headertiefe + ">");
+            html.append("Zeitraum: " + df.format(monat));
+            html.append("</h" + headertiefe + ">");
+
+            html.append("<table border=\"1\"><tr>" +
+                    "<th>BewohnerIn</th><th>Dauer (Minuten)</th><th>Dauer (Stunden)</th><th>Stundenschnitt pro Tag</th><th>PEA (Minuten)</th><th>PEA (Stunden)</th><th>Stundenschnitt pro Tag</th></tr>");
+            for (Object object : list) {
+                Bewohner bewohner = (Bewohner) ((Object[]) object)[0];
+                BigDecimal sdauer = (BigDecimal) ((Object[]) object)[1];
+                BigDecimal peadauer = (BigDecimal) ((Object[]) object)[2];
+
+
+                html.append("<tr>");
+
+                html.append("<td>" + BewohnerTools.getBWLabel1(bewohner) + "</td>");
+                html.append("<td>" + sdauer + "</td>");
+                html.append("<td>" + sdauer.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP) + "</td>");
+                html.append("<td>" + sdauer.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP) + "</td>");
+                html.append("<td>" + peadauer + "</td>");
+                html.append("<td>" + peadauer.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP) + "</td>");
+                html.append("<td>" + peadauer.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP) + "</td>");
+                html.append("</tr>");
+            }
+
+            html.append("</table>");
+
+            html.append("<p><b>PEA:</b> Personen mit erheblich eingeschränkter Alltagskompetenz (gemäß §87b SGB XI)." +
+                    " Der hier errechnete Wert ist der <b>Anteil</b> für die PEA Leistungen, die in den allgemeinen Sozialzeiten" +
+                    " mit enthalten sind.</p>");
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        return html.toString();
+    }
+
 }

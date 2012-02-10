@@ -29,6 +29,7 @@ import op.OPDE;
 
 import java.sql.*;
 
+@Deprecated
 public class Database {
 
 

@@ -13,7 +13,7 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {comp jToolBar1::l::878:x, seq l {space :p::p, par l {comp pbPart::::776:x, comp pbMain::l::776:x:2}, space :p::p, comp btnStop:::p::p, space :p::p}, seq t {space :::p, comp jLabel1:::p::p, space s:::p, comp lblProgress::::716:x, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}}</string> 
+        <string>par l {comp jToolBar1::l::876:x, seq l {space :p::p, par l {comp pbPart::::770:x, comp pbMain::l::770:x:2}, space :p::p, comp btnStop:::p::p, space :p::p}, seq t {space :::p, comp jLabel1:::p::p, space s:::p, comp lblProgress::::732:x, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
@@ -66,11 +66,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq {space :::p, par l {seq l {comp cbBVAktivitaet:::p::p, space :p:224:p, comp spinBVWochen::::39:x:1}, comp cbVerordnungenOhneAnbruch::l:p::p, seq l {par l {comp cbPlanung::l:p::p, comp cbNichtAbgehakteBHPs::l:p::p}, space :p:34:p, par l {comp spinBHPTage::l:::x:1, comp spinPlanungenTage::l:::x:1}}, seq l {par l {seq {comp cbBerichte:::p::p, space :p::p, comp txtBerichte::::152:x}, comp cbGeringeVorraete::l:p::p:1}, space :::p, par l:::p {comp spinBerichteMonate:::p:45:p, comp spinVorratProzent::l::45:x:1}}, seq l {par l {comp cbInko::l:p::p, comp cbBeschwerden::l:p::p}, space :p:139:p, comp spinBeschwerdenMonate:::::x:1}, seq {space :25:25:25, comp cmbTags::::350:x}}, space :::p}}</string> 
+            <string>par l {seq {space :::p, par l {seq l {comp cbBVAktivitaet:::p::p, space :p:224:p, comp spinBVWochen::::74:x:1}, comp cbVerordnungenOhneAnbruch::l:p::p, seq l {par l {comp cbPlanung::l:p::p, comp cbNichtAbgehakteBHPs::l:p::p}, space :p:34:p, par l {comp spinBHPTage::l::82:x:1, comp spinPlanungenTage::l::82:x:1}}, seq l {par l {seq {comp cbBerichte:::p::p, space :p::p, comp txtBerichte::::194:x}, comp cbGeringeVorraete::l:p::p:1}, space :::p, par l:::p {comp spinBerichteMonate:::p:45:p, comp spinVorratProzent::l::45:x:1}}, seq l {par l {comp cbInko::l:p::p, comp cbBeschwerden::l:p::p}, space :p:139:p, comp spinBeschwerdenMonate::::77:x:1}, seq {space :25:25:25, comp cmbTags::::376:x}}, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq l {par b {comp cbBVAktivitaet::b:p::p, comp spinBVWochen::b:p::p}, space :::p, par b {comp cbNichtAbgehakteBHPs::b:p::p, comp spinBHPTage::b:p::p}, space :::p, par b {comp cbPlanung::b:p::p, comp spinPlanungenTage::b:p::p}, space :::p, comp cbVerordnungenOhneAnbruch:::p::p, space :::p, par l {comp spinVorratProzent:::p::p, comp cbGeringeVorraete:::p::p}, space :::p, par l {par b {comp cbBerichte::b:p::p, comp txtBerichte::b:p::p}, comp spinBerichteMonate:::p::p}, space :::p, comp cmbTags:::p::p, space ::9:x, par t {seq t {comp cbInko:::p::p, space :::p, comp cbBeschwerden:::p::p}, comp spinBeschwerdenMonate:::p::p}, space :::p}}</string> 
+            <string>par l {seq l {par b {comp cbBVAktivitaet::b:p::p, comp spinBVWochen::b:p::p}, space :::p, par b {comp cbNichtAbgehakteBHPs::b:p::p, comp spinBHPTage::b:p::p}, space :::p, par b {comp cbPlanung::b:p::p, comp spinPlanungenTage::b:p::p}, space :::p, comp cbVerordnungenOhneAnbruch:::p::p, space :::p, par l {comp spinVorratProzent:::p::p, comp cbGeringeVorraete:::p::p}, space :::p, par l {par b {comp cbBerichte::b:p::p, comp txtBerichte::b:p::p}, comp spinBerichteMonate:::p::p}, space :::p, comp cmbTags:::p::p, space ::31:x, par t {seq t {comp cbInko:::p::p, space :::p, comp cbBeschwerden:::p::p}, comp spinBeschwerdenMonate:::p::p}, space :::p}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -499,11 +499,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq {space :::p, par l {seq l {comp cbGewicht:::p::p, space ::92:x, comp spinGewichtMonate:::p:47:p:1}, seq l {par l {comp cbBilanz:::p::p, comp cbMediControl:::p:196:p}, space :::p, par l {comp cmbStation::l::107:x, comp cmbBilanzMonat::l::107:x}}, seq l {comp cbWunden:::p::p, space ::97:x, comp spinWundenMonate:::p:46:p}}, space :::p}}</string> 
+            <string>par l {seq {space :::p, par l {seq l {comp cbGewicht:::p::p, space ::131:x, comp spinGewichtMonate:::p:47:p:1}, seq l {par l {comp cbBilanz:::p::p, comp cbMediControl:::p:196:p}, space :::p, par l {comp cmbStation::l::133:x, comp cmbBilanzMonat::l::133:x}}, seq l {comp cbWunden:::p::p, space ::132:x, comp spinWundenMonate:::p:46:p}}, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq l {par t {comp cbBilanz:::p::p, comp cmbBilanzMonat:::p::p}, space :::p, par b {comp cbGewicht::b:p::p, comp spinGewichtMonate::b:p::p}, par l {seq {space :p:2:p, comp cmbStation:::p::p}, seq l {space :::p, comp cbMediControl:::p::p}}, space :::p, par l {comp cbWunden:::p::p, comp spinWundenMonate:::p::p}, space ::181:x}}</string> 
+            <string>par l {seq l {par t {comp cbBilanz:::p::p, comp cmbBilanzMonat:::p::p}, space :::p, par b {comp cbGewicht::b:p::p, comp spinGewichtMonate::b:p::p}, par l {seq {space :p:2:p, comp cmbStation:::p::p}, seq l {space :::p, comp cbMediControl:::p::p}}, space :::p, par l {comp cbWunden:::p::p, comp spinWundenMonate:::p::p}, space ::197:x}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -712,11 +712,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq {space :::p, par l {seq l {comp cbSozialBerichte:::p::p, space ::137:x, comp spinSozialWochen:::p:52:p:1}, seq l {comp cbSozialZeiten:::p::p, space :p:54:p, comp cmbPEAMonat::::146:x}}, space :::p}}</string> 
+            <string>par l {seq {space :::p, par l {seq l {comp cbSozialBerichte:::p::p, space ::202:x, comp spinSozialMonate:::p:52:p:1}, seq l {comp cbSozialZeiten:::p::p, space :p:54:p, comp cmbPEAMonat::::211:x}}, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq l {par b {comp cbSozialBerichte::b:p::p, comp spinSozialWochen::b:p::p}, space :::p, par b {comp cbSozialZeiten::b:p::p, comp cmbPEAMonat::b:p::p}, space ::39:x}}</string> 
+            <string>par l {seq l {par b {comp cbSozialBerichte::b:p::p, comp spinSozialMonate::b:p::p}, space :::p, par b {comp cbSozialZeiten::b:p::p, comp cmbPEAMonat::b:p::p}, space ::52:x}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -756,10 +756,10 @@
             <string>javax.swing.JSpinner</string> 
             <void method="setProperty"> 
              <string>toolTipText</string> 
-             <string>In den letzten n Wochen</string> 
+             <string>In den letzten n Monaten</string> 
             </void> 
             <void property="name"> 
-             <string>spinSozialWochen</string> 
+             <string>spinSozialMonate</string> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -832,11 +832,11 @@
            <class>org.jdesktop.layout.GroupLayout</class> 
            <void method="setProperty"> 
             <string>$horizontalGroup</string> 
-            <string>par l {seq {space :::p, par l {seq l {comp cbSturzAnonym:::p::p, space ::97:x, comp spinSturzAMonate:::p:50:p:1}, seq l {comp cbSturz:::p::p, space ::72:x, comp spinSturzMonate:::p:50:p:1}}, space :::p}}</string> 
+            <string>par l {seq {space :::p, par l {seq l {comp cbSturzAnonym:::p::p, space ::135:x, comp spinSturzAMonate:::p:50:p:1}, seq l {comp cbSturz:::p::p, space ::109:x, comp spinSturzMonate:::p:50:p:1}}, space :::p}}</string> 
            </void> 
            <void method="setProperty"> 
             <string>$verticalGroup</string> 
-            <string>par l {seq l {space :::p, par b {comp cbSturzAnonym::b:p::p, comp spinSturzAMonate::b:p::p}, space :::p, par b {comp cbSturz::b:p::p, comp spinSturzMonate::b:p::p}, space ::26:x}}</string> 
+            <string>par l {seq l {space :::p, par b {comp cbSturzAnonym::b:p::p, comp spinSturzAMonate::b:p::p}, space :::p, par b {comp cbSturz::b:p::p, comp spinSturzMonate::b:p::p}, space ::38:x}}</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -1087,6 +1087,13 @@
         <int>697</int> 
        </object> 
       </void> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>0</int> 
+       </object> 
+      </void> 
      </object> 
     </void> 
     <void method="add"> 
@@ -1105,6 +1112,16 @@
       </object> 
       <void property="name"> 
        <string>jPanel4</string> 
+      </void> 
+     </object> 
+     <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+      <null/> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>707</int> 
+       </object> 
       </void> 
      </object> 
     </void> 

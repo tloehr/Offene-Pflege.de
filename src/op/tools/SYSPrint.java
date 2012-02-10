@@ -366,13 +366,14 @@ public class SYSPrint {
             File temp = File.createTempFile("opde", ".html");
 
 
-            String text = "<html><body>";
+            String text = "<html><head>";
             if (addPrintJScript) {
                 text += "<script type=\"text/javascript\">" +
                         "window.onload = function() {"
                         + "window.print();"
                         + "}</script>";
             }
+            text += OPDE.getCSS();
             text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
                     + "<hr/><b>Ende des Berichtes</b><br/>" + SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname())
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
@@ -386,6 +387,7 @@ public class SYSPrint {
             out.close();
             handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
+            OPDE.fatal(e);
         }
 
     }

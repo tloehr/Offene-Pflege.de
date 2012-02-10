@@ -1082,8 +1082,14 @@ public class SYSTools {
      */
     public static String toHTML(String in) {
         String out = null;
+
         if (!catchNull(in).equals("")) {
-            out = "<html><body>" + in + "</body></html>";
+            out = "<html>"
+                    + "<head>"
+                    + "<title>" + OPDE.getAppInfo().getProgname() + "</title>"
+                    + OPDE.getCSS()
+                    + "</head>"
+                    + "<body>" + in + "</body></html>";
         }
         return out;
     }

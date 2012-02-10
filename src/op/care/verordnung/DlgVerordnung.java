@@ -30,7 +30,6 @@ import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.care.med.DlgMediAssistent;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -928,15 +927,15 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
         //String template = ( txtMed.getText().matches("^ß?\\d{7}") ? "" : txtMed.getText());
         //new DlgMed(this, template);
-        ArrayList result = new ArrayList();
-        result.add(txtMed.getText());
-        new DlgMediAssistent(this, result);
-        if (result.size() > 0) {
-            ignoreEvent = true;
-            txtMed.setText(result.get(0).toString());
-            ignoreEvent = false;
-            txtMedCaretUpdate(null);
-        }
+//        ArrayList result = new ArrayList();
+//        result.add(txtMed.getText());
+//        new DlgMediAssistent(this, result);
+//        if (result.size() > 0) {
+//            ignoreEvent = true;
+//            txtMed.setText(result.get(0).toString());
+//            ignoreEvent = false;
+//            txtMedCaretUpdate(null);
+//        }
     }//GEN-LAST:event_btnMedActionPerformed
 
     private void btnBedarfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBedarfActionPerformed

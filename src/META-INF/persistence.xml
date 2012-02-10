@@ -18,6 +18,7 @@
         <class>entity.files.Sysbw2file</class>
         <class>entity.BWInfoKat</class>
         <class>entity.BWInfoTyp</class>
+        <class>entity.bwinfo.BWInfos</class>
         <class>entity.BWInfo</class>
         <class>entity.verordnungen.Verordnung</class>
         <class>entity.Groups</class>

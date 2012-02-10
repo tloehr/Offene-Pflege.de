@@ -230,10 +230,6 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, null, TaskPaneContentChangedEvent.BOTTOM, ""));
     }
 
-    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutActionPerformed
-
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         SYSPrint.print(this, SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
     }//GEN-LAST:event_btnPrintActionPerformed

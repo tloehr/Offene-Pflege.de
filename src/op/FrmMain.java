@@ -32,7 +32,6 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
-import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
 import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
@@ -61,7 +60,7 @@ import java.util.Iterator;
  */
 public class FrmMain extends javax.swing.JFrame {
 
-    public static final String internaalClassID = "opde.mainframe";
+    public static final String internalClassID = "opde.mainframe";
 
 
     private boolean initPhase;
@@ -349,9 +348,11 @@ public class FrmMain extends javax.swing.JFrame {
 
         JPanel panel = null;
 
-        if (classname.equals("op.bw.tg.PnlTG")) {
-            panel = new PnlTG(this, tpccl);
-        } else if (classname.equals("op.vorgang.PnlVorgang")) {
+//        if (classname.equals("op.bw.tg.PnlTG")) {
+//            panel = new PnlTG(this, tpccl);
+//        } else
+
+         if (classname.equals("op.vorgang.PnlVorgang")) {
             panel = new PnlVorgang(null, null, this, tpccl);
         }
 
@@ -427,7 +428,8 @@ public class FrmMain extends javax.swing.JFrame {
         pnlTopRight.add(btnLogout);
         pnlMain.remove(pnlTopRight);
         pnlMain.add(pnlTopRight, CC.xy(7, 2, CC.DEFAULT, CC.FILL));
-        pnlTopRight.validate();
+        pnlTopRight.repaint();
+//        pnlMain.validate();
 
         scrollMain.setViewportView(currentVisiblePanel);
     }
