@@ -4,6 +4,7 @@
  */
 package op.care.berichte;
 
+import entity.PflegeberichteTools;
 import op.tools.DBRetrieve;
 import op.tools.SYSTools;
 
@@ -13,31 +14,30 @@ import java.util.HashMap;
 /**
  * @author tloehr
  */
+@Deprecated
 public class DBHandling {
 
 
-    public static String getBerichtAsHTML(long tbid) {
-        HashMap hm = DBRetrieve.getSingleRecord("Pflegeberichte", "PBID", tbid);
-        return getBerichtAsHTML(hm.get("Text").toString(), hm.get("UKennung").toString(), hm.get("BWKennung").toString(), hm.get("EKennung").toString(), false, (Date) hm.get("PIT"));
-    }
-
-    public static String getBerichtAsHTML(String text, String ukennung, String bwkennung, String ekennung, boolean mitBWKennung, Date pit) {
-        String html = "";
-        text = SYSTools.replace(text, "\n", "<br/>");
-        if (ekennung.equals("")) {
-            if (mitBWKennung) {
-                html += "<b>Pflegebericht für " + SYSTools.getBWLabel(bwkennung) + "</b>";
-            } else {
-                html += "<b>Pflegebericht</b>";
-            }
-        } else {
-            html += "<b>Stationsbucheintrag für die Einrichtung '" + ekennung + "'</b>";
-        }
-        String name = DBRetrieve.getUsername(ukennung);
-        html += "<p>" + text + "</p>";
-
-        return html;
-    }
+//    public static String getBerichtAsHTML(long tbid) {
+//        HashMap hm = DBRetrieve.getSingleRecord("Pflegeberichte", "PBID", tbid);
+//        return getBerichtAsHTML(hm.get("Text").toString(), hm.get("UKennung").toString(), hm.get("BWKennung").toString(), false, (Date) hm.get("PIT"));
+////        PflegeberichteTools.getBerichtAsHTML()
+//    }
+//
+//    public static String getBerichtAsHTML(String text, String ukennung, String bwkennung, boolean mitBWKennung, Date pit) {
+//        String html = "";
+//        text = SYSTools.replace(text, "\n", "<br/>");
+//
+//        if (mitBWKennung) {
+//            html += "<b>Pflegebericht für " + SYSTools.getBWLabel(bwkennung) + "</b>";
+//        } else {
+//            html += "<b>Pflegebericht</b>";
+//        }
+////        String name = DBRetrieve.getUsername(ukennung);
+//        html += "<p>" + text + "</p>";
+//
+//        return html;
+//    }
 
 //    public static String getBerichteAsHTML(TMPflegeberichte tm, Bewohner bewohner, int[] sel) {
 //        String html = "";

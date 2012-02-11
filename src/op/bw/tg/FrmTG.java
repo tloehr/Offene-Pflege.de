@@ -77,6 +77,8 @@ public class FrmTG extends JFrame {
     public static final String internalClassID = "admin.residents.cash";
     public static final int TAB_TG = 0;
     public static final int TAB_STAT = 1;
+    public static final long MIN_DATE = 1230764400000l; // das hier ist der 01.01.2009 um 0 uhr. Gilt für neue Belege.
+
     //    private ListSelectionListener lsl;
     private TableModelListener tml;
     //    private ListSelectionListener lslstat;
@@ -623,6 +625,7 @@ public class FrmTG extends JFrame {
         GregorianCalendar gc;
         try {
             gc = SYSCalendar.erkenneDatum(((JTextField) evt.getSource()).getText());
+
         } catch (NumberFormatException ex) {
             lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie haben ein falsches Datum eingegeben. Wurde auf heute zurückgesetzt.");
             gc = SYSCalendar.today();
@@ -631,6 +634,11 @@ public class FrmTG extends JFrame {
         if (SYSCalendar.sameDay(gc, SYSCalendar.today()) > 0) {
             gc = SYSCalendar.today();
             lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie haben ein Datum in der Zukunft eingegeben. Wurde auf heute zurückgesetzt.");
+        }
+        // Ist Datum zu weit in der Vergangenheit ?
+        if (gc.getTimeInMillis() < MIN_DATE) {
+            gc = SYSCalendar.today();
+            lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie können keine Belege vor dem "+DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(MIN_DATE))+" eingeben.");
         }
         ((JTextField) evt.getSource()).setText(SYSCalendar.printGCGermanStyle(gc));
     }//GEN-LAST:event_txtDatumFocusLost
@@ -764,42 +772,42 @@ public class FrmTG extends JFrame {
         }
     }//GEN-LAST:event_tblStatMouseClicked
 
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-//        if (JOptionPane.showConfirmDialog(this, "Sie löschen nun den markierten Datensatz.\nMöchten Sie das ?", "Storno eines Taschengeldvorgangs", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-//            return;
-//        }
-//
-//        EntityManager em = OPDE.createEM();
-//
-//        try{
-//            em.getTransaction().begin();
-//            Query query = em.createQuery("DELETE FROM Barbetrag t WHERE t.replacedBy = :tg ");
-//            query.executeUpdate();
-//
-//            em.remove(currentTG);
-//        }
-//
-//        Connection db = OPDE.getDb().db;
-//        String deleteSQL = "DELETE FROM Taschengeld WHERE TGID=? OR _cancel=?";
-//
-//        try {
-//            // Löschen
-//            PreparedStatement stmtDelete = db.prepareStatement(deleteSQL);
-//            stmtDelete.setLong(1, currentTGID);
-//            stmtDelete.setLong(2, currentTGID);
-//            stmtDelete.executeUpdate();
-//
-//        } catch (SQLException ex) {
-//            new DlgException(ex);
-//            ex.printStackTrace();
-//        }
-//        // Nach dem Löschen ist erstmal nix gewählt. Daher würden sonst die Knöpfe aktiv bleiben.
-//        // Schalten wir sie lieber vorsichtshalber ab.
-//        btnDelete.setEnabled(false);
-//        btnStorno.setEnabled(false);
-//        setMinMax();
-//        reloadDisplay();
-    }//GEN-LAST:event_btnDeleteActionPerformed
+//    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+////        if (JOptionPane.showConfirmDialog(this, "Sie löschen nun den markierten Datensatz.\nMöchten Sie das ?", "Storno eines Taschengeldvorgangs", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+////            return;
+////        }
+////
+////        EntityManager em = OPDE.createEM();
+////
+////        try{
+////            em.getTransaction().begin();
+////            Query query = em.createQuery("DELETE FROM Barbetrag t WHERE t.replacedBy = :tg ");
+////            query.executeUpdate();
+////
+////            em.remove(currentTG);
+////        }
+////
+////        Connection db = OPDE.getDb().db;
+////        String deleteSQL = "DELETE FROM Taschengeld WHERE TGID=? OR _cancel=?";
+////
+////        try {
+////            // Löschen
+////            PreparedStatement stmtDelete = db.prepareStatement(deleteSQL);
+////            stmtDelete.setLong(1, currentTGID);
+////            stmtDelete.setLong(2, currentTGID);
+////            stmtDelete.executeUpdate();
+////
+////        } catch (SQLException ex) {
+////            new DlgException(ex);
+////            ex.printStackTrace();
+////        }
+////        // Nach dem Löschen ist erstmal nix gewählt. Daher würden sonst die Knöpfe aktiv bleiben.
+////        // Schalten wir sie lieber vorsichtshalber ab.
+////        btnDelete.setEnabled(false);
+////        btnStorno.setEnabled(false);
+////        setMinMax();
+////        reloadDisplay();
+//    }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
         if (jtpMain.getSelectedIndex() == TAB_STAT) {

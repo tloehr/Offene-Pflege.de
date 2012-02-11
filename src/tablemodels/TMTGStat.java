@@ -59,7 +59,7 @@ public class TMTGStat extends AbstractTableModel {
         Query query = em.createQuery(" " +
                 " SELECT b, SUM(k.betrag) FROM Bewohner b " +
                 " LEFT JOIN b.konto k " +
-                " WHERE b.station IS NOT NULL " +
+                (alle ? "" : " WHERE b.station IS NOT NULL ") +
                 " GROUP BY b " +
                 " ORDER BY b.nachname, b.vorname, b.bWKennung ");
 
@@ -94,7 +94,7 @@ public class TMTGStat extends AbstractTableModel {
         BigDecimal saldo = listData.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) listData.get(row)[1];
         switch (col) {
             case COL_BW: {
-                result = SYSTools.htmlUmlautConversion(SYSTools.toHTML("<b>"+BewohnerTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getBWKennung()+"]"));
+                result = SYSTools.htmlUmlautConversion("<b>"+BewohnerTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getBWKennung()+"]");
                 break;
             }
             case COL_SALDO: {

@@ -1,8 +1,10 @@
 package entity.verordnungen;
 
 import entity.BewohnerTools;
+import entity.Stationen;
 import op.OPDE;
 import op.tools.DlgException;
+import op.tools.SYSConst;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
@@ -10,11 +12,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +31,7 @@ public class MedBestandTools {
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+            public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
@@ -197,35 +199,6 @@ public class MedBestandTools {
             apvNeu = berechneBuchungsWert(bestand);
 
             OPDE.info("Neuberechnung von DafID:" + bestand.getDarreichung().getDafID() + ", " + bestand.getDarreichung().getMedProdukt().getBezeichnung());
-
-//            if (bestand.getDarreichung().getMedForm().getStatus() != MedFormenTools.APV1) {
-//                apvNeu = berechneBuchungsWert(bestand);
-//
-//                if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
-//                    apv = new APV(apvNeu, false, bestand.getVorrat().getBewohner(), bestand.getDarreichung());
-//                    em.persist(apv);
-//                    OPDE.info("FormStatus APV_PER_BW. APVneu: " + apvNeu.toPlainString());
-//                } else {
-//                    // APV_PER_DAF hier gibt es immer nur ein APV Objekt. Das wird entweder ausgetauscht (nur bei Beginn, wenn man
-//                    // noch nicht weiss, wie der Bedarf ist) oder durch das arithmetische Mittel des alten apv und des neuen erstetzt.
-//
-//                    BigDecimal apvAlt = bestand.getApv();
-//                    // Zugehöriges APV Objekt ermitteln.
-//
-//                    apv = APVTools.getAPV(bestand.getDarreichung());
-//
-//                    if (apv.isTauschen()) {
-//                        apv.setApv(apvNeu);
-//                        apv.setTauschen(false);
-//                        OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + apvNeu + "  !Wert wurde ausgetauscht!");
-//                    } else {
-//                        // der DafID APV wird durch den arithmetischen Mittelwert aus altem und neuem APV ersetzt.
-//                        apv.setApv(apvAlt.add(apvNeu).divide(BigDecimal.valueOf(2), 4, BigDecimal.ROUND_UP));
-//                        OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt.toPlainString() + "  APVneu: " + apv.getApv().toPlainString());
-//                    }
-//                    apv = em.merge(apv);
-//                }
-//            }
         }
         return apvNeu;
     }
@@ -439,9 +412,9 @@ public class MedBestandTools {
 
         BigDecimal apv = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW){
+        if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
             apv = getAPVperBW(bestand.getVorrat());
-        } else if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_DAF){
+        } else if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_DAF) {
             apv = getAPVperDAF(bestand.getDarreichung());
         }
 
@@ -484,5 +457,50 @@ public class MedBestandTools {
         return result;
     }
 
+    public static String getMediKontrolle(EntityManager em, Stationen station, int headertiefe) {
+        StringBuilder html = new StringBuilder(1000);
 
+        String jpql = " " +
+                " SELECT b FROM MedBestand b " +
+                " WHERE b.vorrat.bewohner.station = :station AND b.vorrat.bewohner.adminonly <> 2 " +
+                " AND b.anbruch < :anbruch AND b.aus = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
+                " ORDER BY b.vorrat.bewohner.nachname, b.vorrat.bewohner.vorname, b.vorrat.text, b.anbruch ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("anbruch", new Date());
+        query.setParameter("station", station);
+        List<MedBestand> list = query.getResultList();
+
+        DateFormat df = DateFormat.getDateInstance();
+        if (!list.isEmpty())
+            html.append("<h" + headertiefe + ">");
+        html.append("Liste zur Medikamentenkontrolle");
+        html.append("</h" + headertiefe + ">");
+        html.append("<h" + (headertiefe + 1) + ">");
+        html.append("Legende");
+        html.append("</h" + (headertiefe + 1) + ">");
+        html.append("#1 - Medikament abgelaufen<br/>");
+        html.append("#2 - Packung nicht beschriftet<br/>");
+        html.append("#3 - Packung beschädigt<br/>");
+        html.append("#4 - Anbruchsdatum nicht vermerkt<br/>");
+        html.append("#5 - Medikament ist nicht verordnet<br/>");
+        html.append("#6 - Mehr als 1 Blister im Anbruch<br/>");
+        html.append("#7 - Mehr als 1 Tablette geteilt<br/>");
+        html.append("#8 - falsche Bestandsnummer im Anbruch<br/><br/>");
+
+        html.append("<table border=\"1\"><tr>" +
+                "<th>BewohnerIn</th><th>BestNr</th><th>Präparat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th><th>#8</th></tr>");
+
+        for (MedBestand bestand : list) {
+            html.append("<tr>");
+            html.append("<td>" + BewohnerTools.getBWLabelTextKompakt(bestand.getVorrat().getBewohner()) + "</td>");
+            html.append("<td>" + bestand.getBestID() + "</td>");
+            html.append("<td>" + DarreichungTools.toPrettyString(bestand.getDarreichung()) + "</td>");
+            html.append("<td>" + df.format(bestand.getAnbruch()) + "</td>");
+            html.append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
+            html.append("</tr>");
+        }
+        html.append("</table>");
+        return html.toString();
+    }
 }

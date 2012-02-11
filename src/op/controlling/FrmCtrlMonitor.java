@@ -28,8 +28,10 @@ package op.controlling;
 
 import entity.PBerichtTAGS;
 import entity.PflegeberichteTools;
+import entity.Stationen;
 import entity.StationenTools;
 import entity.system.SYSPropsTools;
+import entity.verordnungen.MedBestandTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSPrint;
@@ -49,6 +51,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -217,12 +220,15 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         });
         cmbPEAMonat.setSelectedIndex(cmbPEAMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
 
-        StationenTools.setComboBox(cmbStation);
+        EntityManager em = OPDE.createEM();
+        Query query1 = em.createNamedQuery("Stationen.findAllSorted");
+        cmbStation.setModel(new DefaultComboBoxModel(new Vector<Stationen>(query1.getResultList())));
+        cmbStation.setSelectedItem(StationenTools.getStation4ThisHost());
 
         // Leeren Kopf vor die Liste setzen.
 //        ListElement[] headtag = new ListElement[]{new ListElement("Keine Auswahl", "")};
 
-        EntityManager em = OPDE.createEM();
+
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         cmbTags.setModel(SYSTools.lst2cmb(SYSTools.list2dlm(query.getResultList())));
         cmbTags.setRenderer(new ListCellRenderer() {
@@ -331,9 +337,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         }
 
         if (!isCancelled && cbVerordnungenOhneAnbruch.isSelected()) {
-            if (html.length() > 0) {
-                html.append("<p style=\"page-break-before: always\"/>");
-            }
+//            if (html.length() > 0) {
+//                html.append("<p style=\"page-break-before: always\"/>");
+//            }
             lblProgress.setText("Verordnungen ohne Medikamente im Anbruch");
             pbPart.setValue(0);
             html.append(DBHandling.getAktiveVorraeteOhneBestandImAnbruch(1));
@@ -354,13 +360,14 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         pbMain.setValue(progress);
 
         if (!isCancelled && cbMediControl.isSelected()) {
-            if (html.length() > 0) {
-                html.append("<p style=\"page-break-before: always\"/>");
-            }
+//            if (html.length() > 0) {
+//                html.append("<p style=\"page-break-before: always\"/>");
+//            }
             lblProgress.setText("Medikamenten Kontroll Liste");
             pbPart.setValue(0);
-            String station = cmbStation.getSelectedItem().toString();
-            html.append(DBHandling.getMediKontrolle(station, 1));
+//            String station = cmbStation.getSelectedItem().toString();
+//            html.append(DBHandling.getMediKontrolle(station, 1));
+            html.append(MedBestandTools.getMediKontrolle(em, (Stationen) cmbStation.getSelectedItem(), 1));
             progress++;
             pbMain.setValue(progress);
         }

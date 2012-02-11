@@ -375,9 +375,11 @@ public class SYSPrint {
             }
             text += OPDE.getCSS();
             text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                    + "<hr/><b>Ende des Berichtes</b><br/>" + SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname())
+                    + "<hr/>" +
+                    "<div font=\"fonttext\">" +
+                    "<b>Ende des Berichtes</b><br/>" + SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname())
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>http://www.offene-pflege.de</body></html>";
+                    + "<br/>http://www.offene-pflege.de</div></body></html>";
 
 
             // Write to temp file
