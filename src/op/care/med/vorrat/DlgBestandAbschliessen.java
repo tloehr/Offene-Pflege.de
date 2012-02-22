@@ -318,6 +318,12 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
         dcbm.insertElementAt("keine", 0);
         cmbBestID.setModel(dcbm);
+        cmbBestID.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+                return new JLabel(((MedBestand) o).getBestID().toString());
+            }
+        });
         em.close();
 
         int index = Math.min(2, cmbBestID.getItemCount());
@@ -404,18 +410,19 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
 
             } else {
-                BigDecimal apv = null;
+                BigDecimal apv = bestand.getApv();
 
                 if (rbGefallen.isSelected()) {
-                    apv = MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
+                    MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     //DBHandling.closeBestand(bestid, "Packung ist runtergefallen.", false, DBHandling.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    apv = MedBestandTools.abschliessen(em, bestand, "Packung ist abgelaufen.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
+                    MedBestandTools.abschliessen(em, bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     //DBHandling.closeBestand(bestid, "Packung ist abgelaufen.", false, DBHandling.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
-                    apv = MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
+                    MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
+                    apv = MedBestandTools.berechneAPV(bestand);
                     //DBHandling.closeBestand(bestid, "Korrekturbuchung zum Packungsabschluss", true, DBHandling.STATUS_KORREKTUR_AUTO_LEER);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }

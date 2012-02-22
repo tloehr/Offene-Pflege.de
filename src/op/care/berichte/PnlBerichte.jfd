@@ -8,7 +8,7 @@
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
      <object class="com.jformdesigner.model.FormContainer"> 
-      <string>op.care.CleanablePanel</string> 
+      <string>op.tools.CleanablePanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>javax.swing.BoxLayout</class> 
        <void method="setProperty"> 

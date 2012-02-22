@@ -48,6 +48,7 @@ public class DlgEditBuchung extends javax.swing.JDialog {
     private BigDecimal bestandsumme;
     private BigDecimal packgroesse;
     private MedBestand bestand;
+    private MedBuchungen buchung;
 
 
     public DlgEditBuchung(java.awt.Frame parent, MedBestand bestand) {
@@ -65,6 +66,7 @@ public class DlgEditBuchung extends javax.swing.JDialog {
     }
 
     private void initDialog() {
+        initComponents();
         setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
         bestandsumme = MedBestandTools.getBestandSumme(bestand);
 
@@ -76,7 +78,6 @@ public class DlgEditBuchung extends javax.swing.JDialog {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }
 
-        initComponents();
         SYSTools.centerOnParent(parent, this);
         txtMenge.setText("0.00");
         setVisible(true);
@@ -157,42 +158,42 @@ public class DlgEditBuchung extends javax.swing.JDialog {
         contentPaneLayout.setHorizontalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jScrollPane1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
-                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING)
-                                .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addComponent(btnBuchung)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnCancel))
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtMenge, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblEinheit, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
+                            .addComponent(jLabel1, GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
+                            .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addComponent(btnBuchung)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnCancel))
+                            .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addComponent(jLabel2)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtMenge, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(lblEinheit, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)))
+                    .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel2)
-                                .addComponent(lblEinheit)
-                                .addComponent(txtMenge, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnCancel)
-                                .addComponent(btnBuchung))
-                        .addContainerGap())
+                    .addContainerGap()
+                    .addComponent(jLabel1)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(lblEinheit)
+                            .addComponent(txtMenge, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnCancel)
+                            .addComponent(btnBuchung))
+                    .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());
@@ -208,9 +209,13 @@ public class DlgEditBuchung extends javax.swing.JDialog {
     }//GEN-LAST:event_btnBuchungActionPerformed
 
     private void save() {
-        MedBuchungen buchung = new MedBuchungen(bestand, menge, null, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+        buchung = new MedBuchungen(bestand, menge, null, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
         buchung.setText(txtText.getText());
         EntityTools.persist(buchung);
+    }
+
+    public MedBuchungen getBuchung() {
+        return buchung;
     }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate

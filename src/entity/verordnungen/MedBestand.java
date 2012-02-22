@@ -51,7 +51,7 @@ import java.util.Date;
                 "      ) sum ON sum.BestID = best.BestID " +
                 " WHERE best.VorID = ? " +
                 " AND ( ? = 1 OR best.Aus = '9999-12-31 23:59:59' ) " +
-                " ORDER BY best.anbruch ", resultSetMapping = "MedBestand.findByVorratMitRestsummeResultMapping")
+                " ORDER BY best.ein, best.anbruch ", resultSetMapping = "MedBestand.findByVorratMitRestsummeResultMapping")
 })
 
 @SqlResultSetMappings({
@@ -61,7 +61,7 @@ import java.util.Date;
         )
 })
 
-public class MedBestand implements Serializable, Comparable {
+public class MedBestand implements Serializable, Comparable<MedBestand> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -265,29 +265,16 @@ public class MedBestand implements Serializable, Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof MedBestand)) {
-            return -1;
-        }
-        MedBestand other = (MedBestand) o;
-        return this.ein.compareTo(other.getEin());
+    public int compareTo(MedBestand o) {
+        int result = this.ein.compareTo(o.getEin());
+        if (result == 0){
+            result = this.bestID.compareTo(o.getBestID());
+        };
+        return result;
     }
 
     @Override
     public String toString() {
-        return "MedBestand{" +
-                "bestID=" + bestID +
-                ", ein=" + ein +
-                ", anbruch=" + anbruch +
-                ", aus=" + aus +
-                ", text='" + text + '\'' +
-                ", apv=" + apv +
-                ", buchungen=" + buchungen +
-                ", packung=" + packung +
-                ", vorrat=" + vorrat +
-                ", darreichung=" + darreichung +
-                ", naechsterBestand=" + naechsterBestand +
-                ", user=" + user +
-                '}';
+        return "MedBestand{bestID=" + bestID + '}';
     }
 }

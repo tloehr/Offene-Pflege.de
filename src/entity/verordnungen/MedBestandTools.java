@@ -100,7 +100,6 @@ public class MedBestandTools {
      * @return
      */
     public static MedBestand anbrechen(EntityManager em, MedBestand bestand, BigDecimal apv) throws Exception {
-        MedBestand result = null;
         if (apv == null) {
             throw new NullPointerException("apv darf nicht null sein");
         }
@@ -111,9 +110,7 @@ public class MedBestandTools {
             apv = BigDecimal.ONE;
         }
         bestand.setApv(apv);
-        bestand = em.merge(bestand);
-
-        return result;
+        return em.merge(bestand);
     }
 
 
@@ -154,59 +151,76 @@ public class MedBestandTools {
     public static BigDecimal getBestandSumme(MedBestand bestand) {
         BigDecimal result = BigDecimal.ZERO;
 
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" " +
-                " SELECT SUM(bu.menge) " +
-                " FROM MedBestand b " +
-                " JOIN b.buchungen bu " +
-                " WHERE b = :bestand ");
+        for (MedBuchungen buchung : bestand.getBuchungen()) {
+            result = result.add(buchung.getMenge());
+        }
 
-        try {
-            query.setParameter("bestand", bestand);
-            result = (BigDecimal) query.getSingleResult();
-        } catch (NoResultException nre) {
-            result = BigDecimal.ZERO;
-        } catch (Exception ex) {
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery(" " +
+//                " SELECT SUM(bu.menge) " +
+//                " FROM MedBestand b " +
+//                " JOIN b.buchungen bu " +
+//                " WHERE b = :bestand ");
+//
+//        try {
+//            query.setParameter("bestand", bestand);
+//            result = (BigDecimal) query.getSingleResult();
+//        } catch (NoResultException nre) {
+//            result = BigDecimal.ZERO;
+//        } catch (Exception ex) {
+//            OPDE.fatal(ex);
+//        } finally {
+//            em.close();
+//        }
+        return result;
+    }
+
+    /**
+     * Schliesst einen Bestand ab. Erzeugt dazu direkt eine passende Abschlussbuchung, die den Bestand auf null bringt.
+     * @param em, EntityManager in dessen Transaktion das ganze abläuft.
+     * @param bestand, der abzuschliessen ist.
+     * @param text, evtl. gewünschter Text für die Abschlussbuchung
+     * @param status, für die Abschlussbuchung
+     * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
+     * @throws Exception
+     */
+    public static void abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
+        BigDecimal bestandsumme = getBestandSumme(bestand);
+//        BigDecimal apvNeu = bestand.getApv();
+
+
+        MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), null, status);
+        abschlussBuchung.setText(text);
+        em.persist(abschlussBuchung);
+
+        bestand.setAus(new Date());
+        bestand.setNaechsterBestand(null);
+        bestand.getBuchungen().add(abschlussBuchung);
+        bestand = em.merge(bestand);
+
+//        if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
+//            apvNeu = berechneBuchungsWert(bestand);
+//
+//            OPDE.info("Neuberechnung von DafID:" + bestand.getDarreichung().getDafID() + ", " + bestand.getDarreichung().getMedProdukt().getBezeichnung());
+//        }
+//        return apvNeu;
+    }
+
+    private static MedBuchungen getAnfangsBuchung(MedBestand bestand) {
+        MedBuchungen result = null;
+        for (MedBuchungen buchung : bestand.getBuchungen()){
+            if (buchung.getStatus() == MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND){
+                result = buchung;
+                break;
+            }
         }
         return result;
     }
 
     /**
-     * @param em
-     * @param bestand
-     * @param text
-     * @param mitNeuberechnung
-     * @param status
-     * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
-     * @throws Exception
-     */
-    public static BigDecimal abschliessen(EntityManager em, MedBestand bestand, String text, boolean mitNeuberechnung, short status) throws Exception {
-        BigDecimal bestandsumme = getBestandSumme(bestand);
-        BigDecimal apvNeu = bestand.getApv();
-
-        MedBuchungen buchung = new MedBuchungen(bestand, bestandsumme.negate(), null, status);
-        buchung.setText(text);
-        em.persist(buchung);
-
-        bestand.setAus(new Date());
-        bestand.setNaechsterBestand(null);
-        bestand = em.merge(bestand);
-
-        if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
-            apvNeu = berechneBuchungsWert(bestand);
-
-            OPDE.info("Neuberechnung von DafID:" + bestand.getDarreichung().getDafID() + ", " + bestand.getDarreichung().getMedProdukt().getBezeichnung());
-        }
-        return apvNeu;
-    }
-
-    /**
      * @param bestand, für den das Verhältnis neu berechnet werden soll.
      */
-    public static BigDecimal berechneBuchungsWert(MedBestand bestand) {
+    public static BigDecimal berechneAPV(MedBestand bestand) {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
@@ -214,14 +228,14 @@ public class MedBestandTools {
 
             EntityManager em = OPDE.createEM();
             try {
-                Query queryAnfangsBuchung = em.createQuery("SELECT m FROM MedBuchungen m WHERE m.bestand = :bestand AND m.status = :status");
-                queryAnfangsBuchung.setParameter("bestand", bestand);
-                queryAnfangsBuchung.setParameter("status", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
-                MedBuchungen anfangsBuchung = (MedBuchungen) queryAnfangsBuchung.getSingleResult();
+//                Query queryAnfangsBuchung = em.createQuery("SELECT m FROM MedBuchungen m WHERE m.bestand = :bestand AND m.status = :status");
+//                queryAnfangsBuchung.setParameter("bestand", bestand);
+//                queryAnfangsBuchung.setParameter("status", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
+//                MedBuchungen anfangsBuchung = ;
 
                 // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
                 // drin war. Meist das, was auf der Packung steht.
-                BigDecimal inhaltZuBeginn = anfangsBuchung.getMenge();
+                BigDecimal inhaltZuBeginn = getAnfangsBuchung(bestand).getMenge();
 
                 // Das APV, das bei diesem Bestand angenommen wurde.
                 BigDecimal apvAlt = bestand.getApv();
@@ -308,6 +322,7 @@ public class MedBestandTools {
 
             // passende Buchung anlegen.
             result = new MedBuchungen(bestand, korrektur, null, status);
+            bestand.getBuchungen().add(result);
             result.setText(text);
             em.persist(result);
         }

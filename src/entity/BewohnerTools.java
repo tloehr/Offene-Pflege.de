@@ -29,8 +29,9 @@ public class BewohnerTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Bewohner.findByBWKennung");
         query.setParameter("bWKennung", bwkennung);
+        Bewohner bewohner = (Bewohner) query.getSingleResult();
         em.close();
-        return (Bewohner) query.getSingleResult();
+        return bewohner;
     }
 
     public static JLabel getBWLabel(Bewohner bewohner) {

@@ -8,16 +8,16 @@
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
      <object class="com.jformdesigner.model.FormContainer"> 
-      <string>op.care.CleanablePanel</string> 
+      <string>op.tools.CleanablePanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {seq l {space :::p, par l {comp jspBHP::l::431:x:1, seq {par l {seq t {comp jPanel1:::::x:1, space :::p, comp btnLock:::p::p}, comp jLabel12::l::425:x}, space :::p}}}}</string> 
+        <string>par l {seq l {space :::p, par l {comp jspBHP::l::750:x:1, seq {par l {seq t {comp jPanel1:::::x:1, space :::p, comp btnLock:::p::p}, comp jLabel12::l::738:x}, space :::p}}}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {space :p:32:p, par l {seq {space :p:14:p, comp btnLock:::p::p}, comp jPanel1::l:p::p}, space :::p, comp jspBHP::::178:x, space :::p, comp jLabel12:::p::p, space :::p}}</string> 
+        <string>par l {seq l {space :p:32:p, par l {seq {space :p:14:p, comp btnLock:::p::p}, comp jPanel1::l:p::p}, space :::p, comp jspBHP::::282:x, space :::p, comp jLabel12:::p::p, space :::p}}</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -75,11 +75,11 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, comp jdcDatum:::p:111:p, space :::p, comp btnTop:::p:24:p, space :::p, comp btnBack:::p::p, space :::p, comp btnForward:::p::p, space :::p, comp btnNow:::p:24:p, space :::x, comp btnBedarf:::p::p, space :::p, comp cmbSchicht:::p::p, space :::p}}</string> 
+          <string>par l {seq l {space :::p, comp jdcDatum:::p:183:p, space :::p, comp btnTop:::p:24:p, space :::p, comp btnBack:::p:20:p, space u:::p, comp btnForward:::p:20:p, space u:::p, comp btnNow:::p:36:p, space ::234:x, comp btnBedarf:::p::p, space :::p, comp cmbSchicht:::p::p, space :::p}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
-          <string>par l {seq l {space :::p, par l {par b:l {comp cmbSchicht::b:p::p, comp btnBedarf::b:p::p}, par t:l::p {comp btnNow::l:::x:1, comp btnForward::l:::x:1, comp btnBack::l:::x:1, comp btnTop::l:::x:1, comp jdcDatum::l:::x:1}}, space ::10:x}}</string> 
+          <string>par l {seq t {space :::p, par t {comp btnBack::l::31:x:1, comp btnForward::l::31:x:1, comp btnNow::l::31:x:1, comp jdcDatum::l:p::p:1, comp btnTop::l::31:x:1, par b:l {comp cmbSchicht::b:p::p, comp btnBedarf::b:p::p}}, space :::p}}</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -347,8 +347,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>400</int> 
-        <int>300</int> 
+        <int>760</int> 
+        <int>415</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

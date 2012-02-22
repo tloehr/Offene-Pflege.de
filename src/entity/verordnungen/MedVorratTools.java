@@ -5,14 +5,11 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,7 +63,7 @@ public class MedVorratTools {
      */
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
 
-        OPDE.debug("entnahmeVorrat/6: vorrat: " + vorrat);
+        OPDE.debug("entnahmeVorrat/5: vorrat: " + vorrat);
 
         if (vorrat == null) {
             throw new Exception("Keine Packung im Anbruch");
@@ -82,7 +79,7 @@ public class MedVorratTools {
             menge = menge.divide(apv, 4, BigDecimal.ROUND_UP);
         }
 
-        OPDE.debug("entnahmeVorrat/6: menge: " + menge);
+        OPDE.debug("entnahmeVorrat/5: menge: " + menge);
 
         entnahmeVorrat(em, vorrat, menge, bhp);
     }
@@ -121,39 +118,41 @@ public class MedVorratTools {
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-
             BigDecimal restsumme = MedBestandTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
 
             // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
 
-            // sollte eine Packung aber schon als nachfolger bestimmt sein,
-            if (bestand.hasNextBestand() && restsumme.compareTo(wunschmenge) <= 0) {
-                entnahme = restsumme; // dann wird erst diese hier leergebraucht
-            } // und dann der Rest aus der nächsten Packung genommen.
-
-
-            // Erstmal die Buchung für diesen Durchgang
-
-            MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-            em.persist(buchung);
-            OPDE.debug("entnahmeVorrat/4: buchung1: " + buchung);
-
             if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
-                if (restsumme.compareTo(wunschmenge) <= 0) {
-                    // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
-                    // Dann müssen wird erstmal den alten Bestand abschließen.
+                if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
+                    MedBestand naechsterBestand = bestand.getNaechsterBestand();
 
-                    BigDecimal apv = MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
+                    // Bzw. die Packung wurde mit dieser Gabe geleert.
+                    // Dann müssen wird erstmal den alten Bestand abschließen.
+                    MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
-                    MedBestandTools.anbrechen(em, bestand.getNaechsterBestand(), apv);
+                    naechsterBestand = MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(bestand));
+
+                } else {
+                    MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
+                    bestand.getBuchungen().add(buchung);
+                    em.persist(buchung);
+                    OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
                     entnahmeVorrat(em, vorrat, wunschmenge.subtract(entnahme), bhp);
                 }
+            } else {
+                MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
+                bestand.getBuchungen().add(buchung);
+                em.persist(buchung);
+                OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
             }
+
         }
     }
 
@@ -239,25 +238,41 @@ public class MedVorratTools {
      */
     public static MedBestand anbrechenNaechste(MedVorrat vorrat) throws Exception {
         MedBestand result = null;
-        EntityManager em = OPDE.createEM();
-        try {
-            Query query = em.createQuery(" " +
-                    " SELECT b FROM MedBestand b " +
-                    " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
-                    " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
-            query.setParameter("vorrat", vorrat);
-            query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
-            query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
-            query.setMaxResults(1);
-            result = (MedBestand) query.getSingleResult();
-            MedBestandTools.anbrechen(result);
-        } catch (NoResultException nre) {
-            OPDE.debug(nre);
-        } catch (Exception ex) {
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
+
+
+        java.util.List<MedBestand> list = new ArrayList(vorrat.getBestaende());
+        Collections.sort(list);
+
+        for (MedBestand bestand : list) {
+            if (bestand.getAus().equals(SYSConst.DATE_BIS_AUF_WEITERES) && bestand.getAnbruch().equals(SYSConst.DATE_BIS_AUF_WEITERES)) {
+                BigDecimal apv = MedBestandTools.getPassendesAPV(bestand);
+                bestand.setAnbruch(new Date());
+                bestand.setApv(apv);
+                result = bestand;
+                break;
+            }
         }
+
+//
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            Query query = em.createQuery(" " +
+//                    " SELECT b FROM MedBestand b " +
+//                    " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
+//                    " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+//            query.setParameter("vorrat", vorrat);
+//            query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
+//            query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
+//            query.setMaxResults(1);
+//            result = (MedBestand) query.getSingleResult();
+//            MedBestandTools.anbrechen(result);
+//        } catch (NoResultException nre) {
+//            OPDE.debug(nre);
+//        } catch (Exception ex) {
+//            OPDE.fatal(ex);
+//        } finally {
+//            em.close();
+//        }
 
         return result;
     }
@@ -265,6 +280,7 @@ public class MedVorratTools {
 
     /**
      * Schliesst einen Vorrat und alle zugehörigen, noch vorhandenen Bestände ab. Inklusive der notwendigen Abschlussbuchungen.
+     *
      * @param vorrat
      */
     public static void abschliessen(MedVorrat vorrat) {
@@ -275,7 +291,7 @@ public class MedVorratTools {
             // Alle Bestände abschliessen.
             for (MedBestand bestand : vorrat.getBestaende()) {
                 if (!bestand.isAbgeschlossen()) {
-                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
                 }
             }
 

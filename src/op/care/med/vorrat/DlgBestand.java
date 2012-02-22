@@ -583,19 +583,18 @@ public class DlgBestand extends javax.swing.JDialog {
             }
             MedBestand bestand = MedVorratTools.einbuchenVorrat(em, vorrat, packung, darreichung, txtBemerkung.getText(), menge);
 
-            em.getTransaction().commit();
-
             if (MedVorratTools.getImAnbruch(vorrat) == null &&
                     JOptionPane.showConfirmDialog(this, "Dieser Vorrat enthält bisher nur verschlossene Packungen.\n" +
                             "Soll die neue Packung direkt als angebrochen markiert werden ?", "Packungs-Anbruch",
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                MedVorratTools.anbrechenNaechste(vorrat);
+                em.merge(MedVorratTools.anbrechenNaechste(vorrat));
             }
 
             if (cbDruck.isSelected()) {
                 SYSPrint.printLabel(bestand);
             }
 
+            em.getTransaction().commit();
         } catch (Exception ex) {
             em.getTransaction().rollback();
             OPDE.fatal(ex);

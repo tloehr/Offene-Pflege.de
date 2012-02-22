@@ -95,6 +95,7 @@ public class FrmMed extends javax.swing.JFrame {
         btnVorrat.setEnabled(true);
 
         SYSTools.center(this);
+        setSize(850, 370);
         setVisible(true);
     }
 

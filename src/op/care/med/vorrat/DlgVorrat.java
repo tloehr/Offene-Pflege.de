@@ -44,6 +44,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -181,6 +183,7 @@ public class DlgVorrat extends javax.swing.JDialog {
         SYSTools.packTable(tblBuchung, 2);
     }
 
+
     private void initDialog() {
         setTitle(SYSTools.getWindowTitle("Medikamentenvorrat"));
         thisDialog = this;
@@ -195,6 +198,20 @@ public class DlgVorrat extends javax.swing.JDialog {
             BewohnerTools.setBWLabel(lblBW, bewohner);
         }
         reloadVorratTable();
+        tblVorrat.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                if (!listSelectionEvent.getValueIsAdjusting()) {
+                    OPDE.debug(listSelectionEvent);
+                    MedVorrat myVorrat = ((TMVorraete) tblVorrat.getModel()).getVorrat(tblVorrat.getSelectedRow());
+                    if (!myVorrat.equals(vorrat)){
+                        vorrat = myVorrat;
+                        reloadBestandTable();
+                    }
+
+                }
+            }
+        });
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -231,8 +248,8 @@ public class DlgVorrat extends javax.swing.JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, 308dlu:grow, $lcgap, default:grow(0.5), $lcgap, $rgap",
-            "fill:default, $rgap, 2*(fill:default, $lgap), fill:60dlu, $lgap, fill:215dlu:grow, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                "$rgap, $lcgap, 308dlu:grow, $lcgap, default:grow(0.5), $lcgap, $rgap",
+                "fill:default, $rgap, 2*(fill:default, $lgap), fill:60dlu, $lgap, fill:215dlu:grow, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jToolBar1 ========
         {
@@ -295,15 +312,15 @@ public class DlgVorrat extends javax.swing.JDialog {
 
                 //---- tblVorrat ----
                 tblVorrat.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblVorrat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tblVorrat.addMouseListener(new MouseAdapter() {
@@ -424,7 +441,7 @@ public class DlgVorrat extends javax.swing.JDialog {
             jPanel1.add(txtSuche);
 
             //---- cmbBW ----
-            cmbBW.setModel(new DefaultComboBoxModel(new String[] {
+            cmbBW.setModel(new DefaultComboBoxModel(new String[]{
 
             }));
             cmbBW.addItemListener(new ItemListener() {
@@ -551,7 +568,8 @@ public class DlgVorrat extends javax.swing.JDialog {
             JMenuItem itemPopupNew = new JMenuItem("Neu");
             itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgEditBuchung(thisComponent, bestand);
+                    DlgEditBuchung dlg = new DlgEditBuchung(thisComponent, bestand);
+                    bestand.getBuchungen().add(dlg.getBuchung());
                     reloadBuchungTable();
                     refreshBothTables();
                 }
@@ -700,7 +718,7 @@ public class DlgVorrat extends javax.swing.JDialog {
                         try {
                             em.getTransaction().begin();
 
-                            MedBestandTools.abschliessen(em, bestand, "", !MedBestandTools.apvNeuberechnung, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+                            MedBestandTools.abschliessen(em, bestand, "", MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
                             em.getTransaction().commit();
                         } catch (Exception e) {
                             em.getTransaction().rollback();
