@@ -46,10 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Properties;
+import java.util.*;
 
 public class OPDE {
 
@@ -211,6 +208,8 @@ public class OPDE {
         SYSPrint.print(null, SYSTools.getThrowableAsHTML(e), false);
         if (host != null) {
             SYSHostsTools.shutdown(1);
+        } else {
+            System.exit(1);
         }
     }
 
@@ -320,20 +319,16 @@ public class OPDE {
 
         opts.addOption(dfnimport);
 
-        //Option bhpimport = null;
-//
-//        if (debug) {
-//            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
-//        } else {
-//
-//        }
+        Option bhpimport = null;
 
-        Option bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
+        if (isDebug()) {
+            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
+            bhpimport.setOptionalArg(true);
+            bhpimport.setArgName("DayOffset (nur im Debug Modus)");
+        } else {
+            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
+        }
 
-//        if (OCDEBUG.equalsIgnoreCase("true")){
-//            bhpimport.setOptionalArg(true);
-//            bhpimport.setArgName("DayOffset (nur im Debug Modus)");
-//        }
         opts.addOption(bhpimport);
 
 
@@ -445,48 +440,48 @@ public class OPDE {
             }
 
             if (cl.hasOption("d")) {
+                // initProps();
                 String d = cl.getOptionValue("d");
                 try {
                     DFNImport.importDFN();
                 } catch (Exception ex) {
                     fatal(ex);
-                    System.exit(1);
                 }
                 System.exit(0);
             }
 
             if (cl.hasOption("b")) {
+
+                EntityManager em = OPDE.createEM();
+                int offset = 0;
+
+                if (isDebug()) {
+                    String sOffset = cl.getOptionValue("b");
+                    OPDE.debug(cl.getOptionValue("b"));
+                    try {
+                        offset = Integer.parseInt(sOffset);
+                    } catch (NumberFormatException ex) {
+                        offset = 0;
+                    }
+                }
+
                 try {
-                    int offset = 0;
-//                if (isDebug()) {
-//                    String sOffset = cl.getOptionValue("b");
-//                    OPDE.debug(cl.getOptionValue("b"));
-//                    try {
-//                        offset = Integer.parseInt(sOffset);
-//                    } catch (NumberFormatException ex) {
-//                        offset = 0;
-//                    }
-//                }
-                    EntityManager myEM = OPDE.createEM();
-                    Users rootUser = myEM.find(Users.class, "root");
-                    myEM.close();
+                    em.getTransaction().begin();
+                    Users rootUser = em.find(Users.class, "root");
 
                     SYSLogin rootLogin = new SYSLogin(rootUser);
                     EntityTools.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
+                    initProps();
 
-                    EntityManager em = createEM();
-                    try {
-                        em.getTransaction().begin();
-                        BHPTools.erzeugen(em);
-                        em.getTransaction().commit();
-                    } catch (Exception e) {
-                        fatal(e);
-                    } finally {
-                        em.close();
-                    }
+                    Date stichtag = SYSCalendar.addDate(new Date(), offset);
+                    BHPTools.erzeugen(em, stichtag);
+                    em.getTransaction().commit();
                 } catch (Exception ex) {
+                    em.getTransaction().rollback();
                     fatal(ex);
+                } finally {
+                    em.close();
                 }
                 SYSHostsTools.shutdown(0);
             }

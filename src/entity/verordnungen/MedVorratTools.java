@@ -123,6 +123,8 @@ public class MedVorratTools {
             // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
 
+            //TODO: hier gibts noch ein Problem. Wenn eine Packung leer wird und NEXTBEST != null, dann sollte mit dem leer werden die Packung auch abgeschlossen werden und nicht erst mit der nächsten Buchung
+
             if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
                     MedBestand naechsterBestand = bestand.getNaechsterBestand();

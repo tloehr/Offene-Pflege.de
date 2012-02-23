@@ -353,8 +353,8 @@ public class SYSPrint {
     }
 
     /**
-     * Standard Druck Routine. Nimmt einen HTML Text entgegen und ?ffnet den lokal installierten Browser damit.
-     * Erstellt tempor?re Dateien im temp Verzeichnis opde<irgendwas>.html
+     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
+     * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
      *
      * @param parent
      * @param html
@@ -377,7 +377,7 @@ public class SYSPrint {
             text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
                     + "<hr/>" +
                     "<div font=\"fonttext\">" +
-                    "<b>Ende des Berichtes</b><br/>" + SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname())
+                    "<b>Ende des Berichtes</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
                     + "<br/>http://www.offene-pflege.de</div></body></html>";
 

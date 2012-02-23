@@ -46,10 +46,24 @@ public class SyslogTools {
         try {
             localMachine = InetAddress.getLocalHost();
         } catch (java.net.UnknownHostException uhe) {
-            System.exit(1);
+            OPDE.fatal(uhe);
         }
 
         EntityTools.persist(new Syslog(localMachine.getHostName(), localMachine.getHostAddress(), OPDE.getLocalProps().getProperty("hostkey"), new Date(), message, level, OPDE.getLogin()));
+
+    }
+
+    public static void addLog(EntityManager em, String message, short level) throws Exception {
+
+        InetAddress localMachine = null;
+
+        try {
+            localMachine = InetAddress.getLocalHost();
+        } catch (java.net.UnknownHostException uhe) {
+            System.exit(1);
+        }
+
+        em.persist(new Syslog(localMachine.getHostName(), localMachine.getHostAddress(), OPDE.getLocalProps().getProperty("hostkey"), new Date(), message, level, OPDE.getLogin()));
 
     }
 

@@ -44,8 +44,9 @@ public class SYSHostsTools {
             // Dann gehen wir davon aus, dass der Host abgestürzt ist.
             // Der Host scheint noch zu leben. Dann können wir nich nochmal starten. Gäb sonst Durcheinander.
             if (SYSCalendar.earlyEnough(host.getLpol().getTime(), 2)) {
-                OPDE.fatal(new Exception("Es gibt bereits einen aktiven Host mit demselben Hostkey."));
                 host = null;
+                OPDE.fatal(new Exception("Es gibt bereits einen aktiven Host mit demselben Hostkey."));
+                System.exit(1);
             } else {
                 // ===================== REPARATUR DEFEKTER HOST EINTRÄGE ======================
                 // Ein frühere Sitzung ist zusammengebrochen und nicht sauber beendet worden.
@@ -100,7 +101,6 @@ public class SYSHostsTools {
         } catch (Exception e) { // Neuer Host, der bisher noch nicht existierte. Dann legen wir den neu an.
             OPDE.debug(e);
             host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
-            // TODO: Exception bei doppeltem Host abfangen.
             EntityTools.persist(host);
         } finally {
             em.close();

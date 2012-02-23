@@ -321,7 +321,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         cmbBestID.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                return new JLabel(((MedBestand) o).getBestID().toString());
+                String text = o instanceof MedBestand ? ((MedBestand) o).getBestID().toString() : o.toString();
+                return new JLabel(text);
             }
         });
         em.close();

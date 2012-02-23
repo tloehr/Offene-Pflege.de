@@ -1,6 +1,7 @@
 package entity.verordnungen;
 
 import entity.EntityTools;
+import entity.system.SYSPropsTools;
 import entity.system.SYSRunningClasses;
 import entity.system.SYSRunningClassesTools;
 import op.OPDE;
@@ -43,21 +44,16 @@ public class BHPTools {
         return num;
     }
 
-
-//    public static int erzeugen(EntityManager em) throws Exception {
-//        return erzeugen(em, (Verordnung) null, null);
-//    }
-
     /**
-     * verordnung Die Verordnung, auf den sich der Import Vorgang beschränken soll. Steht hier null, dann wird die BHP für alle erstellt.
-     * Wird eine Zeit angegeben, dann wird der Plan nur ab diesem Zeitpunkt (innerhalb des Tages) erstellt.
-     * Es wird noch geprüft, ob es abgehakte BHPs in dieser Schicht gibt. Wenn ja, wird alles erst ab der nächsten
-     * Schicht eingetragen.
-     * zeit       ist ein Date, dessen Uhrzeit-Anteil benutzt wird, um nur die BHPs für diesen Tag <b>ab</b> dieser Uhrzeit zu importieren. <code>null</code>, wenn alle importiert werden sollen.
+     * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft, ermittelt ob sie am betreffenden Stichtag auch "dran" sind und dann
+     * werden daraus Einträge in der BHP Tabelle erzeugt. Sie teilt sich die Arbeit mit der <code>erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, Date zeit)</code> Methode
+     *
+     * @param em, EntityManager Kontext
+     * @param datum, das Datum für den die BHPs erzeugt werden sollen. <code>null</code>, wenn das heutige Datum gewünscht ist.
      *
      * @return Anzahl der erzeugten BHPs
      */
-    public static int erzeugen(EntityManager em) throws Exception {
+    public static int erzeugen(EntityManager em, Date datum) throws Exception {
 
         String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
@@ -67,15 +63,29 @@ public class BHPTools {
         int wtagnum;
         SYSRunningClasses me = null;
 
-
         me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
-
 
         if (me != null) {
 
-
-            Date stichtag = new Date();
+            if (datum == null) {
+                datum = new Date();
+            }
+            Date stichtag = datum;
             GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
+
+            // Datum, an dem der letzte BHP Gesamtimport erfolgte. Darf nur einmal am Tag gemacht werden.
+            GregorianCalendar lastbhp = (GregorianCalendar) gcStichtag.clone();
+
+            if (OPDE.getProps().containsKey("LASTBHPIMPORT")) {
+                lastbhp = SYSCalendar.erkenneDatum(OPDE.getProps().getProperty("LASTBHPIMPORT"));
+            } else {
+                lastbhp.add(GregorianCalendar.DATE, -1); // einen Tag vorher, falls es noch nichts gibt
+            }
+
+            if (SYSCalendar.getDaysBetween(lastbhp, gcStichtag) != 1) {
+                SYSRunningClassesTools.endModule(me);
+                throw new IndexOutOfBoundsException("Es kann kein BHPImport für dieses Datum durchgeführt werden.");
+            }
 
             // Mache aus "Montag" -> "mon"
             wtag = SYSCalendar.WochentagName(gcStichtag);
@@ -141,11 +151,12 @@ public class BHPTools {
 
             numbhp = erzeugen(em, list, stichtag, null);
 
+            OPDE.info("BHPImport abgeschlossen. Stichtag: " + DateFormat.getDateInstance().format(stichtag));
 
-            OPDE.info("BHPImport abgeschlossen");
-            if (me != null) {
-                SYSRunningClassesTools.endModule(me);
-            }
+            SYSRunningClassesTools.endModule(me);
+
+            SYSPropsTools.storeProp("LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
+
         } else {
             OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");
         }
@@ -188,7 +199,15 @@ public class BHPTools {
 
     }
 
-
+    /**
+     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben.
+     *
+     * @param em
+     * @param list
+     * @param stichtag, gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
+     * @param zeit,     ist die Tageszeit, ab der die Einträge erfolgen sollen. Bei <code>null</code> wird immer für den ganzen Tag eingetragen.
+     * @return die Anzahl der erzeugten BHPs.
+     */
     public static int erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, Date zeit) {
         GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
         int maxrows = list.size();
