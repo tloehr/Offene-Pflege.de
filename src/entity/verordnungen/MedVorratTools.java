@@ -219,7 +219,7 @@ public class MedVorratTools {
      */
     public static MedBestand getImAnbruch(MedVorrat vorrat) {
         MedBestand bestand = null;
-        if (vorrat.getBestaende() != null) {
+        if (vorrat != null && vorrat.getBestaende() != null) {
             Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
             while (itBestand.hasNext()) {
                 bestand = itBestand.next();

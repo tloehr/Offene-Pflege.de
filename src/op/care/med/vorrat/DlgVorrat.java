@@ -581,7 +581,6 @@ public class DlgVorrat extends javax.swing.JDialog {
             itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     DlgEditBuchung dlg = new DlgEditBuchung(thisComponent, bestand);
-                    bestand.getBuchungen().add(dlg.getBuchung());
                     reloadBuchungTable();
                     refreshBothTables();
                 }

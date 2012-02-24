@@ -2,11 +2,13 @@ package entity.verordnungen;
 
 import entity.Users;
 import op.OPDE;
+import op.tools.SYSCalendar;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 @Entity
 @Table(name = "BHPPlanung")
@@ -410,6 +412,104 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         return woechentlich > 0;
     }
 
+    /**
+     * @param date, zu prüfendes Datum.
+     * @return Ist <code>true</code>, wenn diese Planung wöchentlich gilt und das Attribut mit dem aktuellen Wochentagsnamen größer null ist.
+     */
+    public boolean isPassenderWochentag(Date date) {
+        boolean passend = false;
+        if (isWoechentlich()) { // wenn nicht wöchentlich, dann passt gar nix
+            GregorianCalendar gcDate = SYSCalendar.toGC(date);
+            switch (gcDate.get(GregorianCalendar.DAY_OF_WEEK)) {
+                case GregorianCalendar.MONDAY: {
+                    passend = mon > 0;
+                    break;
+                }
+                case GregorianCalendar.TUESDAY: {
+                    passend = die > 0;
+                    break;
+                }
+                case GregorianCalendar.WEDNESDAY: {
+                    passend = mit > 0;
+                    break;
+                }
+                case GregorianCalendar.THURSDAY: {
+                    passend = don > 0;
+                    break;
+                }
+                case GregorianCalendar.FRIDAY: {
+                    passend = fre > 0;
+                    break;
+                }
+                case GregorianCalendar.SATURDAY: {
+                    passend = sam > 0;
+                    break;
+                }
+                case GregorianCalendar.SUNDAY: {
+                    passend = son > 0;
+                    break;
+                }
+                default: {
+                    passend = false;
+                    break;
+                }
+            }
+        }
+        return passend;
+    }
+
+    /**
+     * @param date, zu prüfendes Datum.
+     * @return Ist <code>true</code>, wenn diese Planung monatlich gilt und das Attribut <code>tagnum</code> dem aktuellen Tag im Monat entspricht
+     * <b>oder</b> das Attribut mit dem aktuellen Wochentagsnamen gleich dem Wochentag im Monat entpricht (der erste Mitwwoch im Monat hat 1, der zweite 2 usw...).
+     */
+    public boolean isPassenderTagImMonat(Date date) {
+        boolean passend = false;
+        if (isMonatlich()) { // wenn nicht monatlich, dann passt gar nix
+            GregorianCalendar gcDate = SYSCalendar.toGC(date);
+
+            passend = tagNum == gcDate.get(GregorianCalendar.DAY_OF_MONTH);
+
+            if (!passend) {
+                switch (gcDate.get(GregorianCalendar.DAY_OF_WEEK)) {
+                    case GregorianCalendar.MONDAY: {
+                        passend = mon == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.TUESDAY: {
+                        passend = die == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.WEDNESDAY: {
+                        passend = mit == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.THURSDAY: {
+                        passend = don == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.FRIDAY: {
+                        passend = fre == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.SATURDAY: {
+                        passend = sam == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.SUNDAY: {
+                        passend = son == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    default: {
+                        passend = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return passend;
+    }
+
     public boolean isMonatlich() {
         return monatlich > 0;
     }
@@ -423,7 +523,6 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof VerordnungPlanung)) {
             return false;
         }
@@ -436,17 +535,18 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     @Override
     public Object clone() {
-        return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum,  user, verordnung);
+        return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, verordnung);
     }
 
     /**
      * Vergleichsoperator für die Sortierung. Die Sortierung soll in folgender Reihenfolge sein:
      * <ol>
-     *     <li>Zuerst die Verordnungen mit Zeiten</li>
-     *     <li>Dann die Verordnungen mit Uhrzeiten</li>
-     *     <li>Dann der Rest</li>
+     * <li>Zuerst die Verordnungen mit Zeiten</li>
+     * <li>Dann die Verordnungen mit Uhrzeiten</li>
+     * <li>Dann der Rest</li>
      * </ol>
      * Innerhalb der Gruppen wird nach dem PK sortiert. Bei den Uhrzeiten wird das compareTo von Date verwendet.
+     *
      * @param that
      * @return
      */
@@ -454,15 +554,15 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     public int compareTo(VerordnungPlanung that) {
         int result = 0;
 
-        if (this.verwendetMaximalDosis() == that.verwendetMaximalDosis()){
+        if (this.verwendetMaximalDosis() == that.verwendetMaximalDosis()) {
             result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.verwendetZeiten() == that.verwendetZeiten()){
+        } else if (this.verwendetZeiten() == that.verwendetZeiten()) {
             result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.verwendetUhrzeit() == that.verwendetUhrzeit()){
+        } else if (this.verwendetUhrzeit() == that.verwendetUhrzeit()) {
             result = this.uhrzeit.compareTo(that.getUhrzeit());
-        } else if (this.verwendetZeiten()){ // Zeiten zuerst.
+        } else if (this.verwendetZeiten()) { // Zeiten zuerst.
             result = 1;
-        } else if (this.verwendetUhrzeit() && that.verwendetMaximalDosis()){ // dann Uhrzeiten
+        } else if (this.verwendetUhrzeit() && that.verwendetMaximalDosis()) { // dann Uhrzeiten
             result = 1;
         } else {
             result = -1;

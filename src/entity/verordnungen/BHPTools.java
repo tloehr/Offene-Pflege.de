@@ -58,9 +58,9 @@ public class BHPTools {
         String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
 
-        String wtag; // kurze Darstellung des Wochentags des Stichtags
-        int tagnum;
-        int wtagnum;
+//        String wtag; // kurze Darstellung des Wochentags des Stichtags
+//        int tagnum;
+//        int wtagnum;
         SYSRunningClasses me = null;
 
         me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
@@ -88,11 +88,11 @@ public class BHPTools {
             }
 
             // Mache aus "Montag" -> "mon"
-            wtag = SYSCalendar.WochentagName(gcStichtag);
-            wtag = wtag.substring(0, 3).toLowerCase();
+//            wtag = SYSCalendar.WochentagName(gcStichtag);
+//            wtag = wtag.substring(0, 3).toLowerCase();
 
-            tagnum = gcStichtag.get(GregorianCalendar.DAY_OF_MONTH);
-            wtagnum = gcStichtag.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH); // der erste Mitwwoch im Monat hat 1, der zweite 2 usw...
+//            tagnum = gcStichtag.get(GregorianCalendar.DAY_OF_MONTH);
+//            wtagnum = gcStichtag.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH); // der erste Mitwwoch im Monat hat 1, der zweite 2 usw...
 
             Query select = em.createQuery(" " +
                     " SELECT vp FROM VerordnungPlanung vp " +
@@ -101,32 +101,9 @@ public class BHPTools {
                     // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
                     // Das heisst, wenn eine Verordnung heute endet, dann wird sie dennoch eingetragen.
                     // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
-                    " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum" +
-//                    // Einschränkung auf bestimmte Verordnung0en, wenn gewünscht
-//                    (verordnung != null ? " AND v = :verordnung " : " ") +
-                    // und nur die Planungen, die überhaupt auf den Stichtag passen könnten.
-                    // Hier werden bereits die falschen Wochentage rausgefiltert. Brauchen
-                    // wir uns nachher nicht mehr drum zu kümmern.
-                    " AND (" +
-                    // 1. Alles was taeglich (jeden Tag oder jeden soundsovielten Tag)
-                    "       (vp.taeglich > 0) " +
-                    "            OR" +
-                    // 2.   Alles was woechentlich ist und die Spalte mit dem aktuellen Wochentagsnamen größer null ist.
-                    //      Hier wird der Ausdruck dynamisch erzeugt. wtag enthält nämlich das Wochentagskürzel
-                    "       (vp.woechentlich > 0 AND vp." + wtag + " > 0) " +
-                    "           OR " +
-                    // 3.   Monatliche Einträge. Aber nur dann, wenn
-                    "       (vp.monatlich > 0 AND " +
-                    // 3a.  es der n.te Tag im Monat ist
-                    "           (vp.tagNum = :tagnum " +
-                    "               OR " +
-                    // 3b.  oder der n.te Wochentag (z.B. Freitag) im Monat ist.
-                    //      :wtag enthält hier den sog. DAY_OF_WEEK_IN_MONTH
-                    "           vp." + wtag + " = :wtag)" +
-                    "       )" +
-                    "    ) " +
+                    " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
-                    "AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2");
+                    " AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2");
 
             // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
@@ -138,8 +115,8 @@ public class BHPTools {
 
             select.setParameter("andatum", new Date(SYSCalendar.endOfDay(stichtag)));
             select.setParameter("abdatum", new Date(SYSCalendar.startOfDay(stichtag)));
-            select.setParameter("tagnum", tagnum);
-            select.setParameter("wtag", wtagnum);
+//            select.setParameter("tagnum", tagnum);
+//            select.setParameter("wtag", wtagnum);
             select.setParameter("ldatum", new Date(SYSCalendar.endOfDay(stichtag)));
 
 //            if (verordnung != null) {
@@ -200,12 +177,28 @@ public class BHPTools {
     }
 
     /**
-     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben.
+     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die Liste wird aber vorher
+     * noch darauf geprüft, ob sie auch wirklich an dem besagten Stichtag passt. Dabei gilt:
+     * <ol>
+     *     <li>Alles was taeglich angeordnet ist (jeden Tag oder jeden soundsovielten Tag)</li>
+     *     <li>Alles was woechentlich ist und die Spalte (Attribut) mit dem aktuellen Wochentagsnamen größer null ist.</li>
+     *     <li>Monatliche Einträge. Aber nur dann, wenn
+     *     <ol>
+     *         <li>es der <i>n</i>.te Tag im Monat ist <br/><b>oder</b></li>
+     *         <li>oder der <i>n</i>.te Wochentag (z.B. Freitag) im Monat ist</li>
+     *     </ol>
+     *     </li>
+     * </ol>
      *
-     * @param em
-     * @param list
-     * @param stichtag, gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
-     * @param zeit,     ist die Tageszeit, ab der die Einträge erfolgen sollen. Bei <code>null</code> wird immer für den ganzen Tag eingetragen.
+     * Diese Methode kann von verschiednenen Seiten aufgerufen werden. Zum einen von der "anderen" erzeugen Methode, die einen vollständigen Tagesplan für
+     * alle BWs erzeugt oder von dem Verordnungs Editor, der seinerseits nur eine einzige Verordnung nachtragen möchte. Auf jeden Fall kann die Liste <code>list</code>
+     * auch Einträge enthalten, die unpassend sind. Sie dient nur der Vorauswahl und wird innerhalb dieser Methode dann genau geprüft. Sie "pickt" sich also
+     * nur die passenden Elemente aus dieser Liste heraus.
+     *
+     * @param em EntityManager Kontext
+     * @param list Liste der VerordnungPlanungen, die ggf. einzutragen sind.
+     * @param stichtag gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
+     * @param zeit     ist die Tageszeit, ab der die Einträge erfolgen sollen. Bei <code>null</code> wird immer für den ganzen Tag eingetragen.
      * @return die Anzahl der erzeugten BHPs.
      */
     public static int erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, Date zeit) {
@@ -217,10 +210,61 @@ public class BHPTools {
         int row = 0;
 
         OPDE.debug("MaxRows: " + maxrows);
-        // Erstmal alle Einträge, die täglich oder wöchentlich nötig sind.
-        while (planungen.hasNext()) {
+
+        for (VerordnungPlanung planung : list){
+
+            if (!SYSCalendar.isInFuture(planung.getLDatum()) || planung.isTaeglich() || planung.isPassenderWochentag(stichtag) || planung.isPassenderTagImMonat(stichtag)){
+
+//               " AND (" +
+//                    // 1. Alles was taeglich (jeden Tag oder jeden soundsovielten Tag)
+//                    "       (vp.taeglich > 0) " +
+//                    "            OR" +
+//                    // 2.   Alles was woechentlich ist und die Spalte mit dem aktuellen Wochentagsnamen größer null ist.
+//                    //      Hier wird der Ausdruck dynamisch erzeugt. wtag enthält nämlich das Wochentagskürzel
+//                    "       (vp.woechentlich > 0 AND vp." + wtag + " > 0) " +
+//                    "           OR " +
+//                    // 3.   Monatliche Einträge. Aber nur dann, wenn
+//                    "       (vp.monatlich > 0 AND " +
+//                    // 3a.  es der n.te Tag im Monat ist
+//                    "           (vp.tagNum = :tagnum " +
+//                    "               OR " +
+//                    // 3b.  oder der n.te Wochentag (z.B. Freitag) im Monat ist.
+//                    //      :wtag enthält hier den sog. DAY_OF_WEEK_IN_MONTH
+//                    "           vp." + wtag + " = :wtag)" +
+//                    "       )" +
+//                    "    ) " +
+
+
+                                    //                    // Einschränkung auf bestimmte Verordnung0en, wenn gewünscht
+//                    (verordnung != null ? " AND v = :verordnung " : " ") +
+                    // und nur die Planungen, die überhaupt auf den Stichtag passen könnten.
+                    // Hier werden bereits die falschen Wochentage rausgefiltert. Brauchen
+                    // wir uns nachher nicht mehr drum zu kümmern.
+//                    " AND (" +
+//                    // 1. Alles was taeglich (jeden Tag oder jeden soundsovielten Tag)
+//                    "       (vp.taeglich > 0) " +
+//                    "            OR" +
+//                    // 2.   Alles was woechentlich ist und die Spalte mit dem aktuellen Wochentagsnamen größer null ist.
+//                    //      Hier wird der Ausdruck dynamisch erzeugt. wtag enthält nämlich das Wochentagskürzel
+//                    "       (vp.woechentlich > 0 AND vp." + wtag + " > 0) " +
+//                    "           OR " +
+//                    // 3.   Monatliche Einträge. Aber nur dann, wenn
+//                    "       (vp.monatlich > 0 AND " +
+//                    // 3a.  es der n.te Tag im Monat ist
+//                    "           (vp.tagNum = :tagnum " +
+//                    "               OR " +
+//                    // 3b.  oder der n.te Wochentag (z.B. Freitag) im Monat ist.
+//                    //      :wtag enthält hier den sog. DAY_OF_WEEK_IN_MONTH
+//                    "           vp." + wtag + " = :wtag)" +
+//                    "       )" +
+//                    "    ) " +
+
+
+
+
+
             row++;
-            VerordnungPlanung planung = planungen.next();
+
             OPDE.info("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
             OPDE.debug("==========================================");
             //OPDE.debug(planung);
@@ -323,6 +367,7 @@ public class BHPTools {
                 // Nun noch das LDatum in der Tabelle DFNPlanung neu setzen.
                 planung.setLDatum(stichtag);
                 em.merge(planung);
+            }
             }
         }
         OPDE.debug("Erzeugte BHPs: " + numbhp);

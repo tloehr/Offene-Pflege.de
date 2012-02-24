@@ -225,4 +225,6 @@ public class VerordnungPlanungTools {
         return result.equals("") ? "&nbsp;" : result;
     }
 
+
+
 }

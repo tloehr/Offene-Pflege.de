@@ -73,7 +73,6 @@ public class VerordnungTools {
     }
 
 
-
     /**
      * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
      * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
@@ -116,8 +115,6 @@ public class VerordnungTools {
         }
         return html;
     }
-
-
 
 
     private static String getStellplan(List data) {
@@ -251,19 +248,28 @@ public class VerordnungTools {
         } else {
             // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
 
-            MedBestand aktuellerAnbruch = MedVorratTools.getImAnbruch(DarreichungTools.getVorratZurDarreichung(verordnung.getBewohner(), verordnung.getDarreichung()));
-            if (aktuellerAnbruch != null && !aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
-                result += "<font face=\"Sans Serif\"><b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
-                        (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b></font>" +
-                        (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
-                        (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
-                result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ");
-                result += (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</i>";
+            MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(verordnung.getBewohner(), verordnung.getDarreichung());
+            MedBestand aktuellerAnbruch = MedVorratTools.getImAnbruch(vorrat);
+
+            if (aktuellerAnbruch != null) {
+                if (!aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
+                    result += "<font face=\"Sans Serif\"><b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
+                            (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b></font>" +
+                            (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
+                            (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
+                    result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ");
+                    result += (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</i>";
+                } else {
+                    result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
+                            + (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b></font>" +
+                            (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
+                            (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
+                }
             } else {
                 result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
-                        + (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b></font>" +
-                        (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
-                        (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
+                            + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz()) + "</b></font>" +
+                            (verordnung.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getDarreichung().getMedForm().getZubereitung()) + " " +
+                            (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
             }
 
 

@@ -560,7 +560,9 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
 
         CollectionUtils.forAllDo(planungen, new Closure() {
             public void execute(Object o) {
-                copy.getPlanungen().add((VerordnungPlanung) ((VerordnungPlanung) o).clone());
+                VerordnungPlanung planungCopy = (VerordnungPlanung) ((VerordnungPlanung) o).clone();
+                planungCopy.setVerordnung(copy);
+                copy.getPlanungen().add(planungCopy);
             }
         });
         return copy;
