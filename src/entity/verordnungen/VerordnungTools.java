@@ -537,4 +537,19 @@ public class VerordnungTools {
         }
     }
 
+    /**
+     * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.
+     * Verordnung, die über die Zeit mehrfach geändert werden, hängen über die VerordnungsKennung aneinander.
+     * @param verordnung
+     * @return Anzahl der Verordnungen, die zu dieser gehören.e
+     */
+    public static int getNumVerodnungenMitGleicherKennung(Verordnung verordnung) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Verordnung.findByVerKennung");
+        query.setParameter("verKennung", verordnung.getVerKennung());
+        int num = query.getResultList().size();
+        em.close();
+        return num;
+    }
+
 }

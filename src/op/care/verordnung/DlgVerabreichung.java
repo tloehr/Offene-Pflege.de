@@ -278,25 +278,25 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         rbTag = new JRadioButton();
         rbWoche = new JRadioButton();
         rbMonat = new JRadioButton();
-        jLabel7 = new JLabel();
-        jLabel8 = new JLabel();
         cbMon = new JCheckBox();
         cbDie = new JCheckBox();
+        rbMonatTag = new JRadioButton();
+        rbMonatWTag = new JRadioButton();
+        spinTaeglich = new JSpinner();
+        jLabel7 = new JLabel();
+        spinWoche = new JSpinner();
+        jLabel8 = new JLabel();
         cbMit = new JCheckBox();
         cbDon = new JCheckBox();
         cbFre = new JCheckBox();
         cbSam = new JCheckBox();
         cbSon = new JCheckBox();
-        jLabel9 = new JLabel();
-        rbMonatTag = new JRadioButton();
-        jLabel10 = new JLabel();
-        rbMonatWTag = new JRadioButton();
-        cmbWTag = new JComboBox();
-        spinTaeglich = new JSpinner();
-        spinWoche = new JSpinner();
         spinMonat = new JSpinner();
+        jLabel9 = new JLabel();
         spinMonatTag = new JSpinner();
+        jLabel10 = new JLabel();
         spinMonatWTag = new JSpinner();
+        cmbWTag = new JComboBox();
         jLabel13 = new JLabel();
         jdcLDatum = new JDateChooser();
         jPanel1 = new JPanel();
@@ -310,13 +310,13 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$rgap, $lcgap, default:grow, $lcgap",
-            "$rgap, $lgap, pref, $lgap, fill:default"));
+            "$rgap, $lgap, pref:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel3 ========
         {
             jPanel3.setLayout(new FormLayout(
                 "2*(default:grow, $lcgap), default:grow",
-                "2*(fill:default, $lgap), fill:default"));
+                "fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
 
             //======== jPanel2 ========
             {
@@ -638,6 +638,9 @@ public class DlgVerabreichung extends javax.swing.JDialog {
             //======== pnlWdh ========
             {
                 pnlWdh.setBorder(new TitledBorder("Wiederholungen"));
+                pnlWdh.setLayout(new FormLayout(
+                    "25dlu, $lcgap, 17dlu, $lcgap, 11dlu, $lcgap, 21dlu, $lcgap, default, $lcgap, 26dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+                    "8*(fill:default, $lgap), default:grow"));
 
                 //---- rbTag ----
                 rbTag.setText("t\u00e4glich alle");
@@ -649,6 +652,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbTagActionPerformed(e);
                     }
                 });
+                pnlWdh.add(rbTag, CC.xywh(1, 1, 5, 1));
 
                 //---- rbWoche ----
                 rbWoche.setText("w\u00f6chentlich alle");
@@ -660,6 +664,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbWocheActionPerformed(e);
                     }
                 });
+                pnlWdh.add(rbWoche, CC.xywh(1, 3, 9, 1));
 
                 //---- rbMonat ----
                 rbMonat.setText("monatlich alle");
@@ -671,12 +676,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbMonatActionPerformed(e);
                     }
                 });
-
-                //---- jLabel7 ----
-                jLabel7.setText("Tage");
-
-                //---- jLabel8 ----
-                jLabel8.setText("Wochen am:");
+                pnlWdh.add(rbMonat, CC.xywh(1, 9, 7, 1));
 
                 //---- cbMon ----
                 cbMon.setText("Mon");
@@ -688,6 +688,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         cbMonActionPerformed(e);
                     }
                 });
+                pnlWdh.add(cbMon, CC.xywh(1, 5, 3, 1));
 
                 //---- cbDie ----
                 cbDie.setText("Die");
@@ -699,64 +700,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         cbDieActionPerformed(e);
                     }
                 });
-
-                //---- cbMit ----
-                cbMit.setText("Mit");
-                cbMit.setBorder(BorderFactory.createEmptyBorder());
-                cbMit.setMargin(new Insets(0, 0, 0, 0));
-                cbMit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbMitActionPerformed(e);
-                    }
-                });
-
-                //---- cbDon ----
-                cbDon.setText("Don");
-                cbDon.setBorder(BorderFactory.createEmptyBorder());
-                cbDon.setMargin(new Insets(0, 0, 0, 0));
-                cbDon.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbDonActionPerformed(e);
-                    }
-                });
-
-                //---- cbFre ----
-                cbFre.setText("Fre");
-                cbFre.setBorder(BorderFactory.createEmptyBorder());
-                cbFre.setMargin(new Insets(0, 0, 0, 0));
-                cbFre.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbFreActionPerformed(e);
-                    }
-                });
-
-                //---- cbSam ----
-                cbSam.setText("Sam");
-                cbSam.setBorder(BorderFactory.createEmptyBorder());
-                cbSam.setMargin(new Insets(0, 0, 0, 0));
-                cbSam.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbSamActionPerformed(e);
-                    }
-                });
-
-                //---- cbSon ----
-                cbSon.setText("Son");
-                cbSon.setBorder(BorderFactory.createEmptyBorder());
-                cbSon.setMargin(new Insets(0, 0, 0, 0));
-                cbSon.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbSonActionPerformed(e);
-                    }
-                });
-
-                //---- jLabel9 ----
-                jLabel9.setText("Monat(e)");
+                pnlWdh.add(cbDie, CC.xywh(5, 5, 3, 1));
 
                 //---- rbMonatTag ----
                 rbMonatTag.setText("wiederholt am");
@@ -768,9 +712,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbMonatTagActionPerformed(e);
                     }
                 });
-
-                //---- jLabel10 ----
-                jLabel10.setText("Tag");
+                pnlWdh.add(rbMonatTag, CC.xywh(3, 11, 9, 1));
 
                 //---- rbMonatWTag ----
                 rbMonatWTag.setText("wiederholt am");
@@ -782,6 +724,128 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbMonatWTagActionPerformed(e);
                     }
                 });
+                pnlWdh.add(rbMonatWTag, CC.xywh(3, 13, 9, 1));
+
+                //---- spinTaeglich ----
+                spinTaeglich.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinTaeglichStateChanged(e);
+                    }
+                });
+                pnlWdh.add(spinTaeglich, CC.xywh(9, 1, 5, 1));
+
+                //---- jLabel7 ----
+                jLabel7.setText("Tage");
+                pnlWdh.add(jLabel7, CC.xy(15, 1));
+
+                //---- spinWoche ----
+                spinWoche.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinWocheStateChanged(e);
+                    }
+                });
+                pnlWdh.add(spinWoche, CC.xywh(9, 3, 5, 1));
+
+                //---- jLabel8 ----
+                jLabel8.setText("Wochen am:");
+                pnlWdh.add(jLabel8, CC.xy(15, 3));
+
+                //---- cbMit ----
+                cbMit.setText("Mit");
+                cbMit.setBorder(BorderFactory.createEmptyBorder());
+                cbMit.setMargin(new Insets(0, 0, 0, 0));
+                cbMit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbMitActionPerformed(e);
+                    }
+                });
+                pnlWdh.add(cbMit, CC.xywh(9, 5, 4, 1));
+
+                //---- cbDon ----
+                cbDon.setText("Don");
+                cbDon.setBorder(BorderFactory.createEmptyBorder());
+                cbDon.setMargin(new Insets(0, 0, 0, 0));
+                cbDon.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbDonActionPerformed(e);
+                    }
+                });
+                pnlWdh.add(cbDon, CC.xywh(13, 5, 3, 1));
+
+                //---- cbFre ----
+                cbFre.setText("Fre");
+                cbFre.setBorder(BorderFactory.createEmptyBorder());
+                cbFre.setMargin(new Insets(0, 0, 0, 0));
+                cbFre.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbFreActionPerformed(e);
+                    }
+                });
+                pnlWdh.add(cbFre, CC.xy(1, 7));
+
+                //---- cbSam ----
+                cbSam.setText("Sam");
+                cbSam.setBorder(BorderFactory.createEmptyBorder());
+                cbSam.setMargin(new Insets(0, 0, 0, 0));
+                cbSam.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSamActionPerformed(e);
+                    }
+                });
+                pnlWdh.add(cbSam, CC.xywh(5, 7, 4, 1));
+
+                //---- cbSon ----
+                cbSon.setText("Son");
+                cbSon.setBorder(BorderFactory.createEmptyBorder());
+                cbSon.setMargin(new Insets(0, 0, 0, 0));
+                cbSon.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cbSonActionPerformed(e);
+                    }
+                });
+                pnlWdh.add(cbSon, CC.xywh(9, 7, 4, 1));
+
+                //---- spinMonat ----
+                spinMonat.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinMonatStateChanged(e);
+                    }
+                });
+                pnlWdh.add(spinMonat, CC.xywh(9, 9, 5, 1));
+
+                //---- jLabel9 ----
+                jLabel9.setText("Monat(e)");
+                pnlWdh.add(jLabel9, CC.xy(15, 9));
+
+                //---- spinMonatTag ----
+                spinMonatTag.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinMonatTagStateChanged(e);
+                    }
+                });
+                pnlWdh.add(spinMonatTag, CC.xywh(9, 11, 5, 1));
+
+                //---- jLabel10 ----
+                jLabel10.setText("Tag");
+                pnlWdh.add(jLabel10, CC.xy(15, 11));
+
+                //---- spinMonatWTag ----
+                spinMonatWTag.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        spinMonatWTagStateChanged(e);
+                    }
+                });
+                pnlWdh.add(spinMonatWTag, CC.xywh(9, 13, 5, 1));
 
                 //---- cmbWTag ----
                 cmbWTag.setModel(new DefaultComboBoxModel(new String[] {
@@ -799,164 +863,16 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         cmbWTagItemStateChanged(e);
                     }
                 });
-
-                //---- spinTaeglich ----
-                spinTaeglich.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        spinTaeglichStateChanged(e);
-                    }
-                });
-
-                //---- spinWoche ----
-                spinWoche.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        spinWocheStateChanged(e);
-                    }
-                });
-
-                //---- spinMonat ----
-                spinMonat.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        spinMonatStateChanged(e);
-                    }
-                });
-
-                //---- spinMonatTag ----
-                spinMonatTag.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        spinMonatTagStateChanged(e);
-                    }
-                });
-
-                //---- spinMonatWTag ----
-                spinMonatWTag.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        spinMonatWTagStateChanged(e);
-                    }
-                });
+                pnlWdh.add(cmbWTag, CC.xywh(15, 13, 3, 1));
 
                 //---- jLabel13 ----
                 jLabel13.setText("Erste Anwendung am:");
-
-                GroupLayout pnlWdhLayout = new GroupLayout(pnlWdh);
-                pnlWdh.setLayout(pnlWdhLayout);
-                pnlWdhLayout.setHorizontalGroup(
-                    pnlWdhLayout.createParallelGroup()
-                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnlWdhLayout.createParallelGroup()
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addGap(17, 17, 17)
-                                                .addGroup(pnlWdhLayout.createParallelGroup()
-                                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                                .addComponent(rbMonatTag)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
-                                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                                .addComponent(rbMonatWTag)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)))
-                                                .addGap(20, 20, 20)
-                                                .addGroup(pnlWdhLayout.createParallelGroup()
-                                                        .addComponent(jLabel10)
-                                                        .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addComponent(rbWoche)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jLabel8))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addComponent(rbTag)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jLabel7))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addGap(17, 17, 17)
-                                                .addGroup(pnlWdhLayout.createParallelGroup()
-                                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                                .addComponent(cbFre)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(cbSam)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(cbSon))
-                                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                                .addComponent(cbMon)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(cbDie)
-                                                                .addGap(16, 16, 16)
-                                                                .addComponent(cbMit)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(cbDon))))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addComponent(rbMonat)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jLabel9))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addComponent(jLabel13)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jdcLDatum, GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)))
-                                .addContainerGap())
-                );
-                pnlWdhLayout.setVerticalGroup(
-                    pnlWdhLayout.createParallelGroup()
-                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(rbTag)
-                                        .addComponent(spinTaeglich, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel7))
-                                .addGap(18, 18, 18)
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(rbWoche)
-                                        .addComponent(spinWoche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel8))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbMon)
-                                        .addComponent(cbDie)
-                                        .addComponent(cbMit)
-                                        .addComponent(cbDon))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cbFre)
-                                        .addComponent(cbSam)
-                                        .addComponent(cbSon))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(rbMonat)
-                                        .addComponent(jLabel9)
-                                        .addComponent(spinMonat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(rbMonatTag)
-                                        .addComponent(spinMonatTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel10))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlWdhLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(rbMonatWTag)
-                                        .addComponent(spinMonatWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cmbWTag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addGroup(pnlWdhLayout.createParallelGroup()
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jLabel13))
-                                        .addGroup(pnlWdhLayout.createSequentialGroup()
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jdcLDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(82, Short.MAX_VALUE))
-                );
+                pnlWdh.add(jLabel13, CC.xywh(1, 15, 13, 1));
+                pnlWdh.add(jdcLDatum, CC.xywh(9, 15, 9, 1));
             }
             jPanel3.add(pnlWdh, CC.xywh(3, 1, 3, 5));
         }
-        contentPane.add(jPanel3, CC.xy(3, 3));
+        contentPane.add(jPanel3, CC.xy(3, 3, CC.FILL, CC.FILL));
 
         //======== jPanel1 ========
         {
@@ -985,7 +901,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
             jPanel1.add(btnDiscard);
         }
         contentPane.add(jPanel1, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(825, 445);
+        setSize(835, 445);
         setLocationRelativeTo(null);
 
         //---- bgWdh ----
@@ -1753,25 +1669,25 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     private JRadioButton rbTag;
     private JRadioButton rbWoche;
     private JRadioButton rbMonat;
-    private JLabel jLabel7;
-    private JLabel jLabel8;
     private JCheckBox cbMon;
     private JCheckBox cbDie;
+    private JRadioButton rbMonatTag;
+    private JRadioButton rbMonatWTag;
+    private JSpinner spinTaeglich;
+    private JLabel jLabel7;
+    private JSpinner spinWoche;
+    private JLabel jLabel8;
     private JCheckBox cbMit;
     private JCheckBox cbDon;
     private JCheckBox cbFre;
     private JCheckBox cbSam;
     private JCheckBox cbSon;
-    private JLabel jLabel9;
-    private JRadioButton rbMonatTag;
-    private JLabel jLabel10;
-    private JRadioButton rbMonatWTag;
-    private JComboBox cmbWTag;
-    private JSpinner spinTaeglich;
-    private JSpinner spinWoche;
     private JSpinner spinMonat;
+    private JLabel jLabel9;
     private JSpinner spinMonatTag;
+    private JLabel jLabel10;
     private JSpinner spinMonatWTag;
+    private JComboBox cmbWTag;
     private JLabel jLabel13;
     private JDateChooser jdcLDatum;
     private JPanel jPanel1;

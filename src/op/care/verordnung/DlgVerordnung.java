@@ -26,6 +26,8 @@
  */
 package op.care.verordnung;
 
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.verordnungen.*;
@@ -67,6 +69,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
     public static final int NEW_MODE = 1; // Neu
     public static final int EDIT_MODE = 2; // Korrigieren
     public static final int CHANGE_MODE = 3; // Ändern
+    public static final int EDIT_OF_CHANGE_MODE = 4; // Das ist dann, wenn man eine Veränderung (Change) nachträglich nochmal korrigiert.
 
     private java.awt.Frame parent;
     private boolean ignoreSitCaret;
@@ -142,7 +145,6 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private void initComponents() {
         lblBW = new JLabel();
         lblTitle = new JLabel();
-        jSeparator1 = new JSeparator();
         jPanel1 = new JPanel();
         cmbSit = new JComboBox();
         txtMed = new JTextField();
@@ -176,11 +178,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
         jLabel2 = new JLabel();
         lblAN = new JLabel();
         cmbKHAn = new JComboBox();
-        jSeparator2 = new JSeparator();
-        btnSave = new JButton();
-        btnClose = new JButton();
         jPanel5 = new JPanel();
         lblVerordnung = new JLabel();
+        panel1 = new JPanel();
+        btnSave = new JButton();
+        btnClose = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -191,26 +193,34 @@ public class DlgVerordnung extends javax.swing.JDialog {
             }
         });
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, $rgap",
+            "3*(fill:default, $lgap), fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //---- lblBW ----
         lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
         lblBW.setForeground(new Color(255, 51, 0));
         lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
+        contentPane.add(lblBW, CC.xywh(3, 3, 3, 1));
 
         //---- lblTitle ----
         lblTitle.setFont(new Font("Dialog", Font.BOLD, 24));
         lblTitle.setText("\u00c4rztliche Verordnung");
+        contentPane.add(lblTitle, CC.xywh(3, 1, 3, 1));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+            jPanel1.setLayout(new FormLayout(
+                "63dlu, $lcgap, default, 2*($lcgap, default:grow)",
+                "3*(fill:default, $lgap), fill:default"));
 
             //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbSit.addItemListener(new ItemListener() {
                 @Override
@@ -218,6 +228,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     cmbSitItemStateChanged(e);
                 }
             });
+            jPanel1.add(cmbSit, CC.xy(7, 3));
 
             //---- txtMed ----
             txtMed.setText("jTextField1");
@@ -233,13 +244,14 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     txtMedFocusGained(e);
                 }
             });
+            jPanel1.add(txtMed, CC.xy(5, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMed.addItemListener(new ItemListener() {
                 @Override
@@ -247,13 +259,14 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     cmbMedItemStateChanged(e);
                 }
             });
+            jPanel1.add(cmbMed, CC.xy(7, 1));
 
             //---- cmbMass ----
-            cmbMass.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMass.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMass.addItemListener(new ItemListener() {
                 @Override
@@ -261,6 +274,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     cmbMassItemStateChanged(e);
                 }
             });
+            jPanel1.add(cmbMass, CC.xywh(3, 5, 5, 1));
 
             //---- txtSit ----
             txtSit.setText("jTextField1");
@@ -270,6 +284,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     txtSitCaretUpdate(e);
                 }
             });
+            jPanel1.add(txtSit, CC.xy(5, 3));
 
             //---- btnBedarf ----
             btnBedarf.setText("Situation");
@@ -280,6 +295,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     btnBedarfActionPerformed(e);
                 }
             });
+            jPanel1.add(btnBedarf, CC.xywh(1, 3, 3, 1));
 
             //---- btnMed ----
             btnMed.setText("Medikament");
@@ -289,10 +305,14 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     btnMedActionPerformed(e);
                 }
             });
+            jPanel1.add(btnMed, CC.xywh(1, 1, 3, 1));
 
             //======== jPanel8 ========
             {
                 jPanel8.setBorder(new TitledBorder("Dosis / H\u00e4ufigkeit"));
+                jPanel8.setLayout(new FormLayout(
+                    "default, $lcgap, default:grow",
+                    "fill:default:grow, $lgap, fill:default"));
 
                 //======== jspDosis ========
                 {
@@ -312,15 +332,15 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ));
                     tblDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie Ver\u00e4nderungen vornehmen wollen.</html>");
                     tblDosis.addMouseListener(new MouseAdapter() {
@@ -331,6 +351,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     });
                     jspDosis.setViewportView(tblDosis);
                 }
+                jPanel8.add(jspDosis, CC.xywh(1, 1, 3, 1));
 
                 //---- cbPackEnde ----
                 cbPackEnde.setText("Bis Packungsende");
@@ -343,6 +364,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cbPackEndeActionPerformed(e);
                     }
                 });
+                jPanel8.add(cbPackEnde, CC.xy(1, 3));
 
                 //---- cbStellplan ----
                 cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
@@ -354,99 +376,33 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cbStellplanActionPerformed(e);
                     }
                 });
-
-                GroupLayout jPanel8Layout = new GroupLayout(jPanel8);
-                jPanel8.setLayout(jPanel8Layout);
-                jPanel8Layout.setHorizontalGroup(
-                        jPanel8Layout.createParallelGroup()
-                                .addGroup(jPanel8Layout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addGroup(jPanel8Layout.createParallelGroup()
-                                                .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-                                                .addGroup(jPanel8Layout.createSequentialGroup()
-                                                        .addComponent(cbPackEnde)
-                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(cbStellplan)))
-                                        .addContainerGap())
-                );
-                jPanel8Layout.setVerticalGroup(
-                        jPanel8Layout.createParallelGroup()
-                                .addGroup(GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                                        .addComponent(jspDosis, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel8Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(cbPackEnde)
-                                                .addComponent(cbStellplan))
-                                        .addContainerGap())
-                );
+                jPanel8.add(cbStellplan, CC.xy(3, 3));
             }
+            jPanel1.add(jPanel8, CC.xywh(1, 7, 7, 1));
 
             //---- jLabel6 ----
             jLabel6.setText("Massnahmen:");
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                            .addComponent(jPanel8, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addComponent(jLabel6)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cmbMass, 0, 459, Short.MAX_VALUE))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                                            .addComponent(btnBedarf, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                            .addComponent(btnMed, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                                            .addComponent(txtSit, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-                                                            .addComponent(txtMed, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                            .addComponent(cmbSit, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                            .addComponent(cmbMed, GroupLayout.PREFERRED_SIZE, 275, GroupLayout.PREFERRED_SIZE))))
-                                    .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                            .addComponent(btnMed)
-                                                            .addComponent(txtMed, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                            .addComponent(btnBedarf)
-                                                            .addComponent(txtSit, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addComponent(cmbMed, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cmbSit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(jLabel6)
-                                            .addComponent(cmbMass, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jPanel8, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
+            jPanel1.add(jLabel6, CC.xy(1, 5));
         }
+        contentPane.add(jPanel1, CC.xy(5, 7));
 
         //======== jPanel3 ========
         {
             jPanel3.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+            jPanel3.setLayout(new FormLayout(
+                "149dlu",
+                "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== jPanel4 ========
             {
                 jPanel4.setBorder(new TitledBorder("Absetzung"));
+                jPanel4.setLayout(new FormLayout(
+                    "default, $lcgap, default:grow",
+                    "4*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- jLabel3 ----
                 jLabel3.setText("Am:");
+                jPanel4.add(jLabel3, CC.xy(1, 3));
 
                 //---- jdcAB ----
                 jdcAB.setEnabled(false);
@@ -456,16 +412,18 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         jdcABPropertyChange(e);
                     }
                 });
+                jPanel4.add(jdcAB, CC.xy(3, 3));
 
                 //---- jLabel4 ----
                 jLabel4.setText("Durch:");
+                jPanel4.add(jLabel4, CC.xy(1, 5));
 
                 //---- cmbAB ----
-                cmbAB.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbAB.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbAB.setEnabled(false);
                 cmbAB.addItemListener(new ItemListener() {
@@ -474,6 +432,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cmbABItemStateChanged(e);
                     }
                 });
+                jPanel4.add(cmbAB, CC.xy(3, 5));
 
                 //---- cbAB ----
                 cbAB.setText("Abgesetzt");
@@ -485,16 +444,18 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cbABActionPerformed(e);
                     }
                 });
+                jPanel4.add(cbAB, CC.xywh(1, 1, 3, 1));
 
                 //---- lblAB ----
                 lblAB.setText("jLabel13");
+                jPanel4.add(lblAB, CC.xy(3, 9));
 
                 //---- cmbKHAb ----
-                cmbKHAb.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbKHAb.setEnabled(false);
                 cmbKHAb.addItemListener(new ItemListener() {
@@ -503,46 +464,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cmbKHAbItemStateChanged(e);
                     }
                 });
-
-                GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
-                jPanel4.setLayout(jPanel4Layout);
-                jPanel4Layout.setHorizontalGroup(
-                        jPanel4Layout.createParallelGroup()
-                                .addGroup(jPanel4Layout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addGroup(jPanel4Layout.createParallelGroup()
-                                                .addComponent(cbAB)
-                                                .addGroup(jPanel4Layout.createSequentialGroup()
-                                                        .addGroup(jPanel4Layout.createParallelGroup()
-                                                                .addComponent(jLabel4)
-                                                                .addComponent(jLabel3))
-                                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addGroup(jPanel4Layout.createParallelGroup()
-                                                                .addComponent(cmbAB, 0, 221, Short.MAX_VALUE)
-                                                                .addComponent(cmbKHAb, 0, 221, Short.MAX_VALUE)
-                                                                .addComponent(jdcAB, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
-                                                                .addComponent(lblAB, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))))
-                                        .addContainerGap())
-                );
-                jPanel4Layout.setVerticalGroup(
-                        jPanel4Layout.createParallelGroup()
-                                .addGroup(jPanel4Layout.createSequentialGroup()
-                                        .addComponent(cbAB)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                .addComponent(jLabel3)
-                                                .addComponent(jdcAB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(jLabel4)
-                                                .addComponent(cmbAB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(cmbKHAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblAB)
-                                        .addContainerGap())
-                );
+                jPanel4.add(cmbKHAb, CC.xy(3, 7));
             }
+            jPanel3.add(jPanel4, CC.xy(1, 3));
 
             //======== jScrollPane3 ========
             {
@@ -556,16 +480,22 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 });
                 jScrollPane3.setViewportView(txtBemerkung);
             }
+            jPanel3.add(jScrollPane3, CC.xy(1, 7));
 
             //---- jLabel5 ----
             jLabel5.setText("Bemerkung:");
+            jPanel3.add(jLabel5, CC.xy(1, 5));
 
             //======== jPanel2 ========
             {
                 jPanel2.setBorder(new TitledBorder("Ansetzung"));
+                jPanel2.setLayout(new FormLayout(
+                    "default, $lcgap, 68dlu:grow",
+                    "17dlu, 3*($lgap, fill:17dlu)"));
 
                 //---- jLabel1 ----
                 jLabel1.setText("Am:");
+                jPanel2.add(jLabel1, CC.xy(1, 1));
 
                 //---- jdcAN ----
                 jdcAN.addPropertyChangeListener("date", new PropertyChangeListener() {
@@ -574,13 +504,14 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         jdcANPropertyChange(e);
                     }
                 });
+                jPanel2.add(jdcAN, CC.xy(3, 1));
 
                 //---- cmbAN ----
-                cmbAN.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbAN.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbAN.addItemListener(new ItemListener() {
                     @Override
@@ -588,19 +519,22 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cmbANItemStateChanged(e);
                     }
                 });
+                jPanel2.add(cmbAN, CC.xy(3, 3));
 
                 //---- jLabel2 ----
                 jLabel2.setText("Durch:");
+                jPanel2.add(jLabel2, CC.xy(1, 3));
 
                 //---- lblAN ----
                 lblAN.setText("jLabel11");
+                jPanel2.add(lblAN, CC.xy(3, 7));
 
                 //---- cmbKHAn ----
-                cmbKHAn.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbKHAn.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbKHAn.addItemListener(new ItemListener() {
                     @Override
@@ -608,90 +542,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
                         cmbKHAnItemStateChanged(e);
                     }
                 });
-
-                GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
-                jPanel2.setLayout(jPanel2Layout);
-                jPanel2Layout.setHorizontalGroup(
-                        jPanel2Layout.createParallelGroup()
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addGroup(jPanel2Layout.createParallelGroup()
-                                                .addComponent(jLabel2)
-                                                .addComponent(jLabel1))
-                                        .addGap(5, 5, 5)
-                                        .addGroup(jPanel2Layout.createParallelGroup()
-                                                .addComponent(jdcAN, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
-                                                .addComponent(cmbKHAn, 0, 224, Short.MAX_VALUE)
-                                                .addComponent(cmbAN, 0, 224, Short.MAX_VALUE)
-                                                .addComponent(lblAN, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE))
-                                        .addContainerGap())
-                );
-                jPanel2Layout.setVerticalGroup(
-                        jPanel2Layout.createParallelGroup()
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addGroup(jPanel2Layout.createParallelGroup()
-                                                .addComponent(jLabel1)
-                                                .addComponent(jdcAN, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(jLabel2)
-                                                .addComponent(cmbAN, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(cmbKHAn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lblAN))
-                );
+                jPanel2.add(cmbKHAn, CC.xy(3, 5));
             }
-
-            GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
-            jPanel3.setLayout(jPanel3Layout);
-            jPanel3Layout.setHorizontalGroup(
-                    jPanel3Layout.createParallelGroup()
-                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jScrollPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                                            .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                    .addComponent(jPanel4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addComponent(jLabel5, GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
-                                    .addContainerGap())
-            );
-            jPanel3Layout.setVerticalGroup(
-                    jPanel3Layout.createParallelGroup()
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 144, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel5)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
+            jPanel3.add(jPanel2, CC.xy(1, 1));
         }
-
-        //---- btnSave ----
-        btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnSave.setText("Speichern");
-        btnSave.setEnabled(false);
-        btnSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnSaveActionPerformed(e);
-            }
-        });
-
-        //---- btnClose ----
-        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnClose.setText("Schlie\u00dfen");
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCloseActionPerformed(e);
-            }
-        });
+        contentPane.add(jPanel3, CC.xy(3, 7));
 
         //======== jPanel5 ========
         {
@@ -705,63 +560,47 @@ public class DlgVerordnung extends javax.swing.JDialog {
             GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
             jPanel5.setLayout(jPanel5Layout);
             jPanel5Layout.setHorizontalGroup(
-                    jPanel5Layout.createParallelGroup()
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, 888, Short.MAX_VALUE)
-                                    .addContainerGap())
+                jPanel5Layout.createParallelGroup()
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, 882, Short.MAX_VALUE)
+                        .addContainerGap())
             );
             jPanel5Layout.setVerticalGroup(
-                    jPanel5Layout.createParallelGroup()
-                            .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                jPanel5Layout.createParallelGroup()
+                    .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             );
         }
+        contentPane.add(jPanel5, CC.xywh(3, 5, 3, 1));
 
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-                                        .addComponent(lblBW, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-                                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                                .addComponent(btnSave)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnClose))
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addComponent(jPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitle)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnClose)
-                                        .addComponent(btnSave))
-                                .addContainerGap())
-        );
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+
+            //---- btnSave ----
+            btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnSave.setText("Speichern");
+            btnSave.setEnabled(false);
+            btnSave.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSaveActionPerformed(e);
+                }
+            });
+            panel1.add(btnSave);
+
+            //---- btnClose ----
+            btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnClose.setText("Schlie\u00dfen");
+            btnClose.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCloseActionPerformed(e);
+                }
+            });
+            panel1.add(btnClose);
+        }
+        contentPane.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -862,10 +701,10 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
             cmbMass.setSelectedItem(verordnung.getMassnahme());
 
-            cmbMed.setEnabled(this.editMode != CHANGE_MODE);
-            txtMed.setEnabled(this.editMode != CHANGE_MODE);
-            txtSit.setEnabled(this.editMode != CHANGE_MODE);
-            cmbSit.setEnabled(this.editMode != CHANGE_MODE);
+            cmbMed.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
+            txtMed.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
+            txtSit.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
+            cmbSit.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
 
             if (cmbMed.getSelectedItem() != null) {
                 lblVerordnung.setText(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
@@ -1141,7 +980,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
 
             if (!verordnung.isBedarf()) {
-                if (editMode == CHANGE_MODE) {
+                if (editMode == CHANGE_MODE || editMode == EDIT_OF_CHANGE_MODE) {
                     // ab der aktuellen Uhrzeit
                     BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
                 } else {
@@ -1415,7 +1254,6 @@ public class DlgVerordnung extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JLabel lblBW;
     private JLabel lblTitle;
-    private JSeparator jSeparator1;
     private JPanel jPanel1;
     private JComboBox cmbSit;
     private JTextField txtMed;
@@ -1449,11 +1287,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private JLabel jLabel2;
     private JLabel lblAN;
     private JComboBox cmbKHAn;
-    private JSeparator jSeparator2;
-    private JButton btnSave;
-    private JButton btnClose;
     private JPanel jPanel5;
     private JLabel lblVerordnung;
+    private JPanel panel1;
+    private JButton btnSave;
+    private JButton btnClose;
     // End of variables declaration//GEN-END:variables
 
 }

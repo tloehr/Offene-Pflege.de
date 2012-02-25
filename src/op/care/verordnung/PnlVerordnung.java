@@ -489,7 +489,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
         if (singleRowSelected && evt.isPopupTrigger()) {
 
             final Verordnung verordnung = (Verordnung) selection.get(0);
-
             long num = BHPTools.getNumBHPs(verordnung);
             boolean editAllowed = !readOnly && num == 0;
             boolean changeAllowed = !readOnly && !verordnung.isBedarf() && !verordnung.isAbgesetzt() && num > 0;
@@ -503,7 +502,9 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgVerordnung(parent, verordnung, DlgVerordnung.EDIT_MODE);
+                    long numVerKennung = VerordnungTools.getNumVerodnungenMitGleicherKennung(verordnung);
+                    int status = numVerKennung == 1 ? DlgVerordnung.EDIT_MODE : DlgVerordnung.EDIT_OF_CHANGE_MODE;
+                    new DlgVerordnung(parent, verordnung, status);
                     reloadTable();
                 }
             });

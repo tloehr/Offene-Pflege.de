@@ -48,9 +48,8 @@ public class BHPTools {
      * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft, ermittelt ob sie am betreffenden Stichtag auch "dran" sind und dann
      * werden daraus Einträge in der BHP Tabelle erzeugt. Sie teilt sich die Arbeit mit der <code>erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, Date zeit)</code> Methode
      *
-     * @param em, EntityManager Kontext
+     * @param em,    EntityManager Kontext
      * @param datum, das Datum für den die BHPs erzeugt werden sollen. <code>null</code>, wenn das heutige Datum gewünscht ist.
-     *
      * @return Anzahl der erzeugten BHPs
      */
     public static int erzeugen(EntityManager em, Date datum) throws Exception {
@@ -58,9 +57,6 @@ public class BHPTools {
         String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
 
-//        String wtag; // kurze Darstellung des Wochentags des Stichtags
-//        int tagnum;
-//        int wtagnum;
         SYSRunningClasses me = null;
 
         me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
@@ -70,7 +66,7 @@ public class BHPTools {
             if (datum == null) {
                 datum = new Date();
             }
-            Date stichtag = datum;
+            Date stichtag = new Date(SYSCalendar.startOfDay(datum));
             GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
 
             // Datum, an dem der letzte BHP Gesamtimport erfolgte. Darf nur einmal am Tag gemacht werden.
@@ -87,13 +83,6 @@ public class BHPTools {
                 throw new IndexOutOfBoundsException("Es kann kein BHPImport für dieses Datum durchgeführt werden.");
             }
 
-            // Mache aus "Montag" -> "mon"
-//            wtag = SYSCalendar.WochentagName(gcStichtag);
-//            wtag = wtag.substring(0, 3).toLowerCase();
-
-//            tagnum = gcStichtag.get(GregorianCalendar.DAY_OF_MONTH);
-//            wtagnum = gcStichtag.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH); // der erste Mitwwoch im Monat hat 1, der zweite 2 usw...
-
             Query select = em.createQuery(" " +
                     " SELECT vp FROM VerordnungPlanung vp " +
                     " JOIN vp.verordnung v " +
@@ -103,7 +92,8 @@ public class BHPTools {
                     // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
                     " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
-                    " AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2");
+                    " AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2 " +
+                    " ORDER BY vp.bhppid ");
 
             // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
@@ -113,15 +103,9 @@ public class BHPTools {
 
             OPDE.info("Schreibe nach: " + OPDE.getUrl());
 
-            select.setParameter("andatum", new Date(SYSCalendar.endOfDay(stichtag)));
-            select.setParameter("abdatum", new Date(SYSCalendar.startOfDay(stichtag)));
-//            select.setParameter("tagnum", tagnum);
-//            select.setParameter("wtag", wtagnum);
+            select.setParameter("andatum", new Date(SYSCalendar.startOfDay(stichtag)));
+            select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(stichtag)));
             select.setParameter("ldatum", new Date(SYSCalendar.endOfDay(stichtag)));
-
-//            if (verordnung != null) {
-//                select.setParameter("verordnung", verordnung);
-//            }
 
             List<VerordnungPlanung> list = select.getResultList();
 
@@ -180,23 +164,23 @@ public class BHPTools {
      * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die Liste wird aber vorher
      * noch darauf geprüft, ob sie auch wirklich an dem besagten Stichtag passt. Dabei gilt:
      * <ol>
-     *     <li>Alles was taeglich angeordnet ist (jeden Tag oder jeden soundsovielten Tag)</li>
-     *     <li>Alles was woechentlich ist und die Spalte (Attribut) mit dem aktuellen Wochentagsnamen größer null ist.</li>
-     *     <li>Monatliche Einträge. Aber nur dann, wenn
-     *     <ol>
-     *         <li>es der <i>n</i>.te Tag im Monat ist <br/><b>oder</b></li>
-     *         <li>oder der <i>n</i>.te Wochentag (z.B. Freitag) im Monat ist</li>
-     *     </ol>
-     *     </li>
+     * <li>Alles was taeglich angeordnet ist (jeden Tag oder jeden soundsovielten Tag)</li>
+     * <li>Alles was woechentlich ist und die Spalte (Attribut) mit dem aktuellen Wochentagsnamen größer null ist.</li>
+     * <li>Monatliche Einträge. Aber nur dann, wenn
+     * <ol>
+     * <li>es der <i>n</i>.te Tag im Monat ist <br/><b>oder</b></li>
+     * <li>oder der <i>n</i>.te Wochentag (z.B. Freitag) im Monat ist</li>
      * </ol>
-     *
+     * </li>
+     * </ol>
+     * <p/>
      * Diese Methode kann von verschiednenen Seiten aufgerufen werden. Zum einen von der "anderen" erzeugen Methode, die einen vollständigen Tagesplan für
      * alle BWs erzeugt oder von dem Verordnungs Editor, der seinerseits nur eine einzige Verordnung nachtragen möchte. Auf jeden Fall kann die Liste <code>list</code>
      * auch Einträge enthalten, die unpassend sind. Sie dient nur der Vorauswahl und wird innerhalb dieser Methode dann genau geprüft. Sie "pickt" sich also
      * nur die passenden Elemente aus dieser Liste heraus.
      *
-     * @param em EntityManager Kontext
-     * @param list Liste der VerordnungPlanungen, die ggf. einzutragen sind.
+     * @param em       EntityManager Kontext
+     * @param list     Liste der VerordnungPlanungen, die ggf. einzutragen sind.
      * @param stichtag gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
      * @param zeit     ist die Tageszeit, ab der die Einträge erfolgen sollen. Bei <code>null</code> wird immer für den ganzen Tag eingetragen.
      * @return die Anzahl der erzeugten BHPs.
@@ -211,163 +195,117 @@ public class BHPTools {
 
         OPDE.debug("MaxRows: " + maxrows);
 
-        for (VerordnungPlanung planung : list){
+        for (VerordnungPlanung planung : list) {
 
-            if (!SYSCalendar.isInFuture(planung.getLDatum()) || planung.isTaeglich() || planung.isPassenderWochentag(stichtag) || planung.isPassenderTagImMonat(stichtag)){
+            if (!SYSCalendar.isInFuture(planung.getLDatum()) && (planung.isTaeglich() || planung.isPassenderWochentag(stichtag) || planung.isPassenderTagImMonat(stichtag))) {
 
-//               " AND (" +
-//                    // 1. Alles was taeglich (jeden Tag oder jeden soundsovielten Tag)
-//                    "       (vp.taeglich > 0) " +
-//                    "            OR" +
-//                    // 2.   Alles was woechentlich ist und die Spalte mit dem aktuellen Wochentagsnamen größer null ist.
-//                    //      Hier wird der Ausdruck dynamisch erzeugt. wtag enthält nämlich das Wochentagskürzel
-//                    "       (vp.woechentlich > 0 AND vp." + wtag + " > 0) " +
-//                    "           OR " +
-//                    // 3.   Monatliche Einträge. Aber nur dann, wenn
-//                    "       (vp.monatlich > 0 AND " +
-//                    // 3a.  es der n.te Tag im Monat ist
-//                    "           (vp.tagNum = :tagnum " +
-//                    "               OR " +
-//                    // 3b.  oder der n.te Wochentag (z.B. Freitag) im Monat ist.
-//                    //      :wtag enthält hier den sog. DAY_OF_WEEK_IN_MONTH
-//                    "           vp." + wtag + " = :wtag)" +
-//                    "       )" +
-//                    "    ) " +
+                row++;
+
+                OPDE.info("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
+                OPDE.debug("==========================================");
+                System.out.println("Planung: " + planung.getBhppid());
+                OPDE.debug("BWKennung: " + planung.getVerordnung().getBewohner().getBWKennung());
+                OPDE.debug("VerID: " + planung.getVerordnung().getVerid());
 
 
-                                    //                    // Einschränkung auf bestimmte Verordnung0en, wenn gewünscht
-//                    (verordnung != null ? " AND v = :verordnung " : " ") +
-                    // und nur die Planungen, die überhaupt auf den Stichtag passen könnten.
-                    // Hier werden bereits die falschen Wochentage rausgefiltert. Brauchen
-                    // wir uns nachher nicht mehr drum zu kümmern.
-//                    " AND (" +
-//                    // 1. Alles was taeglich (jeden Tag oder jeden soundsovielten Tag)
-//                    "       (vp.taeglich > 0) " +
-//                    "            OR" +
-//                    // 2.   Alles was woechentlich ist und die Spalte mit dem aktuellen Wochentagsnamen größer null ist.
-//                    //      Hier wird der Ausdruck dynamisch erzeugt. wtag enthält nämlich das Wochentagskürzel
-//                    "       (vp.woechentlich > 0 AND vp." + wtag + " > 0) " +
-//                    "           OR " +
-//                    // 3.   Monatliche Einträge. Aber nur dann, wenn
-//                    "       (vp.monatlich > 0 AND " +
-//                    // 3a.  es der n.te Tag im Monat ist
-//                    "           (vp.tagNum = :tagnum " +
-//                    "               OR " +
-//                    // 3b.  oder der n.te Wochentag (z.B. Freitag) im Monat ist.
-//                    //      :wtag enthält hier den sog. DAY_OF_WEEK_IN_MONTH
-//                    "           vp." + wtag + " = :wtag)" +
-//                    "       )" +
-//                    "    ) " +
+                boolean treffer = false;
+                GregorianCalendar ldatum = SYSCalendar.toGC(planung.getLDatum());
 
+                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(planung.getLDatum()));
+                OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(stichtag));
 
-
-
-
-            row++;
-
-            OPDE.info("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
-            OPDE.debug("==========================================");
-            //OPDE.debug(planung);
-            System.out.println("Planung: " + planung.getBhppid());
-            OPDE.debug("BWKennung: " + planung.getVerordnung().getBewohner().getBWKennung());
-            OPDE.debug("VerID: " + planung.getVerordnung().getVerid());
-
-
-            boolean treffer = false;
-            GregorianCalendar ldatum = SYSCalendar.toGC(planung.getLDatum());
-
-            OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(planung.getLDatum()));
-            OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(stichtag));
-
-            // Genaue Ermittlung der Treffer
-            // =============================
-            if (planung.getTaeglich() > 0) { // Taeglich -------------------------------------------------------------
-                OPDE.debug("Eine tägliche Planung");
-                // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
-                // der stichtag getroffen wurde oder überschritten ist.
-                while (SYSCalendar.sameDay(ldatum, gcStichtag) < 0) {
-                    OPDE.debug("ldatum liegt vor dem stichtag. Addiere tage: " + planung.getTaeglich());
-                    ldatum.add(GregorianCalendar.DATE, planung.getTaeglich());
-                }
-                // Mich interssiert nur der Treffer, also die Punktlandung auf dem Stichtag
-                treffer = SYSCalendar.sameDay(ldatum, gcStichtag) == 0;
-            } else if (planung.getWoechentlich() > 0) { // Woechentlich -------------------------------------------------------------
-                OPDE.debug("Eine wöchentliche Planung");
-                while (SYSCalendar.sameWeek(ldatum, gcStichtag) < 0) {
-                    OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + planung.getWoechentlich());
-                    ldatum.add(GregorianCalendar.WEEK_OF_YEAR, planung.getWoechentlich());
-                }
-                // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
-                // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
-                treffer = SYSCalendar.sameWeek(ldatum, gcStichtag) == 0;
-            } else if (planung.getMonatlich() > 0) { // Monatlich -------------------------------------------------------------
-                OPDE.debug("Eine monatliche Planung");
-                while (SYSCalendar.sameMonth(ldatum, gcStichtag) < 0) {
-                    OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + planung.getMonatlich());
-                    ldatum.add(GregorianCalendar.MONTH, planung.getMonatlich());
-                }
-                // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest im selben Monat desselben Jahres liegt.
-                // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat überhaupt zugelassen wurden, muss das somit der richtige sein.
-                treffer = SYSCalendar.sameMonth(ldatum, gcStichtag) == 0;
-            }
-
-            OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(new Date(ldatum.getTimeInMillis())));
-            OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
-
-            // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
-            // abgelaufenen Zeitpunkten arbeitet.
-            // Bei zeit == null werden all diese Booleans zu true und damit neutralisiert.
-            boolean erstAbFM = (zeit == null) || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.FM;
-            boolean erstAbMO = (zeit == null) || erstAbFM || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.MO;
-            boolean erstAbMI = (zeit == null) || erstAbMO || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.MI;
-            boolean erstAbNM = (zeit == null) || erstAbMI || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.NM;
-            boolean erstAbAB = (zeit == null) || erstAbNM || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.AB;
-            boolean erstAbNA = (zeit == null) || erstAbAB || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.NA;
-            boolean uhrzeitOK = (zeit == null) || (planung.getUhrzeit() != null && SYSCalendar.compareTime(planung.getUhrzeit(), zeit) > 0);
-
-            if (treffer) {
-                if (erstAbFM && planung.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
-                    //OPDE.debug(bhp);
-                    OPDE.debug("SYSConst.FM, " + planung.getNachtMo());
-                    em.persist(new BHP(planung, stichtag, SYSConst.FM, planung.getNachtMo()));
-                    numbhp++;
-                }
-                if (erstAbMO && planung.getMorgens().compareTo(BigDecimal.ZERO) > 0) {
-                    OPDE.debug("SYSConst.MO, " + planung.getMorgens());
-                    em.persist(new BHP(planung, stichtag, SYSConst.MO, planung.getMorgens()));
-                    numbhp++;
-                }
-                if (erstAbMI && planung.getMittags().compareTo(BigDecimal.ZERO) > 0) {
-                    OPDE.debug("SYSConst.MI, " + planung.getMittags());
-                    em.persist(new BHP(planung, stichtag, SYSConst.MI, planung.getMittags()));
-                    numbhp++;
-                }
-                if (erstAbNM && planung.getNachmittags().compareTo(BigDecimal.ZERO) > 0) {
-                    OPDE.debug("SYSConst.NM, " + planung.getNachmittags());
-                    em.persist(new BHP(planung, stichtag, SYSConst.NM, planung.getNachmittags()));
-                    numbhp++;
-                }
-                if (erstAbAB && planung.getAbends().compareTo(BigDecimal.ZERO) > 0) {
-                    OPDE.debug("SYSConst.AB, " + planung.getAbends());
-                    em.persist(new BHP(planung, stichtag, SYSConst.AB, planung.getAbends()));
-                    numbhp++;
-                }
-                if (erstAbNA && planung.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
-                    OPDE.debug("SYSConst.NA, " + planung.getNachtAb());
-                    em.persist(new BHP(planung, stichtag, SYSConst.NA, planung.getNachtAb()));
-                    numbhp++;
-                }
-                if (uhrzeitOK && planung.getUhrzeit() != null) {
-                    Date neuerStichtag = SYSCalendar.addTime2Date(stichtag, planung.getUhrzeit());
-                    OPDE.debug("SYSConst.UZ, " + planung.getUhrzeitDosis() + ", " + DateFormat.getDateTimeInstance().format(neuerStichtag));
-                    em.persist(new BHP(planung, neuerStichtag, SYSConst.UZ, planung.getUhrzeitDosis()));
-                    numbhp++;
+                // Genaue Ermittlung der Treffer
+                // =============================
+                if (planung.isTaeglich()) {
+                    OPDE.debug("Eine tägliche Planung");
+                    // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
+                    // der stichtag getroffen wurde oder überschritten ist.
+                    while (SYSCalendar.sameDay(ldatum, gcStichtag) < 0) {
+                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere tage: " + planung.getTaeglich());
+                        ldatum.add(GregorianCalendar.DATE, planung.getTaeglich());
+                    }
+                    // Mich interssiert nur der Treffer, also die Punktlandung auf dem Stichtag
+                    treffer = SYSCalendar.sameDay(ldatum, gcStichtag) == 0;
+                } else if (planung.isWoechentlich()) {
+                    OPDE.debug("Eine wöchentliche Planung");
+                    while (SYSCalendar.sameWeek(ldatum, gcStichtag) < 0) {
+                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + planung.getWoechentlich());
+                        ldatum.add(GregorianCalendar.WEEK_OF_YEAR, planung.getWoechentlich());
+                    }
+                    // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
+                    // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
+                    treffer = SYSCalendar.sameWeek(ldatum, gcStichtag) == 0;
+                } else if (planung.isMonatlich()) {
+                    OPDE.debug("Eine monatliche Planung");
+                    while (SYSCalendar.sameMonth(ldatum, gcStichtag) < 0) {
+                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + planung.getMonatlich());
+                        ldatum.add(GregorianCalendar.MONTH, planung.getMonatlich());
+                    }
+                    // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest im selben Monat desselben Jahres liegt.
+                    // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat überhaupt zugelassen wurden, muss das somit der richtige sein.
+                    treffer = SYSCalendar.sameMonth(ldatum, gcStichtag) == 0;
                 }
 
-                // Nun noch das LDatum in der Tabelle DFNPlanung neu setzen.
-                planung.setLDatum(stichtag);
-                em.merge(planung);
-            }
+                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(new Date(ldatum.getTimeInMillis())));
+                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
+
+                // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
+                // abgelaufenen Zeitpunkten arbeitet.
+                // Bei zeit == null werden all diese Booleans zu true und damit neutralisiert.
+                boolean erstAbFM = (zeit == null) || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.FM;
+                boolean erstAbMO = (zeit == null) || erstAbFM || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.MO;
+                boolean erstAbMI = (zeit == null) || erstAbMO || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.MI;
+                boolean erstAbNM = (zeit == null) || erstAbMI || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.NM;
+                boolean erstAbAB = (zeit == null) || erstAbNM || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.AB;
+                boolean erstAbNA = (zeit == null) || erstAbAB || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.NA;
+                boolean uhrzeitOK = (zeit == null) || (planung.getUhrzeit() != null && SYSCalendar.compareTime(planung.getUhrzeit(), zeit) > 0);
+
+                if (treffer) {
+                    if (erstAbFM && planung.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
+                        //OPDE.debug(bhp);
+                        OPDE.debug("SYSConst.FM, " + planung.getNachtMo());
+                        em.persist(new BHP(planung, stichtag, SYSConst.FM, planung.getNachtMo()));
+                        numbhp++;
+                    }
+                    if (erstAbMO && planung.getMorgens().compareTo(BigDecimal.ZERO) > 0) {
+                        OPDE.debug("SYSConst.MO, " + planung.getMorgens());
+                        em.persist(new BHP(planung, stichtag, SYSConst.MO, planung.getMorgens()));
+                        numbhp++;
+                    }
+                    if (erstAbMI && planung.getMittags().compareTo(BigDecimal.ZERO) > 0) {
+                        OPDE.debug("SYSConst.MI, " + planung.getMittags());
+                        em.persist(new BHP(planung, stichtag, SYSConst.MI, planung.getMittags()));
+                        numbhp++;
+                    }
+                    if (erstAbNM && planung.getNachmittags().compareTo(BigDecimal.ZERO) > 0) {
+                        OPDE.debug("SYSConst.NM, " + planung.getNachmittags());
+                        em.persist(new BHP(planung, stichtag, SYSConst.NM, planung.getNachmittags()));
+                        numbhp++;
+                    }
+                    if (erstAbAB && planung.getAbends().compareTo(BigDecimal.ZERO) > 0) {
+                        OPDE.debug("SYSConst.AB, " + planung.getAbends());
+                        em.persist(new BHP(planung, stichtag, SYSConst.AB, planung.getAbends()));
+                        numbhp++;
+                    }
+                    if (erstAbNA && planung.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
+                        OPDE.debug("SYSConst.NA, " + planung.getNachtAb());
+                        em.persist(new BHP(planung, stichtag, SYSConst.NA, planung.getNachtAb()));
+                        numbhp++;
+                    }
+                    if (uhrzeitOK && planung.getUhrzeit() != null) {
+                        Date neuerStichtag = SYSCalendar.addTime2Date(stichtag, planung.getUhrzeit());
+                        OPDE.debug("SYSConst.UZ, " + planung.getUhrzeitDosis() + ", " + DateFormat.getDateTimeInstance().format(neuerStichtag));
+                        em.persist(new BHP(planung, neuerStichtag, SYSConst.UZ, planung.getUhrzeitDosis()));
+                        numbhp++;
+                    }
+
+                    // Nun noch das LDatum in der Tabelle DFNPlanung neu setzen.
+                    planung.setLDatum(stichtag);
+                    em.merge(planung);
+                }
+            } else {
+                OPDE.debug("///////////////////////////////////////////////////////////");
+                OPDE.debug("Folgende Planung wurde nicht angenommen: "+planung);
             }
         }
         OPDE.debug("Erzeugte BHPs: " + numbhp);

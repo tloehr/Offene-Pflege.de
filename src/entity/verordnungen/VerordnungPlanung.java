@@ -418,6 +418,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
      */
     public boolean isPassenderWochentag(Date date) {
         boolean passend = false;
+
         if (isWoechentlich()) { // wenn nicht wöchentlich, dann passt gar nix
             GregorianCalendar gcDate = SYSCalendar.toGC(date);
             switch (gcDate.get(GregorianCalendar.DAY_OF_WEEK)) {
