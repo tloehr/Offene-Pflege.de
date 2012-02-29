@@ -47,6 +47,7 @@ public class MedBuchungen implements Serializable {
         this.menge = menge;
         this.bhp = null;
         this.status = MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND;
+        bestand.getBuchungen().add(this);
         this.user = OPDE.getLogin().getUser();
     }
 
@@ -57,6 +58,8 @@ public class MedBuchungen implements Serializable {
         this.bhp = bhp;
         this.status = MedBuchungenTools.STATUS_AUSBUCHEN_NORMAL;
         this.user = OPDE.getLogin().getUser();
+        bestand.getBuchungen().add(this);
+        bhp.getBuchungen().add(this);
     }
 
     public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
@@ -66,6 +69,8 @@ public class MedBuchungen implements Serializable {
         this.bhp = bhp;
         this.status = status;
         this.user = OPDE.getLogin().getUser();
+        bestand.getBuchungen().add(this);
+        bhp.getBuchungen().add(this);
     }
 
     public Long getBuchID() {
@@ -112,17 +117,17 @@ public class MedBuchungen implements Serializable {
         return bhp;
     }
 
-    public void setBhp(BHP bhp) {
-        this.bhp = bhp;
-    }
+//    public void setBhp(BHP bhp) {
+//        this.bhp = bhp;
+//    }
 
     public MedBestand getBestand() {
         return bestand;
     }
 
-    public void setBestand(MedBestand bestand) {
-        this.bestand = bestand;
-    }
+//    public void setBestand(MedBestand bestand) {
+//        this.bestand = bestand;
+//    }
 
     public Users getUser() {
         return user;
@@ -131,14 +136,17 @@ public class MedBuchungen implements Serializable {
     // N:1 Relationen
     @JoinColumn(name = "BestID", referencedColumnName = "BestID")
     @ManyToOne
+    //OWNER
     private MedBestand bestand;
 
     @JoinColumn(name = "BHPID", referencedColumnName = "BHPID")
     @ManyToOne
+    //OWNER
     private BHP bhp;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
+    //OWNER
     private Users user;
 
     @Override

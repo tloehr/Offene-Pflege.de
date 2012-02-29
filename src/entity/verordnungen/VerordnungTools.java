@@ -253,21 +253,21 @@ public class VerordnungTools {
 
             if (aktuellerAnbruch != null) {
                 if (!aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
-                    result += "<font face=\"Sans Serif\"><b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
-                            (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b></font>" +
+                    result += "<b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
+                            (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b>" +
                             (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
                             (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
                     result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ");
-                    result += (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</i>";
+                    result += (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + ")</i>";
                 } else {
-                    result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
-                            + (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b></font>" +
+                    result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
+                            + (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b>" +
                             (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
                             (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
                 }
             } else {
-                result += "<font face=\"Sans Serif\"><b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
-                            + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz()) + "</b></font>" +
+                result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
+                            + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz()) + "</b>" +
                             (verordnung.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getDarreichung().getMedForm().getZubereitung()) + " " +
                             (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
             }
@@ -477,31 +477,30 @@ public class VerordnungTools {
 //                if (SYSTools.catchNull(bwkennung).equals("")) {
 //                    result += "<h2>Ärztliche Verordnungen</h2>";
 //                } else {
-            result += "<h1>Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(verordnung.getBewohner()) + "</h1>";
+            result += "<h1  id=\"fonth1\" >Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(verordnung.getBewohner()) + "</h1>";
             if (verordnung.getBewohner().getStation() != null) {
                 result += EinrichtungenTools.getAsText(verordnung.getBewohner().getStation().getEinrichtung());
             }
 
-            result += "<table border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th style=\"width:30%\">Medikament/Massnahme</th><th style=\"width:50%\">Dosierung / Hinweise</th><th style=\"width:20%\">Angesetzt</th></tr>";
+            result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
+                    "<th >Medikament/Massnahme</th><th >Dosierung / Hinweise</th><th >Angesetzt</th></tr>";
 
             Iterator<Verordnung> itVerordnung = list.iterator();
             while (itVerordnung.hasNext()) {
                 verordnung = itVerordnung.next();
 
                 result += "<tr>";
-                result += "<td valign=\"top\">" + SYSTools.unHTML2(getMassnahme(verordnung)) + "</td>";
-                result += "<td valign=\"top\">" + SYSTools.unHTML2(getDosis(verordnung)) + "<br/>";
-                result += SYSTools.unHTML2(getHinweis(verordnung)) + "</td>";
-                result += "<td valign=\"top\">" + SYSTools.unHTML2(getAN(verordnung)) + "</td>";
+                result += "<td valign=\"top\">" + getMassnahme(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getDosis(verordnung) + "<br/>";
+                result += getHinweis(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getAN(verordnung) + "</td>";
                 //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
                 result += "</tr>";
-
-
-                result += "</table>";
             }
+
+            result += "</table>";
         } else {
-            result += "<h2>Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
+            result += "<h2  id=\"fonth2\" >Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
         }
         return result;
     }

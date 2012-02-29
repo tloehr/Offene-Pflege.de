@@ -319,15 +319,20 @@ public class OPDE {
 
         opts.addOption(dfnimport);
 
-        Option bhpimport = null;
+//        Option bhpimport = null;
+//
+//        if (isDebug()) {
+//            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
+//            bhpimport.setOptionalArg(true);
+//            bhpimport.setArgName("Anzahl der Tage, ");
+//        } else {
+//            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
+//        }
 
-        if (isDebug()) {
-            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag. (Debug Modus mit DayOffset)").create("b");
-            bhpimport.setOptionalArg(true);
-            bhpimport.setArgName("DayOffset (nur im Debug Modus)");
-        } else {
-            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-        }
+
+        Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
+        bhpimport.setOptionalArg(true);
+        bhpimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
 
         opts.addOption(bhpimport);
 
@@ -415,7 +420,7 @@ public class OPDE {
 
 
 //            if (isDebug()) {
-                jpaProps.put("eclipselink.logging.level", "FINER");
+            jpaProps.put("eclipselink.logging.level", "FINER");
 //            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);

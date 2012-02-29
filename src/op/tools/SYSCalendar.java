@@ -1050,10 +1050,10 @@ public class SYSCalendar {
     }
 
     /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 23:59:59
+     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 23:59:59
      *
      * @param d
-     * @return
+     * @return das Ergebnis als TimeInMillis
      */
     public static long endOfDay(Date d) {
         GregorianCalendar gc = new GregorianCalendar();
@@ -1066,10 +1066,10 @@ public class SYSCalendar {
     }
 
     /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 00:00:00
+     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 00:00:00.
      *
      * @param d
-     * @return
+     * @return das Ergebnis als TimeInMillis
      */
     public static long startOfDay(Date d) {
         GregorianCalendar gc = new GregorianCalendar();
@@ -1082,10 +1082,10 @@ public class SYSCalendar {
     }
 
     /**
-     * nimmt das übergebene Datum und Zeit die Uhrzeitkomponente auf 12:00:00
+     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 12:00:00
      *
      * @param d
-     * @return
+     * @return das Ergebnis als TimeInMillis
      */
     public static long midOfDay(Date d) {
         GregorianCalendar gc = new GregorianCalendar();

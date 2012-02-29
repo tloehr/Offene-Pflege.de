@@ -164,7 +164,7 @@ import java.util.List;
  */
         @NamedNativeQuery(name = "Verordnung.findActiveByVorratAndPackende", query = " " +
                 " SELECT DISTINCT ver.* FROM BHPVerordnung ver " +
-                " INNER JOIN MPVorrat v ON v.BWKennung = bhp.BWKennung " + // Verbindung über Bewohner
+                " INNER JOIN MPVorrat v ON v.BWKennung = b.BWKennung " + // Verbindung über Bewohner
                 " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
                 " WHERE b.VorID=? AND ver.BisPackEnde = ? " +
                 " AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratAndPackendeResultMapping"),

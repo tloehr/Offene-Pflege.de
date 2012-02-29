@@ -173,7 +173,7 @@ public class VerordnungPlanungTools {
             result += "</b><br/>";
         } else if (getTerminStatus(planung) == UHRZEIT) {
             if (headerNeeded) {
-                result += "<table border=\"1\" >" +
+                result += "<table border=\"1\" cellspacing=\"0\" >" +
                         "   <tr>" +
                         "      <th align=\"center\">Uhrzeit</th>" +
                         "      <th align=\"center\">Anzahl</th>" +

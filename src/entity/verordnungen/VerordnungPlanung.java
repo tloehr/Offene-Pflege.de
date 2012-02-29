@@ -114,6 +114,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         lDatum = new Date();
 
         this.verordnung = verordnung;
+        this.verordnung.getPlanungen().add(this);
 
         if (verordnung.isBedarf()) {
             morgens = BigDecimal.ZERO;
@@ -132,6 +133,8 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         fre = 0;
         sam = 0;
         son = 0;
+
+
 
         user = OPDE.getLogin().getUser();
 
@@ -162,6 +165,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         this.lDatum = lDatum;
         this.user = user;
         this.verordnung = verordnung;
+        this.verordnung.getPlanungen().add(this);
     }
 
     public Long getBhppid() {
@@ -341,12 +345,23 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         this.son = son;
     }
 
+    /**
+     * LDatum enthält das Datum, an dem diese VerordnungPlanung zuletzt zu einer BHP geführt hat. Das Datum kann auch in der Zukunft liegen,
+     * dann wird der BHPImport solange warten, bis diese Verordnung "an der Reihe" ist. Das LDatum wird bei DlgVerabreichung ebenfalls gesetzt.
+     * Steht dort auf dem Dialog unter "Erste Verabreichung am".
+     *
+     * @return
+     */
     public Date getLDatum() {
-        return lDatum;
+        return new Date(SYSCalendar.startOfDay(lDatum));
     }
 
+    /**
+     * @see #getLDatum()
+     * @param lDatum
+     */
     public void setLDatum(Date lDatum) {
-        this.lDatum = lDatum;
+        this.lDatum = new Date(SYSCalendar.startOfDay(lDatum));
     }
 
     // ==

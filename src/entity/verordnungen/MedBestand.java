@@ -91,7 +91,10 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
 
     public MedBestand(MedVorrat vorrat, Darreichung darreichung, MedPackung packung, String text) {
         this.apv = BigDecimal.ONE;
+
         this.vorrat = vorrat;
+        this.vorrat.getBestaende().add(this);
+
         this.darreichung = darreichung;
         this.packung = packung;
         this.text = text;
@@ -100,6 +103,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         this.aus = SYSConst.DATE_BIS_AUF_WEITERES;
         this.user = OPDE.getLogin().getUser();
         this.buchungen = new ArrayList<MedBuchungen>();
+
         this.naechsterBestand = null;
 
     }
@@ -162,7 +166,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand", fetch = FetchType.EAGER)
     private Collection<MedBuchungen> buchungen;
 
     // N:1 Relationen
@@ -212,17 +216,17 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         return naechsterBestand != null;
     }
 
-    public void setVorrat(MedVorrat vorrat) {
-        this.vorrat = vorrat;
-    }
+//    public void setVorrat(MedVorrat vorrat) {
+//        this.vorrat = vorrat;
+//    }
 
     public Darreichung getDarreichung() {
         return darreichung;
     }
 
-    public void setDarreichung(Darreichung darreichung) {
-        this.darreichung = darreichung;
-    }
+//    public void setDarreichung(Darreichung darreichung) {
+//        this.darreichung = darreichung;
+//    }
 
     public MedBestand getNaechsterBestand() {
         return naechsterBestand;

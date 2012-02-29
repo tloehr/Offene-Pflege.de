@@ -426,7 +426,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                         && SYSCalendar.earlyEnough(bhp.getMDate().getTime(), 30)
                                         // und kein abgesetzter Bestand beteiligt ist. Das verhindert einfach, dass bei
                                         // eine Rückgabe eines Vorrates verhindert wird, wenn d
-                                        && !MedBestandTools.hasAbgesetzteBestaende(bhp)
+                                        && !bhp.hasAbgesetzteBestand()
                                 )
                 );
         // damit man nichts rückgängig machen kann, was irgendwie einen abgeschlossenen Bestand betrifft.

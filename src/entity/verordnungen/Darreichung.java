@@ -67,6 +67,9 @@ public class Darreichung implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung", fetch = FetchType.EAGER)
     private Collection<MedPackung> packungen;
 
+//        @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung", fetch = FetchType.EAGER)
+//    private Collection<MedPackung> packungen;
+
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")
     @ManyToOne

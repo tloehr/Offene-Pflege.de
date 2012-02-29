@@ -140,7 +140,7 @@ public class MedVorratTools {
 
                 } else {
                     MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-                    bestand.getBuchungen().add(buchung);
+
                     em.persist(buchung);
                     OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
                 }
@@ -150,7 +150,8 @@ public class MedVorratTools {
                 }
             } else {
                 MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-                bestand.getBuchungen().add(buchung);
+//                bestand.getBuchungen().add(buchung);
+
                 em.persist(buchung);
                 OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
             }
@@ -172,9 +173,9 @@ public class MedVorratTools {
             bestand = new MedBestand(vorrat, darreichung, packung, text);
             bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
             MedBuchungen buchung = new MedBuchungen(bestand, menge);
-            bestand.getBuchungen().add(buchung);
+//            bestand.getBuchungen().add(buchung);
             em.persist(bestand);
-//            em.persist(buchung);
+            em.persist(buchung);
         }
         return bestand;
     }

@@ -34,7 +34,7 @@ public class MedBestandTools {
             public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                    text = "<i>Keine Auswahl</i>";//SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof MedBestand) {
                     text = ((MedBestand) o).getBestID().toString();
                 } else {
@@ -177,10 +177,11 @@ public class MedBestandTools {
 
     /**
      * Schliesst einen Bestand ab. Erzeugt dazu direkt eine passende Abschlussbuchung, die den Bestand auf null bringt.
-     * @param em, EntityManager in dessen Transaktion das ganze abläuft.
+     *
+     * @param em,      EntityManager in dessen Transaktion das ganze abläuft.
      * @param bestand, der abzuschliessen ist.
-     * @param text, evtl. gewünschter Text für die Abschlussbuchung
-     * @param status, für die Abschlussbuchung
+     * @param text,    evtl. gewünschter Text für die Abschlussbuchung
+     * @param status,  für die Abschlussbuchung
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
      */
@@ -195,7 +196,7 @@ public class MedBestandTools {
 
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
-        bestand.getBuchungen().add(abschlussBuchung);
+//        bestand.getBuchungen().add(abschlussBuchung);
         bestand = em.merge(bestand);
 
 //        if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
@@ -208,8 +209,8 @@ public class MedBestandTools {
 
     private static MedBuchungen getAnfangsBuchung(MedBestand bestand) {
         MedBuchungen result = null;
-        for (MedBuchungen buchung : bestand.getBuchungen()){
-            if (buchung.getStatus() == MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND){
+        for (MedBuchungen buchung : bestand.getBuchungen()) {
+            if (buchung.getStatus() == MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND) {
                 result = buchung;
                 break;
             }
@@ -322,7 +323,7 @@ public class MedBestandTools {
 
             // passende Buchung anlegen.
             result = new MedBuchungen(bestand, korrektur, null, status);
-            bestand.getBuchungen().add(result);
+//            bestand.getBuchungen().add(result);
             result.setText(text);
             em.persist(result);
         }
@@ -399,26 +400,26 @@ public class MedBestandTools {
         }
     }
 
-    public static boolean hasAbgesetzteBestaende(BHP bhp) {
-        boolean result = false;
-
-        EntityManager em = OPDE.createEM();
-
-        try {
-            Query query = em.createQuery(" " +
-                    " SELECT b FROM MedBestand b " +
-                    " JOIN b.buchungen bu " +
-                    " WHERE bu.bhp = :bhp " +
-                    " AND b.aus < '9999-12-31 23:59:59'");
-            query.setParameter("bhp", bhp);
-            result = !query.getResultList().isEmpty();
-        } catch (Exception ex) {
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
-        }
-        return result;
-    }
+//    public static boolean hasAbgesetzteBestaende(BHP bhp) {
+//        boolean result = false;
+//
+//        EntityManager em = OPDE.createEM();
+//
+//        try {
+//            Query query = em.createQuery(" " +
+//                    " SELECT b FROM MedBestand b " +
+//                    " JOIN b.buchungen bu " +
+//                    " WHERE bu.bhp = :bhp " +
+//                    " AND b.aus < '9999-12-31 23:59:59'");
+//            query.setParameter("bhp", bhp);
+//            result = !query.getResultList().isEmpty();
+//        } catch (Exception ex) {
+//            OPDE.fatal(ex);
+//        } finally {
+//            em.close();
+//        }
+//        return result;
+//    }
 
     /**
      * Ermittelt für einen bestimmten Bestand ein passendes APV.
@@ -437,21 +438,36 @@ public class MedBestandTools {
     }
 
     public static BigDecimal getAPVperBW(MedVorrat vorrat) {
-        EntityManager em = OPDE.createEM();
-        BigDecimal result = null;
+        BigDecimal apv = null;
 
-        try {
-            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.vorrat = :vorrat");
-            query.setParameter("vorrat", vorrat);
-            result = (BigDecimal) query.getSingleResult();
-        } catch (NoResultException nre) {
-            result = BigDecimal.ONE; // Im Zweifel ist das 1
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        } finally {
-            em.close();
+        if (!vorrat.getBestaende().isEmpty()) {
+            apv = BigDecimal.ZERO;
+            for (MedBestand bestand : vorrat.getBestaende()) {
+                apv.add(bestand.getApv());
+            }
+            // Arithmetisches Mittel
+            apv = apv.divide(new BigDecimal(vorrat.getBestaende().size()));
+        } else {
+            // Im Zweifel ist das 1
+            apv = BigDecimal.ONE;
         }
-        return result;
+
+//
+//        EntityManager em = OPDE.createEM();
+//        BigDecimal result = null;
+//
+//        try {
+//            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.vorrat = :vorrat");
+//            query.setParameter("vorrat", vorrat);
+//            result = (BigDecimal) query.getSingleResult();
+//        } catch (NoResultException nre) {
+//            result = BigDecimal.ONE; // Im Zweifel ist das 1
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+        return apv;
     }
 
     public static BigDecimal getAPVperDAF(Darreichung darreichung) {

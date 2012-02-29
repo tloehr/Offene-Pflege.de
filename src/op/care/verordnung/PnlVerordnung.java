@@ -430,7 +430,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             temp.deleteOnExit();
 
             // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+//            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
 //            TMVerordnung tm = new TMVerordnung(bwkennung, cbAbgesetzt.isSelected(), cbMedi.isSelected(),
 //                    cbOhneMedi.isSelected(), cbBedarf.isSelected(), cbRegel.isSelected(), false);
@@ -438,10 +438,13 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
             String html = SYSTools.htmlUmlautConversion(VerordnungTools.getVerordnungenAsHTML(listVerordnung));
 
-            out.write(SYSTools.addHTMLTitle(html, BewohnerTools.getBWLabelText(bewohner), true));
+//            out.write(SYSTools.addHTMLTitle(html, BewohnerTools.getBWLabelText(bewohner), true));
 
-            out.close();
-            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+//            out.close();
+
+            SYSPrint.print(parent, html, true);
+
+//            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
             new DlgException(e);
         }

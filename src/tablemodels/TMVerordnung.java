@@ -27,24 +27,14 @@
 package tablemodels;
 
 import entity.Bewohner;
-import entity.BewohnerTools;
 import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedVorrat;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
-import op.OPDE;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 
@@ -75,35 +65,41 @@ public class TMVerordnung
         this.mitBestand = bestand;
     }
 
-    public Verordnung getVerordnung(int row){
-         return (Verordnung) listeVerordnungen.get(row)[0];
+    public Verordnung getVerordnung(int row) {
+        return (Verordnung) listeVerordnungen.get(row)[0];
     }
 
-    public MedVorrat getVorrat(int row){
-         return (MedVorrat) listeVerordnungen.get(row)[1];
+    public MedVorrat getVorrat(int row) {
+        return (MedVorrat) listeVerordnungen.get(row)[1];
     }
 
-    public MedBestand getBestand(int row){
-         return (MedBestand) listeVerordnungen.get(row)[3];
+    public MedBestand getBestand(int row) {
+        return (MedBestand) listeVerordnungen.get(row)[3];
     }
 
-    public BigDecimal getVorratSaldo(int row){
-         return (BigDecimal) listeVerordnungen.get(row)[2];
+    public BigDecimal getVorratSaldo(int row) {
+        return (BigDecimal) listeVerordnungen.get(row)[2];
     }
 
-    public BigDecimal getBestandSaldo(int row){
-         return (BigDecimal) listeVerordnungen.get(row)[4];
+    public BigDecimal getBestandSaldo(int row) {
+        return (BigDecimal) listeVerordnungen.get(row)[4];
     }
 
-    public List<Verordnung> getVordnungenAt(int [] sel){
+    public List<Verordnung> getVordnungenAt(int[] sel) {
         ArrayList<Verordnung> selection = new ArrayList<Verordnung>();
-        for (int i : sel){
-            selection.add(getVerordnung(i));
+        if (sel == null) { // dann alle
+            for (int i = 0; i < listeVerordnungen.size(); i++) {
+                selection.add(getVerordnung(i));
+            }
+        } else {
+            for (int i : sel) {
+                selection.add(getVerordnung(i));
+            }
         }
         return selection;
     }
 
-    public void reload(){
+    public void reload() {
         cache.clear();
         listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, !abgesetzt);
         fireTableDataChanged();
@@ -111,7 +107,7 @@ public class TMVerordnung
 
     @Override
     public int getRowCount() {
-       return listeVerordnungen.size();
+        return listeVerordnungen.size();
     }
 
     @Override
@@ -159,15 +155,15 @@ public class TMVerordnung
                 break;
             }
             case COL_Dosis: {
-                result = getDosis(verordnung, getBestand(row),  getBestandSaldo(row), getVorratSaldo(row), mitBestand);
+                result = getDosis(verordnung, getBestand(row), getBestandSaldo(row), getVorratSaldo(row), mitBestand);
                 break;
             }
             case COL_Hinweis: {
-                String hinweis =  VerordnungTools.getHinweis(verordnung);
-                String an =  VerordnungTools.getAN(verordnung);
-                String ab =  VerordnungTools.getAB(verordnung);
+                String hinweis = VerordnungTools.getHinweis(verordnung);
+                String an = VerordnungTools.getAN(verordnung);
+                String ab = VerordnungTools.getAB(verordnung);
 
-                ab = ab.isEmpty() ? "" : "<br/>"+ab;
+                ab = ab.isEmpty() ? "" : "<br/>" + ab;
                 hinweis = hinweis.isEmpty() ? "" : hinweis + "<br/>";
 
                 result = hinweis + an + ab;

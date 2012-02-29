@@ -403,9 +403,9 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 MedBestandTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
                 //DBHandling.setzeBestand(bestid, inhalt, "Korrekturbuchung zum Packungsabschluss", DBHandling.STATUS_KORREKTUR_AUTO_VORAB);
                 //op.tools.DBHandling.updateRecord("MPBestand", hm, "BestID", bestid);
-                bestand.getVorrat().getBestaende().remove(bestand);
+//                bestand.getVorrat().getBestaende().remove(bestand);
                 bestand = em.merge(bestand);
-                bestand.getVorrat().getBestaende().add(bestand);
+//                bestand.getVorrat().getBestaende().add(bestand);
 
                 OPDE.info(classname + ": Vorabstellen angeklickt. Sind noch " + inhalt + " in der Packung.");
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");

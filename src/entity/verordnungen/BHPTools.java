@@ -116,7 +116,7 @@ public class BHPTools {
 
             SYSRunningClassesTools.endModule(me);
 
-            SYSPropsTools.storeProp("LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
+            SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
 
         } else {
             OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");

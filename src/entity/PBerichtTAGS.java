@@ -63,8 +63,8 @@ public class PBerichtTAGS implements Serializable {
     @Basic(optional = false)
     @Column(name = "Sort")
     private int sort;
-    @ManyToMany(mappedBy = "tags")
-    private Collection<Pflegeberichte> pflegeberichte;
+//    @ManyToMany(mappedBy = "tags")
+//    private Collection<Pflegeberichte> pflegeberichte;
 
     public PBerichtTAGS() {
     }
@@ -101,9 +101,9 @@ public class PBerichtTAGS implements Serializable {
         this.besonders = besonders;
     }
 
-    public Collection<Pflegeberichte> getPflegeberichte() {
-        return pflegeberichte;
-    }
+//    public Collection<Pflegeberichte> getPflegeberichte() {
+//        return pflegeberichte;
+//    }
 
     public boolean getAktiv() {
         return aktiv;

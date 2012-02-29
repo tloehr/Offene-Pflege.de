@@ -1,12 +1,13 @@
 package entity.verordnungen;
 
+import entity.Bewohner;
 import entity.Users;
-import org.eclipse.persistence.annotations.ConversionValue;
-import org.eclipse.persistence.annotations.ObjectTypeConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 @Entity
@@ -23,18 +24,18 @@ import java.util.Date;
         @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtKeineMedis", query = " " +
                 " SELECT bhp.*, NULL BestID, NULL NextBest " +
                 " FROM BHP bhp " +
-                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
-                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
-                " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
-                " WHERE Date(Soll)=Date(?) AND BWKennung=? AND v.DafID IS NULL" +
+//                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+//                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
+//                " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
+                " WHERE Date(Soll)=Date(?) AND BWKennung=? AND DafID IS NULL" +
                 // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
                 " AND ( ? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping"),
 
         @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtMitMedis", query = " " +
                 " SELECT bhp.*, bestand.BestID, bestand.NextBest" +
                 " FROM BHP bhp " +
-                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
-                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
+//                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+//                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
                 // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
                 // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
                 // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
@@ -53,7 +54,7 @@ import java.util.Date;
                 "     INNER JOIN (" +
                 "       SELECT best.VorID, best.DafID FROM MPBestand best " +
                 "     ) b ON a.VorID = b.VorID " +
-                " ) vor ON vor.DafID = v.DafID " +
+                " ) vor ON vor.DafID = bhp.DafID " +
                 // Das hier sucht passende Bestände im Anbruch raus
                 " LEFT OUTER JOIN( " +
                 "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV " +
@@ -61,7 +62,7 @@ import java.util.Date;
                 "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
                 "       GROUP BY best1.BestID" +
                 " ) bestand ON bestand.VorID = vor.VorID " +
-                " WHERE v.DafID IS NOT NULL AND Date(Soll)=Date(?) AND BWKennung=?" +
+                " WHERE bhp.DafID IS NOT NULL AND Date(bhp.Soll)=Date(?) AND bhp.BWKennung=?" +
                 // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
                 " AND (? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping")
 })
@@ -79,7 +80,7 @@ import java.util.Date;
         @NamedQuery(name = "BHP.findByMdate", query = "SELECT b FROM BHP b WHERE b.mdate = :mdate"),
         @NamedQuery(name = "BHP.findByDauer", query = "SELECT b FROM BHP b WHERE b.dauer = :dauer"),
         @NamedQuery(name = "BHP.numByNOTStatusAndVerordnung", query = " " +
-                " SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.verordnungPlanung.verordnung = :verordnung AND bhp.status <> :status ")})
+                " SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.verordnung = :verordnung AND bhp.status <> :status ")})
 
 public class BHP implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -117,21 +118,46 @@ public class BHP implements Serializable {
     }
 
     public BHP(VerordnungPlanung verordnungPlanung) {
+        // Das sieht redundant aus, dient aber der Vereinfachung
         this.verordnungPlanung = verordnungPlanung;
+        this.verordnung = verordnungPlanung.getVerordnung();
+        this.bewohner = verordnungPlanung.getVerordnung().getBewohner();
+        this.darreichung = verordnungPlanung.getVerordnung().getDarreichung();
+        buchungen = new ArrayList<MedBuchungen>();
     }
 
     public BHP(VerordnungPlanung verordnungPlanung, Date soll, Byte sZeit, BigDecimal dosis) {
+        // Das sieht redundant aus, dient aber der Vereinfachung
         this.verordnungPlanung = verordnungPlanung;
+        this.verordnung = verordnungPlanung.getVerordnung();
+        this.bewohner = verordnungPlanung.getVerordnung().getBewohner();
+        this.darreichung = verordnungPlanung.getVerordnung().getDarreichung();
         this.soll = soll;
         this.sZeit = sZeit;
         this.dosis = dosis;
         this.status = BHPTools.STATUS_OFFEN;
         this.mdate = new Date();
+        buchungen = new ArrayList<MedBuchungen>();
     }
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "bhp")
+    private Collection<MedBuchungen> buchungen;
+
     @JoinColumn(name = "BHPPID", referencedColumnName = "BHPPID")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private VerordnungPlanung verordnungPlanung;
+
+    @JoinColumn(name = "VerID", referencedColumnName = "VerID")
+    @ManyToOne
+    private Verordnung verordnung;
+
+    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @ManyToOne
+    private Bewohner bewohner;
+
+    @JoinColumn(name = "DafID", referencedColumnName = "DafID")
+    @ManyToOne
+    private Darreichung darreichung;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -234,11 +260,52 @@ public class BHP implements Serializable {
         this.dauer = dauer;
     }
 
+    public Verordnung getVerordnung() {
+        return verordnung;
+    }
+
+    public void setVerordnung(Verordnung verordnung) {
+        this.verordnung = verordnung;
+    }
+
+    public Bewohner getBewohner() {
+        return bewohner;
+    }
+
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
+    public Darreichung getDarreichung() {
+        return darreichung;
+    }
+
+    public void setDarreichung(Darreichung darreichung) {
+        this.darreichung = darreichung;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (bhpid != null ? bhpid.hashCode() : 0);
         return hash;
+    }
+
+    public Collection<MedBuchungen> getBuchungen() {
+        return buchungen;
+    }
+
+    public boolean hasAbgesetzteBestand() {
+        boolean yes = false;
+        if (buchungen != null) {
+            for (MedBuchungen buchung : buchungen) {
+                yes = buchung.getBestand().isAbgeschlossen();
+                if (yes){
+                    break;
+                }
+            }
+        }
+        return yes;
     }
 
     @Override

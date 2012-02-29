@@ -20,9 +20,9 @@ import java.util.Properties;
  */
 public class SYSPropsTools {
 
-    public static void storeProp(String key, String value, Users user) {
+    public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String namedQuery = "SYSProps.findByKeyAndUser";
-        EntityManager em = OPDE.createEM();
+
         if (user == null) {
             namedQuery = "SYSProps.findByKey";
         }
@@ -41,18 +41,23 @@ public class SYSPropsTools {
             prop.setValue(value);
         } catch (NoResultException nre) {
             prop = new SYSProps(key, value, user);
-        } catch (Exception e) {
-            OPDE.fatal(e);
         }
 
+        if (em.contains(prop)) {
+            em.merge(prop);
+        } else {
+            em.persist(prop);
+        }
+
+        OPDE.setProp(key, value);
+    }
+
+    public static void storeProp(String key, String value, Users user) {
+        EntityManager em = OPDE.createEM();
 
         try {
             em.getTransaction().begin();
-            if (em.contains(prop)) {
-                em.merge(prop);
-            } else {
-                em.persist(prop);
-            }
+            storeProp(em, key, value, user);
             em.getTransaction().commit();
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -61,11 +66,14 @@ public class SYSPropsTools {
             em.close();
         }
 
-        OPDE.setProp(key, value);
     }
 
     public static void storeProp(String key, String value) {
         storeProp(key, value, null);
+    }
+
+    public static void storeProp(EntityManager em, String key, String value) throws Exception {
+        storeProp(em, key, value, null);
     }
 
 

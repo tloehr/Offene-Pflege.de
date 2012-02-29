@@ -211,7 +211,7 @@ public class DlgEditBuchung extends javax.swing.JDialog {
 
     private void save() {
         buchung = new MedBuchungen(bestand, menge, null, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
-        bestand.getBuchungen().add(buchung);
+//        bestand.getBuchungen().add(buchung);
         buchung.setText(txtText.getText());
 
         EntityManager em = OPDE.createEM();

@@ -8,6 +8,7 @@ import op.tools.SYSConst;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -105,7 +106,7 @@ public class MedVorrat implements Serializable {
         this.user = OPDE.getLogin().getUser();
         this.von = new Date();
         this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
-
+        this.bestaende = new ArrayList<MedBestand>();
     }
 
     public Long getVorID() {

@@ -391,9 +391,9 @@ public class Pflegeberichte implements Serializable, VorgangElement {
         return tags;
     }
 
-    public void setTags(Collection<PBerichtTAGS> tags) {
-        this.tags = tags;
-    }
+//    public void setTags(Collection<PBerichtTAGS> tags) {
+//        this.tags = tags;
+//    }
 
     public Users getUser() {
         return user;
