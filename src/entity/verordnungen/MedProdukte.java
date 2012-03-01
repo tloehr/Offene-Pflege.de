@@ -74,7 +74,7 @@ public class MedProdukte implements Serializable {
         return hash;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "medProdukt", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "medProdukt")
     private Collection<Darreichung> darreichungen;
 
     @Override

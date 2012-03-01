@@ -144,7 +144,7 @@ public class MedVorrat implements Serializable {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "vorrat")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorrat")
     private Collection<MedBestand> bestaende;
 
     // ==

@@ -29,8 +29,10 @@ package op.threads;
 
 import op.OPDE;
 import op.tools.SYSTools;
+import org.pushingpixels.trident.Timeline;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,12 +47,18 @@ public class HeapStat extends Thread {
     private List<DisplayMessage> messageQ;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0;
+    private Timeline mainTL;
+
+    final Color ledLabelFG = new Color(105, 80, 69);
+    final Color ledLabelBG = new Color(234, 237, 223);
+
 
     /**
      * Creates a new instance of HeapStat
      */
     public HeapStat(JProgressBar p, JLabel lblMain, JLabel lblSub) {
         super();
+        mainTL = null;
         this.setName("HeapStat");
         this.interrupted = false;
         this.jp = p;
@@ -64,10 +72,14 @@ public class HeapStat extends Thread {
     }
 
     public void setMainMessage(String message) {
-//        lblMain.setText(message);
-
-        SYSTools.fadein(lblMain, message);
-//        msg.setProcessed(System.currentTimeMillis());
+        if (mainTL != null && !mainTL.isDone()) {
+            while (!mainTL.isDone()) {
+                mainTL.end();
+            }
+            lblMain.setText(null);
+            lblMain.setForeground(ledLabelFG);
+        }
+        mainTL = SYSTools.fadein(lblMain, message);
     }
 
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {

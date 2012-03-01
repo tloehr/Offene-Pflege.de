@@ -210,8 +210,7 @@ public class DlgEditBuchung extends javax.swing.JDialog {
     }//GEN-LAST:event_btnBuchungActionPerformed
 
     private void save() {
-        buchung = new MedBuchungen(bestand, menge, null, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
-//        bestand.getBuchungen().add(buchung);
+        buchung = new MedBuchungen(bestand, menge, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
         buchung.setText(txtText.getText());
 
         EntityManager em = OPDE.createEM();

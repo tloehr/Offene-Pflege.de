@@ -140,7 +140,7 @@ public class BHP implements Serializable {
         buchungen = new ArrayList<MedBuchungen>();
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "bhp")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")
     private Collection<MedBuchungen> buchungen;
 
     @JoinColumn(name = "BHPPID", referencedColumnName = "BHPPID")

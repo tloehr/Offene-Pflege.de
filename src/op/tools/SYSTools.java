@@ -1670,14 +1670,14 @@ public class SYSTools {
 
     }
 
-    public static void fadeout(JLabel lbl) {
+    public static Timeline fadeout(JLabel lbl) {
         //lbl.setIcon(null);
         final JLabel lbl1 = lbl;
         final Color foreground = lbl.getForeground();
         Timeline timeline1 = new Timeline(lbl);
         timeline1.addPropertyToInterpolate("foreground", lbl.getForeground(), lbl.getBackground());
         timeline1.setDuration(500);
-        timeline1.addCallback(new TimelineCallback() {
+        timeline1.addCallback(new TimelineCallbackAdapter() {
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
                 if (timelineState1 == Timeline.TimelineState.DONE) {
@@ -1686,48 +1686,53 @@ public class SYSTools {
                     lbl1.setIcon(null);
                 }
             }
-
-            @Override
-            public void onTimelinePulse(float v, float v1) {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
         });
         timeline1.play();
+        return timeline1;
     }
 
-    public static void fadein(JLabel lbl, String text) {
+    public static Timeline fadein(JLabel lbl, String text) {
+        Timeline timeline1 = null;
         final JLabel lbl1 = lbl;
         final String text1 = text;
         final Color foreground = lbl1.getForeground();
         final Color background = lbl1.getBackground();
 
-        if (!SYSTools.catchNull(lbl.getText()).isEmpty()) {
-            Timeline timeline1 = new Timeline(lbl1);
-            timeline1.addPropertyToInterpolate("foreground", foreground, background);
-            timeline1.setDuration(500);
-            timeline1.addCallback(new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-                    if (timelineState1 == Timeline.TimelineState.DONE) {
-                        lbl1.setIcon(null);
-                        lbl1.setForeground(background);
-                        lbl1.setText(text1);
-                        Timeline timeline2 = new Timeline(lbl1);
-                        timeline2.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
-                        timeline2.setDuration(700);
-                        timeline2.play();
-                    }
-                }
-            });
-            timeline1.play();
-        } else {
-            lbl1.setForeground(background);
-            lbl1.setText(text);
-            Timeline timeline1 = new Timeline(lbl1);
-            timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
-            timeline1.setDuration(700);
-            timeline1.play();
-        }
+        lbl1.setForeground(background);
+        lbl1.setText(text);
+        timeline1 = new Timeline(lbl1);
+        timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
+        timeline1.setDuration(700);
+        timeline1.play();
+
+//        if (!SYSTools.catchNull(lbl.getText()).isEmpty()) {
+//            timeline1 = new Timeline(lbl1);
+//            timeline1.addPropertyToInterpolate("foreground", foreground, background);
+//            timeline1.setDuration(500);
+//            timeline1.addCallback(new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+//                    if (timelineState1 == Timeline.TimelineState.DONE) {
+//                        lbl1.setIcon(null);
+//                        lbl1.setForeground(background);
+//                        lbl1.setText(text1);
+//                        Timeline timeline2 = new Timeline(lbl1);
+//                        timeline2.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
+//                        timeline2.setDuration(700);
+//                        timeline2.play();
+//                    }
+//                }
+//            });
+//            timeline1.play();
+//        } else {
+//            lbl1.setForeground(background);
+//            lbl1.setText(text);
+//            timeline1 = new Timeline(lbl1);
+//            timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
+//            timeline1.setDuration(700);
+//            timeline1.play();
+//        }
+        return timeline1;
     }
 
     public static Timeline flashLabel(JLabel lbl1, String text) {
@@ -1780,8 +1785,11 @@ public class SYSTools {
         timeline1.addPropertyToInterpolate("foreground", background, foreground);
         timeline1.setDuration(400);
         timeline1.addCallback(new TimelineCallback() {
+            Timeline.TimelineState state;
+
             @Override
             public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
+                state = timelineState1;
                 if (timelineState1 == Timeline.TimelineState.DONE) {
                     lbl1.setText("");
                     lbl1.setForeground(foreground);
@@ -1791,7 +1799,9 @@ public class SYSTools {
 
             @Override
             public void onTimelinePulse(float v, float v1) {
-                //To change body of implemented methods use File | Settings | File Templates.
+                if (state == Timeline.TimelineState.DONE) {
+                    OPDE.debug("TIMELINESTATE IS DONE");
+                }
             }
         });
         timeline1.playLoop(2, Timeline.RepeatBehavior.REVERSE);

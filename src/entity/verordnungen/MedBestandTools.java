@@ -9,7 +9,6 @@ import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.io.UnsupportedEncodingException;
@@ -187,16 +186,13 @@ public class MedBestandTools {
      */
     public static void abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
         BigDecimal bestandsumme = getBestandSumme(bestand);
-//        BigDecimal apvNeu = bestand.getApv();
 
-
-        MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), null, status);
+        MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
         abschlussBuchung.setText(text);
         em.persist(abschlussBuchung);
 
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
-//        bestand.getBuchungen().add(abschlussBuchung);
         bestand = em.merge(bestand);
 
 //        if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
@@ -322,7 +318,7 @@ public class MedBestandTools {
             }
 
             // passende Buchung anlegen.
-            result = new MedBuchungen(bestand, korrektur, null, status);
+            result = new MedBuchungen(bestand, korrektur, status);
 //            bestand.getBuchungen().add(result);
             result.setText(text);
             em.persist(result);
@@ -446,7 +442,7 @@ public class MedBestandTools {
                 apv.add(bestand.getApv());
             }
             // Arithmetisches Mittel
-            apv = apv.divide(new BigDecimal(vorrat.getBestaende().size()));
+            apv = apv.divide(new BigDecimal(vorrat.getBestaende().size()), BigDecimal.ROUND_UP);
         } else {
             // Im Zweifel ist das 1
             apv = BigDecimal.ONE;
@@ -471,21 +467,38 @@ public class MedBestandTools {
     }
 
     public static BigDecimal getAPVperDAF(Darreichung darreichung) {
-        EntityManager em = OPDE.createEM();
-        BigDecimal result = null;
 
-        try {
-            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.darreichung = :darreichung");
-            query.setParameter("darreichung", darreichung);
-            result = (BigDecimal) query.getSingleResult();
-        } catch (NoResultException nre) {
-            result = BigDecimal.ONE; // Im Zweifel ist das 1
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        } finally {
-            em.close();
+        BigDecimal apv = null;
+
+        if (!darreichung.getBestaende().isEmpty()) {
+            apv = BigDecimal.ZERO;
+            for (MedBestand bestand : darreichung.getBestaende()) {
+                apv.add(bestand.getApv());
+            }
+            // Arithmetisches Mittel
+            apv = apv.divide(new BigDecimal(darreichung.getBestaende().size()), BigDecimal.ROUND_UP);
+        } else {
+            // Im Zweifel ist das 1
+            apv = BigDecimal.ONE;
         }
-        return result;
+
+//        EntityManager em = OPDE.createEM();
+//        BigDecimal result = null;
+//
+//
+//
+//        try {
+//            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.darreichung = :darreichung");
+//            query.setParameter("darreichung", darreichung);
+//            result = (BigDecimal) query.getSingleResult();
+//        } catch (NoResultException nre) {
+//            result = BigDecimal.ONE; // Im Zweifel ist das 1
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+        return apv;
     }
 
     public static String getMediKontrolle(EntityManager em, Stationen station, int headertiefe) {

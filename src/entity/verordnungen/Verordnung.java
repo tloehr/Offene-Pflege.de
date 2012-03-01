@@ -274,11 +274,11 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<Sysver2file> attachedFiles;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<SYSVER2VORGANG> attachedVorgaenge;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<VerordnungPlanung> planungen;
     // ==
     // N:1 Relationen
@@ -559,10 +559,8 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         final Verordnung copy = new Verordnung(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, bewohner, massnahme, darreichung, situation, anKH, abKH, anArzt, abArzt);
 
         CollectionUtils.forAllDo(planungen, new Closure() {
-            public void execute(Object o) {
-                VerordnungPlanung planungCopy = (VerordnungPlanung) ((VerordnungPlanung) o).clone();
-                planungCopy.setVerordnung(copy);
-                copy.getPlanungen().add(planungCopy);
+            public   void execute(Object o) {
+                VerordnungPlanung planungCopy = ((VerordnungPlanung) o).createCopy(copy);
             }
         });
         return copy;

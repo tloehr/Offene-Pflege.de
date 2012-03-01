@@ -40,6 +40,7 @@ public class MedPackung implements Serializable {
 
     public MedPackung(Darreichung darreichung) {
         this.darreichung = darreichung;
+        this.darreichung.getPackungen().add(this);
     }
 
     public Darreichung getDarreichung() {

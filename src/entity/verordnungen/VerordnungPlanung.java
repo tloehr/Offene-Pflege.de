@@ -135,7 +135,6 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         son = 0;
 
 
-
         user = OPDE.getLogin().getUser();
 
     }
@@ -357,8 +356,8 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     }
 
     /**
-     * @see #getLDatum()
      * @param lDatum
+     * @see #getLDatum()
      */
     public void setLDatum(Date lDatum) {
         this.lDatum = new Date(SYSCalendar.startOfDay(lDatum));
@@ -382,6 +381,9 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     public void setVerordnung(Verordnung verordnung) {
         this.verordnung = verordnung;
+        if (!this.verordnung.getPlanungen().contains(this)) {
+            this.verordnung.getPlanungen().add(this);
+        }
     }
 
     public Users getUser() {
@@ -477,7 +479,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     /**
      * @param date, zu prüfendes Datum.
      * @return Ist <code>true</code>, wenn diese Planung monatlich gilt und das Attribut <code>tagnum</code> dem aktuellen Tag im Monat entspricht
-     * <b>oder</b> das Attribut mit dem aktuellen Wochentagsnamen gleich dem Wochentag im Monat entpricht (der erste Mitwwoch im Monat hat 1, der zweite 2 usw...).
+     *         <b>oder</b> das Attribut mit dem aktuellen Wochentagsnamen gleich dem Wochentag im Monat entpricht (der erste Mitwwoch im Monat hat 1, der zweite 2 usw...).
      */
     public boolean isPassenderTagImMonat(Date date) {
         boolean passend = false;
@@ -551,6 +553,10 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     @Override
     public Object clone() {
+        return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, verordnung);
+    }
+
+    public VerordnungPlanung createCopy(Verordnung verordnung){
         return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, verordnung);
     }
 

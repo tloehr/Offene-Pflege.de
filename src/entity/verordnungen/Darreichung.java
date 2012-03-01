@@ -1,13 +1,9 @@
 package entity.verordnungen;
 
-import entity.Bewohner;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Table(name = "MPDarreichung")
@@ -32,13 +28,18 @@ public class Darreichung implements Serializable {
 
     public Darreichung(MedProdukte medProdukt) {
         this.medProdukt = medProdukt;
+        this.medProdukt.getDarreichungen().add(this);
+        this.packungen = new ArrayList<MedPackung>();
+        this.bestaende = new ArrayList<MedBestand>();
     }
 
     public Darreichung(MedProdukte medProdukt, String zusatz, MedFormen medForm) {
         this.medProdukt = medProdukt;
         this.zusatz = zusatz;
         this.medForm = medForm;
+        this.medProdukt.getDarreichungen().add(this);
         this.packungen = new ArrayList<MedPackung>();
+        this.bestaende = new ArrayList<MedBestand>();
     }
 
     public Long getDafID() {
@@ -64,11 +65,11 @@ public class Darreichung implements Serializable {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
     private Collection<MedPackung> packungen;
 
-//        @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung", fetch = FetchType.EAGER)
-//    private Collection<MedPackung> packungen;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
+    private Collection<MedBestand> bestaende;
 
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")
@@ -93,6 +94,10 @@ public class Darreichung implements Serializable {
 
     public void setMedForm(MedFormen medForm) {
         this.medForm = medForm;
+    }
+
+    public Collection<MedBestand> getBestaende() {
+        return bestaende;
     }
 
     @Override

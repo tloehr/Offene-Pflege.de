@@ -96,6 +96,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         this.vorrat.getBestaende().add(this);
 
         this.darreichung = darreichung;
+        this.darreichung.getBestaende().add(this);
         this.packung = packung;
         this.text = text;
         this.ein = new Date();
@@ -166,7 +167,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand")
     private Collection<MedBuchungen> buchungen;
 
     // N:1 Relationen

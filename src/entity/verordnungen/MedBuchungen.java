@@ -62,15 +62,25 @@ public class MedBuchungen implements Serializable {
         bhp.getBuchungen().add(this);
     }
 
-    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
+//    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
+//        this.bestand = bestand;
+//        this.menge = menge;
+//        this.pit = new Date();
+//        this.bhp = bhp;
+//        this.status = status;
+//        this.user = OPDE.getLogin().getUser();
+//        bestand.getBuchungen().add(this);
+//        bhp.getBuchungen().add(this);
+//    }
+
+    public MedBuchungen(MedBestand bestand, BigDecimal menge, short status) {
         this.bestand = bestand;
         this.menge = menge;
         this.pit = new Date();
-        this.bhp = bhp;
+        this.bhp = null;
         this.status = status;
         this.user = OPDE.getLogin().getUser();
         bestand.getBuchungen().add(this);
-        bhp.getBuchungen().add(this);
     }
 
     public Long getBuchID() {

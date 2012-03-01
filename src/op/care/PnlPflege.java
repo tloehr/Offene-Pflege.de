@@ -52,11 +52,8 @@ public class PnlPflege extends NursingRecordsPanel {
 
     private boolean initPhase;
     private Bewohner currentBewohner = null;
-    private JXTaskPaneContainer panelSearch;
     private JFrame parent;
     private TaskPaneContentChangedListener taskPaneContentChangedListener;
-
-    public JLabel bwlabel;
 
 
     public PnlPflege(JFrame frame, Bewohner bewohner, TaskPaneContentChangedListener taskPaneContentChangedListener) {

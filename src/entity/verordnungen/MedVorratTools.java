@@ -137,10 +137,8 @@ public class MedVorratTools {
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
                     naechsterBestand = MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(bestand));
-
                 } else {
                     MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-
                     em.persist(buchung);
                     OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
                 }
@@ -150,8 +148,6 @@ public class MedVorratTools {
                 }
             } else {
                 MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-//                bestand.getBuchungen().add(buchung);
-
                 em.persist(buchung);
                 OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
             }
@@ -173,7 +169,6 @@ public class MedVorratTools {
             bestand = new MedBestand(vorrat, darreichung, packung, text);
             bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
             MedBuchungen buchung = new MedBuchungen(bestand, menge);
-//            bestand.getBuchungen().add(buchung);
             em.persist(bestand);
             em.persist(buchung);
         }
