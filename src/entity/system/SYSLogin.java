@@ -38,7 +38,7 @@ import op.tools.SYSConst;
     @NamedQuery(name = "SYSLogin.findAll", query = "SELECT s FROM SYSLogin s"),
     @NamedQuery(name = "SYSLogin.findByLoginID", query = "SELECT s FROM SYSLogin s WHERE s.loginID = :loginID"),
     @NamedQuery(name = "SYSLogin.findByLogin", query = "SELECT s FROM SYSLogin s WHERE s.login = :login"),
-    @NamedQuery(name = "SYSLogin.findByHost", query = "SELECT s FROM SYSLogin s WHERE s.host = :host"),
+//    @NamedQuery(name = "SYSLogin.findByHost", query = "SELECT s FROM SYSLogin s WHERE s.host = :host"),
     @NamedQuery(name = "SYSLogin.findByLogout", query = "SELECT s FROM SYSLogin s WHERE s.logout = :logout")})
 public class SYSLogin implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -55,9 +55,9 @@ public class SYSLogin implements Serializable {
     @Column(name = "Logout")
     @Temporal(TemporalType.TIMESTAMP)
     private Date logout;
-    @JoinColumn(name = "HostID", referencedColumnName = "HostID")
-    @ManyToOne
-    private SYSHosts host;
+//    @JoinColumn(name = "HostID", referencedColumnName = "HostID")
+//    @ManyToOne
+//    private SYSHosts host;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "login")
     private Collection<SYSRunningClasses> runningClasses;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
@@ -69,7 +69,7 @@ public class SYSLogin implements Serializable {
     }
 
     public SYSLogin(Users user) {
-        this.host = OPDE.getHost();
+//        this.host = OPDE.getHost();
         this.user = user;
         this.login = new Date();
         this.logout = SYSConst.DATE_BIS_AUF_WEITERES;
@@ -77,14 +77,6 @@ public class SYSLogin implements Serializable {
 
     public Users getUser() {
         return user;
-    }
-
-    public SYSHosts getHost() {
-        return host;
-    }
-
-    public void setHost(SYSHosts host) {
-        this.host = host;
     }
 
     public Long getLoginID() {

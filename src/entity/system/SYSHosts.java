@@ -47,8 +47,8 @@ public class SYSHosts implements Serializable {
     @Column(name = "UP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date up;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "host")
-    private Collection<SYSLogin> logins;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "host")
+//    private Collection<SYSLogin> logins;
 
     public SYSHosts() {
     }

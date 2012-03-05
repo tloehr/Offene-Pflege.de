@@ -49,7 +49,8 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     @Column(name = "BHPPID")
     private Long bhppid;
     @Version
-    private long version;
+    @Column(name="version")
+    private Long version;
     @Column(name = "NachtMo")
     private BigDecimal nachtMo;
     @Column(name = "Morgens")
@@ -177,6 +178,10 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         this.bhppid = bhppid;
     }
 
+
+    public Long getVersion() {
+        return version;
+    }
 
     public BigDecimal getNachtMo() {
         return nachtMo;

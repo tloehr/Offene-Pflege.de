@@ -252,7 +252,8 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     @Column(name = "VerID")
     private Long verid;
     @Version
-    private long version;
+    @Column(name="version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "AnDatum")
     @Temporal(TemporalType.TIMESTAMP)
@@ -354,6 +355,10 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
 
     public Long getVerid() {
         return verid;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     public void setVerid(Long verid) {

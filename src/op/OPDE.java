@@ -37,6 +37,7 @@ import op.threads.BackgroundMonitor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
+import org.eclipse.persistence.config.QueryHints;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -216,11 +217,12 @@ public class OPDE {
         SyslogTools.fatal(e.getMessage());
         e.printStackTrace();
         SYSPrint.print(null, SYSTools.getThrowableAsHTML(e), false);
-        if (host != null) {
-            SYSHostsTools.shutdown(1);
-        } else {
-            System.exit(1);
-        }
+        System.exit(1);
+//        if (host != null) {
+////            SYSHostsTools.shutdown(1);
+//        } else {
+//            System.exit(1);
+//        }
     }
 
     public static void error(Object message) {
@@ -427,6 +429,9 @@ public class OPDE {
             url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
             jpaProps.put("javax.persistence.jdbc.url", url);
 
+            jpaProps.put(QueryHints.JDBC_TIMEOUT, "3");
+
+
 
 //            if (isDebug()) {
             jpaProps.put("eclipselink.logging.level", "FINER");
@@ -436,14 +441,14 @@ public class OPDE {
             // Cache lösche mit
             // em.getEntityManagerFactory().getCache().evictAll();
 
-            host = SYSHostsTools.getHost(hostkey);
+//            host = SYSHostsTools.getHost(hostkey);
 
-            if (host == null) {
-                fatal(new Exception("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten. Wenn es dann nicht besser wird, fragen Sie den Administrator."));
-            }
+//            if (host == null) {
+//                fatal(new Exception("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten. Wenn es dann nicht besser wird, fragen Sie den Administrator."));
+//            }
 
-            bm = new BackgroundMonitor();
-            bm.start();
+//            bm = new BackgroundMonitor();
+//            bm.start();
 
             String header = SYSTools.getWindowTitle("");
 
@@ -497,7 +502,8 @@ public class OPDE {
                 } finally {
                     em.close();
                 }
-                SYSHostsTools.shutdown(0);
+//                SYSHostsTools.shutdown(0);
+                System.exit(0);
             }
 
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");

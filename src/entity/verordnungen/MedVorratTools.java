@@ -63,6 +63,9 @@ public class MedVorratTools {
      */
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
 
+        vorrat = em.merge(vorrat);
+        bhp = em.merge(bhp);
+
         OPDE.debug("entnahmeVorrat/5: vorrat: " + vorrat);
 
         if (vorrat == null) {

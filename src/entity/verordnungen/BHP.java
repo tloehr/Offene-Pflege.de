@@ -90,7 +90,8 @@ public class BHP implements Serializable {
     @Column(name = "BHPID")
     private Long bhpid;
     @Version
-    private long version;
+    @Column(name="version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Soll")
     @Temporal(TemporalType.TIMESTAMP)
@@ -126,6 +127,7 @@ public class BHP implements Serializable {
         this.bewohner = verordnungPlanung.getVerordnung().getBewohner();
         this.darreichung = verordnungPlanung.getVerordnung().getDarreichung();
         buchungen = new ArrayList<MedBuchungen>();
+        this.version = 0l;
     }
 
     public BHP(VerordnungPlanung verordnungPlanung, Date soll, Byte sZeit, BigDecimal dosis) {
@@ -135,6 +137,7 @@ public class BHP implements Serializable {
         this.bewohner = verordnungPlanung.getVerordnung().getBewohner();
         this.darreichung = verordnungPlanung.getVerordnung().getDarreichung();
         this.soll = soll;
+        this.version = 0l;
         this.sZeit = sZeit;
         this.dosis = dosis;
         this.status = BHPTools.STATUS_OFFEN;
@@ -192,6 +195,10 @@ public class BHP implements Serializable {
 
     public Date getSoll() {
         return soll;
+    }
+
+    public long getVersion() {
+        return version;
     }
 
     public void setSoll(Date soll) {

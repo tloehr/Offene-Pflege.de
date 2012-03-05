@@ -74,7 +74,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
      * aufgerufen wurden, einen reloadTable() auslösen können.
      */
     private ActionListener standardActionListener;
-    private SYSRunningClasses myRunningClass, blockingClass;
+//    private SYSRunningClasses myRunningClass, blockingClass;
 
     /**
      * Creates new form PnlVerordnung
@@ -91,12 +91,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
 
-        if (myRunningClass != null) {
-            SYSRunningClassesTools.endModule(myRunningClass);
-        }
-
-        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
-        myRunningClass = pair.getFirst();
+//        if (myRunningClass != null) {
+//            SYSRunningClassesTools.endModule(myRunningClass);
+//        }
+//
+//        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
+//        myRunningClass = pair.getFirst();
 //        readOnly = !myRunningClass.isRW();
 //
 //        if (readOnly) {
@@ -724,7 +724,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     public void cleanup() {
         SYSTools.unregisterListeners(this);
-        SYSRunningClassesTools.endModule(myRunningClass);
+//        SYSRunningClassesTools.endModule(myRunningClass);
     }
 
     private void loadTable() {

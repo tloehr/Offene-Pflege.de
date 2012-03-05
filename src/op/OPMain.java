@@ -271,7 +271,9 @@ public class OPMain extends javax.swing.JFrame {
             }
         }
 
-        SYSHostsTools.shutdown(0);
+        System.exit(0);
+
+//        SYSHostsTools.shutdown(0);
 
     }//GEN-LAST:event_formWindowClosing
 

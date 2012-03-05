@@ -19,7 +19,7 @@ import java.io.Serializable;
         @NamedQuery(name = "SYSRunningClasses.findByRcid", query = "SELECT s FROM SYSRunningClasses s WHERE s.rcid = :rcid"),
         @NamedQuery(name = "SYSRunningClasses.findBySignature", query = "SELECT s FROM SYSRunningClasses s WHERE s.signature = :signature"),
         @NamedQuery(name = "SYSRunningClasses.findByLogin", query = "SELECT s FROM SYSRunningClasses s WHERE s.login = :login"),
-        @NamedQuery(name = "SYSRunningClasses.findByHost", query = "SELECT s FROM SYSRunningClasses s WHERE s.login.host = :host"),
+        //@NamedQuery(name = "SYSRunningClasses.findByHost", query = "SELECT s FROM SYSRunningClasses s WHERE s.login.host = :host"),
         @NamedQuery(name = "SYSRunningClasses.findByStatus", query = "SELECT s FROM SYSRunningClasses s WHERE s.status = :status")})
 public class SYSRunningClasses implements Serializable {
 

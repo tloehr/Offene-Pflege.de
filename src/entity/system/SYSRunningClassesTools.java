@@ -142,9 +142,9 @@ public class SYSRunningClassesTools {
     protected static void notifyClasses(List<SYSRunningClasses> list, int message, String textmessage) {
         Iterator<SYSRunningClasses> it = list.iterator();
         while (it.hasNext()) {
-            SYSRunningClasses thisClass = it.next();
-            SYSMessages sysMessage = new SYSMessages(OPDE.getHost(), thisClass.getLogin().getHost(), message, textmessage);
-            EntityTools.persist(sysMessage);
+//            SYSRunningClasses thisClass = it.next();
+//            SYSMessages sysMessage = new SYSMessages(OPDE.getHost(), thisClass.getLogin().getHost(), message, textmessage);
+//            EntityTools.persist(sysMessage);
         }
     }
 

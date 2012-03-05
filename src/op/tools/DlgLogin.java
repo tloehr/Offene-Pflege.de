@@ -455,7 +455,8 @@ public class DlgLogin extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAboutActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        SYSHostsTools.shutdown(1);
+//        SYSHostsTools.shutdown(1);
+        System.exit(1);
     }//GEN-LAST:event_formWindowClosing
 
     /**
@@ -521,9 +522,9 @@ public class DlgLogin extends javax.swing.JDialog {
 //            stmtMassTerminCleanupSession.executeUpdate();
 
             // Dann OCLogin bereinigen.
-            String sqlCleanupSession = "UPDATE SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID SET l.Logout=LPOL WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now()";
-            PreparedStatement stmtCleanupSession = OPDE.getDb().db.prepareStatement(sqlCleanupSession);
-            stmtCleanupSession.executeUpdate();
+//            String sqlCleanupSession = "UPDATE SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID SET l.Logout=LPOL WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now()";
+//            PreparedStatement stmtCleanupSession = OPDE.getDb().db.prepareStatement(sqlCleanupSession);
+//            stmtCleanupSession.executeUpdate();
 
 //            } else {
 //                JOptionPane.showMessageDialog(this, "Sie sind bereits an diesem Computer angemeldet.\n\nFalls Sie den Rechner gerade neu gestartet haben,\ndann warten Sie ca. 1 Minute und versuchen es dann nochmal.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);

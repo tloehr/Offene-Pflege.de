@@ -132,6 +132,10 @@ public class TMBHP extends AbstractTableModel{
         return String.class;
     }
 
+    public void setBHP(int row, BHP bhp){
+        listeBHP.get(row)[0] = bhp;
+    }
+
     public BHP getBHP(int row) {
         return (BHP) listeBHP.get(row)[0];
     }

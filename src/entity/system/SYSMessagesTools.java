@@ -62,7 +62,7 @@ public class SYSMessagesTools {
                     out.close();
                     SYSPrint.handleFile(new JFrame(), temp.getAbsolutePath(), Desktop.Action.OPEN);
 
-                    SYSHostsTools.shutdown(0); // Den aktuellen HOST als "heruntergefahren" markieren
+//                    SYSHostsTools.shutdown(0); // Den aktuellen HOST als "heruntergefahren" markieren
                 } catch (Exception ex) {
                     OPDE.fatal(ex);
                     ex.printStackTrace();

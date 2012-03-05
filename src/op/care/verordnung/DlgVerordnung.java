@@ -52,8 +52,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -96,7 +95,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
             if (editMode == CHANGE_MODE) {
                 oldVerordnung = em.merge(verordnung);
-                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
+
+                Map<String,Object> props = new HashMap<String, Object>();
+                props.put("javax.persistence.lock.timeout", 3000);
+
+                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE, props);
                 this.verordnung = (Verordnung) verordnung.clone();
 
             } else {
@@ -891,6 +894,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
     public void dispose() {
 
         if (em.isOpen()){
+            if (em.getTransaction().isActive()){
+                em.getTransaction().rollback();
+            }
             em.close();
         }
 

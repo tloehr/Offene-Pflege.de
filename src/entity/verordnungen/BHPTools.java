@@ -317,12 +317,14 @@ public class BHPTools {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
+            bhp = em.merge(bhp);
+
             bhp.setStatus(BHPTools.STATUS_VERWEIGERT_VERWORFEN);
             bhp.setUser(OPDE.getLogin().getUser());
             bhp.setIst(new Date());
             bhp.setiZeit(SYSCalendar.ermittleZeit());
             bhp.setMDate(new Date());
-            bhp = EntityTools.merge(bhp);
+//            bhp = EntityTools.merge(bhp);
 
             MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bhp.getVerordnungPlanung().getVerordnung().getBewohner(), bhp.getVerordnungPlanung().getVerordnung().getDarreichung());
             MedVorratTools.entnahmeVorrat(em, vorrat, bhp.getDosis(), bhp);

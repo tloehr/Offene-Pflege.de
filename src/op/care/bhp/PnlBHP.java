@@ -27,17 +27,22 @@
 package op.care.bhp;
 
 import com.toedter.calendar.JDateChooser;
-import entity.*;
-import entity.system.SYSRunningClasses;
-import entity.system.SYSRunningClassesTools;
+import entity.BWInfo;
+import entity.BWInfoTools;
+import entity.Bewohner;
+import entity.EntityTools;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.tools.*;
+import op.tools.InternalClassACL;
+import op.tools.NursingRecordsPanel;
+import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import tablemodels.TMBHP;
 import tablerenderer.RNDBHP;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.TableColumnModel;
@@ -61,9 +66,9 @@ public class PnlBHP extends NursingRecordsPanel {
     private boolean ignoreJDCEvent;
     //private boolean ignoreSchichtEvent;
     //private long[] ocwo;
-    private boolean readOnly;
+//    private boolean readOnly;
     private boolean abwesend;
-    private SYSRunningClasses runningClass, blockingClass;
+//    private SYSRunningClasses runningClass, blockingClass;
 
     /**
      * Creates ner form PnlBHP
@@ -81,29 +86,29 @@ public class PnlBHP extends NursingRecordsPanel {
         this.bwkennung = bewohner.getBWKennung();
         this.bewohner = bewohner;
 
-        if (runningClass != null) {
-            SYSRunningClassesTools.endModule(runningClass);
-        }
-
-        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
-        runningClass = pair.getFirst();
-        readOnly = !runningClass.isRW();
-
-        if (readOnly) {
-            blockingClass = pair.getSecond();
-            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
-                    + blockingClass.getLogin().getUser().getNameUndVorname()
-                    + "</body></html>");
-        } else {
-            btnLock.setToolTipText(null);
-        }
-        btnLock.setEnabled(readOnly);
+//        if (runningClass != null) {
+//            SYSRunningClassesTools.endModule(runningClass);
+//        }
+//
+//        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
+//        runningClass = pair.getFirst();
+//        readOnly = !runningClass.isRW();
+//
+//        if (readOnly) {
+//            blockingClass = pair.getSecond();
+//            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
+//                    + blockingClass.getLogin().getUser().getNameUndVorname()
+//                    + "</body></html>");
+//        } else {
+//            btnLock.setToolTipText(null);
+//        }
+//        btnLock.setEnabled(readOnly);
 
         cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
 
         abwesend = BWInfoTools.getAbwesendSeit(bewohner) != null;
 
-        btnBedarf.setEnabled(!readOnly && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+        btnBedarf.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
         ignoreJDCEvent = true;
         jdcDatum.setDate(SYSCalendar.today_date());
@@ -124,7 +129,7 @@ public class PnlBHP extends NursingRecordsPanel {
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
-        SYSRunningClassesTools.endModule(runningClass);
+//        SYSRunningClassesTools.endModule(runningClass);
     }
 
     /**
@@ -250,38 +255,38 @@ public class PnlBHP extends NursingRecordsPanel {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 234, Short.MAX_VALUE)
-                        .addComponent(btnBedarf)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 234, Short.MAX_VALUE)
+                                    .addComponent(btnBedarf)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                            .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                            .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                            .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                            .addGroup(GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnBedarf)))
-                        .addContainerGap())
+                    jPanel1Layout.createParallelGroup()
+                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                            .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                                            .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                                            .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                                            .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                                            .addGroup(GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(btnBedarf)))
+                                    .addContainerGap())
             );
         }
 
@@ -303,34 +308,34 @@ public class PnlBHP extends NursingRecordsPanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(layout.createParallelGroup()
-                        .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)
+                layout.createParallelGroup()
                         .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup()
-                                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(btnLock))
-                                .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
-                            .addContainerGap())))
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup()
+                                        .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup()
+                                                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(btnLock))
+                                                        .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(32, 32, 32)
-                    .addGroup(layout.createParallelGroup()
+                layout.createParallelGroup()
                         .addGroup(layout.createSequentialGroup()
-                            .addGap(14, 14, 14)
-                            .addComponent(btnLock))
-                        .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
+                                .addGap(32, 32, 32)
+                                .addGroup(layout.createParallelGroup()
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(14, 14, 14)
+                                                .addComponent(btnLock))
+                                        .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -381,7 +386,7 @@ public class PnlBHP extends NursingRecordsPanel {
     }//GEN-LAST:event_cmbSchichtItemStateChanged
 
     private void tblBHPMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBHPMousePressed
-        if (readOnly || !OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (!OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             return;
         } // Hier dürfen nur Examen dran.
         final TMBHP tm = (TMBHP) tblBHP.getModel();
@@ -438,31 +443,34 @@ public class PnlBHP extends NursingRecordsPanel {
                 byte status = bhp.getStatus();
                 MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
 
-
+                boolean deleted = false; // für das richtige fireTableRows....
                 if (!verordnung.hasMedi() || status != BHPTools.STATUS_OFFEN || MedVorratTools.getImAnbruch(vorrat) != null) {
                     status++;
                     if (status > 1) {
                         status = BHPTools.STATUS_OFFEN;
                     }
-
-                    bhp.setStatus(status);
-                    bhp.setMDate(new Date());
-                    if (status == BHPTools.STATUS_OFFEN) {
-                        bhp.setUser(null);
-                        bhp.setIst(null);
-                        bhp.setiZeit(null);
-                        bhp.setBemerkung(null);
-                    } else {
-                        bhp.setUser(OPDE.getLogin().getUser());
-                        bhp.setIst(new Date());
-                        bhp.setiZeit(SYSCalendar.ermittleZeit());
-                    }
-
-                    boolean deleted = false; // für das richtige fireTableRows....
                     EntityManager em = OPDE.createEM();
+                    bhp = em.merge(bhp);
                     try {
                         em.getTransaction().begin();
-                        bhp = em.merge(bhp);
+
+//                        em.find(BHP.class, bhp.getBHPid(), LockModeType.OPTIMISTIC);
+                        em.lock(bhp, LockModeType.OPTIMISTIC);
+
+                        bhp.setStatus(status);
+                        bhp.setMDate(new Date());
+                        if (status == BHPTools.STATUS_OFFEN) {
+                            bhp.setUser(null);
+                            bhp.setIst(null);
+                            bhp.setiZeit(null);
+                            bhp.setBemerkung(null);
+                        } else {
+                            bhp.setUser(em.merge(OPDE.getLogin().getUser()));
+                            bhp.setIst(new Date());
+                            bhp.setiZeit(SYSCalendar.ermittleZeit());
+                        }
+
+//                        bhp = em.merge(bhp);
 
                         if (verordnung.hasMedi()) {
                             if (status == BHPTools.STATUS_ERLEDIGT) {
@@ -478,6 +486,9 @@ public class PnlBHP extends NursingRecordsPanel {
                             deleted = true;
                         }
                         em.getTransaction().commit();
+                    } catch (OptimisticLockException ole) {
+                         em.getTransaction().rollback();
+                        OPDE.debug(ole);
                     } catch (Exception ex) {
                         em.getTransaction().rollback();
                         OPDE.fatal(ex);
@@ -487,6 +498,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     if (deleted) {
                         reloadTable();
                     } else {
+                        tm.setBHP(row, bhp);
                         tm.fireTableRowsUpdated(row, row);
                     }
                 }
