@@ -89,6 +89,8 @@ public class BHP implements Serializable {
     @Basic(optional = false)
     @Column(name = "BHPID")
     private Long bhpid;
+    @Version
+    private long version;
     @Basic(optional = false)
     @Column(name = "Soll")
     @Temporal(TemporalType.TIMESTAMP)
@@ -300,7 +302,7 @@ public class BHP implements Serializable {
         if (buchungen != null) {
             for (MedBuchungen buchung : buchungen) {
                 yes = buchung.getBestand().isAbgeschlossen();
-                if (yes){
+                if (yes) {
                     break;
                 }
             }

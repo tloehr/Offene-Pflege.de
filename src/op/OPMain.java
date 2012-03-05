@@ -25,10 +25,12 @@
  */
 package op;
 
+import com.sun.tools.javac.processing.PrintingProcessor;
 import entity.system.SYSHostsTools;
 import entity.system.SYSLoginTools;
 import op.share.tools.PnlEditor;
 
+import op.threads.PrintProcessor;
 import op.tools.DlgException;
 import op.tools.DlgLogin;
 import op.tools.SYSTools;
@@ -59,6 +61,8 @@ public class OPMain extends javax.swing.JFrame {
     //private String classname;
     private JPanel pnlMainButtons;
     private JPopupMenu menu;
+    private PrintProcessor pp;
+
 
     public OPMain() {
         //this.classname = this.getClass().getName();
@@ -89,6 +93,10 @@ public class OPMain extends javax.swing.JFrame {
 
         txtGeburtstag.setContentType("text/html");
         txtAlarm.setContentType("text/html");
+
+        pp = new PrintProcessor();
+        pp.start();
+
 
         initOC();
 

@@ -48,6 +48,8 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     @Basic(optional = false)
     @Column(name = "BHPPID")
     private Long bhppid;
+    @Version
+    private long version;
     @Column(name = "NachtMo")
     private BigDecimal nachtMo;
     @Column(name = "Morgens")
@@ -556,7 +558,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, verordnung);
     }
 
-    public VerordnungPlanung createCopy(Verordnung verordnung){
+    public VerordnungPlanung createCopy(Verordnung verordnung) {
         return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, verordnung);
     }
 

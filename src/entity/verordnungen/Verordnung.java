@@ -251,6 +251,8 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     @Basic(optional = false)
     @Column(name = "VerID")
     private Long verid;
+    @Version
+    private long version;
     @Basic(optional = false)
     @Column(name = "AnDatum")
     @Temporal(TemporalType.TIMESTAMP)

@@ -1445,6 +1445,26 @@ public class SYSTools {
         return padded.toString();
     }
 
+    public static String padC(String str, int size, String padChar) {
+        StringBuilder padded = new StringBuilder(str);
+        while (padded.length() < size) {
+            padded.insert(0, padChar);
+            // Dadurch sitzt das Ergebnis nicht unbedingt in der Mitte. Aber doch so mittig wie möglich.
+            if (padded.length() < size) {
+                padded.append(padChar);
+            }
+        }
+        return padded.toString();
+    }
+
+    public static String padR(String str, int size, String padChar) {
+        StringBuilder padded = new StringBuilder(str);
+        while (padded.length() < size) {
+            padded.append(padChar);
+        }
+        return padded.toString();
+    }
+
     public static ImageIcon resizeImageIcon(ImageIcon imageIcon, double factor) {
         Image image = imageIcon.getImage();
 

@@ -1,6 +1,7 @@
 package entity.verordnungen;
 
 import entity.BewohnerTools;
+import entity.Mitarbeiter;
 import entity.Stationen;
 import op.OPDE;
 import op.tools.DlgException;
@@ -15,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -112,13 +114,32 @@ public class MedBestandTools {
         return em.merge(bestand);
     }
 
+    public static HashMap getBestand4Printing(MedBestand bestand) {
+        OPDE.debug("BestandID: " + bestand.getBestID());
+
+        HashMap hm = new HashMap();
+        hm.put("bestand.darreichung", DarreichungTools.toPrettyString(bestand.getDarreichung()));
+
+        String pzn = bestand.getPackung().getPzn() == null ? "??" : bestand.getPackung().getPzn();
+        hm.put("bestand.packung.pzn", pzn);
+        hm.put("bestand.bestid", bestand.getBestID());
+        hm.put("bestand.eingang", bestand.getEin());
+        hm.put("bestand.userkurz", bestand.getUser().getUKennung());
+        hm.put("bestand.userlang", bestand.getUser().getNameUndVorname());
+        hm.put("bestand.vorrat.bewohnername", BewohnerTools.getBWLabel1(bestand.getVorrat().getBewohner()));
+        hm.put("bestand.vorrat.bewohnergebdatum", bestand.getVorrat().getBewohner().getGebDatum());
+        hm.put("bestand.vorrat.bewohnerkennung", bestand.getVorrat().getBewohner().getBWKennung());
+
+        return hm;
+    }
+
 
     public static String getBestandText4Print(MedBestand bestand) {
         String result = "";
 
         result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
         result += SYSPrint.EPL2_labelformat(57, 19, 3);
-        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz());
+        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getDarreichung())); // bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz())
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
             result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUKennung() + ")");
         }

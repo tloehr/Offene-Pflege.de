@@ -32,6 +32,7 @@ import entity.system.*;
 import entity.verordnungen.BHPTools;
 import op.care.DFNImport;
 import op.system.FrmInit;
+import op.system.Printers;
 import op.threads.BackgroundMonitor;
 import op.tools.*;
 import org.apache.commons.cli.*;
@@ -54,6 +55,7 @@ public class OPDE {
     protected static Database db;
     public static OPMain ocmain;
     protected static String url;
+    protected static Printers printers;
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
@@ -76,12 +78,20 @@ public class OPDE {
     protected static String opwd = "";
     protected static String css = "";
 
+    /**
+     *
+     * @return Das Arbeitsverzeichnis für OPDE.
+     */
     public static String getOpwd() {
         return opwd;
     }
 
     public static String getOPCache() {
         return opwd + System.getProperty("file.separator") + "cache";
+    }
+
+    public static Printers getPrinters() {
+        return printers;
     }
 
     public static ArrayList<ImageIcon> getAnimationCache() {
@@ -277,11 +287,9 @@ public class OPDE {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
         animationCache = new ArrayList(96);
-        //debug = true;
 
         // Das hier fängt alle ungefangenen Exceptions auf.
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 OPDE.fatal(e);
@@ -373,6 +381,7 @@ public class OPDE {
             anonym = false;
         }
 
+        printers = new Printers();
 
         if (loadLocalProperties()) {
 
