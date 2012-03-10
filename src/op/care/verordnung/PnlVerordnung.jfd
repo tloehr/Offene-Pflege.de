@@ -8,16 +8,16 @@
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
      <object class="com.jformdesigner.model.FormContainer"> 
-      <string>op.care.CleanablePanel</string> 
+      <string>op.tools.CleanablePanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {comp jToolBar1::l::755:x, seq t {space :::p, comp lblBW::::707:x, space :::p, comp btnLock:::p::p, space :::p}, seq l {space :::p, comp jPanel1:::::x, space :::p}, seq l {space :::p, comp jspVerordnung::::733:x, space :::p}}</string> 
+        <string>par l {comp jToolBar1::l::755:x, seq t {space :::p, comp lblBW::::711:x, space :p:38:p}, seq l {space :::p, comp jPanel1:::::x, space :::p}, seq l {space :::p, comp jspVerordnung::::743:x, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, par l {comp btnLock:::p::p, comp lblBW:::p::p}, space :::p, comp jPanel1:::p::p, space :::p, comp jspVerordnung::::94:x, space :::p}}</string> 
+        <string>par l {seq l {comp jToolBar1:::p::p, space :::p, comp lblBW:::p::p, space :::p, comp jPanel1:::p::p, space :::p, comp jspVerordnung::::118:x, space :::p}}</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -200,7 +200,7 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq {space :::p, par l {seq l {comp cbAbgesetzt:::p::p, space :::p, comp cbMedi:::p::p, space :::p, comp cbOhneMedi:::p::p, space :::p, comp cbBedarf:::p::p, space :::p, comp cbRegel:::p::p}, par t:l::p {comp jLabel12::l:::x:1, comp jLabel1::l:::x:1, comp jLabel2::l:::x:1}}, space ::191:x}}</string> 
+          <string>par l {seq {space :::p, par l {seq l {comp cbAbgesetzt:::p::p, space :::p, comp cbMedi:::p::p, space :::p, comp cbOhneMedi:::p::p, space :::p, comp cbBedarf:::p::p, space :::p, comp cbRegel:::p::p}, par t:l::p {comp jLabel12::l:::x:1, comp jLabel1::l:::x:1, comp jLabel2::l:::x:1}}, space ::193:x}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
@@ -643,46 +643,6 @@
             <boolean>true</boolean> 
            </object> 
           </void> 
-         </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JButton</string> 
-        <void method="setProperty"> 
-         <string>background</string> 
-         <object class="java.awt.Color"> 
-          <int>255</int> 
-          <int>255</int> 
-          <int>255</int> 
-          <int>255</int> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>icon</string> 
-         <object class="com.jformdesigner.model.SwingIcon"> 
-          <int>0</int> 
-          <string>/artwork/22x22/encrypted.png</string> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-        </void> 
-        <void method="setProperty"> 
-         <string>borderPainted</string> 
-         <boolean>false</boolean> 
-        </void> 
-        <void property="name"> 
-         <string>btnLock</string> 
-        </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ActionListener</string> 
-          <string>actionPerformed</string> 
-          <string>btnLockActionPerformed</string> 
-          <boolean>true</boolean> 
          </object> 
         </void> 
        </object> 

@@ -96,10 +96,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
             if (editMode == CHANGE_MODE) {
                 oldVerordnung = em.merge(verordnung);
 
-                Map<String,Object> props = new HashMap<String, Object>();
-                props.put("javax.persistence.lock.timeout", 3000);
-
-                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE, props);
+                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
                 this.verordnung = (Verordnung) verordnung.clone();
 
             } else {

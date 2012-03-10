@@ -16,10 +16,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -30,46 +27,61 @@ public class VerordnungTools {
      * Diese Methode ermittelt eine Liste aller Verordnungen gemäß der unten genannten Einschränkungen.
      *
      * @param bewohner    dessen Verordnungen wir suchen
-     * @param nurAktuelle true, wenn wir nur die aktuellen Verordnungen wünschen, false sonst.
      * @return Eine Liste aus Objekt Arrays, die folgenden Aufbau hat:
      *         <center><code><b>{Verordnung, Vorrat, Saldo des Vorrats,
      *         Bestand (im Anbruch), Saldo des Bestandes, Bezeichnung des Medikamentes, Bezeichnung der Massnahme}</b></code></center>
      *         Es gibt Verordnungen, die keine Medikamente besitzen, bei denen steht dann <code>null</code> an den entsprechenden
      *         Stellen.
      */
-    public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean nurAktuelle) {
+    public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, Date abdatum) {
+        List<Object[]> listResult = new ArrayList<Object[]>();
+
         EntityManager em = OPDE.createEM();
-        Query queryVorrat = em.createNamedQuery("Verordnung.findByBewohnerMitVorraeten");
-        queryVorrat.setParameter(1, bewohner.getBWKennung());
-        queryVorrat.setParameter(2, bewohner.getBWKennung());
-        queryVorrat.setParameter(3, !nurAktuelle);
-        List listeVorrat = queryVorrat.getResultList();
+        Query queryVerordnung = em.createQuery("SELECT v FROM Verordnung v WHERE v.abDatum >= :abdatum AND v.bewohner = :bewohner ");
+        queryVerordnung.setParameter("abdatum", abdatum);
+        queryVerordnung.setParameter("bewohner", bewohner);
+        List<Verordnung> listeVerordnung = queryVerordnung.getResultList();
 
-        // Aus technischen Gründe, kann ich diese native SQL nicht direkt mit der Liste aller zugehörigen Objekte
-        // füllen lassen, daher muss ich das hier von Hand machen. Die Verordnungsobjekte sind zwar schon da, aber
-        // die Vorrats und Bestandsobjekte nicht. Da bei diesem Ausdruck NULLs auftreten können, geht das nicht automatisch.
+//        // Aus technischen Gründe, kann ich diese native SQL nicht direkt mit der Liste aller zugehörigen Objekte
+//        // füllen lassen, daher muss ich das hier von Hand machen. Die Verordnungsobjekte sind zwar schon da, aber
+//        // die Vorrats und Bestandsobjekte nicht. Da bei diesem Ausdruck NULLs auftreten können, geht das nicht automatisch.
+//
+//        Iterator it = listeVorrat.iterator();
+//        while (it.hasNext()) {
+//            Object[] line = (Object[]) it.next();
+//
+//
+//            if (line[1] != null) {
+//                BigInteger vorID = (BigInteger) line[1];
+//                MedVorrat vorrat = em.find(MedVorrat.class, vorID.longValue());
+//                line[1] = vorrat;
+//            }
+//
+//            if (line[3] != null) {
+//                BigInteger bestID = (BigInteger) line[3];
+//                MedBestand bestand = em.find(MedBestand.class, bestID.longValue());
+//                line[3] = bestand;
+//            }
+//        }
+        // v.*, vor.VorID, vor.saldo, bestand.BestID, bestand.summe, M.Bezeichnung mptext, Ms.Bezeichnung mssntext
+        // Verordnung, AktiverVorrat, AktiverBestand
+//        Query queryBestand = em.createQuery(" " +
+//                " SELECT DISTINCT best FROM MedBestand best " +
+//                " WHERE best.vorrat.bis = :bis AND best.vorrat.bewohner = :bewohner AND best.darreichung = :darreichung ");
+//
+//        queryBestand.setParameter("bewohner", bewohner);
+//        queryBestand.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);
 
-        Iterator it = listeVorrat.iterator();
-        while (it.hasNext()) {
-            Object[] line = (Object[]) it.next();
+        for (Verordnung verordnung : listeVerordnung) {
 
-
-            if (line[1] != null) {
-                BigInteger vorID = (BigInteger) line[1];
-                MedVorrat vorrat = em.find(MedVorrat.class, vorID.longValue());
-                line[1] = vorrat;
-            }
-
-            if (line[3] != null) {
-                BigInteger bestID = (BigInteger) line[3];
-                MedBestand bestand = em.find(MedBestand.class, bestID.longValue());
-                line[3] = bestand;
-            }
+            MedVorrat vorrat = verordnung.getDarreichung() == null ? null : DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
+            MedBestand aktiverBestand = MedBestandTools.getBestandImAnbruch(vorrat);
+            listResult.add(new Object[]{verordnung, vorrat, aktiverBestand});
         }
 
         em.close();
 
-        return listeVorrat;
+        return listResult;
     }
 
 
@@ -249,7 +261,7 @@ public class VerordnungTools {
             // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
 
             MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(verordnung.getBewohner(), verordnung.getDarreichung());
-            MedBestand aktuellerAnbruch = MedVorratTools.getImAnbruch(vorrat);
+            MedBestand aktuellerAnbruch = MedBestandTools.getBestandImAnbruch(vorrat);
 
             if (aktuellerAnbruch != null) {
                 if (!aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
@@ -267,9 +279,9 @@ public class VerordnungTools {
                 }
             } else {
                 result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
-                            + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz()) + "</b>" +
-                            (verordnung.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getDarreichung().getMedForm().getZubereitung()) + " " +
-                            (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
+                        + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz()) + "</b>" +
+                        (verordnung.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getDarreichung().getMedForm().getZubereitung()) + " " +
+                        (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
             }
 
 
@@ -341,10 +353,11 @@ public class VerordnungTools {
     }
 
     public static String getDosis(Verordnung verordnung) {
-        return getDosis(verordnung, null, null, null, false);
+        return getDosis(verordnung, null);
     }
 
-    public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
+    public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch) {
+
         String result = "";
         if (verordnung.getPlanungen().size() > 1) {
             Collections.sort(verordnung.getPlanungen());
@@ -375,7 +388,10 @@ public class VerordnungTools {
             if (verordnung.isBisPackEnde()) {
                 result += "nur bis Packungs Ende<br/>";
             }
-            if (mitBestand && !verordnung.isAbgesetzt()) {
+            if (bestandImAnbruch != null && !verordnung.isAbgesetzt()) {
+                BigDecimal vorratSumme =MedVorratTools.getSumme(bestandImAnbruch.getVorrat());
+                BigDecimal bestandSumme = MedBestandTools.getBestandSumme(bestandImAnbruch);
+
                 if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
                     result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
                             SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] +
@@ -539,6 +555,7 @@ public class VerordnungTools {
     /**
      * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.
      * Verordnung, die über die Zeit mehrfach geändert werden, hängen über die VerordnungsKennung aneinander.
+     *
      * @param verordnung
      * @return Anzahl der Verordnungen, die zu dieser gehören.e
      */

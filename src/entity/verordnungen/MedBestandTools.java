@@ -1,7 +1,6 @@
 package entity.verordnungen;
 
 import entity.BewohnerTools;
-import entity.Mitarbeiter;
 import entity.Stationen;
 import op.OPDE;
 import op.tools.DlgException;
@@ -17,6 +16,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class MedBestandTools {
-    public static boolean apvNeuberechnung = true;
+//    public static boolean apvNeuberechnung = true;
 
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
@@ -67,6 +67,28 @@ public class MedBestandTools {
 //
 //        return result;
 //    }
+
+
+    /**
+     * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
+     *
+     * @param vorrat
+     * @return der angebrochene Bestand. null, wenn es keinen gab.
+     */
+    public static MedBestand getBestandImAnbruch(MedVorrat vorrat) {
+        MedBestand bestand = null;
+        if (vorrat != null && vorrat.getBestaende() != null) {
+            Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
+            while (itBestand.hasNext()) {
+                bestand = itBestand.next();
+                if (bestand.isAngebrochen() && !bestand.isAbgeschlossen()) {
+                    break;
+                }
+            }
+        }
+        return bestand;
+    }
+
 
     /**
      * Bricht einen Bestand an. Berechnet das neue APV selbstständig.

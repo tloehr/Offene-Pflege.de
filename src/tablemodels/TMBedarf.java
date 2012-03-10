@@ -133,13 +133,13 @@ public class TMBedarf
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
      */
-    protected String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
+    protected String getDosis(int row) {
         String result = "";
-        if (cache.containsKey(verordnung)) {
-            result = cache.get(verordnung).toString();
+        if (cache.containsKey(getVerordnung(row))) {
+            result = cache.get(getVerordnung(row)).toString();
         } else {
-            result = VerordnungTools.getDosis(verordnung, bestandImAnbruch, bestandSumme, vorratSumme, mitBestand);
-            cache.put(verordnung, result);
+            result = VerordnungTools.getDosis(getVerordnung(row), getBestand(row));
+            cache.put(getVerordnung(row), result);
         }
         return result;
     }
@@ -160,7 +160,7 @@ public class TMBedarf
             }
             case COL_Dosis: {
                 String tmp = "<html><body>";
-                tmp += getDosis(getVerordnung(row), getBestand(row), getBestandSumme(row), getVorratSaldo(row), true);
+                tmp += getDosis(row);
 
                 if (getTagesdosisBisher(row).equals(BigDecimal.ZERO)) {
                     tmp += "<br/><b>Diese Verordnung wurde heute nocht nicht angewendet.</b>";

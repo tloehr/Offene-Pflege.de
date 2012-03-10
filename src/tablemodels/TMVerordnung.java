@@ -27,14 +27,14 @@
 package tablemodels;
 
 import entity.Bewohner;
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedVorrat;
-import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungTools;
+import entity.verordnungen.*;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,6 +49,7 @@ public class TMVerordnung
     public static final int COL_Hinweis = 2;
     protected boolean mitBestand, abgesetzt;
     protected Bewohner bewohner;
+    private Date abdatum;
 
     protected HashMap cache;
 
@@ -57,7 +58,9 @@ public class TMVerordnung
     public TMVerordnung(Bewohner bewohner, boolean abgesetzt, boolean bestand) {
         super();
 
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, !abgesetzt);
+        abdatum = abgesetzt ? new Date() : SYSConst.DATE_BIS_AUF_WEITERES;
+
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, abdatum);
         this.bewohner = bewohner;
         this.abgesetzt = abgesetzt;
 
@@ -74,7 +77,7 @@ public class TMVerordnung
     }
 
     public MedBestand getBestand(int row) {
-        return (MedBestand) listeVerordnungen.get(row)[3];
+        return (MedBestand) listeVerordnungen.get(row)[2];
     }
 
     public BigDecimal getVorratSaldo(int row) {
@@ -101,7 +104,7 @@ public class TMVerordnung
 
     public void reload() {
         cache.clear();
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, !abgesetzt);
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, abdatum);
         fireTableDataChanged();
     }
 
@@ -125,13 +128,14 @@ public class TMVerordnung
      * Dient nur zu Optimierungszwecken. Damit die Datenbankzugriffe minimiert werden.
      * Lokaler Cache.
      */
-    protected String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand) {
+    private String getDosis(int row) {
+        // Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand)
         String result = "";
-        if (cache.containsKey(verordnung)) {
-            result = cache.get(verordnung).toString();
+        if (cache.containsKey(getVerordnung(row))) {
+            result = cache.get(getVerordnung(row)).toString();
         } else {
-            result = VerordnungTools.getDosis(verordnung, bestandImAnbruch, bestandSumme, vorratSumme, mitBestand);
-            cache.put(verordnung, result);
+            result = VerordnungTools.getDosis(getVerordnung(row), mitBestand ? getBestand(row) : null);
+            cache.put(getVerordnung(row), result);
         }
         return result;
     }
@@ -155,7 +159,7 @@ public class TMVerordnung
                 break;
             }
             case COL_Dosis: {
-                result = getDosis(verordnung, getBestand(row), getBestandSaldo(row), getVorratSaldo(row), mitBestand);
+                result = getDosis(row);
                 break;
             }
             case COL_Hinweis: {

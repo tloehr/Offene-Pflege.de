@@ -13,11 +13,11 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {seq l {space :::p, par l {comp jspBHP::l::750:x:1, seq {par l {seq t {comp jPanel1:::::x:1, space :::p, comp btnLock:::p::p}, comp jLabel12::l::738:x}, space :::p}}}}</string> 
+        <string>par l {seq l {space :::p, par l {seq l {comp jPanel1:::::x:1, space :::p}, comp jspBHP::l::750:x:1, seq {comp jLabel12::::738:x, space :::p}}}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {space :p:32:p, par l {seq {space :p:14:p, comp btnLock:::p::p}, comp jPanel1::l:p::p}, space :::p, comp jspBHP::::282:x, space :::p, comp jLabel12:::p::p, space :::p}}</string> 
+        <string>par l {seq l {space :p:32:p, comp jPanel1:::p::p, space :::p, comp jspBHP::::277:x, space :::p, comp jLabel12:::p::p, space :::p}}</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -75,11 +75,11 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, comp jdcDatum:::p:183:p, space :::p, comp btnTop:::p:24:p, space :::p, comp btnBack:::p:20:p, space u:::p, comp btnForward:::p:20:p, space u:::p, comp btnNow:::p:36:p, space ::234:x, comp btnBedarf:::p::p, space :::p, comp cmbSchicht:::p::p, space :::p}}</string> 
+          <string>par l {seq l {space :::p, comp jdcDatum:::p:183:p, space :::p, comp btnTop:::p:24:p, space :::p, comp btnBack:::p:20:p, space u:::p, comp btnForward:::p:20:p, space u:::p, comp btnNow:::p:36:p, space ::263:x, comp btnBedarf:::p::p, space :::p, comp cmbSchicht:::p::p, space :::p}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
-          <string>par l {seq t {space :::p, par t {comp btnBack::l::31:x:1, comp btnForward::l::31:x:1, comp btnNow::l::31:x:1, comp jdcDatum::l:p::p:1, comp btnTop::l::31:x:1, par b:l {comp cmbSchicht::b:p::p, comp btnBedarf::b:p::p}}, space :::p}}</string> 
+          <string>par l {seq t {space :::p, par t {comp btnBack::l::36:x:1, comp btnForward::l::36:x:1, comp btnNow::l::36:x:1, comp jdcDatum::l:p::p:1, comp btnTop::l::36:x:1, par b:l {comp cmbSchicht::b:p::p, comp btnBedarf::b:p::p}}, space :::p}}</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -285,46 +285,6 @@
             <boolean>true</boolean> 
            </object> 
           </void> 
-         </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JButton</string> 
-        <void method="setProperty"> 
-         <string>background</string> 
-         <object class="java.awt.Color"> 
-          <int>255</int> 
-          <int>255</int> 
-          <int>255</int> 
-          <int>255</int> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>icon</string> 
-         <object class="com.jformdesigner.model.SwingIcon"> 
-          <int>0</int> 
-          <string>/artwork/22x22/encrypted.png</string> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-        </void> 
-        <void method="setProperty"> 
-         <string>borderPainted</string> 
-         <boolean>false</boolean> 
-        </void> 
-        <void property="name"> 
-         <string>btnLock</string> 
-        </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ActionListener</string> 
-          <string>actionPerformed</string> 
-          <string>btnLockActionPerformed</string> 
-          <boolean>true</boolean> 
          </object> 
         </void> 
        </object> 

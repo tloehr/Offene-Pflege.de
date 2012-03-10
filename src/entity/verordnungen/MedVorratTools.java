@@ -39,10 +39,11 @@ public class MedVorratTools {
     }
 
     public static BigDecimal getSumme(MedVorrat vorrat) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("MedVorrat.getSumme");
-        query.setParameter("vorrat", vorrat);
-        BigDecimal result = (BigDecimal) query.getSingleResult();
+        BigDecimal result = BigDecimal.ZERO;
+        for (MedBestand bestand : vorrat.getBestaende()) {
+            BigDecimal summe = MedBestandTools.getBestandSumme(bestand);
+            result = result.add(summe);
+        }
         return result;
     }
 
@@ -73,7 +74,7 @@ public class MedVorratTools {
         }
 
         if (anweinheit) { // Umrechnung der Anwendungs Menge in die Packungs-Menge.
-            MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
+            MedBestand bestand = MedBestandTools.getBestandImAnbruch(vorrat);
             BigDecimal apv = bestand.getApv();
 
             if (apv.equals(BigDecimal.ZERO)) {
@@ -116,7 +117,7 @@ public class MedVorratTools {
 
 
     protected static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
-        MedBestand bestand = MedVorratTools.getImAnbruch(vorrat);
+        MedBestand bestand = MedBestandTools.getBestandImAnbruch(vorrat);
 
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
@@ -202,27 +203,6 @@ public class MedVorratTools {
             for (MedBestand myBestand : bestaende) {
                 if (!myBestand.isAbgeschlossen()) {
                     bestand = myBestand;
-                    break;
-                }
-            }
-        }
-        return bestand;
-    }
-
-
-    /**
-     * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
-     *
-     * @param vorrat
-     * @return der angebrochene Bestand. null, wenn es keinen gab.
-     */
-    public static MedBestand getImAnbruch(MedVorrat vorrat) {
-        MedBestand bestand = null;
-        if (vorrat != null && vorrat.getBestaende() != null) {
-            Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
-            while (itBestand.hasNext()) {
-                bestand = itBestand.next();
-                if (bestand.isAngebrochen() && !bestand.isAbgeschlossen()) {
                     break;
                 }
             }

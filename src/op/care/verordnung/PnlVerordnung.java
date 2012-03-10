@@ -91,24 +91,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
 
-//        if (myRunningClass != null) {
-//            SYSRunningClassesTools.endModule(myRunningClass);
-//        }
-//
-//        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
-//        myRunningClass = pair.getFirst();
-//        readOnly = !myRunningClass.isRW();
-//
-//        if (readOnly) {
-//            blockingClass = pair.getSecond();
-//            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
-//                    + blockingClass.getLogin().getUser().getNameUndVorname()
-//                    + "</body></html>");
-//        } else {
-//            btnLock.setToolTipText(null);
-//        }
-
-//        btnLock.setEnabled(readOnly);
 
         BewohnerTools.setBWLabel(lblBW, bewohner);
 
@@ -152,7 +134,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
         btnVorrat = new JButton();
         btnPrint = new JButton();
         btnStellplan = new JButton();
-        btnLock = new JButton();
 
         //======== this ========
 
@@ -168,15 +149,15 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
             //---- tblVerordnung ----
             tblVerordnung.setModel(new DefaultTableModel(
-                    new Object[][]{
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                    },
-                    new String[]{
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
             ));
             tblVerordnung.setToolTipText(null);
             tblVerordnung.addMouseListener(new MouseAdapter() {
@@ -263,43 +244,43 @@ public class PnlVerordnung extends NursingRecordsPanel {
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addComponent(cbAbgesetzt)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbMedi)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbOhneMedi)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbBedarf)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cbRegel))
-                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                    .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addContainerGap(191, Short.MAX_VALUE))
+                                .addComponent(cbAbgesetzt)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbMedi)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbOhneMedi)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbBedarf)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbRegel))
+                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap(193, Short.MAX_VALUE))
             );
             jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(cbAbgesetzt)
-                                            .addComponent(cbMedi)
-                                            .addComponent(cbOhneMedi)
-                                            .addComponent(cbBedarf)
-                                            .addComponent(cbRegel))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel1)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel2)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addContainerGap(20, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbAbgesetzt)
+                            .addComponent(cbMedi)
+                            .addComponent(cbOhneMedi)
+                            .addComponent(cbBedarf)
+                            .addComponent(cbRegel))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(20, Short.MAX_VALUE))
             );
         }
 
@@ -369,51 +350,35 @@ public class PnlVerordnung extends NursingRecordsPanel {
             jToolBar1.add(btnStellplan);
         }
 
-        //---- btnLock ----
-        btnLock.setBackground(Color.white);
-        btnLock.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png")));
-        btnLock.setBorder(null);
-        btnLock.setBorderPainted(false);
-        btnLock.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnLockActionPerformed(e);
-            }
-        });
-
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup()
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 733, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
+                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
+                    .addGap(38, 38, 38))
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup()
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblBW)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -579,7 +544,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             if (verordnung.hasMedi()) {
                 menu.add(new JSeparator());
 
-                final MedBestand bestandImAnbruch = MedVorratTools.getImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
+                final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
                 boolean bestandAbschliessenAllowed = !readOnly && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
                 boolean bestandAnbrechenAllowed = !readOnly && bestandImAnbruch == null;
 
@@ -632,7 +597,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    final MedBestand bestandImAnbruch = MedVorratTools.getImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
+                    final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
 
                     long dafid = 0;
                     BigDecimal apv = BigDecimal.ZERO;
@@ -768,7 +733,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
     private JButton btnVorrat;
     private JButton btnPrint;
     private JButton btnStellplan;
-    private JButton btnLock;
     // End of variables declaration//GEN-END:variables
 
 

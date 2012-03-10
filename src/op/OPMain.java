@@ -25,7 +25,6 @@
  */
 package op;
 
-import com.sun.tools.javac.processing.PrintingProcessor;
 import entity.system.SYSHostsTools;
 import entity.system.SYSLoginTools;
 import op.share.tools.PnlEditor;

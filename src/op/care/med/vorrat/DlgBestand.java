@@ -583,7 +583,7 @@ public class DlgBestand extends javax.swing.JDialog {
             }
             MedBestand bestand = MedVorratTools.einbuchenVorrat(em, vorrat, packung, darreichung, txtBemerkung.getText(), menge);
 
-            if (MedVorratTools.getImAnbruch(vorrat) == null &&
+            if (MedBestandTools.getBestandImAnbruch(vorrat) == null &&
                     JOptionPane.showConfirmDialog(this, "Dieser Vorrat enthält bisher nur verschlossene Packungen.\n" +
                             "Soll die neue Packung direkt als angebrochen markiert werden ?", "Packungs-Anbruch",
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
