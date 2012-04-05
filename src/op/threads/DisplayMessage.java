@@ -11,8 +11,8 @@ package op.threads;
 public class DisplayMessage implements Comparable<DisplayMessage> {
 
     public static final int IMMEDIATELY = 10;
-    public static final int NORMAL = 20;
-    public static final int INDEFFERENT = 30;
+    public static final int NORMAL = 30;
+    public static final int INDEFFERENT = 40;
 
     private String message;
     private int priority;
@@ -21,13 +21,24 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     private int secondsToShow;
     private int percentage;
 
-    public DisplayMessage(String message, int priority, long timestamp, long processed, int secondsToShow, int percentage) {
+
+
+    public DisplayMessage(String message) {
+        this.message = message;
+        this.priority = NORMAL;
+        this.timestamp = System.currentTimeMillis();
+        this.processed = 0;
+        this.secondsToShow = 0;
+        this.percentage = 0;
+    }
+
+    public DisplayMessage(String message, int priority, int secondsToShow) {
         this.message = message;
         this.priority = priority;
-        this.timestamp = timestamp;
-        this.processed = processed;
+        this.timestamp = System.currentTimeMillis();
+        this.processed = 0;
         this.secondsToShow = secondsToShow;
-        this.percentage = percentage;
+        this.percentage = 0;
     }
 
     public DisplayMessage(String message, int priority, long timestamp, long processed, int secondsToShow) {
@@ -87,7 +98,22 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.percentage = percentage;
     }
 
-    @Override
+    /**
+     *
+     * @return true, wenn die Nachricht
+     */
+    public boolean isObsolete(){
+        return !isShowingTillReplacement() && processed + secondsToShow * 1000 <= System.currentTimeMillis();
+    }
+
+    public boolean isProcessed(){
+        return processed != 0;
+    }
+
+    public boolean isShowingTillReplacement(){
+        return secondsToShow == 0;
+    }
+
     public int compareTo(DisplayMessage other) {
         int sort = new Integer(priority).compareTo(other.priority);
         if (sort == 0){

@@ -35,7 +35,7 @@ import entity.StationenTools;
 import op.care.PnlPflege;
 import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
-import op.threads.HeapStat;
+import op.threads.DisplayManager;
 import op.tools.*;
 import op.vorgang.PnlVorgang;
 import org.jdesktop.swingx.JXTaskPane;
@@ -58,13 +58,13 @@ import java.util.Iterator;
 /**
  * @author __USER__
  */
-public class FrmMain extends javax.swing.JFrame {
+public class FrmMain extends SheetableJFrame {
 
     public static final String internalClassID = "opde.mainframe";
 
 
     private boolean initPhase;
-    private HeapStat hs;
+    private DisplayManager displayManager;
     private JPanel currentVisiblePanel;
     private Bewohner currentBewohner;
     private JFrame thisFrame;
@@ -153,8 +153,8 @@ public class FrmMain extends javax.swing.JFrame {
         createProgramList();
         createBewohnerListe();
 
-        hs = new HeapStat(pbMsg, lblMainMsg, lblSubMsg);
-        hs.start();
+        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
+        displayManager.start();
 
         btnLogout.setText("<html>" + OPDE.getLogin().getUser().getNameUndVorname() + "<br/>Abmelden</html>");
 
@@ -185,28 +185,17 @@ public class FrmMain extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        btnVerlegung = new JButton();
         pnlMain = new JPanel();
         pnlMainMessage = new JPanel();
-        lblMainMsg = new JLabel();
-        lblSubMsg = new JLabel();
-        pbMsg = new JProgressBar();
-        pnlTopRight = new JPanel();
+        btnVerlegung = new JButton();
+        lblMainMsg = new FadingLabel();
         btnLogout = new JButton();
+        lblSubMsg = new FadingLabel();
+        pbMsg = new JProgressBar();
+        button1 = new JButton();
         jspSearch = new JScrollPane();
         panelSearch = new JXTaskPaneContainer();
         scrollMain = new JScrollPane();
-
-        //---- btnVerlegung ----
-        btnVerlegung.setText("Verlegung");
-        btnVerlegung.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 13));
-        btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/infored.png")));
-        btnVerlegung.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnVerlegungActionPerformed(e);
-            }
-        });
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -217,7 +206,7 @@ public class FrmMain extends javax.swing.JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, left:default:grow, $rgap, default, $lcgap, $rgap",
+                "$rgap, $lcgap, default, $lcgap, left:default:grow, 2*($rgap)",
                 "$rgap, default, $rgap, default:grow, $lgap, $rgap"));
 
             //======== pnlMainMessage ========
@@ -225,48 +214,67 @@ public class FrmMain extends javax.swing.JFrame {
                 pnlMainMessage.setBackground(new Color(234, 237, 223));
                 pnlMainMessage.setBorder(new DropShadowBorder(Color.black, 5, 0.3f, 12, true, true, true, true));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $lcgap, default",
+                    "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
                     "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
+
+                //---- btnVerlegung ----
+                btnVerlegung.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 13));
+                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/infored.png")));
+                btnVerlegung.setBorder(null);
+                btnVerlegung.setToolTipText("Verlegungsbericht drucken");
+                btnVerlegung.setBorderPainted(false);
+                btnVerlegung.setOpaque(true);
+                btnVerlegung.setBackground(new Color(0, 0, 0, 0));
+                btnVerlegung.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnVerlegungActionPerformed(e);
+                    }
+                });
+                pnlMainMessage.add(btnVerlegung, CC.xywh(2, 3, 2, 5));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("Main Message Line for Main Text");
                 lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
                 lblMainMsg.setForeground(new Color(105, 80, 69));
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblMainMsg, CC.xy(3, 3));
-
-                //---- lblSubMsg ----
-                lblSubMsg.setText("Main Message Line for Main Text");
-                lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
-                lblSubMsg.setForeground(new Color(105, 80, 69));
-                lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblSubMsg, CC.xy(3, 5));
-
-                //---- pbMsg ----
-                pbMsg.setValue(50);
-                pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
-                pbMsg.setForeground(new Color(105, 80, 69));
-                pnlMainMessage.add(pbMsg, CC.xy(3, 7, CC.FILL, CC.DEFAULT));
-            }
-            pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 3, 1));
-
-            //======== pnlTopRight ========
-            {
-                pnlTopRight.setLayout(new VerticalLayout());
+                pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
 
                 //---- btnLogout ----
-                btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/gpg.png")));
-                btnLogout.setText("<html>L\u00f6hr, Torsten<br/>Abmelden</html>");
+                btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/bw/lock.png")));
                 btnLogout.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 13));
+                btnLogout.setBorder(null);
+                btnLogout.setBorderPainted(false);
+                btnLogout.setBackground(new Color(0, 0, 0, 0));
                 btnLogout.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         btnLogoutHandler(e);
                     }
                 });
-                pnlTopRight.add(btnLogout);
+                pnlMainMessage.add(btnLogout, CC.xy(7, 3));
+
+                //---- lblSubMsg ----
+                lblSubMsg.setText("Main Message Line for Main Text");
+                lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblSubMsg.setForeground(new Color(105, 80, 69));
+                lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
+                pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
+
+                //---- pbMsg ----
+                pbMsg.setValue(50);
+                pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
+                pbMsg.setForeground(new Color(105, 80, 69));
+                pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.DEFAULT));
+
+                //---- button1 ----
+                button1.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/bw/fileclose.png")));
+                button1.setBorder(null);
+                button1.setBorderPainted(false);
+                button1.setBackground(new Color(0, 0, 0, 0));
+                pnlMainMessage.add(button1, CC.xy(7, 7));
             }
-            pnlMain.add(pnlTopRight, CC.xy(7, 2, CC.DEFAULT, CC.FILL));
+            pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1));
 
             //======== jspSearch ========
             {
@@ -279,7 +287,7 @@ public class FrmMain extends javax.swing.JFrame {
                 jspSearch.setViewportView(panelSearch);
             }
             pnlMain.add(jspSearch, CC.xy(3, 4, CC.FILL, CC.FILL));
-            pnlMain.add(scrollMain, CC.xywh(5, 4, 3, 1, CC.FILL, CC.FILL));
+            pnlMain.add(scrollMain, CC.xywh(5, 4, 2, 1, CC.FILL, CC.FILL));
         }
         contentPane.add(pnlMain);
         setSize(945, 695);
@@ -328,7 +336,7 @@ public class FrmMain extends javax.swing.JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    hs.setMainMessage(shortDescription);
+                    displayManager.setMainMessage(shortDescription);
                     setPanelTo(loadPanel(javaclass));
                 }
             });
@@ -402,7 +410,7 @@ public class FrmMain extends javax.swing.JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    hs.setMainMessage(BewohnerTools.getBWLabelText(innerbewohner));
+                    displayManager.setMainMessage(BewohnerTools.getBWLabelText(innerbewohner));
                     if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
                         ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
@@ -419,23 +427,16 @@ public class FrmMain extends javax.swing.JFrame {
 
     private void setPanelTo(JPanel pnl) {
         currentVisiblePanel = pnl;
-        pnlTopRight = new JPanel(new VerticalLayout());
-        if (currentVisiblePanel instanceof PnlPflege) {
-            pnlTopRight.add(btnVerlegung);
-        } else {
+//        pnlTopRight = new JPanel(new VerticalLayout());
+        btnVerlegung.setVisible(currentVisiblePanel instanceof PnlPflege);
+        if (!(currentVisiblePanel instanceof PnlPflege)) {
             collapseBewohner();
         }
-        pnlTopRight.add(btnLogout);
-        pnlMain.remove(pnlTopRight);
-        pnlMain.add(pnlTopRight, CC.xy(7, 2, CC.DEFAULT, CC.FILL));
-        pnlTopRight.repaint();
-//        pnlMain.validate();
-
         scrollMain.setViewportView(currentVisiblePanel);
     }
 
     public void dispose() {
-        hs.interrupt();
+        displayManager.interrupt();
         cleanup();
         super.dispose();
     }
@@ -449,14 +450,14 @@ public class FrmMain extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JButton btnVerlegung;
     private JPanel pnlMain;
     private JPanel pnlMainMessage;
-    private JLabel lblMainMsg;
-    private JLabel lblSubMsg;
-    private JProgressBar pbMsg;
-    private JPanel pnlTopRight;
+    private JButton btnVerlegung;
+    private FadingLabel lblMainMsg;
     private JButton btnLogout;
+    private FadingLabel lblSubMsg;
+    private JProgressBar pbMsg;
+    private JButton button1;
     private JScrollPane jspSearch;
     private JXTaskPaneContainer panelSearch;
     private JScrollPane scrollMain;
