@@ -63,15 +63,7 @@ public class DlgBericht extends javax.swing.JDialog {
      */
     public DlgBericht(PnlUebergabe parent, Einrichtungen einrichtung, Date datum) {
         super(parent.getPflege(), false);
-        if (OPDE.addNewModule(internalClassID, new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                logout = true;
-                dispose();
-            }
-        })) {
-            this.parent = parent;
+//        ithis.parent = parent;
             this.einrichtung = einrichtung;
             initComponents();
             this.setTitle(SYSTools.getWindowTitle("Allgemeinen Bericht eingeben"));
@@ -81,7 +73,17 @@ public class DlgBericht extends javax.swing.JDialog {
             btnSave.setEnabled(false);
             SYSTools.centerOnParent(parent, this);
             this.setVisible(true);
-        }
+
+        this.parent = parent;
+            this.einrichtung = einrichtung;
+            initComponents();
+            this.setTitle(SYSTools.getWindowTitle("Allgemeinen Bericht eingeben"));
+            jdcDatum.setDate(datum);
+            txtTBUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(datum));
+            txtUebergabe.setText("");
+            btnSave.setEnabled(false);
+            SYSTools.centerOnParent(parent, this);
+            this.setVisible(true);
     }
 
     /**
@@ -276,7 +278,7 @@ public class DlgBericht extends javax.swing.JDialog {
     @Override
     public void dispose() {
 
-        OPDE.removeModule(internalClassID);
+//        OPDE.removeModule(internalClassID);
         parent.reloadTable();
 
         jdcDatum.cleanup();

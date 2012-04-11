@@ -23,7 +23,7 @@ public class DisplayManager extends Thread {
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0;
-    private DateFormat df;
+//    private DateFormat df;
 
     /**
      * Creates a new instance of HeapStat
@@ -41,11 +41,18 @@ public class DisplayManager extends Thread {
         lblSub.setText(" ");
         messageQ = new ArrayList<DisplayMessage>();
         oldMessages = new ArrayList<DisplayMessage>();
-        df = DateFormat.getTimeInstance(DateFormat.SHORT);
+//        df = DateFormat.getTimeInstance(DateFormat.SHORT);
     }
 
     public void setMainMessage(String message) {
         lblMain.setText(message);
+    }
+
+
+    public void clearAllMessages(){
+        setMainMessage(null);
+        messageQ.clear();
+        processSubMessage();
     }
 
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {
@@ -65,7 +72,8 @@ public class DisplayManager extends Thread {
             messageQ.remove(0);
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
-            lblSub.setText(df.format(new Date()) + ": " + currentSubMessage.getMessage());
+            lblSub.setText(currentSubMessage.getMessage());
+            // df.format(new Date()) + ": " +
         } else {
             if (currentSubMessage == null || currentSubMessage.isObsolete()) {
                 lblSub.setText(" ");
@@ -108,7 +116,7 @@ public class DisplayManager extends Thread {
                 Thread.sleep(500);
             } catch (InterruptedException ie) {
                 interrupted = true;
-                System.out.println("HeapStat interrupted!");
+                System.out.println("DisplayManager interrupted!");
             }
         }
     }

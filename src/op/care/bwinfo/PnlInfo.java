@@ -124,9 +124,6 @@ public class PnlInfo extends NursingRecordsPanel {
         ((PnlBWInfo) pnlMain).print();
     }//GEN-LAST:event_btnPrintActionPerformed
 
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     @Override
     public void cleanup() {

@@ -29,11 +29,8 @@ package op.care.dfn;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.system.SYSRunningClasses;
-import entity.system.SYSRunningClassesTools;
 import op.OCSec;
 import op.OPDE;
-import op.tools.CleanablePanel;
 import op.care.planung.DlgMassSelect;
 import op.tools.*;
 
@@ -65,7 +62,7 @@ public class PnlDFN extends NursingRecordsPanel {
     private boolean ignoreJDCEvent;
     private boolean readOnly;
     private boolean abwesend;
-    private SYSRunningClasses myRunningClass, blockingClass;
+//    private SYSRunningClasses myRunningClass, blockingClass;
 
     /**
      * Creates new form PnlDFN
@@ -81,7 +78,7 @@ public class PnlDFN extends NursingRecordsPanel {
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
-        SYSRunningClassesTools.endModule(myRunningClass);
+//        SYSRunningClassesTools.endModule(myRunningClass);
     }
 
     private void btnLockActionPerformed(ActionEvent e) {
@@ -96,22 +93,22 @@ public class PnlDFN extends NursingRecordsPanel {
 
         abwesend = DBRetrieve.getAbwesendSeit(bwkennung) != null;
 
-        if (myRunningClass != null){
-            SYSRunningClassesTools.endModule(myRunningClass);
-        }
+//        if (myRunningClass != null){
+//            SYSRunningClassesTools.endModule(myRunningClass);
+//        }
+//
+//        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.planung", "nursingrecords.dfn", "nursingrecords.dfnimport"});
+//        myRunningClass = pair.getFirst();
+//        readOnly = myRunningClass.isRW();
 
-        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.planung", "nursingrecords.dfn", "nursingrecords.dfnimport"});
-        myRunningClass = pair.getFirst();
-        readOnly = myRunningClass.isRW();
-
-        if (readOnly) {
-            blockingClass = pair.getSecond();
-            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
-                    + blockingClass.getLogin().getUser().getNameUndVorname()
-                    + "</body></html>");
-        } else {
-            btnLock.setToolTipText(null);
-        }
+//        if (readOnly) {
+//            blockingClass = pair.getSecond();
+//            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
+//                    + blockingClass.getLogin().getUser().getNameUndVorname()
+//                    + "</body></html>");
+//        } else {
+//            btnLock.setToolTipText(null);
+//        }
 
         btnLock.setEnabled(readOnly);
 
@@ -352,10 +349,6 @@ public class PnlDFN extends NursingRecordsPanel {
                                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     private void btnNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNowActionPerformed
         jdcDatum.setDate(SYSCalendar.today_date());

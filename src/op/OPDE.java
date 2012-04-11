@@ -25,15 +25,17 @@
  */
 package op;
 
+import com.jidesoft.utils.Lm;
 import entity.EntityTools;
 import entity.Users;
 import entity.UsersTools;
-import entity.system.*;
+import entity.system.SYSLogin;
+import entity.system.SYSPropsTools;
+import entity.system.SyslogTools;
 import entity.verordnungen.BHPTools;
 import op.care.DFNImport;
 import op.system.FrmInit;
 import op.system.Printers;
-import op.threads.BackgroundMonitor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
@@ -44,17 +46,22 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Properties;
+
+//import op.threads.BackgroundMonitor;
 
 public class OPDE {
 
     public static long uptime;
     protected static Database db;
-    public static OPMain ocmain;
+    //    public static OPMain ocmain;
+    public static FrmMain mainframe;
     protected static String url;
     protected static Printers printers;
     protected static Properties props;
@@ -71,8 +78,9 @@ public class OPDE {
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;
-    protected static SYSHosts host;
-    protected static BackgroundMonitor bm;
+    //    protected static SYSHosts host;
+//    protected static BackgroundMonitor bm;
+    // Vielleicht später
     protected static ArrayList<ImageIcon> animationCache;
     protected static boolean animation = false;
     protected static boolean debug;
@@ -80,7 +88,6 @@ public class OPDE {
     protected static String css = "";
 
     /**
-     *
      * @return Das Arbeitsverzeichnis für OPDE.
      */
     public static String getOpwd() {
@@ -101,10 +108,6 @@ public class OPDE {
 
     public static boolean isDebug() {
         return debug;
-    }
-
-    public static BackgroundMonitor getBM() {
-        return bm;
     }
 
     public static boolean isAnimation() {
@@ -140,41 +143,41 @@ public class OPDE {
         OPDE.getProps().putAll(OPDE.getLocalProps());
     }
 
-    public static boolean addNewModule(String internalClassID, ActionListener listener) {
-        boolean success = false;
-        if (!runningModules.containsKey(internalClassID)) {
-            listenerList.add(ActionListener.class, listener);
-            runningModules.put(internalClassID, listener);
-            success = true;
-            OPDE.debug("Modul " + internalClassID + " hinzugefügt.");
-        }
-        return success;
-    }
-
-    public static void removeModule(String internalClassID) {
-        listenerList.remove(ActionListener.class, runningModules.get(internalClassID));
-        runningModules.remove(internalClassID);
-        OPDE.debug("Modul " + internalClassID + " entfernt.");
-    }
-
-    public static void notifyAboutLogout() {
-        Object[] listeners = listenerList.getListenerList();
-        // Each listener occupies two elements - the first is the listener class
-        // and the second is the listener instance
-        for (int i = 0; i < listeners.length; i += 2) {
-            ((ActionListener) listeners[i + 1]).actionPerformed(new ActionEvent(OPDE.class, 1, "LOGOUT"));
-        }
-        clearModules();
-    }
-
-    protected static void clearModules() {
-        Iterator<String> keys = runningModules.keySet().iterator();
-        while (keys.hasNext()) {
-            listenerList.remove(ActionListener.class, runningModules.get(keys.next()));
-        }
-        runningModules.clear();
-        listenerList = new EventListenerList();
-    }
+//    public static boolean addNewModule(String internalClassID, ActionListener listener) {
+//        boolean success = false;
+//        if (!runningModules.containsKey(internalClassID)) {
+//            listenerList.add(ActionListener.class, listener);
+//            runningModules.put(internalClassID, listener);
+//            success = true;
+//            OPDE.debug("Modul " + internalClassID + " hinzugefügt.");
+//        }
+//        return success;
+//    }
+//
+//    public static void removeModule(String internalClassID) {
+//        listenerList.remove(ActionListener.class, runningModules.get(internalClassID));
+//        runningModules.remove(internalClassID);
+//        OPDE.debug("Modul " + internalClassID + " entfernt.");
+//    }
+//
+//    public static void notifyAboutLogout() {
+//        Object[] listeners = listenerList.getListenerList();
+//        // Each listener occupies two elements - the first is the listener class
+//        // and the second is the listener instance
+//        for (int i = 0; i < listeners.length; i += 2) {
+//            ((ActionListener) listeners[i + 1]).actionPerformed(new ActionEvent(OPDE.class, 1, "LOGOUT"));
+//        }
+//        clearModules();
+//    }
+//
+//    protected static void clearModules() {
+//        Iterator<String> keys = runningModules.keySet().iterator();
+//        while (keys.hasNext()) {
+//            listenerList.remove(ActionListener.class, runningModules.get(keys.next()));
+//        }
+//        runningModules.clear();
+//        listenerList = new EventListenerList();
+//    }
 
     public static Logger getLogger() {
         return logger;
@@ -259,10 +262,6 @@ public class OPDE {
 
     public static AppInfo getAppInfo() {
         return appInfo;
-    }
-
-    public static SYSHosts getHost() {
-        return host;
     }
 
     public static SYSLogin getLogin() {
@@ -432,9 +431,8 @@ public class OPDE {
             jpaProps.put(QueryHints.JDBC_TIMEOUT, "3");
 
 
-
 //            if (isDebug()) {
-            jpaProps.put("eclipselink.logging.level", "FINER");
+            jpaProps.put("eclipselink.logging.level", "INFO");
 //            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
@@ -506,7 +504,7 @@ public class OPDE {
                 System.exit(0);
             }
 
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 
 
             try {
@@ -515,7 +513,10 @@ public class OPDE {
                 css = "";
             }
 
-            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "z6EYnsGFI8kEez3kchMObntWx0FM9Yo");
+
+//            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            mainframe = new FrmMain();
 
         }
     }

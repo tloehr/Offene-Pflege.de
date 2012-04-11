@@ -40,7 +40,7 @@ public class StationenTools {
 
 
 
-    public static Stationen getStation4ThisHost(){
+    public static Stationen getSpecialStation(){
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
         return EntityTools.find(Stationen.class, statid);
     }

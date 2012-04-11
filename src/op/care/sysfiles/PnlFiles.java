@@ -223,7 +223,7 @@ public class PnlFiles extends NursingRecordsPanel {
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-        OPDE.ocmain.lockOC();
+//        OPDE.ocmain.lockOC();
     }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     private void tblFilesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblFilesMousePressed

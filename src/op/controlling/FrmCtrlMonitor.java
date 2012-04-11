@@ -223,7 +223,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
         EntityManager em = OPDE.createEM();
         Query query1 = em.createNamedQuery("Stationen.findAllSorted");
         cmbStation.setModel(new DefaultComboBoxModel(new Vector<Stationen>(query1.getResultList())));
-        cmbStation.setSelectedItem(StationenTools.getStation4ThisHost());
+        cmbStation.setSelectedItem(StationenTools.getSpecialStation());
 
         // Leeren Kopf vor die Liste setzen.
 //        ListElement[] headtag = new ListElement[]{new ListElement("Keine Auswahl", "")};

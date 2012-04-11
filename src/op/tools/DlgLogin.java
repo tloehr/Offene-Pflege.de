@@ -25,35 +25,36 @@
  */
 package op.tools;
 
-import java.awt.*;
-import java.awt.Component;
-import java.awt.event.*;
-import javax.swing.border.*;
-import entity.system.SYSHostsTools;
 import entity.system.SYSLoginTools;
 import op.OPDE;
+import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.JXHyperlink;
 
 import javax.swing.*;
+import javax.swing.border.SoftBevelBorder;
+import java.awt.*;
+import java.awt.event.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import org.jdesktop.swingx.*;
 
 /**
  * @author __USER__
  */
-public class DlgLogin extends javax.swing.JDialog {
+public class DlgLogin extends JDialog {
 
-    Thread thread = null;
+    //    Thread thread = null;
+    Closure actionBlock;
 
     /**
      * Creates new form DlgLogin
      */
-    public DlgLogin(java.awt.Frame parent, String preMessage) {
-        super(parent, true);
+    public DlgLogin(java.awt.Frame parent, String preMessage, Closure actionBlock) {
+        super(parent, false);
         //Tools.center(this);
         OPDE.setLogin(null);
+        this.actionBlock = actionBlock;
+
         try {
             if (OPDE.getDb() != null && !OPDE.getDb().db.isClosed()) {
                 OPDE.getDb().db.close();
@@ -88,47 +89,41 @@ public class DlgLogin extends javax.swing.JDialog {
             new DlgException(ex);
         }
 
-        SYSTools.centerOnParent(parent, this);
-        if (OPDE.isAnimation()) {
-            animateLogo();
-        } else {
-            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/animation/opde-52.png")));
-        }
-        setVisible(true);
+//        SYSTools.centerOnParent(parent, this);
+        btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/animation/opde-52.png")));
+//        setVisible(true);
+        pack();
     }
 
-    private void btnLoginActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
 
-    private void animateLogo() {
-        thread = new Thread() {
-
-            public void run() {
-
-                int maxIconsNum = 85;
-
-                try {
-                    int i = 0;
-                    while (true) {
-                        if (i == OPDE.getAnimationCache().size()) {
-                            OPDE.getAnimationCache().add(new ImageIcon(getClass().getResource("/artwork/animation/opde-" + (i + 1) + ".png")));
-                        }
-                        btnAbout.setIcon(OPDE.getAnimationCache().get(i));
-
-                        Thread.sleep(55);
-                        if (i == maxIconsNum) {
-                            i = 0;
-                        } else {
-                            i++;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-        thread.start();
-    }
+//    private void animateLogo() {
+//        thread = new Thread() {
+//
+//            public void run() {
+//
+//                int maxIconsNum = 85;
+//
+//                try {
+//                    int i = 0;
+//                    while (true) {
+//                        if (i == OPDE.getAnimationCache().size()) {
+//                            OPDE.getAnimationCache().add(new ImageIcon(getClass().getResource("/artwork/animation/opde-" + (i + 1) + ".png")));
+//                        }
+//                        btnAbout.setIcon(OPDE.getAnimationCache().get(i));
+//
+//                        Thread.sleep(55);
+//                        if (i == maxIconsNum) {
+//                            i = 0;
+//                        } else {
+//                            i++;
+//                        }
+//                    }
+//                } catch (InterruptedException e) {
+//                }
+//            }
+//        };
+//        thread.start();
+//    }
 
     /**
      * This method is called from within the constructor to
@@ -154,12 +149,6 @@ public class DlgLogin extends javax.swing.JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Anmeldung");
         setResizable(false);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                formWindowClosing(e);
-            }
-        });
         Container contentPane = getContentPane();
 
         //---- btnLogin ----
@@ -223,15 +212,15 @@ public class DlgLogin extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblMessage, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
+                            .addComponent(lblMessage, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
                             .addGroup(GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup()
-                                    .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                                    .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
                                     .addComponent(jLabel2))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup()
-                                    .addComponent(txtPassword, GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
-                                    .addComponent(txtUsername, GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE))
+                                    .addComponent(txtPassword, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                                    .addComponent(txtUsername, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE))
                                 .addContainerGap())))
             );
             jPanel1Layout.setVerticalGroup(
@@ -315,7 +304,7 @@ public class DlgLogin extends javax.swing.JDialog {
                         .addGroup(contentPaneLayout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
+                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
                                 .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addComponent(btnLogin))
                     .addContainerGap())
@@ -348,9 +337,9 @@ public class DlgLogin extends javax.swing.JDialog {
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     public void dispose() {
-        if (thread != null) {
-            thread.interrupt();
-        }
+//        if (thread != null) {
+//            thread.interrupt();
+//        }
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -373,78 +362,20 @@ public class DlgLogin extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(this, "Benutzername oder Passwort falsch.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);
                 OPDE.info("Falsches Passwort eingegeben.");
             } else {
-                //OPDE.getLogin().getUser().getUKennung() = OPDE.getLogin().getUser().getUKennung();
-                //OPDE.UPW = password;
 
-
-//                    // Letzte Abmeldung ermitteln.
-//                    String sql1 = ""
-//                            + " SELECT LPOL FROM OCLogin "
-//                            + " WHERE UKennung = ? "
-//                            + " ORDER BY OCLOGINID DESC "
-//                            + " LIMIT 0,1";
-//                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(sql1);
-//                    stmt1.setString(1, OPDE.getLogin().getUser().getUKennung());
-//                    ResultSet rs = stmt1.executeQuery();
-//                    if (rs.first()) {
-//                        OPDE.lastlogout = rs.getTimestamp("LPOL").getTime();
-//                    } else {
-//                        OPDE.lastlogout = 0l;
-//                    }
-
-//                    PreparedStatement stmt;
-//                    String s = "UPDATE Users SET LastLogin = now() WHERE UKennung=?";
-//                    stmt = OPDE.getDb().db.prepareStatement(s);
-//                    stmt.setString(1, username);
-
-//                    HashMap hm = new HashMap();
-//                    hm.put("UKennung", new Object[]{username,"="});
-//                    hm.put("GKennung", new Object[]{"admin","="});
-//                    BigInteger bi = (BigInteger) DBRetrieve.getSingleValue("OCMember", "OCMID", hm);
-//                    OPDE.setAdmin(bi != null);
-                //OPDE.setGroups(DBHandling.getGroups(username));
                 OPDE.newOCSec();
-
-//                    // Gruppeninfo lesen und in ocgroups schreiben.
-//                    s = "SELECT Gruppe FROM oc.OCGroups WHERE UKennung = ?";
-//                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
-//                    stmt1.setString(1, username);
-//                    ResultSet rs = stmt1.executeQuery();
-//                    OPDE.ocgroups = new Properties();
-//                    while (rs.next()) {
-//                        OPDE.ocgroups.put(rs.getString("Gruppe"), "true");
-//                    }
-
 
                 OPDE.initProps();
 
                 OPDE.info("Anmeldung erfolgt: UKennung: " + username);
                 OPDE.info("LoginID: " + OPDE.getLogin().getUser().getUKennung());
 
-
-//                SYSRunningClasses sr = SYSRunningClassesTools.startModule("nursingrecords.bhp", null, SYSRunningClassesTools.STATUS_RW);
-//
-//                OPDE.debug(SYSRunningClassesTools.getRunning("9823bw", SYSRunningClassesTools.STATUS_DONT_CARE, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}));
-//                OPDE.debug(SYSRunningClassesTools.getRunning(null, SYSRunningClassesTools.STATUS_DONT_CARE, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}));
-//
-//                SYSRunningClassesTools.moduleEnded(sr);
+                actionBlock.execute(OPDE.getLogin());
 
 
-
-
-                dispose();
             }
 
         } catch (SQLException se) {
-////                if (se.getErrorCode() == com.mysql.jdbc.MysqlErrorNumbers.ER_ACCESS_DENIED_ERROR) {
-////                    JOptionPane.showMessageDialog(this, "Benutzername oder Passwort falsch.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);
-////                    OPDE.info("Falsches Passwort eingegeben.");
-////                } else {
-////                    new DlgException(se);
-////                    System.exit(se.getErrorCode());
-////                }
-//
-//                new DlgException(se);
             OPDE.fatal(se);
             System.exit(se.getErrorCode());
         }
@@ -477,63 +408,63 @@ public class DlgLogin extends javax.swing.JDialog {
         String password = new String(txtPassword.getPassword());
 
         OPDE.setLogin(SYSLoginTools.login(username, password));
-
-        try {
-
-
-            // Gibt es noch laufende Sitzungen, die sich innerhalb der vergangenen 2 Minuten als
-            // lebendig gemeldet haben ?
-//            String sqlRunningSessions = "SELECT OCLoginID FROM OCLogin "
-//                    + "WHERE UKennung=? AND IP=? AND Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 2 MINUTE) > now()";
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlRunningSessions);
-//            stmt.setString(1, username);
-//            stmt.setString(2, OPDE.getProps().getProperty("ip"));
-//            ResultSet rsRunningSessions = stmt.executeQuery();
-
-//            if (!rsRunningSessions.first()) { // Die Luft ist rein.... Schnell anmelden ;-)
-//                String sqlNewSession = "INSERT INTO OCLogin (UKennung, HOST, IP, Login, LPOL, Logout) VALUES (?, ?, ?, NOW(), NOW(), '9999-12-31 23:59:59')";
-//                PreparedStatement stmtNewSession = OPDE.getDb().db.prepareStatement(sqlNewSession);
-//                stmtNewSession.setString(1, username);
-//                stmtNewSession.setString(2, OPDE.getLocalProps().getProperty("hostname"));
-//                stmtNewSession.setString(3, OPDE.getLocalProps().getProperty("ip"));
-//                stmtNewSession.executeUpdate();
 //
-//                loginid = OPDE.getDb().getLastInsertedID();
-
-            // Aufräumen
-            // Zuerst OCWorkingOn von alten Trümmer Einträgen befreien.
-//                String sqlWOCleanupSession = "UPDATE OCWorkingOn SET Finish=NOW()  WHERE OCLoginID IN ( SELECT OCLoginID FROM OCLogin WHERE Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 3 MINUTE) <= now() )";
-//                PreparedStatement stmtWOCleanupSession = OPDE.getDb().db.prepareStatement(sqlWOCleanupSession);
-//                stmtWOCleanupSession.executeUpdate();
+//        try {
 //
-//                // OCMessages löschen, die von toten Logins stammen. Damit ein evtl. BHPImport nicht ewig darauf wartet.
-//                String sqlMessageCleanupSession = "DELETE FROM OCMessage WHERE Receiver IN ( SELECT OCLoginID FROM OCLogin WHERE Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 3 MINUTE) <= now() )";
-//                PreparedStatement stmtMessageCleanupSession = OPDE.getDb().db.prepareStatement(sqlMessageCleanupSession);
-//                stmtMessageCleanupSession.executeUpdate();
-
-//            // Dann Verordnungen zur BHP, die aus alten Trümmersitzungen stammen löschen.
-//            String sqlBHPCleanupSession = "DELETE FROM BHPPlanung WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
-//            PreparedStatement stmtBHPCleanupSession = OPDE.getDb().db.prepareStatement(sqlBHPCleanupSession);
-//            stmtBHPCleanupSession.executeUpdate();
 //
-//            // Dann MassTermine löschen, die aus alten Trümmersitzungen stammen löschen.
-//            String sqlMassTerminCleanupSession = "DELETE FROM MassTermin WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
-//            PreparedStatement stmtMassTerminCleanupSession = OPDE.getDb().db.prepareStatement(sqlMassTerminCleanupSession);
-//            stmtMassTerminCleanupSession.executeUpdate();
-
-            // Dann OCLogin bereinigen.
-//            String sqlCleanupSession = "UPDATE SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID SET l.Logout=LPOL WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now()";
-//            PreparedStatement stmtCleanupSession = OPDE.getDb().db.prepareStatement(sqlCleanupSession);
-//            stmtCleanupSession.executeUpdate();
-
-//            } else {
-//                JOptionPane.showMessageDialog(this, "Sie sind bereits an diesem Computer angemeldet.\n\nFalls Sie den Rechner gerade neu gestartet haben,\ndann warten Sie ca. 1 Minute und versuchen es dann nochmal.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);
-//                loginid = 0;
-//            }
-        } // try
-        catch (Exception se) {
-            OPDE.fatal(se);
-        } // catch
+//            // Gibt es noch laufende Sitzungen, die sich innerhalb der vergangenen 2 Minuten als
+//            // lebendig gemeldet haben ?
+////            String sqlRunningSessions = "SELECT OCLoginID FROM OCLogin "
+////                    + "WHERE UKennung=? AND IP=? AND Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 2 MINUTE) > now()";
+////            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlRunningSessions);
+////            stmt.setString(1, username);
+////            stmt.setString(2, OPDE.getProps().getProperty("ip"));
+////            ResultSet rsRunningSessions = stmt.executeQuery();
+//
+////            if (!rsRunningSessions.first()) { // Die Luft ist rein.... Schnell anmelden ;-)
+////                String sqlNewSession = "INSERT INTO OCLogin (UKennung, HOST, IP, Login, LPOL, Logout) VALUES (?, ?, ?, NOW(), NOW(), '9999-12-31 23:59:59')";
+////                PreparedStatement stmtNewSession = OPDE.getDb().db.prepareStatement(sqlNewSession);
+////                stmtNewSession.setString(1, username);
+////                stmtNewSession.setString(2, OPDE.getLocalProps().getProperty("hostname"));
+////                stmtNewSession.setString(3, OPDE.getLocalProps().getProperty("ip"));
+////                stmtNewSession.executeUpdate();
+////
+////                loginid = OPDE.getDb().getLastInsertedID();
+//
+//            // Aufräumen
+//            // Zuerst OCWorkingOn von alten Trümmer Einträgen befreien.
+////                String sqlWOCleanupSession = "UPDATE OCWorkingOn SET Finish=NOW()  WHERE OCLoginID IN ( SELECT OCLoginID FROM OCLogin WHERE Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 3 MINUTE) <= now() )";
+////                PreparedStatement stmtWOCleanupSession = OPDE.getDb().db.prepareStatement(sqlWOCleanupSession);
+////                stmtWOCleanupSession.executeUpdate();
+////
+////                // OCMessages löschen, die von toten Logins stammen. Damit ein evtl. BHPImport nicht ewig darauf wartet.
+////                String sqlMessageCleanupSession = "DELETE FROM OCMessage WHERE Receiver IN ( SELECT OCLoginID FROM OCLogin WHERE Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 3 MINUTE) <= now() )";
+////                PreparedStatement stmtMessageCleanupSession = OPDE.getDb().db.prepareStatement(sqlMessageCleanupSession);
+////                stmtMessageCleanupSession.executeUpdate();
+//
+////            // Dann Verordnungen zur BHP, die aus alten Trümmersitzungen stammen löschen.
+////            String sqlBHPCleanupSession = "DELETE FROM BHPPlanung WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
+////            PreparedStatement stmtBHPCleanupSession = OPDE.getDb().db.prepareStatement(sqlBHPCleanupSession);
+////            stmtBHPCleanupSession.executeUpdate();
+////
+////            // Dann MassTermine löschen, die aus alten Trümmersitzungen stammen löschen.
+////            String sqlMassTerminCleanupSession = "DELETE FROM MassTermin WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
+////            PreparedStatement stmtMassTerminCleanupSession = OPDE.getDb().db.prepareStatement(sqlMassTerminCleanupSession);
+////            stmtMassTerminCleanupSession.executeUpdate();
+//
+//            // Dann OCLogin bereinigen.
+////            String sqlCleanupSession = "UPDATE SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID SET l.Logout=LPOL WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now()";
+////            PreparedStatement stmtCleanupSession = OPDE.getDb().db.prepareStatement(sqlCleanupSession);
+////            stmtCleanupSession.executeUpdate();
+//
+////            } else {
+////                JOptionPane.showMessageDialog(this, "Sie sind bereits an diesem Computer angemeldet.\n\nFalls Sie den Rechner gerade neu gestartet haben,\ndann warten Sie ca. 1 Minute und versuchen es dann nochmal.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);
+////                loginid = 0;
+////            }
+//        } // try
+//        catch (Exception se) {
+//            OPDE.fatal(se);
+//        } // catch
         //return (loginid);
     }
 

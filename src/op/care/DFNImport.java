@@ -26,8 +26,6 @@
  */
 package op.care;
 
-import entity.system.SYSRunningClasses;
-import entity.system.SYSRunningClassesTools;
 import op.OPDE;
 import op.tools.*;
 
@@ -40,7 +38,6 @@ import java.util.GregorianCalendar;
 public class DFNImport {
 
     public static final String internalClassID = "nursingrecords.dfnimport";
-    private static SYSRunningClasses runningClass, blockingClass;
 
     //    public static void importBHP(int offset)
 //    throws SQLException{
@@ -90,7 +87,6 @@ public class DFNImport {
         String bwkennung;
         int schichtOffset = 0;
         boolean doCommit = false;
-        SYSRunningClasses me = null;
 
 
 
@@ -98,11 +94,11 @@ public class DFNImport {
 
         Connection db = OPDE.getDb().db;
 
-        if (planid == 0) {
-            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
-        }
+//        if (planid == 0) {
+//            me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
+//        }
 
-        if (planid > 0 || me != null) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.
+        if (planid > 0 ) { // Bei Verid <> 0 wird diese Methode nicht registriert. Ansonsten müssen wir einen Lock haben.
 
             OPDE.debug("PlanID: " + planid);
             OPDE.debug("Zeit: " + zeit);
@@ -393,9 +389,9 @@ public class DFNImport {
                 OPDE.getLogger().error("Rolling back transaction");
             }
             OPDE.info("DFNImport abgeschlossen");
-            if (me != null) {
-                SYSRunningClassesTools.endModule(me);
-            }
+//            if (me != null) {
+//                SYSRunningClassesTools.endModule(me);
+//            }
         } else {
             OPDE.warn("DFNImport NICHT abgeschlossen. Zugriffskonflikt.");
         }

@@ -749,7 +749,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     }
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        OPDE.ocmain.lockOC();
+//        OPDE.ocmain.lockOC();
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void tblVitalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVitalMousePressed

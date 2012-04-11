@@ -377,7 +377,7 @@ public class PnlUebergabe extends CleanablePanel {
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        OPDE.ocmain.lockOC();
+//        OPDE.ocmain.lockOC();
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnConfirmAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmAllActionPerformed

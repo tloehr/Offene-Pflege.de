@@ -26,8 +26,6 @@
  */
 package op.threads;
 
-import entity.EntityTools;
-import entity.system.SYSMessagesTools;
 import op.OPDE;
 
 import java.util.Date;

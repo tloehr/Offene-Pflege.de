@@ -32,6 +32,15 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.percentage = 0;
     }
 
+    public DisplayMessage(String message, int secondsToShow) {
+        this.message = message;
+        this.priority = NORMAL;
+        this.timestamp = System.currentTimeMillis();
+        this.processed = 0;
+        this.secondsToShow = secondsToShow;
+        this.percentage = 0;
+    }
+
     public DisplayMessage(String message, int priority, int secondsToShow) {
         this.message = message;
         this.priority = priority;

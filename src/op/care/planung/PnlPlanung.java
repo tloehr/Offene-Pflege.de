@@ -520,9 +520,6 @@ public class PnlPlanung extends NursingRecordsPanel {
         reloadTable();
     }//GEN-LAST:event_btnCopyActionPerformed
 
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     private void reloadTable() {
 

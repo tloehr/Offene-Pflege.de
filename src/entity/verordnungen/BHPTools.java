@@ -2,8 +2,6 @@ package entity.verordnungen;
 
 import entity.EntityTools;
 import entity.system.SYSPropsTools;
-import entity.system.SYSRunningClasses;
-import entity.system.SYSRunningClassesTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -57,11 +55,7 @@ public class BHPTools {
         String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
 
-        SYSRunningClasses me = null;
 
-        me = SYSRunningClassesTools.startModule(internalClassID, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"}, 5, "BHP Tagesplan muss erstellt werden.");
-
-        if (me != null) {
 
             if (datum == null) {
                 datum = new Date();
@@ -79,7 +73,7 @@ public class BHPTools {
             }
 
             if (SYSCalendar.getDaysBetween(lastbhp, gcStichtag) != 1) {
-                SYSRunningClassesTools.endModule(me);
+//                SYSRunningClassesTools.endModule(me);
                 throw new IndexOutOfBoundsException("Es kann kein BHPImport für dieses Datum durchgeführt werden.");
             }
 
@@ -114,13 +108,13 @@ public class BHPTools {
 
             OPDE.info("BHPImport abgeschlossen. Stichtag: " + DateFormat.getDateInstance().format(stichtag));
 
-            SYSRunningClassesTools.endModule(me);
+//            SYSRunningClassesTools.endModule(me);
 
             SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
 
-        } else {
-            OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");
-        }
+//        } else {
+//            OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");
+//        }
         return numbhp;
     }
 

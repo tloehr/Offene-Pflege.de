@@ -322,10 +322,6 @@ public class PnlBHP extends NursingRecordsPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
-
     private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
         change2Bewohner(bewohner);
     }//GEN-LAST:event_btnLockActionPerformed

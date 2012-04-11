@@ -58,8 +58,8 @@ public class SYSLogin implements Serializable {
 //    @JoinColumn(name = "HostID", referencedColumnName = "HostID")
 //    @ManyToOne
 //    private SYSHosts host;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "login")
-    private Collection<SYSRunningClasses> runningClasses;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "login")
+//    private Collection<SYSRunningClasses> runningClasses;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;

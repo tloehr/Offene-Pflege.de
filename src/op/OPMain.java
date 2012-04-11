@@ -429,7 +429,7 @@ public class OPMain extends javax.swing.JFrame {
 
     public void lockOC(String message) {
         disposeFrame("op.care.FrmPflege");
-        OPDE.notifyAboutLogout();
+//        OPDE.notifyAboutLogout();
         if (frames.size() == 0) {
             // Menüs aufräumen
             SYSTools.unregisterListeners(jmbMain);
@@ -480,7 +480,7 @@ public class OPMain extends javax.swing.JFrame {
 
         tblVorgang.setModel(new DefaultTableModel());
         tblVorgang.setVisible(false);
-        new DlgLogin(this, preMessage);
+//        new DlgLogin(this, preMessage);
         if (OPDE.getLogin() == null) {
             System.exit(0);
         }
