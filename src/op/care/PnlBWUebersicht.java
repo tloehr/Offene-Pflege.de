@@ -227,7 +227,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     public void reloadDisplay() {
         txtUebersicht.setText(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, true, cbBWInfo.isSelected()));
         jspHTML.getViewport().setViewPosition(new Point(0, 0));
-        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, null, TaskPaneContentChangedEvent.BOTTOM, ""));
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, null, null));
     }
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed

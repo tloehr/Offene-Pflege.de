@@ -4,6 +4,7 @@
  */
 package entity;
 
+import com.jidesoft.pane.CollapsiblePane;
 import op.OPDE;
 import org.jdesktop.swingx.JXTaskPane;
 
@@ -129,7 +130,7 @@ public class PBerichtTAGSTools {
      * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
      * @return das Panel zur weiteren Verwendung.
      */
-    public static void addCheckBoxPanelForTags(JXTaskPane panel, ItemListener listener, Collection<PBerichtTAGS> preselect) {
+    public static void addCheckBoxPanelForTags(CollapsiblePane panel, ItemListener listener, Collection<PBerichtTAGS> preselect) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());

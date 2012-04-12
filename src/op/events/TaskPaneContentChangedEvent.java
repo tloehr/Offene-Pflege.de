@@ -1,5 +1,6 @@
 package op.events;
 
+import com.jidesoft.pane.CollapsiblePane;
 import org.jdesktop.swingx.JXTaskPane;
 
 import java.util.EventObject;
@@ -14,27 +15,18 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class TaskPaneContentChangedEvent extends EventObject {
-    public static final int TOP = 0;
-    public static final int MIDDLE = 1;
-    public static final int BOTTOM = 2;
 
-    protected List<JXTaskPane> taskPanes;
-    protected int whereToPut;
+    protected List<CollapsiblePane> taskPanes;
     protected String title;
 
-    public TaskPaneContentChangedEvent(Object source, List<JXTaskPane> taskPanes, int whereToPut, String title) {
+    public TaskPaneContentChangedEvent(Object source, List<CollapsiblePane> taskPanes, String title) {
         super(source);
         this.taskPanes = taskPanes;
-        this.whereToPut = whereToPut;
         this.title = title;
     }
 
-    public List<JXTaskPane> getTaskPanes() {
+    public List<CollapsiblePane> getTaskPanes() {
         return taskPanes;
-    }
-
-    public int getWhereToPut() {
-        return whereToPut;
     }
 
     public String getTitle() {

@@ -31,13 +31,17 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.plaf.basic.ThemePainter;
-import com.jidesoft.swing.*;
+import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.TitledSeparator;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.system.SYSLoginTools;
+import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
+import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -100,42 +104,12 @@ public class FrmMain extends SheetableJFrame {
         displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
         displayManager.start();
 
-//        tpccl = new TaskPaneContentChangedListener() {
-//            @Override
-//            public void contentChanged(TaskPaneContentChangedEvent evt) {
-//                panelSearch.removeAll();
-//                panelSearch.add((JPanel) programPane);
-//
-//                if (evt.getWhereToPut() == TaskPaneContentChangedEvent.TOP) {
-//                    if (!evt.getTitle().isEmpty()) {
-//                        panelSearch.add(new JXTitledSeparator(evt.getTitle(), SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
-//                    }
-//                    if (evt.getTaskPanes() != null) {
-//                        for (JXTaskPane pane : evt.getTaskPanes()) {
-//                            panelSearch.add((JPanel) pane);
-//                        }
-//                    }
-//                    panelSearch.add(new JXTitledSeparator("Pflegeakte", SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/pflegeakte.png"))));
-//                    for (JXTaskPane pane : bewohnerPanes) {
-//                        panelSearch.add((JPanel) pane);
-//                    }
-//                } else {
-//                    panelSearch.add(new JXTitledSeparator("Pflegeakte", SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/pflegeakte.png"))));
-//                    for (JXTaskPane pane : bewohnerPanes) {
-//                        panelSearch.add((JPanel) pane);
-//                    }
-//                    if (!evt.getTitle().isEmpty()) {
-//                        panelSearch.add(new JXTitledSeparator(evt.getTitle(), SwingConstants.LEFT, new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
-//                    }
-//                    if (evt.getTaskPanes() != null) {
-//                        for (JXTaskPane pane : evt.getTaskPanes()) {
-//                            panelSearch.add((JPanel) pane);
-//                        }
-//                    }
-//                }
-//                panelSearch.validate();
-//            }
-//        };
+        tpccl = new TaskPaneContentChangedListener() {
+            @Override
+            public void contentChanged(TaskPaneContentChangedEvent evt) {
+                createSearchPane(evt.getTaskPanes(), evt.getTitle());
+            }
+        };
 
 //        btnVerlegung = new JButton("Verlegung");
 //        btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
@@ -170,9 +144,7 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private void btnExitActionPerformed(ActionEvent e) {
-
         logout();
-
     }
 
     private void thisWindowClosing(WindowEvent e) {
@@ -190,13 +162,12 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private void afterLogin() {
-        panesSearch = new CollapsiblePanes();
-        panesSearch.setLayout(new JideBoxLayout(panesSearch, JideBoxLayout.Y_AXIS));
-        jspSearch.setViewportView(panesSearch);
-//        createProgramList();
-        createBewohnerListe();
+
+        createSearchPane(null, "");
 
         btnExit.setText("<html>" + OPDE.getLogin().getUser().getNameUndVorname() + "<br/>Abmelden</html>");
+        displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
+        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 10));
 
 //        JLabel lbl = new JLabel("Bitte wählen Sie eine(n) BewohnerIn aus.");
 //        lbl.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/agt_back.png")));
@@ -247,7 +218,7 @@ public class FrmMain extends SheetableJFrame {
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(234, 237, 223));
-                pnlMainMessage.setBorder(new LineBorder(Color.black));
+                pnlMainMessage.setBorder(LineBorder.createBlackLineBorder());
                 pnlMainMessage.setLayout(new FormLayout(
                         "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
                         "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
@@ -342,31 +313,68 @@ public class FrmMain extends SheetableJFrame {
     }//GEN-LAST:event_jtpUebersichtStateChanged
 
 
-//    private void createProgramList() {
-//        programPane = new JXTaskPane("Programme");
-//        programPane.setSpecial(true);
-//        programPane.setCollapsed(false);
-//
-//        panelSearch.add((JPanel) programPane);
-//        for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
-//
-//
-//            final String shortDescription = ic.getShortDescription();
-//            final String javaclass = ic.getJavaClass();
-//
-//            programPane.add(new AbstractAction() {
-//                {
-//                    putValue(Action.NAME, shortDescription);
-//                }
-//
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    displayManager.setMainMessage(shortDescription);
-//                    setPanelTo(loadPanel(javaclass));
-//                }
-//            });
-//        }
-//    }
+    private void createProgramListe() {
+        CollapsiblePane programPane = new CollapsiblePane("Programme");
+        programPane.setSlidingDirection(SwingConstants.SOUTH);
+        programPane.setStyle(CollapsiblePane.TREE_STYLE);
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+
+        try {
+            programPane.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+        }
+
+        for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
+
+            final String shortDescription = ic.getShortDescription();
+            final String longDescription = ic.getLongDescription();
+            final String javaclass = ic.getJavaClass();
+
+            ActionListener actionListener = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    displayManager.setMainMessage(shortDescription);
+                    displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
+                    setPanelTo(loadPanel(javaclass));
+                }
+            };
+
+            JideButton button = GUITools.createHyperlinkButton(shortDescription, null, actionListener);
+            button.setToolTipText(longDescription);
+
+            labelPanel.add(button);
+        }
+
+        programPane.setContentPane(labelPanel);
+        panesSearch.add(programPane);
+    }
+
+    private void createSearchPane(java.util.List<CollapsiblePane> panesToAdd, String titleForAdditionalPanes) {
+        panesSearch = new CollapsiblePanes();
+        panesSearch.setLayout(new JideBoxLayout(panesSearch, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(panesSearch);
+
+        createProgramListe();
+        createBewohnerListe();
+
+        if (panesToAdd != null) {
+            if (!SYSTools.catchNull(titleForAdditionalPanes).isEmpty()) {
+                TitledSeparator sep = new TitledSeparator();
+                sep.setLabelComponent(new JLabel(titleForAdditionalPanes, null, JLabel.LEFT));
+                sep.setTextAlignment(SwingConstants.RIGHT);
+                sep.setBarAlignment(SwingConstants.CENTER);
+                panesSearch.add(sep);
+            }
+            for (CollapsiblePane pane : panesToAdd) {
+                panesSearch.add(pane);
+            }
+        }
+
+        panesSearch.addExpansion();
+    }
 
     private JPanel loadPanel(String classname) {
 //        Class c;
@@ -381,11 +389,9 @@ public class FrmMain extends SheetableJFrame {
 
         JPanel panel = null;
 
-//        if (classname.equals("op.bw.tg.PnlTG")) {
-//            panel = new PnlTG(this, tpccl);
-//        } else
-
-        if (classname.equals("op.vorgang.PnlVorgang")) {
+        if (classname.equals("op.bw.tg.PnlTG")) {
+            panel = new PnlTG(this, tpccl);
+        } else if (classname.equals("op.vorgang.PnlVorgang")) {
             panel = new PnlVorgang(null, null, this, tpccl);
         }
 
@@ -408,7 +414,7 @@ public class FrmMain extends SheetableJFrame {
         em.close();
 
         CollapsiblePane mypane = new CollapsiblePane(station.getBezeichnung());
-        mypane.setEmphasized(station.equals(station == StationenTools.getSpecialStation()));
+        mypane.setEmphasized(station.equals(StationenTools.getSpecialStation()));
         mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.TREE_STYLE);
 
@@ -454,6 +460,7 @@ public class FrmMain extends SheetableJFrame {
      * Das erstellt eine Liste aller Bewohner mit direktem Verweis auf die jeweilige Pflegeakte.
      */
     private void createBewohnerListe() {
+
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Stationen.findAllSorted");
 
@@ -468,12 +475,11 @@ public class FrmMain extends SheetableJFrame {
 //        sep.setBarAlignment(SwingConstants.CENTER);
 //        sep.setSeparatorBorder(new PartialGradientLineBorder(new Color[]{Color.BLACK, Color.WHITE}, 5, PartialSide.SOUTH));
 
-
-        while (it.hasNext()){
-            panesSearch.add(createBewohnerListe(it.next()));
+        while (it.hasNext()) {
+            CollapsiblePane pane = createBewohnerListe(it.next());
+            panesSearch.add(pane);
         }
 
-        panesSearch.addExpansion();
         em.close();
     }
 

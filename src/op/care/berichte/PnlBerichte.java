@@ -28,17 +28,21 @@ package op.care.berichte;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
-import op.tools.CleanablePanel;
 import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
 import op.tools.*;
-import org.jdesktop.swingx.*;
+import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.JXTaskPane;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import tablemodels.TMPflegeberichte;
@@ -55,6 +59,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -88,7 +93,7 @@ public class PnlBerichte extends NursingRecordsPanel {
     private double splitTEPercent, splitBCPercent;
     private boolean singleRowSelected;
 
-    private ArrayList<JXTaskPane> panelSearch;
+    private ArrayList<CollapsiblePane> panelSearch;
     private TaskPaneContentChangedListener taskPaneContentChangedListener;
 
     /**
@@ -99,7 +104,7 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     private JDateChooser jdcVon, jdcBis;
     private JXSearchField txtSearch;
-    private JXTaskPane panelTime, panelText, panelTags;
+    private CollapsiblePane panelTime, panelText, panelTags;
     private JCheckBox cbShowEdits, cbShowIDs;
 
     private Timeline textmessageTL, textUpperLabelTL, lblMessage2Timeline;
@@ -901,16 +906,16 @@ public class PnlBerichte extends NursingRecordsPanel {
 
 
     private void prepareSearchArea() {
-        panelSearch = new ArrayList<JXTaskPane>();
+        panelSearch = new ArrayList<CollapsiblePane>();
         addByTime();
         addByTags();
         addBySearchText();
-        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Pflegeberichte"));
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, "Pflegeberichte"));
     }
 
 
     private void addByTags() {
-        panelTags = new JXTaskPane("nach Markierung");
+        panelTags = new CollapsiblePane("nach Markierung");
         PBerichtTAGSTools.addCheckBoxPanelForTags(panelTags, new ItemListener() {
 
             @Override
@@ -928,22 +933,29 @@ public class PnlBerichte extends NursingRecordsPanel {
             }
         }, new ArrayList<PBerichtTAGS>());
 
-        panelTags.setCollapsed(true);
+        try {
+            panelTags.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         panelSearch.add(panelTags);
 
-        panelTags.addPropertyChangeListener(new PropertyChangeListener() {
+        panelTags.addCollapsiblePaneListener(new CollapsiblePaneAdapter(){
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("collapsed")) {
-                    reloadTable();
-                }
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                reloadTable();
+            }
+
+            @Override
+            public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                reloadTable();
             }
         });
 
     }
 
     private void addBySearchText() {
-        panelText = new JXTaskPane("nach Suchbegriff");
+        panelText = new CollapsiblePane("nach Suchbegriff");
         txtSearch = new JXSearchField("Suchbegriff");
         txtSearch.setInstantSearchDelay(500);
         txtSearch.addActionListener(new ActionListener() {
@@ -954,23 +966,29 @@ public class PnlBerichte extends NursingRecordsPanel {
         });
 
         panelText.add(txtSearch);
-        panelText.setCollapsed(true);
+        try {
+            panelText.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         panelSearch.add(panelText);
 
-        panelText.addPropertyChangeListener(new PropertyChangeListener() {
+        panelText.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("collapsed")) {
-                    reloadTable();
-                }
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                reloadTable();
+            }
+
+            @Override
+            public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                reloadTable();
             }
         });
-
     }
 
     private void addByTime() {
 
-        panelTime = new JXTaskPane("nach Zeit");
+        panelTime = new CollapsiblePane("nach Zeit");
         jdcVon = new JDateChooser(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
         jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -984,41 +1002,35 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        panelTime.add(new JXTitledSeparator("Von"));
+        panelTime.add(new JLabel("Von"));
         panelTime.add(jdcVon);
-        panelTime.add(new AbstractAction() {
-            {
-                putValue(Action.NAME, "vor 2 Wochen");
-            }
-
+        JideButton button2Weeks = GUITools.createHyperlinkButton("vor 2 Wochen", null, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent actionEvent) {
                 jdcVon.setDate(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
             }
         });
-
-        panelTime.add(new AbstractAction() {
-            {
-                putValue(Action.NAME, "vor 4 Wochen");
-            }
-
+        JideButton button4Weeks = GUITools.createHyperlinkButton("vor 4 Wochen", null, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent actionEvent) {
                 jdcVon.setDate(SYSCalendar.addField(new Date(), -4, GregorianCalendar.WEEK_OF_MONTH));
             }
         });
-
-
-        panelTime.add(new AbstractAction() {
-            {
-                putValue(Action.NAME, "von Anfang an");
-            }
-
+        JideButton buttonBeginning = GUITools.createHyperlinkButton("von Anfang an", null, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent actionEvent) {
                 jdcVon.setDate(PflegeberichteTools.firstBericht(bewohner).getPit());
             }
         });
+        JideButton buttonToday = GUITools.createHyperlinkButton("heute", null, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcBis.setDate(new Date());
+            }
+        });
+        panelTime.add(button2Weeks);
+        panelTime.add(button4Weeks);
+        panelTime.add(buttonBeginning);
 
         jdcBis = new JDateChooser(new Date());
         jdcBis.addPropertyChangeListener(new PropertyChangeListener() {
@@ -1033,28 +1045,22 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        panelTime.add(new JLabel(" "));
-        panelTime.add(new JXTitledSeparator("Bis"));
+        panelTime.add(new JLabel("Bis"));
+//        panelTime.add(new JXTitledSeparator("Bis"));
         panelTime.add(jdcBis);
-        panelTime.add(new AbstractAction() {
-            {
-                putValue(Action.NAME, "heute");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jdcBis.setDate(new Date());
-            }
-        });
+        panelTime.add(buttonToday);
 
         panelSearch.add(panelTime);
 
-        panelTime.addPropertyChangeListener(new PropertyChangeListener() {
+        panelTime.addCollapsiblePaneListener(new CollapsiblePaneAdapter(){
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("collapsed")) {
-                    reloadTable();
-                }
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                reloadTable();
+            }
+
+            @Override
+            public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                reloadTable();
             }
         });
     }

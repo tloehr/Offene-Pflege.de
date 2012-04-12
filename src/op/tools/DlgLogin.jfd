@@ -70,7 +70,7 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :p::p, par t {comp lblMessage::l::447:x:1, seq l {par l {comp jLabel1::::88:x:1, comp jLabel2::l:p::p:1}, space :::p, par l {comp txtPassword::::329:x:2, comp txtUsername::l::329:x:2}, space :p::p}}}}</string> 
+          <string>par l {seq l {space :p::p, par t {comp lblMessage::l::443:x:1, seq l {par l {comp jLabel1::::88:x:1, comp jLabel2::l:p::p:1}, space :::p, par l {comp txtPassword::::325:x:2, comp txtUsername::l::325:x:2}, space :p::p}}}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
@@ -79,12 +79,11 @@
         </object> 
         <void method="setProperty"> 
          <string>border</string> 
-         <object class="javax.swing.border.SoftBevelBorder"> 
-          <int>0</int> 
-          <null/> 
-          <null/> 
-          <null/> 
-          <null/> 
+         <object id="EmptyBorder0" class="javax.swing.border.EmptyBorder"> 
+          <int>5</int> 
+          <int>5</int> 
+          <int>5</int> 
+          <int>5</int> 
          </object> 
         </void> 
         <void property="name"> 
@@ -208,13 +207,7 @@
         </object> 
         <void method="setProperty"> 
          <string>border</string> 
-         <object class="javax.swing.border.SoftBevelBorder"> 
-          <int>0</int> 
-          <null/> 
-          <null/> 
-          <null/> 
-          <null/> 
-         </object> 
+         <object idref="EmptyBorder0"/> 
         </void> 
         <void property="name"> 
          <string>jPanel2</string> 
@@ -226,7 +219,7 @@
            <string>icon</string> 
            <object class="com.jformdesigner.model.SwingIcon"> 
             <int>0</int> 
-            <string>/artwork/animation/opde-58.png</string> 
+            <string>/artwork/64x64/opde-metal.png</string> 
            </object> 
           </void> 
           <void method="setProperty"> 
