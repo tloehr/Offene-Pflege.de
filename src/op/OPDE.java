@@ -36,6 +36,7 @@ import entity.verordnungen.BHPTools;
 import op.care.DFNImport;
 import op.system.FrmInit;
 import op.system.Printers;
+import op.threads.DisplayManager;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
@@ -519,6 +520,19 @@ public class OPDE {
             mainframe = new FrmMain();
 
         }
+    }
+
+
+    public static DisplayManager getDisplayManager(){
+        return mainframe.getDisplayManager();
+    }
+
+    public static void showJDialogAsSheet(JDialog dlg){
+        mainframe.showJDialogAsSheet(dlg);
+    }
+
+    public static void hideSheet(){
+        mainframe.hideSheet();
     }
 
     private static boolean loadLocalProperties() {

@@ -23,6 +23,7 @@ public class DisplayManager extends Thread {
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0;
+    private ImageIcon red, yellow, green, blue;
 //    private DateFormat df;
 
     /**
@@ -80,6 +81,11 @@ public class DisplayManager extends Thread {
                 currentSubMessage = null;
             }
         }
+    }
+
+
+    private void flashLED(){
+
     }
 
 

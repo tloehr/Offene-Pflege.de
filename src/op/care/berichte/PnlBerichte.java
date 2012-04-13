@@ -42,7 +42,6 @@ import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
 import op.tools.*;
 import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.JXTaskPane;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import tablemodels.TMPflegeberichte;
@@ -326,7 +325,7 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     private void btnDeleteActionPerformed(ActionEvent e) {
         // Darf ich das ?
-        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE))){
+        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE))) {
             return;
         }
         laufendeOperation = LAUFENDE_OPERATION_BERICHT_LOESCHEN;
@@ -506,8 +505,8 @@ public class PnlBerichte extends NursingRecordsPanel {
         //======== pnlContent ========
         {
             pnlContent.setLayout(new FormLayout(
-                "pref:grow",
-                "fill:default:grow, 20dlu"));
+                    "pref:grow",
+                    "fill:default:grow, 20dlu"));
 
             //======== splitTableEditor ========
             {
@@ -531,21 +530,22 @@ public class PnlBerichte extends NursingRecordsPanel {
 
                     //---- tblTB ----
                     tblTB.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ));
                     tblTB.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mousePressed(MouseEvent e) {
                             tblTBMousePressed(e);
                         }
+
                         @Override
                         public void mouseReleased(MouseEvent e) {
                             tblTBMouseReleased(e);
@@ -558,8 +558,8 @@ public class PnlBerichte extends NursingRecordsPanel {
                 //======== panel1 ========
                 {
                     panel1.setLayout(new FormLayout(
-                        "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
-                        "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
+                            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, center:pref, $lcgap, $rgap",
+                            "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
 
                     //---- label1 ----
                     label1.setText("Datum");
@@ -609,6 +609,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                         public void focusGained(FocusEvent e) {
                             txtDauerFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDauerFocusLost(e);
@@ -940,7 +941,7 @@ public class PnlBerichte extends NursingRecordsPanel {
         }
         panelSearch.add(panelTags);
 
-        panelTags.addCollapsiblePaneListener(new CollapsiblePaneAdapter(){
+        panelTags.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 reloadTable();
@@ -988,6 +989,9 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     private void addByTime() {
 
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+
         panelTime = new CollapsiblePane("nach Zeit");
         jdcVon = new JDateChooser(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
         jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
@@ -1002,8 +1006,8 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        panelTime.add(new JLabel("Von"));
-        panelTime.add(jdcVon);
+        labelPanel.add(new JLabel("Von"));
+        labelPanel.add(jdcVon);
         JideButton button2Weeks = GUITools.createHyperlinkButton("vor 2 Wochen", null, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -1028,9 +1032,9 @@ public class PnlBerichte extends NursingRecordsPanel {
                 jdcBis.setDate(new Date());
             }
         });
-        panelTime.add(button2Weeks);
-        panelTime.add(button4Weeks);
-        panelTime.add(buttonBeginning);
+        labelPanel.add(button2Weeks);
+        labelPanel.add(button4Weeks);
+        labelPanel.add(buttonBeginning);
 
         jdcBis = new JDateChooser(new Date());
         jdcBis.addPropertyChangeListener(new PropertyChangeListener() {
@@ -1045,14 +1049,16 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        panelTime.add(new JLabel("Bis"));
+        labelPanel.add(new JLabel("Bis"));
 //        panelTime.add(new JXTitledSeparator("Bis"));
-        panelTime.add(jdcBis);
-        panelTime.add(buttonToday);
+        labelPanel.add(jdcBis);
+        labelPanel.add(buttonToday);
+
+        panelTime.setContentPane(labelPanel);
 
         panelSearch.add(panelTime);
 
-        panelTime.addCollapsiblePaneListener(new CollapsiblePaneAdapter(){
+        panelTime.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 reloadTable();

@@ -35,5 +35,4 @@ import op.events.TaskPaneContentChangedListener;
  */
 public abstract class CleanablePanel extends javax.swing.JPanel {
     public abstract void cleanup();
-//    public abstract void setTaskPaneContentChangeListener(TaskPaneContentChangedListener taskPaneContentChangeListener);
 }

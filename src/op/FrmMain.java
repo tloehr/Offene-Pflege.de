@@ -30,7 +30,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.plaf.basic.ThemePainter;
+import com.jidesoft.status.*;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.TitledSeparator;
@@ -52,6 +55,7 @@ import org.apache.commons.collections.Closure;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
@@ -68,11 +72,17 @@ public class FrmMain extends SheetableJFrame {
 
 
     private boolean initPhase;
+
+    public DisplayManager getDisplayManager() {
+        return displayManager;
+    }
+
     private DisplayManager displayManager;
     private JPanel currentVisiblePanel;
     private Bewohner currentBewohner;
     private JFrame thisFrame;
     private DlgLogin dlgLogin;
+    private CollapsiblePane panelPflegeakte;
 
     private int positionToAddPanels;
 
@@ -164,18 +174,11 @@ public class FrmMain extends SheetableJFrame {
     private void afterLogin() {
 
         createSearchPane(null, "");
-
-        btnExit.setText("<html>" + OPDE.getLogin().getUser().getNameUndVorname() + "<br/>Abmelden</html>");
-        displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
-        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 10));
-
-//        JLabel lbl = new JLabel("Bitte wählen Sie eine(n) BewohnerIn aus.");
-//        lbl.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/agt_back.png")));
-//        lbl.setFont(new java.awt.Font("Lucida Grande", 1, 42));
-//        lbl.setHorizontalAlignment(SwingConstants.CENTER);
-//        lbl.setForeground(Color.blue);
-
         emptyFrame();
+
+        displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
+        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
+
     }
 
     /**
@@ -188,7 +191,6 @@ public class FrmMain extends SheetableJFrame {
     private void initComponents() {
         pnlMain = new JPanel();
         pnlMainMessage = new JPanel();
-        btnVerlegung = new JButton();
         lblMainMsg = new FadingLabel();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
@@ -196,6 +198,7 @@ public class FrmMain extends SheetableJFrame {
         jspSearch = new JScrollPane();
         panesSearch = new CollapsiblePanes();
         scrollMain = new JScrollPane();
+        statusBar1 = new StatusBar();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -212,56 +215,47 @@ public class FrmMain extends SheetableJFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "$rgap, $lcgap, 112dlu, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, $rgap"));
+                "$rgap, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, $rgap"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(234, 237, 223));
                 pnlMainMessage.setBorder(LineBorder.createBlackLineBorder());
                 pnlMainMessage.setLayout(new FormLayout(
-                        "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
-                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
-
-                //---- btnVerlegung ----
-                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
-                btnVerlegung.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnVerlegungActionPerformed(e);
-                    }
-                });
-                pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 5));
+                    "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
+                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("Main Message Line for Main Text");
                 lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
                 lblMainMsg.setForeground(new Color(105, 80, 69));
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
+                pnlMainMessage.add(lblMainMsg, CC.xywh(3, 3, 3, 1));
 
                 //---- btnExit ----
                 btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
+                btnExit.setBorder(new EmptyBorder(5, 5, 5, 5));
                 btnExit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         btnExitActionPerformed(e);
                     }
                 });
-                pnlMainMessage.add(btnExit, CC.xywh(7, 3, 1, 5));
+                pnlMainMessage.add(btnExit, CC.xywh(7, 3, 1, 4));
 
                 //---- lblSubMsg ----
                 lblSubMsg.setText("Main Message Line for Main Text");
                 lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
                 lblSubMsg.setForeground(new Color(105, 80, 69));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
+                pnlMainMessage.add(lblSubMsg, CC.xywh(3, 5, 3, 1));
 
                 //---- pbMsg ----
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
                 pbMsg.setForeground(new Color(105, 80, 69));
-                pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.DEFAULT));
+                pnlMainMessage.add(pbMsg, CC.xywh(3, 7, 5, 1, CC.FILL, CC.DEFAULT));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1));
 
@@ -282,6 +276,7 @@ public class FrmMain extends SheetableJFrame {
             }
             pnlMain.add(jspSearch, CC.xy(3, 4, CC.FILL, CC.FILL));
             pnlMain.add(scrollMain, CC.xywh(5, 4, 2, 1, CC.FILL, CC.FILL));
+            pnlMain.add(statusBar1, CC.xywh(3, 6, 4, 1, CC.FILL, CC.FILL));
         }
         contentPane.add(pnlMain);
         setSize(945, 695);
@@ -294,7 +289,7 @@ public class FrmMain extends SheetableJFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSPrint.print(thisFrame, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }
@@ -304,52 +299,58 @@ public class FrmMain extends SheetableJFrame {
         //formatBWTable();
     }//GEN-LAST:event_jspBWComponentResized
 
-    private void jtpPflegeakteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpPflegeakteStateChanged
-//        reloadDisplay(currentBewohner);
-    }//GEN-LAST:event_jtpPflegeakteStateChanged
-
-    private void jtpUebersichtStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpUebersichtStateChanged
-//        reloadDisplay(currentBewohner);
-    }//GEN-LAST:event_jtpUebersichtStateChanged
-
-
     private void createProgramListe() {
-        CollapsiblePane programPane = new CollapsiblePane("Programme");
-        programPane.setSlidingDirection(SwingConstants.SOUTH);
-        programPane.setStyle(CollapsiblePane.TREE_STYLE);
-
-        JPanel labelPanel = new JPanel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
-
-        try {
-            programPane.setCollapsed(true);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-        }
 
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
-            final String shortDescription = ic.getShortDescription();
-            final String longDescription = ic.getLongDescription();
-            final String javaclass = ic.getJavaClass();
 
-            ActionListener actionListener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    displayManager.setMainMessage(shortDescription);
-                    displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
-                    setPanelTo(loadPanel(javaclass));
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassname(), InternalClassACL.EXECUTE)) {
+
+                final String shortDescription = ic.getShortDescription();
+                final String longDescription = ic.getLongDescription();
+                final String javaclass = ic.getJavaClass();
+
+                final CollapsiblePane programPane = new CollapsiblePane(shortDescription);
+                programPane.setSlidingDirection(SwingConstants.SOUTH);
+                programPane.setStyle(CollapsiblePane.TREE_STYLE);
+
+//                JPanel labelPaanel = new JPanel();
+//                labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+
+                try {
+                    programPane.setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();
                 }
-            };
 
-            JideButton button = GUITools.createHyperlinkButton(shortDescription, null, actionListener);
-            button.setToolTipText(longDescription);
+//            ActionListener actionListener = new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                    displayManager.setMainMessage(shortDescription);
+//                    displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
+//                    setPanelTo(loadPanel(javaclass, programPane));
+//                }
+//            };
 
-            labelPanel.add(button);
+//            JideButton button = GUITools.createHyperlinkButton(shortDescription, null, actionListener);
+                programPane.setToolTipText(longDescription);
+                programPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+                    @Override
+                    public void paneExpanding(CollapsiblePaneEvent collapsiblePaneEvent) {
+                        displayManager.setMainMessage(shortDescription);
+                        displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
+                        setPanelTo(loadPanel(javaclass, programPane));
+
+                        collapseAllOthers(programPane);
+
+                    }
+                });
+                panesSearch.add(programPane);
+            }
         }
 
-        programPane.setContentPane(labelPanel);
-        panesSearch.add(programPane);
+//        programPane.setContentPane(labelPanel);
+//        panesSearch.add(programPane);
     }
 
     private void createSearchPane(java.util.List<CollapsiblePane> panesToAdd, String titleForAdditionalPanes) {
@@ -358,7 +359,7 @@ public class FrmMain extends SheetableJFrame {
         jspSearch.setViewportView(panesSearch);
 
         createProgramListe();
-        createBewohnerListe();
+        createPflegedokumentation();
 
         if (panesToAdd != null) {
             if (!SYSTools.catchNull(titleForAdditionalPanes).isEmpty()) {
@@ -376,21 +377,12 @@ public class FrmMain extends SheetableJFrame {
         panesSearch.addExpansion();
     }
 
-    private JPanel loadPanel(String classname) {
-//        Class c;
-//        JPanel panel = null;
-//        try {
-//            c = Class.forName(classname);
-//            panel = (JPanel) c.newInstance();
-//        } catch (Exception ex) {
-//            OPDE.debug(ex);
-//        }
-
+    private JPanel loadPanel(String classname, CollapsiblePane programPane) {
 
         JPanel panel = null;
 
         if (classname.equals("op.bw.tg.PnlTG")) {
-            panel = new PnlTG(this, tpccl);
+            panel = new PnlTG(this, programPane);
         } else if (classname.equals("op.vorgang.PnlVorgang")) {
             panel = new PnlVorgang(null, null, this, tpccl);
         }
@@ -434,6 +426,7 @@ public class FrmMain extends SheetableJFrame {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     displayManager.setMainMessage(BewohnerTools.getBWLabelText(innerbewohner));
+                    currentBewohner = innerbewohner;
                     if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
                         ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
@@ -459,13 +452,17 @@ public class FrmMain extends SheetableJFrame {
     /**
      * Das erstellt eine Liste aller Bewohner mit direktem Verweis auf die jeweilige Pflegeakte.
      */
-    private void createBewohnerListe() {
+    private void createPflegedokumentation() {
+
+        if (!OPDE.getAppInfo().userHasAccessLevelForThisClass("nursingrecords.main", InternalClassACL.EXECUTE)) {
+            return;
+        }
+
 
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Stationen.findAllSorted");
-
-
         Iterator<Stationen> it = query.getResultList().iterator();
+        em.close();
 
 //        CollapsiblePane currentStationsPane = null;
 
@@ -475,21 +472,48 @@ public class FrmMain extends SheetableJFrame {
 //        sep.setBarAlignment(SwingConstants.CENTER);
 //        sep.setSeparatorBorder(new PartialGradientLineBorder(new Color[]{Color.BLACK, Color.WHITE}, 5, PartialSide.SOUTH));
 
+        JPanel dokuPanel = new JPanel();
+        dokuPanel.setLayout(new BoxLayout(dokuPanel, BoxLayout.PAGE_AXIS));
+
+        JideButton buttonVerlegung = GUITools.createHyperlinkButton("Verlegungsbericht", new ImageIcon(getClass().getResource("/artwork/16x16/infored.png")), new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (currentBewohner != null) {
+                    SYSPrint.print(thisFrame, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+                } else {
+                    displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
+                }
+
+            }
+        });
+
+        dokuPanel.add(buttonVerlegung);
+
         while (it.hasNext()) {
-            CollapsiblePane pane = createBewohnerListe(it.next());
-            panesSearch.add(pane);
+            dokuPanel.add(createBewohnerListe(it.next()));
         }
 
-        em.close();
+        panelPflegeakte = new CollapsiblePane("Pflegeakte", new ImageIcon(getClass().getResource("/artwork/16x16/pflegeakte.png")));
+        panelPflegeakte.setSlidingDirection(SwingConstants.SOUTH);
+        panelPflegeakte.setStyle(CollapsiblePane.TREE_STYLE);
+        panelPflegeakte.setContentPane(dokuPanel);
+
+        // Wenn die Pflegeakte ausgeklappt wird, dann werden alle Programme eingeklappt.
+        panelPflegeakte.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                collapseAllOthers(panelPflegeakte);
+            }
+        });
+
+        panesSearch.add(panelPflegeakte);
     }
 
     private void setPanelTo(JPanel pnl) {
         currentVisiblePanel = pnl;
 //        pnlTopRight = new JPanel(new VerticalLayout());
 //        btnVerlegung.setVisible(currentVisiblePanel instanceof PnlPflege);
-        if (!(currentVisiblePanel instanceof PnlPflege)) {
-            collapseBewohner();
-        }
+
         scrollMain.setViewportView(currentVisiblePanel);
     }
 
@@ -523,6 +547,8 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private void logout() {
+        emptyFrame();
+
         try {
             OPDE.closeDB();
         } catch (SQLException ex) {
@@ -537,14 +563,25 @@ public class FrmMain extends SheetableJFrame {
         OPDE.getEMF().getCache().evictAll();
 
         cleanup();
-        emptyFrame();
+
         showLogin();
+    }
+
+    private void collapseAllOthers(CollapsiblePane thisPane) {
+        for (int comp = 0; comp < panesSearch.getComponentCount(); comp++) {
+            if (panesSearch.getComponent(comp) != thisPane && panesSearch.getComponent(comp) instanceof CollapsiblePane) {
+                try {
+                    ((CollapsiblePane) panesSearch.getComponent(comp)).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;
     private JPanel pnlMainMessage;
-    private JButton btnVerlegung;
     private FadingLabel lblMainMsg;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
@@ -552,6 +589,7 @@ public class FrmMain extends SheetableJFrame {
     private JScrollPane jspSearch;
     private CollapsiblePanes panesSearch;
     private JScrollPane scrollMain;
+    private StatusBar statusBar1;
     // End of variables declaration//GEN-END:variables
 
 

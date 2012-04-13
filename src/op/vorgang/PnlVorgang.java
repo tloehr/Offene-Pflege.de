@@ -11,9 +11,9 @@
 package op.vorgang;
 
 import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.Sizes;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
@@ -23,14 +23,9 @@ import entity.vorgang.*;
 import op.OPDE;
 import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
-import op.tools.CleanablePanel;
 import op.share.tools.PnlEditor;
 import op.tools.*;
-import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXTaskPane;
-import org.jdesktop.swingx.JXTaskPaneContainer;
-import org.jdesktop.swingx.JXTitledSeparator;
-import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.pushingpixels.trident.Timeline;
 import tablemodels.TMElement;
 import tablerenderer.RNDHTML;
@@ -49,10 +44,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -81,8 +75,8 @@ public class PnlVorgang extends NursingRecordsPanel {
     protected boolean pdcaChanged = false, ignoreEvents = false;
     //protected IconFlash iconflasher;
     protected JComboBox cmbBW, cmbMA;
-    private ArrayList<JXTaskPane> panelSearch;
-//    private int positionToAddPanels;
+    private ArrayList<CollapsiblePane> panelSearch;
+    //    private int positionToAddPanels;
 //    protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
     private TaskPaneContentChangedListener taskPaneContentChangedListener;
     private Timeline textmessageTL;
@@ -92,7 +86,7 @@ public class PnlVorgang extends NursingRecordsPanel {
         initComponents();
         this.taskPaneContentChangedListener = taskPaneContentChangedListener;
 
-        panelSearch = new ArrayList<JXTaskPane>();
+        panelSearch = new ArrayList<CollapsiblePane>();
 
 //        if (panelSearch == null) {
 //            this.panelSearch = taskContainer;
@@ -136,23 +130,21 @@ public class PnlVorgang extends NursingRecordsPanel {
             }
         });
 
-        if (aktuellerBewohner != null) {
-            panelSearch.add(addVorgaengeFuerBW(aktuellerBewohner));
-            taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Vorgänge"));
-        } else {
-            addMeineVorgaenge();
-            addMeineAbgelaufenenVorgaenge();
-            //addAlleVorgaenge();
-//            addVorgaengeFuerBW();
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-                addVorgaengeFuerMA();
-                addAblaufendeVorgaenge();
-            }
-            taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.TOP, "Vorgänge"));
-
-        }
-
-
+//        if (aktuellerBewohner != null) {
+//            panelSearch.add(addVorgaengeFuerBW(aktuellerBewohner));
+//            taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Vorgänge"));
+//        } else {
+//            addMeineVorgaenge();
+//            addMeineAbgelaufenenVorgaenge();
+//            //addAlleVorgaenge();
+////            addVorgaengeFuerBW();
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+//                addVorgaengeFuerMA();
+//                addAblaufendeVorgaenge();
+//            }
+//            taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.TOP, "Vorgänge"));
+//
+//        }
 
 
         //
@@ -182,44 +174,44 @@ public class PnlVorgang extends NursingRecordsPanel {
 //        }
 //    }
 
-    protected void addAblaufendeVorgaenge() {
-        pnlVorgaengeRunningOut = new JXTaskPane("Vorgänge, die bald ablaufen");
-        pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
-        pnlVorgaengeRunningOut.setCollapsed(true);
+//    protected void addAblaufendeVorgaenge() {
+//        pnlVorgaengeRunningOut = new JXTaskPane("Vorgänge, die bald ablaufen");
+//        pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+//        pnlVorgaengeRunningOut.setCollapsed(true);
+//
+//        pnlVorgaengeRunningOut.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                if (!(Boolean) evt.getNewValue()) {
+//                    loadVorgaengeRunningOut();
+//                } else {
+//                    pnlVorgaengeRunningOut.removeAll();
+//                }
+//            }
+//        });
+//        panelSearch.add(pnlVorgaengeRunningOut);
+//
+//    }
 
-        pnlVorgaengeRunningOut.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!(Boolean) evt.getNewValue()) {
-                    loadVorgaengeRunningOut();
-                } else {
-                    pnlVorgaengeRunningOut.removeAll();
-                }
-            }
-        });
-        panelSearch.add(pnlVorgaengeRunningOut);
 
-    }
-
-
-    protected void addMeineAbgelaufenenVorgaenge() {
-        pnlMeineAltenVorgaenge = new JXTaskPane("Meine alten Vorgänge");
-        //pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
-        pnlMeineAltenVorgaenge.setCollapsed(true);
-
-        pnlMeineAltenVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!(Boolean) evt.getNewValue()) {
-                    loadMeineInaktivenVorgaenge();
-                } else {
-                    pnlMeineAltenVorgaenge.removeAll();
-                }
-            }
-        });
-        panelSearch.add(pnlMeineAltenVorgaenge);
-
-    }
+//    protected void addMeineAbgelaufenenVorgaenge() {
+//        pnlMeineAltenVorgaenge = new JXTaskPane("Meine alten Vorgänge");
+//        //pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+//        pnlMeineAltenVorgaenge.setCollapsed(true);
+//
+//        pnlMeineAltenVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                if (!(Boolean) evt.getNewValue()) {
+//                    loadMeineInaktivenVorgaenge();
+//                } else {
+//                    pnlMeineAltenVorgaenge.removeAll();
+//                }
+//            }
+//        });
+//        panelSearch.add(pnlMeineAltenVorgaenge);
+//
+//    }
 
 
 //    protected void addAlleVorgaenge() {
@@ -240,34 +232,41 @@ public class PnlVorgang extends NursingRecordsPanel {
 //        panelSearch.add(pnlAlleVorgaenge);
 //    }
 
-    protected JXTaskPane addVorgaengeFuerBW(Bewohner bewohner) {
+    protected CollapsiblePane addVorgaengeFuerBW(Bewohner bewohner) {
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
         query.setParameter("bewohner", bewohner);
         List<Vorgaenge> listVorgaenge = query.getResultList();
         Iterator<Vorgaenge> it = listVorgaenge.iterator();
+        em.close();
 
-        JXTaskPane bwpanel = new JXTaskPane(bewohner.getNachname() + ", " + bewohner.getVorname());
-        bwpanel.setCollapsed(false);
+        CollapsiblePane bwpanel = new CollapsiblePane(bewohner.getNachname() + ", " + bewohner.getVorname());
+        try {
+            bwpanel.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
 
         if (!listVorgaenge.isEmpty()) {
             while (it.hasNext()) {
                 final Vorgaenge innervorgang = it.next();
-                bwpanel.add(new AbstractAction() {
-                    {
-                        putValue(Action.NAME, innervorgang.getTitel());
-                    }
-
+                JideButton buttonBW = GUITools.createHyperlinkButton(innervorgang.getTitel(), null, new ActionListener() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(ActionEvent actionEvent) {
                         loadTable(innervorgang);
                         loadDetails(innervorgang);
                     }
                 });
+                labelPanel.add(buttonBW);
             }
         }
 
-        em.close();
+        bwpanel.setContentPane(labelPanel);
 
         return bwpanel;
     }
@@ -367,138 +366,138 @@ public class PnlVorgang extends NursingRecordsPanel {
             em.close();
         }
     }
-
-    protected void addVorgaengeFuerMA() {
-        EntityManager em = OPDE.createEM();
-        List<Users> listeUser = em.createNamedQuery("Users.findByStatusSorted").setParameter("status", 1).getResultList();
-
-        JXTaskPane allmapanel = new JXTaskPane("nach MitarbeiterInnen");
-        allmapanel.setCollapsed(true);
-
-        for (Users user : listeUser) {
-
-            Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
-            query.setParameter("besitzer", user);
-            List<Vorgaenge> listVorgaenge = query.getResultList();
-            Iterator<Vorgaenge> it = listVorgaenge.iterator();
-
-            if (!listVorgaenge.isEmpty()) {
-                JXTaskPane mapanel = new JXTaskPane(user.getNachname() + ", " + user.getVorname());
-                mapanel.setCollapsed(true);
-
-                while (it.hasNext()) {
-                    final Vorgaenge innervorgang = it.next();
-                    OPDE.debug(innervorgang);
-                    mapanel.add(new AbstractAction() {
-                        {
-                            String titel = innervorgang.getTitel();
-                            if (innervorgang.getBewohner() != null) {
-                                titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
-                            }
-                            putValue(Action.NAME, titel);
-                        }
-
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            loadTable(innervorgang);
-                            loadDetails(innervorgang);
-                        }
-                    });
-                }
-                allmapanel.add(mapanel);
-            }
-
-        }
-
-        panelSearch.add(allmapanel);
-        em.close();
-    }
-
-    protected void addMeineVorgaenge() {
-        pnlMyVorgaenge = new JXTaskPane("Meine alten Vorgänge");
-        pnlMyVorgaenge.setSpecial(true);
-        pnlMyVorgaenge.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/identity.png")));
-        //pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
-        pnlMyVorgaenge.setCollapsed(false);
-        loadMeineVorgaenge();
-
-        pnlMyVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!(Boolean) evt.getNewValue()) {
-                    loadMeineVorgaenge();
-                } else {
-                    pnlMyVorgaenge.removeAll();
-                }
-            }
-        });
-        panelSearch.add(pnlMyVorgaenge);
-    }
-
-
-    protected void loadAllVorgaenge() {
-
-        if (pnlAlleVorgaenge.isEnabled()) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createNamedQuery("Vorgaenge.findAllActiveSorted");
-            ArrayList<Vorgaenge> alleAktiven = new ArrayList(query.getResultList());
-
-            Iterator<Vorgaenge> it = alleAktiven.iterator();
-
-            while (it.hasNext()) {
-                final Vorgaenge innervorgang = it.next();
-                pnlAlleVorgaenge.add(new AbstractAction() {
-                    {
-                        putValue(Action.NAME, innervorgang.getTitel());
-                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
-                    }
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        loadTable(innervorgang);
-                        if (btnDetails.isSelected()) {
-                            loadDetails(innervorgang);
-                        }
-                    }
-                });
-
-            }
-            em.close();
-        }
-    }
-
-
-    protected void loadVorgaengeRunningOut() {
-
-        if (pnlVorgaengeRunningOut.isEnabled()) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createNamedQuery("Vorgaenge.findActiveRunningOut");
-            query.setParameter("wv", SYSCalendar.addDate(new Date(), 4)); // 4 Tage von heute aus gerechnet.
-            ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
-
-            Iterator<Vorgaenge> it = vorgaenge.iterator();
-
-            while (it.hasNext()) {
-                final Vorgaenge innervorgang = it.next();
-                pnlVorgaengeRunningOut.add(new AbstractAction() {
-                    {
-                        putValue(Action.NAME, innervorgang.getTitel());
-                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
-                    }
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        loadTable(innervorgang);
-                        if (btnDetails.isSelected()) {
-                            loadDetails(innervorgang);
-                        }
-                    }
-                });
-
-            }
-            em.close();
-        }
-    }
+//
+//    protected void addVorgaengeFuerMA() {
+//        EntityManager em = OPDE.createEM();
+//        List<Users> listeUser = em.createNamedQuery("Users.findByStatusSorted").setParameter("status", 1).getResultList();
+//
+//        JXTaskPane allmapanel = new JXTaskPane("nach MitarbeiterInnen");
+//        allmapanel.setCollapsed(true);
+//
+//        for (Users user : listeUser) {
+//
+//            Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
+//            query.setParameter("besitzer", user);
+//            List<Vorgaenge> listVorgaenge = query.getResultList();
+//            Iterator<Vorgaenge> it = listVorgaenge.iterator();
+//
+//            if (!listVorgaenge.isEmpty()) {
+//                JXTaskPane mapanel = new JXTaskPane(user.getNachname() + ", " + user.getVorname());
+//                mapanel.setCollapsed(true);
+//
+//                while (it.hasNext()) {
+//                    final Vorgaenge innervorgang = it.next();
+//                    OPDE.debug(innervorgang);
+//                    mapanel.add(new AbstractAction() {
+//                        {
+//                            String titel = innervorgang.getTitel();
+//                            if (innervorgang.getBewohner() != null) {
+//                                titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
+//                            }
+//                            putValue(Action.NAME, titel);
+//                        }
+//
+//                        @Override
+//                        public void actionPerformed(ActionEvent e) {
+//                            loadTable(innervorgang);
+//                            loadDetails(innervorgang);
+//                        }
+//                    });
+//                }
+//                allmapanel.add(mapanel);
+//            }
+//
+//        }
+//
+//        panelSearch.add(allmapanel);
+//        em.close();
+//    }
+//
+//    protected void addMeineVorgaenge() {
+//        pnlMyVorgaenge = new JXTaskPane("Meine alten Vorgänge");
+//        pnlMyVorgaenge.setSpecial(true);
+//        pnlMyVorgaenge.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/identity.png")));
+//        //pnlVorgaengeRunningOut.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/redled.png")));
+//        pnlMyVorgaenge.setCollapsed(false);
+//        loadMeineVorgaenge();
+//
+//        pnlMyVorgaenge.addPropertyChangeListener("collapsed", new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                if (!(Boolean) evt.getNewValue()) {
+//                    loadMeineVorgaenge();
+//                } else {
+//                    pnlMyVorgaenge.removeAll();
+//                }
+//            }
+//        });
+//        panelSearch.add(pnlMyVorgaenge);
+//    }
+//
+//
+//    protected void loadAllVorgaenge() {
+//
+//        if (pnlAlleVorgaenge.isEnabled()) {
+//            EntityManager em = OPDE.createEM();
+//            Query query = em.createNamedQuery("Vorgaenge.findAllActiveSorted");
+//            ArrayList<Vorgaenge> alleAktiven = new ArrayList(query.getResultList());
+//
+//            Iterator<Vorgaenge> it = alleAktiven.iterator();
+//
+//            while (it.hasNext()) {
+//                final Vorgaenge innervorgang = it.next();
+//                pnlAlleVorgaenge.add(new AbstractAction() {
+//                    {
+//                        putValue(Action.NAME, innervorgang.getTitel());
+//                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
+//                    }
+//
+//                    @Override
+//                    public void actionPerformed(ActionEvent e) {
+//                        loadTable(innervorgang);
+//                        if (btnDetails.isSelected()) {
+//                            loadDetails(innervorgang);
+//                        }
+//                    }
+//                });
+//
+//            }
+//            em.close();
+//        }
+//    }
+//
+//
+//    protected void loadVorgaengeRunningOut() {
+//
+//        if (pnlVorgaengeRunningOut.isEnabled()) {
+//            EntityManager em = OPDE.createEM();
+//            Query query = em.createNamedQuery("Vorgaenge.findActiveRunningOut");
+//            query.setParameter("wv", SYSCalendar.addDate(new Date(), 4)); // 4 Tage von heute aus gerechnet.
+//            ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
+//
+//            Iterator<Vorgaenge> it = vorgaenge.iterator();
+//
+//            while (it.hasNext()) {
+//                final Vorgaenge innervorgang = it.next();
+//                pnlVorgaengeRunningOut.add(new AbstractAction() {
+//                    {
+//                        putValue(Action.NAME, innervorgang.getTitel());
+//                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
+//                    }
+//
+//                    @Override
+//                    public void actionPerformed(ActionEvent e) {
+//                        loadTable(innervorgang);
+//                        if (btnDetails.isSelected()) {
+//                            loadDetails(innervorgang);
+//                        }
+//                    }
+//                });
+//
+//            }
+//            em.close();
+//        }
+//    }
 
     protected void loadMeineVorgaenge() {
         EntityManager em = OPDE.createEM();
@@ -1019,8 +1018,8 @@ public class PnlVorgang extends NursingRecordsPanel {
             }
         });
         setLayout(new FormLayout(
-            "$rgap, 0dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
-            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
+                "$rgap, 0dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
 
         //---- lblVorgang ----
         lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
@@ -1066,15 +1065,15 @@ public class PnlVorgang extends NursingRecordsPanel {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ));
                     tblElements.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                     tblElements.addMouseListener(new MouseAdapter() {
@@ -1104,8 +1103,8 @@ public class PnlVorgang extends NursingRecordsPanel {
                 //======== pnlDetails ========
                 {
                     pnlDetails.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 0dlu",
-                        "0dlu, 9*($lgap, fill:default)"));
+                            "0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 0dlu",
+                            "0dlu, 9*($lgap, fill:default)"));
 
                     //---- label1 ----
                     label1.setText("Titel");
@@ -1404,8 +1403,8 @@ public class PnlVorgang extends NursingRecordsPanel {
         aktuellerBewohner = bewohner;
 //        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         panelSearch.clear();
-        panelSearch.add(addVorgaengeFuerBW(aktuellerBewohner));
-        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, TaskPaneContentChangedEvent.BOTTOM, "Vorgänge"));
+        panelSearch.add(addVorgaengeFuerBW(aktuellerBewohner)); // TaskPaneContentChangedEvent.BOTTOM,
+        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, panelSearch, "Vorgänge"));
     }
 
     private void btnAddBerichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBerichtActionPerformed

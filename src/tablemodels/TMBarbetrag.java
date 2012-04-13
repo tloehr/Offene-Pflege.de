@@ -126,19 +126,19 @@ public class TMBarbetrag extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        boolean allowed;
-        // Vortrag
-        if (subset && rowIndex == 0) {
-            // Steht auf Vortrag
-            allowed = false;
-        } else if (subset && rowIndex == getRowCount() - 1) { // Zusammenfassung
-            allowed = false;
-        } else if (columnIndex == COL_Zeilensaldo) { // Steht auf Zeilensaldo
-            allowed = false;
-        } else {
-            allowed = editable;
-        }
-        return allowed;
+//        boolean allowed;
+//        // Vortrag
+//        if (subset && rowIndex == 0) {
+//            // Steht auf Vortrag
+//            allowed = false;
+//        } else if (subset && rowIndex == getRowCount() - 1) { // Zusammenfassung
+//            allowed = false;
+//        } else if (columnIndex == COL_Zeilensaldo) { // Steht auf Zeilensaldo
+//            allowed = false;
+//        } else {
+//            allowed = editable;
+//        }
+        return false;
     }
 
     /**
