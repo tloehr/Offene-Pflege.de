@@ -32,11 +32,13 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
+import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.TitledSeparator;
 import entity.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTitledSeparator;
 import tablemodels.TMBarbetrag;
@@ -68,9 +70,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.*;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -88,14 +88,15 @@ public class PnlTG extends CleanablePanel {
     private Date max;
     private BigDecimal betrag;
     private JPopupMenu menu;
-    private DateFormat timeDF;
     private Bewohner bewohner;
     private CollapsiblePane progPane, panelText, panelTime;
-    //    private JDateChooser jdcVon, jdcBis;
     private JComboBox cmbVon, cmbBis, cmbMonat;
     private JXSearchField txtBW;
     private JFrame parent;
     private boolean ignoreDateComboEvent;
+    //    private List<Object[]> bwSearchList;
+    private HashMap<Bewohner, Object[]> searchSaldoButtonMap;
+    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 
     /**
      * Creates new form FrmBWAttr
@@ -137,7 +138,8 @@ public class PnlTG extends CleanablePanel {
                     popup.setMovable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                    final JTextField txtEditor = new JTextField(20);;
+                    final JTextField txtEditor = new JTextField(20);
+
                     switch (col) {
                         case TMBarbetrag.COL_Datum: {
                             txtEditor.setText(DateFormat.getDateInstance().format(mytg.getBelegDatum()));
@@ -157,10 +159,9 @@ public class PnlTG extends CleanablePanel {
                         }
                     }
 
-
                     popup.getContentPane().add(txtEditor);
 
-                    JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/bw/apply.png")));
+                    final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/bw/apply.png")));
                     saveButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -189,8 +190,28 @@ public class PnlTG extends CleanablePanel {
                                 tm.getListData().set(tm.getListData().indexOf(mytg), mytg2);
                                 tm.fireTableCellUpdated(row, col);
                                 popup.hidePopup();
-                                summeNeuRechnen();
+
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Datensatz '" + mytg.getBelegtext() + "' geändert.", 2));
+
+                                if (col == TMBarbetrag.COL_Datum && !panelTime.isCollapsed()) {
+                                    if (min.after(mytg2.getBelegDatum())) {
+                                        // Neuer Eintrag liegt ausserhalb des bisherigen Intervals.
+                                        min = SYSCalendar.bom(mytg2.getBelegDatum());
+                                        initSearchTime();
+                                    }
+                                    cmbMonat.setSelectedItem(SYSCalendar.bom(mytg2.getBelegDatum()));
+                                } else if (col == TMBarbetrag.COL_Betrag) {
+                                    summeNeuRechnen();
+                                    BigDecimal saldo = (BigDecimal) searchSaldoButtonMap.get(bewohner)[0];
+                                    JideButton button = (JideButton) searchSaldoButtonMap.get(bewohner)[1];
+
+                                    saldo = saldo.add(mytg2.getBetrag());
+                                    searchSaldoButtonMap.put(bewohner, new Object[]{button, saldo});
+
+                                    String titel = "<html>" + bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getBWKennung() + "] <b><font " + (saldo.compareTo(BigDecimal.ZERO) < 0 ? "color=\"red\"" : "color=\"black\"") + ">" + currencyFormat.format(saldo) + "</font></b></html>";
+                                    button.setText(titel);
+                                }
+
                             } catch (Exception e) {
                                 em.getTransaction().rollback();
                             } finally {
@@ -198,15 +219,17 @@ public class PnlTG extends CleanablePanel {
                             }
                         }
                     });
-//                    popup.setOwner(itemPopupEdit);
+                    txtEditor.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            saveButton.doClick();
+                        }
+                    });
+
                     popup.setOwner(tblTG);
                     popup.getContentPane().add(new JPanel().add(saveButton));
                     popup.setDefaultFocusComponent(txtEditor);
-//                    popup.setTransient(true);
                     popup.showPopup(screenposition.x, screenposition.y);
-//                    popup.setOwner(tblTG.getCellRenderer(row, col).getTableCellRendererComponent(tblTG,tm.getValueAt(row,col),false,false,row,col));
-
-
                 }
             });
             menu.add(itemPopupEdit);
@@ -249,7 +272,6 @@ public class PnlTG extends CleanablePanel {
     public PnlTG(JFrame parent, CollapsiblePane progPane) {
         this.parent = parent;
         this.progPane = progPane;
-        timeDF = DateFormat.getTimeInstance(DateFormat.SHORT);
         bewohner = null;
         initComponents();
 //        this.setTitle(SYSTools.getWindowTitle("Barbetragsverwaltung"));
@@ -446,6 +468,7 @@ public class PnlTG extends CleanablePanel {
 
             //======== pnlStat ========
             {
+                pnlStat.setEnabled(false);
 
                 //---- lbl1 ----
                 lbl1.setFont(new Font("Dialog", Font.BOLD, 18));
@@ -535,42 +558,42 @@ public class PnlTG extends CleanablePanel {
                 pnlStatLayout.setHorizontalGroup(
                     pnlStatLayout.createParallelGroup()
                         .addGroup(GroupLayout.Alignment.TRAILING, pnlStatLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jspStat, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                                .addComponent(jSeparator2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                                .addComponent(jLabel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                                .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
-                                    .addComponent(rbBWAlle)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(rbAktuell))
-                                .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
-                                    .addComponent(lbl1)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(lblSumme, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)))
-                            .addContainerGap())
+                                .addContainerGap()
+                                .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jspStat, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
+                                        .addComponent(jSeparator2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
+                                        .addComponent(jLabel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
+                                        .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
+                                                .addComponent(rbBWAlle)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(rbAktuell))
+                                        .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
+                                                .addComponent(lbl1)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblSumme, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)))
+                                .addContainerGap())
                 );
                 pnlStatLayout.setVerticalGroup(
                     pnlStatLayout.createParallelGroup()
                         .addGroup(pnlStatLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lbl1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblSumme, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel5)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(rbBWAlle)
-                                .addComponent(rbAktuell))
-                            .addContainerGap())
+                                .addContainerGap()
+                                .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblSumme, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel5)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(rbBWAlle)
+                                        .addComponent(rbAktuell))
+                                .addContainerGap())
                 );
             }
             jtpMain.addTab("\u00dcbersicht", pnlStat);
@@ -806,7 +829,7 @@ public class PnlTG extends CleanablePanel {
 //            lblBetrag.setForeground(Color.BLACK);
 //        }
 
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner) + ", Saldo: "+nf.format(zeilensaldo));
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner) + ", Saldo: " + nf.format(zeilensaldo));
 
 
     }
@@ -876,9 +899,9 @@ public class PnlTG extends CleanablePanel {
 
         // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
         // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
-        if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
+        if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
             Query queryPast = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg WHERE tg.belegDatum <= :datum");
-            queryPast.setParameter("datum", SYSCalendar.eom((Date) cmbPast.getSelectedItem()));
+            queryPast.setParameter("datum", SYSCalendar.eom((Date) cmbMonat.getSelectedItem()));
 
             BigDecimal summePast = BigDecimal.ZERO;
             try {
@@ -894,13 +917,13 @@ public class PnlTG extends CleanablePanel {
 
         em.close();
 
-        lblSumme.setText(summentext);
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gesamtsaldo aller Barbeträge: "+summentext, 10));
 
-        if (summe.compareTo(BigDecimal.ZERO) < 0) {
-            lblSumme.setForeground(Color.RED);
-        } else {
-            lblSumme.setForeground(Color.BLACK);
-        }
+//        if (summe.compareTo(BigDecimal.ZERO) < 0) {
+//            lblSumme.setForeground(Color.RED);
+//        } else {
+//            lblSumme.setForeground(Color.BLACK);
+//        }
 
     }
 
@@ -917,7 +940,7 @@ public class PnlTG extends CleanablePanel {
 //        schaltet auf den Monat um, in dem der letzte Beleg eingegeben wurde.
 //        Sofern die ein bestimmter Monat eingestellt war.
         if (!panelTime.isCollapsed()) {
-            GregorianCalendar gcDatum = SYSCalendar.toGC(datum);
+//            GregorianCalendar gcDatum = SYSCalendar.toGC(datum);
             if (min.after(datum)) {
                 // Neuer Eintrag liegt ausserhalb des bisherigen Intervals.
                 min = SYSCalendar.bom(datum);
@@ -933,6 +956,15 @@ public class PnlTG extends CleanablePanel {
         txtBetrag.setText("0.00 " + SYSConst.eurosymbol);
         betrag = BigDecimal.ZERO;
         txtDatum.requestFocus();
+
+        BigDecimal saldo = (BigDecimal) searchSaldoButtonMap.get(bewohner)[0];
+        JideButton button = (JideButton) searchSaldoButtonMap.get(bewohner)[1];
+
+        saldo = saldo.add(barbetrag.getBetrag());
+        searchSaldoButtonMap.put(bewohner, new Object[]{saldo, button});
+
+        String titel = "<html>" + bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getBWKennung() + "] <b><font " + (saldo.compareTo(BigDecimal.ZERO) < 0 ? "color=\"red\"" : "color=\"black\"") + ">" + currencyFormat.format(saldo) + "</font></b></html>";
+        button.setText(titel);
 
 
 //        lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Neuen Datensatz eingefügt.");
@@ -1005,15 +1037,8 @@ public class PnlTG extends CleanablePanel {
 
     private void prepareSearchArea() {
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new BoxLayout(mypanel, BoxLayout.PAGE_AXIS));
-        mypanel.add(addBySearchBW());
-        mypanel.add(addByTime());
-        progPane.setContentPane(mypanel);
-    }
-
-
-    private CollapsiblePane addBySearchBW() {
-        panelText = new CollapsiblePane("nach Bewohner");
+        mypanel.setLayout(new BoxLayout(mypanel, BoxLayout.Y_AXIS));
+        mypanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         txtBW = new JXSearchField("Bewohnername");
         txtBW.setInstantSearchDelay(2000); // 2 Sekunden bevor der Caret Update zieht
@@ -1023,32 +1048,90 @@ public class PnlTG extends CleanablePanel {
                 if (txtBW.getText().trim().isEmpty()) {
                     return;
                 }
-                Bewohner prevBW = bewohner;
-                bewohner = BewohnerTools.findeBW(parent, txtBW.getText());
-                if (bewohner == null) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine(n) passende(n) Bewohner(in) gefunden.", 2));
-//                    JOptionPane.showMessageDialog(parent, "Keine(n) passende(n) Bewohner(in) gefunden.", "Hinweis", JOptionPane.INFORMATION_MESSAGE);
-                    //tblTG.setModel(new DefaultTableModel());
-                    bewohner = prevBW;
-                } else {
-                    reloadDisplay();
-                }
+                BewohnerTools.findeBW(txtBW.getText(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o == null) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine(n) passende(n) Bewohner(in) gefunden.", 2));
+                        } else {
+                            bewohner = (Bewohner) o;
+                            reloadDisplay();
+                        }
+                    }
+                });
             }
         });
+        mypanel.add(txtBW);
 
-        JPanel pnl = new JPanel();
-        pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
-        pnl.add(txtBW);
-        panelText.setContentPane(pnl);
+        JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
+                printSingle(tm.getListData(), tm.getVortrag());
+            }
+        });
+        mypanel.add(printButton);
+
+        JideButton gesamtSummeButton = GUITools.createHyperlinkButton("Gesamtsumme ermitteln", new ImageIcon(getClass().getResource("/artwork/22x22/bw/kcalc.png")), new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                updateSummenAngabe();
+            }
+        });
+        mypanel.add(gesamtSummeButton);
+
+        mypanel.add(addByTime());
+        mypanel.add(addBySearchBW());
+
+        progPane.setContentPane(mypanel);
+    }
+
+
+    private CollapsiblePane addBySearchBW() {
+        panelText = new CollapsiblePane("nach Bewohner");
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new BoxLayout(mypanel, BoxLayout.PAGE_AXIS));
+        searchSaldoButtonMap = new HashMap<Bewohner, Object[]>();
+
+        EntityManager em = OPDE.createEM();
+
+        Query query = em.createQuery(" " +
+                " SELECT b, SUM(k.betrag) FROM Bewohner b " +
+                " LEFT JOIN b.konto k " +
+                " WHERE b.station IS NOT NULL " +
+                " GROUP BY b " +
+                " ORDER BY b.nachname, b.vorname, b.bWKennung ");
+
+        List<Object[]> bwSearchList = query.getResultList();
+
+        em.close();
+
+        for (int row = 0; row < bwSearchList.size(); row++) {
+            final Bewohner myBewohner = (Bewohner) bwSearchList.get(row)[0];
+            BigDecimal saldo = bwSearchList.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) bwSearchList.get(row)[1];
+
+            String titel = "<html>" + myBewohner.getNachname() + ", " + myBewohner.getVorname() + " [" + myBewohner.getBWKennung() + "] <b><font " + (saldo.compareTo(BigDecimal.ZERO) < 0 ? "color=\"red\"" : "color=\"black\"") + ">" + currencyFormat.format(saldo) + "</font></b></html>";
+
+            JideButton button = GUITools.createHyperlinkButton(titel, null, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    bewohner = myBewohner;
+                    reloadDisplay();
+                }
+            });
+            button.setButtonStyle(JideButton.FLAT_STYLE);
+            searchSaldoButtonMap.put(myBewohner, new Object[]{saldo, button});
+            mypanel.add(button);
+        }
 
         try {
-            panelText.setCollapsed(false);
+            panelText.setCollapsed(true);
         } catch (PropertyVetoException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
-//        panelText.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_group.png")));
-//        panelSearch.add(panelText);
+        panelText.setSlidingDirection(SwingConstants.SOUTH);
+        panelText.setStyle(CollapsiblePane.TREE_STYLE);
+        panelText.setContentPane(mypanel);
         return panelText;
     }
 

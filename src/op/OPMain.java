@@ -25,13 +25,11 @@
  */
 package op;
 
-import entity.system.SYSHostsTools;
 import entity.system.SYSLoginTools;
 import op.share.tools.PnlEditor;
 
 import op.threads.PrintProcessor;
 import op.tools.DlgException;
-import op.tools.DlgLogin;
 import op.tools.SYSTools;
 import tablemodels.TMVorgang;
 import tablerenderer.RNDHTML;

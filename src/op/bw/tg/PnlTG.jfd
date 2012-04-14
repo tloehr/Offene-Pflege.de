@@ -500,6 +500,10 @@
             <string>par l {seq l {space :::p, par b {comp lbl1::b:p:22:p, comp lblSumme::b:p:22:p, comp cmbPast::b:p::p}, space :::p, comp jSeparator2:::p:10:p, space :::p, comp jLabel5:::p::p, space :::p, comp jspStat::::502:x, space :::p, par b {comp rbBWAlle::b:p::p, comp rbAktuell::b:p::p}, space :::p}}</string> 
            </void> 
           </object> 
+          <void method="setProperty"> 
+           <string>enabled</string> 
+           <boolean>false</boolean> 
+          </void> 
           <void property="name"> 
            <string>pnlStat</string> 
           </void> 

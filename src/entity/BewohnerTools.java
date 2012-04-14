@@ -8,6 +8,7 @@ import op.OPDE;
 import op.tools.DlgListSelector;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -85,7 +86,7 @@ public class BewohnerTools {
     /**
      * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
      */
-    public static Bewohner findeBW(java.awt.Frame parent, String muster) {
+    public static void findeBW(String muster, Closure applyClosure) {
         Bewohner bewohner = EntityTools.find(Bewohner.class, muster);
 
         if (bewohner == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
@@ -99,16 +100,18 @@ public class BewohnerTools {
             DefaultListModel dlm = SYSTools.list2dlm(listBW);
 
             if (dlm.getSize() > 1) {
-                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
-                bewohner = (Bewohner) dlg.getSelection();
+                OPDE.showJDialogAsSheet(new DlgListSelector("Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm, applyClosure));
             } else if (dlm.getSize() == 1) {
                 bewohner = listBW.get(0);
+                applyClosure.execute(bewohner);
             } else {
-                bewohner = null;
+                applyClosure.execute(null);
             }
         }
-        return bewohner;
     }
+
+
+
 
 
 }

@@ -39,11 +39,11 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>relgap, labelcompgap, pref, labelcompgap, left:default:grow, relgap, relgap</string> 
+          <string>0dlu, labelcompgap, pref, labelcompgap, left:default:grow, relgap, relgap</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>relgap, default, relgap, default:grow, linegap, pref, linegap, relgap</string> 
+          <string>relgap, default, relgap, default:grow, linegap, pref, linegap, 0dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -66,18 +66,20 @@
           <void method="setProperty"> 
            <string>background</string> 
            <object class="java.awt.Color"> 
-            <int>234</int> 
-            <int>237</int> 
+            <int>220</int> 
             <int>223</int> 
+            <int>208</int> 
             <int>255</int> 
            </object> 
           </void> 
           <void method="setProperty"> 
            <string>border</string> 
-           <object class="javax.swing.border.LineBorder"> 
-            <object class="java.awt.Color" field="black"/> 
-            <int>1</int> 
-            <boolean>false</boolean> 
+           <object class="javax.swing.border.SoftBevelBorder"> 
+            <int>0</int> 
+            <null/> 
+            <null/> 
+            <null/> 
+            <null/> 
            </object> 
           </void> 
           <void property="name"> 
@@ -292,6 +294,15 @@
           <object class="com.jformdesigner.model.FormLayoutManager"> 
            <class>javax.swing.JScrollPane</class> 
           </object> 
+          <void method="setProperty"> 
+           <string>background</string> 
+           <object class="java.awt.Color"> 
+            <int>238</int> 
+            <int>238</int> 
+            <int>238</int> 
+            <int>255</int> 
+           </object> 
+          </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
             <string>java.awt.event.ComponentListener</string> 
@@ -313,6 +324,10 @@
               <int>3</int> 
              </void> 
             </object> 
+            <void method="setProperty"> 
+             <string>opaque</string> 
+             <boolean>false</boolean> 
+            </void> 
             <void property="name"> 
              <string>panesSearch</string> 
             </void> 
@@ -376,8 +391,17 @@
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>com.jidesoft.status.StatusBar</string> 
+          <void method="setProperty"> 
+           <string>background</string> 
+           <object class="java.awt.Color"> 
+            <int>238</int> 
+            <int>238</int> 
+            <int>238</int> 
+            <int>255</int> 
+           </object> 
+          </void> 
           <void property="name"> 
-           <string>statusBar1</string> 
+           <string>statusBar</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 

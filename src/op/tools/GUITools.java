@@ -18,7 +18,6 @@ public class GUITools {
 
     public static JideButton createHyperlinkButton(String name, Icon icon, ActionListener actionListener) {
         final JideButton button = new JideButton(name, icon);
-        final String n = name;
         button.setButtonStyle(JideButton.HYPERLINK_STYLE);
 
         button.setOpaque(false);

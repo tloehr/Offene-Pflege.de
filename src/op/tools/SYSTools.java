@@ -556,8 +556,8 @@ public class SYSTools {
             ResultSet rs = DBHandling.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum", "BWKennung"}, where1);
             DefaultListModel dlm = rs2lst(rs);
             if (dlm.getSize() > 1) {
-                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
-                Object selection = dlg.getSelection();
+//                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
+                Object selection = null;
                 if (selection != null) {
                     ListElement le = (ListElement) selection;
                     result = le.getData();

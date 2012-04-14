@@ -26,31 +26,40 @@
 
 package op.tools;
 
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
+import op.OPDE;
+import org.apache.commons.collections.Closure;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @author tloehr
  */
 public class DlgListSelector extends javax.swing.JDialog {
-    private boolean apply;
+    private Closure applyClosure;
 
     /**
      * Creates new form DlgFindeBW
      */
-    public DlgListSelector(java.awt.Frame parent, String title, String topic, String detail, DefaultListModel dlm) {
-        super(parent, true);
+    public DlgListSelector(String topic, String detail, DefaultListModel dlm, Closure applyClosure) {
+        super(new JFrame(), false);
         initComponents();
         lstSelect.setModel(dlm);
         lstSelect.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lstSelect.addListSelectionListener(new HandleSelections());
         btnApply.setEnabled(false);
-        this.setTitle(title);
         lblTopic.setText(topic);
         lblDetail.setText(detail);
-        SYSTools.centerOnParent(parent, this);
-        apply = false;
+        this.applyClosure = applyClosure;
+        pack();
     }
 
     /**
@@ -61,92 +70,87 @@ public class DlgListSelector extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        lblTopic = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        lblDetail = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        lstSelect = new javax.swing.JList();
-        btnCancel = new javax.swing.JButton();
-        btnApply = new javax.swing.JButton();
+        lblTopic = new JLabel();
+        lblDetail = new JLabel();
+        jScrollPane1 = new JScrollPane();
+        lstSelect = new JList();
+        panel1 = new JPanel();
+        btnApply = new JButton();
+        btnCancel = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        lblTopic.setFont(new java.awt.Font("Dialog", 1, 14));
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "$rgap, $lcgap, default:grow, $lcgap, $rgap",
+            "$rgap, 2*($lgap, fill:default), $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+
+        //---- lblTopic ----
+        lblTopic.setFont(new Font("Dialog", Font.BOLD, 14));
         lblTopic.setText("jLabel1");
+        contentPane.add(lblTopic, CC.xywh(3, 3, 2, 1));
 
-        lblDetail.setFont(new java.awt.Font("Dialog", 0, 12));
+        //---- lblDetail ----
+        lblDetail.setFont(new Font("Dialog", Font.PLAIN, 12));
         lblDetail.setText("jLabel2");
+        contentPane.add(lblDetail, CC.xywh(3, 5, 2, 1));
 
-        lstSelect.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+        //======== jScrollPane1 ========
+        {
 
-            public int getSize() {
-                return strings.length;
-            }
+            //---- lstSelect ----
+            lstSelect.setModel(new AbstractListModel() {
+                String[] values = {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4",
+                    "Item 5"
+                };
+                @Override
+                public int getSize() { return values.length; }
+                @Override
+                public Object getElementAt(int i) { return values[i]; }
+            });
+            lstSelect.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    lstSelectMouseClicked(e);
+                }
+            });
+            jScrollPane1.setViewportView(lstSelect);
+        }
+        contentPane.add(jScrollPane1, CC.xywh(3, 7, 2, 1));
 
-            public Object getElementAt(int i) {
-                return strings[i];
-            }
-        });
-        lstSelect.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lstSelectMouseClicked(evt);
-            }
-        });
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
 
-        jScrollPane1.setViewportView(lstSelect);
+            //---- btnApply ----
+            btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnApply.setText("W\u00e4hlen");
+            btnApply.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnApplyActionPerformed(e);
+                }
+            });
+            panel1.add(btnApply);
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-
-        btnApply.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnApply.setText("W\u00e4hlen");
-        btnApply.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnApplyActionPerformed(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblTopic, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.LEADING, lblDetail, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                                        .add(layout.createSequentialGroup()
-                                                .add(btnApply)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(btnCancel)))
-                                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(lblTopic)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(lblDetail)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(btnCancel)
-                                        .add(btnApply))
-                                .addContainerGap())
-        );
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 600) / 2, (screenSize.height - 441) / 2, 600, 441);
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.setText("Abbrechen");
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            panel1.add(btnCancel);
+        }
+        contentPane.add(panel1, CC.xy(3, 9, CC.RIGHT, CC.DEFAULT));
+        setSize(600, 441);
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void lstSelectMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstSelectMouseClicked
@@ -156,37 +160,37 @@ public class DlgListSelector extends javax.swing.JDialog {
     }//GEN-LAST:event_lstSelectMouseClicked
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        super.setVisible(false);
+        OPDE.hideSheet();
+        applyClosure.execute(null);
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    // dummy, damit keiner das fenster selbst sichtbar macht.
-    public void setVisible(boolean b) {
-    }
-
-    public Object getSelection() {
-        super.setVisible(true);
-        Object result = null;
-        if (apply) {
-            ListModel lm = lstSelect.getModel();
-            ListSelectionModel lsm = lstSelect.getSelectionModel();
-            result = lm.getElementAt(lsm.getLeadSelectionIndex());
-        }
-        return result;
-    }
+//    public Object getSelection() {
+//        super.setVisible(true);
+//        Object result = null;
+//        if (apply) {
+//            ListModel lm = lstSelect.getModel();
+//            ListSelectionModel lsm = lstSelect.getSelectionModel();
+//            result = lm.getElementAt(lsm.getLeadSelectionIndex());
+//        }
+//        return result;
+//    }
 
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
-        apply = true;
-        super.setVisible(false);
+        OPDE.hideSheet();
+        ListModel lm = lstSelect.getModel();
+        ListSelectionModel lsm = lstSelect.getSelectionModel();
+        applyClosure.execute(lm.getElementAt(lsm.getLeadSelectionIndex()));
+
     }//GEN-LAST:event_btnApplyActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnApply;
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JLabel lblDetail;
-    private javax.swing.JLabel lblTopic;
-    private javax.swing.JList lstSelect;
+    private JLabel lblTopic;
+    private JLabel lblDetail;
+    private JScrollPane jScrollPane1;
+    private JList lstSelect;
+    private JPanel panel1;
+    private JButton btnApply;
+    private JButton btnCancel;
     // End of variables declaration//GEN-END:variables
 
     class HandleSelections implements ListSelectionListener {

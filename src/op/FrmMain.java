@@ -26,6 +26,7 @@
  */
 package op;
 
+import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
@@ -33,7 +34,10 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.plaf.basic.ThemePainter;
-import com.jidesoft.status.*;
+import com.jidesoft.status.LabelStatusBarItem;
+import com.jidesoft.status.MemoryStatusBarItem;
+import com.jidesoft.status.StatusBar;
+import com.jidesoft.status.TimeStatusBarItem;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.TitledSeparator;
@@ -44,8 +48,7 @@ import entity.StationenTools;
 import entity.system.SYSLoginTools;
 import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
-import op.events.TaskPaneContentChangedEvent;
-import op.events.TaskPaneContentChangedListener;
+import op.system.DlgLogin;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -61,6 +64,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.Iterator;
 
 /**
@@ -83,23 +87,14 @@ public class FrmMain extends SheetableJFrame {
     private JFrame thisFrame;
     private DlgLogin dlgLogin;
     private CollapsiblePane panelPflegeakte;
-
-    private int positionToAddPanels;
-
-    //    private java.util.List<JXTaskPane> bewohnerPanes, additionalSearchPanes;
-//    private JXTaskPane programPane;
-    private TaskPaneContentChangedListener tpccl;
-
+    private LabelStatusBarItem labelUSER;
 
     public FrmMain() {
         initPhase = true;
         initComponents();
-        positionToAddPanels = 0;
         currentVisiblePanel = null;
         currentBewohner = null;
-//        bewohnerPanes = new ArrayList<JXTaskPane>();
-//        additionalSearchPanes = new ArrayList<JXTaskPane>();
-//        programPane = null;
+
         thisFrame = this;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
         this.setVisible(true);
@@ -114,35 +109,26 @@ public class FrmMain extends SheetableJFrame {
         displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
         displayManager.start();
 
-        tpccl = new TaskPaneContentChangedListener() {
-            @Override
-            public void contentChanged(TaskPaneContentChangedEvent evt) {
-                createSearchPane(evt.getTaskPanes(), evt.getTitle());
-            }
-        };
 
-//        btnVerlegung = new JButton("Verlegung");
-//        btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
-//        btnVerlegung.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                if (currentBewohner != null) {
-//                    SYSPrint.print(thisFrame, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
-//                }
-//            }
-//        });
-
-
-//        jtpPflegeakte.setComponentAt(jtpPflegeakte.getSelectedIndex(), pnl);
-//        for (int i = 0; i < jtpPflegeakte.getTabCount(); i++) {
-//            jtpPflegeakte.setEnabledAt(i, false);
-//        }
-//
+        // StatusBar Setup
+        final LabelStatusBarItem label = new LabelStatusBarItem("Line");
+        label.setText(OPDE.getLocalProps().getProperty("javax.persistence.jdbc.url"));
+        statusBar.add(label, JideBoxLayout.FLEXIBLE);
+        labelUSER = new LabelStatusBarItem("Line");
+        labelUSER.setText("--");
+        labelUSER.setAlignment(JLabel.CENTER);
+        statusBar.add(labelUSER, JideBoxLayout.FLEXIBLE);
+        final TimeStatusBarItem time = new TimeStatusBarItem();
+        time.setUpdateInterval(10000);
+        time.setTextFormat(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT));
+        time.setAlignment(JLabel.CENTER);
+        statusBar.add(time, JideBoxLayout.FLEXIBLE);
+        final MemoryStatusBarItem gc = new MemoryStatusBarItem();
+        statusBar.add(gc, JideBoxLayout.FLEXIBLE);
 
         initPhase = false;
 
         showLogin();
-
     }
 
 
@@ -151,21 +137,19 @@ public class FrmMain extends SheetableJFrame {
         currentVisiblePanel.setLayout(new BorderLayout());
         scrollMain.setViewportView(currentVisiblePanel);
         displayManager.clearAllMessages();
+        jspSearch.setViewportView(new JPanel());
+        panesSearch.removeAll();
+        panesSearch = null;
     }
 
     private void btnExitActionPerformed(ActionEvent e) {
         logout();
+        showLogin();
     }
 
     private void thisWindowClosing(WindowEvent e) {
         if (OPDE.getLogin() != null) {
-            // OPDE.getDb().doLogout();
-            try {
-                OPDE.getDb().db.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                System.exit(1);
-            }
+            logout();
         }
 
         System.exit(0);
@@ -173,11 +157,15 @@ public class FrmMain extends SheetableJFrame {
 
     private void afterLogin() {
 
+
+//        emptyFrame();
+
         createSearchPane(null, "");
-        emptyFrame();
+        labelUSER.setText(OPDE.getLogin().getUser().getNameUndVorname());
 
         displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
         displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
+
 
     }
 
@@ -198,7 +186,7 @@ public class FrmMain extends SheetableJFrame {
         jspSearch = new JScrollPane();
         panesSearch = new CollapsiblePanes();
         scrollMain = new JScrollPane();
-        statusBar1 = new StatusBar();
+        statusBar = new StatusBar();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -215,13 +203,13 @@ public class FrmMain extends SheetableJFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, $rgap"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
-                pnlMainMessage.setBackground(new Color(234, 237, 223));
-                pnlMainMessage.setBorder(LineBorder.createBlackLineBorder());
+                pnlMainMessage.setBackground(new Color(220, 223, 208));
+                pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
                     "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
                     "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
@@ -261,6 +249,7 @@ public class FrmMain extends SheetableJFrame {
 
             //======== jspSearch ========
             {
+                jspSearch.setBackground(new Color(238, 238, 238));
                 jspSearch.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
@@ -270,13 +259,17 @@ public class FrmMain extends SheetableJFrame {
 
                 //======== panesSearch ========
                 {
+                    panesSearch.setOpaque(false);
                     panesSearch.setLayout(new BoxLayout(panesSearch, BoxLayout.PAGE_AXIS));
                 }
                 jspSearch.setViewportView(panesSearch);
             }
             pnlMain.add(jspSearch, CC.xy(3, 4, CC.FILL, CC.FILL));
             pnlMain.add(scrollMain, CC.xywh(5, 4, 2, 1, CC.FILL, CC.FILL));
-            pnlMain.add(statusBar1, CC.xywh(3, 6, 4, 1, CC.FILL, CC.FILL));
+
+            //---- statusBar ----
+            statusBar.setBackground(new Color(238, 238, 238));
+            pnlMain.add(statusBar, CC.xywh(3, 6, 4, 1, CC.FILL, CC.FILL));
         }
         contentPane.add(pnlMain);
         setSize(945, 695);
@@ -384,19 +377,11 @@ public class FrmMain extends SheetableJFrame {
         if (classname.equals("op.bw.tg.PnlTG")) {
             panel = new PnlTG(this, programPane);
         } else if (classname.equals("op.vorgang.PnlVorgang")) {
-            panel = new PnlVorgang(null, null, this, tpccl);
+            panel = new PnlVorgang(null, null, this, null);
         }
 
         return panel;
     }
-
-
-    private void collapseBewohner() {
-//        for (JXTaskPane pane : bewohnerPanes) {
-//            pane.setCollapsed(true);
-//        }
-    }
-
 
     private CollapsiblePane createBewohnerListe(Stationen station) {
         EntityManager em = OPDE.createEM();
@@ -431,7 +416,7 @@ public class FrmMain extends SheetableJFrame {
                         ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
 //                        programPane.setCollapsed(true);
-                        currentVisiblePanel = new PnlPflege(thisFrame, innerbewohner, tpccl);
+                        currentVisiblePanel = new PnlPflege(thisFrame, innerbewohner);
                         setPanelTo(currentVisiblePanel);
                     }
                 }
@@ -549,10 +534,11 @@ public class FrmMain extends SheetableJFrame {
     private void logout() {
         emptyFrame();
 
+        labelUSER.setText("--");
+
         try {
             OPDE.closeDB();
         } catch (SQLException ex) {
-            new DlgException(ex);
             ex.printStackTrace();
             System.exit(1);
         }
@@ -564,7 +550,6 @@ public class FrmMain extends SheetableJFrame {
 
         cleanup();
 
-        showLogin();
     }
 
     private void collapseAllOthers(CollapsiblePane thisPane) {
@@ -589,7 +574,7 @@ public class FrmMain extends SheetableJFrame {
     private JScrollPane jspSearch;
     private CollapsiblePanes panesSearch;
     private JScrollPane scrollMain;
-    private StatusBar statusBar1;
+    private StatusBar statusBar;
     // End of variables declaration//GEN-END:variables
 
 

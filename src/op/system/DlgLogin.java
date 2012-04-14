@@ -23,10 +23,12 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package op.tools;
+package op.system;
 
 import entity.system.SYSLoginTools;
 import op.OPDE;
+import op.tools.DlgException;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXHyperlink;
 

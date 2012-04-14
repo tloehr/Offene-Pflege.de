@@ -1006,7 +1006,6 @@ public class FrmTG extends JFrame {
 //        schaltet auf den Monat um, in dem der letzte Beleg eingegeben wurde.
 //        Sofern die ein bestimmter Monat eingestellt war.
         if (!panelTime.isCollapsed()) {
-            GregorianCalendar gcDatum = SYSCalendar.toGC(datum);
             if (min.after(datum)) {
                 // Neuer Eintrag liegt ausserhalb des bisherigen Intervals.
                 min = SYSCalendar.bom(datum);
@@ -1121,7 +1120,7 @@ public class FrmTG extends JFrame {
                     return;
                 }
                 Bewohner prevBW = bewohner;
-                bewohner = BewohnerTools.findeBW(thisComponent, txtBW.getText());
+//                bewohner = BewohnerTools.findeBW(thisComponent, txtBW.getText());
                 if (bewohner == null) {
                     JOptionPane.showMessageDialog(thisComponent, "Keine(n) passende(n) Bewohner(in) gefunden.", "Hinweis", JOptionPane.INFORMATION_MESSAGE);
                     //tblTG.setModel(new DefaultTableModel());
