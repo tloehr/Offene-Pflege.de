@@ -26,7 +26,6 @@
  */
 package op;
 
-import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
@@ -59,7 +58,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
+import javax.swing.border.SoftBevelBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
@@ -82,7 +81,7 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private DisplayManager displayManager;
-    private JPanel currentVisiblePanel;
+    private CleanablePanel currentVisiblePanel;
     private Bewohner currentBewohner;
     private JFrame thisFrame;
     private DlgLogin dlgLogin;
@@ -133,8 +132,7 @@ public class FrmMain extends SheetableJFrame {
 
 
     private void emptyFrame() {
-        currentVisiblePanel = new JPanel();
-        currentVisiblePanel.setLayout(new BorderLayout());
+        currentVisiblePanel = null;
         scrollMain.setViewportView(currentVisiblePanel);
         displayManager.clearAllMessages();
         jspSearch.setViewportView(new JPanel());
@@ -156,9 +154,6 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private void afterLogin() {
-
-
-//        emptyFrame();
 
         createSearchPane(null, "");
         labelUSER.setText(OPDE.getLogin().getUser().getNameUndVorname());
@@ -215,7 +210,7 @@ public class FrmMain extends SheetableJFrame {
                     "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
-                lblMainMsg.setText("Main Message Line for Main Text");
+                lblMainMsg.setText("OPDE");
                 lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
                 lblMainMsg.setForeground(new Color(105, 80, 69));
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
@@ -233,7 +228,7 @@ public class FrmMain extends SheetableJFrame {
                 pnlMainMessage.add(btnExit, CC.xywh(7, 3, 1, 4));
 
                 //---- lblSubMsg ----
-                lblSubMsg.setText("Main Message Line for Main Text");
+                lblSubMsg.setText("OPDE");
                 lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
                 lblSubMsg.setForeground(new Color(105, 80, 69));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
@@ -328,14 +323,27 @@ public class FrmMain extends SheetableJFrame {
 //            JideButton button = GUITools.createHyperlinkButton(shortDescription, null, actionListener);
                 programPane.setToolTipText(longDescription);
                 programPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+                    CleanablePanel thisPanel;
+
                     @Override
                     public void paneExpanding(CollapsiblePaneEvent collapsiblePaneEvent) {
                         displayManager.setMainMessage(shortDescription);
                         displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
                         setPanelTo(loadPanel(javaclass, programPane));
-
+                        thisPanel = currentVisiblePanel;
                         collapseAllOthers(programPane);
+                    }
 
+                    @Override
+                    public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+
+                        OPDE.debug("collapsing");
+                        thisPanel.cleanup();
+//                        currentVisiblePanel.cleanup();
+//                        currentVisiblePanel = null;
+//                        scrollMain.setViewportView(currentVisiblePanel);
+//                        displayManager.clearAllMessages();
+                        panesSearch.validate();
                     }
                 });
                 panesSearch.add(programPane);
@@ -370,9 +378,9 @@ public class FrmMain extends SheetableJFrame {
         panesSearch.addExpansion();
     }
 
-    private JPanel loadPanel(String classname, CollapsiblePane programPane) {
+    private CleanablePanel loadPanel(String classname, CollapsiblePane programPane) {
 
-        JPanel panel = null;
+        CleanablePanel panel = null;
 
         if (classname.equals("op.bw.tg.PnlTG")) {
             panel = new PnlTG(this, programPane);
@@ -383,7 +391,8 @@ public class FrmMain extends SheetableJFrame {
         return panel;
     }
 
-    private CollapsiblePane createBewohnerListe(Stationen station) {
+    private CollapsiblePane createBewohnerListe(Stationen station, CollapsiblePane pflegeSearchPanel) {
+        final CollapsiblePane psPanel = pflegeSearchPanel;
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
         query.setParameter("station", station);
@@ -416,7 +425,7 @@ public class FrmMain extends SheetableJFrame {
                         ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
 //                        programPane.setCollapsed(true);
-                        currentVisiblePanel = new PnlPflege(thisFrame, innerbewohner);
+                        currentVisiblePanel = new PnlPflege(thisFrame, innerbewohner, psPanel);
                         setPanelTo(currentVisiblePanel);
                     }
                 }
@@ -473,9 +482,11 @@ public class FrmMain extends SheetableJFrame {
         });
 
         dokuPanel.add(buttonVerlegung);
+        CollapsiblePane pflegeSearchPanel = new CollapsiblePane();
+        dokuPanel.add(pflegeSearchPanel);
 
         while (it.hasNext()) {
-            dokuPanel.add(createBewohnerListe(it.next()));
+            dokuPanel.add(createBewohnerListe(it.next(), pflegeSearchPanel));
         }
 
         panelPflegeakte = new CollapsiblePane("Pflegeakte", new ImageIcon(getClass().getResource("/artwork/16x16/pflegeakte.png")));
@@ -494,7 +505,7 @@ public class FrmMain extends SheetableJFrame {
         panesSearch.add(panelPflegeakte);
     }
 
-    private void setPanelTo(JPanel pnl) {
+    private void setPanelTo(CleanablePanel pnl) {
         currentVisiblePanel = pnl;
 //        pnlTopRight = new JPanel(new VerticalLayout());
 //        btnVerlegung.setVisible(currentVisiblePanel instanceof PnlPflege);
@@ -524,11 +535,9 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private void cleanup() {
-
-        if (currentVisiblePanel instanceof CleanablePanel) {
-            ((CleanablePanel) currentVisiblePanel).cleanup();
+        if (currentVisiblePanel != null) {
+            currentVisiblePanel.cleanup();
         }
-
     }
 
     private void logout() {
@@ -554,11 +563,14 @@ public class FrmMain extends SheetableJFrame {
 
     private void collapseAllOthers(CollapsiblePane thisPane) {
         for (int comp = 0; comp < panesSearch.getComponentCount(); comp++) {
+            OPDE.debug("collapseAllOthers: " + (panesSearch.getComponent(comp) != thisPane));
             if (panesSearch.getComponent(comp) != thisPane && panesSearch.getComponent(comp) instanceof CollapsiblePane) {
-                try {
-                    ((CollapsiblePane) panesSearch.getComponent(comp)).setCollapsed(true);
-                } catch (PropertyVetoException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                if (!((CollapsiblePane) panesSearch.getComponent(comp)).isCollapsed()) {
+                    try {
+                        ((CollapsiblePane) panesSearch.getComponent(comp)).setCollapsed(true);
+                    } catch (PropertyVetoException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
                 }
             }
         }

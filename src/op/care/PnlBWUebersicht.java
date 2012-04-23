@@ -26,23 +26,23 @@
  */
 package op.care;
 
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
-import javax.swing.border.*;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
-import op.events.TaskPaneContentChangedEvent;
-import op.events.TaskPaneContentChangedListener;
-import op.tools.CleanablePanel;
+import op.threads.DisplayMessage;
+import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
+import org.jdesktop.swingx.VerticalLayout;
+import tablemodels.TMBarbetrag;
 
+import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.awt.event.*;
+import java.beans.PropertyVetoException;
 
 /**
  * @author tloehr
@@ -50,27 +50,83 @@ import java.util.ArrayList;
 public class PnlBWUebersicht extends NursingRecordsPanel {
 
     private Bewohner bewohner;
-    private TaskPaneContentChangedListener taskPaneContentChangedListener;
+    private CollapsiblePane searchPane;
+    private JCheckBox cbMedi;
+    private JCheckBox cbBilanz;
+    private JCheckBox cbBerichte;
+    private JCheckBox cbBWInfo;
+    private ItemListener itemListener;
+    private MouseAdapter mouseAdapter;
 
     /**
      * Creates new form PnlBWUebersicht
      */
-    public PnlBWUebersicht(Bewohner bewohner, TaskPaneContentChangedListener taskPaneContentChangedListener) {
+    public PnlBWUebersicht(Bewohner bewohner, CollapsiblePane searchPane) {
         initComponents();
-        txtUebersicht.setContentType("text/html");
-        this.taskPaneContentChangedListener = taskPaneContentChangedListener;
+        this.searchPane = searchPane;
+        initPanel();
+        prepareSearchArea();
         change2Bewohner(bewohner);
+    }
+
+    private void initPanel() {
+        txtUebersicht.setContentType("text/html");
+
+        itemListener = new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                reloadDisplay();
+            }
+        };
+
+        mouseAdapter = new MouseAdapter() {
+            String text = "";
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                text = ((JCheckBox) mouseEvent.getSource()).getText();
+                ((JCheckBox) mouseEvent.getSource()).setText("<html><u>"+text+"</u></html>");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                ((JCheckBox) mouseEvent.getSource()).setText(text);
+            }
+        };
+
+
+        cbMedi = new JCheckBox("Medikamente", false);
+        cbMedi.addItemListener(itemListener);
+        cbMedi.addMouseListener(mouseAdapter);
+        cbBerichte = new JCheckBox("Pflegeberichte", false);
+        cbBerichte.addItemListener(itemListener);
+        cbBerichte.addMouseListener(mouseAdapter);
+        cbBilanz = new JCheckBox("Bilanz", true);
+        cbBilanz.addItemListener(itemListener);
+        cbBerichte.addMouseListener(mouseAdapter);
+        cbBWInfo = new JCheckBox("Bewohner-Informationen", false);
+        cbBWInfo.addItemListener(itemListener);
+        cbBWInfo.addMouseListener(mouseAdapter);
     }
 
     @Override
     public void cleanup() {
+        cbMedi.removeItemListener(itemListener);
+        cbMedi.removeMouseListener(mouseAdapter);
+        cbBerichte.removeItemListener(itemListener);
+        cbBerichte.removeMouseListener(mouseAdapter);
+        cbBilanz.removeItemListener(itemListener);
+        cbBilanz.removeMouseListener(mouseAdapter);
+        cbBWInfo.removeItemListener(itemListener);
+        cbBWInfo.removeMouseListener(mouseAdapter);
+
         SYSTools.unregisterListeners(this);
     }
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
-        BewohnerTools.setBWLabel(lblBW, bewohner);
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
         reloadDisplay();
     }
 
@@ -82,40 +138,11 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jToolBar1 = new JToolBar();
-        btnPrint = new JButton();
-        lblBW = new JLabel();
         jspHTML = new JScrollPane();
         txtUebersicht = new JTextPane();
-        jPanel1 = new JPanel();
-        cbMedi = new JCheckBox();
-        cbBilanz = new JCheckBox();
-        cbBerichte = new JCheckBox();
-        cbBWInfo = new JCheckBox();
 
         //======== this ========
-
-        //======== jToolBar1 ========
-        {
-            jToolBar1.setFloatable(false);
-
-            //---- btnPrint ----
-            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer.png")));
-            btnPrint.setText("Drucken");
-            btnPrint.setFocusable(false);
-            btnPrint.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnPrintActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnPrint);
-        }
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("jLabel3");
+        setLayout(new CardLayout());
 
         //======== jspHTML ========
         {
@@ -124,110 +151,38 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             txtUebersicht.setEditable(false);
             jspHTML.setViewportView(txtUebersicht);
         }
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-            //---- cbMedi ----
-            cbMedi.setText("Verordnungen");
-            cbMedi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbMediActionPerformed(e);
-                }
-            });
-
-            //---- cbBilanz ----
-            cbBilanz.setSelected(true);
-            cbBilanz.setText("Bilanz");
-            cbBilanz.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbBilanzActionPerformed(e);
-                }
-            });
-
-            //---- cbBerichte ----
-            cbBerichte.setText("Berichte");
-            cbBerichte.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbBerichteActionPerformed(e);
-                }
-            });
-
-            //---- cbBWInfo ----
-            cbBWInfo.setText("Informationen");
-            cbBWInfo.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbBWInfoActionPerformed(e);
-                }
-            });
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(cbMedi)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbBilanz)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbBerichte)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbBWInfo)
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbMedi)
-                            .addComponent(cbBilanz)
-                            .addComponent(cbBerichte)
-                            .addComponent(cbBWInfo))
-                        .addContainerGap())
-            );
-        }
-
-        GroupLayout layout = new GroupLayout(this);
-        setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addComponent(jspHTML, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
-                        .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
+        add(jspHTML, "card1");
     }// </editor-fold>//GEN-END:initComponents
 
     public void reloadDisplay() {
         txtUebersicht.setText(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, true, cbBWInfo.isSelected()));
         jspHTML.getViewport().setViewPosition(new Point(0, 0));
-        taskPaneContentChangedListener.contentChanged(new TaskPaneContentChangedEvent(this, null, null));
+    }
+
+    private void prepareSearchArea() {
+        searchPane.setTitle("Bewohner-Übersicht");
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+
+        JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+            }
+        });
+        mypanel.add(printButton);
+
+        mypanel.add(cbMedi);
+        mypanel.add(cbBilanz);
+        mypanel.add(cbBerichte);
+        mypanel.add(cbBWInfo);
+
+        searchPane.setContentPane(mypanel);
     }
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
@@ -251,15 +206,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }//GEN-LAST:event_cbBWInfoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JToolBar jToolBar1;
-    private JButton btnPrint;
-    private JLabel lblBW;
     private JScrollPane jspHTML;
     private JTextPane txtUebersicht;
-    private JPanel jPanel1;
-    private JCheckBox cbMedi;
-    private JCheckBox cbBilanz;
-    private JCheckBox cbBerichte;
-    private JCheckBox cbBWInfo;
     // End of variables declaration//GEN-END:variables
 }

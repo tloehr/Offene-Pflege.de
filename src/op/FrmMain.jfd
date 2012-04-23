@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -90,7 +90,7 @@
             <string>op.tools.FadingLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Main Message Line for Main Text</string> 
+             <string>OPDE</string> 
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
@@ -185,7 +185,7 @@
             <string>op.tools.FadingLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Main Message Line for Main Text</string> 
+             <string>OPDE</string> 
             </void> 
             <void method="setProperty"> 
              <string>font</string> 

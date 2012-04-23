@@ -40,10 +40,8 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.JXTitledSeparator;
+import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMBarbetrag;
-import tablemodels.TMTGStat;
-import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -52,8 +50,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -78,11 +74,7 @@ import java.util.List;
  */
 public class PnlTG extends CleanablePanel {
     public static final String internalClassID = "admin.residents.cash";
-    public static final int TAB_TG = 0;
-    public static final int TAB_STAT = 1;
-    //    private ListSelectionListener lsl;
     private TableModelListener tml;
-    //    private ListSelectionListener lslstat;
 
     private Date min;
     private Date max;
@@ -94,9 +86,9 @@ public class PnlTG extends CleanablePanel {
     private JXSearchField txtBW;
     private JFrame parent;
     private boolean ignoreDateComboEvent;
-    //    private List<Object[]> bwSearchList;
     private HashMap<Bewohner, Object[]> searchSaldoButtonMap;
     private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+    private JComboBox cmbPast;
 
     /**
      * Creates new form FrmBWAttr
@@ -274,35 +266,25 @@ public class PnlTG extends CleanablePanel {
         this.progPane = progPane;
         bewohner = null;
         initComponents();
-//        this.setTitle(SYSTools.getWindowTitle("Barbetragsverwaltung"));
         setVisible(true);
         tblTG.setModel(new DefaultTableModel());
         ignoreDateComboEvent = true;
         prepareSearchArea();
         setMinMax();
         initSearchTime();
-        cmbPast.setModel(SYSCalendar.createMonthList(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.YEAR), SYSCalendar.today_date()));
-        cmbPast.setSelectedIndex(cmbPast.getModel().getSize() - 1);
-        cmbPast.setRenderer(new ListCellRenderer() {
-            Format formatter = new SimpleDateFormat("MMMM yyyy");
 
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text = formatter.format(o);
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-            }
-        });
-        cmbPast.setEnabled(false);
         ignoreDateComboEvent = false;
 
-//        txtBW.requestFocus();
-        jtpMain.setSelectedIndex(TAB_TG);
-        jtpMain.setEnabledAt(TAB_STAT, OPDE.isAdmin());
     }
 
     @Override
     public void cleanup() {
-
+        progPane.getContentPane().removeAll();
+        SYSTools.unregisterListeners(cmbPast);
+        SYSTools.unregisterListeners(cmbVon);
+        SYSTools.unregisterListeners(cmbBis);
+        OPDE.getDisplayManager().clearAllMessages();
+        jspData.setViewportView(null);
     }
 
     /**
@@ -313,7 +295,6 @@ public class PnlTG extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jtpMain = new JTabbedPane();
         pnlBarbetrag = new JPanel();
         jPanel4 = new JPanel();
         jspData = new JScrollPane();
@@ -322,170 +303,34 @@ public class PnlTG extends CleanablePanel {
         txtDatum = new JTextField();
         txtBelegtext = new JTextField();
         txtBetrag = new JTextField();
-        pnlStat = new JPanel();
-        lbl1 = new JLabel();
-        jspStat = new JScrollPane();
-        tblStat = new JTable();
-        jSeparator2 = new JSeparator();
-        jLabel5 = new JLabel();
-        rbBWAlle = new JRadioButton();
-        rbAktuell = new JRadioButton();
-        lblSumme = new JLabel();
-        cmbPast = new JComboBox();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== jtpMain ========
+        //======== pnlBarbetrag ========
         {
-            jtpMain.setTabPlacement(SwingConstants.BOTTOM);
-            jtpMain.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    jtpMainStateChanged(e);
-                }
-            });
+            pnlBarbetrag.setLayout(new FormLayout(
+                "default:grow, $lcgap, pref",
+                "fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
-            //======== pnlBarbetrag ========
+            //======== jPanel4 ========
             {
-                pnlBarbetrag.setLayout(new FormLayout(
-                    "default:grow, $lcgap, pref",
-                    "fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                jPanel4.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+                jPanel4.setLayout(new FormLayout(
+                    "default:grow",
+                    "fill:default:grow"));
 
-                //======== jPanel4 ========
+                //======== jspData ========
                 {
-                    jPanel4.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
-                    jPanel4.setLayout(new FormLayout(
-                        "default:grow",
-                        "fill:default:grow"));
-
-                    //======== jspData ========
-                    {
-                        jspData.addComponentListener(new ComponentAdapter() {
-                            @Override
-                            public void componentResized(ComponentEvent e) {
-                                jspDataComponentResized(e);
-                            }
-                        });
-
-                        //---- tblTG ----
-                        tblTG.setModel(new DefaultTableModel(
-                            new Object[][] {
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                            },
-                            new String[] {
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
-                        ));
-                        tblTG.setFont(new Font("sansserif", Font.PLAIN, 14));
-                        tblTG.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mousePressed(MouseEvent e) {
-                                tblTGMousePressed(e);
-                            }
-                        });
-                        jspData.setViewportView(tblTG);
-                    }
-                    jPanel4.add(jspData, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
-                }
-                pnlBarbetrag.add(jPanel4, CC.xywh(1, 1, 3, 1));
-
-                //======== jPanel5 ========
-                {
-                    jPanel5.setBorder(LineBorder.createBlackLineBorder());
-                    jPanel5.setLayout(new FormLayout(
-                        "default:grow(0.30000000000000004), $lcgap, default:grow(0.7000000000000001), $lcgap, 30dlu:grow(0.30000000000000004)",
-                        "fill:default"));
-
-                    //---- txtDatum ----
-                    txtDatum.setEnabled(false);
-                    txtDatum.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtDatumActionPerformed(e);
-                        }
-                    });
-                    txtDatum.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusGained(FocusEvent e) {
-                            txtDatumFocusGained(e);
-                        }
-                        @Override
-                        public void focusLost(FocusEvent e) {
-                            txtDatumFocusLost(e);
-                        }
-                    });
-                    jPanel5.add(txtDatum, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
-
-                    //---- txtBelegtext ----
-                    txtBelegtext.setEnabled(false);
-                    txtBelegtext.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtBelegtextActionPerformed(e);
-                        }
-                    });
-                    txtBelegtext.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusGained(FocusEvent e) {
-                            txtBelegtextFocusGained(e);
-                        }
-                        @Override
-                        public void focusLost(FocusEvent e) {
-                            txtBelegtextFocusLost(e);
-                        }
-                    });
-                    jPanel5.add(txtBelegtext, CC.xy(3, 1, CC.FILL, CC.DEFAULT));
-
-                    //---- txtBetrag ----
-                    txtBetrag.setHorizontalAlignment(SwingConstants.RIGHT);
-                    txtBetrag.setEnabled(false);
-                    txtBetrag.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtBetragActionPerformed(e);
-                        }
-                    });
-                    txtBetrag.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusGained(FocusEvent e) {
-                            txtBetragFocusGained(e);
-                        }
-                        @Override
-                        public void focusLost(FocusEvent e) {
-                            txtBetragFocusLost(e);
-                        }
-                    });
-                    jPanel5.add(txtBetrag, CC.xy(5, 1, CC.FILL, CC.DEFAULT));
-                }
-                pnlBarbetrag.add(jPanel5, CC.xywh(1, 3, 3, 1));
-            }
-            jtpMain.addTab("Barbetrag", pnlBarbetrag);
-
-
-            //======== pnlStat ========
-            {
-                pnlStat.setEnabled(false);
-
-                //---- lbl1 ----
-                lbl1.setFont(new Font("Dialog", Font.BOLD, 18));
-                lbl1.setForeground(new Color(51, 51, 255));
-                lbl1.setText("Summe aller Barbetr\u00e4ge:");
-
-                //======== jspStat ========
-                {
-                    jspStat.addComponentListener(new ComponentAdapter() {
+                    jspData.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
-                            jspStatComponentResized(e);
+                            jspDataComponentResized(e);
                         }
                     });
 
-                    //---- tblStat ----
-                    tblStat.setModel(new DefaultTableModel(
+                    //---- tblTG ----
+                    tblTG.setModel(new DefaultTableModel(
                         new Object[][] {
                             {null, null, null, null},
                             {null, null, null, null},
@@ -496,115 +341,90 @@ public class PnlTG extends CleanablePanel {
                             "Title 1", "Title 2", "Title 3", "Title 4"
                         }
                     ));
-                    tblStat.setFont(new Font("sansserif", Font.PLAIN, 14));
-                    tblStat.addMouseListener(new MouseAdapter() {
+                    tblTG.setFont(new Font("sansserif", Font.PLAIN, 14));
+                    tblTG.addMouseListener(new MouseAdapter() {
                         @Override
-                        public void mouseClicked(MouseEvent e) {
-                            tblStatMouseClicked(e);
+                        public void mousePressed(MouseEvent e) {
+                            tblTGMousePressed(e);
                         }
                     });
-                    jspStat.setViewportView(tblStat);
+                    jspData.setViewportView(tblTG);
                 }
-
-                //---- jLabel5 ----
-                jLabel5.setFont(new Font("Dialog", Font.BOLD, 14));
-                jLabel5.setText("\u00dcbersicht \u00fcber Kontost\u00e4nde je BewohnerIn:");
-
-                //---- rbBWAlle ----
-                rbBWAlle.setText("Alle BW anzeigen");
-                rbBWAlle.setBorder(BorderFactory.createEmptyBorder());
-                rbBWAlle.setMargin(new Insets(0, 0, 0, 0));
-                rbBWAlle.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        rbBWAlleActionPerformed(e);
-                    }
-                });
-
-                //---- rbAktuell ----
-                rbAktuell.setSelected(true);
-                rbAktuell.setText("Nur die aktuellen BW anzeigen");
-                rbAktuell.setBorder(BorderFactory.createEmptyBorder());
-                rbAktuell.setMargin(new Insets(0, 0, 0, 0));
-                rbAktuell.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        rbAktuellActionPerformed(e);
-                    }
-                });
-
-                //---- lblSumme ----
-                lblSumme.setFont(new Font("Dialog", Font.BOLD, 18));
-                lblSumme.setHorizontalAlignment(SwingConstants.RIGHT);
-                lblSumme.setText("jLabel6");
-
-                //---- cmbPast ----
-                cmbPast.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
-                }));
-                cmbPast.setToolTipText("Summenanzeige f\u00fcr die Vergangenheit");
-                cmbPast.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbPastItemStateChanged(e);
-                    }
-                });
-
-                GroupLayout pnlStatLayout = new GroupLayout(pnlStat);
-                pnlStat.setLayout(pnlStatLayout);
-                pnlStatLayout.setHorizontalGroup(
-                    pnlStatLayout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, pnlStatLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jspStat, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                                        .addComponent(jSeparator2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                                        .addComponent(jLabel5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
-                                        .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
-                                                .addComponent(rbBWAlle)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(rbAktuell))
-                                        .addGroup(GroupLayout.Alignment.LEADING, pnlStatLayout.createSequentialGroup()
-                                                .addComponent(lbl1)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblSumme, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)))
-                                .addContainerGap())
-                );
-                pnlStatLayout.setVerticalGroup(
-                    pnlStatLayout.createParallelGroup()
-                        .addGroup(pnlStatLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lbl1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(lblSumme, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cmbPast, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspStat, GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlStatLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(rbBWAlle)
-                                        .addComponent(rbAktuell))
-                                .addContainerGap())
-                );
+                jPanel4.add(jspData, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
             }
-            jtpMain.addTab("\u00dcbersicht", pnlStat);
+            pnlBarbetrag.add(jPanel4, CC.xywh(1, 1, 3, 1));
 
+            //======== jPanel5 ========
+            {
+                jPanel5.setBorder(LineBorder.createBlackLineBorder());
+                jPanel5.setLayout(new FormLayout(
+                    "default:grow(0.30000000000000004), $lcgap, default:grow(0.7000000000000001), $lcgap, 30dlu:grow(0.30000000000000004)",
+                    "fill:default"));
+
+                //---- txtDatum ----
+                txtDatum.setEnabled(false);
+                txtDatum.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtDatumActionPerformed(e);
+                    }
+                });
+                txtDatum.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtDatumFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtDatumFocusLost(e);
+                    }
+                });
+                jPanel5.add(txtDatum, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
+
+                //---- txtBelegtext ----
+                txtBelegtext.setEnabled(false);
+                txtBelegtext.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtBelegtextActionPerformed(e);
+                    }
+                });
+                txtBelegtext.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtBelegtextFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtBelegtextFocusLost(e);
+                    }
+                });
+                jPanel5.add(txtBelegtext, CC.xy(3, 1, CC.FILL, CC.DEFAULT));
+
+                //---- txtBetrag ----
+                txtBetrag.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtBetrag.setEnabled(false);
+                txtBetrag.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtBetragActionPerformed(e);
+                    }
+                });
+                txtBetrag.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtBetragFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtBetragFocusLost(e);
+                    }
+                });
+                jPanel5.add(txtBetrag, CC.xy(5, 1, CC.FILL, CC.DEFAULT));
+            }
+            pnlBarbetrag.add(jPanel5, CC.xywh(1, 3, 3, 1));
         }
-        add(jtpMain);
-
-        //---- bgBWFilter ----
-        ButtonGroup bgBWFilter = new ButtonGroup();
-        bgBWFilter.add(rbBWAlle);
-        bgBWFilter.add(rbAktuell);
+        add(pnlBarbetrag);
     }// </editor-fold>//GEN-END:initComponents
 
 //    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
@@ -713,53 +533,6 @@ public class PnlTG extends CleanablePanel {
 
     }
 
-    private void jspStatComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspStatComponentResized
-        JScrollPane jsp = (JScrollPane) evt.getComponent();
-        Dimension dim = jsp.getSize();
-        // Größe der Text Spalten im DFN ändern.
-        // Summe der fixen Spalten  = 175 + ein bisschen
-        int textWidth = dim.width - 20;
-        TableColumnModel tcm1 = tblStat.getColumnModel();
-        if (tblStat.getModel().getRowCount() == 0) {
-            return;
-        }
-
-        tcm1.getColumn(0).setHeaderValue("BewohnerIn");
-        tcm1.getColumn(0).setPreferredWidth(textWidth / 4 * 3);
-        tcm1.getColumn(1).setHeaderValue("Summe");
-        tcm1.getColumn(1).setPreferredWidth(textWidth / 4);
-    }//GEN-LAST:event_jspStatComponentResized
-
-    private void rbAktuellActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbAktuellActionPerformed
-        reloadDisplay();
-    }//GEN-LAST:event_rbAktuellActionPerformed
-
-    private void rbBWAlleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbBWAlleActionPerformed
-        reloadDisplay();
-    }//GEN-LAST:event_rbBWAlleActionPerformed
-
-    private void tblStatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblStatMouseClicked
-        if (evt.getClickCount() > 1) {
-            TMTGStat tm = (TMTGStat) tblStat.getModel();
-            ListSelectionModel lsm = tblStat.getSelectionModel();
-            jtpMain.setSelectedIndex(TAB_TG);
-//            OPDE.debug("txtBW.setText(" + tm.getBewohner(lsm.getLeadSelectionIndex()).getBWKennung()+")");
-            txtBW.setText(tm.getBewohner(lsm.getLeadSelectionIndex()).getBWKennung());
-            txtBW.postActionEvent();
-        }
-    }//GEN-LAST:event_tblStatMouseClicked
-
-    private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
-        if (jtpMain.getSelectedIndex() == TAB_STAT) {
-            cmbPast.setEnabled(true);
-            reloadDisplay();
-        } else {
-            cmbPast.setEnabled(false);
-//            txtBW.setText(bewohner.getBWKennung());
-
-        }
-    }//GEN-LAST:event_jtpMainStateChanged
-
     private void jspDataComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspDataComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
@@ -787,12 +560,6 @@ public class PnlTG extends CleanablePanel {
 
     }//GEN-LAST:event_jspDataComponentResized
 
-    private void cmbPastItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPastItemStateChanged
-        if (ignoreDateComboEvent) {
-            return;
-        }
-        updateSummenAngabe();
-    }//GEN-LAST:event_cmbPastItemStateChanged
 
     /**
      * Setzt den Zeitraum, innerhalb dessen die Belege in der Tabelle angezeigt werden können. Nicht unbedingt werden.
@@ -838,48 +605,25 @@ public class PnlTG extends CleanablePanel {
 //        lblMessage.setText("");
 
         // Welcher Tab ist gerade ausgewählt ?
-        switch (jtpMain.getSelectedIndex()) {
-            case TAB_TG: {
-                setMinMax();
-                initSearchTime();
 
-                if (bewohner != null) {
+        setMinMax();
+        initSearchTime();
+
+        if (bewohner != null) {
 //                    BewohnerTools.setBWLabel(lblBW, bewohner);
 
-                    txtDatum.setText(SYSCalendar.printGermanStyle(SYSCalendar.today_date()));
-                    txtBelegtext.setText("Bitte geben Sie einen Belegtext ein.");
-                    txtBetrag.setText("0,00 " + SYSConst.eurosymbol);
-                    betrag = BigDecimal.ZERO;
-                    txtDatum.setEnabled(true);
-                    txtBelegtext.setEnabled(true);
-                    txtBetrag.setEnabled(true);
-                    reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
-                    summeNeuRechnen();
-                }
-
-                break;
-            }
-            case TAB_STAT: {
-//                btnPrint.setEnabled(false);
-//                btnEdit.setEnabled(false);
-                updateSummenAngabe();
-                reloadStatTable();
-                break;
-            }
+            txtDatum.setText(SYSCalendar.printGermanStyle(SYSCalendar.today_date()));
+            txtBelegtext.setText("Bitte geben Sie einen Belegtext ein.");
+            txtBetrag.setText("0,00 " + SYSConst.eurosymbol);
+            betrag = BigDecimal.ZERO;
+            txtDatum.setEnabled(true);
+            txtBelegtext.setEnabled(true);
+            txtBetrag.setEnabled(true);
+            reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
+            summeNeuRechnen();
         }
 
-    }
 
-    private void reloadStatTable() {
-
-        tblStat.setModel(new TMTGStat(rbBWAlle.isSelected()));
-        tblStat.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblStat.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-
-        jspStat.dispatchEvent(new ComponentEvent(jspStat, ComponentEvent.COMPONENT_RESIZED));
-
-        tblStat.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-        tblStat.getColumnModel().getColumn(1).setCellRenderer(new CurrencyRenderer());
     }
 
     private void updateSummenAngabe() {
@@ -899,9 +643,9 @@ public class PnlTG extends CleanablePanel {
 
         // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
         // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
-        if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
+        if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
             Query queryPast = em.createQuery("SELECT SUM(tg.betrag) FROM Barbetrag tg WHERE tg.belegDatum <= :datum");
-            queryPast.setParameter("datum", SYSCalendar.eom((Date) cmbMonat.getSelectedItem()));
+            queryPast.setParameter("datum", SYSCalendar.eom((Date) cmbPast.getSelectedItem()));
 
             BigDecimal summePast = BigDecimal.ZERO;
             try {
@@ -917,7 +661,7 @@ public class PnlTG extends CleanablePanel {
 
         em.close();
 
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gesamtsaldo aller Barbeträge: "+summentext, 10));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gesamtsaldo aller Barbeträge: " + summentext, 10));
 
 //        if (summe.compareTo(BigDecimal.ZERO) < 0) {
 //            lblSumme.setForeground(Color.RED);
@@ -1013,7 +757,6 @@ public class PnlTG extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JTabbedPane jtpMain;
     private JPanel pnlBarbetrag;
     private JPanel jPanel4;
     private JScrollPane jspData;
@@ -1022,23 +765,13 @@ public class PnlTG extends CleanablePanel {
     private JTextField txtDatum;
     private JTextField txtBelegtext;
     private JTextField txtBetrag;
-    private JPanel pnlStat;
-    private JLabel lbl1;
-    private JScrollPane jspStat;
-    private JTable tblStat;
-    private JSeparator jSeparator2;
-    private JLabel jLabel5;
-    private JRadioButton rbBWAlle;
-    private JRadioButton rbAktuell;
-    private JLabel lblSumme;
-    private JComboBox cmbPast;
     // End of variables declaration//GEN-END:variables
 
 
     private void prepareSearchArea() {
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new BoxLayout(mypanel, BoxLayout.Y_AXIS));
-        mypanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        mypanel.setLayout(new VerticalLayout());
+//        mypanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         txtBW = new JXSearchField("Bewohnername");
         txtBW.setInstantSearchDelay(2000); // 2 Sekunden bevor der Caret Update zieht
@@ -1048,7 +781,7 @@ public class PnlTG extends CleanablePanel {
                 if (txtBW.getText().trim().isEmpty()) {
                     return;
                 }
-                BewohnerTools.findeBW(txtBW.getText(), new Closure() {
+                BewohnerTools.findeBW(txtBW.getText().trim(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o == null) {
@@ -1066,21 +799,194 @@ public class PnlTG extends CleanablePanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
-                printSingle(tm.getListData(), tm.getVortrag());
+                if (bewohner != null) {
+                    TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
+                    printSingle(tm.getListData(), tm.getVortrag());
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wählen Sie zuerst eine(n) BewohnerIn aus.", 2));
+                }
             }
         });
         mypanel.add(printButton);
 
-        JideButton gesamtSummeButton = GUITools.createHyperlinkButton("Gesamtsumme ermitteln", new ImageIcon(getClass().getResource("/artwork/22x22/bw/kcalc.png")), new ActionListener() {
+        if (OPDE.isAdmin()) {
+            JideButton gesamtSummeButton = GUITools.createHyperlinkButton("Gesamtsumme ermitteln", new ImageIcon(getClass().getResource("/artwork/22x22/bw/kcalc.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    updateSummenAngabe();
+                }
+            });
+            mypanel.add(gesamtSummeButton);
+
+            cmbPast = new JComboBox();
+            cmbPast.setModel(SYSCalendar.createMonthList(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.YEAR), SYSCalendar.today_date()));
+            cmbPast.setSelectedIndex(cmbPast.getModel().getSize() - 1);
+            cmbPast.setRenderer(new ListCellRenderer() {
+                Format formatter = new SimpleDateFormat("MMMM yyyy");
+
+                @Override
+                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                    String text = formatter.format(o);
+                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+                }
+            });
+            cmbPast.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent itemEvent) {
+                    if (!ignoreDateComboEvent) {
+                        updateSummenAngabe();
+                    }
+                }
+            });
+            mypanel.add(cmbPast);
+        }
+//        mypanel.add(addByTime());
+
+
+
+
+        cmbVon = new JComboBox();
+
+        cmbVon.setRenderer(new ListCellRenderer() {
+            Format formatter = new SimpleDateFormat("MMMM yyyy");
+
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                updateSummenAngabe();
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text = formatter.format(o);
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         });
-        mypanel.add(gesamtSummeButton);
 
-        mypanel.add(addByTime());
+        cmbVon.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (ignoreDateComboEvent) {
+                    return;
+                }
+                if (cmbVon.getSelectedIndex() > cmbBis.getSelectedIndex()) {
+                    ignoreDateComboEvent = true;
+                    cmbBis.setSelectedIndex(cmbVon.getSelectedIndex());
+                    ignoreDateComboEvent = false;
+                }
+                reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
+            }
+        });
+
+        mypanel.add(new TitledSeparator("Von", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
+        mypanel.add(cmbVon);
+
+
+        cmbBis = new JComboBox();
+        cmbBis.setRenderer(new ListCellRenderer() {
+            Format formatter = new SimpleDateFormat("MMMM yyyy");
+
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text = formatter.format(o);
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        });
+
+        cmbBis.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (ignoreDateComboEvent) {
+                    return;
+                }
+                if (cmbVon.getSelectedIndex() > cmbBis.getSelectedIndex()) {
+                    ignoreDateComboEvent = true;
+                    cmbVon.setSelectedIndex(cmbBis.getSelectedIndex());
+                    ignoreDateComboEvent = false;
+                }
+                reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
+            }
+        });
+
+//        panelTime.add(new JLabel(" "));
+        mypanel.add(new TitledSeparator("Bis", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
+        mypanel.add(cmbBis);
+
+        cmbMonat = new JComboBox();
+        cmbMonat.setRenderer(new ListCellRenderer() {
+            Format formatter = new SimpleDateFormat("MMMM yyyy");
+
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+//                OPDE.debug(o.toString());
+                String text = formatter.format(o);
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        });
+
+        cmbMonat.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                ignoreDateComboEvent = true;
+                cmbVon.setSelectedItem(cmbMonat.getSelectedItem());
+                cmbBis.setSelectedItem(cmbMonat.getSelectedItem());
+                ignoreDateComboEvent = false;
+                reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
+            }
+        });
+
+//        panelTime.add(new JLabel(" "));
+        mypanel.add(new TitledSeparator("Bestimmter Monat", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
+        panelTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/date.png")));
+        mypanel.add(cmbMonat);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() > 0) {
+                    cmbMonat.setSelectedIndex(0);
+                }
+            }
+        });
+//        homeButton.setBorder(new EmptyBorder(0,0,0,0));
+        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/back.png")));
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() > 0) {
+                    cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() - 1);
+                }
+            }
+        });
+//        backButton.setBorder(new EmptyBorder(0,0,0,0));
+        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/forward.png")));
+        fwdButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
+                    cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() + 1);
+                }
+            }
+        });
+//        fwdButton.setBorder(new EmptyBorder(0,0,0,0));
+        JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
+        endButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
+                    cmbMonat.setSelectedIndex(cmbMonat.getModel().getSize() - 1);
+                }
+            }
+        });
+//        endButton.setBorder(new EmptyBorder(0,0,0,0));
+
+        buttonPanel.add(homeButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(fwdButton);
+        buttonPanel.add(endButton);
+        mypanel.add(buttonPanel);
+
+
+
         mypanel.add(addBySearchBW());
 
         progPane.setContentPane(mypanel);
@@ -1090,7 +996,7 @@ public class PnlTG extends CleanablePanel {
     private CollapsiblePane addBySearchBW() {
         panelText = new CollapsiblePane("nach Bewohner");
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new BoxLayout(mypanel, BoxLayout.PAGE_AXIS));
+        mypanel.setLayout(new VerticalLayout());
         searchSaldoButtonMap = new HashMap<Bewohner, Object[]>();
 
         EntityManager em = OPDE.createEM();
@@ -1154,7 +1060,8 @@ public class PnlTG extends CleanablePanel {
     private CollapsiblePane addByTime() {
         panelTime = new CollapsiblePane("nach Zeitraum");
         JPanel innerpanel = new JPanel();
-        innerpanel.setLayout(new BoxLayout(innerpanel, BoxLayout.PAGE_AXIS));
+        // new BoxLayout(innerpanel, BoxLayout.Y_AXIS)
+        innerpanel.setLayout(new VerticalLayout());
 
         cmbVon = new JComboBox();
 
@@ -1183,7 +1090,7 @@ public class PnlTG extends CleanablePanel {
             }
         });
 
-        innerpanel.add(new TitledSeparator("Von", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.CENTER));
+        innerpanel.add(new TitledSeparator("Von", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
         innerpanel.add(cmbVon);
 
 
@@ -1214,7 +1121,7 @@ public class PnlTG extends CleanablePanel {
         });
 
 //        panelTime.add(new JLabel(" "));
-        innerpanel.add(new TitledSeparator("Bis", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.CENTER));
+        innerpanel.add(new TitledSeparator("Bis", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
         innerpanel.add(cmbBis);
 
         cmbMonat = new JComboBox();
@@ -1241,7 +1148,7 @@ public class PnlTG extends CleanablePanel {
         });
 
 //        panelTime.add(new JLabel(" "));
-        innerpanel.add(new JXTitledSeparator("Bestimmter Monat"));
+        innerpanel.add(new TitledSeparator("Bestimmter Monat", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
         panelTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/date.png")));
         innerpanel.add(cmbMonat);
 

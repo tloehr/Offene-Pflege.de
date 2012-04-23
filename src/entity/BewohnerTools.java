@@ -107,6 +107,8 @@ public class BewohnerTools {
             } else {
                 applyClosure.execute(null);
             }
+        } else {
+            applyClosure.execute(bewohner);
         }
     }
 

@@ -6,6 +6,7 @@ package op.care;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.pane.CollapsiblePane;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
@@ -52,13 +53,15 @@ public class PnlPflege extends NursingRecordsPanel {
 
     private boolean initPhase;
     private Bewohner currentBewohner = null;
+    private CollapsiblePane searchPane;
     private JFrame parent;
 
 
-    public PnlPflege(JFrame frame, Bewohner bewohner) {
+    public PnlPflege(JFrame frame, Bewohner bewohner, CollapsiblePane searchPane) {
         initPhase = true;
         initComponents();
         this.parent = frame;
+        this.searchPane = searchPane;
         initPanel();
         initPhase = false;
         change2Bewohner(bewohner);
@@ -96,7 +99,7 @@ public class PnlPflege extends NursingRecordsPanel {
 //        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         switch (jtpPflegeakte.getSelectedIndex()) {
             case TAB_UEBERSICHT: {
-                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner, null));
+                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner, searchPane));
                 jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 break;
             }
