@@ -6,7 +6,9 @@ package entity;
 
 import com.jidesoft.pane.CollapsiblePane;
 import op.OPDE;
+import op.tools.GUITools;
 import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -16,6 +18,7 @@ import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -99,6 +102,7 @@ public class PBerichtTAGSTools {
      */
     public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect, LayoutManager layout) {
         EntityManager em = OPDE.createEM();
+        MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
         JPanel panel = new JPanel(layout);
@@ -114,12 +118,12 @@ public class PBerichtTAGSTools {
 
             cb.setSelected(preselect.contains(tag));
             cb.addItemListener(listener);
+            cb.addMouseListener(ma);
 
             panel.add(cb);
         }
         em.close();
         return panel;
-
     }
 
 
@@ -130,14 +134,17 @@ public class PBerichtTAGSTools {
      * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
      * @return das Panel zur weiteren Verwendung.
      */
-    public static void addCheckBoxPanelForTags(CollapsiblePane panel, ItemListener listener, Collection<PBerichtTAGS> preselect) {
+    public static JPanel getCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect) {
         EntityManager em = OPDE.createEM();
+        JPanel panel = new JPanel(new VerticalLayout());
+        MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
         Iterator<PBerichtTAGS> itTags = tags.iterator();
         while (itTags.hasNext()) {
             PBerichtTAGS tag = itTags.next();
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
+            cb.setBackground(Color.WHITE);
             cb.setForeground(tag.getColor());
             if (tag.isBesonders()) {
                 cb.setFont(new Font("Lucida Grande", Font.BOLD, 13));
@@ -146,10 +153,12 @@ public class PBerichtTAGSTools {
 
             cb.setSelected(preselect.contains(tag));
             cb.addItemListener(listener);
+            cb.addMouseListener(ma);
 
             panel.add(cb);
         }
         em.close();
+        return panel;
     }
 
     /**

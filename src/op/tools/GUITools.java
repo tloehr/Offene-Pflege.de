@@ -1,11 +1,12 @@
 package op.tools;
 
-import com.jidesoft.plaf.basic.ThemePainter;
 import com.jidesoft.swing.JideButton;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,5 +31,23 @@ public class GUITools {
         button.addActionListener(actionListener);
 
         return button;
+    }
+
+
+    public static MouseAdapter getHyperlinkStyleMouseAdapter() {
+        return new MouseAdapter() {
+            String text = "";
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                text = ((JCheckBox) mouseEvent.getSource()).getText();
+                ((JCheckBox) mouseEvent.getSource()).setText("<html><u>" + text + "</u></html>");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                ((JCheckBox) mouseEvent.getSource()).setText(text);
+            }
+        };
     }
 }

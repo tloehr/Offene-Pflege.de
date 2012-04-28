@@ -29,31 +29,30 @@ package op.care.berichte;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.popup.JidePopup;
+import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.TitledSeparator;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
-import op.care.*;
-import op.events.TaskPaneContentChangedEvent;
-import op.events.TaskPaneContentChangedListener;
+import op.threads.DisplayMessage;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 import tablemodels.TMPflegeberichte;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -65,14 +64,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Time;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author root
@@ -82,28 +76,15 @@ public class PnlBerichte extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.reports";
     public static final int DEFAULT_DAUER = 3;
 
-    private static int speedSlow = 700;
-    private static int speedFast = 500;
-
-    private final int LAUFENDE_OPERATION_NICHTS = 0;
-    private final int LAUFENDE_OPERATION_BERICHT_EINGABE = 1;
-    private final int LAUFENDE_OPERATION_BERICHT_LOESCHEN = 2;
-    private final int LAUFENDE_OPERATION_BERICHT_BEARBEITEN = 3;
-
-    private int laufendeOperation;
-    private double splitTEPercent, splitBCPercent;
-    private boolean singleRowSelected;
-
-
     /**
      * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
      * Bericht ausgewählt wurde, steht hier immer der Verweis auf den ERSTEN Bericht der Auswahl.
      */
-    private Pflegeberichte aktuellerBericht, oldBericht;
+    private Pflegeberichte bericht;
 
-    private JDateChooser jdcVon, jdcBis;
+    private JDateChooser jdcVon;
     private JXSearchField txtSearch;
-    private CollapsiblePane panelTime, panelText, panelTags;
+    private CollapsiblePane panelTime, panelSearchText, panelTags, panelSpecials;
     private JCheckBox cbShowEdits, cbShowIDs;
 
 
@@ -113,11 +94,8 @@ public class PnlBerichte extends NursingRecordsPanel {
     private JPopupMenu menu;
     private boolean initPhase;
 
-    private CollapsiblePane searchPane;
-    private JCheckBox cbMedi;
-    private JCheckBox cbBilanz;
-    private JCheckBox cbBerichte;
-    private JCheckBox cbBWInfo;
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
     private ItemListener itemListener;
     private MouseAdapter mouseAdapter;
 
@@ -136,21 +114,14 @@ public class PnlBerichte extends NursingRecordsPanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(Bewohner bewohner, CollapsiblePane searchPane) {
+    public PnlBerichte(Bewohner bewohner, JScrollPane jspSearch) {
         this.initPhase = true;
-        this.laufendeOperation = LAUFENDE_OPERATION_NICHTS;
-        this.searchPane = searchPane;
-        this.aktuellerBericht = null;
-        this.oldBericht = null;
-        this.dauerChanged = false;
-        this.singleRowSelected = false;
-
 
         initComponents();
 
 //        btnSystemInfo.setSelected(SYSPropsTools.isBoolean(internalClassID + ":btnSystemInfo"));
 
-        this.searchPane = searchPane;
+        this.jspSearch = jspSearch;
 
 //        this.panelSearch.add(new JXHeader("Berichte", "", new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
 //        positionToAddPanels = this.panelSearch.getComponentCount();
@@ -164,12 +135,6 @@ public class PnlBerichte extends NursingRecordsPanel {
         tagFilter = new ArrayList<PBerichtTAGS>();
         prepareSearchArea();
 
-        btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-        btnSystemInfo.setEnabled(true);
-
-        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE);
-        splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE);
-
         this.initPhase = false;
 
         change2Bewohner(bewohner);
@@ -178,7 +143,14 @@ public class PnlBerichte extends NursingRecordsPanel {
     }
 
     private void prepareSearchArea() {
-        searchPane.setTitle("Bewohner-Übersicht");
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        CollapsiblePane searchPane = new CollapsiblePane("Pflegeberichte");
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
@@ -186,307 +158,222 @@ public class PnlBerichte extends NursingRecordsPanel {
         }
         JPanel mypanel = new JPanel();
         mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
 
-        JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addButton = GUITools.createHyperlinkButton("Neuen Bericht eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, new Closure() {
+                        @Override
+                        public void execute(Object bericht) {
+                            if (bericht != null) {
+                                EntityTools.persist(bericht);
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
+                }
+            });
+            mypanel.add(addButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+            JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+//                    SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+                }
+            });
+            mypanel.add(printButton);
+        }
+
+
+        txtSearch = new JXSearchField("Suchbegriff");
+        txtSearch.setInstantSearchDelay(500);
+        txtSearch.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+            public void actionPerformed(ActionEvent e) {
+                reloadTable();
             }
         });
-        mypanel.add(printButton);
 
-        mypanel.add(cbMedi);
-        mypanel.add(cbBilanz);
-        mypanel.add(cbBerichte);
-        mypanel.add(cbBWInfo);
+
+        searchPane.add(txtSearch);
 
         searchPane.setContentPane(mypanel);
+        searchPanes.add(searchPane);
+
+        addSpecials();
+        addByTime();
+        addByTags();
+
+        searchPanes.addExpansion();
+
     }
 
-    private void btnAddBerichtActionPerformed(ActionEvent e) {
-        initPhase = true;
+//    private void btnApplyActionPerformed(ActionEvent e) {
+//        boolean success = false;
+//        TimelineCallbackAdapter standardAdapter = new TimelineCallbackAdapter() {
+//            @Override
+//            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                if (newState == Timeline.TimelineState.DONE) {
+////                    btnSearch.setEnabled(true);
+//                    btnAddBericht.setEnabled(true);
+//                }
+//            }
+//        };
+//        switch (laufendeOperation) {
+//            case LAUFENDE_OPERATION_BERICHT_EINGABE: {
+//                if (txtBericht.getText().trim().isEmpty()) {
+//                    if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE) {
+//                        lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
+//                    }
+//                } else {
+//                    success = EntityTools.persist(aktuellerBericht);
+//                    splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
+//                }
+//                break;
+//            }
+//            case LAUFENDE_OPERATION_BERICHT_BEARBEITEN: {
+//                if (txtBericht.getText().trim().isEmpty()) {
+//                    if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE) {
+//                        lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
+//                    }
+//                } else {
+//                    success = PflegeberichteTools.changeBericht(oldBericht, aktuellerBericht);
+//                    oldBericht = null;
+//                    splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
+//                }
+//                break;
+//            }
+//            case LAUFENDE_OPERATION_BERICHT_LOESCHEN: {
+//                success = PflegeberichteTools.deleteBericht(aktuellerBericht);
+//                break;
+//            }
+//            default: {
+//
+//            }
+//        }
+//
+//        // War alles ok, dann wird der Ausgangszustand wieder hergestellt.
+//        if (success) {
+//            lblMessage.setText(null);
+//            aktuellerBericht = null;
+//            textmessageTL.cancel();
+//            splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
+//            laufendeOperation = LAUFENDE_OPERATION_NICHTS;
+//            reloadTable();
+//        }
+//    }
 
-        Date now = new Date();
-        laufendeOperation = LAUFENDE_OPERATION_BERICHT_EINGABE;
-        aktuellerBericht = new Pflegeberichte(bewohner);
-        aktuellerBericht.setPit(now);
-        aktuellerBericht.setText("");
-        aktuellerBericht.setDauer(DEFAULT_DAUER);
-        btnAddBericht.setEnabled(false);
-
-        pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cb = (JCheckBox) e.getSource();
-                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    aktuellerBericht.getTags().remove(tag);
-                } else {
-                    aktuellerBericht.getTags().add(tag);
-                }
-            }
-        }, aktuellerBericht.getTags(), new GridLayout(0, 1)));
-
-        DateFormat df = DateFormat.getTimeInstance();
-        jdcDatum.setDate(now);
-        jdcDatum.setMaxSelectableDate(now);
-        txtUhrzeit.setText(df.format(now));
-        txtBericht.setText("");
-
-        initPhase = false;
-        textmessageTL = SYSTools.flashLabel(lblMessage, "Neuen Bericht speichern ?");
-        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
-        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.4d, speedFast);
-        txtBericht.requestFocus();
-    }
-
-    private void btnApplyActionPerformed(ActionEvent e) {
-        boolean success = false;
-        TimelineCallbackAdapter standardAdapter = new TimelineCallbackAdapter() {
-            @Override
-            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                if (newState == Timeline.TimelineState.DONE) {
-//                    btnSearch.setEnabled(true);
-                    btnAddBericht.setEnabled(true);
-                }
-            }
-        };
-        switch (laufendeOperation) {
-            case LAUFENDE_OPERATION_BERICHT_EINGABE: {
-                if (txtBericht.getText().trim().isEmpty()) {
-                    if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE) {
-                        lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
-                    }
-                } else {
-                    success = EntityTools.persist(aktuellerBericht);
-                    splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
-                }
-                break;
-            }
-            case LAUFENDE_OPERATION_BERICHT_BEARBEITEN: {
-                if (txtBericht.getText().trim().isEmpty()) {
-                    if (lblMessage2Timeline == null || lblMessage2Timeline.getState() == Timeline.TimelineState.IDLE) {
-                        lblMessage2Timeline = SYSTools.flashLabel(lblMessage2, "Kann keinen leeren Bericht speichern.", 6, Color.BLUE);
-                    }
-                } else {
-                    success = PflegeberichteTools.changeBericht(oldBericht, aktuellerBericht);
-                    oldBericht = null;
-                    splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardAdapter);
-                }
-                break;
-            }
-            case LAUFENDE_OPERATION_BERICHT_LOESCHEN: {
-                success = PflegeberichteTools.deleteBericht(aktuellerBericht);
-                break;
-            }
-            default: {
-
-            }
-        }
-
-        // War alles ok, dann wird der Ausgangszustand wieder hergestellt.
-        if (success) {
-            lblMessage.setText(null);
-            aktuellerBericht = null;
-            textmessageTL.cancel();
-            splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
-            laufendeOperation = LAUFENDE_OPERATION_NICHTS;
-            reloadTable();
-        }
-    }
-
-    private void splitButtonsCenterComponentResized(ComponentEvent e) {
-        SYSTools.showSide(splitButtonsCenter, splitBCPercent);
-        //OPDE.debug("splitButtonsCenterComponentResized(ComponentEvent e)");
-    }
-
-    private void jdcDatumPropertyChange(PropertyChangeEvent e) {
-        if (!initPhase && e.getPropertyName().equals("date")) {
-            Time uhrzeit = new Time(SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText()).getTimeInMillis());
-            aktuellerBericht.setPit(SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit));
-        }
-    }
-
-    private void txtUhrzeitFocusLost(FocusEvent e) {
-        GregorianCalendar gc;
-        try {
-            gc = SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText());
-            txtUhrzeit.setText(SYSCalendar.toGermanTime(gc));
-
-        } catch (NumberFormatException nfe) {
-            gc = new GregorianCalendar();
-            txtUhrzeit.setText(SYSCalendar.toGermanTime(gc));
-        }
-        Time uhrzeit = new Time(gc.getTimeInMillis());
-        aktuellerBericht.setPit(SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit));
-    }
-
-    private void txtDauerFocusGained(FocusEvent e) {
-        dauerChanged = true;
-    }
-
-    private void txtDauerFocusLost(FocusEvent e) {
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        String test = txtDauer.getText();
-        int dauer = 3;
-        try {
-            Number num = nf.parse(test);
-            dauer = num.intValue();
-            if (dauer < 0) {
-                dauer = 3;
-                txtDauer.setText("3");
-            }
-        } catch (ParseException ex) {
-            dauer = 3;
-            txtDauer.setText("3");
-        }
-        aktuellerBericht.setDauer(dauer);
-    }
-
-    private void txtBerichtCaretUpdate(CaretEvent e) {
-        aktuellerBericht.setText(txtBericht.getText());
-    }
-
-    private void txtUhrzeitActionPerformed(ActionEvent e) {
-        txtDauer.requestFocus();
-    }
-
-    private void splitTableEditorComponentResized(ComponentEvent e) {
-        SYSTools.showSide(splitTableEditor, splitTEPercent);
-    }
-
-    private void btnDeleteActionPerformed(ActionEvent e) {
-        // Darf ich das ?
-        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE))) {
-            return;
-        }
-        laufendeOperation = LAUFENDE_OPERATION_BERICHT_LOESCHEN;
-
-        textmessageTL = SYSTools.flashLabel(lblMessage, "Bericht löschen ?");
-        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
-    }
-
-    private void btnEditActionPerformed(ActionEvent e) {
-        // Darf ich das ?
-        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE))) {
-            return;
-        }
-
-        initPhase = true;
-        Date now = new Date();
-        laufendeOperation = LAUFENDE_OPERATION_BERICHT_BEARBEITEN;
-        oldBericht = aktuellerBericht;
-        aktuellerBericht = PflegeberichteTools.copyBericht(aktuellerBericht);
-
-        pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cb = (JCheckBox) e.getSource();
-                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    aktuellerBericht.getTags().remove(tag);
-                } else {
-                    aktuellerBericht.getTags().add(tag);
-                }
-            }
-        }, aktuellerBericht.getTags(), new GridLayout(0, 1)));
-
-        DateFormat df = DateFormat.getTimeInstance();
-        jdcDatum.setDate(aktuellerBericht.getPit());
-        jdcDatum.setMaxSelectableDate(now);
-        txtUhrzeit.setText(df.format(aktuellerBericht.getPit()));
-        txtBericht.setText(aktuellerBericht.getText());
-
-        initPhase = false;
-        textmessageTL = SYSTools.flashLabel(lblMessage, "Geänderten Bericht speichern ?");
-        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
-        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.4d, speedFast, null);
-        txtBericht.requestFocus();
-    }
+//    private void splitTableEditorComponentResized(ComponentEvent e) {
+//        SYSTools.showSide(splitTableEditor, splitTEPercent);
+//    }
+//
+//    private void btnDeleteActionPerformed(ActionEvent e) {
+//        // Darf ich das ?
+//        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE))) {
+//            return;
+//        }
+//        laufendeOperation = LAUFENDE_OPERATION_BERICHT_LOESCHEN;
+//
+//        textmessageTL = SYSTools.flashLabel(lblMessage, "Bericht löschen ?");
+//        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
+//    }
+//
+//    private void btnEditActionPerformed(ActionEvent e) {
+//        // Darf ich das ?
+//        if (!(singleRowSelected && aktuellerBericht != null && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE))) {
+//            return;
+//        }
+//
+//        initPhase = true;
+//        Date now = new Date();
+//        laufendeOperation = LAUFENDE_OPERATION_BERICHT_BEARBEITEN;
+//        oldBericht = aktuellerBericht;
+//        aktuellerBericht = PflegeberichteTools.copyBericht(aktuellerBericht);
+//
+//        pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                JCheckBox cb = (JCheckBox) e.getSource();
+//                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
+//                if (e.getStateChange() == ItemEvent.DESELECTED) {
+//                    aktuellerBericht.getTags().remove(tag);
+//                } else {
+//                    aktuellerBericht.getTags().add(tag);
+//                }
+//            }
+//        }, aktuellerBericht.getTags(), new GridLayout(0, 1)));
+//
+//        DateFormat df = DateFormat.getTimeInstance();
+//        jdcDatum.setDate(aktuellerBericht.getPit());
+//        jdcDatum.setMaxSelectableDate(now);
+//        txtUhrzeit.setText(df.format(aktuellerBericht.getPit()));
+//        txtBericht.setText(aktuellerBericht.getText());
+//
+//        initPhase = false;
+//        textmessageTL = SYSTools.flashLabel(lblMessage, "Geänderten Bericht speichern ?");
+//        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
+//        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.4d, speedFast, null);
+//        txtBericht.requestFocus();
+//    }
 
 //    private void btnSearchActionPerformed(ActionEvent e) {
 //        toggleSearchArea(speedSlow);
 //    }
 
-//    private void toggleSearchArea(int speed) {
-//        btnSearch.setEnabled(false);
-//        if (searchAreaVisible) {
-//            SYSTools.showSide(splitSearchEdit, SYSTools.RIGHT_LOWER_SIDE, speed, new TimelineCallbackAdapter() {
-//                @Override
-//                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-//                    if (timelineState == Timeline.TimelineState.DONE) {
-//                        btnSearch.setEnabled(true);
-//                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2rightarrow.png")));
-//                    }
-//                }
-//            });
-//        } else {
-//            SYSTools.showSide(splitSearchEdit, panelSearch.getPreferredSize().width, speedSlow, new TimelineCallbackAdapter() {
-//                @Override
-//                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-//                    if (timelineState == Timeline.TimelineState.DONE) {
-//                        btnSearch.setEnabled(true);
-//                        btnSearch.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2leftarrow.png")));
-//                    }
-//                }
-//            });
-//        }
-//        searchAreaVisible = !searchAreaVisible;
-//        SYSPropsTools.storeBoolean(internalClassID + "::searchAreaVisible", searchAreaVisible);
+//    private void tblTBMouseReleased(MouseEvent e) {
+//        ListSelectionModel lsm = tblTB.getSelectionModel();
+//        singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+////        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+//
 //    }
 
-    private void tblTBMouseReleased(MouseEvent e) {
-        ListSelectionModel lsm = tblTB.getSelectionModel();
-        singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-//        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
 
-    }
-
-    private void thisComponentResized(ComponentEvent e) {
-        splitButtonsCenterComponentResized(e);
-        splitTableEditorComponentResized(e);
-    }
-
-    private void btnSystemInfoItemStateChanged(ItemEvent e) {
-        if (initPhase) {
-            return;
-        }
-        SYSPropsTools.storeBoolean(internalClassID + ":btnSystemInfo", btnSystemInfo.isSelected());
-        reloadTable();
-    }
-
-    private void btnCancelActionPerformed(ActionEvent e) {
-
-        TimelineCallbackAdapter standardCancelAdapter = new TimelineCallbackAdapter() {
-            @Override
-            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                if (newState == Timeline.TimelineState.DONE) {
-                    btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-                }
-            }
-        };
-
-
-        switch (laufendeOperation) {
-            case LAUFENDE_OPERATION_BERICHT_EINGABE: {
-                splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardCancelAdapter);
-                break;
-            }
-            case LAUFENDE_OPERATION_BERICHT_BEARBEITEN: {
-                splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardCancelAdapter);
-                break;
-            }
-            default: {
-
-            }
-        }
-        aktuellerBericht = null;
-        oldBericht = null;
-        lblMessage.setText(null);
-        textmessageTL.cancel();
-        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
-        laufendeOperation = LAUFENDE_OPERATION_NICHTS;
-    }
+//    private void btnSystemInfoItemStateChanged(ItemEvent e) {
+//        if (initPhase) {
+//            return;
+//        }
+//        SYSPropsTools.storeBoolean(internalClassID + ":btnSystemInfo", btnSystemInfo.isSelected());
+//        reloadTable();
+//    }
+//
+//    private void btnCancelActionPerformed(ActionEvent e) {
+//
+//        TimelineCallbackAdapter standardCancelAdapter = new TimelineCallbackAdapter() {
+//            @Override
+//            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                if (newState == Timeline.TimelineState.DONE) {
+//                    btnAddBericht.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+//                }
+//            }
+//        };
+//
+//
+//        switch (laufendeOperation) {
+//            case LAUFENDE_OPERATION_BERICHT_EINGABE: {
+//                splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardCancelAdapter);
+//                break;
+//            }
+//            case LAUFENDE_OPERATION_BERICHT_BEARBEITEN: {
+//                splitTEPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedSlow, standardCancelAdapter);
+//                break;
+//            }
+//            default: {
+//
+//            }
+//        }
+//        aktuellerBericht = null;
+//        oldBericht = null;
+//        lblMessage.setText(null);
+//        textmessageTL.cancel();
+//        splitBCPercent = SYSTools.showSide(splitButtonsCenter, SYSTools.LEFT_UPPER_SIDE, speedFast);
+//        laufendeOperation = LAUFENDE_OPERATION_NICHTS;
+//    }
 
     /**
      * This method is called from within the constructor to
@@ -500,13 +387,9 @@ public class PnlBerichte extends NursingRecordsPanel {
         tblTB = new JTable();
 
         //======== this ========
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                thisComponentResized(e);
-            }
-        });
-        setLayout(new CardLayout());
+        setLayout(new FormLayout(
+                "default:grow",
+                "fill:default:grow"));
 
         //======== jspTblTB ========
         {
@@ -519,29 +402,25 @@ public class PnlBerichte extends NursingRecordsPanel {
 
             //---- tblTB ----
             tblTB.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ));
             tblTB.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     tblTBMousePressed(e);
                 }
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    tblTBMouseReleased(e);
-                }
             });
             jspTblTB.setViewportView(tblTB);
         }
-        add(jspTblTB, "card2");
+        add(jspTblTB, CC.xy(1, 1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspTblTBComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspTblTBComponentResized
@@ -563,42 +442,17 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     }//GEN-LAST:event_jspTblTBComponentResized
 
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     @Override
     public void cleanup() {
-        if (textUpperLabelTL != null) {
-            textUpperLabelTL.cancel();
-            textUpperLabelTL = null;
-        }
-        if (textmessageTL != null) {
-            textmessageTL.cancel();
-            textmessageTL = null;
-        }
-        if (lblMessage2Timeline != null) {
-            lblMessage2Timeline.cancel();
-            lblMessage2Timeline = null;
-        }
-//        tblTB.getSelectionModel().removeListSelectionListener(lsl);
-//        lsl = null;
+
         jdcVon.cleanup();
-        jdcBis.cleanup();
-//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
+
     }
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        if (laufendeOperation != LAUFENDE_OPERATION_NICHTS) {
-            btnCancel.doClick();
-        }
-
         this.bewohner = bewohner;
-//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
-        prepareSearchArea();
-//        BewohnerTools.setBWLabel(lblBW, bewohner);
-//        panelSearch.validate();
         reloadTable();
     }
 
@@ -617,48 +471,168 @@ public class PnlBerichte extends NursingRecordsPanel {
             out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false)));
 
             out.close();
-            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSPrint.handleFile(new JFrame(), temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
         }
     }
 
-    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-        printBericht(null);
-    }//GEN-LAST:event_btnPrintActionPerformed
-
     private void tblTBMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTBMousePressed
         Point p = evt.getPoint();
+
+        Point p2 = evt.getPoint();
+        // Convert a coordinate relative to a component's bounds to screen coordinates
+        SwingUtilities.convertPointToScreen(p2, tblTB);
+
+        final Point screenposition = p2;
+
+        final int row = tblTB.rowAtPoint(p);
+        final int col = tblTB.columnAtPoint(p);
+        OPDE.debug("COLUMN: " + col);
+
         ListSelectionModel lsm = tblTB.getSelectionModel();
+        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
-        singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-
-        int row = tblTB.rowAtPoint(p);
         if (singleRowSelected) {
             lsm.setSelectionInterval(row, row);
         }
 
-        aktuellerBericht = (Pflegeberichte) tblTB.getModel().getValueAt(lsm.getLeadSelectionIndex(), TMPflegeberichte.COL_BERICHT);
-        boolean alreadyEdited = aktuellerBericht.isDeleted() || aktuellerBericht.isReplaced();
-        boolean sameUser = aktuellerBericht.getUser().equals(OPDE.getLogin().getUser());
-
-        // Wenn die Zeile gewechselt wird, dann wird jede aktuelle Eingabe einfach beendet.
-        if (laufendeOperation != LAUFENDE_OPERATION_NICHTS) {
-            btnCancel.doClick();
-        }
+        bericht = (Pflegeberichte) tblTB.getModel().getValueAt(lsm.getLeadSelectionIndex(), TMPflegeberichte.COL_BERICHT);
+        final boolean alreadyEdited = bericht.isDeleted() || bericht.isReplaced();
+        final boolean sameUser = bericht.getUser().equals(OPDE.getLogin().getUser());
 
 //        btnEdit.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
 //        btnDelete.setEnabled(singleRowSelected && !aktuellerBericht.isDeleted() && !aktuellerBericht.isReplaced() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
         if (evt.isPopupTrigger()) {
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+
             /**
              * KORRIGIEREN
              * Ein Bericht kann geändert werden (Korrektur)
              * - Wenn sie nicht im Übergabeprotokoll abgehakt wurde.
              */
-            boolean bearbeitenMöglich = !alreadyEdited && singleRowSelected && aktuellerBericht.getUsersAcknowledged().isEmpty();
+            final boolean bearbeitenMöglich = !alreadyEdited && singleRowSelected && bericht.getUsersAcknowledged().isEmpty();
 
-            SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
+            final JMenuItem itemPopupEdit = new JMenuItem("Bericht korrigieren");
+            itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                    final JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                    final JComponent editor;
+                    final Collection<PBerichtTAGS> mytags = new ArrayList(bericht.getTags());
+
+                    switch (col) {
+                        case TMPflegeberichte.COL_PIT: {
+                            editor = new JTextArea(DateFormat.getDateTimeInstance().format(bericht.getPit()));
+                            ((JTextArea) editor).setLineWrap(true);
+                            ((JTextArea) editor).setWrapStyleWord(true);
+                            break;
+                        }
+                        case TMPflegeberichte.COL_Flags: {
+                            if (bearbeitenMöglich && (sameUser || OPDE.isAdmin())) {
+
+                                ItemListener il = new ItemListener() {
+                                    @Override
+                                    public void itemStateChanged(ItemEvent itemEvent) {
+                                        JCheckBox cb = (JCheckBox) itemEvent.getSource();
+                                        PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
+                                        if (itemEvent.getStateChange() == ItemEvent.DESELECTED) {
+                                            mytags.remove(tag);
+                                        } else {
+                                            mytags.add(tag);
+                                        }
+                                    }
+                                };
+
+                                editor = PBerichtTAGSTools.createCheckBoxPanelForTags(il, bericht.getTags(), new VerticalLayout());
+
+                            } else {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie können diesen Bericht nicht ändern.", 2));
+                                editor = null;
+                            }
+                            break;
+                        }
+                        case TMPflegeberichte.COL_HTML: {
+                            editor = new JTextArea(bericht.getText(), 10, 40);
+                            break;
+                        }
+                        default: {
+                            editor = null;
+                        }
+                    }
+
+                    if (editor != null && bearbeitenMöglich) {
+                        popup.getContentPane().add(new JScrollPane(editor));
+                        final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/bw/apply.png")));
+                        saveButton.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+
+                                    Pflegeberichte newBericht = PflegeberichteTools.copyBericht(bericht);
+                                    popup.hidePopup();
+
+                                    switch (col) {
+                                        case TMPflegeberichte.COL_PIT: {
+                                            try {
+                                                newBericht.setPit(DateFormat.getDateTimeInstance().parse(((JTextArea) editor).getText()));
+                                                PflegeberichteTools.changeBericht(bericht, newBericht);
+                                                reloadTable();
+                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Datum geändert", 2));
+                                            } catch (ParseException pe) {
+                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Falsche Datumseingabe", 2));
+                                            }
+                                            break;
+                                        }
+                                        case TMPflegeberichte.COL_Flags: {
+                                            bericht.getTags().clear();
+                                            bericht.getTags().addAll(mytags);
+                                            bericht = EntityTools.merge(bericht);
+                                            reloadTable();
+                                            break;
+                                        }
+                                        case TMPflegeberichte.COL_HTML: {
+                                            if (!((JTextArea) editor).getText().trim().isEmpty()) {
+                                                newBericht.setText(((JTextArea) editor).getText().trim());
+                                                PflegeberichteTools.changeBericht(bericht, newBericht);
+                                                reloadTable();
+                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bericht geändert", 2));
+                                            } else {
+                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Kann keinen leeren Bericht speichern", 2));
+                                            }
+                                            break;
+                                        }
+                                        default: {
+
+                                        }
+                                    }
+
+
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        });
+
+//                    popup.setOwner(tblTB);
+                        popup.getContentPane().add(new JPanel().add(saveButton));
+                        popup.setDefaultFocusComponent(editor);
+                        popup.showPopup(screenposition.x, screenposition.y);
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie können diesen Bericht nicht ändern.", 2));
+                    }
+                }
+            });
+            menu.add(itemPopupEdit);
+            itemPopupEdit.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+
 
             JMenuItem itemPopupPrint = new JMenuItem("Markierte Berichte drucken");
             itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
@@ -674,19 +648,19 @@ public class PnlBerichte extends NursingRecordsPanel {
 //            itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
 
             // Nur anzeigen wenn derselbe User die Änderung versucht, der auch den Text geschrieben hat.
-            if (bearbeitenMöglich && (sameUser || OPDE.isAdmin())) {
-                menu.add(PBerichtTAGSTools.createMenuForTags(aktuellerBericht));
-            }
+//            if (bearbeitenMöglich && (sameUser || OPDE.isAdmin())) {
+//                menu.add(PBerichtTAGSTools.createMenuForTags(bericht));
+//            }
 
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                 menu.add(new JSeparator());
-                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, aktuellerBericht, standardActionListener));
+                menu.add(SYSFilesTools.getSYSFilesContextMenu(new JFrame(), bericht, standardActionListener));
             }
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
                 menu.add(new JSeparator());
-                menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerBericht, bewohner, standardActionListener));
+                menu.add(VorgaengeTools.getVorgangContextMenu(new JFrame(), bericht, bewohner, standardActionListener));
             }
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
@@ -705,8 +679,11 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     private void addByTags() {
         panelTags = new CollapsiblePane("nach Markierung");
-        PBerichtTAGSTools.addCheckBoxPanelForTags(panelTags, new ItemListener() {
+        panelTags.setSlidingDirection(SwingConstants.SOUTH);
+        panelTags.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        panelTags.setCollapsible(false);
 
+        JPanel panel = PBerichtTAGSTools.getCheckBoxPanelForTags(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 JCheckBox cb = (JCheckBox) e.getSource();
@@ -727,7 +704,6 @@ public class PnlBerichte extends NursingRecordsPanel {
         } catch (PropertyVetoException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        panelSearch.add(panelTags);
 
         panelTags.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
@@ -741,47 +717,60 @@ public class PnlBerichte extends NursingRecordsPanel {
             }
         });
 
+        panelTags.setContentPane(panel);
+        searchPanes.add(panelTags);
     }
 
-    private void addBySearchText() {
-        panelText = new CollapsiblePane("nach Suchbegriff");
-        txtSearch = new JXSearchField("Suchbegriff");
-        txtSearch.setInstantSearchDelay(500);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reloadTable();
-            }
-        });
-
-        panelText.add(txtSearch);
-        try {
-            panelText.setCollapsed(true);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        panelSearch.add(panelText);
-
-        panelText.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-            @Override
-            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                reloadTable();
-            }
-
-            @Override
-            public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
-                reloadTable();
-            }
-        });
-    }
+//    private void addBySearchText() {
+//
+//        panelSearchText = new CollapsiblePane("nach Suchbegriff");
+//        panelSearchText.setSlidingDirection(SwingConstants.SOUTH);
+//        panelSearchText.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        panelSearchText.setCollapsible(false);
+//
+//        txtSearch = new JXSearchField("Suchbegriff");
+//        txtSearch.setInstantSearchDelay(500);
+//        txtSearch.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                reloadTable();
+//            }
+//        });
+//
+//
+//        panelSearchText.add(txtSearch);
+//        try {
+//            panelSearchText.setCollapsed(true);
+//        } catch (PropertyVetoException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+////        panelSearchText.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+////            @Override
+////            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+////                reloadTable();
+////            }
+////
+////            @Override
+////            public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+////                reloadTable();
+////            }
+////        });
+//        searchPanes.add(panelSearchText);
+//    }
 
     private void addByTime() {
 
         JPanel labelPanel = new JPanel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout());
 
         panelTime = new CollapsiblePane("nach Zeit");
+        panelTime.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelTime.setCollapsible(false);
+
         jdcVon = new JDateChooser(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
+        jdcVon.setBackground(Color.WHITE);
         jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -794,7 +783,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        labelPanel.add(new JLabel("Von"));
+        labelPanel.add(new TitledSeparator("Berichte anzeigen von", TitledSeparator.TYPE_PARTIAL_ETCHED, SwingConstants.LEADING));
         labelPanel.add(jdcVon);
         JideButton button2Weeks = GUITools.createHyperlinkButton("vor 2 Wochen", null, new ActionListener() {
             @Override
@@ -814,37 +803,12 @@ public class PnlBerichte extends NursingRecordsPanel {
                 jdcVon.setDate(PflegeberichteTools.firstBericht(bewohner).getPit());
             }
         });
-        JideButton buttonToday = GUITools.createHyperlinkButton("heute", null, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                jdcBis.setDate(new Date());
-            }
-        });
+
         labelPanel.add(button2Weeks);
         labelPanel.add(button4Weeks);
         labelPanel.add(buttonBeginning);
 
-        jdcBis = new JDateChooser(new Date());
-        jdcBis.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (initPhase) {
-                    return;
-                }
-                if (!evt.getPropertyName().equals("date")) {
-                    return;
-                }
-                reloadTable();
-            }
-        });
-        labelPanel.add(new JLabel("Bis"));
-//        panelTime.add(new JXTitledSeparator("Bis"));
-        labelPanel.add(jdcBis);
-        labelPanel.add(buttonToday);
-
         panelTime.setContentPane(labelPanel);
-
-        panelSearch.add(panelTime);
 
         panelTime.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
@@ -857,37 +821,61 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
+
+        searchPanes.add(panelTime);
     }
 
-//    private void addSpecials() {
-//        panelSpecials = new JXTaskPane("Sonstiges");
-//
-//        cbShowEdits = new JCheckBox("Änderungen anzeigen");
-//        cbShowEdits.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                SYSPropsTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
-//                reloadTable();
-//            }
-//        });
-//        cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
-//        cbShowIDs.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                SYSPropsTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
-//                reloadTable();
-//            }
-//        });
-//
-//        panelSpecials.add(cbShowEdits);
-//        panelSpecials.add(cbShowIDs);
-//        panelSpecials.setCollapsed(false);
-//        panelSearch.add((JPanel) panelSpecials);
-//
-//        SYSPropsTools.restoreState(internalClassID + ":cbShowEdits", cbShowEdits);
-//        SYSPropsTools.restoreState(internalClassID + ":cbShowIDs", cbShowIDs);
-//
-//    }
+    private void addSpecials() {
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout());
+
+
+        panelSpecials = new CollapsiblePane("Sonstiges");
+        panelSpecials.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelSpecials.setCollapsible(false);
+
+        txtSearch = new JXSearchField("Suchbegriff");
+        txtSearch.setInstantSearchDelay(500);
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reloadTable();
+            }
+        });
+
+
+        labelPanel.add(txtSearch);
+
+        cbShowEdits = new JCheckBox("Änderungen anzeigen");
+        cbShowEdits.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+        cbShowEdits.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SYSPropsTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
+                reloadTable();
+            }
+        });
+        cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
+        cbShowIDs.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+        cbShowIDs.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SYSPropsTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
+                reloadTable();
+            }
+        });
+
+        labelPanel.add(cbShowEdits);
+        labelPanel.add(cbShowIDs);
+
+        panelSpecials.setContentPane(labelPanel);
+        searchPanes.add(panelSpecials);
+
+        SYSPropsTools.restoreState(internalClassID + ":cbShowEdits", cbShowEdits);
+        SYSPropsTools.restoreState(internalClassID + ":cbShowIDs", cbShowIDs);
+
+    }
 
     private void reloadTable() {
         if (initPhase) {
@@ -900,10 +888,6 @@ public class PnlBerichte extends NursingRecordsPanel {
 //        }
 //        textUpperLabelTL = SYSTools.flashLabel(lblBW, "Datenbankzugriff");
 
-        if (laufendeOperation != LAUFENDE_OPERATION_NICHTS) {
-            btnCancel.doClick();
-        }
-
 
         String tags = "";
         if (!panelTags.isCollapsed()) {
@@ -914,49 +898,31 @@ public class PnlBerichte extends NursingRecordsPanel {
             }
         }
 
-        String search = panelText.isCollapsed() ? "" : txtSearch.getText().trim();
-        Date von = panelTime.isCollapsed() ? SYSConst.DATE_VON_ANFANG_AN : jdcVon.getDate();
-        Date bis = panelTime.isCollapsed() ? SYSConst.DATE_BIS_AUF_WEITERES : jdcBis.getDate();
+        String search = txtSearch.getText().trim();
 
-        if (von.after(bis)) {
-            von = bis;
-        }
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" "
                 + " SELECT p FROM Pflegeberichte p "
                 + (tags.isEmpty() ? "" : " JOIN p.tags t ")
                 + " WHERE p.bewohner = :bewohner "
-                + " AND p.pit >= :von AND p.pit <= :bis "
-                + (search.isEmpty() ? "" : " AND p.text like :search ")
+                + (search.isEmpty() ? " AND p.pit >= :von " : " AND p.text like :search ")
                 + (tags.isEmpty() ? "" : " AND t.pbtagid IN (" + tags + " ) ")
-                + (btnSystemInfo.isSelected() ? "" : " AND p.editedBy is null ")
+                + (cbShowEdits.isSelected() ? "" : " AND p.editedBy is null ")
                 + " ORDER BY p.pit DESC ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("von", new Date(SYSCalendar.startOfDay(von)));
-        query.setParameter("bis", new Date(SYSCalendar.endOfDay(bis)));
+
 
         if (!search.isEmpty()) {
             query.setParameter("search", "%" + search + "%");
+        } else {
+            query.setParameter("von", new Date(SYSCalendar.startOfDay(jdcVon.getDate())));
         }
 
         ArrayList<Pflegeberichte> listBerichte = new ArrayList<Pflegeberichte>(query.getResultList());
         em.close();
 
-        tblTB.setModel(new TMPflegeberichte(listBerichte, btnSystemInfo.isSelected()));
-
-
-        //OPDE.debug("tl: "+tl.getState());
-//        if (tl.getState() == Timeline.TimelineState.READY){
-//            OPDE.debug("ready");
-//        } else {
-//            tl.cancel();
-//        }
-//        OPDE.debug("cancelling");
-        //tl.cancel();
-
-        btnPrint.setEnabled(tblTB.getModel().getRowCount() > 0 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
-
+        tblTB.setModel(new TMPflegeberichte(listBerichte, cbShowIDs.isSelected()));
         tblTB.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         jspTblTB.dispatchEvent(new ComponentEvent(jspTblTB, ComponentEvent.COMPONENT_RESIZED));

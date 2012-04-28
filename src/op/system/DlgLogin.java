@@ -50,14 +50,13 @@ import java.sql.SQLException;
 public class DlgLogin extends JDialog {
 
     //    Thread thread = null;
-    Closure actionBlock;
+    private Closure actionBlock;
 
     /**
      * Creates new form DlgLogin
      */
     public DlgLogin(java.awt.Frame parent, String preMessage, Closure actionBlock) {
         super(parent, false);
-        //Tools.center(this);
         OPDE.setLogin(null);
         this.actionBlock = actionBlock;
 
@@ -71,10 +70,6 @@ public class DlgLogin extends JDialog {
 
         initComponents();
         lblMessage.setText(SYSTools.catchNull(preMessage));
-//        this.setLocation(500, 350);
-//        this.requestFocus();
-
-
 
         String defaultlogin = "";
 

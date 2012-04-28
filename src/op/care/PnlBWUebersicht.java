@@ -27,17 +27,17 @@
 package op.care;
 
 import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
-import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSPrint;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.VerticalLayout;
-import tablemodels.TMBarbetrag;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +50,8 @@ import java.beans.PropertyVetoException;
 public class PnlBWUebersicht extends NursingRecordsPanel {
 
     private Bewohner bewohner;
-    private CollapsiblePane searchPane;
+    private CollapsiblePanes searchPanes;
+    private JScrollPane jspSearch;
     private JCheckBox cbMedi;
     private JCheckBox cbBilanz;
     private JCheckBox cbBerichte;
@@ -61,9 +62,9 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     /**
      * Creates new form PnlBWUebersicht
      */
-    public PnlBWUebersicht(Bewohner bewohner, CollapsiblePane searchPane) {
+    public PnlBWUebersicht(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
-        this.searchPane = searchPane;
+        this.jspSearch = jspSearch;
         initPanel();
         prepareSearchArea();
         change2Bewohner(bewohner);
@@ -79,21 +80,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             }
         };
 
-        mouseAdapter = new MouseAdapter() {
-            String text = "";
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-                text = ((JCheckBox) mouseEvent.getSource()).getText();
-                ((JCheckBox) mouseEvent.getSource()).setText("<html><u>"+text+"</u></html>");
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-                ((JCheckBox) mouseEvent.getSource()).setText(text);
-            }
-        };
-
+        mouseAdapter = GUITools.getHyperlinkStyleMouseAdapter();
 
         cbMedi = new JCheckBox("Medikamente", false);
         cbMedi.addItemListener(itemListener);
@@ -103,7 +90,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         cbBerichte.addMouseListener(mouseAdapter);
         cbBilanz = new JCheckBox("Bilanz", true);
         cbBilanz.addItemListener(itemListener);
-        cbBerichte.addMouseListener(mouseAdapter);
+        cbBilanz.addMouseListener(mouseAdapter);
         cbBWInfo = new JCheckBox("Bewohner-Informationen", false);
         cbBWInfo.addItemListener(itemListener);
         cbBWInfo.addMouseListener(mouseAdapter);
@@ -160,7 +147,15 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }
 
     private void prepareSearchArea() {
-        searchPane.setTitle("Bewohner-Übersicht");
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+
+
+        CollapsiblePane searchPane = new CollapsiblePane("Bewohner-Übersicht");
+        searchPane.setSlidingDirection(SwingConstants.SOUTH);
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
@@ -181,8 +176,15 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         mypanel.add(cbBilanz);
         mypanel.add(cbBerichte);
         mypanel.add(cbBWInfo);
+        mypanel.setBackground(Color.WHITE);
 
         searchPane.setContentPane(mypanel);
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+
+        jspSearch.setViewportView(searchPanes);
+
+
     }
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed

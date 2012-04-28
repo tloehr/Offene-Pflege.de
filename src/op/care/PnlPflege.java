@@ -7,6 +7,7 @@ package op.care;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
@@ -53,15 +54,16 @@ public class PnlPflege extends NursingRecordsPanel {
 
     private boolean initPhase;
     private Bewohner currentBewohner = null;
-    private CollapsiblePane searchPane;
+    private CollapsiblePanes searchPanes;
+    private JScrollPane jspSearch;
     private JFrame parent;
 
 
-    public PnlPflege(JFrame frame, Bewohner bewohner, CollapsiblePane searchPane) {
+    public PnlPflege(JFrame frame, Bewohner bewohner, JScrollPane jspSearch) {
         initPhase = true;
         initComponents();
         this.parent = frame;
-        this.searchPane = searchPane;
+        this.jspSearch = jspSearch;
         initPanel();
         initPhase = false;
         change2Bewohner(bewohner);
@@ -99,12 +101,12 @@ public class PnlPflege extends NursingRecordsPanel {
 //        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         switch (jtpPflegeakte.getSelectedIndex()) {
             case TAB_UEBERSICHT: {
-                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner, searchPane));
+                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner, jspSearch));
                 jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 break;
             }
             case TAB_PB: {
-                jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(parent, bewohner, null));
+                jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(bewohner, jspSearch));
                 jtpPflegeakte.setTitleAt(TAB_PB, "Pflegeberichte");
                 break;
             }

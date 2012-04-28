@@ -10,16 +10,16 @@
      <object class="com.jformdesigner.model.FormContainer"> 
       <string>op.tools.CleanablePanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>java.awt.CardLayout</class> 
+       <class>com.jgoodies.forms.layout.FormLayout</class> 
+       <void method="setProperty"> 
+        <string>$columnSpecs</string> 
+        <string>default:grow</string> 
+       </void> 
+       <void method="setProperty"> 
+        <string>$rowSpecs</string> 
+        <string>fill:default:grow</string> 
+       </void> 
       </object> 
-      <void method="addEvent"> 
-       <object class="com.jformdesigner.model.FormEvent"> 
-        <string>java.awt.event.ComponentListener</string> 
-        <string>componentResized</string> 
-        <string>thisComponentResized</string> 
-        <boolean>true</boolean> 
-       </object> 
-      </void> 
       <void property="name"> 
        <string>this</string> 
       </void> 
@@ -181,22 +181,18 @@
             <boolean>true</boolean> 
            </object> 
           </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.MouseListener</string> 
-            <string>mouseReleased</string> 
-            <string>tblTBMouseReleased</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
          </object> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>java.lang.String</class> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
-         <string>value</string> 
-         <string>card2</string> 
+         <string>gridX</string> 
+         <int>1</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>1</int> 
         </void> 
        </object> 
       </void> 

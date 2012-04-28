@@ -10,7 +10,15 @@
      <object class="com.jformdesigner.model.FormWindow"> 
       <string>javax.swing.JDialog</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>java.awt.CardLayout</class> 
+       <class>com.jgoodies.forms.layout.FormLayout</class> 
+       <void method="setProperty"> 
+        <string>$columnSpecs</string> 
+        <string>default:grow</string> 
+       </void> 
+       <void method="setProperty"> 
+        <string>$rowSpecs</string> 
+        <string>fill:default:grow</string> 
+       </void> 
       </object> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
@@ -19,7 +27,7 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>relgap, labelcompgap, default, labelcompgap, default:grow, labelcompgap, center:pref, labelcompgap, relgap</string> 
+          <string>relgap, labelcompgap, default, labelcompgap, 177dlu:grow, labelcompgap, 115dlu:grow, 0dlu, relgap</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -66,14 +74,6 @@
           <void property="name"> 
            <string>jdcDatum</string> 
           </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.beans.PropertyChangeListener</string> 
-            <string>propertyChange</string> 
-            <string>jdcDatumPropertyChange</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -110,6 +110,10 @@
           <void method="setProperty"> 
            <string>gridHeight</string> 
            <int>7</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>hAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
           </void> 
          </object> 
         </void> 
@@ -329,6 +333,14 @@
             <void property="name"> 
              <string>btnCancel</string> 
             </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>btnCancelActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
            </object> 
           </void> 
           <void method="add"> 
@@ -343,6 +355,14 @@
             </void> 
             <void property="name"> 
              <string>btnApply</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>btnApplyActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
             </void> 
            </object> 
           </void> 
@@ -373,10 +393,14 @@
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>java.lang.String</class> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
-         <string>value</string> 
-         <string>card1</string> 
+         <string>gridX</string> 
+         <int>1</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>1</int> 
         </void> 
        </object> 
       </void> 
@@ -396,8 +420,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>400</int> 
-        <int>300</int> 
+        <int>665</int> 
+        <int>415</int> 
        </object> 
       </void> 
      </object> 
