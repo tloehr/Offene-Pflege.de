@@ -9,7 +9,10 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,11 +42,14 @@ public class MedVorratTools {
     }
 
     public static BigDecimal getSumme(MedVorrat vorrat) {
+//        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedBestand bestand : vorrat.getBestaende()) {
             BigDecimal summe = MedBestandTools.getBestandSumme(bestand);
             result = result.add(summe);
         }
+//        long time2 = System.currentTimeMillis();
+//        OPDE.debug("MedVorratTools.getSumme(): " + (time2 - timeStart) + " millis");
         return result;
     }
 

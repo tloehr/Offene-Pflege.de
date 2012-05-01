@@ -23,9 +23,6 @@ import java.util.Map;
  * Ich habe die ursprüngliche Klasse im JavaSpecialist Newsletter #106 gefunden und weitestgehend* unverändert übernommen.
  * Vielen Dank an den Autor Dr. Heinz M. Kabutz.
  *
- * Anmerkungen zu Nimbus:
- *
- *
  * @author Heinz Kabutz: This code is from The Java Specialists' Newsletter http://www.javaspecialists.eu, used with permission.
  * @see "http://www.offene-pflege.de/component/content/article/3-informationen/9-quellen#TJSN"
  *      <p/>

@@ -41,6 +41,7 @@ import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
 import org.eclipse.persistence.config.QueryHints;
+import org.eclipse.persistence.logging.JavaLog;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -433,7 +434,7 @@ public class OPDE {
 
 
 //            if (isDebug()) {
-            jpaProps.put("eclipselink.logging.level", "INFO");
+            jpaProps.put("eclipselink.logging.level", JavaLog.OFF_LABEL);
 //            }
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
@@ -514,7 +515,7 @@ public class OPDE {
                 css = "";
             }
 
-            Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "z6EYnsGFI8kEez3kchMObntWx0FM9Yo");
+            Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
 
 //            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             mainframe = new FrmMain();

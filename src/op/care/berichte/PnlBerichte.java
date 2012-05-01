@@ -46,6 +46,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.JXTitledSeparator;
 import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMPflegeberichte;
 import tablerenderer.RNDHTML;
@@ -428,15 +429,15 @@ public class PnlBerichte extends NursingRecordsPanel {
         Dimension dim = jsp.getSize();
         // Größe der Text Spalte im TB ändern.
         // Summe der fixen Spalten  = 210 + ein bisschen
-        int textWidth = dim.width - 200 - 50;
+        int textWidth = dim.width - 200 - 100;
         TableColumnModel tcm1 = tblTB.getColumnModel();
-        tcm1.getColumn(0).setPreferredWidth(200);
-        tcm1.getColumn(1).setPreferredWidth(50);
-        tcm1.getColumn(2).setPreferredWidth(textWidth);
+        tcm1.getColumn(TMPflegeberichte.COL_PIT).setPreferredWidth(200);
+        tcm1.getColumn(TMPflegeberichte.COL_Flags).setPreferredWidth(100);
+        tcm1.getColumn(TMPflegeberichte.COL_HTML).setPreferredWidth(textWidth);
 
-        tcm1.getColumn(0).setHeaderValue("Datum");
-        tcm1.getColumn(1).setHeaderValue("Info");
-        tcm1.getColumn(2).setHeaderValue("Bericht");
+        tcm1.getColumn(TMPflegeberichte.COL_PIT).setHeaderValue("Datum");
+        tcm1.getColumn(TMPflegeberichte.COL_Flags).setHeaderValue("Info");
+        tcm1.getColumn(TMPflegeberichte.COL_HTML).setHeaderValue("Bericht");
 
         OPDE.debug("jspTblTBComponentResized(java.awt.event.ComponentEvent evt)");
 
@@ -453,6 +454,7 @@ public class PnlBerichte extends NursingRecordsPanel {
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
         reloadTable();
     }
 
@@ -528,8 +530,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                     switch (col) {
                         case TMPflegeberichte.COL_PIT: {
                             editor = new JTextArea(DateFormat.getDateTimeInstance().format(bericht.getPit()));
-                            ((JTextArea) editor).setLineWrap(true);
-                            ((JTextArea) editor).setWrapStyleWord(true);
+                            ((JTextArea) editor).setEditable(true);
                             break;
                         }
                         case TMPflegeberichte.COL_Flags: {
@@ -558,6 +559,9 @@ public class PnlBerichte extends NursingRecordsPanel {
                         }
                         case TMPflegeberichte.COL_HTML: {
                             editor = new JTextArea(bericht.getText(), 10, 40);
+                            ((JTextArea) editor).setLineWrap(true);
+                            ((JTextArea) editor).setWrapStyleWord(true);
+                            ((JTextArea) editor).setEditable(true);
                             break;
                         }
                         default: {
@@ -567,7 +571,7 @@ public class PnlBerichte extends NursingRecordsPanel {
 
                     if (editor != null && bearbeitenMöglich) {
                         popup.getContentPane().add(new JScrollPane(editor));
-                        final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/bw/apply.png")));
+                        final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                         saveButton.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent actionEvent) {
@@ -621,7 +625,8 @@ public class PnlBerichte extends NursingRecordsPanel {
                             }
                         });
 
-//                    popup.setOwner(tblTB);
+                        popup.setOwner(tblTB);
+                        popup.removeExcludedComponent(tblTB);
                         popup.getContentPane().add(new JPanel().add(saveButton));
                         popup.setDefaultFocusComponent(editor);
                         popup.showPopup(screenposition.x, screenposition.y);
@@ -783,7 +788,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        labelPanel.add(new TitledSeparator("Berichte anzeigen von", TitledSeparator.TYPE_PARTIAL_ETCHED, SwingConstants.LEADING));
+        labelPanel.add(new JXTitledSeparator("Berichte anzeigen von"));
         labelPanel.add(jdcVon);
         JideButton button2Weeks = GUITools.createHyperlinkButton("vor 2 Wochen", null, new ActionListener() {
             @Override

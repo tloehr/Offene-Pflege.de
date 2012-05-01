@@ -26,28 +26,36 @@
  */
 package op.care.verordnung;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.files.SYSFilesTools;
+import entity.EntityTools;
+import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
-import entity.vorgang.VorgaengeTools;
 import op.OPDE;
+import op.care.berichte.DlgBericht;
 import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgBestandAbschliessen;
 import op.care.med.vorrat.DlgBestandAnbrechen;
 import op.care.med.vorrat.DlgVorrat;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMVerordnung;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyVetoException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -67,22 +75,26 @@ public class PnlVerordnung extends NursingRecordsPanel {
     //    private boolean readOnly = false;
     private JPopupMenu menu;
 
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
+    private JCheckBox cbAbgesetzt;
+
+
     /**
      * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
      * aufgerufen wurden, einen reloadTable() auslösen können.
      */
-    private ActionListener standardActionListener;
-//    private SYSRunningClasses myRunningClass, blockingClass;
+//    private ActionListener standardActionListener;
 
     /**
      * Creates new form PnlVerordnung
      */
-    public PnlVerordnung(JFrame parent, Bewohner bewohner) {
-        this.parent = parent;
-
-
+    public PnlVerordnung(Bewohner bewohner, JScrollPane jspSearch) {
+        this.jspSearch = jspSearch;
         initComponents();
-        change2Bewohner(bewohner);
+        prepareSearchArea();
+        this.bewohner = bewohner;
+        loadTable();
     }
 
     @Override
@@ -90,20 +102,22 @@ public class PnlVerordnung extends NursingRecordsPanel {
         this.bewohner = bewohner;
 
 
-        BewohnerTools.setBWLabel(lblBW, bewohner);
+//        BewohnerTools.setBWLabel(lblBW, bewohner);
 
-        btnNew.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-        btnBuchen.setEnabled(false);
-        btnVorrat.setEnabled(false);
-        btnPrint.setEnabled(false);
+//        btnNew.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+//        btnBuchen.setEnabled(false);
+//        btnVorrat.setEnabled(false);
+//        btnPrint.setEnabled(false);
 
-        standardActionListener = new ActionListener() {
+//        standardActionListener = new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                reloadTable();
+//            }
+//        };
 
-            public void actionPerformed(ActionEvent e) {
-                reloadTable();
-            }
-        };
-        loadTable();
+        OPDE.debug(BewohnerTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        reloadTable();
     }
 
     /**
@@ -116,24 +130,11 @@ public class PnlVerordnung extends NursingRecordsPanel {
     private void initComponents() {
         jspVerordnung = new JScrollPane();
         tblVerordnung = new JTable();
-        jPanel1 = new JPanel();
-        cbOhneMedi = new JCheckBox();
-        cbBedarf = new JCheckBox();
-        cbMedi = new JCheckBox();
-        cbAbgesetzt = new JCheckBox();
-        jLabel1 = new JLabel();
-        jLabel2 = new JLabel();
-        cbRegel = new JCheckBox();
-        jLabel12 = new JLabel();
-        lblBW = new JLabel();
-        jToolBar1 = new JToolBar();
-        btnNew = new JButton();
-        btnBuchen = new JButton();
-        btnVorrat = new JButton();
-        btnPrint = new JButton();
-        btnStellplan = new JButton();
 
         //======== this ========
+        setLayout(new FormLayout(
+                "default:grow",
+                "fill:default:grow"));
 
         //======== jspVerordnung ========
         {
@@ -147,15 +148,15 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
             //---- tblVerordnung ----
             tblVerordnung.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ));
             tblVerordnung.setToolTipText(null);
             tblVerordnung.addMouseListener(new MouseAdapter() {
@@ -166,218 +167,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             });
             jspVerordnung.setViewportView(tblVerordnung);
         }
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-            //---- cbOhneMedi ----
-            cbOhneMedi.setSelected(true);
-            cbOhneMedi.setText("ohne Medikamente");
-            cbOhneMedi.setBorder(BorderFactory.createEmptyBorder());
-            cbOhneMedi.setMargin(new Insets(0, 0, 0, 0));
-            cbOhneMedi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbOhneMediActionPerformed(e);
-                }
-            });
-
-            //---- cbBedarf ----
-            cbBedarf.setSelected(true);
-            cbBedarf.setText("bei Bedarf");
-            cbBedarf.setBorder(BorderFactory.createEmptyBorder());
-            cbBedarf.setMargin(new Insets(0, 0, 0, 0));
-            cbBedarf.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbBedarfActionPerformed(e);
-                }
-            });
-
-            //---- cbMedi ----
-            cbMedi.setSelected(true);
-            cbMedi.setText("mit Medikamenten");
-            cbMedi.setBorder(BorderFactory.createEmptyBorder());
-            cbMedi.setMargin(new Insets(0, 0, 0, 0));
-            cbMedi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbMediActionPerformed(e);
-                }
-            });
-
-            //---- cbAbgesetzt ----
-            cbAbgesetzt.setText("Abgesetzte");
-            cbAbgesetzt.setBorder(BorderFactory.createEmptyBorder());
-            cbAbgesetzt.setMargin(new Insets(0, 0, 0, 0));
-            cbAbgesetzt.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbAbgesetztActionPerformed(e);
-                }
-            });
-
-            //---- jLabel1 ----
-            jLabel1.setText("fm - nachts, fr\u00fch morgens | mo - morgens | mi - mittags");
-
-            //---- jLabel2 ----
-            jLabel2.setText("nm - nachmittags | ab - abends | sa - nachts, sp\u00e4t abends");
-
-            //---- cbRegel ----
-            cbRegel.setSelected(true);
-            cbRegel.setText("regelm\u00e4\u00dfig");
-            cbRegel.setBorder(BorderFactory.createEmptyBorder());
-            cbRegel.setMargin(new Insets(0, 0, 0, 0));
-            cbRegel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbRegelActionPerformed(e);
-                }
-            });
-
-            //---- jLabel12 ----
-            jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cbAbgesetzt)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbMedi)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbOhneMedi)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbBedarf)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbRegel))
-                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel12, GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap(193, Short.MAX_VALUE))
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbAbgesetzt)
-                            .addComponent(cbMedi)
-                            .addComponent(cbOhneMedi)
-                            .addComponent(cbBedarf)
-                            .addComponent(cbRegel))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(20, Short.MAX_VALUE))
-            );
-        }
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
-
-        //======== jToolBar1 ========
-        {
-            jToolBar1.setFloatable(false);
-
-            //---- btnNew ----
-            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
-            btnNew.setText("Neu");
-            btnNew.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnNewActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnNew);
-
-            //---- btnBuchen ----
-            btnBuchen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")));
-            btnBuchen.setText("Buchen");
-            btnBuchen.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBuchenActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnBuchen);
-
-            //---- btnVorrat ----
-            btnVorrat.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png")));
-            btnVorrat.setText("Vorrat");
-            btnVorrat.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnVorratActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnVorrat);
-
-            //---- btnPrint ----
-            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
-            btnPrint.setText("Drucken");
-            btnPrint.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnPrintActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnPrint);
-
-            //---- btnStellplan ----
-            btnStellplan.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/fileprint.png")));
-            btnStellplan.setText("Stellplan");
-            btnStellplan.setToolTipText("<html>Druckt den Plan zum Tabletten stellen f\u00fcr den <b>aktuellen</b> Tag und f\u00fcr <b>alle</b> BewohnerInnen.</html>");
-            btnStellplan.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnStellplanActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnStellplan);
-        }
-
-        GroupLayout layout = new GroupLayout(this);
-        setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
-                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
-                    .addGap(38, 38, 38))
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspVerordnung, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
+        add(jspVerordnung, CC.xy(1, 1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnStellplanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStellplanActionPerformed
@@ -493,8 +283,16 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     long numVerKennung = VerordnungTools.getNumVerodnungenMitGleicherKennung(verordnung);
                     int status = numVerKennung == 1 ? DlgVerordnung.EDIT_MODE : DlgVerordnung.EDIT_OF_CHANGE_MODE;
-                    new DlgVerordnung(parent, verordnung, status);
-                    reloadTable();
+
+                    OPDE.showJDialogAsSheet(new DlgVerordnung(verordnung, status, new Closure() {
+                        @Override
+                        public void execute(Object verordnung) {
+                            if (verordnung != null) {
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
                 }
             });
 
@@ -506,8 +304,16 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgVerordnung(parent, verordnung, DlgVerordnung.CHANGE_MODE);
-                    loadTable();
+
+                    OPDE.showJDialogAsSheet(new DlgVerordnung(verordnung, DlgVerordnung.CHANGE_MODE, new Closure() {
+                        @Override
+                        public void execute(Object verordnung) {
+                            if (verordnung != null) {
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
                 }
             });
             menu.add(itemPopupChange);
@@ -531,7 +337,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                     if (JOptionPane.showConfirmDialog(parent, "Soll die Verordnung wirklich gelöscht werden.",
                             "Verordnung löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         VerordnungTools.loeschen(verordnung);
-                        loadTable();
+                        reloadTable();
                     }
                 }
             });
@@ -579,15 +385,15 @@ public class PnlVerordnung extends NursingRecordsPanel {
             });
             menu.add(itemPopupPrint);
 
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
-                menu.add(new JSeparator());
-                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, standardActionListener));
-            }
-
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
-                menu.add(new JSeparator());
-                menu.add(VorgaengeTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
-            }
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
+//                menu.add(new JSeparator());
+//                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, standardActionListener));
+//            }
+//
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
+//                menu.add(new JSeparator());
+//                menu.add(VorgaengeTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
+//            }
 
 
             menu.add(new JSeparator());
@@ -617,52 +423,16 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
         new DlgVorrat(this.parent, bewohner);
-        loadTable();
+        reloadTable();
     }//GEN-LAST:event_btnVorratActionPerformed
 
-    private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
-        change2Bewohner(bewohner);
-    }//GEN-LAST:event_btnLockActionPerformed
-
-    private void cbRegelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbRegelActionPerformed
-        if (!cbBedarf.isSelected() && !cbRegel.isSelected()) {
-            cbBedarf.doClick();
-        } else {
-            loadTable();
-        }
-    }//GEN-LAST:event_cbRegelActionPerformed
-
-    private void cbBedarfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBedarfActionPerformed
-        if (!cbBedarf.isSelected() && !cbRegel.isSelected()) {
-            cbRegel.doClick();
-        } else {
-            loadTable();
-        }
-    }//GEN-LAST:event_cbBedarfActionPerformed
-
-    private void cbOhneMediActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOhneMediActionPerformed
-        if (!cbOhneMedi.isSelected() && !cbMedi.isSelected()) {
-            cbMedi.doClick();
-        } else {
-            loadTable();
-        }
-    }//GEN-LAST:event_cbOhneMediActionPerformed
-
-    private void cbMediActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbMediActionPerformed
-        if (!cbOhneMedi.isSelected() && !cbMedi.isSelected()) {
-            cbOhneMedi.doClick();
-        } else {
-            loadTable();
-        }
-    }//GEN-LAST:event_cbMediActionPerformed
-
     private void cbAbgesetztActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbAbgesetztActionPerformed
-        loadTable();
+        reloadTable();
     }//GEN-LAST:event_cbAbgesetztActionPerformed
 
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
         new DlgBestand(parent, bewohner, "");
-        loadTable();
+        reloadTable();
     }//GEN-LAST:event_btnBuchenActionPerformed
 
     private void jspVerordnungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVerordnungComponentResized
@@ -681,8 +451,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
     }//GEN-LAST:event_jspVerordnungComponentResized
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        new DlgVerordnung(parent, bewohner);
-        loadTable();
+
     }//GEN-LAST:event_btnNewActionPerformed
 
     public void cleanup() {
@@ -692,12 +461,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     private void loadTable() {
 
-        tblVerordnung.setModel(new TMVerordnung(bewohner, cbAbgesetzt.isSelected(), cbMedi.isSelected()));
+        tblVerordnung.setModel(new TMVerordnung(bewohner, cbAbgesetzt.isSelected(), true));
         tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        btnBuchen.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnVorrat.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-        btnPrint.setEnabled(tblVerordnung.getModel().getRowCount() > 0 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
+//        btnBuchen.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+//        btnVorrat.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+//        btnPrint.setEnabled(tblVerordnung.getModel().getRowCount() > 0 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
 
         jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
         tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
@@ -709,28 +478,152 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     private void reloadTable() {
         TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
-        tm.reload();
+        tm.reload(bewohner, cbAbgesetzt.isSelected());
+    }
+
+
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+
+        searchPanes.add(addCommands());
+        searchPanes.add(addFilter());
+
+        searchPanes.addExpansion();
+
+    }
+
+    private CollapsiblePane addFilter() {
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout());
+
+        CollapsiblePane panelFilter = new CollapsiblePane("Filter");
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
+
+
+        cbAbgesetzt = new JCheckBox("Abgesetzte Verordnungen anzeigen");
+        cbAbgesetzt.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+        cbAbgesetzt.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SYSPropsTools.storeState(internalClassID + ":cbAbgesetzt", cbAbgesetzt);
+                reloadTable();
+            }
+        });
+
+        labelPanel.add(cbAbgesetzt);
+        SYSPropsTools.restoreState(internalClassID + ":cbAbgesetzt", cbAbgesetzt);
+
+        panelFilter.setContentPane(labelPanel);
+
+        return panelFilter;
+    }
+
+    private CollapsiblePane addCommands() {
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane("Verordnungen");
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addButton = GUITools.createHyperlinkButton("Neue Verordnung eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    OPDE.showJDialogAsSheet(new DlgVerordnung(new Verordnung(bewohner), DlgVerordnung.NEW_MODE, new Closure() {
+                        @Override
+                        public void execute(Object verordnung) {
+                            if (verordnung != null) {
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
+
+//                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, );
+                }
+            });
+            mypanel.add(addButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+            JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, new Closure() {
+                        @Override
+                        public void execute(Object bericht) {
+                            if (bericht != null) {
+                                EntityTools.persist(bericht);
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
+                }
+            });
+            mypanel.add(buchenButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+            JideButton vorratButton = GUITools.createHyperlinkButton("Vorräte bearbeiten", new ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, new Closure() {
+                        @Override
+                        public void execute(Object bericht) {
+                            if (bericht != null) {
+                                EntityTools.persist(bericht);
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
+                }
+            });
+            mypanel.add(vorratButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+            JideButton printButton = GUITools.createHyperlinkButton("Verordnungen drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+//                    SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+                }
+            });
+            mypanel.add(printButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+            JideButton printButton = GUITools.createHyperlinkButton("Stellplan drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+//                    SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+                }
+            });
+            mypanel.add(printButton);
+        }
+
+        searchPane.setContentPane(mypanel);
+        return searchPane;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspVerordnung;
     private JTable tblVerordnung;
-    private JPanel jPanel1;
-    private JCheckBox cbOhneMedi;
-    private JCheckBox cbBedarf;
-    private JCheckBox cbMedi;
-    private JCheckBox cbAbgesetzt;
-    private JLabel jLabel1;
-    private JLabel jLabel2;
-    private JCheckBox cbRegel;
-    private JLabel jLabel12;
-    private JLabel lblBW;
-    private JToolBar jToolBar1;
-    private JButton btnNew;
-    private JButton btnBuchen;
-    private JButton btnVorrat;
-    private JButton btnPrint;
-    private JButton btnStellplan;
     // End of variables declaration//GEN-END:variables
 
 

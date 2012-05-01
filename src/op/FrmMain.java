@@ -423,17 +423,14 @@ public class FrmMain extends SheetableJFrame {
             ActionListener actionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    displayManager.setMainMessage(BewohnerTools.getBWLabelText(innerbewohner));
                     currentBewohner = innerbewohner;
-//                    currentVisiblePanel = new PnlPflege(thisFrame, innerbewohner, jspSearch);
-//                    setPanelTo(currentVisiblePanel);
+
                     if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
                         ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                     } else {
-//                        programPane.setCollapsed(true);
-//                        currentVisiblePanel =
-                        setPanelTo(new PnlPflege(thisFrame, innerbewohner, jspSearch));
+                        setPanelTo(new PnlPflege(innerbewohner, jspSearch));
                     }
+
                 }
             };
 

@@ -9,6 +9,7 @@ import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.io.UnsupportedEncodingException;
@@ -193,27 +194,28 @@ public class MedBestandTools {
     public static BigDecimal getBestandSumme(MedBestand bestand) {
         BigDecimal result = BigDecimal.ZERO;
 
-        for (MedBuchungen buchung : bestand.getBuchungen()) {
-            result = result.add(buchung.getMenge());
-        }
-
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery(" " +
-//                " SELECT SUM(bu.menge) " +
-//                " FROM MedBestand b " +
-//                " JOIN b.buchungen bu " +
-//                " WHERE b = :bestand ");
-//
-//        try {
-//            query.setParameter("bestand", bestand);
-//            result = (BigDecimal) query.getSingleResult();
-//        } catch (NoResultException nre) {
-//            result = BigDecimal.ZERO;
-//        } catch (Exception ex) {
-//            OPDE.fatal(ex);
-//        } finally {
-//            em.close();
+//      Das hier geht zwar auch ist aber LAAAAAANGSAMMMM
+//        for (MedBuchungen buchung : bestand.getBuchungen()) {
+//            result = result.add(buchung.getMenge());
 //        }
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(" " +
+                " SELECT SUM(bu.menge) " +
+                " FROM MedBestand b " +
+                " JOIN b.buchungen bu " +
+                " WHERE b = :bestand ");
+
+        try {
+            query.setParameter("bestand", bestand);
+            result = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            result = BigDecimal.ZERO;
+        } catch (Exception ex) {
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
         return result;
     }
 

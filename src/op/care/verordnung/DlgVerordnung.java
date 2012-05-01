@@ -28,10 +28,12 @@ package op.care.verordnung;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -52,7 +54,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.*;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -61,14 +64,14 @@ import java.util.List;
  *
  * @author tloehr
  */
-public class DlgVerordnung extends javax.swing.JDialog {
+public class DlgVerordnung extends JDialog {
 
     public static final int NEW_MODE = 1; // Neu
     public static final int EDIT_MODE = 2; // Korrigieren
     public static final int CHANGE_MODE = 3; // Ändern
     public static final int EDIT_OF_CHANGE_MODE = 4; // Das ist dann, wenn man eine Veränderung (Change) nachträglich nochmal korrigiert.
 
-    private java.awt.Frame parent;
+    //    private java.awt.Frame parent;
     private boolean ignoreSitCaret;
     private boolean ignoreEvent;
 
@@ -76,18 +79,19 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private JPopupMenu menu;
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
+    private Closure actionBlock;
+    private Verordnung verordnung = null, oldVerordnung = null;
 
-    Verordnung verordnung = null, oldVerordnung = null;
-
-    EntityManager em;
+    private EntityManager em;
 
 
     /**
      * Creates new form DlgVerordnung
      */
-    public DlgVerordnung(java.awt.Frame parent, Verordnung verordnung, int mode) {
-        super(parent, true);
-        this.parent = parent;
+    public DlgVerordnung(Verordnung verordnung, int mode, Closure actionBlock) {
+        super(new JFrame(), false);
+        this.actionBlock = actionBlock;
+
         this.editMode = mode;
         em = OPDE.createEM();
         try {
@@ -131,20 +135,36 @@ public class DlgVerordnung extends javax.swing.JDialog {
         saveOK();
     }
 
+    private void btnAddDosisActionPerformed(ActionEvent e) {
+         PnlRegelDosis dlg = new PnlRegelDosis(verordnung, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    verordnung.getPlanungen().add((VerordnungPlanung) o);
+                    reloadTable();
+                }
+            }
+        });
+        final JidePopup popup = new JidePopup();
+        popup.setMovable(false);
+        popup.setContentPane(dlg);
+        popup.setOwner(btnAddDosis);
+        popup.removeExcludedComponent(btnAddDosis);
+        popup.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                OPDE.debug(propertyChangeEvent.getPropertyName());
+            }
+        });
+        popup.showPopup();
+    }
+
     private void jdcABPropertyChange(PropertyChangeEvent e) {
         if (ignoreEvent) {
             return;
         }
         verordnung.setAbDatum(jdcAB.getDate());
         saveOK();
-    }
-
-    public DlgVerordnung(java.awt.Frame parent, Bewohner bewohner) {
-        super(parent, true);
-        this.parent = parent;
-        this.verordnung = new Verordnung(bewohner);
-        this.editMode = NEW_MODE;
-        initDialog();
     }
 
     /**
@@ -155,8 +175,6 @@ public class DlgVerordnung extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        lblBW = new JLabel();
-        lblTitle = new JLabel();
         jPanel1 = new JPanel();
         cmbSit = new JComboBox();
         txtMed = new JTextField();
@@ -168,9 +186,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
         jPanel8 = new JPanel();
         jspDosis = new JScrollPane();
         tblDosis = new JTable();
+        panel2 = new JPanel();
+        btnAddDosis = new JButton();
+        jLabel6 = new JLabel();
         cbPackEnde = new JCheckBox();
         cbStellplan = new JCheckBox();
-        jLabel6 = new JLabel();
         jPanel3 = new JPanel();
         jPanel4 = new JPanel();
         jLabel3 = new JLabel();
@@ -190,11 +210,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
         jLabel2 = new JLabel();
         lblAN = new JLabel();
         cmbKHAn = new JComboBox();
-        jPanel5 = new JPanel();
-        lblVerordnung = new JLabel();
         panel1 = new JPanel();
-        btnSave = new JButton();
         btnClose = new JButton();
+        btnSave = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -206,33 +224,22 @@ public class DlgVerordnung extends javax.swing.JDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, $rgap",
-                "3*(fill:default, $lgap), fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
-        contentPane.add(lblBW, CC.xywh(3, 3, 3, 1));
-
-        //---- lblTitle ----
-        lblTitle.setFont(new Font("Dialog", Font.BOLD, 24));
-        lblTitle.setText("\u00c4rztliche Verordnung");
-        contentPane.add(lblTitle, CC.xywh(3, 1, 3, 1));
+            "default, $lcgap, default",
+            "fill:default:grow, $lgap, fill:default"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
             jPanel1.setLayout(new FormLayout(
-                    "63dlu, $lcgap, default, 2*($lcgap, default:grow)",
-                    "3*(fill:default, $lgap), fill:default"));
+                "63dlu, $lcgap, default, $lcgap, 52dlu, $lcgap, 204dlu",
+                "3*(fill:default, $lgap), 2*(default, $lgap), fill:default:grow"));
 
             //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbSit.addItemListener(new ItemListener() {
                 @Override
@@ -259,11 +266,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
             jPanel1.add(txtMed, CC.xy(5, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMed.addItemListener(new ItemListener() {
                 @Override
@@ -274,11 +281,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
             jPanel1.add(cmbMed, CC.xy(7, 1));
 
             //---- cmbMass ----
-            cmbMass.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMass.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMass.addItemListener(new ItemListener() {
                 @Override
@@ -323,18 +330,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
             {
                 jPanel8.setBorder(new TitledBorder("Dosis / H\u00e4ufigkeit"));
                 jPanel8.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow",
-                        "fill:default:grow, $lgap, fill:default"));
+                    "default:grow",
+                    "fill:default:grow, $lgap, fill:default"));
 
                 //======== jspDosis ========
                 {
                     jspDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie neue Dosierungen eintragen wollen.</html>");
-                    jspDosis.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            jspDosisMousePressed(e);
-                        }
-                    });
                     jspDosis.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
@@ -344,15 +345,15 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ));
                     tblDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie Ver\u00e4nderungen vornehmen wollen.</html>");
                     tblDosis.addMouseListener(new MouseAdapter() {
@@ -363,54 +364,71 @@ public class DlgVerordnung extends javax.swing.JDialog {
                     });
                     jspDosis.setViewportView(tblDosis);
                 }
-                jPanel8.add(jspDosis, CC.xywh(1, 1, 3, 1));
+                jPanel8.add(jspDosis, CC.xy(1, 1));
 
-                //---- cbPackEnde ----
-                cbPackEnde.setText("Bis Packungsende");
-                cbPackEnde.setBorder(BorderFactory.createEmptyBorder());
-                cbPackEnde.setEnabled(false);
-                cbPackEnde.setMargin(new Insets(0, 0, 0, 0));
-                cbPackEnde.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbPackEndeActionPerformed(e);
-                    }
-                });
-                jPanel8.add(cbPackEnde, CC.xy(1, 3));
+                //======== panel2 ========
+                {
+                    panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
 
-                //---- cbStellplan ----
-                cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
-                cbStellplan.setBorder(BorderFactory.createEmptyBorder());
-                cbStellplan.setMargin(new Insets(0, 0, 0, 0));
-                cbStellplan.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cbStellplanActionPerformed(e);
-                    }
-                });
-                jPanel8.add(cbStellplan, CC.xy(3, 3));
+                    //---- btnAddDosis ----
+                    btnAddDosis.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                    btnAddDosis.setBorder(null);
+                    btnAddDosis.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnAddDosisActionPerformed(e);
+                        }
+                    });
+                    panel2.add(btnAddDosis);
+                }
+                jPanel8.add(panel2, CC.xy(1, 3));
             }
-            jPanel1.add(jPanel8, CC.xywh(1, 7, 7, 1));
+            jPanel1.add(jPanel8, CC.xywh(1, 11, 7, 1));
 
             //---- jLabel6 ----
             jLabel6.setText("Massnahmen:");
             jPanel1.add(jLabel6, CC.xy(1, 5));
+
+            //---- cbPackEnde ----
+            cbPackEnde.setText("Bis Packungsende");
+            cbPackEnde.setBorder(BorderFactory.createEmptyBorder());
+            cbPackEnde.setEnabled(false);
+            cbPackEnde.setMargin(new Insets(0, 0, 0, 0));
+            cbPackEnde.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbPackEndeActionPerformed(e);
+                }
+            });
+            jPanel1.add(cbPackEnde, CC.xywh(1, 7, 7, 1));
+
+            //---- cbStellplan ----
+            cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
+            cbStellplan.setBorder(BorderFactory.createEmptyBorder());
+            cbStellplan.setMargin(new Insets(0, 0, 0, 0));
+            cbStellplan.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbStellplanActionPerformed(e);
+                }
+            });
+            jPanel1.add(cbStellplan, CC.xywh(1, 9, 7, 1));
         }
-        contentPane.add(jPanel1, CC.xy(5, 7));
+        contentPane.add(jPanel1, CC.xy(3, 1));
 
         //======== jPanel3 ========
         {
             jPanel3.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
             jPanel3.setLayout(new FormLayout(
-                    "149dlu",
-                    "3*(fill:default, $lgap), fill:default:grow"));
+                "149dlu",
+                "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== jPanel4 ========
             {
                 jPanel4.setBorder(new TitledBorder("Absetzung"));
                 jPanel4.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow",
-                        "4*(fill:17dlu, $lgap), fill:17dlu"));
+                    "default, $lcgap, 120dlu",
+                    "4*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- jLabel3 ----
                 jLabel3.setText("Am:");
@@ -431,11 +449,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 jPanel4.add(jLabel4, CC.xy(1, 5));
 
                 //---- cmbAB ----
-                cmbAB.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbAB.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbAB.setEnabled(false);
                 cmbAB.addItemListener(new ItemListener() {
@@ -463,11 +481,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 jPanel4.add(lblAB, CC.xy(3, 9));
 
                 //---- cmbKHAb ----
-                cmbKHAb.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbKHAb.setEnabled(false);
                 cmbKHAb.addItemListener(new ItemListener() {
@@ -502,8 +520,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
             {
                 jPanel2.setBorder(new TitledBorder("Ansetzung"));
                 jPanel2.setLayout(new FormLayout(
-                        "default, $lcgap, 68dlu:grow",
-                        "17dlu, 3*($lgap, fill:17dlu)"));
+                    "default, $lcgap, 119dlu:grow",
+                    "17dlu, 3*($lgap, fill:17dlu)"));
 
                 //---- jLabel1 ----
                 jLabel1.setText("Am:");
@@ -519,11 +537,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 jPanel2.add(jdcAN, CC.xy(3, 1));
 
                 //---- cmbAN ----
-                cmbAN.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbAN.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbAN.addItemListener(new ItemListener() {
                     @Override
@@ -542,11 +560,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 jPanel2.add(lblAN, CC.xy(3, 7));
 
                 //---- cmbKHAn ----
-                cmbKHAn.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbKHAn.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbKHAn.addItemListener(new ItemListener() {
                     @Override
@@ -558,40 +576,24 @@ public class DlgVerordnung extends javax.swing.JDialog {
             }
             jPanel3.add(jPanel2, CC.xy(1, 1));
         }
-        contentPane.add(jPanel3, CC.xy(3, 7));
-
-        //======== jPanel5 ========
-        {
-            jPanel5.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
-
-            //---- lblVerordnung ----
-            lblVerordnung.setFont(new Font("Dialog", Font.BOLD, 18));
-            lblVerordnung.setForeground(new Color(0, 51, 255));
-            lblVerordnung.setText("jLabel11");
-
-            GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
-            jPanel5.setLayout(jPanel5Layout);
-            jPanel5Layout.setHorizontalGroup(
-                    jPanel5Layout.createParallelGroup()
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, 882, Short.MAX_VALUE)
-                                    .addContainerGap())
-            );
-            jPanel5Layout.setVerticalGroup(
-                    jPanel5Layout.createParallelGroup()
-                            .addComponent(lblVerordnung, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            );
-        }
-        contentPane.add(jPanel5, CC.xywh(3, 5, 3, 1));
+        contentPane.add(jPanel3, CC.xy(1, 1));
 
         //======== panel1 ========
         {
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
 
+            //---- btnClose ----
+            btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnClose.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCloseActionPerformed(e);
+                }
+            });
+            panel1.add(btnClose);
+
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnSave.setText("Speichern");
             btnSave.setEnabled(false);
             btnSave.addActionListener(new ActionListener() {
                 @Override
@@ -600,19 +602,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
                 }
             });
             panel1.add(btnSave);
-
-            //---- btnClose ----
-            btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnClose.setText("Schlie\u00dfen");
-            btnClose.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCloseActionPerformed(e);
-                }
-            });
-            panel1.add(btnClose);
         }
-        contentPane.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
+        contentPane.add(panel1, CC.xy(3, 3, CC.RIGHT, CC.DEFAULT));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -650,7 +641,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         initComponents();
 //        prepareTMPData();
 
-        BewohnerTools.setBWLabel(lblBW, verordnung.getBewohner());
+//        BewohnerTools.setBWLabel(lblBW, verordnung.getBewohner());
         setTitle(SYSTools.getWindowTitle("Ärztliche Verordnungen, Detailansicht"));
         fillAerzteUndKHs();
 
@@ -666,7 +657,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
         cmbSit.setRenderer(SituationenTools.getSituationenRenderer());
         cmbMed.setModel(new DefaultComboBoxModel());
         if (this.editMode == NEW_MODE) { // NewMode
-            lblTitle.setText(lblTitle.getText() + " (Neuer Eintrag)");
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neuer Eintrag einer ärztlichen Verordnung"));
+//            lblTitle.setText(lblTitle.getText() + " (Neuer Eintrag)");
             jdcAN.setDate(SYSCalendar.today_date());
             cbAB.setSelected(false);
             txtBemerkung.setText("");
@@ -677,11 +669,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
             cbStellplan.setEnabled(true);
             cbStellplan.setSelected(false);
             tblDosis.setModel(new DefaultTableModel());
-            lblVerordnung.setText(" ");
+//            lblVerordnung.setText(" ");
 
             cbPackEnde.setEnabled(false);
         } else { // CHANGE oder EDIT
-            lblTitle.setText(lblTitle.getText() + (editMode == EDIT_MODE ? " (Korrektur)" : " (Änderung der bestehenden Verordnung)"));
+//            lblTitle.setText(lblTitle.getText() + (editMode == EDIT_MODE ? " (Korrektur)" : " (Änderung der bestehenden Verordnung)"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage((editMode == EDIT_MODE ? "Korrektur" : "Änderung") + " der bestehenden Verordnung)"));
             // Bei einer Änderung muss sich das Fenster am Anfang in einem Zustand befinden,
             // der ein Save ermöglich
             btnSave.setEnabled(true);
@@ -719,10 +712,12 @@ public class DlgVerordnung extends javax.swing.JDialog {
             cmbSit.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
 
             if (cmbMed.getSelectedItem() != null) {
-                lblVerordnung.setText(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
+//                lblVerordnung.setText();
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
                 cbPackEnde.setEnabled(true);
             } else {
-                lblVerordnung.setText(((Massnahmen) cmbMass.getSelectedItem()).getBezeichnung());
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(((Massnahmen) cmbMass.getSelectedItem()).getBezeichnung()));
+//                lblVerordnung.setText();
                 cbPackEnde.setEnabled(false);
             }
             if (!verordnung.isAbgesetzt()) {
@@ -744,7 +739,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         ignoreSitCaret = false;
         ignoreEvent = false;
         pack();
-        SYSTools.centerOnParent(parent, this);
+//        SYSTools.centerOnParent(parent, this);
         txtMed.requestFocus();
 
         myPropertyChangeListener = new java.beans.PropertyChangeListener() {
@@ -759,7 +754,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
         jdcAN.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
         jdcAB.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void txtMedFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMedFocusGained
@@ -807,7 +802,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
         if (!evt.isPopupTrigger()) {
             return;
         }
+        Point p2 = evt.getPoint();
+        // Convert a coordinate relative to a component's bounds to screen coordinates
+        SwingUtilities.convertPointToScreen(p2, jspDosis);
 
+        final Point screenposition = p2;
         // Wenn die Dosis Tabelle leer ist, dann funktioniert da auch kein MousePressed Event
         // In diesem Fall muss die ScrollPane einspringen.
         TableModel tm = tblDosis.getModel();
@@ -822,13 +821,28 @@ public class DlgVerordnung extends javax.swing.JDialog {
         itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Date ldatum = null;
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, verordnung);
-                if (dlg.getPlanung() != null) {
-                    verordnung.getPlanungen().add(dlg.getPlanung());
-                    reloadTable();
-                }
-                dlg = null;
+                //Date ldatum = null;
+                PnlRegelDosis dlg = new PnlRegelDosis(verordnung, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            verordnung.getPlanungen().add((VerordnungPlanung) o);
+                            reloadTable();
+                        }
+                    }
+                });
+                final JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.setContentPane(dlg);
+                popup.setOwner(tblDosis);
+                popup.removeExcludedComponent(tblDosis);
+                popup.showPopup(screenposition.x, screenposition.y);
+                popup.addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                        OPDE.debug(propertyChangeEvent.getPropertyName());
+                    }
+                });
             }
         });
         menu.add(itemPopupNew);
@@ -845,7 +859,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
         cmbMass.setEnabled(false);
         cbStellplan.setEnabled(false);
         cbStellplan.setSelected(false);
-        lblVerordnung.setText(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
+//        lblVerordnung.setText();
         // Bestand prüfen
         saveOK();
     }//GEN-LAST:event_cmbMedItemStateChanged
@@ -885,13 +900,14 @@ public class DlgVerordnung extends javax.swing.JDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         save();
-        dispose();
+        actionBlock.execute(verordnung);
+        cleanup();
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    public void dispose() {
+    private void cleanup() {
 
-        if (em.isOpen()){
-            if (em.getTransaction().isActive()){
+        if (em.isOpen()) {
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             em.close();
@@ -902,7 +918,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
         jdcAB.cleanup();
         jdcAN.cleanup();
         SYSTools.unregisterListeners(this);
-        super.dispose();
+//        super.dispose();
     }
 
     private void cmbSitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSitItemStateChanged
@@ -1065,8 +1081,13 @@ public class DlgVerordnung extends javax.swing.JDialog {
             return;
         }
         Point p = evt.getPoint();
-        //final int col = tblDosis.columnAtPoint(p);
+        Point p2 = evt.getPoint();
+        // Convert a coordinate relative to a component's bounds to screen coordinates
+        SwingUtilities.convertPointToScreen(p2, tblDosis);
+
+        final Point screenposition = p2;
         final int row = tblDosis.rowAtPoint(p);
+
         ListSelectionModel lsm = tblDosis.getSelectionModel();
         lsm.setSelectionInterval(row, row);
 
@@ -1077,31 +1098,65 @@ public class DlgVerordnung extends javax.swing.JDialog {
         // Menüeinträge
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
-
-        JMenuItem itemPopupNew = new JMenuItem("Neue Dosis eingeben");
-        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                //Date ldatum = null;
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, verordnung);
-                if (dlg.getPlanung() != null) {
-                    verordnung.getPlanungen().add(dlg.getPlanung());
-                    reloadTable();
-                }
-                dlg = null;
-            }
-        });
-        menu.add(itemPopupNew);
+//
+//        JMenuItem itemPopupNew = new JMenuItem("Neue Dosis eingeben");
+//        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
+//
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                //Date ldatum = null;
+//                DlgVerabreichung dlg = new DlgVerabreichung(verordnung, new Closure() {
+//                    @Override
+//                    public void execute(Object o) {
+//                        if (o != null) {
+//                            verordnung.getPlanungen().add((VerordnungPlanung) o);
+//                            reloadTable();
+//                        }
+//                    }
+//                });
+//                final JidePopup popup = new JidePopup();
+//                popup.setMovable(false);
+//                popup.setContentPane(dlg);
+//                popup.setOwner(tblDosis);
+//                popup.removeExcludedComponent(tblDosis);
+//                popup.showPopup(screenposition.x, screenposition.y);
+//                popup.addPropertyChangeListener(new PropertyChangeListener() {
+//                    @Override
+//                    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+//                        OPDE.debug(propertyChangeEvent.getPropertyName());
+//                    }
+//                });
+//            }
+//        });
+//        menu.add(itemPopupNew);
         // Bei Bedarfsmedikation kann immer nur eine Dosis eingegeben werden.
-        itemPopupNew.setEnabled(!verordnung.isBedarf() || tm.getRowCount() == 0);
+
 
         JMenuItem itemPopupEditText = new JMenuItem("Bearbeiten");
         itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
-                DlgVerabreichung dlg = new DlgVerabreichung(parent, planung, verordnung);
-                dlg = null;
+
+
+                PnlRegelDosis dlg = new PnlRegelDosis(planung, verordnung, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+//                            verordnung.getPlanungen().add((VerordnungPlanung) o);
+                            reloadTable();
+                        }
+                    }
+                });
+                final JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.setContentPane(dlg);
+                popup.setOwner(tblDosis);
+                popup.removeExcludedComponent(tblDosis);
+                popup.showPopup(screenposition.x, screenposition.y);
+
+
+//                DlgVerabreichung dlg = new DlgVerabreichung(parent, planung, verordnung);
+//                dlg = null;
                 reloadTable();
             }
         });
@@ -1140,7 +1195,6 @@ public class DlgVerordnung extends javax.swing.JDialog {
             cmbMass.setEnabled(true);
             cbStellplan.setEnabled(true);
             cbStellplan.setSelected(false);
-            lblVerordnung.setText(" ");
             cmbMed.setToolTipText("");
             ignoreEvent = true;
             cbPackEnde.setSelected(false);
@@ -1173,7 +1227,7 @@ public class DlgVerordnung extends javax.swing.JDialog {
             if (cmbMed.getModel().getSize() > 0) {
                 cmbMedItemStateChanged(null);
             } else {
-                lblVerordnung.setText(" ");
+//                lblVerordnung.setText(" ");
                 cmbMed.setToolTipText("");
                 cmbMass.setSelectedIndex(-1);
                 cmbMass.setEnabled(true);
@@ -1188,8 +1242,8 @@ public class DlgVerordnung extends javax.swing.JDialog {
     }//GEN-LAST:event_txtMedCaretUpdate
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-
-        dispose();
+        actionBlock.execute(null);
+        cleanup();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void cmbANItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbANItemStateChanged
@@ -1270,8 +1324,6 @@ public class DlgVerordnung extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel lblBW;
-    private JLabel lblTitle;
     private JPanel jPanel1;
     private JComboBox cmbSit;
     private JTextField txtMed;
@@ -1283,9 +1335,11 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private JPanel jPanel8;
     private JScrollPane jspDosis;
     private JTable tblDosis;
+    private JPanel panel2;
+    private JButton btnAddDosis;
+    private JLabel jLabel6;
     private JCheckBox cbPackEnde;
     private JCheckBox cbStellplan;
-    private JLabel jLabel6;
     private JPanel jPanel3;
     private JPanel jPanel4;
     private JLabel jLabel3;
@@ -1305,11 +1359,9 @@ public class DlgVerordnung extends javax.swing.JDialog {
     private JLabel jLabel2;
     private JLabel lblAN;
     private JComboBox cmbKHAn;
-    private JPanel jPanel5;
-    private JLabel lblVerordnung;
     private JPanel panel1;
-    private JButton btnSave;
     private JButton btnClose;
+    private JButton btnSave;
     // End of variables declaration//GEN-END:variables
 
 }

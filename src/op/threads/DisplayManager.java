@@ -40,7 +40,6 @@ public class DisplayManager extends Thread {
         lblSub.setText(" ");
         messageQ = new ArrayList<DisplayMessage>();
         oldMessages = new ArrayList<DisplayMessage>();
-//        df = DateFormat.getTimeInstance(DateFormat.SHORT);
     }
 
     public void setMainMessage(String message) {

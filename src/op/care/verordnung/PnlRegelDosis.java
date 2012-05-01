@@ -28,11 +28,12 @@ package op.care.verordnung;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.swing.*;
 import com.toedter.calendar.JDateChooser;
-import entity.verordnungen.MedFormenTools;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungPlanung;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -46,27 +47,28 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import org.jdesktop.swingx.*;
 
 /**
  * @author tloehr
  */
-public class DlgVerabreichung extends javax.swing.JDialog {
+public class PnlRegelDosis extends CleanablePanel {
 
     //private HashMap template;
     private JRadioButton dummy;
     private String tage[] = {"Mon", "Die", "Mit", "Don", "Fre", "Sam", "Son"};
     private boolean ignoreEvent = false;
-    private Component parent;
     private JDCPropertyChangeListener jdcpcl;
     private Verordnung verordnung;
     private VerordnungPlanung planung;
+    private Closure actionBlock;
 
 
     /**
      * für Neueingaben
      */
-    public DlgVerabreichung(java.awt.Frame parent, Verordnung verordnung) {
-        this(parent, null, verordnung);
+    public PnlRegelDosis(Verordnung verordnung, Closure actionBlock) {
+        this(null, verordnung, actionBlock);
     }
 
 //    public DlgVerabreichung(JDialog parent, Verordnung verordnung) {
@@ -76,15 +78,14 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     /**
      * für Änderungen
      */
-    public DlgVerabreichung(java.awt.Frame parent, VerordnungPlanung planung, Verordnung verordnung) {
-        super(parent, true);
-        this.parent = parent;
+    public PnlRegelDosis(VerordnungPlanung planung, Verordnung verordnung, Closure actionBlock) {
+        this.actionBlock = actionBlock;
         this.verordnung = verordnung;
         if (planung == null) {
             planung = new VerordnungPlanung(verordnung);
         }
         this.planung = planung;
-        initDialog();
+        initPanel();
     }
 //
 //    public DlgVerabreichung(JDialog parent, VerordnungPlanung planung, Verordnung verordnung) {
@@ -98,18 +99,18 @@ public class DlgVerabreichung extends javax.swing.JDialog {
 //        initDialog();
 //    }
 
-    private void initDialog() {
+    private void initPanel() {
 
         initComponents();
 
-        String einheit = "x";
-        if (verordnung.getDarreichung() != null) {
-            einheit = MedFormenTools.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()];
-        }
+//        String einheit = "x";
+//        if (verordnung.getDarreichung() != null) {
+//            einheit = MedFormenTools.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()];
+//        }
+//
+//        lblEin1.setText("Einheit: " + einheit);
 
-        lblEin1.setText("Einheit: " + einheit);
-
-        this.setTitle(SYSTools.getWindowTitle("Dosierung/Häufigkeit"));
+//        this.setTitle(SYSTools.getWindowTitle("Dosierung/Häufigkeit"));
 
         dummy = new JRadioButton();
         bgMonat.add(dummy);
@@ -117,15 +118,15 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         cmbUhrzeit.setModel(new DefaultComboBoxModel(SYSCalendar.fillUhrzeiten().toArray()));
 
         ignoreEvent = true;
-        if (verordnung.isBedarf()) {
-            txtMaxTimes.setText(planung.getMaxAnzahl().toString());
-            txtEDosis.setText(planung.getMaxEDosis().toString());
-        } else {
-            txtMaxTimes.setText("0");
-            txtEDosis.setText(BigDecimal.ZERO.toString());
-        }
-        lblDosis.setEnabled(verordnung.isBedarf());
-        lblX.setEnabled(verordnung.isBedarf());
+//        if (verordnung.isBedarf()) {
+//            txtMaxTimes.setText(planung.getMaxAnzahl().toString());
+//            txtEDosis.setText(planung.getMaxEDosis().toString());
+//        } else {
+//            txtMaxTimes.setText("0");
+//            txtEDosis.setText(BigDecimal.ZERO.toString());
+//        }
+//        lblDosis.setEnabled(verordnung.isBedarf());
+//        lblX.setEnabled(verordnung.isBedarf());
 
         if (planung.getUhrzeit() == null) {
             cmbUhrzeit.setSelectedIndex(-1);
@@ -209,8 +210,8 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         txtUhrzeit.setEnabled(!verordnung.isBedarf());
         txtNachtAb.setEnabled(!verordnung.isBedarf());
         cmbUhrzeit.setEnabled(!verordnung.isBedarf());
-        txtMaxTimes.setEnabled(verordnung.isBedarf());
-        txtEDosis.setEnabled(verordnung.isBedarf());
+//        txtMaxTimes.setEnabled(verordnung.isBedarf());
+//        txtEDosis.setEnabled(verordnung.isBedarf());
 
         txtNachtMo.setText(planung.getNachtMo().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
         txtMorgens.setText(planung.getMorgens().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
@@ -231,17 +232,13 @@ public class DlgVerabreichung extends javax.swing.JDialog {
 
         jdcLDatum.setEnabled(!verordnung.isBedarf());
 
-        if (verordnung.isBedarf()) {
-            txtEDosis.requestFocus();
-        } else {
-            txtMorgens.requestFocus();
-        }
+        txtMorgens.requestFocus();
 
 
         ignoreEvent = false;
-        pack();
-        SYSTools.centerOnParent(parent, this);
-        setVisible(true);
+//        pack();
+//        SYSTools.centerOnParent(parent, this);
+//        setVisible(true);
     }
 
     /**
@@ -253,27 +250,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPanel3 = new JPanel();
-        jPanel2 = new JPanel();
-        lblDosis = new JLabel();
-        txtMaxTimes = new JTextField();
-        lblX = new JLabel();
-        txtEDosis = new JTextField();
-        lblEin1 = new JLabel();
-        pnlRegular = new JPanel();
-        jLabel1 = new JLabel();
-        jLabel2 = new JLabel();
-        jLabel3 = new JLabel();
-        jLabel4 = new JLabel();
-        jLabel6 = new JLabel();
-        cmbUhrzeit = new JComboBox();
-        jLabel11 = new JLabel();
-        txtNachtMo = new JTextField();
-        txtNachtAb = new JTextField();
-        txtMittags = new JTextField();
-        txtMorgens = new JTextField();
-        txtNachmittags = new JTextField();
-        txtAbends = new JTextField();
-        txtUhrzeit = new JTextField();
         pnlWdh = new JPanel();
         rbTag = new JRadioButton();
         rbWoche = new JRadioButton();
@@ -282,8 +258,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         cbDie = new JCheckBox();
         rbMonatTag = new JRadioButton();
         rbMonatWTag = new JRadioButton();
-        spinTaeglich = new JSpinner();
-        jLabel7 = new JLabel();
         spinWoche = new JSpinner();
         jLabel8 = new JLabel();
         cbMit = new JCheckBox();
@@ -299,348 +273,49 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         cmbWTag = new JComboBox();
         jLabel13 = new JLabel();
         jdcLDatum = new JDateChooser();
-        jPanel1 = new JPanel();
+        pnlRegular = new JPanel();
+        jLabel6 = new JideLabel();
+        jLabel1 = new JideLabel();
+        jLabel2 = new JideLabel();
+        jLabel11 = new JideLabel();
+        jLabel3 = new JideLabel();
+        jLabel4 = new JideLabel();
+        panel1 = new JPanel();
+        label1 = new JLabel();
+        jideLabel1 = new JideLabel();
+        cmbUhrzeit = new JComboBox();
+        txtNachtMo = new JTextField();
+        txtMorgens = new JTextField();
+        txtMittags = new JTextField();
+        txtNachmittags = new JTextField();
+        txtAbends = new JTextField();
+        txtNachtAb = new JTextField();
+        txtUhrzeit = new JTextField();
+        tabWdh = new JideTabbedPane();
+        pnlDaily = new JPanel();
+        spinTaeglich = new JSpinner();
+        jLabel7 = new JLabel();
+        pnlWeekly = new JPanel();
+        pnlMonthly = new JPanel();
         btnSave = new JButton();
-        btnDiscard = new JButton();
         bgWdh = new ButtonGroup();
         bgMonat = new ButtonGroup();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default:grow, $lcgap",
-            "$rgap, $lgap, pref:grow, $lgap, fill:default, $lgap, $rgap"));
+        setLayout(new BorderLayout());
 
         //======== jPanel3 ========
         {
             jPanel3.setLayout(new FormLayout(
-                "2*(default:grow, $lcgap), default:grow",
-                "fill:default, $lgap, fill:default:grow, $lgap, fill:default"));
-
-            //======== jPanel2 ========
-            {
-                jPanel2.setBorder(new TitledBorder("Dosierung (bei Bedarf)"));
-                jPanel2.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow",
-                    "fill:default"));
-
-                //---- lblDosis ----
-                lblDosis.setText("Max. Tagesdosis:");
-                jPanel2.add(lblDosis, CC.xy(1, 1));
-
-                //---- txtMaxTimes ----
-                txtMaxTimes.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtMaxTimes.setText("1");
-                txtMaxTimes.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtMaxTimesCaretUpdate(e);
-                    }
-                });
-                txtMaxTimes.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtMaxTimesActionPerformed(e);
-                    }
-                });
-                txtMaxTimes.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtMaxTimesFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtMaxTimesFocusLost(e);
-                    }
-                });
-                jPanel2.add(txtMaxTimes, CC.xy(3, 1));
-
-                //---- lblX ----
-                lblX.setText("x");
-                jPanel2.add(lblX, CC.xy(5, 1));
-
-                //---- txtEDosis ----
-                txtEDosis.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtEDosis.setText("1.0");
-                txtEDosis.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtEDosisCaretUpdate(e);
-                    }
-                });
-                txtEDosis.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtEDosisActionPerformed(e);
-                    }
-                });
-                txtEDosis.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtEDosisFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtEDosisFocusLost(e);
-                    }
-                });
-                jPanel2.add(txtEDosis, CC.xy(7, 1));
-            }
-            jPanel3.add(jPanel2, CC.xy(1, 5));
-
-            //---- lblEin1 ----
-            lblEin1.setForeground(new Color(51, 51, 255));
-            lblEin1.setText("Einheit:");
-            jPanel3.add(lblEin1, CC.xy(1, 1));
-
-            //======== pnlRegular ========
-            {
-                pnlRegular.setBorder(new TitledBorder("Dosierung, H\u00e4ufigkeit (Regelm\u00e4\u00dfig)"));
-                pnlRegular.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow",
-                    "6*(fill:default, $lgap), fill:default"));
-
-                //---- jLabel1 ----
-                jLabel1.setForeground(new Color(0, 0, 204));
-                jLabel1.setText("Morgens:");
-                pnlRegular.add(jLabel1, CC.xy(1, 3));
-
-                //---- jLabel2 ----
-                jLabel2.setForeground(new Color(255, 102, 0));
-                jLabel2.setText("Mittags:");
-                pnlRegular.add(jLabel2, CC.xy(1, 5));
-
-                //---- jLabel3 ----
-                jLabel3.setForeground(new Color(255, 0, 51));
-                jLabel3.setText("Abends:");
-                pnlRegular.add(jLabel3, CC.xy(1, 9));
-
-                //---- jLabel4 ----
-                jLabel4.setText("Nacht, sp\u00e4t abends:");
-                pnlRegular.add(jLabel4, CC.xy(1, 11));
-
-                //---- jLabel6 ----
-                jLabel6.setText("Nachts, fr\u00fch morgens:");
-                pnlRegular.add(jLabel6, CC.xy(1, 1));
-
-                //---- cmbUhrzeit ----
-                cmbUhrzeit.setModel(new DefaultComboBoxModel(new String[] {
-                    "10:00",
-                    "10:15",
-                    "10:30",
-                    "10:45"
-                }));
-                cmbUhrzeit.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbUhrzeitItemStateChanged(e);
-                    }
-                });
-                pnlRegular.add(cmbUhrzeit, CC.xy(1, 13));
-
-                //---- jLabel11 ----
-                jLabel11.setForeground(new Color(0, 153, 51));
-                jLabel11.setText("Nachmittag:");
-                pnlRegular.add(jLabel11, CC.xy(1, 7));
-
-                //---- txtNachtMo ----
-                txtNachtMo.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtNachtMo.setText("0.0");
-                txtNachtMo.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtNachtMoCaretUpdate(e);
-                    }
-                });
-                txtNachtMo.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtNachtMoActionPerformed(e);
-                    }
-                });
-                txtNachtMo.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtNachtMoFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtNachtMo, CC.xy(3, 1));
-
-                //---- txtNachtAb ----
-                txtNachtAb.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtNachtAb.setText("0.0");
-                txtNachtAb.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtNachtAbCaretUpdate(e);
-                    }
-                });
-                txtNachtAb.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtNachtAbActionPerformed(e);
-                    }
-                });
-                txtNachtAb.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtNachtAbFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtNachtAbFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtNachtAb, CC.xy(3, 11));
-
-                //---- txtMittags ----
-                txtMittags.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtMittags.setText("0.0");
-                txtMittags.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtMittagsCaretUpdate(e);
-                    }
-                });
-                txtMittags.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtMittagsActionPerformed(e);
-                    }
-                });
-                txtMittags.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtMittagsFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtMittagsFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtMittags, CC.xy(3, 5));
-
-                //---- txtMorgens ----
-                txtMorgens.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtMorgens.setText("1.0");
-                txtMorgens.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtMorgensCaretUpdate(e);
-                    }
-                });
-                txtMorgens.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtMorgensActionPerformed(e);
-                    }
-                });
-                txtMorgens.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtMorgensFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtMorgensFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtMorgens, CC.xy(3, 3));
-
-                //---- txtNachmittags ----
-                txtNachmittags.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtNachmittags.setText("0.0");
-                txtNachmittags.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtNachmittagsCaretUpdate(e);
-                    }
-                });
-                txtNachmittags.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtNachmittagsActionPerformed(e);
-                    }
-                });
-                txtNachmittags.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtNachmittagsFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtNachmittagsFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtNachmittags, CC.xy(3, 7));
-
-                //---- txtAbends ----
-                txtAbends.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtAbends.setText("0.0");
-                txtAbends.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtAbendsCaretUpdate(e);
-                    }
-                });
-                txtAbends.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtAbendsActionPerformed(e);
-                    }
-                });
-                txtAbends.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtAbendsFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtAbendsFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtAbends, CC.xy(3, 9));
-
-                //---- txtUhrzeit ----
-                txtUhrzeit.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtUhrzeit.setText("0.0");
-                txtUhrzeit.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtUhrzeitCaretUpdate(e);
-                    }
-                });
-                txtUhrzeit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtUhrzeitActionPerformed(e);
-                    }
-                });
-                txtUhrzeit.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtUhrzeitFocusGained(e);
-                    }
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtUhrzeitFocusLost(e);
-                    }
-                });
-                pnlRegular.add(txtUhrzeit, CC.xy(3, 13));
-            }
-            jPanel3.add(pnlRegular, CC.xy(1, 3));
+                "default, $lcgap, default:grow, $lcgap, 143dlu:grow",
+                "fill:default, $lgap, fill:default:grow, $lgap, default:grow, $lgap, default"));
 
             //======== pnlWdh ========
             {
                 pnlWdh.setBorder(new TitledBorder("Wiederholungen"));
                 pnlWdh.setLayout(new FormLayout(
-                    "25dlu, $lcgap, 17dlu, $lcgap, 11dlu, $lcgap, 21dlu, $lcgap, default, $lcgap, 26dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                    "8*(fill:default, $lgap), default:grow"));
+                    "25dlu, $lcgap, 17dlu, $lcgap, 11dlu, $lcgap, 29dlu, $lcgap, default, $lcgap, 26dlu, $lcgap, default, $lcgap, 59dlu, $lcgap, default",
+                    "7*(fill:default, $lgap), fill:default"));
 
                 //---- rbTag ----
                 rbTag.setText("t\u00e4glich alle");
@@ -712,7 +387,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbMonatTagActionPerformed(e);
                     }
                 });
-                pnlWdh.add(rbMonatTag, CC.xywh(3, 11, 9, 1));
+                pnlWdh.add(rbMonatTag, CC.xywh(3, 11, 5, 1));
 
                 //---- rbMonatWTag ----
                 rbMonatWTag.setText("wiederholt am");
@@ -724,20 +399,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         rbMonatWTagActionPerformed(e);
                     }
                 });
-                pnlWdh.add(rbMonatWTag, CC.xywh(3, 13, 9, 1));
-
-                //---- spinTaeglich ----
-                spinTaeglich.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        spinTaeglichStateChanged(e);
-                    }
-                });
-                pnlWdh.add(spinTaeglich, CC.xywh(9, 1, 5, 1));
-
-                //---- jLabel7 ----
-                jLabel7.setText("Tage");
-                pnlWdh.add(jLabel7, CC.xy(15, 1));
+                pnlWdh.add(rbMonatWTag, CC.xywh(3, 13, 6, 1));
 
                 //---- spinWoche ----
                 spinWoche.addChangeListener(new ChangeListener() {
@@ -786,7 +448,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         cbFreActionPerformed(e);
                     }
                 });
-                pnlWdh.add(cbFre, CC.xy(1, 7));
+                pnlWdh.add(cbFre, CC.xywh(1, 7, 3, 1));
 
                 //---- cbSam ----
                 cbSam.setText("Sam");
@@ -798,7 +460,7 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                         cbSamActionPerformed(e);
                     }
                 });
-                pnlWdh.add(cbSam, CC.xywh(5, 7, 4, 1));
+                pnlWdh.add(cbSam, CC.xywh(5, 7, 3, 1));
 
                 //---- cbSon ----
                 cbSon.setText("Son");
@@ -866,43 +528,333 @@ public class DlgVerabreichung extends javax.swing.JDialog {
                 pnlWdh.add(cmbWTag, CC.xywh(15, 13, 3, 1));
 
                 //---- jLabel13 ----
-                jLabel13.setText("Erste Anwendung am:");
-                pnlWdh.add(jLabel13, CC.xywh(1, 15, 13, 1));
+                jLabel13.setText("Erst einplanen ab dem");
+                pnlWdh.add(jLabel13, CC.xywh(1, 15, 7, 1));
                 pnlWdh.add(jdcLDatum, CC.xywh(9, 15, 9, 1));
             }
-            jPanel3.add(pnlWdh, CC.xywh(3, 1, 3, 5));
-        }
-        contentPane.add(jPanel3, CC.xy(3, 3, CC.FILL, CC.FILL));
+            jPanel3.add(pnlWdh, CC.xywh(3, 1, 3, 3));
 
-        //======== jPanel1 ========
-        {
-            jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.X_AXIS));
+            //======== pnlRegular ========
+            {
+                pnlRegular.setBorder(new TitledBorder("Dosierung, H\u00e4ufigkeit (Regelm\u00e4\u00dfig)"));
+                pnlRegular.setLayout(new FormLayout(
+                    "6*(pref, $lcgap), default",
+                    "fill:default, $lgap, fill:default"));
+
+                //---- jLabel6 ----
+                jLabel6.setText("Nachts, fr\u00fch morgens");
+                jLabel6.setOrientation(1);
+                jLabel6.setHorizontalAlignment(SwingConstants.TRAILING);
+                pnlRegular.add(jLabel6, CC.xy(1, 1));
+
+                //---- jLabel1 ----
+                jLabel1.setForeground(new Color(0, 0, 204));
+                jLabel1.setText("Morgens");
+                jLabel1.setOrientation(1);
+                jLabel1.setHorizontalAlignment(SwingConstants.TRAILING);
+                pnlRegular.add(jLabel1, CC.xy(3, 1));
+
+                //---- jLabel2 ----
+                jLabel2.setForeground(new Color(255, 102, 0));
+                jLabel2.setText("Mittags");
+                jLabel2.setOrientation(1);
+                jLabel2.setHorizontalAlignment(SwingConstants.TRAILING);
+                pnlRegular.add(jLabel2, CC.xy(5, 1));
+
+                //---- jLabel11 ----
+                jLabel11.setForeground(new Color(0, 153, 51));
+                jLabel11.setText("Nachmittag");
+                jLabel11.setOrientation(1);
+                jLabel11.setHorizontalAlignment(SwingConstants.TRAILING);
+                pnlRegular.add(jLabel11, CC.xy(7, 1));
+
+                //---- jLabel3 ----
+                jLabel3.setForeground(new Color(255, 0, 51));
+                jLabel3.setText("Abends");
+                jLabel3.setOrientation(1);
+                jLabel3.setHorizontalAlignment(SwingConstants.TRAILING);
+                pnlRegular.add(jLabel3, CC.xy(9, 1));
+
+                //---- jLabel4 ----
+                jLabel4.setText("Nacht, sp\u00e4t abends");
+                jLabel4.setOrientation(1);
+                jLabel4.setHorizontalAlignment(SwingConstants.TRAILING);
+                pnlRegular.add(jLabel4, CC.xy(11, 1));
+
+                //======== panel1 ========
+                {
+                    panel1.setLayout(new VerticalLayout());
+
+                    //---- label1 ----
+                    label1.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/clock.png")));
+                    label1.setHorizontalAlignment(SwingConstants.CENTER);
+                    panel1.add(label1);
+
+                    //---- jideLabel1 ----
+                    jideLabel1.setText("Uhrzeit");
+                    jideLabel1.setOrientation(1);
+                    panel1.add(jideLabel1);
+
+                    //---- cmbUhrzeit ----
+                    cmbUhrzeit.setModel(new DefaultComboBoxModel(new String[] {
+                        "10:00",
+                        "10:15",
+                        "10:30",
+                        "10:45"
+                    }));
+                    cmbUhrzeit.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent e) {
+                            cmbUhrzeitItemStateChanged(e);
+                        }
+                    });
+                    panel1.add(cmbUhrzeit);
+                }
+                pnlRegular.add(panel1, CC.xy(13, 1, CC.FILL, CC.BOTTOM));
+
+                //---- txtNachtMo ----
+                txtNachtMo.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtNachtMo.setText("0.0");
+                txtNachtMo.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtNachtMoCaretUpdate(e);
+                    }
+                });
+                txtNachtMo.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtNachtMoActionPerformed(e);
+                    }
+                });
+                txtNachtMo.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtNachtMoFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtNachtMo, CC.xy(1, 3));
+
+                //---- txtMorgens ----
+                txtMorgens.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtMorgens.setText("1.0");
+                txtMorgens.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtMorgensCaretUpdate(e);
+                    }
+                });
+                txtMorgens.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtMorgensActionPerformed(e);
+                    }
+                });
+                txtMorgens.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtMorgensFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMorgensFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtMorgens, CC.xy(3, 3));
+
+                //---- txtMittags ----
+                txtMittags.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtMittags.setText("0.0");
+                txtMittags.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtMittagsCaretUpdate(e);
+                    }
+                });
+                txtMittags.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtMittagsActionPerformed(e);
+                    }
+                });
+                txtMittags.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtMittagsFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMittagsFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtMittags, CC.xy(5, 3));
+
+                //---- txtNachmittags ----
+                txtNachmittags.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtNachmittags.setText("0.0");
+                txtNachmittags.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtNachmittagsCaretUpdate(e);
+                    }
+                });
+                txtNachmittags.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtNachmittagsActionPerformed(e);
+                    }
+                });
+                txtNachmittags.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtNachmittagsFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtNachmittagsFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtNachmittags, CC.xy(7, 3));
+
+                //---- txtAbends ----
+                txtAbends.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtAbends.setText("0.0");
+                txtAbends.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtAbendsCaretUpdate(e);
+                    }
+                });
+                txtAbends.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtAbendsActionPerformed(e);
+                    }
+                });
+                txtAbends.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtAbendsFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtAbendsFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtAbends, CC.xy(9, 3));
+
+                //---- txtNachtAb ----
+                txtNachtAb.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtNachtAb.setText("0.0");
+                txtNachtAb.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtNachtAbCaretUpdate(e);
+                    }
+                });
+                txtNachtAb.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtNachtAbActionPerformed(e);
+                    }
+                });
+                txtNachtAb.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtNachtAbFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtNachtAbFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtNachtAb, CC.xy(11, 3));
+
+                //---- txtUhrzeit ----
+                txtUhrzeit.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtUhrzeit.setText("0.0");
+                txtUhrzeit.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtUhrzeitCaretUpdate(e);
+                    }
+                });
+                txtUhrzeit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtUhrzeitActionPerformed(e);
+                    }
+                });
+                txtUhrzeit.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtUhrzeitFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtUhrzeitFocusLost(e);
+                    }
+                });
+                pnlRegular.add(txtUhrzeit, CC.xy(13, 3));
+            }
+            jPanel3.add(pnlRegular, CC.xy(1, 5, CC.DEFAULT, CC.FILL));
+
+            //======== tabWdh ========
+            {
+
+                //======== pnlDaily ========
+                {
+                    pnlDaily.setLayout(new VerticalLayout());
+
+                    //---- spinTaeglich ----
+                    spinTaeglich.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            spinTaeglichStateChanged(e);
+                        }
+                    });
+                    pnlDaily.add(spinTaeglich);
+
+                    //---- jLabel7 ----
+                    jLabel7.setText("Tage");
+                    pnlDaily.add(jLabel7);
+                }
+                tabWdh.addTab("T\u00e4glich", pnlDaily);
+
+
+                //======== pnlWeekly ========
+                {
+                    pnlWeekly.setLayout(new BoxLayout(pnlWeekly, BoxLayout.X_AXIS));
+                }
+                tabWdh.addTab("W\u00f6chentlich", pnlWeekly);
+
+
+                //======== pnlMonthly ========
+                {
+                    pnlMonthly.setLayout(new FormLayout(
+                        "default, $lcgap, default",
+                        "2*(default, $lgap), default"));
+                }
+                tabWdh.addTab("Monatlich", pnlMonthly);
+
+            }
+            jPanel3.add(tabWdh, CC.xywh(3, 5, 3, 1, CC.FILL, CC.FILL));
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnSave.setText("Speichern");
             btnSave.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     btnSaveActionPerformed(e);
                 }
             });
-            jPanel1.add(btnSave);
-
-            //---- btnDiscard ----
-            btnDiscard.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnDiscard.setText("Verwerfen");
-            btnDiscard.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnDiscardActionPerformed(e);
-                }
-            });
-            jPanel1.add(btnDiscard);
+            jPanel3.add(btnSave, CC.xy(5, 7, CC.RIGHT, CC.DEFAULT));
         }
-        contentPane.add(jPanel1, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(835, 445);
-        setLocationRelativeTo(null);
+        add(jPanel3, BorderLayout.CENTER);
 
         //---- bgWdh ----
         bgWdh.add(rbTag);
@@ -933,11 +885,11 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         ignoreEvent = false;
     }//GEN-LAST:event_cmbUhrzeitItemStateChanged
 
-    public void dispose() {
+    @Override
+    public void cleanup() {
         SYSTools.unregisterListeners(this);
         jdcLDatum.removePropertyChangeListener(jdcpcl);
         jdcLDatum.cleanup();
-        super.dispose();
     }
 
 
@@ -1278,7 +1230,8 @@ public class DlgVerabreichung extends javax.swing.JDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         save();
-        this.setVisible(false);
+        actionBlock.execute(planung);
+//        this.setVisible(false);
     }//GEN-LAST:event_btnSaveActionPerformed
 
     public void save() {
@@ -1296,8 +1249,12 @@ public class DlgVerabreichung extends javax.swing.JDialog {
         } else {
             planung.setUhrzeit(new Date(((GregorianCalendar) e.getObject()).getTimeInMillis()));
         }
-        planung.setMaxAnzahl(Integer.parseInt(txtMaxTimes.getText()));
-        planung.setMaxEDosis(new BigDecimal(Double.parseDouble(txtEDosis.getText())));
+//        planung.setMaxAnzahl(Integer.parseInt(txtMaxTimes.getText()));
+//        planung.setMaxEDosis(new BigDecimal(Double.parseDouble(txtEDosis.getText())));
+
+
+        planung.setMaxAnzahl(0);
+        planung.setMaxEDosis(BigDecimal.ZERO);
 
         planung.setTaeglich(Short.parseShort(spinTaeglich.getValue().toString()));
         planung.setWoechentlich(Short.parseShort(spinWoche.getValue().toString()));
@@ -1557,63 +1514,63 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     }//GEN-LAST:event_txtNachtAbActionPerformed
 
     private void txtMaxTimesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMaxTimesActionPerformed
-        txtEDosis.requestFocus();
+//        txtEDosis.requestFocus();
     }//GEN-LAST:event_txtMaxTimesActionPerformed
 
     private void txtEDosisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEDosisActionPerformed
-        txtMaxTimes.requestFocus();
+//        txtMaxTimes.requestFocus();
     }//GEN-LAST:event_txtEDosisActionPerformed
 
-    private void txtMaxTimesFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMaxTimesFocusLost
-        ignoreEvent = true;
-        int i;
-        try {
-            i = Integer.parseInt(txtMaxTimes.getText());
-            txtMaxTimes.setText(Integer.toString(i));
-        } catch (NumberFormatException nfe) {
-            txtMaxTimes.setText("1");
-        }
-
-        txtNachtMo.setText("0.0");
-        txtMorgens.setText("0.0");
-        txtMittags.setText("0.0");
-        txtNachmittags.setText("0.0");
-        txtAbends.setText("0.0");
-        txtNachtAb.setText("0.0");
-        txtUhrzeit.setText("0.0");
-        cmbUhrzeit.setSelectedIndex(-1);
-
-        if (Double.parseDouble(txtEDosis.getText()) == 0) {
-            txtEDosis.setText("1.0");
-        }
-
-        btnSave.setEnabled(true);
-
-        ignoreEvent = false;
-    }//GEN-LAST:event_txtMaxTimesFocusLost
-
-    private void txtEDosisFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEDosisFocusLost
-
-        ignoreEvent = true;
-        double d = SYSTools.parseDouble(txtEDosis.getText());
-        if (d == 0d) {
-            txtEDosis.setText("1.0");
-        } else {
-            txtEDosis.setText(Double.toString(d));
-        }
-
-        txtNachtMo.setText("0.0");
-        txtMorgens.setText("0.0");
-        txtMittags.setText("0.0");
-        txtNachmittags.setText("0.0");
-        txtAbends.setText("0.0");
-        txtNachtAb.setText("0.0");
-        txtUhrzeit.setText("0.0");
-        cmbUhrzeit.setSelectedIndex(-1);
-
-        btnSave.setEnabled(true);
-        ignoreEvent = false;
-    }//GEN-LAST:event_txtEDosisFocusLost
+//    private void txtMaxTimesFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMaxTimesFocusLost
+//        ignoreEvent = true;
+//        int i;
+//        try {
+//            i = Integer.parseInt(txtMaxTimes.getText());
+//            txtMaxTimes.setText(Integer.toString(i));
+//        } catch (NumberFormatException nfe) {
+//            txtMaxTimes.setText("1");
+//        }
+//
+//        txtNachtMo.setText("0.0");
+//        txtMorgens.setText("0.0");
+//        txtMittags.setText("0.0");
+//        txtNachmittags.setText("0.0");
+//        txtAbends.setText("0.0");
+//        txtNachtAb.setText("0.0");
+//        txtUhrzeit.setText("0.0");
+//        cmbUhrzeit.setSelectedIndex(-1);
+//
+//        if (Double.parseDouble(txtEDosis.getText()) == 0) {
+//            txtEDosis.setText("1.0");
+//        }
+//
+//        btnSave.setEnabled(true);
+//
+//        ignoreEvent = false;
+//    }//GEN-LAST:event_txtMaxTimesFocusLost
+//
+//    private void txtEDosisFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEDosisFocusLost
+//
+//        ignoreEvent = true;
+//        double d = SYSTools.parseDouble(txtEDosis.getText());
+//        if (d == 0d) {
+//            txtEDosis.setText("1.0");
+//        } else {
+//            txtEDosis.setText(Double.toString(d));
+//        }
+//
+//        txtNachtMo.setText("0.0");
+//        txtMorgens.setText("0.0");
+//        txtMittags.setText("0.0");
+//        txtNachmittags.setText("0.0");
+//        txtAbends.setText("0.0");
+//        txtNachtAb.setText("0.0");
+//        txtUhrzeit.setText("0.0");
+//        cmbUhrzeit.setSelectedIndex(-1);
+//
+//        btnSave.setEnabled(true);
+//        ignoreEvent = false;
+//    }//GEN-LAST:event_txtEDosisFocusLost
 
     private void txtUhrzeitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUhrzeitActionPerformed
     }//GEN-LAST:event_txtUhrzeitActionPerformed
@@ -1644,27 +1601,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel3;
-    private JPanel jPanel2;
-    private JLabel lblDosis;
-    private JTextField txtMaxTimes;
-    private JLabel lblX;
-    private JTextField txtEDosis;
-    private JLabel lblEin1;
-    private JPanel pnlRegular;
-    private JLabel jLabel1;
-    private JLabel jLabel2;
-    private JLabel jLabel3;
-    private JLabel jLabel4;
-    private JLabel jLabel6;
-    private JComboBox cmbUhrzeit;
-    private JLabel jLabel11;
-    private JTextField txtNachtMo;
-    private JTextField txtNachtAb;
-    private JTextField txtMittags;
-    private JTextField txtMorgens;
-    private JTextField txtNachmittags;
-    private JTextField txtAbends;
-    private JTextField txtUhrzeit;
     private JPanel pnlWdh;
     private JRadioButton rbTag;
     private JRadioButton rbWoche;
@@ -1673,8 +1609,6 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     private JCheckBox cbDie;
     private JRadioButton rbMonatTag;
     private JRadioButton rbMonatWTag;
-    private JSpinner spinTaeglich;
-    private JLabel jLabel7;
     private JSpinner spinWoche;
     private JLabel jLabel8;
     private JCheckBox cbMit;
@@ -1690,9 +1624,31 @@ public class DlgVerabreichung extends javax.swing.JDialog {
     private JComboBox cmbWTag;
     private JLabel jLabel13;
     private JDateChooser jdcLDatum;
-    private JPanel jPanel1;
+    private JPanel pnlRegular;
+    private JideLabel jLabel6;
+    private JideLabel jLabel1;
+    private JideLabel jLabel2;
+    private JideLabel jLabel11;
+    private JideLabel jLabel3;
+    private JideLabel jLabel4;
+    private JPanel panel1;
+    private JLabel label1;
+    private JideLabel jideLabel1;
+    private JComboBox cmbUhrzeit;
+    private JTextField txtNachtMo;
+    private JTextField txtMorgens;
+    private JTextField txtMittags;
+    private JTextField txtNachmittags;
+    private JTextField txtAbends;
+    private JTextField txtNachtAb;
+    private JTextField txtUhrzeit;
+    private JideTabbedPane tabWdh;
+    private JPanel pnlDaily;
+    private JSpinner spinTaeglich;
+    private JLabel jLabel7;
+    private JPanel pnlWeekly;
+    private JPanel pnlMonthly;
     private JButton btnSave;
-    private JButton btnDiscard;
     private ButtonGroup bgWdh;
     private ButtonGroup bgMonat;
     // End of variables declaration//GEN-END:variables

@@ -6,10 +6,8 @@ package op.care;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import entity.Bewohner;
-import entity.BewohnerTools;
 import op.OPDE;
 import op.care.berichte.PnlBerichte;
 import op.care.bhp.PnlBHP;
@@ -18,13 +16,10 @@ import op.care.planung.PnlPlanung;
 import op.care.sysfiles.PnlFiles;
 import op.care.verordnung.PnlVerordnung;
 import op.care.vital.PnlVitalwerte;
-import op.events.TaskPaneContentChangedListener;
 import op.tools.CleanablePanel;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
-import op.vorgang.PnlVorgang;
-import org.jdesktop.swingx.JXTaskPaneContainer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -56,17 +51,16 @@ public class PnlPflege extends NursingRecordsPanel {
     private Bewohner currentBewohner = null;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
-    private JFrame parent;
 
 
-    public PnlPflege(JFrame frame, Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlPflege(Bewohner bewohner, JScrollPane jspSearch) {
         initPhase = true;
         initComponents();
-        this.parent = frame;
         this.jspSearch = jspSearch;
+        currentBewohner = bewohner;
         initPanel();
         initPhase = false;
-        change2Bewohner(bewohner);
+        jtpPflegeakteStateChanged(null);
     }
 
 
@@ -93,50 +87,53 @@ public class PnlPflege extends NursingRecordsPanel {
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
+        currentBewohner = bewohner;
+        ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).change2Bewohner(bewohner);
+    }
+
+    private void jtpPflegeakteStateChanged(ChangeEvent e) {
         if (initPhase) {
             return;
         }
 
-        currentBewohner = bewohner;
-//        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         switch (jtpPflegeakte.getSelectedIndex()) {
             case TAB_UEBERSICHT: {
-                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(bewohner, jspSearch));
+                jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, new PnlBWUebersicht(currentBewohner, jspSearch));
                 jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 break;
             }
             case TAB_PB: {
-                jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(bewohner, jspSearch));
+                jtpPflegeakte.setComponentAt(TAB_PB, new PnlBerichte(currentBewohner, jspSearch));
                 jtpPflegeakte.setTitleAt(TAB_PB, "Pflegeberichte");
                 break;
             }
             case TAB_DFN: {
-                jtpPflegeakte.setComponentAt(TAB_DFN, new PnlDFN(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_DFN, new PnlDFN(new JFrame(), currentBewohner));
                 jtpPflegeakte.setTitleAt(TAB_DFN, "DFN");
                 break;
             }
             case TAB_VITAL: {
-                jtpPflegeakte.setComponentAt(TAB_VITAL, new PnlVitalwerte(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_VITAL, new PnlVitalwerte(new JFrame(), currentBewohner));
                 jtpPflegeakte.setTitleAt(TAB_VITAL, "Werte");
                 break;
             }
             case TAB_INFO: {
-                jtpPflegeakte.setComponentAt(TAB_INFO, new op.care.bwinfo.PnlInfo(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_INFO, new op.care.bwinfo.PnlInfo(new JFrame(), currentBewohner));
                 jtpPflegeakte.setTitleAt(TAB_INFO, "Informationen");
                 break;
             }
             case TAB_BHP: {
-                jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(new JFrame(), currentBewohner));
                 jtpPflegeakte.setTitleAt(TAB_BHP, "BHP");
                 break;
             }
             case TAB_PPLANUNG: {
-                jtpPflegeakte.setComponentAt(TAB_PPLANUNG, new PnlPlanung(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_PPLANUNG, new PnlPlanung(new JFrame(), currentBewohner));
                 jtpPflegeakte.setTitleAt(TAB_PPLANUNG, "Planung");
                 break;
             }
             case TAB_VERORDNUNG: {
-                jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, new PnlVerordnung(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, new PnlVerordnung(currentBewohner, jspSearch));
                 jtpPflegeakte.setTitleAt(TAB_VERORDNUNG, "Verordnungen");
                 break;
             }
@@ -168,17 +165,13 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_FILES: {
-                jtpPflegeakte.setComponentAt(TAB_FILES, new PnlFiles(parent, bewohner));
+                jtpPflegeakte.setComponentAt(TAB_FILES, new PnlFiles(new JFrame(), currentBewohner));
                 jtpPflegeakte.setTitleAt(TAB_FILES, "Dokumente");
                 break;
             }
             default: {
             }
         }
-    }
-
-    private void jtpPflegeakteStateChanged(ChangeEvent e) {
-        change2Bewohner(currentBewohner);
     }
 
 
@@ -203,8 +196,8 @@ public class PnlPflege extends NursingRecordsPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow",
-                "default:grow"));
+                    "default:grow",
+                    "default:grow"));
 
             //======== jtpPflegeakte ========
             {

@@ -6,6 +6,7 @@ package op.tools;
  * Hack 44 und Hack 45
  */
 
+import op.OPDE;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -13,12 +14,14 @@ import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.util.concurrent.TimeUnit;
 
 public class SheetableJFrame extends JFrame {
@@ -103,12 +106,14 @@ public class SheetableJFrame extends JFrame {
         // clear glasspane and set up animatingSheet
         animatingSheet.setSource(sheet);
         glass.removeAll();
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTH;
-        glass.add(animatingSheet, gbc);
-        gbc.gridy = 1;
-        gbc.weighty = Integer.MAX_VALUE;
-        glass.add(Box.createGlue(), gbc);
+        glass.setLayout(null);
+//        GridBagConstraints gbc = new GridBagConstraints();
+//        gbc.anchor = GridBagConstraints.NORTH;
+        animatingSheet.setBounds(glass.getInsets().left + glass.getWidth() / 2 - sheet.getWidth() / 2, glass.getInsets().top + 100, sheet.getWidth(), sheet.getHeight());
+        glass.add(animatingSheet);
+//        gbc.gridy = 1;
+//        gbc.weighty = Integer.MAX_VALUE;
+//        glass.add(Box.createGlue(), gbc);
         glass.setVisible(true);
         if (animationDirection == INCOMING){
             animator.start();
@@ -153,12 +158,15 @@ public class SheetableJFrame extends JFrame {
 
     private void finishShowingSheet() {
         glass.removeAll();
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTH;
-        glass.add(sheet, gbc);
-        gbc.gridy = 1;
-        gbc.weighty = Integer.MAX_VALUE;
-        glass.add(Box.createGlue(), gbc);
+        glass.setLayout(null);
+//        GridBagConstraints gbc = new GridBagConstraints();
+//        gbc.anchor = GridBagConstraints.NORTH;
+
+        sheet.setBounds(glass.getInsets().left + glass.getWidth() / 2 - sheet.getWidth() / 2, glass.getInsets().top + 100, sheet.getWidth(), sheet.getHeight());
+        glass.add(sheet);
+//        gbc.gridy = 2;
+//        gbc.weighty = Integer.MAX_VALUE;
+//        glass.add(Box.createGlue(), gbc);
         glass.revalidate();
         glass.repaint();
     }
@@ -180,6 +188,7 @@ public class SheetableJFrame extends JFrame {
         }
 
         public void setAnimatingHeight(int height) {
+
             animatingSize.height = height;
             setSize(animatingSize);
         }
@@ -213,8 +222,15 @@ public class SheetableJFrame extends JFrame {
             // get the bottom-most n pixels of source and
             // paint them into g, where n is height
 
-            BufferedImage fragment =
-                    offscreenImage.getSubimage(0, offscreenImage.getHeight() - animatingSize.height, source.getWidth(), animatingSize.height);
+//            OPDE.debug(source.getWidth() +", " + animatingSize.height);
+
+
+            BufferedImage fragment;
+            try {
+                fragment = offscreenImage.getSubimage(0, offscreenImage.getHeight() - animatingSize.height, source.getWidth(), animatingSize.height);
+            } catch (RasterFormatException rfe){
+                fragment = offscreenImage;
+            }
             // g.drawImage (fragment, 0, 0, this);
             g.drawImage(fragment, 0, 0, this);
         }

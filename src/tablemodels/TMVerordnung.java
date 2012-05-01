@@ -27,8 +27,11 @@
 package tablemodels;
 
 import entity.Bewohner;
-import entity.verordnungen.*;
-import op.tools.SYSCalendar;
+import entity.verordnungen.MedBestand;
+import entity.verordnungen.MedVorrat;
+import entity.verordnungen.Verordnung;
+import entity.verordnungen.VerordnungTools;
+import op.OPDE;
 import op.tools.SYSConst;
 
 import javax.swing.table.AbstractTableModel;
@@ -102,6 +105,12 @@ public class TMVerordnung
         return selection;
     }
 
+    public void reload(Bewohner bewohner, boolean abgesetzt) {
+        this.bewohner = bewohner;
+        this.abgesetzt = abgesetzt;
+        reload();
+    }
+
     public void reload() {
         cache.clear();
         listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, abdatum);
@@ -147,6 +156,7 @@ public class TMVerordnung
 
         switch (col) {
             case COL_MSSN: {
+
                 String res = "";
                 res = VerordnungTools.getMassnahme(verordnung);
                 if (!verordnung.getAttachedFiles().isEmpty()) {
@@ -159,10 +169,12 @@ public class TMVerordnung
                 break;
             }
             case COL_Dosis: {
+
                 result = getDosis(row);
                 break;
             }
             case COL_Hinweis: {
+
                 String hinweis = VerordnungTools.getHinweis(verordnung);
                 String an = VerordnungTools.getAN(verordnung);
                 String ab = VerordnungTools.getAB(verordnung);

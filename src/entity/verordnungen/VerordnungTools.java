@@ -26,7 +26,7 @@ public class VerordnungTools {
     /**
      * Diese Methode ermittelt eine Liste aller Verordnungen gemäß der unten genannten Einschränkungen.
      *
-     * @param bewohner    dessen Verordnungen wir suchen
+     * @param bewohner dessen Verordnungen wir suchen
      * @return Eine Liste aus Objekt Arrays, die folgenden Aufbau hat:
      *         <center><code><b>{Verordnung, Vorrat, Saldo des Vorrats,
      *         Bestand (im Anbruch), Saldo des Bestandes, Bezeichnung des Medikamentes, Bezeichnung der Massnahme}</b></code></center>
@@ -34,6 +34,7 @@ public class VerordnungTools {
      *         Stellen.
      */
     public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, Date abdatum) {
+        long timestart = System.currentTimeMillis();
         List<Object[]> listResult = new ArrayList<Object[]>();
 
         EntityManager em = OPDE.createEM();
@@ -80,6 +81,9 @@ public class VerordnungTools {
         }
 
         em.close();
+        long timeend = System.currentTimeMillis();
+
+        OPDE.debug("getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, Date abdatum) Ausführungszeit: " + (timeend - timestart) + " millis");
 
         return listResult;
     }
@@ -357,7 +361,7 @@ public class VerordnungTools {
     }
 
     public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch) {
-
+        long timestart = System.currentTimeMillis();
         String result = "";
         if (verordnung.getPlanungen().size() > 1) {
             Collections.sort(verordnung.getPlanungen());
@@ -389,7 +393,7 @@ public class VerordnungTools {
                 result += "nur bis Packungs Ende<br/>";
             }
             if (bestandImAnbruch != null && !verordnung.isAbgesetzt()) {
-                BigDecimal vorratSumme =MedVorratTools.getSumme(bestandImAnbruch.getVorrat());
+                BigDecimal vorratSumme = MedVorratTools.getSumme(bestandImAnbruch.getVorrat());
                 BigDecimal bestandSumme = MedBestandTools.getBestandSumme(bestandImAnbruch);
 
                 if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
@@ -431,6 +435,12 @@ public class VerordnungTools {
 
 
         }
+
+
+        long timeend = System.currentTimeMillis();
+
+        OPDE.debug("time end: "+(timeend - timestart) + " millis");
+
         return result;
     }
 
