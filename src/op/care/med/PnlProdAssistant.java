@@ -264,89 +264,89 @@ public class PnlProdAssistant extends JPanel {
 
     private void proceedToFrame2() {
 //        cmbForm.setEnabled(true);
-        if (numOfVisibleFrames == 1) {
-            numOfVisibleFrames = 2;
-            split1pos = SYSTools.showSide(split1, 0.5d, speedFast, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        thisComponentResized(null);
-                        initZusatz();
-
-                    }
-                }
-            });
-        }
+//        if (numOfVisibleFrames == 1) {
+//            numOfVisibleFrames = 2;
+//            split1pos = SYSTools.showSide(split1, 0.5d, speedFast, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        thisComponentResized(null);
+//                        initZusatz();
+//
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void proceedToFrame3() {
 //        cmbForm.setEnabled(false);
-        if (numOfVisibleFrames >= 2) {
-            numOfVisibleFrames = 3;
-            split1pos = SYSTools.showSide(split1, 0.33d, speedFast / 3, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        split2pos = SYSTools.showSide(split2, 0.5d, speedFast / 3, new TimelineCallbackAdapter() {
-                            @Override
-                            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                                if (newState == Timeline.TimelineState.DONE) {
-
-                                    // Wenn das Produkt bereits in der Datenbank steht, dann hat es auch einen
-                                    // Hersteller, den man hier nicht mehr verändern kann.
-                                    // Dann zeigen wir nur noch die Produkte an.
-                                    boolean targetPosition = produkt.getMedPID() != null ? SYSTools.RIGHT_LOWER_SIDE : SYSTools.LEFT_UPPER_SIDE;
-                                    txtPZN.setText("");
-                                    txtInhalt.setText("1");
-                                    lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
-                                    packung = null;
-                                    split3pos = SYSTools.showSide(split3, targetPosition, speedFast / 3, new TimelineCallbackAdapter() {
-                                        @Override
-                                        public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                                            if (newState == Timeline.TimelineState.DONE) {
-                                                thisComponentResized(null);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-        }
+//        if (numOfVisibleFrames >= 2) {
+//            numOfVisibleFrames = 3;
+//            split1pos = SYSTools.showSide(split1, 0.33d, speedFast / 3, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        split2pos = SYSTools.showSide(split2, 0.5d, speedFast / 3, new TimelineCallbackAdapter() {
+//                            @Override
+//                            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                                if (newState == Timeline.TimelineState.DONE) {
+//
+//                                    // Wenn das Produkt bereits in der Datenbank steht, dann hat es auch einen
+//                                    // Hersteller, den man hier nicht mehr verändern kann.
+//                                    // Dann zeigen wir nur noch die Produkte an.
+//                                    boolean targetPosition = produkt.getMedPID() != null ? SYSTools.RIGHT_LOWER_SIDE : SYSTools.LEFT_UPPER_SIDE;
+//                                    txtPZN.setText("");
+//                                    txtInhalt.setText("1");
+//                                    lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
+//                                    packung = null;
+//                                    split3pos = SYSTools.showSide(split3, targetPosition, speedFast / 3, new TimelineCallbackAdapter() {
+//                                        @Override
+//                                        public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                                            if (newState == Timeline.TimelineState.DONE) {
+//                                                thisComponentResized(null);
+//                                            }
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                        });
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void proceedToFrame4() {
-        if (numOfVisibleFrames >= 3) {
-            numOfVisibleFrames = 4;
-            split1pos = SYSTools.showSide(split1, 0.25d, speedFast / 3, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        split2pos = SYSTools.showSide(split2, 0.33d, speedFast / 3, new TimelineCallbackAdapter() {
-                            @Override
-                            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                                if (newState == Timeline.TimelineState.DONE) {
-                                    txtPZN.setText("");
-                                    txtInhalt.setText("1");
-                                    lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
-                                    packung = null;
-                                    split3pos = SYSTools.showSide(split3, 0.5d, speedFast / 3, new TimelineCallbackAdapter() {
-                                        @Override
-                                        public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                                            if (newState == Timeline.TimelineState.DONE) {
-                                                thisComponentResized(null);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-        }
+//        if (numOfVisibleFrames >= 3) {
+//            numOfVisibleFrames = 4;
+//            split1pos = SYSTools.showSide(split1, 0.25d, speedFast / 3, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        split2pos = SYSTools.showSide(split2, 0.33d, speedFast / 3, new TimelineCallbackAdapter() {
+//                            @Override
+//                            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                                if (newState == Timeline.TimelineState.DONE) {
+//                                    txtPZN.setText("");
+//                                    txtInhalt.setText("1");
+//                                    lblPackEinheit.setText(MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
+//                                    packung = null;
+//                                    split3pos = SYSTools.showSide(split3, 0.5d, speedFast / 3, new TimelineCallbackAdapter() {
+//                                        @Override
+//                                        public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                                            if (newState == Timeline.TimelineState.DONE) {
+//                                                thisComponentResized(null);
+//                                            }
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                        });
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void btnHerstellerWeiterActionPerformed(ActionEvent e) {
@@ -438,16 +438,16 @@ public class PnlProdAssistant extends JPanel {
         if (numOfVisibleFrames > 3 || produkt.getHersteller() != null) {
             return;
         }
-        if (splitHerstellerPos == 1.0d) {
-            splitHerstellerPos = SYSTools.showSide(splitHersteller, new Integer(70), speedFast, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        thisComponentResized(null);
-                    }
-                }
-            });
-        }
+//        if (splitHerstellerPos == 1.0d) {
+//            splitHerstellerPos = SYSTools.showSide(splitHersteller, new Integer(70), speedFast, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        thisComponentResized(null);
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void cmbFormItemStateChanged(ItemEvent e) {
@@ -1427,46 +1427,46 @@ public class PnlProdAssistant extends JPanel {
     }
 
     private void revertToPanel(int num) {
-        if (num < 4 && split3pos != 1d) {
-            numOfVisibleFrames = 3;
-            split3pos = SYSTools.showSide(split3, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        thisComponentResized(null);
-                    }
-                }
-            });
-        }
-
-        if (num < 3 && split2pos != 1d) {
-            numOfVisibleFrames = 2;
-            split1pos = 0.5d;
-            split2pos = SYSTools.showSide(split2, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        thisComponentResized(null);
-                    }
-                }
-            });
-        }
-
-        if (num < 2 && split1pos != 1d) {
-
-            numOfVisibleFrames = 1;
-
-//            cmbForm.setEnabled(true);
-
-            split1pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
-                @Override
-                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-                    if (newState == Timeline.TimelineState.DONE) {
-                        thisComponentResized(null);
-                    }
-                }
-            });
-        }
+//        if (num < 4 && split3pos != 1d) {
+//            numOfVisibleFrames = 3;
+//            split3pos = SYSTools.showSide(split3, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        thisComponentResized(null);
+//                    }
+//                }
+//            });
+//        }
+//
+//        if (num < 3 && split2pos != 1d) {
+//            numOfVisibleFrames = 2;
+//            split1pos = 0.5d;
+//            split2pos = SYSTools.showSide(split2, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        thisComponentResized(null);
+//                    }
+//                }
+//            });
+//        }
+//
+//        if (num < 2 && split1pos != 1d) {
+//
+//            numOfVisibleFrames = 1;
+//
+////            cmbForm.setEnabled(true);
+//
+//            split1pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, speedFast, new TimelineCallbackAdapter() {
+//                @Override
+//                public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
+//                    if (newState == Timeline.TimelineState.DONE) {
+//                        thisComponentResized(null);
+//                    }
+//                }
+//            });
+//        }
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

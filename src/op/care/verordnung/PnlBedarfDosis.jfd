@@ -33,6 +33,19 @@
           <string>default, fill:default</string> 
          </void> 
         </object> 
+        <void method="setProperty"> 
+         <string>border</string> 
+         <object class="org.jdesktop.swingx.border.DropShadowBorder"> 
+          <object class="java.awt.Color" field="black"/> 
+          <int>5</int> 
+          <float>0.5</float> 
+          <int>12</int> 
+          <boolean>true</boolean> 
+          <boolean>true</boolean> 
+          <boolean>true</boolean> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
         <void property="name"> 
          <string>jPanel2</string> 
         </void> 

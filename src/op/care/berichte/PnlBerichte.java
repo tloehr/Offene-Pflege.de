@@ -389,8 +389,8 @@ public class PnlBerichte extends NursingRecordsPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default:grow",
-                "fill:default:grow"));
+            "default:grow",
+            "fill:default:grow"));
 
         //======== jspTblTB ========
         {
@@ -403,15 +403,15 @@ public class PnlBerichte extends NursingRecordsPanel {
 
             //---- tblTB ----
             tblTB.setModel(new DefaultTableModel(
-                    new Object[][]{
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                    },
-                    new String[]{
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
             ));
             tblTB.addMouseListener(new MouseAdapter() {
                 @Override

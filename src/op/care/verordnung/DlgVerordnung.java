@@ -39,6 +39,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.jdesktop.swingx.border.DropShadowBorder;
 import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
@@ -136,26 +137,30 @@ public class DlgVerordnung extends JDialog {
     }
 
     private void btnAddDosisActionPerformed(ActionEvent e) {
-         PnlRegelDosis dlg = new PnlRegelDosis(verordnung, new Closure() {
+         PnlRegelDosis dlg = new PnlRegelDosis(null, new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    verordnung.getPlanungen().add((VerordnungPlanung) o);
+                    ((VerordnungPlanung) o).setVerordnung(verordnung);
                     reloadTable();
                 }
             }
         });
         final JidePopup popup = new JidePopup();
+//        popup.setBorder(new DropShadowBorder(Color.BLACK, 5, 0.5f, 12, true, true, true, true));
         popup.setMovable(false);
-        popup.setContentPane(dlg);
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+        popup.getContentPane().add(dlg);
         popup.setOwner(btnAddDosis);
-        popup.removeExcludedComponent(btnAddDosis);
-        popup.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                OPDE.debug(propertyChangeEvent.getPropertyName());
-            }
-        });
+//        popup.removeExcludedComponent(btnAddDosis);
+        popup.setDefaultFocusComponent(dlg);
+//        popup.addPropertyChangeListener(new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+//                OPDE.debug("JidePopup Property: " + propertyChangeEvent.getPropertyName());
+//                OPDE.debug("JidePopup Value: " + propertyChangeEvent.getNewValue().toString());
+//            }
+//        });
         popup.showPopup();
     }
 
@@ -798,58 +803,6 @@ public class DlgVerordnung extends JDialog {
         }
     }//GEN-LAST:event_btnBedarfActionPerformed
 
-    private void jspDosisMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jspDosisMousePressed
-        if (!evt.isPopupTrigger()) {
-            return;
-        }
-        Point p2 = evt.getPoint();
-        // Convert a coordinate relative to a component's bounds to screen coordinates
-        SwingUtilities.convertPointToScreen(p2, jspDosis);
-
-        final Point screenposition = p2;
-        // Wenn die Dosis Tabelle leer ist, dann funktioniert da auch kein MousePressed Event
-        // In diesem Fall muss die ScrollPane einspringen.
-        TableModel tm = tblDosis.getModel();
-        if (tm.getRowCount() > 0) {
-            return;
-        }
-
-        SYSTools.unregisterListeners(menu);
-        menu = new JPopupMenu();
-
-        JMenuItem itemPopupNew = new JMenuItem("Neue Dosis eingeben");
-        itemPopupNew.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                //Date ldatum = null;
-                PnlRegelDosis dlg = new PnlRegelDosis(verordnung, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            verordnung.getPlanungen().add((VerordnungPlanung) o);
-                            reloadTable();
-                        }
-                    }
-                });
-                final JidePopup popup = new JidePopup();
-                popup.setMovable(false);
-                popup.setContentPane(dlg);
-                popup.setOwner(tblDosis);
-                popup.removeExcludedComponent(tblDosis);
-                popup.showPopup(screenposition.x, screenposition.y);
-                popup.addPropertyChangeListener(new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                        OPDE.debug(propertyChangeEvent.getPropertyName());
-                    }
-                });
-            }
-        });
-        menu.add(itemPopupNew);
-        Point p = evt.getPoint();
-        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-    }//GEN-LAST:event_jspDosisMousePressed
-
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
         if (ignoreEvent) {
             return;
@@ -1138,7 +1091,7 @@ public class DlgVerordnung extends JDialog {
                 VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
 
 
-                PnlRegelDosis dlg = new PnlRegelDosis(planung, verordnung, new Closure() {
+                PnlRegelDosis dlg = new PnlRegelDosis(planung, new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o != null) {

@@ -100,9 +100,10 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     private Date lDatum;
 
     public VerordnungPlanung() {
+
     }
 
-    public VerordnungPlanung(Verordnung verordnung) {
+    public VerordnungPlanung(boolean bedarf) {
         nachtMo = BigDecimal.ZERO;
         mittags = BigDecimal.ZERO;
         nachmittags = BigDecimal.ZERO;
@@ -116,10 +117,9 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         tagNum = 0;
         lDatum = new Date();
 
-        this.verordnung = verordnung;
-        this.verordnung.getPlanungen().add(this);
+        this.verordnung = null;
 
-        if (verordnung.isBedarf()) {
+        if (bedarf) {
             morgens = BigDecimal.ZERO;
             maxAnzahl = 1;
             maxEDosis = BigDecimal.ONE;

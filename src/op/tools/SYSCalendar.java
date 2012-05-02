@@ -27,13 +27,16 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
+import entity.verordnungen.Darreichung;
 import op.OPDE;
 
 import javax.swing.*;
+import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.DateFormat;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -86,6 +89,41 @@ public class SYSCalendar {
             gc.add(GregorianCalendar.MINUTE, 15);
         }
         return list;
+    }
+
+
+    /**
+     * Generiert ein Array aus Uhrzeiten in der Form {"17:00","17:15"...}
+     * Der verwendete Datentyp ist GregorianCalendar
+     */
+    public static ArrayList<Date> getTimeList() {
+        ArrayList list = new ArrayList();
+        GregorianCalendar gc = today();
+        for (int i = 1; i <= 96; i++) {
+            list.add(new Date(gc.getTimeInMillis()));
+            gc.add(GregorianCalendar.MINUTE, 15);
+        }
+        return list;
+    }
+
+
+    public static ListCellRenderer getTimeRenderer() {
+        return new ListCellRenderer() {
+            DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof Date) {
+                    Date date = (Date) o;
+                    text = timeFormat.format(date) + " Uhr";
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
     }
 
     /**

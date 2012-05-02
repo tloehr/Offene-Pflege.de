@@ -28,10 +28,13 @@ package op.tools;
 
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.TimingSource;
+import org.jdesktop.core.animation.timing.TimingTargetAdapter;
+import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
-import org.pushingpixels.trident.ease.Spline;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -59,6 +62,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SYSTools {
 
@@ -1497,13 +1501,13 @@ public class SYSTools {
 
 
     public static double showSide(JSplitPane split, boolean leftUpper) {
-        return showSide(split, leftUpper, 0, null);
+        return showSide(split, leftUpper, 0);
     }
 
-    public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis, TimelineCallback callback) {
-        double stop = leftUpper ? 0.0d : 1.0d;
-        return showSide(split, stop, speedInMillis, callback);
-    }
+//    public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis, TimelineCallback callback) {
+//        double stop = leftUpper ? 0.0d : 1.0d;
+//        return showSide(split, stop, speedInMillis, callback);
+//    }
 
 //    public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis, Closure whatToDoWhenDone) {
 //        double stop = leftUpper ? 0.0d : 1.0d;
@@ -1522,103 +1526,132 @@ public class SYSTools {
 
     public static double showSide(JSplitPane split, boolean leftUpper, int speedInMillis) {
         double stop = leftUpper ? 0.0d : 1.0d;
-        return showSide(split, stop, speedInMillis, null);
+        return showSide(split, stop, speedInMillis);
     }
 
     public static double showSide(JSplitPane split, Double pos) {
-        return showSide(split, pos, 0, null);
+        return showSide(split, pos, 0);
     }
-
-    public static double showSide(JSplitPane split, Double pos, int speedInMillis) {
-        return showSide(split, pos, speedInMillis, null);
-    }
+//
+//    public static double showSide(JSplitPane split, Double pos, int speedInMillis) {
+//        return showSide(split, pos, speedInMillis);
+//    }
 
 
     /**
      * Setzt eine Split Pane (animiert oder nicht animiert) auf eine entsprechende Position (Prozentual zwischen 0 und 1)
      *
      * @param split
-     * @param pos
+     * @param stop
      * @param speedInMillis
      * @return Die neue, relative Position (zwischen 0 und 1)
      */
-    public static double showSide(JSplitPane split, Double pos, int speedInMillis, TimelineCallback callback) {
+    public static double showSide(final JSplitPane split, final double stop, int speedInMillis) {
 
         if (OPDE.isAnimation() && speedInMillis > 0) {
             OPDE.debug("ShowSide double-version");
-            Object start;
-            Object stop;
+            final double start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
+//            final double stop = pos;
 
-            if (isMac() || isWindows()) {
-                start = split.getDividerLocation();
-                stop = getDividerInAbsolutePosition(split, pos);
-            } else {
-                OPDE.debug("*nix running");
-                start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
-                stop = pos;
-            }
+//            Double stop;
 
-            OPDE.debug(start.getClass().toString());
-            OPDE.debug(stop.getClass().toString());
-
-            final Timeline timeline1 = new Timeline(split);
-            timeline1.setEase(new Spline(0.9f));
-            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
-            timeline1.setDuration(speedInMillis);
-
-            if (callback != null) {
-                timeline1.addCallback(callback);
-            }
+//            if (isMac() || isWindows()) {
+//                start = split.getDividerLocation();
+//                stop = getDividerInAbsolutePosition(split, pos);
+//            } else {
+//                OPDE.debug("*nix running");
+//                start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
+//                stop = pos;
+//            }
 
 
-            timeline1.play();
+//
+//            OPDE.debug(start.getClass().toString());
+//            OPDE.debug(stop.getClass().toString());
+//
+//            Animator.Direction direction = Animator.Direction.BACKWARD;
+//            if (start > stop) {
+//                direction =
+//            }
+
+
+            final TimingSource ts = new SwingTimerTimingSource();
+            Animator.setDefaultTimingSource(ts);
+            ts.init();
+            Animator animator = new Animator.Builder().setDuration(speedInMillis, TimeUnit.MILLISECONDS).setRepeatCount(1).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+                double differenz = stop - start;
+
+                @Override
+                public void timingEvent(Animator animator, double fraction) {
+                    split.setDividerLocation(start + (differenz * fraction));
+                }
+
+//            @Override
+//            public void end(Animator source) {
+//                setForeground(new Color(getForeground().getRed(), getForeground().getGreen(), getForeground().getBlue()));
+//            }
+            }).build();
+
+            animator.start();
+
+//            final Timeline timeline1 = new Timeline(split);
+//            timeline1.setEase(new Spline(0.9f));
+//            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
+//            timeline1.setDuration(speedInMillis);
+//
+//            if (callback != null) {
+//                timeline1.addCallback(callback);
+//            }
+//
+//
+//            timeline1.play();
         } else {
-            split.setDividerLocation(pos);
+            split.setDividerLocation(stop);
         }
-        return pos;
+        return stop;
     }
 
-    public static double showSide(JSplitPane split, Integer pos, int speedInMillis) {
-        return showSide(split, pos, speedInMillis, null);
-    }
-
-    public static double showSide(JSplitPane split, Integer pos) {
-        return showSide(split, pos, 0, null);
-    }
-
-    public static double showSide(JSplitPane split, Integer pos, int speedInMillis, TimelineCallback callback) {
-
-        if (OPDE.isAnimation() && speedInMillis > 0) {
-            OPDE.debug("ShowSide int-version");
-            Object start;
-            Object stop;
-
-            if (isMac() || isWindows()) {
-                start = split.getDividerLocation();
-                stop = pos;
-            } else {
-                OPDE.debug("*nix running");
-                start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
-                stop = getDividerInRelativePosition(split, pos);
-            }
-            OPDE.debug(start.getClass().toString());
-            OPDE.debug(stop.getClass().toString());
-
-            final Timeline timeline1 = new Timeline(split);
-            timeline1.setEase(new Spline(0.9f));
-            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
-            timeline1.setDuration(speedInMillis);
-
-            if (callback != null) {
-                timeline1.addCallback(callback);
-            }
-
-            timeline1.play();
-        } else {
-            split.setDividerLocation(pos);
-        }
-        return getDividerInRelativePosition(split, pos);
-    }
+//    public static double showSide(JSplitPane split, Integer pos, int speedInMillis) {
+//        return showSide(split, pos, speedInMillis, null);
+//    }
+//
+//    public static double showSide(JSplitPane split, Integer pos) {
+//        return showSide(split, pos, 0, null);
+//    }
+//
+//    public static double showSide(JSplitPane split, Integer pos, int speedInMillis, TimelineCallback callback) {
+//
+//        if (OPDE.isAnimation() && speedInMillis > 0) {
+//            OPDE.debug("ShowSide int-version");
+//            Object start;
+//            Object stop;
+//
+//            if (isMac() || isWindows()) {
+//                start = split.getDividerLocation();
+//                stop = pos;
+//            } else {
+//                OPDE.debug("*nix running");
+//                start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
+//                stop = getDividerInRelativePosition(split, pos);
+//            }
+//            OPDE.debug(start.getClass().toString());
+//            OPDE.debug(stop.getClass().toString());
+//
+//            final Timeline timeline1 = new Timeline(split);
+//            timeline1.setEase(new Spline(0.9f));
+//            timeline1.addPropertyToInterpolate("dividerLocation", start, stop);
+//            timeline1.setDuration(speedInMillis);
+//
+//            if (callback != null) {
+//                timeline1.addCallback(callback);
+//            }
+//
+//            timeline1.play();
+//        } else {
+//            split.setDividerLocation(pos);
+//        }
+//        return getDividerInRelativePosition(split, pos);
+//    }
 
 //    public static double showSide(JSplitPane split, int pos, int speedInMillis) {
 //

@@ -602,12 +602,12 @@ public class PnlVorgang extends NursingRecordsPanel {
 
     private void btnAssignItemStateChanged(ItemEvent e) {
         double percent = btnAssign.isSelected() ? 0.65d : 1.0d;
-        SYSTools.showSide(splitDetailsOwner, percent, speedSlow, null);
+        SYSTools.showSide(splitDetailsOwner, percent, speedSlow);
     }
 
     private void btnDetailsItemStateChanged(ItemEvent e) {
         splitTDPercent = btnDetails.isSelected() ? 0.4d : 1.0d;
-        SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow, null);
+        SYSTools.showSide(splitTableDetails, splitTDPercent, speedSlow);
         loadDetails(aktuellerVorgang);
         btnEndReactivate.setEnabled(!btnDetails.isSelected() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
     }
@@ -1415,7 +1415,7 @@ public class PnlVorgang extends NursingRecordsPanel {
             splitTDPercent = SYSTools.showSide(splitTableEditor, SYSTools.LEFT_UPPER_SIDE, speedFast);
         }
 
-        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.5d, speedSlow, null);
+        splitTEPercent = SYSTools.showSide(splitTableEditor, 0.5d, speedSlow);
         textmessageTL = SYSTools.flashLabel(lblMessage, "Bericht speichern ?");
         SYSTools.showSide(splitButtonsCenter, SYSTools.RIGHT_LOWER_SIDE, speedFast);
 

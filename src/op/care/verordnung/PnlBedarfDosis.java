@@ -4,12 +4,14 @@
 
 package op.care.verordnung;
 
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
+import org.jdesktop.swingx.border.*;
 
 /**
  * @author Torsten Löhr
@@ -71,6 +73,7 @@ public class PnlBedarfDosis extends JPanel {
 
         //======== jPanel2 ========
         {
+            jPanel2.setBorder(new DropShadowBorder(Color.black, 5, 0.5f, 12, true, true, true, true));
             jPanel2.setLayout(new FormLayout(
                 "default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu",
                 "default, fill:default"));
