@@ -56,7 +56,6 @@ import org.jdesktop.swingx.VerticalLayout;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -176,6 +175,10 @@ public class FrmMain extends SheetableJFrame {
         System.exit(0);
     }
 
+    private void btnReloadSubmessageActionPerformed(ActionEvent e) {
+        displayManager.showLastSubMessageAgain();
+    }
+
     private void afterLogin() {
 
         createSearchPane();
@@ -198,8 +201,11 @@ public class FrmMain extends SheetableJFrame {
         pnlMain = new JPanel();
         pnlMainMessage = new JPanel();
         lblMainMsg = new FadingLabel();
-        btnExit = new JButton();
         btnVerlegung = new JButton();
+        panel1 = new JPanel();
+        btnReloadSubmessage = new JButton();
+        hSpacer1 = new JPanel(null);
+        btnExit = new JButton();
         lblSubMsg = new FadingLabel();
         pbMsg = new JProgressBar();
         splitPaneLeft = new JideSplitPane();
@@ -220,16 +226,16 @@ public class FrmMain extends SheetableJFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
-                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
+                        "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
+                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -238,20 +244,11 @@ public class FrmMain extends SheetableJFrame {
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 pnlMainMessage.add(lblMainMsg, CC.xywh(3, 3, 3, 1));
 
-                //---- btnExit ----
-                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
-                btnExit.setBorder(new EmptyBorder(5, 5, 5, 5));
-                btnExit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnExitActionPerformed(e);
-                    }
-                });
-                pnlMainMessage.add(btnExit, CC.xywh(7, 3, 1, 4));
-
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
-                btnVerlegung.setBorder(new EmptyBorder(5, 5, 5, 5));
+                btnVerlegung.setBorder(null);
+                btnVerlegung.setBorderPainted(false);
+                btnVerlegung.setOpaque(false);
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -259,6 +256,40 @@ public class FrmMain extends SheetableJFrame {
                     }
                 });
                 pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 3));
+
+                //======== panel1 ========
+                {
+                    panel1.setOpaque(false);
+                    panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+
+                    //---- btnReloadSubmessage ----
+                    btnReloadSubmessage.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
+                    btnReloadSubmessage.setBorder(null);
+                    btnReloadSubmessage.setBorderPainted(false);
+                    btnReloadSubmessage.setOpaque(false);
+                    btnReloadSubmessage.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnReloadSubmessageActionPerformed(e);
+                        }
+                    });
+                    panel1.add(btnReloadSubmessage);
+                    panel1.add(hSpacer1);
+
+                    //---- btnExit ----
+                    btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
+                    btnExit.setBorder(null);
+                    btnExit.setBorderPainted(false);
+                    btnExit.setOpaque(false);
+                    btnExit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnExitActionPerformed(e);
+                        }
+                    });
+                    panel1.add(btnExit);
+                }
+                pnlMainMessage.add(panel1, CC.xywh(7, 3, 1, 3));
 
                 //---- lblSubMsg ----
                 lblSubMsg.setText("OPDE");
@@ -423,14 +454,15 @@ public class FrmMain extends SheetableJFrame {
             ActionListener actionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    currentBewohner = innerbewohner;
+                    if (currentBewohner != innerbewohner) {
+                        currentBewohner = innerbewohner;
 
-                    if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
-                        ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
-                    } else {
-                        setPanelTo(new PnlPflege(innerbewohner, jspSearch));
+                        if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
+                            ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
+                        } else {
+                            setPanelTo(new PnlPflege(innerbewohner, jspSearch));
+                        }
                     }
-
                 }
             };
 
@@ -582,8 +614,11 @@ public class FrmMain extends SheetableJFrame {
     private JPanel pnlMain;
     private JPanel pnlMainMessage;
     private FadingLabel lblMainMsg;
-    private JButton btnExit;
     private JButton btnVerlegung;
+    private JPanel panel1;
+    private JButton btnReloadSubmessage;
+    private JPanel hSpacer1;
+    private JButton btnExit;
     private FadingLabel lblSubMsg;
     private JProgressBar pbMsg;
     private JideSplitPane splitPaneLeft;

@@ -143,7 +143,7 @@ public class TMVerordnung
         if (cache.containsKey(getVerordnung(row))) {
             result = cache.get(getVerordnung(row)).toString();
         } else {
-            result = VerordnungTools.getDosis(getVerordnung(row), mitBestand ? getBestand(row) : null);
+            result = VerordnungTools.getDosis(getVerordnung(row), mitBestand, getVorrat(row), getBestand(row));
             cache.put(getVerordnung(row), result);
         }
         return result;

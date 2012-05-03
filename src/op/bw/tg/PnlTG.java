@@ -288,7 +288,7 @@ public class PnlTG extends CleanablePanel {
         SYSTools.unregisterListeners(cmbPast);
         SYSTools.unregisterListeners(cmbVon);
         SYSTools.unregisterListeners(cmbBis);
-        OPDE.getDisplayManager().clearAllMessages();
+        OPDE.getDisplayManager().clearSubMessages();
         jspData.setViewportView(null);
     }
 

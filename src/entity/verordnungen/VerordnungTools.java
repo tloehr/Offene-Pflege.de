@@ -357,10 +357,10 @@ public class VerordnungTools {
     }
 
     public static String getDosis(Verordnung verordnung) {
-        return getDosis(verordnung, null);
+        return getDosis(verordnung, false, null, null);
     }
 
-    public static String getDosis(Verordnung verordnung, MedBestand bestandImAnbruch) {
+    public static String getDosis(Verordnung verordnung, boolean mitBestandsAnzeige, MedVorrat vorrat, MedBestand bestandImAnbruch) {
         long timestart = System.currentTimeMillis();
         String result = "";
         if (verordnung.getPlanungen().size() > 1) {
@@ -386,32 +386,31 @@ public class VerordnungTools {
             result += "<i>Noch keine Dosierung / Anwendungsinformationen verfügbar</i><br/>";
         }
 
-        if (verordnung.hasMedi()) {
-
-
+        if (mitBestandsAnzeige && verordnung.hasMedi()) {
             if (verordnung.isBisPackEnde()) {
                 result += "nur bis Packungs Ende<br/>";
             }
-            if (bestandImAnbruch != null && !verordnung.isAbgesetzt()) {
-                BigDecimal vorratSumme = MedVorratTools.getSumme(bestandImAnbruch.getVorrat());
-                BigDecimal bestandSumme = MedBestandTools.getBestandSumme(bestandImAnbruch);
+            if (!verordnung.isAbgesetzt()) {
+                if (bestandImAnbruch != null) {
+                    BigDecimal vorratSumme = MedVorratTools.getSumme(bestandImAnbruch.getVorrat());
+                    BigDecimal bestandSumme = MedBestandTools.getBestandSumme(bestandImAnbruch);
 
-                if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
-                    result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
-                            SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] +
-                            "</font></b>";
-                    if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
+                    if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
+                        result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
+                                SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] +
+                                "</font></b>";
+                        if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
 
-                        BigDecimal anwmenge = vorratSumme.multiply(bestandImAnbruch.getApv());
+                            BigDecimal anwmenge = vorratSumme.multiply(bestandImAnbruch.getApv());
 
 
-                        //double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
-                        result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-                                MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm());
-                        result += " (bei einem APV von " + SYSTools.roundScale2(bestandImAnbruch.getApv()) + " zu 1)";
-                        result += "</i>";
-                    }
-                    if (bestandImAnbruch != null) {
+                            //double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
+                            result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
+                                    MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm());
+                            result += " (bei einem APV von " + SYSTools.roundScale2(bestandImAnbruch.getApv()) + " zu 1)";
+                            result += "</i>";
+                        }
+
                         result += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + bestandImAnbruch.getBestID() + "</font></b>";
 
                         if (vorratSumme.compareTo(bestandSumme) != 0) {
@@ -425,21 +424,30 @@ public class VerordnungTools {
                                         MedFormenTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm()) + "</i>";
                             }
                         }
+
                     } else {
-                        result += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+                        result += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
                     }
                 } else {
-                    result += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
+                    if (vorrat == null) {
+                        result += "<b><font color=\"red\">Es gibt bisher keinen Vorrat für dieses Medikament.</font></b>";
+                    } else {
+                        if (MedVorratTools.getNaechsteNochUngeoeffnete(vorrat) != null){
+                            result += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+                        } else {
+                            result += "<br/><b><font color=\"red\">Keine Bestände mehr im Vorrat vorhanden. Vergabe nicht möglich.</font></b>";
+                        }
+
+                    }
                 }
             }
-
 
         }
 
 
         long timeend = System.currentTimeMillis();
 
-        OPDE.debug("time end: "+(timeend - timestart) + " millis");
+        OPDE.debug("time end: " + (timeend - timestart) + " millis");
 
         return result;
     }

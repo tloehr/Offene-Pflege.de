@@ -6,19 +6,88 @@ package op.care.verordnung;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
+import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
+import entity.verordnungen.VerordnungPlanung;
+import op.OPDE;
+import op.threads.DisplayMessage;
+import op.tools.CleanablePanel;
+import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.border.*;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlBedarfDosis extends JPanel {
-    public PnlBedarfDosis() {
+public class PnlBedarfDosis extends CleanablePanel {
+    private VerordnungPlanung planung;
+    private Closure actionBlock;
+    private Date currentSelectedTime;
+    private double splitRegularPos;
+
+    public PnlBedarfDosis(VerordnungPlanung planung, Closure actionBlock) {
+        this.actionBlock = actionBlock;
+        this.currentSelectedTime = null;
+
+        if (planung == null) {
+            planung = new VerordnungPlanung(false);
+        }
+        this.planung = planung;
         initComponents();
+        initPanel();
+    }
+
+    private void initPanel(){
+
+    }
+
+    @Override
+    public void cleanup() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void save() throws NumberFormatException {
+
+        if (Double.parseDouble(txtEDosis.getText()) == 0d){
+            throw new NumberFormatException("Alle Dosierungen sind Null.");
+        }
+
+        if (Integer.parseInt(txtMaxTimes.getText()) == 0){
+            throw new NumberFormatException("Die Anzahl ist Null.");
+        }
+
+        planung.setNachtMo(BigDecimal.ZERO);
+        planung.setMorgens(BigDecimal.ZERO);
+        planung.setMittags(BigDecimal.ZERO);
+        planung.setNachmittags(BigDecimal.ZERO);
+        planung.setAbends(BigDecimal.ZERO);
+        planung.setNachtAb(BigDecimal.ZERO);
+        planung.setUhrzeitDosis(BigDecimal.ZERO);
+        planung.setUhrzeit(null);
+
+        planung.setTaeglich((short) 0);
+        planung.setWoechentlich((short) 0);
+        planung.setMonatlich((short) 0);
+        planung.setLDatum(new Date());
+
+        planung.setMon((short) 0);
+        planung.setDie((short) 0);
+        planung.setMit((short) 0);
+        planung.setDon((short) 0);
+        planung.setFre((short) 0);
+        planung.setSam((short) 0);
+        planung.setSon((short) 0);
+
+        planung.setTagNum((short) 0);
+
+        planung.setMaxEDosis(new BigDecimal(Double.parseDouble(txtEDosis.getText())));
+        planung.setMaxAnzahl(Integer.parseInt(txtMaxTimes.getText()));
+
     }
 
     private void txtMaxTimesCaretUpdate(CaretEvent e) {
@@ -30,11 +99,7 @@ public class PnlBedarfDosis extends JPanel {
     }
 
     private void txtMaxTimesFocusGained(FocusEvent e) {
-        // TODO add your code here
-    }
-
-    private void txtMaxTimesFocusLost(FocusEvent e) {
-        // TODO add your code here
+        SYSTools.markAllTxt((JTextField) e.getSource());
     }
 
     private void txtEDosisCaretUpdate(CaretEvent e) {
@@ -46,15 +111,16 @@ public class PnlBedarfDosis extends JPanel {
     }
 
     private void txtEDosisFocusGained(FocusEvent e) {
-        // TODO add your code here
-    }
-
-    private void txtEDosisFocusLost(FocusEvent e) {
-        // TODO add your code here
+        SYSTools.markAllTxt((JTextField) e.getSource());
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        try {
+            save();
+            actionBlock.execute(planung);
+        } catch (NumberFormatException nfe) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Eingabefehler bei der Dosierung. Bitte prüfen. "+nfe.getLocalizedMessage(), 2));
+        }
     }
 
     private void initComponents() {
@@ -75,30 +141,24 @@ public class PnlBedarfDosis extends JPanel {
         {
             jPanel2.setBorder(new DropShadowBorder(Color.black, 5, 0.5f, 12, true, true, true, true));
             jPanel2.setLayout(new FormLayout(
-                "default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu",
-                "default, fill:default"));
+                "$rgap, $lcgap, default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu, $lcgap, $rgap",
+                "default, fill:default, $lgap, $rgap"));
 
             //---- label1 ----
             label1.setText("Anzahl");
-            jPanel2.add(label1, CC.xy(3, 1));
+            jPanel2.add(label1, CC.xy(5, 1));
 
             //---- label2 ----
             label2.setText("Dosis");
-            jPanel2.add(label2, CC.xy(7, 1, CC.CENTER, CC.DEFAULT));
+            jPanel2.add(label2, CC.xy(9, 1, CC.CENTER, CC.DEFAULT));
 
             //---- lblDosis ----
             lblDosis.setText("Max. Tagesdosis:");
-            jPanel2.add(lblDosis, CC.xy(1, 2));
+            jPanel2.add(lblDosis, CC.xy(3, 2));
 
             //---- txtMaxTimes ----
             txtMaxTimes.setHorizontalAlignment(SwingConstants.RIGHT);
             txtMaxTimes.setText("1");
-            txtMaxTimes.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtMaxTimesCaretUpdate(e);
-                }
-            });
             txtMaxTimes.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -110,26 +170,16 @@ public class PnlBedarfDosis extends JPanel {
                 public void focusGained(FocusEvent e) {
                     txtMaxTimesFocusGained(e);
                 }
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtMaxTimesFocusLost(e);
-                }
             });
-            jPanel2.add(txtMaxTimes, CC.xy(3, 2));
+            jPanel2.add(txtMaxTimes, CC.xy(5, 2));
 
             //---- lblX ----
             lblX.setText("x");
-            jPanel2.add(lblX, CC.xy(5, 2));
+            jPanel2.add(lblX, CC.xy(7, 2));
 
             //---- txtEDosis ----
             txtEDosis.setHorizontalAlignment(SwingConstants.RIGHT);
             txtEDosis.setText("1.0");
-            txtEDosis.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtEDosisCaretUpdate(e);
-                }
-            });
             txtEDosis.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -141,12 +191,8 @@ public class PnlBedarfDosis extends JPanel {
                 public void focusGained(FocusEvent e) {
                     txtEDosisFocusGained(e);
                 }
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtEDosisFocusLost(e);
-                }
             });
-            jPanel2.add(txtEDosis, CC.xy(7, 2));
+            jPanel2.add(txtEDosis, CC.xy(9, 2));
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
@@ -156,7 +202,7 @@ public class PnlBedarfDosis extends JPanel {
                     btnSaveActionPerformed(e);
                 }
             });
-            jPanel2.add(btnSave, CC.xy(9, 2, CC.RIGHT, CC.DEFAULT));
+            jPanel2.add(btnSave, CC.xy(11, 2, CC.RIGHT, CC.DEFAULT));
         }
         add(jPanel2);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

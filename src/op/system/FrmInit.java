@@ -7,7 +7,6 @@ package op.system;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.system.SYSHosts;
 import entity.system.SYSProps;
 import op.OPDE;
 import op.tools.DesEncrypter;
@@ -117,14 +116,15 @@ public class FrmInit extends JFrame {
     }
 
 
-    public void saveLocalProps() {
+    private void saveLocalProps() {
         try {
 
-            SYSHosts host = createNewHost(false);
-            defaultProps.put("hostkey", host.getHostKey());
+//            SYSHosts host = createNewHost(false);
+            String hostkey = UUID.randomUUID().toString();
+            defaultProps.put("hostkey", hostkey);
 
             // Passwort verschlüsselt speichern
-            DesEncrypter desEncrypter = new DesEncrypter(host.getHostKey());
+            DesEncrypter desEncrypter = new DesEncrypter(hostkey);
 
             String clearpw = defaultProps.getProperty("javax.persistence.jdbc.password");
             String cryptpw = desEncrypter.encrypt(clearpw);
@@ -143,40 +143,40 @@ public class FrmInit extends JFrame {
         }
     }
 
-    /**
-     * Legt für den aktuellen Client eine neue Host Entity an. Ermittelt einen zufälligen Hostkey.
-     *
-     * @return
-     */
-    public SYSHosts createNewHost(boolean mainhost) {
-        InetAddress localMachine = null;
-        try {
-            localMachine = InetAddress.getLocalHost();
-        } catch (java.net.UnknownHostException uhe) {
-            OPDE.fatal(uhe);
-            System.exit(1);
-        }
-
-        SYSHosts host = null;
-        // Solange versuchen hostkeys zu erzeugen, bis ein eindeutiger gefunden wurde. Das sollte
-        // so gut wie nie mehr als einmal nötig sein.
-        boolean success = false;
-        while (!success) {
-            String hostkey = UUID.randomUUID().toString();
-            host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
-            try {
-                em.getTransaction().begin();
-                em.persist(host);
-                em.getTransaction().commit();
-                success = true;
-            } catch (Exception e) {
-                em.getTransaction().rollback();
-                success = false;
-            }
-        }
-
-        return host;
-    }
+//    /**
+//     * Legt für den aktuellen Client eine neue Host Entity an. Ermittelt einen zufälligen Hostkey.
+//     *
+//     * @return
+//     */
+//    public SYSHosts createNewHost(boolean mainhost) {
+//        InetAddress localMachine = null;
+//        try {
+//            localMachine = InetAddress.getLocalHost();
+//        } catch (java.net.UnknownHostException uhe) {
+//            OPDE.fatal(uhe);
+//            System.exit(1);
+//        }
+//
+//        SYSHosts host = null;
+//        // Solange versuchen hostkeys zu erzeugen, bis ein eindeutiger gefunden wurde. Das sollte
+//        // so gut wie nie mehr als einmal nötig sein.
+//        boolean success = false;
+//        while (!success) {
+//            String hostkey = UUID.randomUUID().toString();
+//            host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
+//            try {
+//                em.getTransaction().begin();
+//                em.persist(host);
+//                em.getTransaction().commit();
+//                success = true;
+//            } catch (Exception e) {
+//                em.getTransaction().rollback();
+//                success = false;
+//            }
+//        }
+//
+//        return host;
+//    }
 
     private void btnCancelActionPerformed(ActionEvent e) {
         dispose();

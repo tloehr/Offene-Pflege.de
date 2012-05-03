@@ -43,7 +43,7 @@ public class Database {
             this.db = DriverManager.getConnection(url, username, new String(passwort));
 
         } catch (ClassNotFoundException exCLASS) {
-            new DlgException(exCLASS);
+            OPDE.fatal(exCLASS);
         }
 
     } // Database()

@@ -1,6 +1,10 @@
 package op.threads;
 
 
+import sun.security.x509.UniqueIdentity;
+
+import java.util.UUID;
+
 /**
  * Created by IntelliJ IDEA.
  * User: tloehr
@@ -20,6 +24,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     private long processed;
     private int secondsToShow;
     private int percentage;
+    private String uid;
 
 
 
@@ -30,6 +35,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.processed = 0;
         this.secondsToShow = 0;
         this.percentage = 0;
+        uid = UUID.randomUUID().toString();
     }
 
     public DisplayMessage(String message, int secondsToShow) {
@@ -39,6 +45,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.processed = 0;
         this.secondsToShow = secondsToShow;
         this.percentage = 0;
+        uid = UUID.randomUUID().toString();
     }
 
     public DisplayMessage(String message, int priority, int secondsToShow) {
@@ -48,6 +55,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.processed = 0;
         this.secondsToShow = secondsToShow;
         this.percentage = 0;
+        uid = UUID.randomUUID().toString();
     }
 
     public DisplayMessage(String message, int priority, long timestamp, long processed, int secondsToShow) {
@@ -57,6 +65,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.processed = processed;
         this.secondsToShow = secondsToShow;
         this.percentage = 0;
+        uid = UUID.randomUUID().toString();
     }
 
     public String getMessage() {
@@ -107,6 +116,10 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.percentage = percentage;
     }
 
+    public String getUID() {
+        return uid;
+    }
+
     /**
      *
      * @return true, wenn die Nachricht
@@ -129,5 +142,23 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
             sort = new Long(timestamp).compareTo(other.timestamp);
         }
         return sort;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return ((DisplayMessage) o).getUID().equals(uid);
+    }
+
+    @Override
+    public String toString() {
+        return "DisplayMessage{" +
+                "message='" + message + '\'' +
+                ", priority=" + priority +
+                ", timestamp=" + timestamp +
+                ", processed=" + processed +
+                ", secondsToShow=" + secondsToShow +
+                ", percentage=" + percentage +
+                ", uid='" + uid + '\'' +
+                '}';
     }
 }

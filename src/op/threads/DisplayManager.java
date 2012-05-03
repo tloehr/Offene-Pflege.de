@@ -1,5 +1,7 @@
 package op.threads;
 
+import op.OPDE;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,10 +48,10 @@ public class DisplayManager extends Thread {
         lblMain.setText(message);
     }
 
-
     public void clearAllMessages() {
         setMainMessage(null);
         messageQ.clear();
+        oldMessages.clear();
         processSubMessage();
     }
 
@@ -59,8 +61,23 @@ public class DisplayManager extends Thread {
     }
 
     public void addSubMessage(DisplayMessage msg) {
+        OPDE.debug(msg);
         messageQ.add(msg);
         Collections.sort(messageQ);
+    }
+
+    public void showLastSubMessageAgain() {
+        if (!oldMessages.isEmpty()) {
+            DisplayMessage lastMessage = oldMessages.get(oldMessages.size() - 1);
+            messageQ.add(lastMessage);
+            processSubMessage();
+        }
+    }
+
+    public void clearSubMessages() {
+        messageQ.clear();
+        currentSubMessage = null;
+        processSubMessage();
     }
 
     private void processSubMessage() {
@@ -68,7 +85,6 @@ public class DisplayManager extends Thread {
 
         if (nextMessage != null) {
             pbIntermediateZyklen = 0;
-            oldMessages.add(currentSubMessage);
             messageQ.remove(0);
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
@@ -78,6 +94,9 @@ public class DisplayManager extends Thread {
             pbIntermediateZyklen++;
             if (currentSubMessage == null || currentSubMessage.isObsolete()) {
                 lblSub.setText(" ");
+                if (currentSubMessage != null && !oldMessages.contains(currentSubMessage)) {
+                    oldMessages.add(currentSubMessage);
+                }
                 currentSubMessage = null;
             }
         }

@@ -138,7 +138,7 @@ public class TMBedarf
         if (cache.containsKey(getVerordnung(row))) {
             result = cache.get(getVerordnung(row)).toString();
         } else {
-            result = VerordnungTools.getDosis(getVerordnung(row), getBestand(row));
+//            result = VerordnungTools.getDosis(getVerordnung(row), true, getBestand(row));
             cache.put(getVerordnung(row), result);
         }
         return result;

@@ -550,6 +550,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 reloadTable();
                             }
                             OPDE.hideSheet();
+                            OPDE.getDisplayManager().clearSubMessages();
                         }
                     }));
 
@@ -570,6 +571,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 EntityTools.persist(bericht);
                                 reloadTable();
                             }
+
                             OPDE.hideSheet();
                         }
                     }));

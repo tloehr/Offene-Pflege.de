@@ -193,7 +193,7 @@ public class MedBestandTools {
      */
     public static BigDecimal getBestandSumme(MedBestand bestand) {
         BigDecimal result = BigDecimal.ZERO;
-
+        //TODO: hier muss noch eine zweite Methode her.
 //      Das hier geht zwar auch ist aber LAAAAAANGSAMMMM
 //        for (MedBuchungen buchung : bestand.getBuchungen()) {
 //            result = result.add(buchung.getMenge());

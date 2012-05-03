@@ -1,5 +1,6 @@
 package entity.verordnungen;
 
+import com.sun.servicetag.SystemEnvironment;
 import entity.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -540,22 +541,71 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (bhppid != null ? bhppid.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VerordnungPlanung that = (VerordnungPlanung) o;
+
+        if (bhppid != null ? !bhppid.equals(that.bhppid) : that.bhppid != null) return false;
+        if (abends != null ? !abends.equals(that.abends) : that.abends != null) return false;
+        if (die != null ? !die.equals(that.die) : that.die != null) return false;
+        if (don != null ? !don.equals(that.don) : that.don != null) return false;
+        if (fre != null ? !fre.equals(that.fre) : that.fre != null) return false;
+        if (lDatum != null ? !lDatum.equals(that.lDatum) : that.lDatum != null) return false;
+        if (maxAnzahl != null ? !maxAnzahl.equals(that.maxAnzahl) : that.maxAnzahl != null) return false;
+        if (maxEDosis != null ? !maxEDosis.equals(that.maxEDosis) : that.maxEDosis != null) return false;
+        if (mit != null ? !mit.equals(that.mit) : that.mit != null) return false;
+        if (mittags != null ? !mittags.equals(that.mittags) : that.mittags != null) return false;
+        if (mon != null ? !mon.equals(that.mon) : that.mon != null) return false;
+        if (monatlich != null ? !monatlich.equals(that.monatlich) : that.monatlich != null) return false;
+        if (morgens != null ? !morgens.equals(that.morgens) : that.morgens != null) return false;
+        if (nachmittags != null ? !nachmittags.equals(that.nachmittags) : that.nachmittags != null) return false;
+        if (nachtAb != null ? !nachtAb.equals(that.nachtAb) : that.nachtAb != null) return false;
+        if (nachtMo != null ? !nachtMo.equals(that.nachtMo) : that.nachtMo != null) return false;
+        if (sam != null ? !sam.equals(that.sam) : that.sam != null) return false;
+        if (son != null ? !son.equals(that.son) : that.son != null) return false;
+        if (taeglich != null ? !taeglich.equals(that.taeglich) : that.taeglich != null) return false;
+        if (tagNum != null ? !tagNum.equals(that.tagNum) : that.tagNum != null) return false;
+        if (uhrzeit != null ? !uhrzeit.equals(that.uhrzeit) : that.uhrzeit != null) return false;
+        if (uhrzeitDosis != null ? !uhrzeitDosis.equals(that.uhrzeitDosis) : that.uhrzeitDosis != null) return false;
+        if (user != null ? !user.equals(that.user) : that.user != null) return false;
+        if (verordnung != null ? !verordnung.equals(that.verordnung) : that.verordnung != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        if (woechentlich != null ? !woechentlich.equals(that.woechentlich) : that.woechentlich != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof VerordnungPlanung)) {
-            return false;
-        }
-        VerordnungPlanung other = (VerordnungPlanung) object;
-        if ((this.bhppid == null && other.bhppid != null) || (this.bhppid != null && !this.bhppid.equals(other.bhppid))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = bhppid != null ? bhppid.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (nachtMo != null ? nachtMo.hashCode() : 0);
+        result = 31 * result + (morgens != null ? morgens.hashCode() : 0);
+        result = 31 * result + (mittags != null ? mittags.hashCode() : 0);
+        result = 31 * result + (nachmittags != null ? nachmittags.hashCode() : 0);
+        result = 31 * result + (abends != null ? abends.hashCode() : 0);
+        result = 31 * result + (nachtAb != null ? nachtAb.hashCode() : 0);
+        result = 31 * result + (uhrzeitDosis != null ? uhrzeitDosis.hashCode() : 0);
+        result = 31 * result + (uhrzeit != null ? uhrzeit.hashCode() : 0);
+        result = 31 * result + (maxAnzahl != null ? maxAnzahl.hashCode() : 0);
+        result = 31 * result + (maxEDosis != null ? maxEDosis.hashCode() : 0);
+        result = 31 * result + (taeglich != null ? taeglich.hashCode() : 0);
+        result = 31 * result + (woechentlich != null ? woechentlich.hashCode() : 0);
+        result = 31 * result + (monatlich != null ? monatlich.hashCode() : 0);
+        result = 31 * result + (tagNum != null ? tagNum.hashCode() : 0);
+        result = 31 * result + (mon != null ? mon.hashCode() : 0);
+        result = 31 * result + (die != null ? die.hashCode() : 0);
+        result = 31 * result + (mit != null ? mit.hashCode() : 0);
+        result = 31 * result + (don != null ? don.hashCode() : 0);
+        result = 31 * result + (fre != null ? fre.hashCode() : 0);
+        result = 31 * result + (sam != null ? sam.hashCode() : 0);
+        result = 31 * result + (son != null ? son.hashCode() : 0);
+        result = 31 * result + (lDatum != null ? lDatum.hashCode() : 0);
+        result = 31 * result + (verordnung != null ? verordnung.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        return result;
     }
 
     @Override
