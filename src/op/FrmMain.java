@@ -204,9 +204,9 @@ public class FrmMain extends SheetableJFrame {
         btnVerlegung = new JButton();
         panel1 = new JPanel();
         btnReloadSubmessage = new JButton();
-        hSpacer1 = new JPanel(null);
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
+        lblDB = new JLabel();
         pbMsg = new JProgressBar();
         splitPaneLeft = new JideSplitPane();
         statusBar = new StatusBar();
@@ -226,23 +226,23 @@ public class FrmMain extends SheetableJFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
-                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:default, $lgap, $rgap"));
+                    "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
+                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
                 lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
                 lblMainMsg.setForeground(new Color(105, 80, 69));
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblMainMsg, CC.xywh(3, 3, 3, 1));
+                pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
 
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
@@ -263,7 +263,7 @@ public class FrmMain extends SheetableJFrame {
                     panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
 
                     //---- btnReloadSubmessage ----
-                    btnReloadSubmessage.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
+                    btnReloadSubmessage.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
                     btnReloadSubmessage.setBorder(null);
                     btnReloadSubmessage.setBorderPainted(false);
                     btnReloadSubmessage.setOpaque(false);
@@ -274,7 +274,6 @@ public class FrmMain extends SheetableJFrame {
                         }
                     });
                     panel1.add(btnReloadSubmessage);
-                    panel1.add(hSpacer1);
 
                     //---- btnExit ----
                     btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
@@ -296,13 +295,18 @@ public class FrmMain extends SheetableJFrame {
                 lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
                 lblSubMsg.setForeground(new Color(105, 80, 69));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblSubMsg, CC.xywh(3, 5, 3, 1));
+                pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
+
+                //---- lblDB ----
+                lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
+                lblDB.setVisible(false);
+                pnlMainMessage.add(lblDB, CC.xy(3, 7));
 
                 //---- pbMsg ----
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
                 pbMsg.setForeground(new Color(105, 80, 69));
-                pnlMainMessage.add(pbMsg, CC.xywh(3, 7, 5, 1, CC.FILL, CC.DEFAULT));
+                pnlMainMessage.add(pbMsg, CC.xywh(5, 7, 3, 1, CC.FILL, CC.DEFAULT));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1));
 
@@ -617,9 +621,9 @@ public class FrmMain extends SheetableJFrame {
     private JButton btnVerlegung;
     private JPanel panel1;
     private JButton btnReloadSubmessage;
-    private JPanel hSpacer1;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
+    private JLabel lblDB;
     private JProgressBar pbMsg;
     private JideSplitPane splitPaneLeft;
     private StatusBar statusBar;

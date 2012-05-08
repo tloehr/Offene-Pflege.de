@@ -86,7 +86,11 @@ public class Situationen implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Situationen[sitID=" + sitID + "]";
+        return "Situationen{" +
+                "sitID=" + sitID +
+                ", kategorie=" + kategorie +
+                ", uKategorie=" + uKategorie +
+                ", text='" + text + '\'' +
+                '}';
     }
-
 }

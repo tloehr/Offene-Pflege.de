@@ -60,7 +60,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>relgap, linegap, fill:13dlu, linegap, fill:11dlu, linegap, fill:default, linegap, relgap</string> 
+            <string>relgap, linegap, fill:13dlu, linegap, fill:11dlu, linegap, fill:15dlu, linegap, relgap</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -125,11 +125,7 @@
             </void> 
             <void method="setProperty"> 
              <string>gridX</string> 
-             <int>3</int> 
-            </void> 
-            <void method="setProperty"> 
-             <string>gridWidth</string> 
-             <int>3</int> 
+             <int>5</int> 
             </void> 
            </object> 
           </void> 
@@ -207,7 +203,7 @@
                <string>icon</string> 
                <object class="com.jformdesigner.model.SwingIcon"> 
                 <int>0</int> 
-                <string>/artwork/22x22/reload.png</string> 
+                <string>/artwork/22x22/bw/reload.png</string> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -232,14 +228,6 @@
                 <string>btnReloadSubmessageActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>com.jformdesigner.designer.wrapper.HSpacer</string> 
-              <void property="name"> 
-               <string>hSpacer1</string> 
               </void> 
              </object> 
             </void> 
@@ -330,11 +318,37 @@
             </void> 
             <void method="setProperty"> 
              <string>gridX</string> 
+             <int>5</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JLabel</string> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/db.png</string> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>visible</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void property="name"> 
+             <string>lblDB</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridX</string> 
              <int>3</int> 
             </void> 
             <void method="setProperty"> 
-             <string>gridWidth</string> 
-             <int>3</int> 
+             <string>gridY</string> 
+             <int>7</int> 
             </void> 
            </object> 
           </void> 
@@ -378,11 +392,11 @@
             </void> 
             <void method="setProperty"> 
              <string>gridX</string> 
-             <int>3</int> 
+             <int>5</int> 
             </void> 
             <void method="setProperty"> 
              <string>gridWidth</string> 
-             <int>5</int> 
+             <int>3</int> 
             </void> 
            </object> 
           </void> 

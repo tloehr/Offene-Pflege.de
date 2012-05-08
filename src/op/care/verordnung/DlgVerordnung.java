@@ -39,12 +39,12 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.jdesktop.swingx.JXSearchField;
 import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.*;
 import javax.swing.*;
-import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -108,7 +108,6 @@ public class DlgVerordnung extends JDialog {
                 this.verordnung = em.merge(verordnung);
                 em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
             }
-
         } catch (PessimisticLockException ple) {
             OPDE.debug(ple);
             em.getTransaction().rollback();
@@ -118,27 +117,20 @@ public class DlgVerordnung extends JDialog {
             OPDE.fatal(e);
         }
 
+        initComponents();
         initDialog();
     }
 
     private void cbStellplanActionPerformed(ActionEvent e) {
-        if (ignoreEvent) {
-            return;
-        }
         verordnung.setStellplan(cbStellplan.isSelected());
     }
 
     private void jdcANPropertyChange(PropertyChangeEvent e) {
-        if (ignoreEvent) {
-            return;
-        }
-        verordnung.setAnDatum(jdcAN.getDate());
         saveOK();
     }
 
     private void btnAddDosisActionPerformed(ActionEvent e) {
-
-        if (verordnung.isBedarf() && verordnung.getPlanungen().size() > 0) {
+        if (isBedarf() && verordnung.getPlanungen().size() > 0) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTML("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden."), 2));
             return;
         }
@@ -146,7 +138,7 @@ public class DlgVerordnung extends JDialog {
         final JidePopup popup = new JidePopup();
 
         JPanel dlg = null;
-        if (verordnung.isBedarf()) {
+        if (isBedarf()) {
             dlg = new PnlBedarfDosis(null, new Closure() {
                 @Override
                 public void execute(Object o) {
@@ -189,7 +181,7 @@ public class DlgVerordnung extends JDialog {
         Point p = new Point(btnAddDosis.getX(), btnAddDosis.getY());
         // Convert a coordinate relative to a component's bounds to screen coordinates
         SwingUtilities.convertPointToScreen(p, btnAddDosis);
-        popup.showPopup(p.x, p.y - (int) dlg.getPreferredSize().getWidth() - (int) btnAddDosis.getPreferredSize().getHeight());
+        popup.showPopup(p.x, p.y - (int) dlg.getPreferredSize().getHeight() - (int) btnAddDosis.getPreferredSize().getHeight());
     }
 
     private void thisKeyPressed(KeyEvent e) {
@@ -199,6 +191,81 @@ public class DlgVerordnung extends JDialog {
     private void thisKeyTyped(KeyEvent e) {
         OPDE.debug(e.getKeyCode());
 
+    }
+
+    private void txtSitActionPerformed(ActionEvent e) {
+        if (txtSit.getText().isEmpty()) {
+            cmbSit.setModel(new DefaultComboBoxModel());
+        } else {
+            cmbSit.setModel(new DefaultComboBoxModel(SituationenTools.findSituationByText(txtSit.getText()).toArray()));
+        }
+        saveOK();
+    }
+
+    private void saveSituation(String text) {
+        if (text.isEmpty()) {
+            return;
+        }
+        Query query = em.createQuery("SELECT s FROM Situationen s WHERE s.text = :text");
+        query.setParameter("text", text);
+        if (query.getResultList().isEmpty()) {
+            Situationen neueSituation = new Situationen(text);
+            em.persist(neueSituation);
+            cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{neueSituation}));
+        } else {
+            cmbSit.setModel(new DefaultComboBoxModel(query.getResultList().toArray()));
+        }
+    }
+
+    private void btnSituationActionPerformed(ActionEvent e) {
+        if (cmbSit.getModel().getSize() != 0) {
+            return;
+        }
+
+        final JidePopup popup = new JidePopup();
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+        final JTextField editor = new JTextField(txtSit.getText(), 30);
+        editor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                saveSituation(editor.getText());
+                popup.hidePopup();
+            }
+        });
+
+        popup.getContentPane().add(new JScrollPane(editor));
+        JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                saveSituation(editor.getText());
+                popup.hidePopup();
+            }
+        });
+
+        popup.setMovable(false);
+        popup.setOwner(btnSituation);
+        popup.removeExcludedComponent(btnSituation);
+//        popup.getContentPane().add(editor);
+        popup.getContentPane().add(saveButton);
+        popup.setDefaultFocusComponent(editor);
+
+//        Point p3 = new Point(btnSituation.getX(), btnSituation.getY());
+//        SwingUtilities.convertPointToScreen(p3, btnSituation);
+        popup.showPopup();
+    }
+
+    private void cmbSitPropertyChange(PropertyChangeEvent e) {
+        cmbSitItemStateChanged(null);
+    }
+
+    private void cbPackEndeItemStateChanged(ItemEvent e) {
+        saveOK();
+    }
+
+    private void btnEmptySitActionPerformed(ActionEvent e) {
+        cmbSit.setModel(new DefaultComboBoxModel());
     }
 
     private void jdcABPropertyChange(PropertyChangeEvent e) {
@@ -218,19 +285,23 @@ public class DlgVerordnung extends JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPanel1 = new JPanel();
-        cmbSit = new JComboBox();
-        txtMed = new JTextField();
+        txtMed = new JXSearchField();
         cmbMed = new JComboBox();
-        cmbMass = new JComboBox();
-        txtSit = new JTextField();
-        btnBedarf = new JButton();
+        panel4 = new JPanel();
+        btnEmptySit2 = new JButton();
         btnMed = new JButton();
+        cmbMass = new JComboBox();
+        txtSit = new JXSearchField();
+        cmbSit = new JComboBox();
+        panel3 = new JPanel();
+        btnEmptySit = new JButton();
+        btnSituation = new JButton();
+        xSearchField1 = new JXSearchField();
         jPanel8 = new JPanel();
         jspDosis = new JScrollPane();
         tblDosis = new JTable();
         panel2 = new JPanel();
         btnAddDosis = new JButton();
-        jLabel6 = new JLabel();
         cbPackEnde = new JCheckBox();
         cbStellplan = new JCheckBox();
         jPanel3 = new JPanel();
@@ -276,33 +347,19 @@ public class DlgVerordnung extends JDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, 2*($lcgap, default), $lcgap, $rgap",
+            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
             "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
         {
-            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+            jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "63dlu, $lcgap, default, $lcgap, 52dlu, $lcgap, 204dlu",
+                "68dlu, $lcgap, 242dlu:grow, $lcgap, pref",
                 "3*(fill:default, $lgap), 2*(default, $lgap), fill:default:grow"));
 
-            //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
-            }));
-            cmbSit.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbSitItemStateChanged(e);
-                }
-            });
-            jPanel1.add(cmbSit, CC.xy(7, 3));
-
             //---- txtMed ----
-            txtMed.setText("jTextField1");
+            txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtMed.setPrompt("Medikamente");
             txtMed.addCaretListener(new CaretListener() {
                 @Override
                 public void caretUpdate(CaretEvent e) {
@@ -315,7 +372,7 @@ public class DlgVerordnung extends JDialog {
                     txtMedFocusGained(e);
                 }
             });
-            jPanel1.add(txtMed, CC.xy(5, 1));
+            jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
             cmbMed.setModel(new DefaultComboBoxModel(new String[] {
@@ -324,13 +381,40 @@ public class DlgVerordnung extends JDialog {
                 "Item 3",
                 "Item 4"
             }));
+            cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     cmbMedItemStateChanged(e);
                 }
             });
-            jPanel1.add(cmbMed, CC.xy(7, 1));
+            jPanel1.add(cmbMed, CC.xy(3, 1));
+
+            //======== panel4 ========
+            {
+                panel4.setLayout(new BoxLayout(panel4, BoxLayout.LINE_AXIS));
+
+                //---- btnEmptySit2 ----
+                btnEmptySit2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel.png")));
+                btnEmptySit2.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnEmptySitActionPerformed(e);
+                    }
+                });
+                panel4.add(btnEmptySit2);
+
+                //---- btnMed ----
+                btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnMed.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnMedActionPerformed(e);
+                    }
+                });
+                panel4.add(btnMed);
+            }
+            jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbMass ----
             cmbMass.setModel(new DefaultComboBoxModel(new String[] {
@@ -339,55 +423,91 @@ public class DlgVerordnung extends JDialog {
                 "Item 3",
                 "Item 4"
             }));
+            cmbMass.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMass.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     cmbMassItemStateChanged(e);
                 }
             });
-            jPanel1.add(cmbMass, CC.xywh(3, 5, 5, 1));
+            jPanel1.add(cmbMass, CC.xywh(3, 5, 3, 1));
 
             //---- txtSit ----
-            txtSit.setText("jTextField1");
-            txtSit.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtSitCaretUpdate(e);
-                }
-            });
-            jPanel1.add(txtSit, CC.xy(5, 3));
-
-            //---- btnBedarf ----
-            btnBedarf.setText("Situation");
-            btnBedarf.setEnabled(false);
-            btnBedarf.addActionListener(new ActionListener() {
+            txtSit.setPrompt("Situationen");
+            txtSit.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtSit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    btnBedarfActionPerformed(e);
+                    txtSitActionPerformed(e);
                 }
             });
-            jPanel1.add(btnBedarf, CC.xywh(1, 3, 3, 1));
+            jPanel1.add(txtSit, CC.xy(1, 3));
 
-            //---- btnMed ----
-            btnMed.setText("Medikament");
-            btnMed.addActionListener(new ActionListener() {
+            //---- cmbSit ----
+            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
+            cmbSit.addItemListener(new ItemListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnMedActionPerformed(e);
+                public void itemStateChanged(ItemEvent e) {
+                    cmbSitItemStateChanged(e);
                 }
             });
-            jPanel1.add(btnMed, CC.xywh(1, 1, 3, 1));
+            cmbSit.addPropertyChangeListener("model", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    cmbSitPropertyChange(e);
+                }
+            });
+            jPanel1.add(cmbSit, CC.xy(3, 3));
+
+            //======== panel3 ========
+            {
+                panel3.setLayout(new BoxLayout(panel3, BoxLayout.LINE_AXIS));
+
+                //---- btnEmptySit ----
+                btnEmptySit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel.png")));
+                btnEmptySit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnEmptySitActionPerformed(e);
+                    }
+                });
+                panel3.add(btnEmptySit);
+
+                //---- btnSituation ----
+                btnSituation.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnSituation.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnSituationActionPerformed(e);
+                    }
+                });
+                panel3.add(btnSituation);
+            }
+            jPanel1.add(panel3, CC.xy(5, 3));
+
+            //---- xSearchField1 ----
+            xSearchField1.setFont(new Font("Arial", Font.PLAIN, 14));
+            xSearchField1.setPrompt("Massnahmen");
+            jPanel1.add(xSearchField1, CC.xy(1, 5));
 
             //======== jPanel8 ========
             {
-                jPanel8.setBorder(new TitledBorder("Dosis / H\u00e4ufigkeit"));
+                jPanel8.setBorder(new TitledBorder(null, "Dosis / H\u00e4ufigkeit", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
+                    new Font("Arial", Font.PLAIN, 14)));
+                jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
                     "default:grow",
-                    "fill:default:grow, $lgap, fill:default"));
+                    "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
                 {
-                    jspDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie neue Dosierungen eintragen wollen.</html>");
+                    jspDosis.setToolTipText(null);
                     jspDosis.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
@@ -407,7 +527,8 @@ public class DlgVerordnung extends JDialog {
                             "Title 1", "Title 2", "Title 3", "Title 4"
                         }
                     ));
-                    tblDosis.setToolTipText("<html>Dr\u00fccken Sie die <b>rechte</b> Maustaste, wenn Sie Ver\u00e4nderungen vornehmen wollen.</html>");
+                    tblDosis.setSurrendersFocusOnKeystroke(true);
+                    tblDosis.setToolTipText(null);
                     tblDosis.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mousePressed(MouseEvent e) {
@@ -424,7 +545,6 @@ public class DlgVerordnung extends JDialog {
 
                     //---- btnAddDosis ----
                     btnAddDosis.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-                    btnAddDosis.setBorder(null);
                     btnAddDosis.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -433,44 +553,42 @@ public class DlgVerordnung extends JDialog {
                     });
                     panel2.add(btnAddDosis);
                 }
-                jPanel8.add(panel2, CC.xy(1, 3));
+                jPanel8.add(panel2, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
             }
-            jPanel1.add(jPanel8, CC.xywh(1, 11, 7, 1));
-
-            //---- jLabel6 ----
-            jLabel6.setText("Massnahmen:");
-            jPanel1.add(jLabel6, CC.xy(1, 5));
+            jPanel1.add(jPanel8, CC.xywh(1, 11, 5, 1));
 
             //---- cbPackEnde ----
             cbPackEnde.setText("Bis Packungsende");
             cbPackEnde.setBorder(BorderFactory.createEmptyBorder());
             cbPackEnde.setEnabled(false);
             cbPackEnde.setMargin(new Insets(0, 0, 0, 0));
-            cbPackEnde.addActionListener(new ActionListener() {
+            cbPackEnde.setFont(new Font("Arial", Font.PLAIN, 14));
+            cbPackEnde.addItemListener(new ItemListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbPackEndeActionPerformed(e);
+                public void itemStateChanged(ItemEvent e) {
+                    cbPackEndeItemStateChanged(e);
                 }
             });
-            jPanel1.add(cbPackEnde, CC.xywh(1, 7, 7, 1));
+            jPanel1.add(cbPackEnde, CC.xywh(1, 7, 5, 1));
 
             //---- cbStellplan ----
             cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
             cbStellplan.setBorder(BorderFactory.createEmptyBorder());
             cbStellplan.setMargin(new Insets(0, 0, 0, 0));
+            cbStellplan.setFont(new Font("Arial", Font.PLAIN, 14));
             cbStellplan.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     cbStellplanActionPerformed(e);
                 }
             });
-            jPanel1.add(cbStellplan, CC.xywh(1, 9, 7, 1));
+            jPanel1.add(cbStellplan, CC.xywh(1, 9, 5, 1));
         }
         contentPane.add(jPanel1, CC.xy(5, 3));
 
         //======== jPanel3 ========
         {
-            jPanel3.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+            jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
                 "149dlu",
                 "3*(fill:default, $lgap), fill:default:grow"));
@@ -690,7 +808,7 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_cmbKHAnItemStateChanged
 
     public void initDialog() {
-        initComponents();
+
 //        prepareTMPData();
 
 //        BewohnerTools.setBWLabel(lblBW, verordnung.getBewohner());
@@ -818,9 +936,6 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_txtMedFocusGained
 
     private void cmbMassItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMassItemStateChanged
-        if (ignoreEvent) {
-            return;
-        }
         verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
         saveOK();
     }//GEN-LAST:event_cmbMassItemStateChanged
@@ -839,20 +954,6 @@ public class DlgVerordnung extends JDialog {
 //        }
     }//GEN-LAST:event_btnMedActionPerformed
 
-    private void btnBedarfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBedarfActionPerformed
-        if (JOptionPane.showConfirmDialog(this, "\"" + txtSit.getText() + "\"", "Situation hinzufügen",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-
-            Situationen neueSituation = new Situationen(txtSit.getText());
-            EntityTools.persist(neueSituation);
-
-            cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{neueSituation}));
-            cbPackEnde.setEnabled(false);
-            ignoreEvent = true;
-            cbPackEnde.setSelected(false);
-            ignoreEvent = false;
-        }
-    }//GEN-LAST:event_btnBedarfActionPerformed
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
         if (ignoreEvent) {
@@ -872,21 +973,24 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_cmbMedItemStateChanged
 
     private void cbPackEndeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPackEndeActionPerformed
+
+    }//GEN-LAST:event_cbPackEndeActionPerformed
+
+    private boolean isBedarf() {
+        return cmbSit.getSelectedItem() != null;
+    }
+
+    private void saveOK() {
         if (ignoreEvent) {
             return;
         }
-        verordnung.setBisPackEnde(cbPackEnde.isSelected());
-        saveOK();
-    }//GEN-LAST:event_cbPackEndeActionPerformed
-
-    private void saveOK() {
         boolean ansetzungOK = jdcAN.getDate() != null && (cmbAN.getSelectedIndex() > 0 || cmbKHAn.getSelectedIndex() > 0);
         boolean absetzungOK = !cbAB.isSelected() || (jdcAB.getDate() != null && (cmbAB.getSelectedIndex() > 0 || cmbKHAb.getSelectedIndex() > 0));
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
         boolean massOK = cmbMass.getSelectedItem() != null;
         boolean dosisVorhanden = tblDosis.getModel().getRowCount() > 0;
         btnSave.setEnabled(ansetzungOK && absetzungOK && medOK && massOK && dosisVorhanden);
-        cbPackEnde.setEnabled(!verordnung.isBedarf() && cmbMed.getModel().getSize() > 0);
+        cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
 
         if (!btnSave.isEnabled()) {
             String ursache = "<html><body>Es fehlen noch Angaben, bevor Sie speichern können.<ul>";
@@ -909,7 +1013,6 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void cleanup() {
-
         if (em.isOpen()) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -926,34 +1029,25 @@ public class DlgVerordnung extends JDialog {
     }
 
     private void cmbSitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSitItemStateChanged
-        verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
-        saveOK();
+        cbPackEnde.setEnabled(!isBedarf());
+        cbPackEnde.setSelected(false);
+
+        if (!isBedarf()) {
+            verordnung.getPlanungen().clear();
+            reloadTable();
+        } else {
+            saveOK();
+        }
+
     }//GEN-LAST:event_cmbSitItemStateChanged
 
     private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
-        if (ignoreEvent) {
-            return;
-        }
-        verordnung.setBemerkung(txtBemerkung.getText());
-        saveOK();
-    }//GEN-LAST:event_txtBemerkungCaretUpdate
-
-    private void txtSitCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSitCaretUpdate
-//        if (!txtSit.isEnabled() || ignoreEvent ) {
+//        if (ignoreEvent) {
 //            return;
 //        }
-        if (txtSit.getText().equals("")) {
-            cmbSit.setModel(new DefaultComboBoxModel());
-            btnBedarf.setEnabled(false);
-        } else {
-            cmbSit.setModel(new DefaultComboBoxModel(SituationenTools.findSituationByText(txtSit.getText()).toArray()));
-            btnBedarf.setEnabled(cmbSit.getModel().getSize() == 0);
-            if (cmbSit.getModel().getSize() != 0){
-                cmbSitItemStateChanged(null);
-            }
-        }
+//        verordnung.setBemerkung(txtBemerkung.getText());
         saveOK();
-    }//GEN-LAST:event_txtSitCaretUpdate
+    }//GEN-LAST:event_txtBemerkungCaretUpdate
 
     private void save() {
         try {
@@ -992,10 +1086,6 @@ public class DlgVerordnung extends JDialog {
             verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
             verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
 
-
-
-            // TODO: Das hier ist falsch. Das setzt die Situation grundsätzlich auf NULL.
-            // Das Model ist auch leer ??? Warum ?
             verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
 
 
@@ -1215,7 +1305,7 @@ public class DlgVerordnung extends JDialog {
                 OPDE.getDisplayManager().clearSubMessages();
                 ignoreEvent = false;
             }
-            cbPackEnde.setEnabled(!verordnung.isBedarf() && cmbMed.getModel().getSize() > 0);
+            cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
         }
     }//GEN-LAST:event_txtMedCaretUpdate
 
@@ -1291,31 +1381,35 @@ public class DlgVerordnung extends JDialog {
         tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setHeaderValue("Anwendung");
         //tblDosis.getColumnModel().getColumn(1).setCellRenderer(new RNDStandard());
 
-        if (tblDosis.getModel().getRowCount() > 0) { // Sobald etwas in der Tabelle steht, darf man die Situation nicht mehr verändern.
-            txtSit.setEnabled(false);
-            txtSit.setText("");
-        } else {
-            txtSit.setEnabled(true);
-        }
+//        if (tblDosis.getModel().getRowCount() > 0) { // Sobald etwas in der Tabelle steht, darf man die Situation nicht mehr verändern.
+//            txtSit.setEnabled(false);
+//            txtSit.setText("");
+//        } else {
+//            txtSit.setEnabled(true);
+//        }
         saveOK();
 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
-    private JComboBox cmbSit;
-    private JTextField txtMed;
+    private JXSearchField txtMed;
     private JComboBox cmbMed;
-    private JComboBox cmbMass;
-    private JTextField txtSit;
-    private JButton btnBedarf;
+    private JPanel panel4;
+    private JButton btnEmptySit2;
     private JButton btnMed;
+    private JComboBox cmbMass;
+    private JXSearchField txtSit;
+    private JComboBox cmbSit;
+    private JPanel panel3;
+    private JButton btnEmptySit;
+    private JButton btnSituation;
+    private JXSearchField xSearchField1;
     private JPanel jPanel8;
     private JScrollPane jspDosis;
     private JTable tblDosis;
     private JPanel panel2;
     private JButton btnAddDosis;
-    private JLabel jLabel6;
     private JCheckBox cbPackEnde;
     private JCheckBox cbStellplan;
     private JPanel jPanel3;
