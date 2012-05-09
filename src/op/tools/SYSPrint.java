@@ -356,11 +356,10 @@ public class SYSPrint {
      * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
      * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
      *
-     * @param parent
      * @param html
      * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
      */
-    public static void print(Component parent, String html, boolean addPrintJScript) {
+    public static void print(String html, boolean addPrintJScript) {
         try {
             // Create temp file.
             File temp = File.createTempFile("opde", ".html");
@@ -387,7 +386,7 @@ public class SYSPrint {
             out.write(text);
 
             out.close();
-            handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+            handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
             OPDE.fatal(e);
         }
@@ -398,11 +397,11 @@ public class SYSPrint {
 //        handleFile(parent, filename, Desktop.Action.OPEN);
 //    }
 
-    public static void handleFile(Component parent, String filename, java.awt.Desktop.Action action) {
+    public static void handleFile(String filename, java.awt.Desktop.Action action) {
         Desktop desktop = null;
-        if (parent == null) {
-            parent = new Frame();
-        }
+
+            Component parent = new Frame();
+
 
         if (SYSTools.getLocalDefinedApp(filename) != null) {
             try {

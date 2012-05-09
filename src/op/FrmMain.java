@@ -111,7 +111,7 @@ public class FrmMain extends SheetableJFrame {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
+        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, lblDB);
         displayManager.start();
 
         bwchange = new Closure() {
@@ -331,7 +331,7 @@ public class FrmMain extends SheetableJFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSPrint.print(thisFrame, SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+            SYSPrint.print(SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }

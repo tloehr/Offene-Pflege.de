@@ -519,7 +519,7 @@ public class PnlBWInfo extends NursingRecordsPanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     int[] sel = tblBWInfo.getSelectedRows();
-                    SYSPrint.print(parent, op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, sel), false);
+                    SYSPrint.print(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, sel), false);
                 }
             });
             menu.add(itemPopupPrint);
@@ -752,7 +752,7 @@ public class PnlBWInfo extends NursingRecordsPanel {
     }
 
     public void print() {
-        SYSPrint.print(this, SYSTools.htmlUmlautConversion(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, null)), false);
+        SYSPrint.print(SYSTools.htmlUmlautConversion(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, null)), false);
 
 //        HashMap params = new HashMap();
 //        params.put("BWName", SYSTools.unHTML(lblBW.getText()));

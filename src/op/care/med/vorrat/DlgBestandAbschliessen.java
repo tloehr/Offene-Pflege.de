@@ -26,21 +26,22 @@
  */
 package op.care.med.vorrat;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.verordnungen.*;
 import op.OPDE;
-
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.border.SoftBevelBorder;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -48,14 +49,16 @@ import java.util.Iterator;
 public class DlgBestandAbschliessen extends javax.swing.JDialog {
 
     private MedBestand bestand;
-    private java.awt.Frame parent;
+    private Closure actionBlock;
+    private EntityManager em;
 
     /**
      * Creates new form DlgBestandAnbruch
      */
-    public DlgBestandAbschliessen(java.awt.Frame parent, MedBestand bestand) {
-        super(parent, true);
-        this.parent = parent;
+    public DlgBestandAbschliessen(MedBestand bestand, Closure actionBlock) {
+        super(new JFrame(), false);
+        this.actionBlock = actionBlock;
+//        this.verordnung = verordnung;
         this.bestand = bestand;
         initComponents();
         initDialog();
@@ -70,8 +73,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new JLabel();
         jPanel1 = new JPanel();
+        jLabel1 = new JLabel();
         jScrollPane1 = new JScrollPane();
         txtInfo = new JTextPane();
         rbLeer = new JRadioButton();
@@ -84,73 +87,94 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         cmbBestID = new JComboBox();
         jLabel3 = new JLabel();
         rbGefallen = new JRadioButton();
+        panel1 = new JPanel();
         btnClose = new JButton();
         btnOk = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
-
         Container contentPane = getContentPane();
-
-        //---- jLabel1 ----
-        jLabel1.setFont(new Font("Dialog", Font.BOLD, 16));
-        jLabel1.setText("Bestand abschlie\u00dfen");
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
         //======== jPanel1 ========
         {
-            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+            jPanel1.setBorder(null);
+            jPanel1.setLayout(new FormLayout(
+                    "$rgap, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, $rgap",
+                    "$rgap, $lgap, default, $lgap, fill:default:grow, 6*($lgap, fill:default), $lgap, $rgap, $lgap, default, $lgap, $rgap"));
+
+            //---- jLabel1 ----
+            jLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
+            jLabel1.setText("Bestand abschlie\u00dfen");
+            jPanel1.add(jLabel1, CC.xy(3, 3));
 
             //======== jScrollPane1 ========
             {
 
                 //---- txtInfo ----
                 txtInfo.setEditable(false);
+                txtInfo.setFont(new Font("Arial", Font.PLAIN, 14));
                 jScrollPane1.setViewportView(txtInfo);
             }
+            jPanel1.add(jScrollPane1, CC.xywh(3, 5, 5, 1));
 
             //---- rbLeer ----
             rbLeer.setSelected(true);
             rbLeer.setText("Die Packung ist nun leer");
+            rbLeer.setFont(new Font("Arial", Font.PLAIN, 14));
             rbLeer.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     rbLeerActionPerformed(e);
                 }
             });
+            jPanel1.add(rbLeer, CC.xy(3, 7));
 
             //---- rbStellen ----
             rbStellen.setText("Beim Vorab Stellen haben Sie die letzten ");
+            rbStellen.setFont(new Font("Arial", Font.PLAIN, 14));
             rbStellen.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     rbStellenActionPerformed(e);
                 }
             });
+            jPanel1.add(rbStellen, CC.xywh(3, 9, 2, 1));
 
             //---- txtLetzte ----
             txtLetzte.setText("jTextField1");
+            txtLetzte.setFont(new Font("Arial", Font.PLAIN, 14));
             txtLetzte.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtLetzteFocusLost(e);
                 }
             });
+            jPanel1.add(txtLetzte, CC.xywh(5, 9, 2, 1));
 
             //---- lblEinheiten ----
             lblEinheiten.setText("Einheiten verbraucht.");
+            lblEinheiten.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(lblEinheiten, CC.xy(7, 9));
 
             //---- rbAbgelaufen ----
             rbAbgelaufen.setText("Die Packung ist abgelaufen oder wird nicht mehr ben\u00f6tigt. Bereit zur Entsorgung.");
+            rbAbgelaufen.setFont(new Font("Arial", Font.PLAIN, 14));
             rbAbgelaufen.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     rbAbgelaufenActionPerformed(e);
                 }
             });
+            jPanel1.add(rbAbgelaufen, CC.xywh(3, 11, 5, 1));
+            jPanel1.add(jSeparator1, CC.xywh(3, 15, 5, 1));
 
             //---- jLabel2 ----
-            jLabel2.setText("Als n\u00e4chstes Packung soll die Nummer:");
+            jLabel2.setText("Als n\u00e4chstes Packung soll die Nummer");
+            jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
+            jLabel2.setHorizontalAlignment(SwingConstants.TRAILING);
+            jPanel1.add(jLabel2, CC.xywh(3, 17, 2, 1));
 
             //---- cmbBestID ----
             cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
@@ -159,126 +183,60 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                     "Item 3",
                     "Item 4"
             }));
+            cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbBestID.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     cmbBestIDItemStateChanged(e);
                 }
             });
+            jPanel1.add(cmbBestID, CC.xywh(5, 17, 2, 1));
 
             //---- jLabel3 ----
             jLabel3.setText("angebrochen werden.");
+            jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(jLabel3, CC.xy(7, 17));
 
             //---- rbGefallen ----
             rbGefallen.setText("<html>Die Packung ist <font color=\"red\">runter gefallen</font> oder <font color=\"red\">verschwunden</font> und muss ausgebucht werden.</html>");
+            rbGefallen.setFont(new Font("Arial", Font.PLAIN, 14));
             rbGefallen.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     rbGefallenActionPerformed(e);
                 }
             });
+            jPanel1.add(rbGefallen, CC.xywh(3, 13, 5, 1));
 
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                            .addComponent(rbGefallen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(rbAbgelaufen)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addComponent(rbStellen)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(txtLetzte, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(lblEinheiten))
-                                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE)
-                                            .addComponent(rbLeer)
-                                            .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 863, Short.MAX_VALUE)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                    .addComponent(jLabel2)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(cmbBestID, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
-                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(jLabel3)))
-                                    .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(rbLeer)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(rbStellen)
-                                            .addComponent(lblEinheiten)
-                                            .addComponent(txtLetzte, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(rbAbgelaufen)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(rbGefallen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(jLabel2)
-                                            .addComponent(cmbBestID, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel3))
-                                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
+            //======== panel1 ========
+            {
+                panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+                //---- btnClose ----
+                btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+                btnClose.setText(null);
+                btnClose.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnCloseActionPerformed(e);
+                    }
+                });
+                panel1.add(btnClose);
+
+                //---- btnOk ----
+                btnOk.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                btnOk.setText(null);
+                btnOk.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnOkActionPerformed(e);
+                    }
+                });
+                panel1.add(btnOk);
+            }
+            jPanel1.add(panel1, CC.xy(7, 21, CC.RIGHT, CC.DEFAULT));
         }
-
-        //---- btnClose ----
-        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnClose.setText("Schlie\u00dfen");
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCloseActionPerformed(e);
-            }
-        });
-
-        //---- btnOk ----
-        btnOk.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnOk.setText("\u00dcbernehmen");
-        btnOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnOkActionPerformed(e);
-            }
-        });
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jLabel1)
-                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                                .addComponent(btnOk)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnClose)))
-                                .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnClose)
-                                        .addComponent(btnOk))
-                                .addContainerGap(30, Short.MAX_VALUE))
-        );
+        contentPane.add(jPanel1);
         pack();
         setLocationRelativeTo(getOwner());
 
@@ -295,11 +253,33 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     }//GEN-LAST:event_rbAbgelaufenActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        dispose();
+        actionBlock.execute(null);
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void initDialog() {
-        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
+//        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
+        em = OPDE.createEM();
+        em.getTransaction().begin();
+
+        try {
+
+            bestand = em.merge(bestand);
+            em.lock(bestand, LockModeType.PESSIMISTIC_WRITE);
+
+            for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat(), true)) {
+                em.lock(em.merge(verordnung), LockModeType.PESSIMISTIC_WRITE);
+                OPDE.debug("Locking Verordnung: "+verordnung.getVerid());
+            }
+
+        } catch (PessimisticLockException ple) {
+            OPDE.debug(ple);
+            em.getTransaction().rollback();
+            em.close();
+            dispose();
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
         String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getBestID() + "</b></font> abschließen.";
         text += "<br/>" + MedBestandTools.getBestandTextAsHTML(bestand) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
@@ -333,10 +313,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         lblEinheiten.setText(MedFormenTools.EINHEIT[bestand.getDarreichung().getMedForm().getPackEinheit()] + " verbraucht");
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
-        SYSTools.centerOnParent(parent, this);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
         rbStellen.setEnabled(bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV1);
-        setVisible(true);
     }
 
     @Override
@@ -404,10 +382,10 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 //DBHandling.setzeBestand(bestid, inhalt, "Korrekturbuchung zum Packungsabschluss", DBHandling.STATUS_KORREKTUR_AUTO_VORAB);
                 //op.tools.DBHandling.updateRecord("MPBestand", hm, "BestID", bestid);
 //                bestand.getVorrat().getBestaende().remove(bestand);
-                bestand = em.merge(bestand);
+//                bestand = em.merge(bestand);
 //                bestand.getVorrat().getBestaende().add(bestand);
 
-                OPDE.info(classname + ": Vorabstellen angeklickt. Sind noch " + inhalt + " in der Packung.");
+                OPDE.info(classname + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
 
             } else {
@@ -436,9 +414,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                     if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null && MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
                         // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                         // Die müssen dann jetzt nämlich abgeschlossen werden.
-                        Iterator<Verordnung> itVerordnung = VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat(), true).iterator();
-                        while (itVerordnung.hasNext()){
-                            Verordnung verordnung = itVerordnung.next();
+                        for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat(), true)) {
                             VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
                         }
                     }
@@ -449,6 +425,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
 //                }
             }
             em.getTransaction().commit();
+            actionBlock.execute(bestand);
         } catch (Exception e) {
             em.getTransaction().rollback();
             OPDE.fatal(e);
@@ -458,8 +435,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel1;
     private JPanel jPanel1;
+    private JLabel jLabel1;
     private JScrollPane jScrollPane1;
     private JTextPane txtInfo;
     private JRadioButton rbLeer;
@@ -472,6 +449,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     private JComboBox cmbBestID;
     private JLabel jLabel3;
     private JRadioButton rbGefallen;
+    private JPanel panel1;
     private JButton btnClose;
     private JButton btnOk;
     // End of variables declaration//GEN-END:variables

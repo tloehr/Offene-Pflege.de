@@ -81,6 +81,21 @@ public class DarreichungTools {
     }
 
 
+    public static List<Darreichung> findDarreichungByMedProduktText(EntityManager em, String suche) {
+        suche = "%" + suche.trim() + "%";
+
+        Query query = em.createQuery(" " +
+                " SELECT d FROM Darreichung d " +
+                " WHERE d.medProdukt.bezeichnung like :suche" +
+                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.medForm.zubereitung ");
+
+        query.setParameter("suche", suche);
+
+        List<Darreichung> list = query.getResultList();
+
+        return list;
+    }
+
     public static List<Darreichung> findDarreichungByMedProduktText(String suche) {
         suche = "%" + suche.trim() + "%";
 

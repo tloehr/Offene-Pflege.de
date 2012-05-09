@@ -27,6 +27,8 @@
 
 package op.care.verordnung;
 
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import entity.Arzt;
 import entity.ArztTools;
 import entity.Krankenhaus;
@@ -34,8 +36,10 @@ import entity.KrankenhausTools;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.ListElement;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -51,18 +55,18 @@ import java.awt.event.ItemListener;
  */
 public class DlgAbsetzen extends javax.swing.JDialog {
     private Verordnung verordnung;
+    private Closure actionBlock;
 
     /**
      * Creates new form DlgAbsetzen
      */
-    public DlgAbsetzen(java.awt.Frame parent, String text, Verordnung verordnung) {
-        super(parent, true);
+    public DlgAbsetzen(Verordnung verordnung, Closure actionBlock) {
+        super(new JFrame(), false);
+        this.actionBlock = actionBlock;
         this.verordnung = verordnung;
         initComponents();
-        lblText.setText(text);
         fillAerzteUndKHs();
-        SYSTools.centerOnParent(parent, this);
-        setVisible(true);
+        pack();
     }
 
     /**
@@ -73,26 +77,24 @@ public class DlgAbsetzen extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jSeparator1 = new JSeparator();
-        lblVital = new JLabel();
-        jLabel4 = new JLabel();
+        label1 = new JLabel();
         cmbArztAb = new JComboBox();
         cmbKHAb = new JComboBox();
+        panel1 = new JPanel();
         btnCancel = new JButton();
-        jSeparator2 = new JSeparator();
         btnOK = new JButton();
-        lblText = new JLabel();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "$rgap, 200dlu:grow, $lcgap, $rgap",
+            "$rgap, $lgap, default, 3*($lgap, fill:default), $lgap, $rgap"));
 
-        //---- lblVital ----
-        lblVital.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblVital.setText("Verordnung absetzen");
-
-        //---- jLabel4 ----
-        jLabel4.setText("Durch:");
+        //---- label1 ----
+        label1.setText("Wer hat die Verordnung abgesetzt ?");
+        label1.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(label1, CC.xy(2, 3));
 
         //---- cmbArztAb ----
         cmbArztAb.setModel(new DefaultComboBoxModel(new String[] {
@@ -101,12 +103,14 @@ public class DlgAbsetzen extends javax.swing.JDialog {
             "Item 3",
             "Item 4"
         }));
+        cmbArztAb.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbArztAb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 cmbArztAbItemStateChanged(e);
             }
         });
+        contentPane.add(cmbArztAb, CC.xy(2, 5));
 
         //---- cmbKHAb ----
         cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
@@ -115,106 +119,60 @@ public class DlgAbsetzen extends javax.swing.JDialog {
             "Item 3",
             "Item 4"
         }));
+        cmbKHAb.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbKHAb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 cmbKHAbItemStateChanged(e);
             }
         });
+        contentPane.add(cmbKHAb, CC.xy(2, 7));
 
-        //---- btnCancel ----
-        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancelActionPerformed(e);
-            }
-        });
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
-        //---- btnOK ----
-        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnOK.setText("Ok");
-        btnOK.setEnabled(false);
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnOKActionPerformed(e);
-            }
-        });
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.setText(null);
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            panel1.add(btnCancel);
 
-        //---- lblText ----
-        lblText.setForeground(Color.blue);
-        lblText.setText("jLabel1");
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addGroup(contentPaneLayout.createParallelGroup()
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addGap(12, 12, 12)
-                                        .addComponent(lblVital, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(jLabel4)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(contentPaneLayout.createParallelGroup()
-                                                .addComponent(cmbKHAb, 0, 452, Short.MAX_VALUE)
-                                                .addComponent(cmbArztAb, 0, 452, Short.MAX_VALUE)))
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
-                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(btnOK)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnCancel))
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addComponent(lblText, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)))
-                        .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblVital)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblText)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel4)
-                                .addComponent(cmbArztAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbKHAb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addGap(9, 9, 9)
-                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnCancel)
-                                .addComponent(btnOK))
-                        .addContainerGap())
-        );
+            //---- btnOK ----
+            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnOK.setText(null);
+            btnOK.setEnabled(false);
+            btnOK.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnOKActionPerformed(e);
+                }
+            });
+            panel1.add(btnOK);
+        }
+        contentPane.add(panel1, CC.xy(2, 9, CC.RIGHT, CC.DEFAULT));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        dispose();
+        actionBlock.execute(null);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         Arzt arzt = (Arzt) cmbArztAb.getSelectedItem();
         Krankenhaus krankenhaus = (Krankenhaus) cmbKHAb.getSelectedItem();
-        VerordnungTools.absetzen(verordnung, arzt, krankenhaus);
-        dispose();
+
+        if (VerordnungTools.absetzen(verordnung, arzt, krankenhaus)){
+            actionBlock.execute(verordnung);
+        } else {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Arzt und Krankenhaus dürfen nicht beide leer sein.", 2));
+        }
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void cmbKHAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAbItemStateChanged
@@ -249,15 +207,12 @@ public class DlgAbsetzen extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private JSeparator jSeparator1;
-    private JLabel lblVital;
-    private JLabel jLabel4;
+    private JLabel label1;
     private JComboBox cmbArztAb;
     private JComboBox cmbKHAb;
+    private JPanel panel1;
     private JButton btnCancel;
-    private JSeparator jSeparator2;
     private JButton btnOK;
-    private JLabel lblText;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

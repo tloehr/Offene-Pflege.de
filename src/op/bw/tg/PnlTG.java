@@ -534,7 +534,7 @@ public class PnlTG extends CleanablePanel {
             out.write(html);
 
             out.close();
-            SYSPrint.handleFile(this, temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
             new DlgException(e);
         }

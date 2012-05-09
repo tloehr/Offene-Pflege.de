@@ -16,9 +16,9 @@ import java.util.List;
  */
 public class DisplayManager extends Thread {
 
-    private boolean interrupted;
+    private boolean interrupted, dbAction;
     private JProgressBar jp;
-    private JLabel lblMain, lblSub;
+    private JLabel lblMain, lblSub, lblDB;
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
@@ -28,16 +28,18 @@ public class DisplayManager extends Thread {
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS) {
+    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS, JLabel lblDB) {
         super();
         setName("DisplayManager");
         interrupted = false;
+        dbAction = false;
         jp = p;
         progressBarMessage = null;
         jp.setStringPainted(false);
         jp.setValue(0);
         lblMain = lblM;
         lblSub = lblS;
+        this.lblDB = lblDB;
         lblMain.setText(" ");
         lblSub.setText(" ");
         messageQ = new ArrayList<DisplayMessage>();
@@ -78,6 +80,10 @@ public class DisplayManager extends Thread {
         messageQ.clear();
         currentSubMessage = null;
         processSubMessage();
+    }
+
+    public void setDBActionMessage(boolean action) {
+        this.dbAction = action;
     }
 
     private void processSubMessage() {
@@ -126,12 +132,22 @@ public class DisplayManager extends Thread {
 //        }
     }
 
+    private void processDBMessage() {
+        if (dbAction) {
+            lblDB.setVisible(zyklen % 2 == 0);
+        } else {
+            lblDB.setVisible(false);
+        }
+    }
+
 
     public void run() {
         while (!interrupted) {
 
+            processDBMessage();
             processProgressBar();
             processSubMessage();
+
 
             try {
                 zyklen++;

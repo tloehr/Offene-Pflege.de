@@ -84,22 +84,21 @@
            <string>prompt</string> 
            <string>Medikamente</string> 
           </void> 
+          <void method="setProperty"> 
+           <string>focusBehavior</string> 
+           <object class="java.lang.Enum" method="valueOf"> 
+            <class>org.jdesktop.swingx.prompt.PromptSupport$FocusBehavior</class> 
+            <string>HIGHLIGHT_PROMPT</string> 
+           </object> 
+          </void> 
           <void property="name"> 
            <string>txtMed</string> 
           </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
-            <string>javax.swing.event.CaretListener</string> 
-            <string>caretUpdate</string> 
-            <string>txtMedCaretUpdate</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.FocusListener</string> 
-            <string>focusGained</string> 
-            <string>txtMedFocusGained</string> 
+            <string>java.awt.event.ActionListener</string> 
+            <string>actionPerformed</string> 
+            <string>txtMedActionPerformed</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
@@ -848,14 +847,6 @@
           </void> 
           <void property="name"> 
            <string>cbStellplan</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>cbStellplanActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 

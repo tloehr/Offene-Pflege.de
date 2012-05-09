@@ -52,20 +52,18 @@ public class TMVerordnung
     public static final int COL_Hinweis = 2;
     protected boolean mitBestand, abgesetzt;
     protected Bewohner bewohner;
-    private Date abdatum;
-
     protected HashMap cache;
 
     protected List<Object[]> listeVerordnungen;
 
-    public TMVerordnung(Bewohner bewohner, boolean abgesetzt, boolean bestand) {
+    public TMVerordnung(Bewohner bewohner, boolean archiv, boolean bestand) {
         super();
 
-        abdatum = abgesetzt ? new Date() : SYSConst.DATE_BIS_AUF_WEITERES;
-
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, abdatum);
         this.bewohner = bewohner;
-        this.abgesetzt = abgesetzt;
+        this.abgesetzt = archiv;
+
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, archiv);
+
 
         this.cache = new HashMap();
         this.mitBestand = bestand;
@@ -105,15 +103,15 @@ public class TMVerordnung
         return selection;
     }
 
-    public void reload(Bewohner bewohner, boolean abgesetzt) {
+    public void reload(Bewohner bewohner, boolean archiv) {
         this.bewohner = bewohner;
-        this.abgesetzt = abgesetzt;
+        this.abgesetzt = archiv;
         reload();
     }
 
     public void reload() {
         cache.clear();
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, abdatum);
+        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, this.abgesetzt);
         fireTableDataChanged();
     }
 

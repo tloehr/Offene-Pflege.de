@@ -92,7 +92,7 @@ import java.util.List;
 })
 
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Verordnung.findActiveByVorratAndPackendeResultMapping",
+        @SqlResultSetMapping(name = "Verordnung.findActiveByVorratResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class)
         ),
 
@@ -162,12 +162,11 @@ import java.util.List;
  * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
  * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
  */
-        @NamedNativeQuery(name = "Verordnung.findActiveByVorratAndPackende", query = " " +
+        @NamedNativeQuery(name = "Verordnung.findActiveByVorrat", query = " " +
                 " SELECT DISTINCT ver.* FROM BHPVerordnung ver " +
-                " INNER JOIN MPVorrat v ON v.BWKennung = b.BWKennung " + // Verbindung über Bewohner
-                " INNER JOIN MPBestand b ON bhp.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
-                " WHERE b.VorID=? AND ver.BisPackEnde = ? " +
-                " AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratAndPackendeResultMapping"),
+                " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
+                " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
+                " WHERE b.VorID=? AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratResultMapping"),
 /**
  * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
  */
@@ -252,7 +251,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     @Column(name = "VerID")
     private Long verid;
     @Version
-    @Column(name="version")
+    @Column(name = "version")
     private Long version;
     @Basic(optional = false)
     @Column(name = "AnDatum")
@@ -283,6 +282,8 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     private List<SYSVER2VORGANG> attachedVorgaenge;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<VerordnungPlanung> planungen;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    private List<BHP> bhps;
     // ==
     // N:1 Relationen
     // ==
@@ -566,7 +567,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         final Verordnung copy = new Verordnung(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, bewohner, massnahme, darreichung, situation, anKH, abKH, anArzt, abArzt);
 
         CollectionUtils.forAllDo(planungen, new Closure() {
-            public   void execute(Object o) {
+            public void execute(Object o) {
                 VerordnungPlanung planungCopy = ((VerordnungPlanung) o).createCopy(copy);
             }
         });

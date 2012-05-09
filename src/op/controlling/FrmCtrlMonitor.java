@@ -1228,7 +1228,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                     String get = SYSTools.catchNull(get());
 //                    String result = SYSTools.htmlUmlautConversion(SYSTools.catchNull(get()));
                     if (!SYSTools.catchNull(get).isEmpty()) {
-                        SYSPrint.print(parent, get, false);
+                        SYSPrint.print(get, false);
                     }
                     btnPrint.setEnabled(true);
                     btnStop.setEnabled(false);

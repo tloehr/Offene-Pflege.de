@@ -54,7 +54,6 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -79,7 +78,7 @@ public class DlgVerordnung extends JDialog {
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
     private Closure actionBlock;
-    private Verordnung verordnung = null, oldVerordnung = null;
+    private Verordnung verordnung = null;
 
     private EntityManager em;
 
@@ -95,34 +94,38 @@ public class DlgVerordnung extends JDialog {
 
         this.editMode = mode;
         em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
+        em.getTransaction().begin();
 
-            if (editMode == CHANGE_MODE) {
-                oldVerordnung = em.merge(verordnung);
-
-                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
-                this.verordnung = (Verordnung) verordnung.clone();
-
-            } else {
+        if (editMode != NEW_MODE) {
+            try {
                 this.verordnung = em.merge(verordnung);
                 em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
+
+//            if (editMode == CHANGE_MODE) {
+//                oldVerordnung = em.merge(verordnung);
+//
+//                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
+//                this.verordnung = (Verordnung) verordnung.clone();
+//
+//            } else {
+//                this.verordnung = em.merge(verordnung);
+//                em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
+//            }
+            } catch (PessimisticLockException ple) {
+                OPDE.debug(ple);
+                em.getTransaction().rollback();
+                em.close();
+                dispose();
+            } catch (Exception e) {
+                OPDE.fatal(e);
             }
-        } catch (PessimisticLockException ple) {
-            OPDE.debug(ple);
-            em.getTransaction().rollback();
-            em.close();
-            dispose();
-        } catch (Exception e) {
-            OPDE.fatal(e);
+        } else {
+            this.verordnung = verordnung;
         }
+
 
         initComponents();
         initDialog();
-    }
-
-    private void cbStellplanActionPerformed(ActionEvent e) {
-        verordnung.setStellplan(cbStellplan.isSelected());
     }
 
     private void jdcANPropertyChange(PropertyChangeEvent e) {
@@ -268,11 +271,58 @@ public class DlgVerordnung extends JDialog {
         cmbSit.setModel(new DefaultComboBoxModel());
     }
 
-    private void jdcABPropertyChange(PropertyChangeEvent e) {
-        if (ignoreEvent) {
-            return;
+    private void txtMedActionPerformed(ActionEvent e) {
+        if (txtMed.getText().isEmpty()) {
+            cmbMed.setModel(new DefaultComboBoxModel());
+            cmbMass.setEnabled(true);
+            cbStellplan.setEnabled(true);
+            cbStellplan.setSelected(false);
+            cbPackEnde.setSelected(false);
+            cbPackEnde.setEnabled(false);
+        } else {
+            OPDE.getDisplayManager().setDBActionMessage(true);
+            if (txtMed.getText().matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
+                String pzn = txtMed.getText();
+
+                pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
+                Query pznQuery = em.createNamedQuery("MedPackung.findByPzn");
+                pznQuery.setParameter("pzn", pzn);
+
+                try {
+                    MedPackung medPackung = (MedPackung) pznQuery.getSingleResult();
+                    cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{medPackung.getDarreichung()}));
+                } catch (NoResultException nre) {
+                    OPDE.debug("Nichts passendes zu dieser PZN gefunden");
+                } catch (Exception ex) {
+                    OPDE.fatal(ex);
+                }
+
+            } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
+                cmbMed.setModel(new DefaultComboBoxModel(DarreichungTools.findDarreichungByMedProduktText(em, txtMed.getText()).toArray()));
+            }
+
+            OPDE.getDisplayManager().setDBActionMessage(false);
+
+            if (cmbMed.getModel().getSize() > 0) {
+                cmbMedItemStateChanged(null);
+            } else {
+//                lblVerordnung.setText(" ");
+                cmbMed.setToolTipText("");
+                cmbMass.setSelectedIndex(-1);
+                cmbMass.setEnabled(true);
+                cbStellplan.setEnabled(true);
+                cbStellplan.setSelected(false);
+//                ignoreEvent = true;
+                cbPackEnde.setSelected(false);
+                currentSubMessage = null;
+                OPDE.getDisplayManager().clearSubMessages();
+//                ignoreEvent = false;
+            }
+            cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
         }
-        verordnung.setAbDatum(jdcAB.getDate());
+    }
+
+    private void jdcABPropertyChange(PropertyChangeEvent e) {
         saveOK();
     }
 
@@ -340,6 +390,7 @@ public class DlgVerordnung extends JDialog {
             public void keyTyped(KeyEvent e) {
                 thisKeyTyped(e);
             }
+
             @Override
             public void keyPressed(KeyEvent e) {
                 thisKeyPressed(e);
@@ -347,39 +398,34 @@ public class DlgVerordnung extends JDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
-            "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
+                "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "68dlu, $lcgap, 242dlu:grow, $lcgap, pref",
-                "3*(fill:default, $lgap), 2*(default, $lgap), fill:default:grow"));
+                    "68dlu, $lcgap, 242dlu:grow, $lcgap, pref",
+                    "3*(fill:default, $lgap), 2*(default, $lgap), fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
             txtMed.setPrompt("Medikamente");
-            txtMed.addCaretListener(new CaretListener() {
+            txtMed.setFocusBehavior(org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
+            txtMed.addActionListener(new ActionListener() {
                 @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtMedCaretUpdate(e);
-                }
-            });
-            txtMed.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtMedFocusGained(e);
+                public void actionPerformed(ActionEvent e) {
+                    txtMedActionPerformed(e);
                 }
             });
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
@@ -417,11 +463,11 @@ public class DlgVerordnung extends JDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbMass ----
-            cmbMass.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbMass.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbMass.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMass.addItemListener(new ItemListener() {
@@ -444,11 +490,11 @@ public class DlgVerordnung extends JDialog {
             jPanel1.add(txtSit, CC.xy(1, 3));
 
             //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbSit.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbSit.addItemListener(new ItemListener() {
@@ -499,11 +545,11 @@ public class DlgVerordnung extends JDialog {
             //======== jPanel8 ========
             {
                 jPanel8.setBorder(new TitledBorder(null, "Dosis / H\u00e4ufigkeit", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                    new Font("Arial", Font.PLAIN, 14)));
+                        new Font("Arial", Font.PLAIN, 14)));
                 jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
-                    "default:grow",
-                    "fill:default:grow, $lgap, pref"));
+                        "default:grow",
+                        "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
                 {
@@ -517,15 +563,15 @@ public class DlgVerordnung extends JDialog {
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ));
                     tblDosis.setSurrendersFocusOnKeystroke(true);
                     tblDosis.setToolTipText(null);
@@ -576,12 +622,6 @@ public class DlgVerordnung extends JDialog {
             cbStellplan.setBorder(BorderFactory.createEmptyBorder());
             cbStellplan.setMargin(new Insets(0, 0, 0, 0));
             cbStellplan.setFont(new Font("Arial", Font.PLAIN, 14));
-            cbStellplan.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbStellplanActionPerformed(e);
-                }
-            });
             jPanel1.add(cbStellplan, CC.xywh(1, 9, 5, 1));
         }
         contentPane.add(jPanel1, CC.xy(5, 3));
@@ -590,15 +630,15 @@ public class DlgVerordnung extends JDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                "149dlu",
-                "3*(fill:default, $lgap), fill:default:grow"));
+                    "149dlu",
+                    "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== jPanel4 ========
             {
                 jPanel4.setBorder(new TitledBorder("Absetzung"));
                 jPanel4.setLayout(new FormLayout(
-                    "default, $lcgap, 120dlu",
-                    "4*(fill:17dlu, $lgap), fill:17dlu"));
+                        "default, $lcgap, 120dlu",
+                        "4*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- jLabel3 ----
                 jLabel3.setText("Am:");
@@ -619,11 +659,11 @@ public class DlgVerordnung extends JDialog {
                 jPanel4.add(jLabel4, CC.xy(1, 5));
 
                 //---- cmbAB ----
-                cmbAB.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbAB.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbAB.setEnabled(false);
                 cmbAB.addItemListener(new ItemListener() {
@@ -651,11 +691,11 @@ public class DlgVerordnung extends JDialog {
                 jPanel4.add(lblAB, CC.xy(3, 9));
 
                 //---- cmbKHAb ----
-                cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbKHAb.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbKHAb.setEnabled(false);
                 cmbKHAb.addItemListener(new ItemListener() {
@@ -690,8 +730,8 @@ public class DlgVerordnung extends JDialog {
             {
                 jPanel2.setBorder(new TitledBorder("Ansetzung"));
                 jPanel2.setLayout(new FormLayout(
-                    "default, $lcgap, 119dlu:grow",
-                    "17dlu, 3*($lgap, fill:17dlu)"));
+                        "default, $lcgap, 119dlu:grow",
+                        "17dlu, 3*($lgap, fill:17dlu)"));
 
                 //---- jLabel1 ----
                 jLabel1.setText("Am:");
@@ -707,11 +747,11 @@ public class DlgVerordnung extends JDialog {
                 jPanel2.add(jdcAN, CC.xy(3, 1));
 
                 //---- cmbAN ----
-                cmbAN.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbAN.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbAN.addItemListener(new ItemListener() {
                     @Override
@@ -730,11 +770,11 @@ public class DlgVerordnung extends JDialog {
                 jPanel2.add(lblAN, CC.xy(3, 7));
 
                 //---- cmbKHAn ----
-                cmbKHAn.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbKHAn.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbKHAn.addItemListener(new ItemListener() {
                     @Override
@@ -779,31 +819,14 @@ public class DlgVerordnung extends JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmbABItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbABItemStateChanged
-        if (ignoreEvent) {
-            return;
-        }
-
-        verordnung.setAbArzt((Arzt) cmbAB.getSelectedItem());
-
         saveOK();
     }//GEN-LAST:event_cmbABItemStateChanged
 
     private void cmbKHAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAbItemStateChanged
-        if (ignoreEvent) {
-            return;
-        }
-
-        verordnung.setAbKH((Krankenhaus) cmbKHAb.getSelectedItem());
-
         saveOK();
     }//GEN-LAST:event_cmbKHAbItemStateChanged
 
     private void cmbKHAnItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAnItemStateChanged
-        if (ignoreEvent) {
-            return;
-        }
-        verordnung.setAnKH((Krankenhaus) cmbKHAn.getSelectedItem());
-
         saveOK();
     }//GEN-LAST:event_cmbKHAnItemStateChanged
 
@@ -812,7 +835,7 @@ public class DlgVerordnung extends JDialog {
 //        prepareTMPData();
 
 //        BewohnerTools.setBWLabel(lblBW, verordnung.getBewohner());
-        setTitle(SYSTools.getWindowTitle("Ärztliche Verordnungen, Detailansicht"));
+//        setTitle(SYSTools.getWindowTitle("Ärztliche Verordnungen, Detailansicht"));
         fillAerzteUndKHs();
 
 //        ignoreSitCaret = true;
@@ -909,25 +932,27 @@ public class DlgVerordnung extends JDialog {
             }
         }
 
-        reloadTable();
+
 //        ignoreSitCaret = false;
         ignoreEvent = false;
         pack();
 //        SYSTools.centerOnParent(parent, this);
         txtMed.requestFocus();
 
-        myPropertyChangeListener = new java.beans.PropertyChangeListener() {
+//        myPropertyChangeListener = new java.beans.PropertyChangeListener() {
+//
+//            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+//                if (evt.getPropertyName().equals("value")) {
+//                    JDateChooser jdcDatum = (JDateChooser) ((JComponent) evt.getSource()).getParent();
+//                    SYSCalendar.checkJDC(jdcDatum);
+//                }
+//            }
+//        };
+//
+//        jdcAN.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
+//        jdcAB.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
 
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("value")) {
-                    JDateChooser jdcDatum = (JDateChooser) ((JComponent) evt.getSource()).getParent();
-                    SYSCalendar.checkJDC(jdcDatum);
-                }
-            }
-        };
-
-        jdcAN.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
-        jdcAB.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
+        reloadTable();
 //        setVisible(true);
     }
 
@@ -936,7 +961,7 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_txtMedFocusGained
 
     private void cmbMassItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMassItemStateChanged
-        verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
+//        verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
         saveOK();
     }//GEN-LAST:event_cmbMassItemStateChanged
 
@@ -956,11 +981,11 @@ public class DlgVerordnung extends JDialog {
 
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
-        if (ignoreEvent) {
-            return;
-        }
-        verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
-        cmbMass.setSelectedItem(verordnung.getDarreichung().getMedForm().getMassnahme());
+//        if (ignoreEvent) {
+//            return;
+//        }
+//        verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
+        cmbMass.setSelectedItem(((Darreichung) cmbMed.getSelectedItem()).getMedForm().getMassnahme());
         cmbMass.setEnabled(false);
         cbStellplan.setEnabled(false);
         cbStellplan.setSelected(false);
@@ -981,9 +1006,7 @@ public class DlgVerordnung extends JDialog {
     }
 
     private void saveOK() {
-        if (ignoreEvent) {
-            return;
-        }
+        if (ignoreEvent) return;
         boolean ansetzungOK = jdcAN.getDate() != null && (cmbAN.getSelectedIndex() > 0 || cmbKHAn.getSelectedIndex() > 0);
         boolean absetzungOK = !cbAB.isSelected() || (jdcAB.getDate() != null && (cmbAB.getSelectedIndex() > 0 || cmbKHAb.getSelectedIndex() > 0));
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
@@ -1029,6 +1052,8 @@ public class DlgVerordnung extends JDialog {
     }
 
     private void cmbSitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSitItemStateChanged
+        if (ignoreEvent) return;
+
         cbPackEnde.setEnabled(!isBedarf());
         cbPackEnde.setSelected(false);
 
@@ -1050,7 +1075,16 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_txtBemerkungCaretUpdate
 
     private void save() {
+
+        Verordnung newVerordnung = null;
         try {
+
+            if (editMode == CHANGE_MODE) {
+                newVerordnung = (Verordnung) verordnung.clone();
+                em.lock(newVerordnung, LockModeType.PESSIMISTIC_WRITE);
+            } else {
+                newVerordnung = verordnung;
+            }
 
             if (cbAB.isSelected()) {
 
@@ -1058,45 +1092,45 @@ public class DlgVerordnung extends JDialog {
                     OPDE.debug("jdcAB steht auf HEUTE");
                     if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
                         OPDE.debug("jdcAB und jdcAN sind gleich");
-                        verordnung.setAnDatum(new Date(SYSCalendar.startOfDay()));
-                        verordnung.setAbDatum(new Date(SYSCalendar.endOfDay()));
+                        newVerordnung.setAnDatum(new Date(SYSCalendar.startOfDay()));
+                        newVerordnung.setAbDatum(new Date(SYSCalendar.endOfDay()));
                     } else {
-                        verordnung.setAbDatum(new Date());
+                        newVerordnung.setAbDatum(new Date());
                     }
                 } else {
                     OPDE.debug("jdcAB steht nicht auf HEUTE");
-                    verordnung.setAbDatum(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
+                    newVerordnung.setAbDatum(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
 
                 }
-                verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+                newVerordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
             } else {
-                verordnung.setAbKH(null);
-                verordnung.setAbArzt(null);
-                verordnung.setAbDatum(SYSConst.DATE_BIS_AUF_WEITERES);
+                newVerordnung.setAbKH(null);
+                newVerordnung.setAbArzt(null);
+                newVerordnung.setAbDatum(SYSConst.DATE_BIS_AUF_WEITERES);
             }
 
-            verordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());
-            verordnung.setAnKH((Krankenhaus) cmbKHAn.getSelectedItem());
-            verordnung.setAbArzt((Arzt) cmbAB.getSelectedItem());
-            verordnung.setAbKH((Krankenhaus) cmbKHAb.getSelectedItem());
-            verordnung.setAngesetztDurch(OPDE.getLogin().getUser());
-            verordnung.setStellplan(cbStellplan.isSelected());
-            verordnung.setBisPackEnde(cbPackEnde.isSelected());
-            verordnung.setBemerkung(txtBemerkung.getText());
-            verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
-            verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
+            newVerordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());
+            newVerordnung.setAnKH((Krankenhaus) cmbKHAn.getSelectedItem());
+            newVerordnung.setAbArzt((Arzt) cmbAB.getSelectedItem());
+            newVerordnung.setAbKH((Krankenhaus) cmbKHAb.getSelectedItem());
+            newVerordnung.setAngesetztDurch(em.merge(OPDE.getLogin().getUser()));
+            newVerordnung.setStellplan(cbStellplan.isSelected());
+            newVerordnung.setBisPackEnde(cbPackEnde.isSelected());
+            newVerordnung.setBemerkung(txtBemerkung.getText());
+            newVerordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
+            newVerordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
+            newVerordnung.setStellplan(cbStellplan.isSelected());
 
-            verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
+            newVerordnung.setSituation((Situationen) cmbSit.getSelectedItem());
 
 
             // Sicherung
             if (editMode == NEW_MODE) { // =================== NEU ====================
                 // Bei einer neuen Verordnung kann einfach eingetragen werden. Die BHP spielt hier keine Rolle.
-                verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
-                em.persist(verordnung);
+                newVerordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
+                em.persist(newVerordnung);
             } else if (editMode == EDIT_MODE) { // =================== KORREKTUR ====================
                 // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
-                verordnung = em.merge(verordnung);
                 Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.verordnungPlanung.verordnung = :verordnung");
                 queryDELBHP.setParameter("verordnung", verordnung);
                 queryDELBHP.executeUpdate();
@@ -1104,21 +1138,21 @@ public class DlgVerordnung extends JDialog {
                 // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
                 // Dann werden die nicht mehr benötigten BHPs entfernt.
                 // Dann wird die neue Verordnung angesetzt.
-                oldVerordnung = VerordnungTools.absetzen(em, oldVerordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+                verordnung = VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
 
                 // die neue Verordnung beginnt eine Sekunde, nachdem die vorherige Abgesetzt wurde.
-                verordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
-                em.persist(verordnung);
+//                verordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
+                em.persist(newVerordnung);
             }
 
 
             if (!verordnung.isBedarf()) {
                 if (editMode == CHANGE_MODE || editMode == EDIT_OF_CHANGE_MODE) {
                     // ab der aktuellen Uhrzeit
-                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
+                    BHPTools.erzeugen(em, newVerordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
                 } else {
                     // für den ganzen Tag
-                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), null);
+                    BHPTools.erzeugen(em, newVerordnung.getPlanungen(), new Date(), null);
                 }
             }
 
@@ -1132,8 +1166,8 @@ public class DlgVerordnung extends JDialog {
         if (OPDE.isDebug()) {
             if (editMode != CHANGE_MODE) {
                 OPDE.debug("Verordnung wurde neu erstellt bzw. korrigiert");
-                OPDE.debug(verordnung);
-                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+                OPDE.debug(newVerordnung);
+                CollectionUtils.forAllDo(newVerordnung.getPlanungen(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         OPDE.debug(o);
@@ -1143,8 +1177,8 @@ public class DlgVerordnung extends JDialog {
                 OPDE.debug("Verordnung wurde neu geändert und gegen eine neue ersetzt.");
                 OPDE.debug("ALT");
                 OPDE.debug("==============");
-                OPDE.debug(oldVerordnung);
-                CollectionUtils.forAllDo(oldVerordnung.getPlanungen(), new Closure() {
+                OPDE.debug(verordnung);
+                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         OPDE.debug(o);
@@ -1153,8 +1187,8 @@ public class DlgVerordnung extends JDialog {
                 OPDE.debug("==============");
                 OPDE.debug("NEU");
                 OPDE.debug("==============");
-                OPDE.debug(verordnung);
-                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+                OPDE.debug(newVerordnung);
+                CollectionUtils.forAllDo(newVerordnung.getPlanungen(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         OPDE.debug(o);
@@ -1248,84 +1282,16 @@ public class DlgVerordnung extends JDialog {
     private void jspDosisComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspDosisComponentResized
     }//GEN-LAST:event_jspDosisComponentResized
 
-    private void txtMedCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMedCaretUpdate
-        if (ignoreEvent) {
-            return;
-        }
-        if (!txtMed.isEnabled() || ignoreEvent) {
-            return;
-        }
-        if (txtMed.getText().equals("")) {
-            cmbMed.setModel(new DefaultComboBoxModel());
-
-            cmbMass.setEnabled(true);
-            cbStellplan.setEnabled(true);
-            cbStellplan.setSelected(false);
-            cmbMed.setToolTipText("");
-            ignoreEvent = true;
-            cbPackEnde.setSelected(false);
-            ignoreEvent = false;
-            cbPackEnde.setEnabled(false);
-        } else {
-            if (txtMed.getText().matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
-                String pzn = txtMed.getText();
-
-                EntityManager em = OPDE.createEM();
-                pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
-                Query pznQuery = em.createNamedQuery("MedPackung.findByPzn");
-                pznQuery.setParameter("pzn", pzn);
-
-                try {
-                    MedPackung medPackung = (MedPackung) pznQuery.getSingleResult();
-                    cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{medPackung.getDarreichung()}));
-                } catch (NoResultException nre) {
-                    OPDE.debug("Nichts passendes zu dieser PZN gefunden");
-                } catch (Exception e) {
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
-                }
-
-            } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
-                cmbMed.setModel(new DefaultComboBoxModel(DarreichungTools.findDarreichungByMedProduktText(txtMed.getText()).toArray()));
-            }
-
-            if (cmbMed.getModel().getSize() > 0) {
-                cmbMedItemStateChanged(null);
-            } else {
-//                lblVerordnung.setText(" ");
-                cmbMed.setToolTipText("");
-                cmbMass.setSelectedIndex(-1);
-                cmbMass.setEnabled(true);
-                cbStellplan.setEnabled(true);
-                cbStellplan.setSelected(false);
-                ignoreEvent = true;
-                cbPackEnde.setSelected(false);
-                currentSubMessage = null;
-                OPDE.getDisplayManager().clearSubMessages();
-                ignoreEvent = false;
-            }
-            cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
-        }
-    }//GEN-LAST:event_txtMedCaretUpdate
-
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         actionBlock.execute(null);
         cleanup();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void cmbANItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbANItemStateChanged
-        if (ignoreEvent) {
-            return;
-        }
-        verordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());
         saveOK();
     }//GEN-LAST:event_cmbANItemStateChanged
 
     private void cbABActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbABActionPerformed
-        if (ignoreEvent) {
-            return;
-        }
         jdcAB.setEnabled(cbAB.isSelected());
         cmbAB.setEnabled(cbAB.isSelected());
         cmbKHAb.setEnabled(cbAB.isSelected());
@@ -1342,7 +1308,6 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_formWindowClosing
 
     private void fillAerzteUndKHs() {
-        EntityManager em = OPDE.createEM();
         Query queryArzt = em.createNamedQuery("Arzt.findAll");
         List<Arzt> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
@@ -1365,7 +1330,7 @@ public class DlgVerordnung extends JDialog {
         cmbKHAn.setSelectedIndex(0);
         cmbKHAb.setSelectedIndex(0);
 
-        em.close();
+//        em.close();
     }
 
     private void reloadTable() {

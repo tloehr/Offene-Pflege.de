@@ -510,7 +510,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                 out.write(DBHandling.getPlanungenAsHTML(bwkennung, von, von));
             }
             out.close();
-            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
         }
     }//GEN-LAST:event_btnPrintActionPerformed

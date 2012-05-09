@@ -687,7 +687,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
             out.write(op.care.vital.DBHandling.getWerteAsHTML(tm, currentBW, sel));
 
             out.close();
-            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
         }
 

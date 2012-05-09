@@ -32,7 +32,7 @@ public class EntityTools {
         return success;
     }
 
-    public static <T> T find(Class<T> entity, Object id){
+    public static <T> T find(Class<T> entity, Object id) {
         T foundEntity = null;
         EntityManager em = OPDE.createEM();
 
@@ -84,11 +84,7 @@ public class EntityTools {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            if (em.contains(entity)){
-                em.remove(entity);
-            } else {
-                em.remove(em.merge(entity));
-            }
+            em.remove(em.merge(entity));
             em.getTransaction().commit();
             success = true;
         } catch (Exception e) {

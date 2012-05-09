@@ -39,10 +39,9 @@ import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.berichte.DlgBericht;
-import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgBestandAbschliessen;
 import op.care.med.vorrat.DlgBestandAnbrechen;
-import op.care.med.vorrat.DlgVorrat;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
@@ -55,6 +54,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -71,13 +72,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.prescription";
 
     private Bewohner bewohner;
-    private JFrame parent;
+    //    private JFrame parent;
     //    private boolean readOnly = false;
     private JPopupMenu menu;
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JCheckBox cbAbgesetzt;
+    private boolean initPhase;
 
 
     /**
@@ -90,11 +92,13 @@ public class PnlVerordnung extends NursingRecordsPanel {
      * Creates new form PnlVerordnung
      */
     public PnlVerordnung(Bewohner bewohner, JScrollPane jspSearch) {
+        initPhase = true;
         this.jspSearch = jspSearch;
         initComponents();
         prepareSearchArea();
         this.bewohner = bewohner;
         loadTable();
+        initPhase = false;
     }
 
     @Override
@@ -199,7 +203,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
 //            out.close();
 
-            SYSPrint.print(parent, html, true);
+            SYSPrint.print(html, true);
 
 //            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
@@ -224,7 +228,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             out.write(html);
 
             out.close();
-            SYSPrint.handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
             new DlgException(e);
         }
@@ -288,6 +292,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         @Override
                         public void execute(Object verordnung) {
                             if (verordnung != null) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung korrigiert", 2));
                                 reloadTable();
                             }
                             OPDE.hideSheet();
@@ -309,6 +314,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         @Override
                         public void execute(Object verordnung) {
                             if (verordnung != null) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung geändert", 2));
                                 reloadTable();
                             }
                             OPDE.hideSheet();
@@ -323,8 +329,20 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), verordnung);
-                    reloadTable();
+
+                    OPDE.showJDialogAsSheet(new DlgAbsetzen(verordnung, new Closure() {
+                        @Override
+                        public void execute(Object verordnung) {
+                            if (verordnung != null) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung abgesetzt", 2));
+                                reloadTable();
+                            }
+                            OPDE.hideSheet();
+                        }
+                    }));
+
+//                    new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), verordnung);
+//                    reloadTable();
                 }
             });
             menu.add(itemPopupQuit);
@@ -332,18 +350,28 @@ public class PnlVerordnung extends NursingRecordsPanel {
             // -------------------------------------------------
             JMenuItem itemPopupDelete = new JMenuItem("Löschen");
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    if (JOptionPane.showConfirmDialog(parent, "Soll die Verordnung wirklich gelöscht werden.",
-                            "Verordnung löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        VerordnungTools.loeschen(verordnung);
-                        reloadTable();
-                    }
+                    JOptionPane pane = new JOptionPane("Soll die Verordnung wirklich gelöscht werden.", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION,new ImageIcon(getClass().getResource("/artwork/48x48/trashcan_empty.png")));
+                    pane.addPropertyChangeListener(new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                            if (propertyChangeEvent.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)) {
+                                if (propertyChangeEvent.getNewValue().equals(JOptionPane.YES_OPTION)) {
+                                    EntityTools.delete(verordnung);
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung gelöscht", 2));
+                                    reloadTable();
+                                }
+                                OPDE.hideSheet();
+                            }
+                        }
+                    });
+                    OPDE.showJDialogAsSheet(pane.createDialog(""));
                 }
             });
             menu.add(itemPopupDelete);
 
             itemPopupDelete.setEnabled(deleteAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+//            itemPopupDelete.setEnabled(true);
 
             if (verordnung.hasMedi()) {
                 menu.add(new JSeparator());
@@ -356,8 +384,13 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        new DlgBestandAbschliessen(parent, bestandImAnbruch);
-                        reloadTable();
+                        OPDE.showJDialogAsSheet(new DlgBestandAbschliessen(bestandImAnbruch, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                reloadTable();
+                                OPDE.hideSheet();
+                            }
+                        }));
                     }
                 });
                 menu.add(itemPopupCloseBestand);
@@ -367,7 +400,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        new DlgBestandAnbrechen(parent, verordnung.getDarreichung(), verordnung.getBewohner());
+                        new DlgBestandAnbrechen(new JFrame(), verordnung.getDarreichung(), verordnung.getBewohner());
                     }
                 });
                 menu.add(itemPopupOpenBestand);
@@ -404,13 +437,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
                     final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
 
                     long dafid = 0;
-                    BigDecimal apv = BigDecimal.ZERO;
-                    BigDecimal apvBest = BigDecimal.ZERO;
+                    String message = "VerID: " + verordnung.getVerid();
                     if (bestandImAnbruch != null) {
-                        apv = MedBestandTools.getAPVperBW(bestandImAnbruch.getVorrat());
-                        apvBest = bestandImAnbruch.getApv();
+                        BigDecimal apv = MedBestandTools.getAPVperBW(bestandImAnbruch.getVorrat());
+                        BigDecimal apvBest = bestandImAnbruch.getApv();
+                        message += "  VorID: " + bestandImAnbruch.getVorrat().getVorID() + "  DafID: " + dafid + "  APV: " + apv + "  APV (Bestand): " + apvBest;
                     }
-                    JOptionPane.showMessageDialog(parent, "VerID: " + verordnung.getVerid() + "\nVorID: " + bestandImAnbruch.getVorrat().getVorID() + "\nDafID: " + dafid + "\nAPV: " + apv + "\nAPV (Bestand): " + apvBest, "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
+
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, 10));
                 }
             });
             itemPopupInfo.setEnabled(true);
@@ -422,17 +456,13 @@ public class PnlVerordnung extends NursingRecordsPanel {
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
-        new DlgVorrat(this.parent, bewohner);
-        reloadTable();
+//        new DlgVorrat(this.parent, bewohner);
+//        reloadTable();
     }//GEN-LAST:event_btnVorratActionPerformed
 
-    private void cbAbgesetztActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbAbgesetztActionPerformed
-        reloadTable();
-    }//GEN-LAST:event_cbAbgesetztActionPerformed
-
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
-        new DlgBestand(parent, bewohner, "");
-        reloadTable();
+//        new DlgBestand(parent, bewohner, "");
+//        reloadTable();
     }//GEN-LAST:event_btnBuchenActionPerformed
 
     private void jspVerordnungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVerordnungComponentResized
@@ -477,6 +507,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
     }
 
     private void reloadTable() {
+        if (initPhase) return;
         TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
         tm.reload(bewohner, cbAbgesetzt.isSelected());
     }

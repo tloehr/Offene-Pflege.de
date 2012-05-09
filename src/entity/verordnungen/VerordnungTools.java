@@ -33,45 +33,16 @@ public class VerordnungTools {
      *         Es gibt Verordnungen, die keine Medikamente besitzen, bei denen steht dann <code>null</code> an den entsprechenden
      *         Stellen.
      */
-    public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, Date abdatum) {
-        long timestart = System.currentTimeMillis();
+    public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean archiv) {
         List<Object[]> listResult = new ArrayList<Object[]>();
 
         EntityManager em = OPDE.createEM();
-        Query queryVerordnung = em.createQuery("SELECT v FROM Verordnung v WHERE v.abDatum >= :abdatum AND v.bewohner = :bewohner ");
-        queryVerordnung.setParameter("abdatum", abdatum);
+        Query queryVerordnung = em.createQuery("SELECT v FROM Verordnung v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.bewohner = :bewohner ");
+        if (!archiv) {
+            queryVerordnung.setParameter("now", new Date());
+        }
         queryVerordnung.setParameter("bewohner", bewohner);
         List<Verordnung> listeVerordnung = queryVerordnung.getResultList();
-
-//        // Aus technischen Gründe, kann ich diese native SQL nicht direkt mit der Liste aller zugehörigen Objekte
-//        // füllen lassen, daher muss ich das hier von Hand machen. Die Verordnungsobjekte sind zwar schon da, aber
-//        // die Vorrats und Bestandsobjekte nicht. Da bei diesem Ausdruck NULLs auftreten können, geht das nicht automatisch.
-//
-//        Iterator it = listeVorrat.iterator();
-//        while (it.hasNext()) {
-//            Object[] line = (Object[]) it.next();
-//
-//
-//            if (line[1] != null) {
-//                BigInteger vorID = (BigInteger) line[1];
-//                MedVorrat vorrat = em.find(MedVorrat.class, vorID.longValue());
-//                line[1] = vorrat;
-//            }
-//
-//            if (line[3] != null) {
-//                BigInteger bestID = (BigInteger) line[3];
-//                MedBestand bestand = em.find(MedBestand.class, bestID.longValue());
-//                line[3] = bestand;
-//            }
-//        }
-        // v.*, vor.VorID, vor.saldo, bestand.BestID, bestand.summe, M.Bezeichnung mptext, Ms.Bezeichnung mssntext
-        // Verordnung, AktiverVorrat, AktiverBestand
-//        Query queryBestand = em.createQuery(" " +
-//                " SELECT DISTINCT best FROM MedBestand best " +
-//                " WHERE best.vorrat.bis = :bis AND best.vorrat.bewohner = :bewohner AND best.darreichung = :darreichung ");
-//
-//        queryBestand.setParameter("bewohner", bewohner);
-//        queryBestand.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);
 
         for (Verordnung verordnung : listeVerordnung) {
 
@@ -81,9 +52,6 @@ public class VerordnungTools {
         }
 
         em.close();
-        long timeend = System.currentTimeMillis();
-
-        OPDE.debug("getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, Date abdatum) Ausführungszeit: " + (timeend - timestart) + " millis");
 
         return listResult;
     }
@@ -432,7 +400,7 @@ public class VerordnungTools {
                     if (vorrat == null) {
                         result += "<b><font color=\"red\">Es gibt bisher keinen Vorrat für dieses Medikament.</font></b>";
                     } else {
-                        if (MedVorratTools.getNaechsteNochUngeoeffnete(vorrat) != null){
+                        if (MedVorratTools.getNaechsteNochUngeoeffnete(vorrat) != null) {
                             result += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
                         } else {
                             result += "<br/><b><font color=\"red\">Keine Bestände mehr im Vorrat vorhanden. Vergabe nicht möglich.</font></b>";
@@ -452,28 +420,30 @@ public class VerordnungTools {
         return result;
     }
 
-    public static List<Verordnung> getVerordnungenByVorrat(EntityManager em, MedVorrat vorrat, boolean bisPackEnde) throws Exception {
+    public static List<Verordnung> getVerordnungenByVorrat(EntityManager em, MedVorrat vorrat) throws Exception {
         List<Verordnung> result = null;
-        Query query = em.createNamedQuery("Verordnung.findActiveByVorratAndPackende");
+        Query query = em.createNamedQuery("Verordnung.findActiveByVorrat");
         query.setParameter(1, vorrat.getVorID());
-        query.setParameter(2, bisPackEnde);
+//        query.setParameter(2, bisPackEnde);
         result = query.getResultList();
         return result;
     }
 
 
-    public static Verordnung absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
+    public static boolean absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
         EntityManager em = OPDE.createEM();
+        boolean result = false;
         try {
             em.getTransaction().begin();
             verordnung = absetzen(em, verordnung, arzt, krankenhaus);
             em.getTransaction().commit();
+            result = true;
         } catch (Exception e) {
             em.getTransaction().rollback();
         } finally {
             em.close();
         }
-        return verordnung;
+        return result;
     }
 
     /**
@@ -543,30 +513,33 @@ public class VerordnungTools {
      * Löscht eine Verordnung und die zugehörigen BHPs und deren Planungen.
      */
     public static void loeschen(Verordnung verordnung) {
-
+        OPDE.getDisplayManager().setDBActionMessage(true);
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
+//            verordnung = em.merge(verordnung);
+//            Query queryBHP = em.createQuery(" " +
+//                    " DELETE FROM BHP bhp " +
+//                    " WHERE bhp.verordnungPlanung.verordnung = :verordnung ");
+//            queryBHP.setParameter("verordnung", verordnung);
+//            queryBHP.executeUpdate();
+//
+//            Query queryPlanung = em.createQuery(" " +
+//                    " DELETE FROM VerordnungPlanung vp" +
+//                    " WHERE vp.verordnung = :verordnung ");
+//            queryPlanung.setParameter("verordnung", verordnung);
+//            queryPlanung.executeUpdate();
 
-            Query queryBHP = em.createQuery(" " +
-                    " DELETE FROM BHP bhp " +
-                    " WHERE bhp.verordnungPlanung.verordnung = :verordnung ");
-            queryBHP.executeUpdate();
-
-            Query queryPlanung = em.createQuery(" " +
-                    " DELETE FROM VerordnungPlanung vp" +
-                    " WHERE vp.verordnung = :verordnung ");
-            queryPlanung.executeUpdate();
-
-            em.remove(verordnung);
-
+            em.remove(em.merge(verordnung));
             em.getTransaction().commit();
 
         } catch (Exception ex) {
+            OPDE.debug(ex.getMessage());
             em.getTransaction().rollback();
             OPDE.fatal(ex);
         } finally {
             em.close();
+            OPDE.getDisplayManager().setDBActionMessage(false);
         }
     }
 

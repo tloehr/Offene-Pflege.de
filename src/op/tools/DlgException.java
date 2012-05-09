@@ -27,8 +27,6 @@
 package op.tools;
 
 import entity.system.SyslogTools;
-import entity.system.SYSHostsTools;
-import entity.system.SYSLoginTools;
 import op.OPDE;
 
 /**
@@ -155,7 +153,7 @@ public class DlgException extends javax.swing.JDialog {
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
 
-        SYSPrint.print(this, txtException.getText(), true);
+        SYSPrint.print(txtException.getText(), true);
 
     }//GEN-LAST:event_btnPrintActionPerformed
 

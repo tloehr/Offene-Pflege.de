@@ -1592,7 +1592,7 @@ public class FrmUser extends javax.swing.JFrame {
         html = SYSTools.replace(html, "<opde-ocuser-pw/>", pw);
         html = SYSTools.htmlUmlautConversion(html);
 
-        SYSPrint.print(this, html, true);
+        SYSPrint.print(html, true);
     }
 
     /**
