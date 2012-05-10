@@ -72,6 +72,7 @@ public class DlgVerordnung extends JDialog {
     //    private java.awt.Frame parent;
 //    private boolean ignoreSitCaret;
     private boolean ignoreEvent;
+    private long version;
 
 
     private JPopupMenu menu;
@@ -80,7 +81,7 @@ public class DlgVerordnung extends JDialog {
     private Closure actionBlock;
     private Verordnung verordnung = null;
 
-    private EntityManager em;
+//    private EntityManager em;
 
     private DisplayMessage currentSubMessage = null;
 
@@ -91,37 +92,38 @@ public class DlgVerordnung extends JDialog {
     public DlgVerordnung(Verordnung verordnung, int mode, Closure actionBlock) {
         super(new JFrame(), false);
         this.actionBlock = actionBlock;
-
+        this.verordnung = verordnung;
+        this.version = verordnung.getVersion();
         this.editMode = mode;
-        em = OPDE.createEM();
-        em.getTransaction().begin();
-
-        if (editMode != NEW_MODE) {
-            try {
-                this.verordnung = em.merge(verordnung);
-                em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
-
-//            if (editMode == CHANGE_MODE) {
-//                oldVerordnung = em.merge(verordnung);
+//        em = OPDE.createEM();
+//        em.getTransaction().begin();
 //
-//                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
-//                this.verordnung = (Verordnung) verordnung.clone();
-//
-//            } else {
+//        if (editMode != NEW_MODE) {
+//            try {
 //                this.verordnung = em.merge(verordnung);
 //                em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
+//
+////            if (editMode == CHANGE_MODE) {
+////                oldVerordnung = em.merge(verordnung);
+////
+////                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
+////                this.verordnung = (Verordnung) verordnung.clone();
+////
+////            } else {
+////                this.verordnung = em.merge(verordnung);
+////                em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
+////            }
+//            } catch (PessimisticLockException ple) {
+//                OPDE.debug(ple);
+//                em.getTransaction().rollback();
+//                em.close();
+//                dispose();
+//            } catch (Exception e) {
+//                OPDE.fatal(e);
 //            }
-            } catch (PessimisticLockException ple) {
-                OPDE.debug(ple);
-                em.getTransaction().rollback();
-                em.close();
-                dispose();
-            } catch (Exception e) {
-                OPDE.fatal(e);
-            }
-        } else {
-            this.verordnung = verordnung;
-        }
+//        } else {
+//            this.verordnung = verordnung;
+//        }
 
 
         initComponents();
@@ -209,6 +211,7 @@ public class DlgVerordnung extends JDialog {
         if (text.isEmpty()) {
             return;
         }
+        EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT s FROM Situationen s WHERE s.text = :text");
         query.setParameter("text", text);
         if (query.getResultList().isEmpty()) {
@@ -218,6 +221,7 @@ public class DlgVerordnung extends JDialog {
         } else {
             cmbSit.setModel(new DefaultComboBoxModel(query.getResultList().toArray()));
         }
+        em.close();
     }
 
     private void btnSituationActionPerformed(ActionEvent e) {
@@ -281,6 +285,7 @@ public class DlgVerordnung extends JDialog {
             cbPackEnde.setEnabled(false);
         } else {
             OPDE.getDisplayManager().setDBActionMessage(true);
+            EntityManager em = OPDE.createEM();
             if (txtMed.getText().matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
                 String pzn = txtMed.getText();
 
@@ -300,8 +305,8 @@ public class DlgVerordnung extends JDialog {
             } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
                 cmbMed.setModel(new DefaultComboBoxModel(DarreichungTools.findDarreichungByMedProduktText(em, txtMed.getText()).toArray()));
             }
-
             OPDE.getDisplayManager().setDBActionMessage(false);
+            em.close();
 
             if (cmbMed.getModel().getSize() > 0) {
                 cmbMedItemStateChanged(null);
@@ -1036,12 +1041,6 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void cleanup() {
-        if (em.isOpen()) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
 
         jdcAB.removePropertyChangeListener(myPropertyChangeListener);
         jdcAN.removePropertyChangeListener(myPropertyChangeListener);
@@ -1077,11 +1076,17 @@ public class DlgVerordnung extends JDialog {
     private void save() {
 
         Verordnung newVerordnung = null;
+        EntityManager em = OPDE.createEM();
+
         try {
+            em.getTransaction().begin();
+            verordnung = em.merge(verordnung);
+            em.lock(verordnung, LockModeType.OPTIMISTIC);
+//            em.refresh(verordnung, LockModeType.OPTIMISTIC);
 
             if (editMode == CHANGE_MODE) {
                 newVerordnung = (Verordnung) verordnung.clone();
-                em.lock(newVerordnung, LockModeType.PESSIMISTIC_WRITE);
+//                em.lock(newVerordnung, LockModeType.OPTIMISTIC);
             } else {
                 newVerordnung = verordnung;
             }
@@ -1138,7 +1143,7 @@ public class DlgVerordnung extends JDialog {
                 // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
                 // Dann werden die nicht mehr benötigten BHPs entfernt.
                 // Dann wird die neue Verordnung angesetzt.
-                verordnung = VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+                VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
 
                 // die neue Verordnung beginnt eine Sekunde, nachdem die vorherige Abgesetzt wurde.
 //                verordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
@@ -1308,6 +1313,7 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_formWindowClosing
 
     private void fillAerzteUndKHs() {
+        EntityManager em = OPDE.createEM();
         Query queryArzt = em.createNamedQuery("Arzt.findAll");
         List<Arzt> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
@@ -1315,6 +1321,7 @@ public class DlgVerordnung extends JDialog {
         Query queryKH = em.createNamedQuery("Krankenhaus.findAll");
         List<Krankenhaus> listKH = queryKH.getResultList();
         listKH.add(0, null);
+        em.close();
 
         cmbAN.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
         cmbAB.setModel(new DefaultComboBoxModel(listAerzte.toArray()));

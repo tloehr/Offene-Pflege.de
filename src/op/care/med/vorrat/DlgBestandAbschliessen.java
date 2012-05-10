@@ -51,6 +51,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     private MedBestand bestand;
     private Closure actionBlock;
     private EntityManager em;
+//    private java.util.List<Verordnung> verordnungenByVorrat;
 
     /**
      * Creates new form DlgBestandAnbruch
@@ -266,11 +267,6 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
             bestand = em.merge(bestand);
             em.lock(bestand, LockModeType.PESSIMISTIC_WRITE);
 
-            for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat(), true)) {
-                em.lock(em.merge(verordnung), LockModeType.PESSIMISTIC_WRITE);
-                OPDE.debug("Locking Verordnung: "+verordnung.getVerid());
-            }
-
         } catch (PessimisticLockException ple) {
             OPDE.debug(ple);
             em.getTransaction().rollback();
@@ -379,11 +375,6 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 bestand.setNaechsterBestand(nextBest);
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
                 MedBestandTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
-                //DBHandling.setzeBestand(bestid, inhalt, "Korrekturbuchung zum Packungsabschluss", DBHandling.STATUS_KORREKTUR_AUTO_VORAB);
-                //op.tools.DBHandling.updateRecord("MPBestand", hm, "BestID", bestid);
-//                bestand.getVorrat().getBestaende().remove(bestand);
-//                bestand = em.merge(bestand);
-//                bestand.getVorrat().getBestaende().add(bestand);
 
                 OPDE.info(classname + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
@@ -414,15 +405,14 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                     if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null && MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
                         // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                         // Die müssen dann jetzt nämlich abgeschlossen werden.
-                        for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat(), true)) {
-                            VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+
+                        for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat())) {
+                            if (verordnung.isBisPackEnde()) {
+                                VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+                            }
                         }
                     }
                 }
-//                if (!DBHandling.hasAnbruch(vorid)) { // Keine mehr im Anbruch ?
-//                    // Dann alles absetzen, was zu diesem Vorrat gehörte und bis PackEnde lief.
-//                    op.care.verordnung.DBHandling.absetzenBisPackEnde2Vorrat(vorid);
-//                }
             }
             em.getTransaction().commit();
             actionBlock.execute(bestand);

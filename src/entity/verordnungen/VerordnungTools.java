@@ -11,6 +11,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -91,7 +92,6 @@ public class VerordnungTools {
         try {
             Query query = em.createNamedQuery("Verordnung.findAllForStellplan");
             query.setParameter(1, einrichtungen.getEKennung());
-
             html = getStellplan(query.getResultList());
 
         } catch (Exception e) {
@@ -420,12 +420,27 @@ public class VerordnungTools {
         return result;
     }
 
+    /**
+     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
+     * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+     */
     public static List<Verordnung> getVerordnungenByVorrat(EntityManager em, MedVorrat vorrat) throws Exception {
+        List<BigInteger> list = null;
         List<Verordnung> result = null;
-        Query query = em.createNamedQuery("Verordnung.findActiveByVorrat");
+        Query query = em.createNativeQuery(" SELECT DISTINCT ver.VerID FROM BHPVerordnung ver " +
+                " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
+                " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
+                " WHERE b.VorID=? AND ver.AbDatum > now() ");
         query.setParameter(1, vorrat.getVorID());
 //        query.setParameter(2, bisPackEnde);
-        result = query.getResultList();
+        list = query.getResultList();
+
+        if (!list.isEmpty()) {
+            result = new ArrayList<Verordnung>(list.size());
+            for (BigInteger verid : list) {
+                result.add(em.find(Verordnung.class, verid.longValue()));
+            }
+        }
         return result;
     }
 
@@ -463,9 +478,10 @@ public class VerordnungTools {
         verordnung.setAbKH(krankenhaus);
         verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
 
-        verordnung = em.merge(verordnung);
+//        verordnung = em.merge(verordnung);
+//        em.lock(verordnung, LockModeType.PESSIMISTIC_WRITE);
+        BHPTools.aufräumen(em, verordnung);
 
-        BHPTools.aufräumen(em, verordnung, new Date());
         return verordnung;
     }
 
@@ -509,39 +525,39 @@ public class VerordnungTools {
         return result;
     }
 
-    /**
-     * Löscht eine Verordnung und die zugehörigen BHPs und deren Planungen.
-     */
-    public static void loeschen(Verordnung verordnung) {
-        OPDE.getDisplayManager().setDBActionMessage(true);
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-//            verordnung = em.merge(verordnung);
-//            Query queryBHP = em.createQuery(" " +
-//                    " DELETE FROM BHP bhp " +
-//                    " WHERE bhp.verordnungPlanung.verordnung = :verordnung ");
-//            queryBHP.setParameter("verordnung", verordnung);
-//            queryBHP.executeUpdate();
+//    /**
+//     * Löscht eine Verordnung und die zugehörigen BHPs und deren Planungen.
+//     */
+//    public static void loeschen(Verordnung verordnung) {
+//        OPDE.getDisplayManager().setDBActionMessage(true);
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+////            verordnung = em.merge(verordnung);
+////            Query queryBHP = em.createQuery(" " +
+////                    " DELETE FROM BHP bhp " +
+////                    " WHERE bhp.verordnungPlanung.verordnung = :verordnung ");
+////            queryBHP.setParameter("verordnung", verordnung);
+////            queryBHP.executeUpdate();
+////
+////            Query queryPlanung = em.createQuery(" " +
+////                    " DELETE FROM VerordnungPlanung vp" +
+////                    " WHERE vp.verordnung = :verordnung ");
+////            queryPlanung.setParameter("verordnung", verordnung);
+////            queryPlanung.executeUpdate();
 //
-//            Query queryPlanung = em.createQuery(" " +
-//                    " DELETE FROM VerordnungPlanung vp" +
-//                    " WHERE vp.verordnung = :verordnung ");
-//            queryPlanung.setParameter("verordnung", verordnung);
-//            queryPlanung.executeUpdate();
-
-            em.remove(em.merge(verordnung));
-            em.getTransaction().commit();
-
-        } catch (Exception ex) {
-            OPDE.debug(ex.getMessage());
-            em.getTransaction().rollback();
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
-            OPDE.getDisplayManager().setDBActionMessage(false);
-        }
-    }
+//            em.remove(em.merge(verordnung));
+//            em.getTransaction().commit();
+//
+//        } catch (Exception ex) {
+//            OPDE.debug(ex.getMessage());
+//            em.getTransaction().rollback();
+//            OPDE.fatal(ex);
+//        } finally {
+//            em.close();
+//            OPDE.getDisplayManager().setDBActionMessage(false);
+//        }
+//    }
 
     /**
      * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.

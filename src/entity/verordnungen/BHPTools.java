@@ -1,6 +1,5 @@
 package entity.verordnungen;
 
-import entity.EntityTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -56,61 +55,60 @@ public class BHPTools {
         int numbhp = 0;
 
 
+        if (datum == null) {
+            datum = new Date();
+        }
+        Date stichtag = new Date(SYSCalendar.startOfDay(datum));
+        GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
 
-            if (datum == null) {
-                datum = new Date();
-            }
-            Date stichtag = new Date(SYSCalendar.startOfDay(datum));
-            GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
+        // Datum, an dem der letzte BHP Gesamtimport erfolgte. Darf nur einmal am Tag gemacht werden.
+        GregorianCalendar lastbhp = (GregorianCalendar) gcStichtag.clone();
 
-            // Datum, an dem der letzte BHP Gesamtimport erfolgte. Darf nur einmal am Tag gemacht werden.
-            GregorianCalendar lastbhp = (GregorianCalendar) gcStichtag.clone();
+        if (OPDE.getProps().containsKey("LASTBHPIMPORT")) {
+            lastbhp = SYSCalendar.erkenneDatum(OPDE.getProps().getProperty("LASTBHPIMPORT"));
+        } else {
+            lastbhp.add(GregorianCalendar.DATE, -1); // einen Tag vorher, falls es noch nichts gibt
+        }
 
-            if (OPDE.getProps().containsKey("LASTBHPIMPORT")) {
-                lastbhp = SYSCalendar.erkenneDatum(OPDE.getProps().getProperty("LASTBHPIMPORT"));
-            } else {
-                lastbhp.add(GregorianCalendar.DATE, -1); // einen Tag vorher, falls es noch nichts gibt
-            }
-
-            if (SYSCalendar.getDaysBetween(lastbhp, gcStichtag) != 1) {
+        if (SYSCalendar.getDaysBetween(lastbhp, gcStichtag) != 1) {
 //                SYSRunningClassesTools.endModule(me);
-                throw new IndexOutOfBoundsException("Es kann kein BHPImport für dieses Datum durchgeführt werden.");
-            }
+            throw new IndexOutOfBoundsException("Es kann kein BHPImport für dieses Datum durchgeführt werden.");
+        }
 
-            Query select = em.createQuery(" " +
-                    " SELECT vp FROM VerordnungPlanung vp " +
-                    " JOIN vp.verordnung v " +
-                    // nur die Verordnungen, die überhaupt gültig sind
-                    // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
-                    // Das heisst, wenn eine Verordnung heute endet, dann wird sie dennoch eingetragen.
-                    // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
-                    " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum " +
-                    // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
-                    " AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2 " +
-                    " ORDER BY vp.bhppid ");
+        Query select = em.createQuery(" " +
+                " SELECT vp FROM VerordnungPlanung vp " +
+                " JOIN vp.verordnung v " +
+                // nur die Verordnungen, die überhaupt gültig sind
+                // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
+                // Das heisst, wenn eine Verordnung heute endet, dann wird sie dennoch eingetragen.
+                // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
+                " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum " +
+                // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
+                " AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2 " +
+                " ORDER BY vp.bhppid ");
 
-            // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
-            // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
-            // die wirklichen Treffer nachher genauer ermittelt werden.
+        // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
+        // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
+        // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.info(SYSTools.getWindowTitle("BHPImport"));
+        OPDE.info(SYSTools.getWindowTitle("BHPImport"));
 
-            OPDE.info("Schreibe nach: " + OPDE.getUrl());
+        OPDE.info("Schreibe nach: " + OPDE.getUrl());
 
-            select.setParameter("andatum", new Date(SYSCalendar.startOfDay(stichtag)));
-            select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(stichtag)));
-            select.setParameter("ldatum", new Date(SYSCalendar.endOfDay(stichtag)));
+        select.setParameter("andatum", new Date(SYSCalendar.startOfDay(stichtag)));
+        select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(stichtag)));
+        select.setParameter("ldatum", new Date(SYSCalendar.endOfDay(stichtag)));
 
-            List<VerordnungPlanung> list = select.getResultList();
+        List<VerordnungPlanung> list = select.getResultList();
 
 
-            numbhp = erzeugen(em, list, stichtag, null);
+        numbhp = erzeugen(em, list, stichtag, null);
 
-            OPDE.info("BHPImport abgeschlossen. Stichtag: " + DateFormat.getDateInstance().format(stichtag));
+        OPDE.info("BHPImport abgeschlossen. Stichtag: " + DateFormat.getDateInstance().format(stichtag));
 
 //            SYSRunningClassesTools.endModule(me);
 
-            SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
+        SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
 
 //        } else {
 //            OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");
@@ -120,37 +118,43 @@ public class BHPTools {
 
 
     /**
-     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung <b>ab</b> einer bestimmten Tages-Zeit.
+     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung <b>ab</b> ab dem aktuellen Zeitpunkt.
+     * Es wird die aktuelle Schicht (bzw. Zeit) ermittelt. Bei BHPs,
+     * die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> der aktuellen Uhrzeit sind sind.
      *
      * @param em         EntityManager, in dessen Kontext das hier ablaufen soll.
-     * @param abUhrzeit  ist ein bestimmter Zeitpunkt. Das gilt natürlich nur für den aktuellen Tag. Somit ist
-     *                   bei <code>abUhrzeit</code> nur der Uhrzeit anteil relevant. Über diesen wird die Schicht (bzw. Zeit) ermittelt. Bei BHPs,
-     *                   die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> <code>abUhrzeit</code> sind.
      * @param verordnung um die es geht.
      */
-    public static void aufräumen(EntityManager em, Verordnung verordnung, Date abUhrzeit) throws Exception {
+    public static void aufräumen(EntityManager em, Verordnung verordnung) throws Exception {
+        Date now = new Date();
 
-        int zeit = SYSCalendar.ermittleZeit(abUhrzeit.getTime());
+        int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
 
-        String sql = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
-                " WHERE bhp.VerID = ? AND Status = 0 AND Date(Soll)=Date(now()) AND " +
-                " (" +
-                "   ( " +
-                "       ( SZeit > ? )" +
-                "   ) " +
-                "   OR " +
-                "   (" +
-                "       ( SZeit = 0 AND Time(Soll) >= Time(?) )" +
-                "   )" +
-                " )";
+//        String sql = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
+//                " WHERE bhp.VerID = ? AND Status = 0 AND Date(Soll)=Date(now()) AND " +
+//                " (" +
+//                "   ( " +
+//                "       ( SZeit > ? )" +
+//                "   ) " +
+//                "   OR " +
+//                "   (" +
+//                "       ( SZeit = 0 AND Time(Soll) >= Time(?) )" +
+//                "   )" +
+//                " )";
 
-        Query query = em.createNativeQuery(sql);
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.verordnung = :verordnung AND b.soll >= :bofday AND b.soll <= :eofday");
 
-        query.setParameter(1, verordnung.getVerid());
-        query.setParameter(2, zeit);
-        query.setParameter(3, abUhrzeit);
+        query.setParameter("verordnung", verordnung);
+        query.setParameter("bofday", new Date(SYSCalendar.startOfDay()));
+        query.setParameter("eofday", new Date(SYSCalendar.endOfDay()));
 
-        query.executeUpdate();
+        List<BHP> bhps = query.getResultList();
+
+        for (BHP bhp : bhps) {
+            if (bhp.getSollZeit() > sollZeit || (bhp.getSollZeit() == 0 && SYSCalendar.compareTime(bhp.getSoll(), now) >= 0)) {
+                em.remove(bhp);
+            }
+        }
 
     }
 
@@ -299,7 +303,7 @@ public class BHPTools {
                 }
             } else {
                 OPDE.debug("///////////////////////////////////////////////////////////");
-                OPDE.debug("Folgende Planung wurde nicht angenommen: "+planung);
+                OPDE.debug("Folgende Planung wurde nicht angenommen: " + planung);
             }
         }
         OPDE.debug("Erzeugte BHPs: " + numbhp);

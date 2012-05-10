@@ -1066,6 +1066,14 @@ public class SYSCalendar {
         return gc1.compareTo(gc2);
     }
 
+    /**
+     * Diese Routine vergleicht Uhrzeiten, die in zwei longs hinterlegt sind.
+     * Das Besondere dabei ist, dass das Datum ausser acht gelassen wird.
+     *
+     * @return int < 0, wenn time1 < time2; int == 0, wenn time1 = time2; int > 0, wenn time1 > time2
+     * @time1
+     * @time2
+     */
     public static int compareTime(Date date1, Date date2) {
         return compareTime(date1.getTime(), date2.getTime());
     }

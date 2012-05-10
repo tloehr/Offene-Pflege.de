@@ -92,9 +92,6 @@ import java.util.List;
 })
 
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Verordnung.findActiveByVorratResultMapping",
-                entities = @EntityResult(entityClass = Verordnung.class)
-        ),
 
         @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
                 entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
@@ -158,15 +155,6 @@ import java.util.List;
                 // Verordungen angezeigt, wenn nicht, dann nur die aktuellen.
                 " AND (1=? OR date(v.AbDatum) >= current_date())" +
                 " ORDER BY v.SitID IS NULL, v.DafID IS NOT NULL, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping"),
-/**
- * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
- * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
- */
-        @NamedNativeQuery(name = "Verordnung.findActiveByVorrat", query = " " +
-                " SELECT DISTINCT ver.* FROM BHPVerordnung ver " +
-                " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
-                " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
-                " WHERE b.VorID=? AND ver.AbDatum > now() ", resultSetMapping = "Verordnung.findActiveByVorratResultMapping"),
 /**
  * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
  */
