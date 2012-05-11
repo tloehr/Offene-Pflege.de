@@ -37,7 +37,9 @@ import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.CleanablePanel;
 import op.tools.ListElement;
+import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -53,7 +55,7 @@ import java.awt.event.ItemListener;
 /**
  * @author root
  */
-public class DlgAbsetzen extends javax.swing.JDialog {
+public class DlgAbsetzen extends MyJDialog {
     private Verordnung verordnung;
     private Closure actionBlock;
 
@@ -61,7 +63,6 @@ public class DlgAbsetzen extends javax.swing.JDialog {
      * Creates new form DlgAbsetzen
      */
     public DlgAbsetzen(Verordnung verordnung, Closure actionBlock) {
-        super(new JFrame(), false);
         this.actionBlock = actionBlock;
         this.verordnung = verordnung;
         initComponents();
@@ -85,7 +86,9 @@ public class DlgAbsetzen extends javax.swing.JDialog {
         btnOK = new JButton();
 
         //======== this ========
+        setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$rgap, 200dlu:grow, $lcgap, $rgap",
@@ -162,7 +165,13 @@ public class DlgAbsetzen extends javax.swing.JDialog {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         actionBlock.execute(null);
+        dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
+
+    @Override
+    public void dispose() {
+        super.dispose();
+    }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         Arzt arzt = (Arzt) cmbArztAb.getSelectedItem();
@@ -170,6 +179,7 @@ public class DlgAbsetzen extends javax.swing.JDialog {
 
         if (VerordnungTools.absetzen(verordnung, arzt, krankenhaus)){
             actionBlock.execute(verordnung);
+            dispose();
         } else {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Arzt und Krankenhaus dürfen nicht beide leer sein.", 2));
         }

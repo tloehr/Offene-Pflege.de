@@ -474,9 +474,9 @@ public class VerordnungTools {
             throw new NullPointerException("Arzt und Krankenhaus dürfen nicht beide NULL sein.");
         }
         verordnung.setAbDatum(new Date());
-        verordnung.setAbArzt(arzt);
-        verordnung.setAbKH(krankenhaus);
-        verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+        verordnung.setAbArzt(em.merge(arzt));
+        verordnung.setAbKH(em.merge(krankenhaus));
+        verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
 
 //        verordnung = em.merge(verordnung);
 //        em.lock(verordnung, LockModeType.PESSIMISTIC_WRITE);

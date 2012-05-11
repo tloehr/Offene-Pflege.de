@@ -11,6 +11,8 @@ import entity.Bewohner;
 import entity.PBerichtTAGS;
 import entity.PBerichtTAGSTools;
 import entity.Pflegeberichte;
+import op.tools.CleanablePanel;
+import op.tools.MyJDialog;
 import op.tools.SYSCalendar;
 import org.apache.commons.collections.Closure;
 
@@ -31,7 +33,7 @@ import java.util.GregorianCalendar;
 /**
  * @author Torsten Löhr
  */
-public class DlgBericht extends JDialog {
+public class DlgBericht extends MyJDialog {
     private Pflegeberichte bericht;
     private Bewohner bewohner;
     private PropertyChangeListener pcl;
@@ -39,7 +41,7 @@ public class DlgBericht extends JDialog {
     private Closure actionBlock;
 
     public DlgBericht(Bewohner bewohner, Closure actionBlock) {
-        super(new JFrame());
+        super();
         this.bewohner = bewohner;
         this.actionBlock = actionBlock;
         initComponents();
@@ -88,9 +90,9 @@ public class DlgBericht extends JDialog {
 
     @Override
     public void dispose() {
-        super.dispose();
         jdcDatum.removePropertyChangeListener(pcl);
         jdcDatum.cleanup();
+        super.dispose();
     }
 
     private void txtUhrzeitFocusLost(FocusEvent e) {
@@ -139,10 +141,12 @@ public class DlgBericht extends JDialog {
 
     private void btnCancelActionPerformed(ActionEvent e) {
         actionBlock.execute(null);
+        dispose();
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
         actionBlock.execute(bericht);
+        dispose();
     }
 
     private void initComponents() {
@@ -162,6 +166,9 @@ public class DlgBericht extends JDialog {
         btnApply = new JButton();
 
         //======== this ========
+        setResizable(false);
+        setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "default:grow",

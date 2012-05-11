@@ -25,12 +25,13 @@
  */
 package op.system;
 
+import java.awt.event.*;
 import entity.system.SYSLoginTools;
 import op.OPDE;
-import op.tools.DlgException;
+import op.threads.DisplayMessage;
+import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.JXHyperlink;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -47,7 +48,7 @@ import java.sql.SQLException;
 /**
  * @author __USER__
  */
-public class DlgLogin extends JDialog {
+public class DlgLogin extends MyJDialog {
 
     //    Thread thread = null;
     private Closure actionBlock;
@@ -55,8 +56,12 @@ public class DlgLogin extends JDialog {
     /**
      * Creates new form DlgLogin
      */
-    public DlgLogin(java.awt.Frame parent, String preMessage, Closure actionBlock) {
-        super(parent, false);
+    private void thisWindowClosing(WindowEvent e) {
+        // TODO add your code here
+    }
+
+    public DlgLogin(Closure actionBlock) {
+        super(OPDE.getMainframe());
         OPDE.setLogin(null);
         this.actionBlock = actionBlock;
 
@@ -69,7 +74,7 @@ public class DlgLogin extends JDialog {
         }
 
         initComponents();
-        lblMessage.setText(SYSTools.catchNull(preMessage));
+//        lblMessage.setText(SYSTools.catchNull(preMessage));
 
         String defaultlogin = "";
 
@@ -91,11 +96,11 @@ public class DlgLogin extends JDialog {
 //        }
 
         txtUsername.requestFocus();
-
+        pack();
 //        SYSTools.centerOnParent(parent, this);
 //        btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/animation/opde-52.png")));
 //        setVisible(true);
-        pack();
+
     }
 
 
@@ -142,16 +147,21 @@ public class DlgLogin extends JDialog {
         txtUsername = new JTextField();
         jLabel1 = new JLabel();
         txtPassword = new JPasswordField();
-        lblMessage = new JLabel();
         jPanel2 = new JPanel();
         btnAbout = new JButton();
         jLabel4 = new JLabel();
         lblOPDE = new JLabel();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Anmeldung");
+        setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
 
         //---- btnLogin ----
@@ -168,6 +178,7 @@ public class DlgLogin extends JDialog {
         //======== jPanel1 ========
         {
             jPanel1.setBorder(new EmptyBorder(5, 5, 5, 5));
+            jPanel1.setOpaque(false);
 
             //---- jLabel2 ----
             jLabel2.setText("Benutzername");
@@ -204,27 +215,20 @@ public class DlgLogin extends JDialog {
                 }
             });
 
-            //---- lblMessage ----
-            lblMessage.setForeground(new Color(255, 0, 51));
-            lblMessage.setText("jLabel3");
-
             GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup()
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblMessage, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE)
-                            .addGroup(GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup()
-                                    .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
-                                    .addComponent(jLabel2))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup()
-                                    .addComponent(txtPassword, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
-                                    .addComponent(txtUsername, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
-                                .addContainerGap())))
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(txtPassword, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                            .addComponent(txtUsername, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE))
+                        .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup()
@@ -237,9 +241,7 @@ public class DlgLogin extends JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblMessage)
-                        .addContainerGap())
+                        .addGap(44, 44, 44))
             );
             jPanel1Layout.linkSize(SwingConstants.VERTICAL, new Component[] {jLabel1, jLabel2});
         }
@@ -247,11 +249,15 @@ public class DlgLogin extends JDialog {
         //======== jPanel2 ========
         {
             jPanel2.setBorder(new EmptyBorder(5, 5, 5, 5));
+            jPanel2.setOpaque(false);
 
             //---- btnAbout ----
             btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/opde-metal.png")));
             btnAbout.setToolTipText("\u00dcber Offene-Pflege.de...");
-            btnAbout.setOpaque(true);
+            btnAbout.setBorderPainted(false);
+            btnAbout.setBorder(null);
+            btnAbout.setOpaque(false);
+            btnAbout.setContentAreaFilled(false);
             btnAbout.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -307,7 +313,7 @@ public class DlgLogin extends JDialog {
                         .addGroup(contentPaneLayout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
+                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
                                 .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addComponent(btnLogin))
                     .addContainerGap())
@@ -318,7 +324,7 @@ public class DlgLogin extends JDialog {
                     .addContainerGap()
                     .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, 94, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(btnLogin)
                     .addContainerGap())
@@ -335,14 +341,14 @@ public class DlgLogin extends JDialog {
         ((JTextField) evt.getSource()).selectAll();
     }//GEN-LAST:event_txtUsernameFocusGained
 
+
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
         btnLogin.doClick();
     }//GEN-LAST:event_txtPasswordActionPerformed
 
+    @Override
     public void dispose() {
-//        if (thread != null) {
-//            thread.interrupt();
-//        }
+        actionBlock.execute(OPDE.getLogin());
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -362,8 +368,7 @@ public class DlgLogin extends JDialog {
             // Hier wird erst geprüft, ob Username und Passwort stimmen.
             registerLogin();
             if (OPDE.getLogin() == null) {
-                lblMessage.setText("Benutzername oder Passwort falsch.");
-//                JOptionPane.showMessageDialog(this, "Benutzername oder Passwort falsch.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Benutzername oder Passwort falsch.", 2));
                 OPDE.info("Falsches Passwort eingegeben.");
             } else {
 
@@ -374,9 +379,7 @@ public class DlgLogin extends JDialog {
                 OPDE.info("Anmeldung erfolgt: UKennung: " + username);
                 OPDE.info("LoginID: " + OPDE.getLogin().getUser().getUKennung());
 
-                actionBlock.execute(OPDE.getLogin());
-
-
+                dispose();
             }
 
         } catch (SQLException se) {
@@ -484,7 +487,6 @@ public class DlgLogin extends JDialog {
     private JTextField txtUsername;
     private JLabel jLabel1;
     private JPasswordField txtPassword;
-    private JLabel lblMessage;
     private JPanel jPanel2;
     private JButton btnAbout;
     private JLabel jLabel4;

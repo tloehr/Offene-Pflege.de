@@ -43,14 +43,15 @@ import java.awt.event.MouseEvent;
 /**
  * @author tloehr
  */
-public class DlgListSelector extends javax.swing.JDialog {
+public class DlgListSelector extends MyJDialog {
     private Closure applyClosure;
+    private Object result;
 
     /**
      * Creates new form DlgFindeBW
      */
     public DlgListSelector(String topic, String detail, DefaultListModel dlm, Closure applyClosure) {
-        super(new JFrame(), false);
+        super();
         initComponents();
         lstSelect.setModel(dlm);
         lstSelect.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -59,7 +60,6 @@ public class DlgListSelector extends javax.swing.JDialog {
         lblTopic.setText(topic);
         lblDetail.setText(detail);
         this.applyClosure = applyClosure;
-        pack();
     }
 
     /**
@@ -79,7 +79,8 @@ public class DlgListSelector extends javax.swing.JDialog {
         btnCancel = new JButton();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
+        setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$rgap, $lcgap, default:grow, $lcgap, $rgap",
@@ -159,9 +160,15 @@ public class DlgListSelector extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_lstSelectMouseClicked
 
+    @Override
+    public void dispose() {
+        applyClosure.execute(result);
+        super.dispose();
+    }
+
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        OPDE.hideSheet();
-        applyClosure.execute(null);
+        result = null;
+        dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
 //    public Object getSelection() {
@@ -176,10 +183,10 @@ public class DlgListSelector extends javax.swing.JDialog {
 //    }
 
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
-        OPDE.hideSheet();
         ListModel lm = lstSelect.getModel();
         ListSelectionModel lsm = lstSelect.getSelectionModel();
-        applyClosure.execute(lm.getElementAt(lsm.getLeadSelectionIndex()));
+        result = lm.getElementAt(lsm.getLeadSelectionIndex());
+        dispose();
 
     }//GEN-LAST:event_btnApplyActionPerformed
 

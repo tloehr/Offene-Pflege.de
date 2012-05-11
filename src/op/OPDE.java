@@ -506,8 +506,7 @@ public class OPDE {
                 System.exit(0);
             }
 
-//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             try {
                 css = SYSTools.readFileAsString(opwd + sep + "standard.css");
@@ -519,21 +518,26 @@ public class OPDE {
 
 //            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             mainframe = new FrmMain();
+            mainframe.setVisible(true);
 
         }
     }
 
 
-    public static DisplayManager getDisplayManager(){
+    public static DisplayManager getDisplayManager() {
         return mainframe.getDisplayManager();
     }
+//
+//    public static void showJDialogAsSheet(JComponent dlg) {
+//        mainframe.showAlert(dlg);
+//    }
+//
+//    public static void hideSheet() {
+//        mainframe.hideAlert();
+//    }
 
-    public static void showJDialogAsSheet(JDialog dlg){
-        mainframe.showJDialogAsSheet(dlg);
-    }
-
-    public static void hideSheet(){
-        mainframe.hideSheet();
+    public static FrmMain getMainframe() {
+        return mainframe;
     }
 
     private static boolean loadLocalProperties() {

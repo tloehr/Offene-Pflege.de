@@ -9,6 +9,7 @@ import entity.*;
 import entity.files.Sysver2file;
 import entity.vorgang.SYSVER2VORGANG;
 import entity.vorgang.VorgangElement;
+import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -317,7 +318,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         this.planungen = new ArrayList<VerordnungPlanung>();
         this.anDatum = new Date();
         this.abDatum = SYSConst.DATE_BIS_AUF_WEITERES;
-
+        this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
     public Verordnung(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Massnahmen massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
@@ -339,6 +340,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         this.abKH = abKH;
         this.anArzt = anArzt;
         this.abArzt = abArzt;
+//        this.version = 0l;
         this.planungen = new ArrayList<VerordnungPlanung>();
     }
 

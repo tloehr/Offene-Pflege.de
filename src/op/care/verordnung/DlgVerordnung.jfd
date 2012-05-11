@@ -21,16 +21,19 @@
        </void> 
       </object> 
       <void method="setProperty"> 
+       <string>modalityType</string> 
+       <object class="java.lang.Enum" method="valueOf"> 
+        <class>java.awt.Dialog$ModalityType</class> 
+        <string>APPLICATION_MODAL</string> 
+       </object> 
+      </void> 
+      <void method="setProperty"> 
+       <string>resizable</string> 
+       <boolean>false</boolean> 
+      </void> 
+      <void method="setProperty"> 
        <string>defaultCloseOperation</string> 
        <int>2</int> 
-      </void> 
-      <void method="addEvent"> 
-       <object class="com.jformdesigner.model.FormEvent"> 
-        <string>java.awt.event.WindowListener</string> 
-        <string>windowClosing</string> 
-        <string>formWindowClosing</string> 
-        <boolean>true</boolean> 
-       </object> 
       </void> 
       <void method="addEvent"> 
        <object class="com.jformdesigner.model.FormEvent"> 

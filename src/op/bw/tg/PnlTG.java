@@ -33,8 +33,6 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.PartialLineBorder;
-import com.jidesoft.swing.TitledSeparator;
 import entity.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -240,7 +238,7 @@ public class PnlTG extends CleanablePanel {
                     final TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
                     final Barbetrag mytg = tm.getListData().get(tm.getModelRow(row));  // Rechnet die Zeile um. Berücksichtigt die Zusammenfassungszeile
 
-                    JOptionPane loeschenPane = new JOptionPane("Sie löschen nun den Datensatz '" + mytg.getBelegtext() + "'.\nMöchten Sie das ?", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
+                    final JOptionPane loeschenPane = new JOptionPane("Sie löschen nun den Datensatz '" + mytg.getBelegtext() + "'.\nMöchten Sie das ?", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
                     loeschenPane.addPropertyChangeListener(new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
@@ -253,11 +251,13 @@ public class PnlTG extends CleanablePanel {
                                     summeNeuRechnen();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Datensatz '" + mytg.getBelegtext() + "' gelöscht.", 2));
                                 }
-                                OPDE.hideSheet();
+//                                loeschenPane.setLocation(OPDE.getMainframe().getLocationForDialog(loeschenPane.getSize()));
+                                loeschenPane.setVisible(false);
                             }
                         }
                     });
-                    OPDE.showJDialogAsSheet(loeschenPane.createDialog(""));
+                    loeschenPane.setLocation(OPDE.getMainframe().getLocationForDialog(loeschenPane.getSize()));
+                    loeschenPane.setVisible(true);
                 }
             });
             menu.add(itemPopupDelete);

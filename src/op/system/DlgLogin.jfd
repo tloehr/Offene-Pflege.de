@@ -13,24 +13,43 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {seq t {par t {seq t {space :::p, par t {comp jPanel2::l::473:x:2, comp jPanel1::l:::x:2}}, comp btnLogin::t:p::p}, space :::p}}</string> 
+        <string>par l {seq t {par t {seq t {space :::p, par t {comp jPanel2::l::491:x:2, comp jPanel1::l:::x:2}}, comp btnLogin::t:p::p}, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {space :::p, comp jPanel2:::p::p, space u:::p, comp jPanel1:::p::p, space u:::p, comp btnLogin:::p::p, space :p::p}}</string> 
+        <string>par l {seq l {space :::p, comp jPanel2:::p::p, space u:::p, comp jPanel1:::p:94:p, space u:::p, comp btnLogin:::p::p, space :p::p}}</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
-       <string>defaultCloseOperation</string> 
-       <int>2</int> 
+       <string>$locationPolicy</string> 
+       <int>0</int> 
       </void> 
       <void method="setProperty"> 
-       <string>title</string> 
-       <string>Anmeldung</string> 
+       <string>$sizePolicy</string> 
+       <int>0</int> 
+      </void> 
+      <void method="setProperty"> 
+       <string>modalityType</string> 
+       <object class="java.lang.Enum" method="valueOf"> 
+        <class>java.awt.Dialog$ModalityType</class> 
+        <string>APPLICATION_MODAL</string> 
+       </object> 
       </void> 
       <void method="setProperty"> 
        <string>resizable</string> 
        <boolean>false</boolean> 
+      </void> 
+      <void method="setProperty"> 
+       <string>defaultCloseOperation</string> 
+       <int>2</int> 
+      </void> 
+      <void method="addEvent"> 
+       <object class="com.jformdesigner.model.FormEvent"> 
+        <string>java.awt.event.WindowListener</string> 
+        <string>windowClosing</string> 
+        <string>thisWindowClosing</string> 
+        <boolean>true</boolean> 
+       </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
@@ -70,11 +89,11 @@
          <class>org.jdesktop.layout.GroupLayout</class> 
          <void method="setProperty"> 
           <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :p::p, par t {comp lblMessage::l::443:x:1, seq l {par l {comp jLabel1::::88:x:1, comp jLabel2::l:p::p:1}, space :::p, par l {comp txtPassword::::325:x:2, comp txtUsername::l::325:x:2}, space :p::p}}}}</string> 
+          <string>par l {seq l {space :p::p, par l {comp jLabel1::::108:x:1, comp jLabel2::l:p::p:1}, space :::p, par l {comp txtPassword::::343:x:2, comp txtUsername::l::343:x:2}, space :p::p}}</string> 
          </void> 
          <void method="setProperty"> 
           <string>$verticalGroup</string> 
-          <string>par l {seq l {space :::p, par b {comp txtUsername::b:p::p:1, comp jLabel2:4:b:p::p:1}, space :::p, par b {comp txtPassword::b:p::p, comp jLabel1:4:b:p::p}, space :::p, comp lblMessage:::p::p, space :p::p}}</string> 
+          <string>par l {seq l {space :::p, par b {comp txtUsername::b:p::p:1, comp jLabel2:4:b:p::p:1}, space :::p, par b {comp txtPassword::b:p::p, comp jLabel1:4:b:p::p}, space :p:44:p}}</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -85,6 +104,10 @@
           <int>5</int> 
           <int>5</int> 
          </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>opaque</string> 
+         <boolean>false</boolean> 
         </void> 
         <void property="name"> 
          <string>jPanel1</string> 
@@ -168,27 +191,6 @@
           </void> 
          </object> 
         </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>foreground</string> 
-           <object class="java.awt.Color"> 
-            <int>255</int> 
-            <int>0</int> 
-            <int>51</int> 
-            <int>255</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>jLabel3</string> 
-          </void> 
-          <void property="name"> 
-           <string>lblMessage</string> 
-          </void> 
-         </object> 
-        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -209,6 +211,10 @@
          <string>border</string> 
          <object idref="EmptyBorder0"/> 
         </void> 
+        <void method="setProperty"> 
+         <string>opaque</string> 
+         <boolean>false</boolean> 
+        </void> 
         <void property="name"> 
          <string>jPanel2</string> 
         </void> 
@@ -227,8 +233,20 @@
            <string>Über Offene-Pflege.de...</string> 
           </void> 
           <void method="setProperty"> 
+           <string>borderPainted</string> 
+           <boolean>false</boolean> 
+          </void> 
+          <void method="setProperty"> 
+           <string>border</string> 
+           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+          </void> 
+          <void method="setProperty"> 
            <string>opaque</string> 
-           <boolean>true</boolean> 
+           <boolean>false</boolean> 
+          </void> 
+          <void method="setProperty"> 
+           <string>contentAreaFilled</string> 
+           <boolean>false</boolean> 
           </void> 
           <void property="name"> 
            <string>btnAbout</string> 

@@ -30,6 +30,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.tools.CleanablePanel;
+import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -46,7 +48,8 @@ import java.math.BigDecimal;
 /**
  * @author tloehr
  */
-public class DlgBestandAbschliessen extends javax.swing.JDialog {
+public class DlgBestandAbschliessen extends MyJDialog {
+
 
     private MedBestand bestand;
     private Closure actionBlock;
@@ -57,7 +60,7 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
      * Creates new form DlgBestandAnbruch
      */
     public DlgBestandAbschliessen(MedBestand bestand, Closure actionBlock) {
-        super(new JFrame(), false);
+        super();
         this.actionBlock = actionBlock;
 //        this.verordnung = verordnung;
         this.bestand = bestand;
@@ -93,8 +96,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         btnOk = new JButton();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+        setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
@@ -102,8 +105,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                    "$rgap, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, $rgap",
-                    "$rgap, $lgap, default, $lgap, fill:default:grow, 6*($lgap, fill:default), $lgap, $rgap, $lgap, default, $lgap, $rgap"));
+                "$rgap, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, $rgap",
+                "$rgap, $lgap, default, $lgap, fill:default:grow, 6*($lgap, fill:default), $lgap, $rgap, $lgap, default, $lgap, $rgap"));
 
             //---- jLabel1 ----
             jLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -178,11 +181,11 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
             jPanel1.add(jLabel2, CC.xywh(3, 17, 2, 1));
 
             //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbBestID.addItemListener(new ItemListener() {
@@ -254,8 +257,16 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
     }//GEN-LAST:event_rbAbgelaufenActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        actionBlock.execute(null);
+        bestand = null;
+        dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
+
+    @Override
+    public void dispose() {
+        actionBlock.execute(bestand);
+        SYSTools.unregisterListeners(this);
+        super.dispose();
+    }
 
     private void initDialog() {
 //        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
@@ -271,7 +282,6 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
             OPDE.debug(ple);
             em.getTransaction().rollback();
             em.close();
-            dispose();
         } catch (Exception e) {
             OPDE.fatal(e);
         }
@@ -313,15 +323,8 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
         rbStellen.setEnabled(bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV1);
     }
 
-    @Override
-    public void dispose() {
-        SYSTools.unregisterListeners(this);
-        super.dispose();
-    }
-
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         save();//GEN-LAST:event_btnOkActionPerformed
-        dispose();
     }
 
     private void rbStellenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbStellenActionPerformed
@@ -415,13 +418,13 @@ public class DlgBestandAbschliessen extends javax.swing.JDialog {
                 }
             }
             em.getTransaction().commit();
-            actionBlock.execute(bestand);
         } catch (Exception e) {
             em.getTransaction().rollback();
             OPDE.fatal(e);
         } finally {
             em.close();
         }
+        dispose();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

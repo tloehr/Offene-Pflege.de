@@ -100,7 +100,7 @@ public class BewohnerTools {
             DefaultListModel dlm = SYSTools.list2dlm(listBW);
 
             if (dlm.getSize() > 1) {
-                OPDE.showJDialogAsSheet(new DlgListSelector("Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm, applyClosure));
+                new DlgListSelector("Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm, applyClosure).setVisible(true);
             } else if (dlm.getSize() == 1) {
                 bewohner = listBW.get(0);
                 applyClosure.execute(bewohner);

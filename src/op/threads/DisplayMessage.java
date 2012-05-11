@@ -27,7 +27,6 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     private String uid;
 
 
-
     public DisplayMessage(String message) {
         this.message = message;
         this.priority = NORMAL;

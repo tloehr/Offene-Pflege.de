@@ -148,8 +148,15 @@
              <boolean>false</boolean> 
             </void> 
             <void method="setProperty"> 
-             <string>opaque</string> 
+             <string>contentAreaFilled</string> 
              <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>selectedIcon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/infoyellow.png</string> 
+             </object> 
             </void> 
             <void property="name"> 
              <string>btnVerlegung</string> 
@@ -183,10 +190,10 @@
            <object class="com.jformdesigner.model.FormContainer"> 
             <string>javax.swing.JPanel</string> 
             <object class="com.jformdesigner.model.FormLayoutManager"> 
-             <class>javax.swing.BoxLayout</class> 
+             <class>java.awt.GridLayout</class> 
              <void method="setProperty"> 
-              <string>axis</string> 
-              <int>2</int> 
+              <string>hgap</string> 
+              <int>10</int> 
              </void> 
             </object> 
             <void method="setProperty"> 
@@ -216,6 +223,10 @@
               </void> 
               <void method="setProperty"> 
                <string>opaque</string> 
+               <boolean>false</boolean> 
+              </void> 
+              <void method="setProperty"> 
+               <string>contentAreaFilled</string> 
                <boolean>false</boolean> 
               </void> 
               <void property="name"> 
@@ -251,6 +262,10 @@
               </void> 
               <void method="setProperty"> 
                <string>opaque</string> 
+               <boolean>false</boolean> 
+              </void> 
+              <void method="setProperty"> 
+               <string>contentAreaFilled</string> 
                <boolean>false</boolean> 
               </void> 
               <void property="name"> 

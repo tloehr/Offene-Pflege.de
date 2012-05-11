@@ -34,16 +34,18 @@ import entity.*;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.MyJDialog;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 import org.jdesktop.swingx.JXSearchField;
 import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
@@ -62,12 +64,13 @@ import java.util.List;
  *
  * @author tloehr
  */
-public class DlgVerordnung extends JDialog {
+public class DlgVerordnung extends MyJDialog {
 
-    public static final int NEW_MODE = 1; // Neu
-    public static final int EDIT_MODE = 2; // Korrigieren
-    public static final int CHANGE_MODE = 3; // Ändern
-    public static final int EDIT_OF_CHANGE_MODE = 4; // Das ist dann, wenn man eine Veränderung (Change) nachträglich nochmal korrigiert.
+    public static final int ALLOW_ALL_EDIT = 0;
+    public static final int NO_CHANGE_MED_AND_SIT = 1;
+//    public static final int EDIT_MODE = 2; // Korrigieren
+//    public static final int CHANGE_MODE = 3; // Ändern
+//    public static final int EDIT_OF_CHANGE_MODE = 4; // Das ist dann, wenn man eine Veränderung (Change) nachträglich nochmal korrigiert.
 
     //    private java.awt.Frame parent;
 //    private boolean ignoreSitCaret;
@@ -80,6 +83,7 @@ public class DlgVerordnung extends JDialog {
     private int editMode;
     private Closure actionBlock;
     private Verordnung verordnung = null;
+    private List<VerordnungPlanung> planungen = null;
 
 //    private EntityManager em;
 
@@ -90,41 +94,9 @@ public class DlgVerordnung extends JDialog {
      * Creates new form DlgVerordnung
      */
     public DlgVerordnung(Verordnung verordnung, int mode, Closure actionBlock) {
-        super(new JFrame(), false);
         this.actionBlock = actionBlock;
         this.verordnung = verordnung;
-        this.version = verordnung.getVersion();
         this.editMode = mode;
-//        em = OPDE.createEM();
-//        em.getTransaction().begin();
-//
-//        if (editMode != NEW_MODE) {
-//            try {
-//                this.verordnung = em.merge(verordnung);
-//                em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
-//
-////            if (editMode == CHANGE_MODE) {
-////                oldVerordnung = em.merge(verordnung);
-////
-////                em.lock(oldVerordnung, LockModeType.PESSIMISTIC_WRITE);
-////                this.verordnung = (Verordnung) verordnung.clone();
-////
-////            } else {
-////                this.verordnung = em.merge(verordnung);
-////                em.lock(this.verordnung, LockModeType.PESSIMISTIC_WRITE);
-////            }
-//            } catch (PessimisticLockException ple) {
-//                OPDE.debug(ple);
-//                em.getTransaction().rollback();
-//                em.close();
-//                dispose();
-//            } catch (Exception e) {
-//                OPDE.fatal(e);
-//            }
-//        } else {
-//            this.verordnung = verordnung;
-//        }
-
 
         initComponents();
         initDialog();
@@ -383,13 +355,9 @@ public class DlgVerordnung extends JDialog {
         btnSave = new JButton();
 
         //======== this ========
+        setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                formWindowClosing(e);
-            }
-        });
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -854,93 +822,94 @@ public class DlgVerordnung extends JDialog {
         cmbMed.setRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
         cmbSit.setRenderer(SituationenTools.getSituationenRenderer());
         cmbMed.setModel(new DefaultComboBoxModel());
-        if (this.editMode == NEW_MODE) { // NewMode
-            currentSubMessage = new DisplayMessage("Neuer Eintrag einer ärztlichen Verordnung");
-            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
-//            lblTitle.setText(lblTitle.getText() + " (Neuer Eintrag)");
-            jdcAN.setDate(SYSCalendar.today_date());
-            cbAB.setSelected(false);
-            txtBemerkung.setText("");
-            lblAN.setText(OPDE.getLogin().getUser().getUKennung());
-            lblAB.setText("");
-            cmbSit.setModel(new DefaultComboBoxModel());
-            cmbMass.setSelectedIndex(-1);
-            cbStellplan.setEnabled(true);
-            cbStellplan.setSelected(false);
-            tblDosis.setModel(new DefaultTableModel());
-//            lblVerordnung.setText(" ");
-
-            cbPackEnde.setEnabled(false);
-        } else { // CHANGE oder EDIT
+//        if (this.editMode == NEW_MODE) { // NewMode
+//            currentSubMessage = new DisplayMessage("Neuer Eintrag einer ärztlichen Verordnung");
+//            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
+////            lblTitle.setText(lblTitle.getText() + " (Neuer Eintrag)");
+//            jdcAN.setDate(SYSCalendar.today_date());
+//            cbAB.setSelected(false);
+//            txtBemerkung.setText("");
+//            lblAN.setText(OPDE.getLogin().getUser().getUKennung());
+//            lblAB.setText("");
+//            cmbSit.setModel(new DefaultComboBoxModel());
+//            cmbMass.setSelectedIndex(-1);
+//            cbStellplan.setEnabled(true);
+//            cbStellplan.setSelected(false);
+//            tblDosis.setModel(new DefaultTableModel());
+////            lblVerordnung.setText(" ");
+//
+//            cbPackEnde.setEnabled(false);
+//        } else { // CHANGE oder EDIT
 //            lblTitle.setText(lblTitle.getText() + (editMode == EDIT_MODE ? " (Korrektur)" : " (Änderung der bestehenden Verordnung)"));
-            currentSubMessage = new DisplayMessage((editMode == EDIT_MODE ? "Korrektur" : "Änderung") + " der bestehenden Verordnung)");
-            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
-            // Bei einer Änderung muss sich das Fenster am Anfang in einem Zustand befinden,
-            // der ein Save ermöglich
-            btnSave.setEnabled(true);
-            //HashMap verordnung = DBRetrieve.getSingleRecord("BHPVerordnung", new String[]{"AnDatum", "AbDatum", "AnArztID", "AbArztID", "AnKHID", "AbKHID", "AnUKennung", "AbUKennung", "VerKennung", "Bemerkung", "MassID", "DafID", "SitID", "BisPackEnde", "Stellplan"}, "VerID", verid);
+//            currentSubMessage = new DisplayMessage((editMode == EDIT_MODE ? "Korrektur" : "Änderung") + " der bestehenden Verordnung)");
+//            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
+        // Bei einer Änderung muss sich das Fenster am Anfang in einem Zustand befinden,
+        // der ein Save ermöglich
+        btnSave.setEnabled(true);
+        //HashMap verordnung = DBRetrieve.getSingleRecord("BHPVerordnung", new String[]{"AnDatum", "AbDatum", "AnArztID", "AbArztID", "AnKHID", "AbKHID", "AnUKennung", "AbUKennung", "VerKennung", "Bemerkung", "MassID", "DafID", "SitID", "BisPackEnde", "Stellplan"}, "VerID", verid);
 
-            jdcAN.setDate(new Date());
-            if (this.editMode == EDIT_MODE) {
-                lblAN.setText(verordnung.getAngesetztDurch().getUKennung());
-            } else {
-                lblAN.setText(OPDE.getLogin().getUser().getUKennung());
-            }
-            cmbAN.setSelectedItem(verordnung.getAnArzt());
-            cmbKHAn.setSelectedItem(verordnung.getAnKH());
+        jdcAN.setDate(new Date());
+        lblAN.setText(verordnung.getAngesetztDurch().getUKennung());
+//            if (this.editMode == EDIT_MODE) {
+//                lblAN.setText(verordnung.getAngesetztDurch().getUKennung());
+//            } else {
+//                lblAN.setText(OPDE.getLogin().getUser().getUKennung());
+//            }
+        cmbAN.setSelectedItem(verordnung.getAnArzt());
+        cmbKHAn.setSelectedItem(verordnung.getAnKH());
 
-            cbPackEnde.setSelected(verordnung.isBisPackEnde());
+        cbPackEnde.setSelected(verordnung.isBisPackEnde());
 
-            jdcAN.setEnabled(editMode == EDIT_MODE);
-            txtBemerkung.setText(SYSTools.catchNull(verordnung.getBemerkung()));
+//            jdcAN.setEnabled(editMode == EDIT_MODE);
+        txtBemerkung.setText(SYSTools.catchNull(verordnung.getBemerkung()));
 
-            if (verordnung.hasMedi()) {
-                cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{verordnung.getDarreichung()}));
-            }
-
-            cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
-            cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
-            cbStellplan.setSelected(verordnung.isStellplan());
-
-            cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{verordnung.getSituation()}));
-
-            cmbMass.setSelectedItem(verordnung.getMassnahme());
-
-            cmbMed.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
-            txtMed.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
-            txtSit.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
-            cmbSit.setEnabled(this.editMode == NEW_MODE || this.editMode == EDIT_MODE);
-
-            if (cmbMed.getSelectedItem() != null) {
-//                lblVerordnung.setText();
-                currentSubMessage = new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
-                OPDE.getDisplayManager().addSubMessage(currentSubMessage);
-                cbPackEnde.setEnabled(true);
-            } else {
-                currentSubMessage = new DisplayMessage(((Massnahmen) cmbMass.getSelectedItem()).getBezeichnung());
-                OPDE.getDisplayManager().addSubMessage(currentSubMessage);
-//                lblVerordnung.setText();
-                cbPackEnde.setEnabled(false);
-            }
-            if (!verordnung.isAbgesetzt()) {
-                cbAB.setSelected(false);
-                lblAB.setText("");
-                cmbAB.setSelectedIndex(-1);
-            } else {
-                cbAB.setSelected(true);
-                jdcAB.setDate(verordnung.getAbDatum());
-                lblAB.setText(verordnung.getAbgesetztDurch().getUKennung());
-                cmbAB.setSelectedItem(verordnung.getAbArzt());
-                cmbKHAb.setSelectedItem(verordnung.getAbKH());
-                cmbAB.setToolTipText(cmbAB.getSelectedItem().toString());
-                cmbKHAb.setToolTipText(cmbKHAb.getSelectedItem().toString());
-            }
+        if (verordnung.hasMedi()) {
+            cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{verordnung.getDarreichung()}));
         }
+
+        cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
+        cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
+        cbStellplan.setSelected(verordnung.isStellplan());
+
+        cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{verordnung.getSituation()}));
+
+        cmbMass.setSelectedItem(verordnung.getMassnahme());
+
+        cmbMed.setEnabled(editMode == ALLOW_ALL_EDIT);
+        txtMed.setEnabled(editMode == ALLOW_ALL_EDIT);
+        txtSit.setEnabled(editMode == ALLOW_ALL_EDIT);
+        cmbSit.setEnabled(editMode == ALLOW_ALL_EDIT);
+
+        if (cmbMed.getSelectedItem() != null) {
+//                lblVerordnung.setText();
+            currentSubMessage = new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
+            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
+            cbPackEnde.setEnabled(true);
+        } else {
+//            currentSubMessage = new DisplayMessage(((Massnahmen) cmbMass.getSelectedItem()).getBezeichnung());
+            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
+//                lblVerordnung.setText();
+            cbPackEnde.setEnabled(false);
+        }
+        if (!verordnung.isAbgesetzt()) {
+            cbAB.setSelected(false);
+            lblAB.setText("");
+            cmbAB.setSelectedIndex(-1);
+        } else {
+            cbAB.setSelected(true);
+            jdcAB.setDate(verordnung.getAbDatum());
+            lblAB.setText(verordnung.getAbgesetztDurch().getUKennung());
+            cmbAB.setSelectedItem(verordnung.getAbArzt());
+            cmbKHAb.setSelectedItem(verordnung.getAbKH());
+            cmbAB.setToolTipText(cmbAB.getSelectedItem().toString());
+            cmbKHAb.setToolTipText(cmbKHAb.getSelectedItem().toString());
+        }
+//        }
 
 
 //        ignoreSitCaret = false;
         ignoreEvent = false;
-        pack();
+
 //        SYSTools.centerOnParent(parent, this);
         txtMed.requestFocus();
 
@@ -1036,18 +1005,19 @@ public class DlgVerordnung extends JDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         save();
-        actionBlock.execute(verordnung);
-        cleanup();
+        dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void cleanup() {
-
+    @Override
+    public void dispose() {
+        actionBlock.execute(verordnung);
         jdcAB.removePropertyChangeListener(myPropertyChangeListener);
         jdcAN.removePropertyChangeListener(myPropertyChangeListener);
         jdcAB.cleanup();
         jdcAN.cleanup();
-        OPDE.getDisplayManager().clearSubMessages();
+//        OPDE.getDisplayManager().clearSubMessages();
         SYSTools.unregisterListeners(this);
+        super.dispose();
     }
 
     private void cmbSitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSitItemStateChanged
@@ -1075,132 +1045,138 @@ public class DlgVerordnung extends JDialog {
 
     private void save() {
 
-        Verordnung newVerordnung = null;
-        EntityManager em = OPDE.createEM();
+//        Verordnung verordnung = null;
+//        EntityManager em = OPDE.createEM();
 
-        try {
-            em.getTransaction().begin();
-            verordnung = em.merge(verordnung);
-            em.lock(verordnung, LockModeType.OPTIMISTIC);
-//            em.refresh(verordnung, LockModeType.OPTIMISTIC);
+//        try {
+//            em.getTransaction().begin();
+//            verordnung = em.merge(verordnung);
+//            em.lock(verordnung, LockModeType.OPTIMISTIC);
 
-            if (editMode == CHANGE_MODE) {
-                newVerordnung = (Verordnung) verordnung.clone();
-//                em.lock(newVerordnung, LockModeType.OPTIMISTIC);
-            } else {
-                newVerordnung = verordnung;
-            }
 
-            if (cbAB.isSelected()) {
+//            if (editMode == CHANGE_MODE) {
+//                verordnung = (Verordnung) verordnung.clone();
+//            } else {
+//                verordnung = verordnung;
+//            }
 
-                if (SYSCalendar.sameDay(jdcAB.getDate(), new Date()) == 0) {
-                    OPDE.debug("jdcAB steht auf HEUTE");
-                    if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
-                        OPDE.debug("jdcAB und jdcAN sind gleich");
-                        newVerordnung.setAnDatum(new Date(SYSCalendar.startOfDay()));
-                        newVerordnung.setAbDatum(new Date(SYSCalendar.endOfDay()));
-                    } else {
-                        newVerordnung.setAbDatum(new Date());
-                    }
+        if (cbAB.isSelected()) {
+
+            if (SYSCalendar.sameDay(jdcAB.getDate(), new Date()) == 0) {
+                OPDE.debug("jdcAB steht auf HEUTE");
+                if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
+                    OPDE.debug("jdcAB und jdcAN sind gleich");
+                    verordnung.setAnDatum(new Date(SYSCalendar.startOfDay()));
+                    verordnung.setAbDatum(new Date(SYSCalendar.endOfDay()));
                 } else {
-                    OPDE.debug("jdcAB steht nicht auf HEUTE");
-                    newVerordnung.setAbDatum(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
-
+                    verordnung.setAbDatum(new Date());
                 }
-                newVerordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
             } else {
-                newVerordnung.setAbKH(null);
-                newVerordnung.setAbArzt(null);
-                newVerordnung.setAbDatum(SYSConst.DATE_BIS_AUF_WEITERES);
+                OPDE.debug("jdcAB steht nicht auf HEUTE");
+                verordnung.setAbDatum(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
+
             }
-
-            newVerordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());
-            newVerordnung.setAnKH((Krankenhaus) cmbKHAn.getSelectedItem());
-            newVerordnung.setAbArzt((Arzt) cmbAB.getSelectedItem());
-            newVerordnung.setAbKH((Krankenhaus) cmbKHAb.getSelectedItem());
-            newVerordnung.setAngesetztDurch(em.merge(OPDE.getLogin().getUser()));
-            newVerordnung.setStellplan(cbStellplan.isSelected());
-            newVerordnung.setBisPackEnde(cbPackEnde.isSelected());
-            newVerordnung.setBemerkung(txtBemerkung.getText());
-            newVerordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
-            newVerordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
-            newVerordnung.setStellplan(cbStellplan.isSelected());
-
-            newVerordnung.setSituation((Situationen) cmbSit.getSelectedItem());
-
-
-            // Sicherung
-            if (editMode == NEW_MODE) { // =================== NEU ====================
-                // Bei einer neuen Verordnung kann einfach eingetragen werden. Die BHP spielt hier keine Rolle.
-                newVerordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
-                em.persist(newVerordnung);
-            } else if (editMode == EDIT_MODE) { // =================== KORREKTUR ====================
-                // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
-                Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.verordnungPlanung.verordnung = :verordnung");
-                queryDELBHP.setParameter("verordnung", verordnung);
-                queryDELBHP.executeUpdate();
-            } else { // if(editMode == CHANGE_MODE) { // =================== VERÄNDERUNG ====================
-                // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
-                // Dann werden die nicht mehr benötigten BHPs entfernt.
-                // Dann wird die neue Verordnung angesetzt.
-                VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
-
-                // die neue Verordnung beginnt eine Sekunde, nachdem die vorherige Abgesetzt wurde.
-//                verordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
-                em.persist(newVerordnung);
-            }
-
-
-            if (!verordnung.isBedarf()) {
-                if (editMode == CHANGE_MODE || editMode == EDIT_OF_CHANGE_MODE) {
-                    // ab der aktuellen Uhrzeit
-                    BHPTools.erzeugen(em, newVerordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
-                } else {
-                    // für den ganzen Tag
-                    BHPTools.erzeugen(em, newVerordnung.getPlanungen(), new Date(), null);
-                }
-            }
-
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            OPDE.fatal(e);
-        } finally {
-            em.close();
+            verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+        } else {
+            verordnung.setAbKH(null);
+            verordnung.setAbArzt(null);
+            verordnung.setAbDatum(SYSConst.DATE_BIS_AUF_WEITERES);
         }
-        if (OPDE.isDebug()) {
-            if (editMode != CHANGE_MODE) {
-                OPDE.debug("Verordnung wurde neu erstellt bzw. korrigiert");
-                OPDE.debug(newVerordnung);
-                CollectionUtils.forAllDo(newVerordnung.getPlanungen(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        OPDE.debug(o);
-                    }
-                });
-            } else {
-                OPDE.debug("Verordnung wurde neu geändert und gegen eine neue ersetzt.");
-                OPDE.debug("ALT");
-                OPDE.debug("==============");
-                OPDE.debug(verordnung);
-                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        OPDE.debug(o);
-                    }
-                });
-                OPDE.debug("==============");
-                OPDE.debug("NEU");
-                OPDE.debug("==============");
-                OPDE.debug(newVerordnung);
-                CollectionUtils.forAllDo(newVerordnung.getPlanungen(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        OPDE.debug(o);
-                    }
-                });
-            }
-        } // DEBUG OUTPUT
+
+        verordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());
+        verordnung.setAnKH((Krankenhaus) cmbKHAn.getSelectedItem());
+        verordnung.setAbArzt((Arzt) cmbAB.getSelectedItem());
+        verordnung.setAbKH((Krankenhaus) cmbKHAb.getSelectedItem());
+        verordnung.setAngesetztDurch(OPDE.getLogin().getUser());
+        verordnung.setStellplan(cbStellplan.isSelected());
+        verordnung.setBisPackEnde(cbPackEnde.isSelected());
+        verordnung.setBemerkung(txtBemerkung.getText());
+        verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
+        verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
+        verordnung.setStellplan(cbStellplan.isSelected());
+
+        verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
+
+
+//            // Sicherung
+//            if (editMode == NEW_MODE) { // =================== NEU ====================
+//                // Bei einer neuen Verordnung kann einfach eingetragen werden. Die BHP spielt hier keine Rolle.
+//                verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
+//                em.persist(verordnung);
+//            } else if (editMode == EDIT_MODE) { // =================== KORREKTUR ====================
+//                // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
+//                Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.verordnungPlanung.verordnung = :verordnung");
+//                queryDELBHP.setParameter("verordnung", verordnung);
+//                queryDELBHP.executeUpdate();
+//            } else { // if(editMode == CHANGE_MODE) { // =================== VERÄNDERUNG ====================
+//                // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
+//                // Dann werden die nicht mehr benötigten BHPs entfernt.
+//                // Dann wird die neue Verordnung angesetzt.
+//                VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+//
+//                // die neue Verordnung beginnt eine Sekunde, nachdem die vorherige Abgesetzt wurde.
+////                verordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
+//                em.persist(verordnung);
+//            }
+//
+//
+//            if (!verordnung.isBedarf()) {
+//                if (editMode == CHANGE_MODE || editMode == EDIT_OF_CHANGE_MODE) {
+//                    // ab der aktuellen Uhrzeit
+//                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
+//                } else {
+//                    // für den ganzen Tag
+//                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), null);
+//                }
+//            }
+
+//            em.getTransaction().commit();
+
+//            if (OPDE.isDebug()) {
+//            if (editMode != CHANGE_MODE) {
+//                OPDE.debug("Verordnung wurde neu erstellt bzw. korrigiert");
+//                OPDE.debug(verordnung);
+//                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+//                    @Override
+//                    public void execute(Object o) {
+//                        OPDE.debug(o);
+//                    }
+//                });
+//            } else {
+//                OPDE.debug("Verordnung wurde neu geändert und gegen eine neue ersetzt.");
+//                OPDE.debug("ALT");
+//                OPDE.debug("==============");
+//                OPDE.debug(verordnung);
+//                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+//                    @Override
+//                    public void execute(Object o) {
+//                        OPDE.debug(o);
+//                    }
+//                });
+//                OPDE.debug("==============");
+//                OPDE.debug("NEU");
+//                OPDE.debug("==============");
+//                OPDE.debug(verordnung);
+//                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
+//                    @Override
+//                    public void execute(Object o) {
+//                        OPDE.debug(o);
+//                    }
+//                });
+//            }
+//        } // DEBUG OUTPUT
+
+//        } catch (OptimisticLockException ole) {
+//            em.getTransaction().rollback();
+//            em.refresh(em.merge(verordnung));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Während Ihrer Eingabe wurde diese Verordnung von einem anderen Benutzer geändert. Ihre Eingabe wird rückgängig gemacht.", DisplayMessage.IMMEDIATELY, 4));
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+
     }
 
 
@@ -1288,8 +1264,8 @@ public class DlgVerordnung extends JDialog {
     }//GEN-LAST:event_jspDosisComponentResized
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        actionBlock.execute(null);
-        cleanup();
+        verordnung = null;
+        dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void cmbANItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbANItemStateChanged
@@ -1308,9 +1284,6 @@ public class DlgVerordnung extends JDialog {
         saveOK();
     }//GEN-LAST:event_cbABActionPerformed
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        dispose();
-    }//GEN-LAST:event_formWindowClosing
 
     private void fillAerzteUndKHs() {
         EntityManager em = OPDE.createEM();

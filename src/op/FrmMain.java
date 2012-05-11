@@ -28,6 +28,8 @@ package op;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.alert.Alert;
+import com.jidesoft.animation.CustomAnimation;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.plaf.basic.ThemePainter;
@@ -38,6 +40,7 @@ import com.jidesoft.status.TimeStatusBarItem;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
+import com.jidesoft.utils.PortingUtils;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
@@ -51,6 +54,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import op.vorgang.PnlVorgang;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -58,10 +62,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -70,7 +71,7 @@ import java.util.Iterator;
 /**
  * @author __USER__
  */
-public class FrmMain extends SheetableJFrame {
+public class FrmMain extends JFrame {
 
     public static final String internalClassID = "opde.mainframe";
 
@@ -91,6 +92,8 @@ public class FrmMain extends SheetableJFrame {
     private JScrollPane jspSearch, jspApps;
     private CollapsiblePanes panesSearch, panesApps;
     private Closure bwchange;
+    private Alert alert;
+    private MouseAdapter mouseAdapter;
 
 
     public FrmMain() {
@@ -102,7 +105,9 @@ public class FrmMain extends SheetableJFrame {
 
         thisFrame = this;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
-        this.setVisible(true);
+//        this.setVisible(true);
+
+
 
         if (OPDE.isDebug()) {
             setSize(1440, 900);
@@ -139,7 +144,6 @@ public class FrmMain extends SheetableJFrame {
 
         initPhase = false;
 
-        showLogin();
     }
 
 
@@ -171,12 +175,23 @@ public class FrmMain extends SheetableJFrame {
         if (OPDE.getLogin() != null) {
             logout();
         }
-
         System.exit(0);
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b){
+            showLogin();
+        }
     }
 
     private void btnReloadSubmessageActionPerformed(ActionEvent e) {
         displayManager.showLastSubMessageAgain();
+    }
+
+    private void button1ActionPerformed(ActionEvent e) {
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTML("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden."), DisplayMessage.IMMEDIATELY, 4));
     }
 
     private void afterLogin() {
@@ -248,7 +263,8 @@ public class FrmMain extends SheetableJFrame {
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
                 btnVerlegung.setBorder(null);
                 btnVerlegung.setBorderPainted(false);
-                btnVerlegung.setOpaque(false);
+                btnVerlegung.setContentAreaFilled(false);
+                btnVerlegung.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infoyellow.png")));
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -260,13 +276,14 @@ public class FrmMain extends SheetableJFrame {
                 //======== panel1 ========
                 {
                     panel1.setOpaque(false);
-                    panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+                    panel1.setLayout(new GridLayout(1, 0, 10, 0));
 
                     //---- btnReloadSubmessage ----
                     btnReloadSubmessage.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
                     btnReloadSubmessage.setBorder(null);
                     btnReloadSubmessage.setBorderPainted(false);
                     btnReloadSubmessage.setOpaque(false);
+                    btnReloadSubmessage.setContentAreaFilled(false);
                     btnReloadSubmessage.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -280,6 +297,7 @@ public class FrmMain extends SheetableJFrame {
                     btnExit.setBorder(null);
                     btnExit.setBorderPainted(false);
                     btnExit.setOpaque(false);
+                    btnExit.setContentAreaFilled(false);
                     btnExit.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -345,6 +363,7 @@ public class FrmMain extends SheetableJFrame {
         JPanel mypanel = new JPanel(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
         final CollapsiblePane mypane = new CollapsiblePane("Programme");
+        mypane.setFont(new Font("Arial", Font.BOLD, 14));
 
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
@@ -438,6 +457,7 @@ public class FrmMain extends SheetableJFrame {
         em.close();
 
         CollapsiblePane mypane = new CollapsiblePane(station.getBezeichnung());
+        mypane.setFont(new Font("Arial", Font.BOLD, 14));
         mypane.setEmphasized(station.equals(StationenTools.getSpecialStation()));
         mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
@@ -482,6 +502,19 @@ public class FrmMain extends SheetableJFrame {
         return mypane;
     }
 
+
+    public Point getLocationForDialog(Dimension dimOfDialog){
+
+
+
+
+
+
+        //Dimension them = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight()+10);
+        SwingUtilities.convertPointToScreen(point, this);
+        return point;
+    }
 
     /**
      * Das erstellt eine Liste aller Bewohner mit direktem Verweis auf die jeweilige Pflegeakte.
@@ -558,19 +591,61 @@ public class FrmMain extends SheetableJFrame {
     }
 
     private void showLogin() {
-        dlgLogin = new DlgLogin(this, "", new Closure() {
+        dlgLogin = new DlgLogin(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    hideSheet();
+                    dlgLogin.setVisible(false);
                     afterLogin();
                 } else {
                     System.exit(1);
                 }
             }
         });
-        showJDialogAsSheet(dlgLogin);
+        dlgLogin.setVisible(true);
     }
+
+//    public void hideAlert() {
+//
+//        alert.hidePopup();
+////        getGlassPane().removeMouseListener(mouseAdapter);
+////        alert.setContentPane(null);
+//    }
+//
+//    public void showAlert(JComponent dlg) {
+//
+//        alert = new Alert();
+//
+//        getGlassPane().addMouseListener(mouseAdapter);
+//
+//        alert.setOwner(pbMsg);
+//        alert.setResizable(false);
+//        alert.setMovable(false);
+//        alert.setTransient(false);
+//
+//        alert.removeExcludedComponent(pbMsg);
+//        alert.setDefaultFocusComponent(dlg);
+//        alert.setAlwaysOnTop(true);
+//        alert.setTimeout(0);
+//
+////        CustomAnimation showAnimation = new CustomAnimation(CustomAnimation.TYPE_ENTRANCE, CustomAnimation.EFFECT_FADE, CustomAnimation.SMOOTHNESS_MEDIUM, CustomAnimation.SPEED_MEDIUM);
+////        showAnimation.setVisibleBounds(PortingUtils.getLocalScreenBounds());
+////        alert.setShowAnimation(showAnimation);
+////
+////        CustomAnimation hideAnimation = new CustomAnimation(CustomAnimation.TYPE_EXIT, CustomAnimation.EFFECT_FADE, CustomAnimation.SMOOTHNESS_MEDIUM, CustomAnimation.SPEED_MEDIUM);
+////        hideAnimation.setVisibleBounds(PortingUtils.getLocalScreenBounds());
+////        alert.setHideAnimation(hideAnimation);
+//
+//        alert.setContentPane(dlg);
+//        Point p = new Point(pbMsg.getX(), pbMsg.getY());
+//        // Convert a coordinate relative to a component's bounds to screen coordinates
+//        SwingUtilities.convertPointToScreen(p, pbMsg);
+//        alert.showPopup(p.x + (int) dlg.getPreferredSize().getWidth() / 2, p.y + (int) pbMsg.getPreferredSize().getHeight());
+//
+//
+////        alert.showPopup(SwingConstants.SOUTH, pbMsg);
+//    }
+
 
     private void cleanup() {
         if (currentVisiblePanel != null) {

@@ -20,6 +20,7 @@ public class GUITools {
     public static JideButton createHyperlinkButton(String name, Icon icon, ActionListener actionListener) {
         final JideButton button = new JideButton(name, icon);
         button.setButtonStyle(JideButton.HYPERLINK_STYLE);
+        button.setFont(new Font("Arial", Font.PLAIN, 12));
 
         button.setOpaque(false);
         button.setHorizontalAlignment(SwingConstants.LEADING);

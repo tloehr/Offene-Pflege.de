@@ -166,16 +166,15 @@ public class PnlBerichte extends NursingRecordsPanel {
             JideButton addButton = GUITools.createHyperlinkButton("Neuen Bericht eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, new Closure() {
+                    new DlgBericht(bewohner, new Closure() {
                         @Override
                         public void execute(Object bericht) {
                             if (bericht != null) {
                                 EntityTools.persist(bericht);
                                 reloadTable();
                             }
-                            OPDE.hideSheet();
                         }
-                    }));
+                    }).setVisible(true);
                 }
             });
             mypanel.add(addButton);

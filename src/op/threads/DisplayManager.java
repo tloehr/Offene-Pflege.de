@@ -3,6 +3,7 @@ package op.threads;
 import op.OPDE;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,7 @@ public class DisplayManager extends Thread {
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
+    private final Color defaultColor = new Color(105, 80, 69);
 
 //    private DateFormat df;
 
@@ -105,6 +107,14 @@ public class DisplayManager extends Thread {
                 }
                 currentSubMessage = null;
             }
+        }
+
+        if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY){
+            jp.setForeground(Color.RED);
+            lblSub.setForeground(Color.RED);
+        } else {
+            lblSub.setForeground(defaultColor);
+            jp.setForeground(defaultColor);
         }
 
         jp.setIndeterminate(currentSubMessage != null && pbIntermediateZyklen < 4); // 4x 500ms lang bei neuen Nachrichten leuchten
