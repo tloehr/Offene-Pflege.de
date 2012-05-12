@@ -2,6 +2,7 @@ package entity.verordnungen;
 
 import com.sun.servicetag.SystemEnvironment;
 import entity.Users;
+import entity.files.Sysver2file;
 import op.OPDE;
 import op.tools.SYSCalendar;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 @Entity
 @Table(name = "BHPPlanung")
@@ -381,7 +383,6 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
-
 
     public Verordnung getVerordnung() {
         return verordnung;

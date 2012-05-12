@@ -53,6 +53,18 @@ public class MedVorratTools {
         return result;
     }
 
+    public static BigDecimal getSumme(EntityManager em, MedVorrat vorrat) {
+//        long timeStart = System.currentTimeMillis();
+        BigDecimal result = BigDecimal.ZERO;
+        for (MedBestand bestand : vorrat.getBestaende()) {
+            BigDecimal summe = MedBestandTools.getBestandSumme(em, bestand);
+            result = result.add(summe);
+        }
+//        long time2 = System.currentTimeMillis();
+//        OPDE.debug("MedVorratTools.getSumme(): " + (time2 - timeStart) + " millis");
+        return result;
+    }
+
     /**
      * Bucht eine Menge aus einem Vorrat aus, ggf. zugehörig zu einer BHP. Übersteigt die Entnahme-Menge den
      * Restbestband, dann wird entweder
@@ -128,7 +140,7 @@ public class MedVorratTools {
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal restsumme = MedBestandTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
+            BigDecimal restsumme = MedBestandTools.getBestandSumme(em, bestand); // wieviel der angebrochene Bestand noch hergibt.
 
             // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.

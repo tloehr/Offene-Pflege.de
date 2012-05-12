@@ -6,15 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  *
@@ -40,6 +32,9 @@ public class Unique implements Serializable {
     @Basic(optional = false)
     @Column(name = "PREFIX")
     private String prefix;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public Unique() {
     }

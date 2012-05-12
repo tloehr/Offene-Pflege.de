@@ -360,8 +360,10 @@ public class VerordnungTools {
             }
             if (!verordnung.isAbgesetzt()) {
                 if (bestandImAnbruch != null) {
-                    BigDecimal vorratSumme = MedVorratTools.getSumme(bestandImAnbruch.getVorrat());
-                    BigDecimal bestandSumme = MedBestandTools.getBestandSumme(bestandImAnbruch);
+                    EntityManager em = OPDE.createEM();
+                    BigDecimal vorratSumme = MedVorratTools.getSumme(em, bestandImAnbruch.getVorrat());
+                    BigDecimal bestandSumme = MedBestandTools.getBestandSumme(em, bestandImAnbruch);
+                    em.close();
 
                     if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
@@ -445,45 +447,46 @@ public class VerordnungTools {
     }
 
 
-    public static boolean absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
-        EntityManager em = OPDE.createEM();
-        boolean result = false;
-        try {
-            em.getTransaction().begin();
-            verordnung = absetzen(em, verordnung, arzt, krankenhaus);
-            em.getTransaction().commit();
-            result = true;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-        } finally {
-            em.close();
-        }
-        return result;
-    }
+//    public static boolean absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
+//        EntityManager em = OPDE.createEM();
+//        boolean result = false;
+//        try {
+//            em.getTransaction().begin();
+//            verordnung = absetzen(em, verordnung, arzt, krankenhaus);
+//            em.getTransaction().commit();
+//            result = true;
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//        } finally {
+//            em.close();
+//        }
+//        return result;
+//    }
 
-    /**
-     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
-     *
-     * @param verordnung  welche Verordnung soll abgesetzt werden.
-     * @param arzt        welcher Arzt hat sie abgesetzt.
-     * @param krankenhaus welches KH hat sie abgesetzt
-     * @return erfolg
-     */
-    public static Verordnung absetzen(EntityManager em, Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) throws Exception {
-        if (arzt == null && krankenhaus == null) {
-            throw new NullPointerException("Arzt und Krankenhaus dürfen nicht beide NULL sein.");
-        }
-        verordnung.setAbDatum(new Date());
-        verordnung.setAbArzt(em.merge(arzt));
-        verordnung.setAbKH(em.merge(krankenhaus));
-        verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
-
+//    /**
+//     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
+//     *
+//     * @param verordnung  welche Verordnung soll abgesetzt werden.
+//     * @param arzt        welcher Arzt hat sie abgesetzt.
+//     * @param krankenhaus welches KH hat sie abgesetzt
+//     * @return erfolg
+//     */
+//    public static Verordnung absetzen(EntityManager em, Verordnung verordnung) throws Exception {
+////        if (arzt == null && krankenhaus == null) {
+////            throw new NullPointerException("Arzt und Krankenhaus dürfen nicht beide NULL sein.");
+////        }
 //        verordnung = em.merge(verordnung);
-//        em.lock(verordnung, LockModeType.PESSIMISTIC_WRITE);
-        BHPTools.aufräumen(em, verordnung);
-
-        return verordnung;
-    }
+//        em.lock(verordnung, LockModeType.OPTIMISTIC);
+//
+//        verordnung.setAbDatum(new Date());
+////        verordnung.setAbArzt(em.merge(arzt));
+////        verordnung.setAbKH(em.merge(krankenhaus));
+//        verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+//
+//        BHPTools.aufräumen(em, verordnung);
+//
+//        return verordnung;
+//    }
 
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
@@ -573,6 +576,20 @@ public class VerordnungTools {
         int num = query.getResultList().size();
         em.close();
         return num;
+    }
+
+    public static String toPrettyString(Verordnung verordnung) {
+        String myPretty = "";
+
+        if (verordnung.hasMedi()){
+            myPretty = DarreichungTools.toPrettyString(verordnung.getDarreichung());
+        } else {
+            myPretty = verordnung.getMassnahme().getBezeichnung();
+        }
+
+        myPretty += verordnung.isBedarf() ? " (Nur bei Bedarf: " + verordnung.getSituation().getText() + ")" : "";
+
+        return myPretty;
     }
 
 }

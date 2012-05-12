@@ -33,6 +33,7 @@ import entity.Bewohner;
 import entity.EntityTools;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
@@ -436,8 +437,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     try {
                         em.getTransaction().begin();
 
-//                        em.find(BHP.class, bhp.getBHPid(), LockModeType.OPTIMISTIC);
-                        em.lock(verordnung, LockModeType.PESSIMISTIC_READ);
+                        em.lock(verordnung, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                         em.lock(bhp, LockModeType.OPTIMISTIC);
 
                         bhp.setStatus(status);
@@ -470,11 +470,8 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
                         em.getTransaction().commit();
                     } catch (OptimisticLockException ole) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
                         em.getTransaction().rollback();
-                        OPDE.debug(ole);
-                    } catch (PessimisticLockException ple) {
-                        em.getTransaction().rollback();
-                        OPDE.debug(ple);
                     } catch (Exception ex) {
                         em.getTransaction().rollback();
                         OPDE.fatal(ex);

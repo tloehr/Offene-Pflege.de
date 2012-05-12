@@ -7,6 +7,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.DateFormat;

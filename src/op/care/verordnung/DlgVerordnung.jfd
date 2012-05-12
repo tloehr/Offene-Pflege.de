@@ -62,7 +62,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>fill:default, linegap, fill:default, linegap, fill:default, linegap, default, linegap, default, linegap, fill:default:grow</string> 
+          <string>16dlu, linegap, 16dlu, linegap, 16dlu, linegap, default, linegap, default, linegap, fill:default:grow</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -180,6 +180,22 @@
               <string>/artwork/22x22/bw/button_cancel.png</string> 
              </object> 
             </void> 
+            <void method="setProperty"> 
+             <string>borderPainted</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>contentAreaFilled</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Auswahl löschen</string> 
+            </void> 
             <void property="name"> 
              <string>btnEmptySit2</string> 
             </void> 
@@ -202,6 +218,22 @@
               <int>0</int> 
               <string>/artwork/22x22/bw/add.png</string> 
              </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>borderPainted</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>contentAreaFilled</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Neues Medikament eintragen</string> 
             </void> 
             <void property="name"> 
              <string>btnMed</string> 
@@ -391,6 +423,22 @@
              <string>icon</string> 
              <object idref="SwingIcon0"/> 
             </void> 
+            <void method="setProperty"> 
+             <string>borderPainted</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>contentAreaFilled</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Auswahl löschen</string> 
+            </void> 
             <void property="name"> 
              <string>btnEmptySit</string> 
             </void> 
@@ -413,6 +461,22 @@
               <int>0</int> 
               <string>/artwork/22x22/bw/add.png</string> 
              </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>borderPainted</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>contentAreaFilled</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Neue  Situation eintragen</string> 
             </void> 
             <void property="name"> 
              <string>btnSituation</string> 
@@ -718,6 +782,22 @@
                 <int>0</int> 
                 <string>/artwork/22x22/bw/add.png</string> 
                </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>borderPainted</string> 
+               <boolean>false</boolean> 
+              </void> 
+              <void method="setProperty"> 
+               <string>border</string> 
+               <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+              </void> 
+              <void method="setProperty"> 
+               <string>contentAreaFilled</string> 
+               <boolean>false</boolean> 
+              </void> 
+              <void method="setProperty"> 
+               <string>toolTipText</string> 
+               <string>Neue Dosierung eintragen</string> 
               </void> 
               <void property="name"> 
                <string>btnAddDosis</string> 

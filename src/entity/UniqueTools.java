@@ -2,9 +2,7 @@ package entity;
 
 import op.tools.SYSTools;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.Query;
+import javax.persistence.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,14 +27,28 @@ public class UniqueTools {
         long newID = 0L;
         Query query = em.createQuery("SELECT u FROM Unique u WHERE u.prefix = :prefix");
         query.setParameter("prefix", SYSTools.catchNull(prefix).trim());
-        Unique unique = (Unique) query.getSingleResult();
 
+        Unique unique;
+        try {
+            unique = (Unique) query.getSingleResult();
+        } catch (NoResultException nre){
+            unique = null;
+        }
 
         if (unique == null) { // für diesen prefix gibt es noch keinen Zähler. Es wird einer angelegt.
-            unique = new Unique(prefix);
+            unique = em.merge(new Unique(prefix));
         } else {
-            // TODO: LOCKs verstehen
-            unique.incUID();
+            boolean done = false;
+            while (!done) {
+                try {
+                    em.lock(unique, LockModeType.OPTIMISTIC);
+                    unique.incUID();
+                    done = true;
+                } catch (OptimisticLockException ole){
+                    done = false;
+                    em.refresh(unique);
+                }
+            }
         }
         return unique;
     } // getUID()

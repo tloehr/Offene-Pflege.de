@@ -185,21 +185,25 @@ public class MedBestandTools {
         return result;
     }
 
+
+    public static BigDecimal getBestandSumme(MedBestand bestand) {
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (MedBuchungen buchung : bestand.getBuchungen()) {
+            result = result.add(buchung.getMenge());
+        }
+        return result;
+    }
+
     /**
      * Ermittelt die Menge, die in einer Packung noch enthalten ist.
      *
      * @param bestand die entsprechende Packung
      * @return die Summe in der Packungs Einheit.
      */
-    public static BigDecimal getBestandSumme(MedBestand bestand) {
+    public static BigDecimal getBestandSumme(EntityManager em, MedBestand bestand) {
         BigDecimal result = BigDecimal.ZERO;
-        //TODO: hier muss noch eine zweite Methode her.
-//      Das hier geht zwar auch ist aber LAAAAAANGSAMMMM
-//        for (MedBuchungen buchung : bestand.getBuchungen()) {
-//            result = result.add(buchung.getMenge());
-//        }
 
-        EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT SUM(bu.menge) " +
                 " FROM MedBestand b " +
@@ -213,9 +217,8 @@ public class MedBestandTools {
             result = BigDecimal.ZERO;
         } catch (Exception ex) {
             OPDE.fatal(ex);
-        } finally {
-            em.close();
         }
+
         return result;
     }
 
@@ -229,23 +232,24 @@ public class MedBestandTools {
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
      */
-    public static void abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
-        BigDecimal bestandsumme = getBestandSumme(bestand);
+    public static MedBestand abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
+        BigDecimal bestandsumme = getBestandSumme(em, bestand);
 
-        MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
+        bestand = em.merge(bestand);
+
+        MedBuchungen abschlussBuchung = em.merge(new MedBuchungen(bestand, bestandsumme.negate(), status));
         abschlussBuchung.setText(text);
-        em.persist(abschlussBuchung);
 
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
-        bestand = em.merge(bestand);
+
 
 //        if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
 //            apvNeu = berechneBuchungsWert(bestand);
 //
 //            OPDE.info("Neuberechnung von DafID:" + bestand.getDarreichung().getDafID() + ", " + bestand.getDarreichung().getMedProdukt().getBezeichnung());
 //        }
-//        return apvNeu;
+        return bestand;
     }
 
     private static MedBuchungen getAnfangsBuchung(MedBestand bestand) {
@@ -352,8 +356,10 @@ public class MedBestandTools {
      */
     public static MedBuchungen setzeBestandAuf(EntityManager em, MedBestand bestand, BigDecimal soll, String text, short status) throws Exception {
         MedBuchungen result = null;
+        bestand = em.merge(bestand);
 
-        BigDecimal bestandSumme = getBestandSumme(bestand);
+        BigDecimal bestandSumme = getBestandSumme(em, bestand);
+
         if (!bestandSumme.equals(soll)) {
             BigDecimal korrektur;
             if (bestandSumme.compareTo(BigDecimal.ZERO) <= 0) {
@@ -363,10 +369,8 @@ public class MedBestandTools {
             }
 
             // passende Buchung anlegen.
-            result = new MedBuchungen(bestand, korrektur, status);
-//            bestand.getBuchungen().add(result);
+            result = em.merge(new MedBuchungen(bestand, korrektur, status));
             result.setText(text);
-            em.persist(result);
         }
         return result;
     }

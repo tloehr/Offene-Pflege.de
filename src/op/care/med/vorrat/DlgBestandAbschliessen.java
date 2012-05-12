@@ -30,11 +30,13 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.eclipse.persistence.exceptions.OptimisticLockException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -44,6 +46,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author tloehr
@@ -366,6 +369,8 @@ public class DlgBestandAbschliessen extends MyJDialog {
         try {
             em.getTransaction().begin();
 
+            bestand = em.merge(bestand);
+
             OPDE.info("Bestands Nr. " + bestand.getBestID() + " wird abgeschlossen");
             OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUKennung());
 
@@ -411,7 +416,22 @@ public class DlgBestandAbschliessen extends MyJDialog {
 
                         for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat())) {
                             if (verordnung.isBisPackEnde()) {
-                                VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
+                                try {
+                                    em.lock(verordnung, LockModeType.OPTIMISTIC);
+                                    verordnung.setAbDatum(new Date());
+                                    verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+                                    BHPTools.aufräumen(em, verordnung);
+                                    em.getTransaction().commit();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
+                                    em.getTransaction().rollback();
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
                             }
                         }
                     }

@@ -50,6 +50,7 @@ import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -61,6 +62,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -269,12 +271,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
 //                em.close();
 //            }
 //
-            final Verordnung verordnung = selection.get(0);
+            final Verordnung selectedVerordnung = selection.get(0);
 
-            long num = BHPTools.getNumBHPs(verordnung);
+            long num = BHPTools.getNumBHPs(selectedVerordnung);
             boolean editAllowed = !readOnly && num == 0;
-            boolean changeAllowed = !readOnly && !verordnung.isBedarf() && !verordnung.isAbgesetzt() && num > 0;
-            boolean absetzenAllowed = !readOnly && !verordnung.isAbgesetzt();
+            boolean changeAllowed = !readOnly && !selectedVerordnung.isBedarf() && !selectedVerordnung.isAbgesetzt() && num > 0;
+            boolean absetzenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt();
             boolean deleteAllowed = !readOnly && num == 0;
 
             SYSTools.unregisterListeners(menu);
@@ -287,11 +289,35 @@ public class PnlVerordnung extends NursingRecordsPanel {
 //                    long numVerKennung = VerordnungTools.getNumVerodnungenMitGleicherKennung(verordnung);
 //                    int status = numVerKennung == 1 ? DlgVerordnung.EDIT_MODE : DlgVerordnung.EDIT_OF_CHANGE_MODE;
 
-                    new DlgVerordnung(verordnung, DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
+                    new DlgVerordnung(selectedVerordnung, DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
                         @Override
-                        public void execute(Object verordnung) {
-                            if (verordnung != null) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung korrigiert", 2));
+                        public void execute(Object o) {
+                            if (o != null) {
+                                EntityManager em = OPDE.createEM();
+                                Verordnung verordnung = (Verordnung) em.merge(o);
+
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(verordnung, LockModeType.OPTIMISTIC);
+
+                                    // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
+                                    Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.verordnung = :verordnung");
+                                    queryDELBHP.setParameter("verordnung", verordnung);
+                                    queryDELBHP.executeUpdate();
+
+                                    em.getTransaction().commit();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Korrigiert: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem korrigiert.", DisplayMessage.IMMEDIATELY, 2));
+                                    em.getTransaction().rollback();
+                                    em.refresh(verordnung);
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
                                 reloadTable();
                             }
                         }
@@ -308,11 +334,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                    new DlgVerordnung(verordnung, DlgVerordnung.NO_CHANGE_MED_AND_SIT, new Closure() {
+                    new DlgVerordnung(selectedVerordnung, DlgVerordnung.NO_CHANGE_MED_AND_SIT, new Closure() {
                         @Override
-                        public void execute(Object verordnung) {
-                            if (verordnung != null) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung geändert", 2));
+                        public void execute(Object o) {
+                            if (o != null) {
+
+//                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Geändert: "+VerordnungTools.toPrettyString(verordnung), 2));
                                 reloadTable();
                             }
 
@@ -328,18 +355,33 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                    new DlgAbsetzen(verordnung, new Closure() {
+                    new DlgAbsetzen(selectedVerordnung, new Closure() {
                         @Override
-                        public void execute(Object verordnung) {
-                            if (verordnung != null) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung abgesetzt", 2));
+                        public void execute(Object o) {
+                            if (o != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Verordnung verordnung = (Verordnung) em.merge(o);
+                                    em.lock(verordnung, LockModeType.OPTIMISTIC);
+                                    verordnung.setAbDatum(new Date());
+                                    verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+                                    BHPTools.aufräumen(em, verordnung);
+                                    em.getTransaction().commit();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
+                                    em.getTransaction().rollback();
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
                                 reloadTable();
                             }
                         }
                     }).setVisible(true);
-
-//                    new DlgAbsetzen(parent, tblVerordnung.getModel().getValueAt(tblVerordnung.getSelectedRow(), TMVerordnung.COL_MSSN).toString(), verordnung);
-//                    reloadTable();
                 }
             });
             menu.add(itemPopupQuit);
@@ -357,15 +399,20 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         Verordnung myverordnung = null;
                         EntityManager em = OPDE.createEM();
                         try {
-                            myverordnung = em.merge(verordnung);
+                            myverordnung = em.merge(selectedVerordnung);
                             em.getTransaction().begin();
                             em.lock(myverordnung, LockModeType.OPTIMISTIC);
                             em.remove(myverordnung);
+
+                            Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.verordnung = :verordnung");
+                            delQuery.setParameter("verordnung", selectedVerordnung);
+                            delQuery.executeUpdate();
+
                             em.getTransaction().commit();
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung gelöscht", 2));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gelöscht: " + VerordnungTools.toPrettyString(selectedVerordnung), 2));
                         } catch (OptimisticLockException ole) {
                             em.getTransaction().rollback();
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Diese Verordnung wurde zwischenzeitlich schon gelöscht.", DisplayMessage.IMMEDIATELY, 4));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Diese Verordnung wurde zwischenzeitlich schon gelöscht.", DisplayMessage.IMMEDIATELY, 2));
                             em.getEntityManagerFactory().getCache().evict(Verordnung.class, myverordnung);
                         } catch (Exception e) {
                             em.getTransaction().rollback();
@@ -384,10 +431,10 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupDelete.setEnabled(deleteAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 //            itemPopupDelete.setEnabled(true);
 
-            if (verordnung.hasMedi()) {
+            if (selectedVerordnung.hasMedi()) {
                 menu.add(new JSeparator());
 
-                final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
+                final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
                 boolean bestandAbschliessenAllowed = !readOnly && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
                 boolean bestandAnbrechenAllowed = !readOnly && bestandImAnbruch == null;
 
@@ -410,7 +457,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        new DlgBestandAnbrechen(new JFrame(), verordnung.getDarreichung(), verordnung.getBewohner());
+                        new DlgBestandAnbrechen(new JFrame(), selectedVerordnung.getDarreichung(), selectedVerordnung.getBewohner());
                     }
                 });
                 menu.add(itemPopupOpenBestand);
@@ -444,10 +491,10 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung()));
+                    final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
 
                     long dafid = 0;
-                    String message = "VerID: " + verordnung.getVerid();
+                    String message = "VerID: " + selectedVerordnung.getVerid();
                     if (bestandImAnbruch != null) {
                         BigDecimal apv = MedBestandTools.getAPVperBW(bestandImAnbruch.getVorrat());
                         BigDecimal apvBest = bestandImAnbruch.getApv();
@@ -582,14 +629,19 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgVerordnung(new Verordnung(bewohner), DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
                         @Override
-                        public void execute(Object verordnung) {
-                            if (verordnung != null) {
+                        public void execute(Object o) {
+                            if (o != null) {
+                                Verordnung verordnung = (Verordnung) o;
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
-                                    ((Verordnung) verordnung).setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
-                                    em.persist(verordnung);
+                                    verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
+                                    verordnung = em.merge(verordnung);
+                                    if (!verordnung.isBedarf()) {
+                                        BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), null);
+                                    }
                                     em.getTransaction().commit();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + VerordnungTools.toPrettyString(verordnung), 2));
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -600,8 +652,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
                             }
                         }
                     }).setVisible(true);
-
-//                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, );
                 }
             });
             mypanel.add(addButton);

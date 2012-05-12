@@ -27,20 +27,16 @@
 
 package op.care.verordnung;
 
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.Arzt;
 import entity.ArztTools;
 import entity.Krankenhaus;
 import entity.KrankenhausTools;
 import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.CleanablePanel;
-import op.tools.ListElement;
 import op.tools.MyJDialog;
-import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
@@ -56,7 +52,7 @@ import java.awt.event.ItemListener;
  * @author root
  */
 public class DlgAbsetzen extends MyJDialog {
-    private Verordnung verordnung;
+    private Verordnung verordnung, verordnungToReturn;
     private Closure actionBlock;
 
     /**
@@ -92,11 +88,11 @@ public class DlgAbsetzen extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$rgap, 200dlu:grow, $lcgap, $rgap",
-            "$rgap, $lgap, default, 3*($lgap, fill:default), $lgap, $rgap"));
+            "$rgap, $lgap, default, 2*($lgap, fill:16dlu), $lgap, fill:default, $lgap, $rgap"));
 
         //---- label1 ----
         label1.setText("Wer hat die Verordnung abgesetzt ?");
-        label1.setFont(new Font("Arial", Font.PLAIN, 14));
+        label1.setFont(new Font("Arial", Font.PLAIN, 24));
         contentPane.add(label1, CC.xy(2, 3));
 
         //---- cmbArztAb ----
@@ -164,24 +160,25 @@ public class DlgAbsetzen extends MyJDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        actionBlock.execute(null);
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     @Override
     public void dispose() {
+        actionBlock.execute(verordnungToReturn);
         super.dispose();
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
+
         Arzt arzt = (Arzt) cmbArztAb.getSelectedItem();
         Krankenhaus krankenhaus = (Krankenhaus) cmbKHAb.getSelectedItem();
 
-        if (VerordnungTools.absetzen(verordnung, arzt, krankenhaus)){
-            actionBlock.execute(verordnung);
-            dispose();
-        } else {
+        if (arzt == null && krankenhaus == null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Arzt und Krankenhaus dürfen nicht beide leer sein.", 2));
+        } else {
+            verordnungToReturn = verordnung;
+            dispose();
         }
     }//GEN-LAST:event_btnOKActionPerformed
 

@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>relgap, linegap, default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, relgap</string> 
+        <string>relgap, linegap, default, linegap, fill:16dlu, linegap, fill:16dlu, linegap, fill:default, linegap, relgap</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -47,7 +47,7 @@
          <object class="java.awt.Font"> 
           <string>Arial</string> 
           <int>0</int> 
-          <int>14</int> 
+          <int>24</int> 
          </object> 
         </void> 
         <void property="name"> 
