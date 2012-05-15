@@ -9,6 +9,7 @@ import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
@@ -201,7 +202,7 @@ public class MedBestandTools {
      * @param bestand die entsprechende Packung
      * @return die Summe in der Packungs Einheit.
      */
-    public static BigDecimal getBestandSumme(EntityManager em, MedBestand bestand) {
+    public static BigDecimal getBestandSumme(EntityManager em, MedBestand bestand) throws Exception {
         BigDecimal result = BigDecimal.ZERO;
 
         Query query = em.createQuery(" " +
@@ -215,8 +216,6 @@ public class MedBestandTools {
             result = (BigDecimal) query.getSingleResult();
         } catch (NoResultException nre) {
             result = BigDecimal.ZERO;
-        } catch (Exception ex) {
-            OPDE.fatal(ex);
         }
 
         return result;
@@ -236,6 +235,7 @@ public class MedBestandTools {
         BigDecimal bestandsumme = getBestandSumme(em, bestand);
 
         bestand = em.merge(bestand);
+        em.lock(bestand, LockModeType.OPTIMISTIC);
 
         MedBuchungen abschlussBuchung = em.merge(new MedBuchungen(bestand, bestandsumme.negate(), status));
         abschlussBuchung.setText(text);

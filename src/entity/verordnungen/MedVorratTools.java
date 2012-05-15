@@ -53,7 +53,7 @@ public class MedVorratTools {
         return result;
     }
 
-    public static BigDecimal getSumme(EntityManager em, MedVorrat vorrat) {
+    public static BigDecimal getSumme(EntityManager em, MedVorrat vorrat) throws Exception {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedBestand bestand : vorrat.getBestaende()) {
@@ -134,7 +134,7 @@ public class MedVorratTools {
     }
 
 
-    protected static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
+    public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedBestand bestand = MedBestandTools.getBestandImAnbruch(vorrat);
 
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
@@ -142,7 +142,7 @@ public class MedVorratTools {
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal restsumme = MedBestandTools.getBestandSumme(em, bestand); // wieviel der angebrochene Bestand noch hergibt.
 
-            // normalerweise wird immer das hergegeben, was auch gew¸nscht ist. Notfalls bis ins minus.
+            // normalerweise wird immer das hergegeben, was auch gewünscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
 
             //TODO: hier gibts noch ein Problem. Wenn eine Packung leer wird und NEXTBEST != null, dann sollte mit dem leer werden die Packung auch abgeschlossen werden und nicht erst mit der nächsten Buchung
@@ -160,8 +160,8 @@ public class MedVorratTools {
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
                     naechsterBestand = MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(bestand));
                 } else {
-                    MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-                    em.persist(buchung);
+                    MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
+//                    em.persist(buchung);
                     OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
                 }
 
@@ -188,11 +188,9 @@ public class MedVorratTools {
     public static MedBestand einbuchenVorrat(EntityManager em, MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) throws Exception {
         MedBestand bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            bestand = new MedBestand(vorrat, darreichung, packung, text);
+            bestand = em.merge(new MedBestand(vorrat, darreichung, packung, text));
             bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
-            MedBuchungen buchung = new MedBuchungen(bestand, menge);
-            em.persist(bestand);
-            em.persist(buchung);
+            MedBuchungen buchung = em.merge(new MedBuchungen(bestand, menge));
         }
         return bestand;
     }

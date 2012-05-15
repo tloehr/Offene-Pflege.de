@@ -13,60 +13,60 @@ import java.util.Date;
 @Entity
 @Table(name = "BHP")
 
-@SqlResultSetMappings({
-        @SqlResultSetMapping(name = "BHP.findByBewohnerDatumSchichtResultMapping",
-                entities = @EntityResult(entityClass = BHP.class),
-                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "NextBest")}
-        )
-})
-
-@NamedNativeQueries({
-        @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtKeineMedis", query = " " +
-                " SELECT bhp.*, NULL BestID, NULL NextBest " +
-                " FROM BHP bhp " +
-//                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
-//                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
-//                " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
-                " WHERE Date(Soll)=Date(?) AND BWKennung=? AND DafID IS NULL" +
-                // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
-                " AND ( ? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping"),
-
-        @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtMitMedis", query = " " +
-                " SELECT bhp.*, bestand.BestID, bestand.NextBest" +
-                " FROM BHP bhp " +
-//                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
-//                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
-                // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
-                // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
-                // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
-                // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
-                // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
-                // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
-                // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
-                " LEFT OUTER JOIN " +
-                " (" +
-                "     SELECT DISTINCT a.VorID, b.DafID FROM (" +
-                "       SELECT best.VorID, best.DafID FROM MPBestand best" +
-                "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
-                "       WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
-                "       GROUP BY VorID" +
-                "     ) a " +
-                "     INNER JOIN (" +
-                "       SELECT best.VorID, best.DafID FROM MPBestand best " +
-                "     ) b ON a.VorID = b.VorID " +
-                " ) vor ON vor.DafID = bhp.DafID " +
-                // Das hier sucht passende Bestände im Anbruch raus
-                " LEFT OUTER JOIN( " +
-                "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV " +
-                "       FROM MPBestand best1" +
-                "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
-                "       GROUP BY best1.BestID" +
-                " ) bestand ON bestand.VorID = vor.VorID " +
-                " WHERE bhp.DafID IS NOT NULL AND Date(bhp.Soll)=Date(?) AND bhp.BWKennung=?" +
-                // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
-                " AND (? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping")
-})
-
+//@SqlResultSetMappings({
+//        @SqlResultSetMapping(name = "BHP.findByBewohnerDatumSchichtResultMapping",
+//                entities = @EntityResult(entityClass = BHP.class),
+//                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "NextBest")}
+//        )
+//})
+//
+//@NamedNativeQueries({
+//        @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtKeineMedis", query = " " +
+//                " SELECT bhp.*, NULL BestID, NULL NextBest " +
+//                " FROM BHP bhp " +
+////                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+////                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
+////                " INNER JOIN Massnahmen mass ON v.MassID = mass.MassID" +
+//                " WHERE Date(Soll)=Date(?) AND BWKennung=? AND DafID IS NULL" +
+//                // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
+//                " AND ( ? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping"),
+//
+//        @NamedNativeQuery(name = "BHP.findByBewohnerDatumSchichtMitMedis", query = " " +
+//                " SELECT bhp.*, bestand.BestID, bestand.NextBest" +
+//                " FROM BHP bhp " +
+////                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID" +
+////                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID" +
+//                // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
+//                // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
+//                // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
+//                // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
+//                // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
+//                // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
+//                // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
+//                " LEFT OUTER JOIN " +
+//                " (" +
+//                "     SELECT DISTINCT a.VorID, b.DafID FROM (" +
+//                "       SELECT best.VorID, best.DafID FROM MPBestand best" +
+//                "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+//                "       WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+//                "       GROUP BY VorID" +
+//                "     ) a " +
+//                "     INNER JOIN (" +
+//                "       SELECT best.VorID, best.DafID FROM MPBestand best " +
+//                "     ) b ON a.VorID = b.VorID " +
+//                " ) vor ON vor.DafID = bhp.DafID " +
+//                // Das hier sucht passende Bestände im Anbruch raus
+//                " LEFT OUTER JOIN( " +
+//                "       SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV " +
+//                "       FROM MPBestand best1" +
+//                "       WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+//                "       GROUP BY best1.BestID" +
+//                " ) bestand ON bestand.VorID = vor.VorID " +
+//                " WHERE bhp.DafID IS NOT NULL AND Date(bhp.Soll)=Date(?) AND bhp.BWKennung=?" +
+//                // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
+//                " AND (? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))", resultSetMapping = "BHP.findByBewohnerDatumSchichtResultMapping")
+//})
+//
 
 @NamedQueries({
         @NamedQuery(name = "BHP.findAll", query = "SELECT b FROM BHP b"),

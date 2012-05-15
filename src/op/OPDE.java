@@ -498,6 +498,7 @@ public class OPDE {
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     em.getTransaction().rollback();
+                    // TODO:Notify per EMail das das nicht geklappt hat.
                     fatal(ex);
                 } finally {
                     em.close();

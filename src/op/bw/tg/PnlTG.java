@@ -968,8 +968,13 @@ public class PnlTG extends CleanablePanel {
                 }
             }
         });
+        homeButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start_pressed.png")));
+        homeButton.setBorder(null);
+        homeButton.setBorderPainted(false);
+        homeButton.setOpaque(false);
+        homeButton.setContentAreaFilled(false);
 
-        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/back.png")));
+        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev.png")));
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -978,8 +983,14 @@ public class PnlTG extends CleanablePanel {
                 }
             }
         });
+        backButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev_pressed.png")));
+        backButton.setBorder(null);
+        backButton.setBorderPainted(false);
+        backButton.setOpaque(false);
+        backButton.setContentAreaFilled(false);
 
-        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/forward.png")));
+
+        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd.png")));
         fwdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -988,6 +999,11 @@ public class PnlTG extends CleanablePanel {
                 }
             }
         });
+        fwdButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd_pressed.png")));
+        fwdButton.setBorder(null);
+        fwdButton.setBorderPainted(false);
+        fwdButton.setOpaque(false);
+        fwdButton.setContentAreaFilled(false);
 
         JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
         endButton.addActionListener(new ActionListener() {
@@ -998,6 +1014,12 @@ public class PnlTG extends CleanablePanel {
                 }
             }
         });
+        endButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end_pressed.png")));
+        endButton.setBorder(null);
+        endButton.setBorderPainted(false);
+        endButton.setOpaque(false);
+        endButton.setContentAreaFilled(false);
+
 
         buttonPanel.add(homeButton);
         buttonPanel.add(backButton);

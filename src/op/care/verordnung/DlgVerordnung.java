@@ -34,10 +34,7 @@ import entity.*;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.MyJDialog;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import tablemodels.TMDosis;
@@ -55,6 +52,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -82,8 +80,9 @@ public class DlgVerordnung extends MyJDialog {
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
     private Closure actionBlock;
-    private Verordnung verordnung, verordnungToSendBack;
-    private List<VerordnungPlanung> planungen = null;
+    private Verordnung verordnung;
+    private List<VerordnungPlanung> planungenToDelete = null;
+    private Pair<Verordnung, List<VerordnungPlanung>> returnPackage = null;
 
 //    private EntityManager em;
 
@@ -96,7 +95,7 @@ public class DlgVerordnung extends MyJDialog {
     public DlgVerordnung(Verordnung verordnung, int mode, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.verordnung = verordnung;
-        this.verordnungToSendBack = null; // Die wird nur gesetzt, wenn der Speichern Knopf gedrückt wird.
+        planungenToDelete = new ArrayList<VerordnungPlanung>();
         this.editMode = mode;
 
         initComponents();
@@ -979,13 +978,13 @@ public class DlgVerordnung extends MyJDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         save();
-        verordnungToSendBack = verordnung;
+        returnPackage = new Pair(verordnung, planungenToDelete);
         dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(verordnungToSendBack);
+        actionBlock.execute(returnPackage);
         jdcAB.removePropertyChangeListener(myPropertyChangeListener);
         jdcAN.removePropertyChangeListener(myPropertyChangeListener);
         jdcAB.cleanup();
@@ -1019,21 +1018,6 @@ public class DlgVerordnung extends MyJDialog {
     }//GEN-LAST:event_txtBemerkungCaretUpdate
 
     private void save() {
-
-//        Verordnung verordnung = null;
-//        EntityManager em = OPDE.createEM();
-
-//        try {
-//            em.getTransaction().begin();
-//            verordnung = em.merge(verordnung);
-//            em.lock(verordnung, LockModeType.OPTIMISTIC);
-
-
-//            if (editMode == CHANGE_MODE) {
-//                verordnung = (Verordnung) verordnung.clone();
-//            } else {
-//                verordnung = verordnung;
-//            }
 
         if (cbAB.isSelected()) {
 
@@ -1217,6 +1201,7 @@ public class DlgVerordnung extends MyJDialog {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
                 verordnung.getPlanungen().remove(planung);
+                planungenToDelete.add(planung);
                 reloadTable();
             }
         });

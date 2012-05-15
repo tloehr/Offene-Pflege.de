@@ -117,15 +117,15 @@ public class DlgBedarf extends javax.swing.JDialog {
 
             //---- tblBedarf ----
             tblBedarf.setModel(new DefaultTableModel(
-                    new Object[][]{
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                    },
-                    new String[]{
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
             ));
             tblBedarf.addMouseListener(new MouseAdapter() {
                 @Override
@@ -160,36 +160,36 @@ public class DlgBedarf extends javax.swing.JDialog {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup()
-                                        .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                                        .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                                        .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel)))
-                                .addContainerGap())
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                        .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                        .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnOK)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel)))
+                    .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitle)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBW)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOK))
-                                .addContainerGap())
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblTitle)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblBW)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnCancel)
+                        .addComponent(btnOK))
+                    .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());

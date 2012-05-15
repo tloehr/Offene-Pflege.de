@@ -31,15 +31,10 @@ import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedVorrat;
 import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
-import op.OPDE;
-import op.tools.SYSConst;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -55,6 +50,7 @@ public class TMVerordnung
     protected HashMap cache;
 
     protected List<Object[]> listeVerordnungen;
+    protected Comparator comparator;
 
     public TMVerordnung(Bewohner bewohner, boolean archiv, boolean bestand) {
         super();
@@ -64,6 +60,27 @@ public class TMVerordnung
 
         listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, archiv);
 
+        comparator = new Comparator<Object[]>() {
+            @Override
+            public int compare(Object[] us, Object[] them) {
+                Verordnung usVerordnung = (Verordnung) us[0];
+                Verordnung themVerordnung = (Verordnung) them[0];
+
+                int result = ((Boolean) usVerordnung.isAbgesetzt()).compareTo(themVerordnung.isAbgesetzt()) * -1;
+                if (result == 0) {
+                    result = ((Boolean) usVerordnung.isBedarf()).compareTo(themVerordnung.isBedarf()) * -1;
+                }
+                if (result == 0) {
+                    result = ((Boolean) usVerordnung.hasMedi()).compareTo(themVerordnung.hasMedi());
+                }
+                if (result == 0) {
+                    result = VerordnungTools.getMassnahme(usVerordnung).compareTo(VerordnungTools.getMassnahme(themVerordnung));
+                }
+                return result;
+            }
+        };
+
+        Collections.sort(listeVerordnungen,  comparator);
 
         this.cache = new HashMap();
         this.mitBestand = bestand;
@@ -112,6 +129,7 @@ public class TMVerordnung
     public void reload() {
         cache.clear();
         listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, this.abgesetzt);
+        Collections.sort(listeVerordnungen, comparator);
         fireTableDataChanged();
     }
 
@@ -183,14 +201,6 @@ public class TMVerordnung
                 result = hinweis + an + ab;
                 break;
             }
-//            case COL_AN: {
-//                result = VerordnungTools.getAN(verordnung);
-//                break;
-//            }
-//            case COL_AB: {
-//                result = VerordnungTools.getAB(verordnung);
-//                break;
-//            }
 
             default: {
                 result = "!!FEHLER!!";

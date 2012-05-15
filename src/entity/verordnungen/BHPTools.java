@@ -1,5 +1,6 @@
 package entity.verordnungen;
 
+import entity.Bewohner;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -7,13 +8,13 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
+import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -40,6 +41,21 @@ public class BHPTools {
         long num = (Long) query.getSingleResult();
         em.close();
         return num;
+    }
+
+    public static Date getMinDatum(Bewohner bewohner) {
+        Date date;
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.bewohner = :bewohner ORDER BY b.soll");
+        query.setParameter("bewohner", bewohner);
+        query.setMaxResults(1);
+        try {
+            date = ((BHP) query.getSingleResult()).getSoll();
+        } catch (Exception e) {
+            date = new Date();
+        }
+        em.close();
+        return date;
     }
 
     /**
@@ -102,8 +118,7 @@ public class BHPTools {
 
         List<VerordnungPlanung> list = select.getResultList();
 
-
-        numbhp = erzeugen(em, list, stichtag, null);
+        numbhp = erzeugen(em, list, stichtag, true);
 
         OPDE.info("BHPImport abgeschlossen. Stichtag: " + DateFormat.getDateInstance().format(stichtag));
 
@@ -178,23 +193,30 @@ public class BHPTools {
      * auch Einträge enthalten, die unpassend sind. Sie dient nur der Vorauswahl und wird innerhalb dieser Methode dann genau geprüft. Sie "pickt" sich also
      * nur die passenden Elemente aus dieser Liste heraus.
      *
-     * @param em       EntityManager Kontext
-     * @param list     Liste der VerordnungPlanungen, die ggf. einzutragen sind.
-     * @param stichtag gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
-     * @param zeit     ist die Tageszeit, ab der die Einträge erfolgen sollen. Bei <code>null</code> wird immer für den ganzen Tag eingetragen.
+     * @param em        EntityManager Kontext
+     * @param list      Liste der VerordnungPlanungen, die ggf. einzutragen sind.
+     * @param stichtag  gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
+     * @param ganzerTag true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
-    public static int erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, Date zeit) {
+    public static int erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, boolean ganzerTag) {
         GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
         int maxrows = list.size();
         int numbhp = 0;
 
-        Iterator<VerordnungPlanung> planungen = list.iterator();
+        long now = System.currentTimeMillis();
+        byte aktuelleZeit = SYSCalendar.ermittleZeit(now);
+
+//        Iterator<VerordnungPlanung> planungen = list.iterator();
         int row = 0;
 
         OPDE.debug("MaxRows: " + maxrows);
 
         for (VerordnungPlanung planung : list) {
+
+            planung = em.merge(planung);
+            em.lock(planung, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+            em.lock(em.merge(planung.getVerordnung()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
             if (!SYSCalendar.isInFuture(planung.getLDatum()) && (planung.isTaeglich() || planung.isPassenderWochentag(stichtag) || planung.isPassenderTagImMonat(stichtag))) {
 
@@ -250,14 +272,14 @@ public class BHPTools {
 
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
-                // Bei zeit == null werden all diese Booleans zu true und damit neutralisiert.
-                boolean erstAbFM = (zeit == null) || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.FM;
-                boolean erstAbMO = (zeit == null) || erstAbFM || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.MO;
-                boolean erstAbMI = (zeit == null) || erstAbMO || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.MI;
-                boolean erstAbNM = (zeit == null) || erstAbMI || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.NM;
-                boolean erstAbAB = (zeit == null) || erstAbNM || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.AB;
-                boolean erstAbNA = (zeit == null) || erstAbAB || SYSCalendar.ermittleZeit(zeit.getTime()) == SYSConst.NA;
-                boolean uhrzeitOK = (zeit == null) || (planung.getUhrzeit() != null && SYSCalendar.compareTime(planung.getUhrzeit(), zeit) > 0);
+                // Bei ganzerTag=true werden all diese booleans zu true und damit neutralisiert.
+                boolean erstAbFM = ganzerTag || aktuelleZeit == SYSConst.FM;
+                boolean erstAbMO = ganzerTag || erstAbFM || aktuelleZeit == SYSConst.MO;
+                boolean erstAbMI = ganzerTag || erstAbMO || aktuelleZeit == SYSConst.MI;
+                boolean erstAbNM = ganzerTag || erstAbMI || aktuelleZeit == SYSConst.NM;
+                boolean erstAbAB = ganzerTag || erstAbNM || aktuelleZeit == SYSConst.AB;
+                boolean erstAbNA = ganzerTag || erstAbAB || aktuelleZeit == SYSConst.NA;
+                boolean uhrzeitOK = ganzerTag || (planung.getUhrzeit() != null && SYSCalendar.compareTime(planung.getUhrzeit(), new Date(now)) > 0);
 
                 if (treffer) {
                     if (erstAbFM && planung.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
@@ -300,7 +322,7 @@ public class BHPTools {
 
                     // Nun noch das LDatum in der Tabelle DFNPlanung neu setzen.
                     planung.setLDatum(stichtag);
-                    em.merge(planung);
+
                 }
             } else {
                 OPDE.debug("///////////////////////////////////////////////////////////");
@@ -309,32 +331,6 @@ public class BHPTools {
         }
         OPDE.debug("Erzeugte BHPs: " + numbhp);
         return numbhp;
-    }
-
-    public static void verweigertUndVerworfen(BHP bhp) {
-
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            bhp = em.merge(bhp);
-
-            bhp.setStatus(BHPTools.STATUS_VERWEIGERT_VERWORFEN);
-            bhp.setUser(OPDE.getLogin().getUser());
-            bhp.setIst(new Date());
-            bhp.setiZeit(SYSCalendar.ermittleZeit());
-            bhp.setMDate(new Date());
-//            bhp = EntityTools.merge(bhp);
-
-            MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bhp.getVerordnungPlanung().getVerordnung().getBewohner(), bhp.getVerordnungPlanung().getVerordnung().getDarreichung());
-            MedVorratTools.entnahmeVorrat(em, vorrat, bhp.getDosis(), bhp);
-
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
     }
 
 }

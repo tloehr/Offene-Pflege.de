@@ -340,7 +340,6 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
         this.abKH = abKH;
         this.anArzt = anArzt;
         this.abArzt = abArzt;
-//        this.version = 0l;
         this.planungen = new ArrayList<VerordnungPlanung>();
     }
 

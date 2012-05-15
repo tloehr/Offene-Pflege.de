@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -10,15 +10,7 @@
      <object class="com.jformdesigner.model.FormContainer"> 
       <string>op.tools.CleanablePanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
-       <class>org.jdesktop.layout.GroupLayout</class> 
-       <void method="setProperty"> 
-        <string>$horizontalGroup</string> 
-        <string>par l {seq l {space :::p, par l {seq l {comp jPanel1:::::x:1, space :::p}, comp jspBHP::l::750:x:1, seq {comp jLabel12::::738:x, space :::p}}}}</string> 
-       </void> 
-       <void method="setProperty"> 
-        <string>$verticalGroup</string> 
-        <string>par l {seq l {space :p:32:p, comp jPanel1:::p::p, space :::p, comp jspBHP::::277:x, space :::p, comp jLabel12:::p::p, space :::p}}</string> 
-       </void> 
+       <class>javax.swing.BoxLayout</class> 
       </object> 
       <void property="name"> 
        <string>this</string> 
@@ -31,13 +23,7 @@
         </object> 
         <void method="setProperty"> 
          <string>border</string> 
-         <object class="javax.swing.border.BevelBorder"> 
-          <int>0</int> 
-          <null/> 
-          <null/> 
-          <null/> 
-          <null/> 
-         </object> 
+         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
         </void> 
         <void method="addEvent"> 
          <object class="com.jformdesigner.model.FormEvent"> 
@@ -65,239 +51,6 @@
            </object> 
           </void> 
          </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>org.jdesktop.layout.GroupLayout</class> 
-         <void method="setProperty"> 
-          <string>$horizontalGroup</string> 
-          <string>par l {seq l {space :::p, comp jdcDatum:::p:183:p, space :::p, comp btnTop:::p:24:p, space :::p, comp btnBack:::p:20:p, space u:::p, comp btnForward:::p:20:p, space u:::p, comp btnNow:::p:36:p, space ::263:x, comp btnBedarf:::p::p, space :::p, comp cmbSchicht:::p::p, space :::p}}</string> 
-         </void> 
-         <void method="setProperty"> 
-          <string>$verticalGroup</string> 
-          <string>par l {seq t {space :::p, par t {comp btnBack::l::36:x:1, comp btnForward::l::36:x:1, comp btnNow::l::36:x:1, comp jdcDatum::l:p::p:1, comp btnTop::l::36:x:1, par b:l {comp cmbSchicht::b:p::p, comp btnBedarf::b:p::p}}, space :::p}}</string> 
-         </void> 
-        </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="javax.swing.border.BevelBorder"> 
-          <int>0</int> 
-          <null/> 
-          <null/> 
-          <null/> 
-          <null/> 
-         </object> 
-        </void> 
-        <void property="name"> 
-         <string>jPanel1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>background</string> 
-           <object class="java.awt.Color" field="white"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/16x16/history.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>borderPainted</string> 
-           <boolean>false</boolean> 
-          </void> 
-          <void property="name"> 
-           <string>btnNow</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnNowActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>background</string> 
-           <object class="java.awt.Color" field="white"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/16x16/1rightarrow.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>borderPainted</string> 
-           <boolean>false</boolean> 
-          </void> 
-          <void property="name"> 
-           <string>btnForward</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnForwardActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>background</string> 
-           <object class="java.awt.Color" field="white"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/16x16/1leftarrow.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>borderPainted</string> 
-           <boolean>false</boolean> 
-          </void> 
-          <void property="name"> 
-           <string>btnBack</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnBackActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>background</string> 
-           <object class="java.awt.Color" field="white"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/16x16/2leftarrow.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>borderPainted</string> 
-           <boolean>false</boolean> 
-          </void> 
-          <void property="name"> 
-           <string>btnTop</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnTopActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>com.toedter.calendar.JDateChooser</string> 
-          <void property="name"> 
-           <string>jdcDatum</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.beans.PropertyChangeListener</string> 
-            <string>propertyChange</string> 
-            <string>jdcDatumPropertyChange</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JComboBox</string> 
-          <void property="name"> 
-           <string>cmbSchicht</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>cmbSchichtItemStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Bei Bedarf</string> 
-          </void> 
-          <void property="name"> 
-           <string>btnBedarf</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnBedarfActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JLabel</string> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>&lt;html&gt;Hinweis: &amp;frac14; = 0,25 | &lt;sup&gt;1&lt;/sup&gt;/&lt;sub&gt;3&lt;/sub&gt; = 0,33 | &amp;frac12; = 0,5 | &amp;frac34; = 0,75&lt;/html&gt;</string> 
-        </void> 
-        <void property="name"> 
-         <string>jLabel12</string> 
         </void> 
        </object> 
       </void> 

@@ -11,7 +11,6 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -361,9 +360,18 @@ public class VerordnungTools {
             if (!verordnung.isAbgesetzt()) {
                 if (bestandImAnbruch != null) {
                     EntityManager em = OPDE.createEM();
-                    BigDecimal vorratSumme = MedVorratTools.getSumme(em, bestandImAnbruch.getVorrat());
-                    BigDecimal bestandSumme = MedBestandTools.getBestandSumme(em, bestandImAnbruch);
-                    em.close();
+
+                    BigDecimal vorratSumme = null;
+                    BigDecimal bestandSumme = null;
+                    try {
+                        vorratSumme = MedVorratTools.getSumme(em, bestandImAnbruch.getVorrat());
+                        bestandSumme = MedBestandTools.getBestandSumme(em, bestandImAnbruch);
+                    } catch (Exception e) {
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
 
                     if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
@@ -581,7 +589,7 @@ public class VerordnungTools {
     public static String toPrettyString(Verordnung verordnung) {
         String myPretty = "";
 
-        if (verordnung.hasMedi()){
+        if (verordnung.hasMedi()) {
             myPretty = DarreichungTools.toPrettyString(verordnung.getDarreichung());
         } else {
             myPretty = verordnung.getMassnahme().getBezeichnung();

@@ -26,34 +26,45 @@
  */
 package op.care.bhp;
 
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import entity.BWInfo;
 import entity.BWInfoTools;
 import entity.Bewohner;
-import entity.EntityTools;
+import entity.BewohnerTools;
+import entity.UniqueTools;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.care.verordnung.DlgVerordnung;
 import op.threads.DisplayMessage;
 import op.tools.*;
-import op.tools.InternalClassACL;
-import op.tools.NursingRecordsPanel;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.HorizontalLayout;
+import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.JXTitledSeparator;
+import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMBHP;
+import tablemodels.TMBarbetrag;
 import tablerenderer.RNDBHP;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PessimisticLockException;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * @author tloehr
@@ -61,78 +72,55 @@ import java.util.Date;
 public class PnlBHP extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.bhp";
-    String bwkennung;
     private Bewohner bewohner;
     JPopupMenu menu;
-    private JFrame parent;
-    //private String classname;
-    private boolean ignoreJDCEvent;
-    //private boolean ignoreSchichtEvent;
-    //private long[] ocwo;
-//    private boolean readOnly;
+    private boolean initPhase;
     private boolean abwesend;
-//    private SYSRunningClasses runningClass, blockingClass;
+
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
+    private JDateChooser jdcDatum;
+    private JComboBox cmbSchicht;
+
 
     /**
      * Creates ner form PnlBHP
      */
-    public PnlBHP(JFrame parent, Bewohner bewohner) {
-        this.parent = parent;
-
+    public PnlBHP(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
+        this.jspSearch = jspSearch;
         change2Bewohner(bewohner);
-
     }
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        this.bwkennung = bewohner.getBWKennung();
+        OPDE.getEMF().getCache().evictAll();
         this.bewohner = bewohner;
 
-//        if (runningClass != null) {
-//            SYSRunningClassesTools.endModule(runningClass);
-//        }
-//
-//        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.prescription", "nursingrecords.bhp", "nursingrecords.bhpimport"});
-//        runningClass = pair.getFirst();
-//        readOnly = !runningClass.isRW();
-//
-//        if (readOnly) {
-//            blockingClass = pair.getSecond();
-//            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
-//                    + blockingClass.getLogin().getUser().getNameUndVorname()
-//                    + "</body></html>");
-//        } else {
-//            btnLock.setToolTipText(null);
-//        }
-//        btnLock.setEnabled(readOnly);
-
-        cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        initPhase = true;
 
         abwesend = BWInfoTools.getAbwesendSeit(bewohner) != null;
+        prepareSearchArea();
 
-        btnBedarf.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-
-        ignoreJDCEvent = true;
-        jdcDatum.setDate(SYSCalendar.today_date());
-
-        java.util.List<BWInfo> listHeimaufenhtalte = BWInfoTools.getHeimaufenthalte(bewohner);
-        if (listHeimaufenhtalte.isEmpty()) {
-            jdcDatum.setMinSelectableDate(new Date());
-        } else {
-            jdcDatum.setMinSelectableDate(listHeimaufenhtalte.get(0).getVon());
-        }
-
-//        BewohnerTools.setBWLabel(lblBW, bewohner);
-        ignoreJDCEvent = false;
-        cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
+        initPhase = false;
+        reloadTable();
     }
+
+    private void clearCache() {
+        OPDE.getEMF().getCache().evict(Verordnung.class);
+        OPDE.getEMF().getCache().evict(VerordnungPlanung.class);
+        OPDE.getEMF().getCache().evict(BHP.class);
+        OPDE.getEMF().getCache().evict(MedBestand.class);
+        OPDE.getEMF().getCache().evict(MedBuchungen.class);
+        OPDE.getEMF().getCache().evict(MedVorrat.class);
+    }
+
 
     @Override
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
-//        SYSRunningClassesTools.endModule(runningClass);
     }
 
     /**
@@ -145,21 +133,13 @@ public class PnlBHP extends NursingRecordsPanel {
     private void initComponents() {
         jspBHP = new JScrollPane();
         tblBHP = new JTable();
-        jPanel1 = new JPanel();
-        btnNow = new JButton();
-        btnForward = new JButton();
-        btnBack = new JButton();
-        btnTop = new JButton();
-        jdcDatum = new JDateChooser();
-        cmbSchicht = new JComboBox();
-        btnBedarf = new JButton();
-        jLabel12 = new JLabel();
 
         //======== this ========
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         //======== jspBHP ========
         {
-            jspBHP.setBorder(new BevelBorder(BevelBorder.RAISED));
+            jspBHP.setBorder(null);
             jspBHP.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
@@ -176,194 +156,8 @@ public class PnlBHP extends NursingRecordsPanel {
             });
             jspBHP.setViewportView(tblBHP);
         }
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-            //---- btnNow ----
-            btnNow.setBackground(Color.white);
-            btnNow.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/history.png")));
-            btnNow.setBorder(null);
-            btnNow.setBorderPainted(false);
-            btnNow.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnNowActionPerformed(e);
-                }
-            });
-
-            //---- btnForward ----
-            btnForward.setBackground(Color.white);
-            btnForward.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
-            btnForward.setBorder(null);
-            btnForward.setBorderPainted(false);
-            btnForward.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnForwardActionPerformed(e);
-                }
-            });
-
-            //---- btnBack ----
-            btnBack.setBackground(Color.white);
-            btnBack.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png")));
-            btnBack.setBorder(null);
-            btnBack.setBorderPainted(false);
-            btnBack.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBackActionPerformed(e);
-                }
-            });
-
-            //---- btnTop ----
-            btnTop.setBackground(Color.white);
-            btnTop.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png")));
-            btnTop.setBorder(null);
-            btnTop.setBorderPainted(false);
-            btnTop.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnTopActionPerformed(e);
-                }
-            });
-
-            //---- jdcDatum ----
-            jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    jdcDatumPropertyChange(e);
-                }
-            });
-
-            //---- cmbSchicht ----
-            cmbSchicht.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbSchichtItemStateChanged(e);
-                }
-            });
-
-            //---- btnBedarf ----
-            btnBedarf.setText("Bei Bedarf");
-            btnBedarf.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBedarfActionPerformed(e);
-                }
-            });
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 263, Short.MAX_VALUE)
-                        .addComponent(btnBedarf)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                            .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                            .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                            .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                            .addGroup(GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnBedarf)))
-                        .addContainerGap())
-            );
-        }
-
-        //---- jLabel12 ----
-        jLabel12.setText("<html>Hinweis: &frac14; = 0,25 | <sup>1</sup>/<sub>3</sub> = 0,33 | &frac12; = 0,5 | &frac34; = 0,75</html>");
-
-        GroupLayout layout = new GroupLayout(this);
-        setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addContainerGap())
-                        .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel12, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
-                            .addContainerGap())))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(32, 32, 32)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspBHP, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jLabel12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
-        );
+        add(jspBHP);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnLockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockActionPerformed
-        change2Bewohner(bewohner);
-    }//GEN-LAST:event_btnLockActionPerformed
-
-    private void btnForwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForwardActionPerformed
-        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
-    }//GEN-LAST:event_btnForwardActionPerformed
-
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
-    }//GEN-LAST:event_btnBackActionPerformed
-
-    private void btnTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTopActionPerformed
-        jdcDatum.setDate(jdcDatum.getMinSelectableDate());
-    }//GEN-LAST:event_btnTopActionPerformed
-
-    private void btnNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNowActionPerformed
-        jdcDatum.setDate(SYSCalendar.today_date());
-    }//GEN-LAST:event_btnNowActionPerformed
-
-    private void jdcDatumPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jdcDatumPropertyChange
-        if (!evt.getPropertyName().equals("date") || ignoreJDCEvent) {
-            return;
-        }
-        ignoreJDCEvent = true;
-        SYSCalendar.checkJDC((JDateChooser) evt.getSource());
-        ignoreJDCEvent = false;
-        reloadTable();
-    }//GEN-LAST:event_jdcDatumPropertyChange
-
-    private void btnBedarfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBedarfActionPerformed
-        new DlgBedarf(parent, bewohner);
-        reloadTable();
-    }//GEN-LAST:event_btnBedarfActionPerformed
-
-    private void cmbSchichtItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSchichtItemStateChanged
-        if (evt.getStateChange() != ItemEvent.SELECTED) {
-            return;
-        }
-        reloadTable();
-    }//GEN-LAST:event_cmbSchichtItemStateChanged
 
     private void tblBHPMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBHPMousePressed
         if (!OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
@@ -381,7 +175,7 @@ public class PnlBHP extends NursingRecordsPanel {
         lsm.setSelectionInterval(row, row);
 
         BHP bhp = tm.getBHP(row);
-        Verordnung verordnung = bhp.getVerordnung();
+//        Verordnung verordnung = bhp.getVerordnung();
 
         boolean changeable =
                 // Diese Kontrolle stellt sicher, dass ein User nur seine eigenen Einträge und das auch nur
@@ -421,10 +215,10 @@ public class PnlBHP extends NursingRecordsPanel {
             if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) { // Drückt auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
 
                 byte status = bhp.getStatus();
-                MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
+                MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, bhp.getVerordnung().getDarreichung());
 
                 boolean deleted = false; // für das richtige fireTableRows....
-                if (!verordnung.hasMedi() || status != BHPTools.STATUS_OFFEN || MedBestandTools.getBestandImAnbruch(vorrat) != null) {
+                if (!bhp.getVerordnung().hasMedi() || status != BHPTools.STATUS_OFFEN || MedBestandTools.getBestandImAnbruch(vorrat) != null) {
                     status++;
                     if (status > 1) {
                         status = BHPTools.STATUS_OFFEN;
@@ -432,12 +226,12 @@ public class PnlBHP extends NursingRecordsPanel {
                     EntityManager em = OPDE.createEM();
 
                     bhp = em.merge(bhp);
-                    verordnung = em.merge(verordnung);
+//                    verordnung = em.merge(verordnung);
 
                     try {
                         em.getTransaction().begin();
 
-                        em.lock(verordnung, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        em.lock(bhp.getVerordnung(), LockModeType.OPTIMISTIC);
                         em.lock(bhp, LockModeType.OPTIMISTIC);
 
                         bhp.setStatus(status);
@@ -455,7 +249,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
 //                        bhp = em.merge(bhp);
 
-                        if (verordnung.hasMedi()) {
+                        if (bhp.getVerordnung().hasMedi()) {
                             if (status == BHPTools.STATUS_ERLEDIGT) {
                                 MedVorratTools.entnahmeVorrat(em, vorrat, bhp.getDosis(), true, bhp);
                             } else {
@@ -464,7 +258,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
                         // Wenn man eine Massnahme aus der Bedarfsmedikation
                         // rückgängig macht, wird sie gelöscht.
-                        if (verordnung.isBedarf() && status == BHPTools.STATUS_OFFEN) {
+                        if (bhp.getVerordnung().isBedarf() && status == BHPTools.STATUS_OFFEN) {
                             em.remove(bhp);
                             deleted = true;
                         }
@@ -472,6 +266,8 @@ public class PnlBHP extends NursingRecordsPanel {
                     } catch (OptimisticLockException ole) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
                         em.getTransaction().rollback();
+                        clearCache();
+                        deleted = true; // damit alles neu geladen wird.
                     } catch (Exception ex) {
                         em.getTransaction().rollback();
                         OPDE.fatal(ex);
@@ -494,13 +290,40 @@ public class PnlBHP extends NursingRecordsPanel {
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
             final BHP myBHP = bhp;
-            if (verordnung.hasMedi()) {
+            if (bhp.getVerordnung().hasMedi()) {
                 JMenuItem itemPopupXDiscard = new JMenuItem("Verweigert (Medikament wird trotzdem ausgebucht.)");
                 itemPopupXDiscard.addActionListener(new java.awt.event.ActionListener() {
-
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        BHPTools.verweigertUndVerworfen(myBHP);
-                        tm.fireTableRowsUpdated(row, row);
+
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            BHP innerbhp = em.merge(myBHP);
+                            em.lock(innerbhp.getVerordnung(), LockModeType.OPTIMISTIC);
+                            em.lock(innerbhp, LockModeType.OPTIMISTIC);
+
+                            innerbhp.setStatus(BHPTools.STATUS_VERWEIGERT_VERWORFEN);
+                            innerbhp.setUser(em.merge(OPDE.getLogin().getUser()));
+                            innerbhp.setIst(new Date());
+                            innerbhp.setiZeit(SYSCalendar.ermittleZeit());
+                            innerbhp.setMDate(new Date());
+
+                            MedVorrat vorrat = DarreichungTools.getVorratZurDarreichung(em, innerbhp.getVerordnungPlanung().getVerordnung().getBewohner(), innerbhp.getVerordnungPlanung().getVerordnung().getDarreichung());
+                            MedVorratTools.entnahmeVorrat(em, vorrat, innerbhp.getDosis(), innerbhp);
+
+                            em.getTransaction().commit();
+                            tm.fireTableRowsUpdated(row, row);
+                        } catch (OptimisticLockException ole) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
+                            em.getTransaction().rollback();
+                            clearCache();
+                            reloadTable();
+                        } catch (Exception e) {
+                            em.getTransaction().rollback();
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
                     }
                 });
                 menu.add(itemPopupXDiscard);
@@ -510,7 +333,7 @@ public class PnlBHP extends NursingRecordsPanel {
             }
             //-----------------------------------------
             String str = "Verweigert";
-            if (verordnung.hasMedi()) {
+            if (bhp.getVerordnung().hasMedi()) {
                 str = "Verweigert (Medikament wird nicht ausgebucht.)";
             }
 
@@ -518,13 +341,29 @@ public class PnlBHP extends NursingRecordsPanel {
             itemPopupXPreserve.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    myBHP.setStatus(BHPTools.STATUS_VERWEIGERT);
-                    myBHP.setUser(OPDE.getLogin().getUser());
-                    myBHP.setIst(new Date());
-                    myBHP.setiZeit(SYSCalendar.ermittleZeit());
-                    myBHP.setMDate(new Date());
-                    EntityTools.merge(myBHP);
-                    tm.fireTableRowsUpdated(row, row);
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        BHP innerBHP = em.merge(myBHP);
+                        em.lock(innerBHP, LockModeType.OPTIMISTIC);
+                        innerBHP.setStatus(BHPTools.STATUS_VERWEIGERT);
+                        innerBHP.setUser(em.merge(OPDE.getLogin().getUser()));
+                        innerBHP.setIst(new Date());
+                        innerBHP.setiZeit(SYSCalendar.ermittleZeit());
+                        innerBHP.setMDate(new Date());
+                        em.getTransaction().commit();
+                        tm.fireTableRowsUpdated(row, row);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
+                        em.getTransaction().rollback();
+                        clearCache();
+                        reloadTable();
+                    } catch (Exception e) {
+                        em.getTransaction().rollback();
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
                 }
             });
             menu.add(itemPopupXPreserve);
@@ -568,7 +407,6 @@ public class PnlBHP extends NursingRecordsPanel {
 
     private void reloadTable() {
 
-        // das hier muss wieder rein
         tblBHP.setModel(new TMBHP(bewohner, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
         tblBHP.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspBHP.dispatchEvent(new ComponentEvent(jspBHP, ComponentEvent.COMPONENT_RESIZED));
@@ -582,17 +420,159 @@ public class PnlBHP extends NursingRecordsPanel {
 
     }
 
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+
+        searchPanes.add(addCommands());
+        searchPanes.add(addFilter());
+
+        searchPanes.addExpansion();
+
+    }
+
+    private CollapsiblePane addFilter() {
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout());
+
+        CollapsiblePane panelFilter = new CollapsiblePane("Auswahl");
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
+
+        cmbSchicht = new JComboBox(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
+        cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
+        cmbSchicht.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (!initPhase){
+                    reloadTable();
+                }
+            }
+        });
+        labelPanel.add(cmbSchicht);
+
+        jdcDatum = new JDateChooser(new Date());
+        jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(bewohner));
+
+        jdcDatum.setBackground(Color.WHITE);
+        jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (initPhase) {
+                    return;
+                }
+                if (evt.getPropertyName().equals("date")) {
+                    reloadTable();
+                }
+            }
+        });
+        labelPanel.add(jdcDatum);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new HorizontalLayout());
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(jdcDatum.getMinSelectableDate());
+            }
+        });
+        homeButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start_pressed.png")));
+        homeButton.setBorder(null);
+        homeButton.setBorderPainted(false);
+        homeButton.setOpaque(false);
+        homeButton.setContentAreaFilled(false);
+
+        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev.png")));
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
+            }
+        });
+        backButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev_pressed.png")));
+        backButton.setBorder(null);
+        backButton.setBorderPainted(false);
+        backButton.setOpaque(false);
+        backButton.setContentAreaFilled(false);
+
+
+        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd.png")));
+        fwdButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
+            }
+        });
+        fwdButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd_pressed.png")));
+        fwdButton.setBorder(null);
+        fwdButton.setBorderPainted(false);
+        fwdButton.setOpaque(false);
+        fwdButton.setContentAreaFilled(false);
+
+        JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
+        endButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(new Date());
+            }
+        });
+        endButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end_pressed.png")));
+        endButton.setBorder(null);
+        endButton.setBorderPainted(false);
+        endButton.setOpaque(false);
+        endButton.setContentAreaFilled(false);
+
+
+        buttonPanel.add(homeButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(fwdButton);
+        buttonPanel.add(endButton);
+
+        labelPanel.add(buttonPanel);
+
+        panelFilter.setContentPane(labelPanel);
+
+        return panelFilter;
+    }
+
+    private CollapsiblePane addCommands() {
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane("BHP");
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addButton = GUITools.createHyperlinkButton("Bei Bedarf", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                }
+            });
+            mypanel.add(addButton);
+        }
+
+        searchPane.setContentPane(mypanel);
+        return searchPane;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspBHP;
     private JTable tblBHP;
-    private JPanel jPanel1;
-    private JButton btnNow;
-    private JButton btnForward;
-    private JButton btnBack;
-    private JButton btnTop;
-    private JDateChooser jdcDatum;
-    private JComboBox cmbSchicht;
-    private JButton btnBedarf;
-    private JLabel jLabel12;
     // End of variables declaration//GEN-END:variables
 }

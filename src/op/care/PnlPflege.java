@@ -123,7 +123,7 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_BHP: {
-                jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(new JFrame(), currentBewohner));
+                jtpPflegeakte.setComponentAt(TAB_BHP, new PnlBHP(currentBewohner, jspSearch));
                 jtpPflegeakte.setTitleAt(TAB_BHP, "BHP");
                 break;
             }

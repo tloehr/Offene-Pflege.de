@@ -8,6 +8,7 @@ import entity.Users;
 import op.OPDE;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
@@ -38,16 +39,20 @@ public class SYSPropsTools {
 
         try {
             prop = (SYSProps) query.getSingleResult();
+//            em.lock(prop, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             prop.setValue(value);
+
         } catch (NoResultException nre) {
             prop = new SYSProps(key, value, user);
         }
 
-        if (em.contains(prop)) {
-            em.merge(prop);
-        } else {
-            em.persist(prop);
-        }
+
+        prop = em.merge(prop);
+//        if (em.contains(prop)) {
+//
+//        } else {
+//            em.persist(prop);
+//        }
 
         OPDE.setProp(key, value);
     }

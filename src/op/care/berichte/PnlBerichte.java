@@ -97,8 +97,6 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private ItemListener itemListener;
-    private MouseAdapter mouseAdapter;
 
     /**
      * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
@@ -860,6 +858,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
+        cbShowEdits.setBackground(Color.WHITE);
         cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
         cbShowIDs.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
         cbShowIDs.addItemListener(new ItemListener() {
@@ -869,6 +868,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
+        cbShowIDs.setBackground(Color.WHITE);
 
         labelPanel.add(cbShowEdits);
         labelPanel.add(cbShowIDs);

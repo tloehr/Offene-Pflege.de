@@ -177,6 +177,8 @@ public class DlgAbsetzen extends MyJDialog {
         if (arzt == null && krankenhaus == null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Arzt und Krankenhaus dürfen nicht beide leer sein.", 2));
         } else {
+            verordnung.setAbArzt(arzt);
+            verordnung.setAbKH(krankenhaus);
             verordnungToReturn = verordnung;
             dispose();
         }

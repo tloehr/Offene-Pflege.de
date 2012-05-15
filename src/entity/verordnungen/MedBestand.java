@@ -68,6 +68,9 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     @Basic(optional = false)
     @Column(name = "BestID")
     private Long bestID;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Ein")
     @Temporal(TemporalType.TIMESTAMP)
@@ -245,7 +248,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         return aus.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
-    public boolean hasPackung(){
+    public boolean hasPackung() {
         return packung != null;
     }
 
@@ -272,9 +275,10 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     @Override
     public int compareTo(MedBestand o) {
         int result = this.ein.compareTo(o.getEin());
-        if (result == 0){
+        if (result == 0) {
             result = this.bestID.compareTo(o.getBestID());
-        };
+        }
+        ;
         return result;
     }
 
