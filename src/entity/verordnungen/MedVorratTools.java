@@ -158,7 +158,7 @@ public class MedVorratTools {
 
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
-                    naechsterBestand = MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(bestand));
+                    naechsterBestand = MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(em, bestand));
                 } else {
                     MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
 //                    em.persist(buchung);

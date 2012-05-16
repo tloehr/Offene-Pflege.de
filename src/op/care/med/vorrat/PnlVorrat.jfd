@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -7,166 +7,21 @@
   <void property="root"> 
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
-     <object class="com.jformdesigner.model.FormWindow"> 
-      <string>javax.swing.JDialog</string> 
+     <object class="com.jformdesigner.model.FormContainer"> 
+      <string>javax.swing.JPanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>relgap, labelcompgap, 308dlu:grow, labelcompgap, default:grow(0.5), labelcompgap, relgap</string> 
+        <string>308dlu:grow, labelcompgap, default:grow(0.5)</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>fill:default, relgap, fill:default, linegap, fill:default, linegap, fill:60dlu, linegap, fill:215dlu:grow, linegap, fill:default:grow, linegap, fill:default, linegap, relgap</string> 
+        <string>fill:215dlu:grow, linegap, fill:default:grow</string> 
        </void> 
       </object> 
-      <void method="setProperty"> 
-       <string>defaultCloseOperation</string> 
-       <int>2</int> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JToolBar</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.JToolBar</class> 
-        </object> 
-        <void method="setProperty"> 
-         <string>floatable</string> 
-         <boolean>false</boolean> 
-        </void> 
-        <void property="name"> 
-         <string>jToolBar1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/22x22/fileprint.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Bestandsliste</string> 
-          </void> 
-          <void property="name"> 
-           <string>btnBestandsliste</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnBestandslisteActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridWidth</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JLabel</string> 
-        <void method="setProperty"> 
-         <string>font</string> 
-         <object class="java.awt.Font"> 
-          <string>Dialog</string> 
-          <int>1</int> 
-          <int>24</int> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>Medikamenten Vorrat</string> 
-        </void> 
-        <void property="name"> 
-         <string>lblFrage</string> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridWidth</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JLabel</string> 
-        <void method="setProperty"> 
-         <string>font</string> 
-         <object class="java.awt.Font"> 
-          <string>Dialog</string> 
-          <int>1</int> 
-          <int>18</int> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>foreground</string> 
-         <object class="java.awt.Color"> 
-          <int>255</int> 
-          <int>51</int> 
-          <int>0</int> 
-          <int>255</int> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>Nachname, Vorname (*GebDatum, 00 Jahre) [??1]</string> 
-        </void> 
-        <void property="name"> 
-         <string>lblBW</string> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>5</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridWidth</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-        </void> 
-       </object> 
+      <void property="name"> 
+       <string>this</string> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
@@ -186,35 +41,6 @@
         </void> 
         <void property="name"> 
          <string>jPanel2</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JCheckBox</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Abgeschlossene anzeigen</string> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="javax.swing.border.EmptyBorder"> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-           </object> 
-          </void> 
-          <void property="name"> 
-           <string>cbClosedVorrat</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>cbClosedVorratItemStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
@@ -375,6 +201,14 @@
              <string>autoResizeMode</string> 
              <int>0</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="java.awt.Font"> 
+              <string>Arial</string> 
+              <int>0</int> 
+              <int>14</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>tblVorrat</string> 
             </void> 
@@ -393,14 +227,6 @@
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>9</int> 
-        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -421,35 +247,6 @@
         </void> 
         <void property="name"> 
          <string>jPanel3</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JCheckBox</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Abgeschlossene anzeigen</string> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="javax.swing.border.EmptyBorder"> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-           </object> 
-          </void> 
-          <void property="name"> 
-           <string>cbClosedBestand</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>cbClosedBestandItemStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
@@ -483,6 +280,14 @@
              <string>autoResizeMode</string> 
              <int>0</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="java.awt.Font"> 
+              <string>Arial</string> 
+              <int>0</int> 
+              <int>14</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>tblBestand</string> 
             </void> 
@@ -502,53 +307,7 @@
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
          <string>gridY</string> 
-         <int>11</int> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JButton</string> 
-        <void method="setProperty"> 
-         <string>icon</string> 
-         <object class="com.jformdesigner.model.SwingIcon"> 
-          <int>0</int> 
-          <string>/artwork/22x22/cancel.png</string> 
-         </object> 
-        </void> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>Schließen</string> 
-        </void> 
-        <void property="name"> 
-         <string>btnClose</string> 
-        </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ActionListener</string> 
-          <string>actionPerformed</string> 
-          <string>btnCloseActionPerformed</string> 
-          <boolean>true</boolean> 
-         </object> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>13</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridWidth</string> 
          <int>3</int> 
         </void> 
        </object> 
@@ -619,6 +378,14 @@
              <string>autoResizeMode</string> 
              <int>0</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="java.awt.Font"> 
+              <string>Arial</string> 
+              <int>0</int> 
+              <int>14</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>tblBuchung</string> 
             </void> 
@@ -639,109 +406,13 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>5</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>9</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridHeight</string> 
          <int>3</int> 
         </void> 
        </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.BoxLayout</class> 
-         <void method="setProperty"> 
-          <string>axis</string> 
-          <int>3</int> 
-         </void> 
-        </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="javax.swing.border.TitledBorder"> 
-          <string>Suche</string> 
-         </object> 
-        </void> 
-        <void property="name"> 
-         <string>jPanel1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTextField</string> 
-          <void property="name"> 
-           <string>txtSuche</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>txtSucheActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.FocusListener</string> 
-            <string>focusGained</string> 
-            <string>txtSucheFocusGained</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JComboBox</string> 
-          <void method="setProperty"> 
-           <string>model</string> 
-           <object class="javax.swing.DefaultComboBoxModel"/> 
-          </void> 
-          <void property="name"> 
-           <string>cmbBW</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>cmbBWItemStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.beans.PropertyChangeListener</string> 
-            <string>propertyChange</string> 
-            <string>cmbBWPropertyChange</string> 
-            <boolean>true</boolean> 
-            <string>model</string> 
-           </object> 
-          </void> 
-         </object> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>com.jgoodies.forms.layout.CellConstraints</class> 
-        <void method="setProperty"> 
-         <string>gridX</string> 
-         <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>7</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>gridWidth</string> 
-         <int>3</int> 
-        </void> 
-       </object> 
-      </void> 
-      <void property="name"> 
-       <string>this</string> 
       </void> 
      </object> 
      <object class="com.jformdesigner.model.FormLayoutConstraints"> 

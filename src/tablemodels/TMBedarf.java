@@ -54,7 +54,6 @@ public class TMBedarf
 
     public TMBedarf(Bewohner bewohner) {
         this.cache = new HashMap();
-        OPDE.getEMF().getCache().evictAll();
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Verordnung.findAllBedarf");
         query.setParameter(1, bewohner.getBWKennung());

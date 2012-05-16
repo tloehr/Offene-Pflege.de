@@ -107,7 +107,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
-        OPDE.getEMF().getCache().evictAll();
         reloadTable();
     }
 
@@ -264,7 +263,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 } catch (javax.persistence.OptimisticLockException ole) {
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem korrigiert.", DisplayMessage.IMMEDIATELY, 2));
                                     em.getTransaction().rollback();
-                                    clearCache(em);
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -296,11 +294,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
                                 Pair<Verordnung, List<VerordnungPlanung>> result = (Pair<Verordnung, List<VerordnungPlanung>>) o;
 
-                                Verordnung newVerordnung = em.merge(result.getFirst());
-                                Verordnung oldVerordnung = em.merge(selectedVerordnung);
-
                                 try {
                                     em.getTransaction().begin();
+
+                                    Verordnung newVerordnung = em.merge(result.getFirst());
+                                    Verordnung oldVerordnung = em.merge(selectedVerordnung);
+
                                     em.lock(oldVerordnung, LockModeType.OPTIMISTIC);
 
                                     // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
@@ -324,12 +323,9 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Geändert: " + VerordnungTools.toPrettyString(oldVerordnung), 2));
-                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
-
                                 } catch (OptimisticLockException ole) {
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem korrigiert.", DisplayMessage.IMMEDIATELY, 2));
                                     em.getTransaction().rollback();
-                                    clearCache(em);
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -369,7 +365,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 } catch (OptimisticLockException ole) {
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
                                     em.getTransaction().rollback();
-                                    clearCache(em);
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -412,7 +407,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         } catch (OptimisticLockException ole) {
                             em.getTransaction().rollback();
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Diese Verordnung wurde zwischenzeitlich schon gelöscht.", DisplayMessage.IMMEDIATELY, 2));
-                            clearCache(em);
                         } catch (Exception e) {
                             em.getTransaction().rollback();
                             OPDE.fatal(e);
@@ -444,9 +438,11 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         new DlgBestandAbschliessen(bestandImAnbruch, new Closure() {
                             @Override
                             public void execute(Object o) {
-                                reloadTable();
+                                if (o != null){
+                                    reloadTable();
+                                }
                             }
-                        }).setVisible(true);
+                        });
                     }
                 });
                 menu.add(itemPopupCloseBestand);
@@ -456,7 +452,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        new DlgBestandAnbrechen(new JFrame(), selectedVerordnung.getDarreichung(), selectedVerordnung.getBewohner());
+                        new DlgBestandAnbrechen(selectedVerordnung.getDarreichung(), selectedVerordnung.getBewohner(), new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                if (o != null){
+                                    reloadTable();
+                                }
+                            }
+                        });
                     }
                 });
                 menu.add(itemPopupOpenBestand);
@@ -510,15 +513,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }//GEN-LAST:event_tblVerordnungMousePressed
-
-    private void clearCache(EntityManager em) {
-        em.getEntityManagerFactory().getCache().evict(Verordnung.class);
-        em.getEntityManagerFactory().getCache().evict(VerordnungPlanung.class);
-        em.getEntityManagerFactory().getCache().evict(BHP.class);
-        em.getEntityManagerFactory().getCache().evict(MedBestand.class);
-        em.getEntityManagerFactory().getCache().evict(MedBuchungen.class);
-        em.getEntityManagerFactory().getCache().evict(MedVorrat.class);
-    }
 
     private void jspVerordnungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVerordnungComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();

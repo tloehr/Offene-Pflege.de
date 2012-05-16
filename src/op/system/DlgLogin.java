@@ -25,7 +25,8 @@
  */
 package op.system;
 
-import java.awt.event.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -36,10 +37,7 @@ import org.apache.commons.collections.Closure;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -58,6 +56,10 @@ public class DlgLogin extends MyJDialog {
      */
     private void thisWindowClosing(WindowEvent e) {
         // TODO add your code here
+    }
+
+    private void btnExitActionPerformed(ActionEvent e) {
+        dispose();
     }
 
     public DlgLogin(Closure actionBlock) {
@@ -96,6 +98,7 @@ public class DlgLogin extends MyJDialog {
 //        }
 
         txtUsername.requestFocus();
+
         pack();
 //        SYSTools.centerOnParent(parent, this);
 //        btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/animation/opde-52.png")));
@@ -141,7 +144,6 @@ public class DlgLogin extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        btnLogin = new JButton();
         jPanel1 = new JPanel();
         jLabel2 = new JLabel();
         txtUsername = new JTextField();
@@ -151,6 +153,10 @@ public class DlgLogin extends MyJDialog {
         btnAbout = new JButton();
         jLabel4 = new JLabel();
         lblOPDE = new JLabel();
+        panel1 = new JPanel();
+        btnExit = new JButton();
+        hSpacer1 = new JPanel(null);
+        btnLogin = new JButton();
 
         //======== this ========
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -163,27 +169,25 @@ public class DlgLogin extends MyJDialog {
             }
         });
         Container contentPane = getContentPane();
-
-        //---- btnLogin ----
-        btnLogin.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnLogin.setText("Anmelden");
-        btnLogin.setActionCommand("btnLogin");
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DoLogin(e);
-            }
-        });
+        contentPane.setLayout(new FormLayout(
+            "2*(default), $lcgap, default",
+            "default, $lgap, 48dlu, 2*($lgap, fill:default), $lgap, default"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(new EmptyBorder(5, 5, 5, 5));
             jPanel1.setOpaque(false);
+            jPanel1.setLayout(new FormLayout(
+                "default, $lcgap, default:grow",
+                "fill:default, $lgap, fill:default"));
 
             //---- jLabel2 ----
             jLabel2.setText("Benutzername");
+            jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(jLabel2, CC.xy(1, 1));
 
             //---- txtUsername ----
+            txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
             txtUsername.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -196,12 +200,16 @@ public class DlgLogin extends MyJDialog {
                     txtUsernameFocusGained(e);
                 }
             });
+            jPanel1.add(txtUsername, CC.xy(3, 1));
 
             //---- jLabel1 ----
             jLabel1.setText("Passwort");
             jLabel1.setPreferredSize(new Dimension(4, 19));
+            jLabel1.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(jLabel1, CC.xy(1, 3));
 
             //---- txtPassword ----
+            txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
             txtPassword.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -214,42 +222,17 @@ public class DlgLogin extends MyJDialog {
                     txtPasswordFocusGained(e);
                 }
             });
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addComponent(txtPassword, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
-                            .addComponent(txtUsername, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE))
-                        .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtUsername, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addGap(44, 44, 44))
-            );
-            jPanel1Layout.linkSize(SwingConstants.VERTICAL, new Component[] {jLabel1, jLabel2});
+            jPanel1.add(txtPassword, CC.xy(3, 3));
         }
+        contentPane.add(jPanel1, CC.xy(2, 5));
 
         //======== jPanel2 ========
         {
             jPanel2.setBorder(new EmptyBorder(5, 5, 5, 5));
             jPanel2.setOpaque(false);
+            jPanel2.setLayout(new FormLayout(
+                "default, $lcgap, default",
+                "fill:default:grow, $lgap, fill:default:grow"));
 
             //---- btnAbout ----
             btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/opde-metal.png")));
@@ -264,71 +247,49 @@ public class DlgLogin extends MyJDialog {
                     btnAboutActionPerformed(e);
                 }
             });
+            jPanel2.add(btnAbout, CC.xywh(1, 1, 1, 3));
 
             //---- jLabel4 ----
             jLabel4.setFont(new Font("Arial", Font.PLAIN, 13));
             jLabel4.setHorizontalAlignment(SwingConstants.CENTER);
             jLabel4.setText("So viel Pflege wie m\u00f6glich, so viel Technik wie n\u00f6tig. ");
+            jPanel2.add(jLabel4, CC.xy(3, 3));
 
             //---- lblOPDE ----
             lblOPDE.setText("Offene-Pflege.de");
             lblOPDE.setFont(new Font("Arial", Font.PLAIN, 24));
             lblOPDE.setHorizontalAlignment(SwingConstants.CENTER);
-
-            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
-            jPanel2.setLayout(jPanel2Layout);
-            jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup()
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnAbout, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblOPDE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE))
-                        .addGap(8, 8, 8))
-            );
-            jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup()
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup()
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btnAbout, GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(25, 25, 25)
-                                .addComponent(lblOPDE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4)))
-                        .addContainerGap())
-            );
+            jPanel2.add(lblOPDE, CC.xy(3, 1));
         }
+        contentPane.add(jPanel2, CC.xy(2, 3));
 
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(jPanel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
-                                .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addComponent(btnLogin))
-                    .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, 94, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(btnLogin)
-                    .addContainerGap())
-        );
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+            //---- btnExit ----
+            btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/exit.png")));
+            btnExit.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnExitActionPerformed(e);
+                }
+            });
+            panel1.add(btnExit);
+            panel1.add(hSpacer1);
+
+            //---- btnLogin ----
+            btnLogin.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnLogin.setActionCommand("btnLogin");
+            btnLogin.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    DoLogin(e);
+                }
+            });
+            panel1.add(btnLogin);
+        }
+        contentPane.add(panel1, CC.xy(2, 7, CC.RIGHT, CC.DEFAULT));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -401,6 +362,12 @@ public class DlgLogin extends MyJDialog {
             }
         }
     }//GEN-LAST:event_btnAboutActionPerformed
+//
+//    @Override
+//    public void setVisible(boolean b) {
+//
+//        super.setVisible(b);    //To change body of overridden methods use File | Settings | File Templates.
+//    }
 
     /**
      * Trägt ein DlgLogin ein. Es werden alte, zerstörte DlgLogin Reste ebenfalls entfernt und zwar nach dem folgendem Muster:
@@ -481,7 +448,6 @@ public class DlgLogin extends MyJDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JButton btnLogin;
     private JPanel jPanel1;
     private JLabel jLabel2;
     private JTextField txtUsername;
@@ -491,5 +457,9 @@ public class DlgLogin extends MyJDialog {
     private JButton btnAbout;
     private JLabel jLabel4;
     private JLabel lblOPDE;
+    private JPanel panel1;
+    private JButton btnExit;
+    private JPanel hSpacer1;
+    private JButton btnLogin;
     // End of variables declaration//GEN-END:variables
 }

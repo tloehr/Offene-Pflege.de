@@ -434,6 +434,8 @@ public class OPDE {
 
 
 //            if (isDebug()) {
+            // Cache abschalten
+            jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.logging.level", JavaLog.FINE_LABEL);
 //            }
 

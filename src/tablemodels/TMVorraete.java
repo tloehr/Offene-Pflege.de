@@ -1,6 +1,7 @@
 package tablemodels;
 
 import entity.verordnungen.MedVorrat;
+import op.tools.Pair;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
@@ -16,30 +17,30 @@ import java.util.List;
 public class TMVorraete extends AbstractTableModel {
     public static final int COL_NAME = 0;
     public static final int COL_MENGE = 1;
-    protected List<Object[]> data;
+    protected List<Pair<MedVorrat, BigDecimal>> data;
 
-    public TMVorraete(List<Object[]> data) {
+    public TMVorraete(List<Pair<MedVorrat, BigDecimal>> data) {
         this.data = data;
     }
 
     public BigDecimal getBestandsMenge(int row) {
-        BigDecimal menge = (BigDecimal) data.get(row)[1];
+        BigDecimal menge = data.get(row).getSecond();
         return menge == null ? BigDecimal.ZERO : menge;
     }
 
-    public List<Object[]> getData() {
+    public List<Pair<MedVorrat, BigDecimal>> getData() {
         return data;
     }
 
     public MedVorrat getVorrat(int row) {
-        return (MedVorrat) data.get(row)[0];
+        return data.get(row).getFirst();
     }
 
     public int findPositionOf(MedVorrat vorrat) {
         int pos = -1;
-        for (Object[] o : data) {
-            if (((MedVorrat) o[0]).equals(vorrat)) {
-                pos = data.indexOf(o);
+        for (Pair<MedVorrat, BigDecimal> pair : data) {
+            if (pair.getFirst().equals(vorrat)) {
+                pos = data.indexOf(pair);
                 break;
             }
         }

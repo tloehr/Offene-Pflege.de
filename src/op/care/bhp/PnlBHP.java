@@ -94,7 +94,6 @@ public class PnlBHP extends NursingRecordsPanel {
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        OPDE.getEMF().getCache().evictAll();
         this.bewohner = bewohner;
 
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
@@ -106,16 +105,6 @@ public class PnlBHP extends NursingRecordsPanel {
         initPhase = false;
         reloadTable();
     }
-
-    private void clearCache() {
-        OPDE.getEMF().getCache().evict(Verordnung.class);
-        OPDE.getEMF().getCache().evict(VerordnungPlanung.class);
-        OPDE.getEMF().getCache().evict(BHP.class);
-        OPDE.getEMF().getCache().evict(MedBestand.class);
-        OPDE.getEMF().getCache().evict(MedBuchungen.class);
-        OPDE.getEMF().getCache().evict(MedVorrat.class);
-    }
-
 
     @Override
     public void cleanup() {
@@ -266,7 +255,6 @@ public class PnlBHP extends NursingRecordsPanel {
                     } catch (OptimisticLockException ole) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
                         em.getTransaction().rollback();
-                        clearCache();
                         deleted = true; // damit alles neu geladen wird.
                     } catch (Exception ex) {
                         em.getTransaction().rollback();
@@ -316,7 +304,6 @@ public class PnlBHP extends NursingRecordsPanel {
                         } catch (OptimisticLockException ole) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
                             em.getTransaction().rollback();
-                            clearCache();
                             reloadTable();
                         } catch (Exception e) {
                             em.getTransaction().rollback();
@@ -356,7 +343,6 @@ public class PnlBHP extends NursingRecordsPanel {
                     } catch (OptimisticLockException ole) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
                         em.getTransaction().rollback();
-                        clearCache();
                         reloadTable();
                     } catch (Exception e) {
                         em.getTransaction().rollback();

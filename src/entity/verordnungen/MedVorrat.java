@@ -39,7 +39,7 @@ import java.util.Date;
         // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
         // beigefügt.
         @NamedNativeQuery(name = "MedVorrat.findVorraeteMitSummen", query = " " +
-                " SELECT DISTINCT v.*, b.saldo" +
+                " SELECT DISTINCT v.VorID, b.saldo" +
                 " FROM MPVorrat v " +
                 " LEFT OUTER JOIN (" +
                 "       SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
@@ -50,15 +50,15 @@ import java.util.Date;
                 " ) b ON b.VorID = v.VorID" +
                 " WHERE v.BWKennung=? " +
                 " AND ( ? = 1 OR v.Bis = '9999-12-31 23:59:59' ) " +
-                " ORDER BY v.Text ", resultSetMapping = "MedVorrat.findVorraeteMitSummenResultMapping")
+                " ORDER BY v.Text ")
 })
-
-@SqlResultSetMappings({
-        @SqlResultSetMapping(name = "MedVorrat.findVorraeteMitSummenResultMapping",
-                entities = @EntityResult(entityClass = MedVorrat.class),
-                columns = @ColumnResult(name = "b.saldo")
-        )
-})
+//
+//@SqlResultSetMappings({
+//        @SqlResultSetMapping(name = "MedVorrat.findVorraeteMitSummenResultMapping",
+//                entities = @EntityResult(entityClass = MedVorrat.class),
+//                columns = @ColumnResult(name = "b.saldo")
+//        )
+//})
 
 public class MedVorrat implements Serializable {
     private static final long serialVersionUID = 1L;

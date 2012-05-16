@@ -237,8 +237,9 @@ public class MedBestandTools {
         bestand = em.merge(bestand);
         em.lock(bestand, LockModeType.OPTIMISTIC);
 
-        MedBuchungen abschlussBuchung = em.merge(new MedBuchungen(bestand, bestandsumme.negate(), status));
+        MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
         abschlussBuchung.setText(text);
+        em.persist(abschlussBuchung);
 
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
@@ -266,78 +267,68 @@ public class MedBestandTools {
     /**
      * @param bestand, für den das Verhältnis neu berechnet werden soll.
      */
-    public static BigDecimal berechneAPV(MedBestand bestand) {
+    public static BigDecimal berechneAPV(EntityManager em, MedBestand bestand) throws Exception {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
         if (bestand.getDarreichung().getMedForm().getStatus() != MedFormenTools.APV1) {
 
-            EntityManager em = OPDE.createEM();
-            try {
-//                Query queryAnfangsBuchung = em.createQuery("SELECT m FROM MedBuchungen m WHERE m.bestand = :bestand AND m.status = :status");
-//                queryAnfangsBuchung.setParameter("bestand", bestand);
-//                queryAnfangsBuchung.setParameter("status", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
-//                MedBuchungen anfangsBuchung = ;
+            // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
+            // drin war. Meist das, was auf der Packung steht.
+            BigDecimal inhaltZuBeginn = getAnfangsBuchung(bestand).getMenge();
 
-                // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
-                // drin war. Meist das, was auf der Packung steht.
-                BigDecimal inhaltZuBeginn = getAnfangsBuchung(bestand).getMenge();
+            // Das APV, das bei diesem Bestand angenommen wurde.
+            BigDecimal apvAlt = bestand.getApv();
 
-                // Das APV, das bei diesem Bestand angenommen wurde.
-                BigDecimal apvAlt = bestand.getApv();
-
-                // Zur Verhinderung von Division durch 0
-                if (apvAlt.equals(BigDecimal.ZERO)) {
-                    apvAlt = BigDecimal.ONE;
-                }
-
-                // Anzahl der per BHP verabreichten Einzeldosen. (in der Anwendungseinheit)
-                Query querySummeBHPDosis = em.createQuery(" " +
-                        " SELECT SUM(bhp.dosis) " +
-                        " FROM MedBuchungen bu " +
-                        " JOIN bu.bhp bhp" +
-                        " WHERE bu.bestand = :bestand ");
-
-                querySummeBHPDosis.setParameter("bestand", bestand);
-                BigDecimal summeBHPDosis = (BigDecimal) querySummeBHPDosis.getSingleResult();
-
-                // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
-                // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
-                // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
-                // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
-                // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
-                // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
-                BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt, 4, BigDecimal.ROUND_UP);
-                // Zur Verhinderung von Division durch 0
-                if (inhaltRechnerisch.equals(BigDecimal.ZERO)) {
-                    inhaltRechnerisch = inhaltZuBeginn;
-                }
-
-                // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
-                // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
-                // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
-                // das apvNeu kleiner als das apvAlt.
-                // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
-                // dann 1 und apvNeu ist gleich apvAlt.
-                // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
-                // der apvNeu wird größer als der apvAlt.
-                apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch, 4, BigDecimal.ROUND_UP).multiply(apvAlt);
-
-
-                // Zu große APV Abweichungen verhindern. Alle außerhalb eines 20% Korridors wird ignoriert.
-                BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
-                BigDecimal halbeBreite = apvAlt.multiply(apvkorridor);
-                BigDecimal korridorUnten = apvAlt.subtract(halbeBreite);
-                BigDecimal korridorOben = apvAlt.add(halbeBreite);
-                // Liegt der neue apv AUSSERHALB des maximalen Korridors, so wird er verworfen
-                if (apvAlt.compareTo(korridorUnten) < 0 || korridorOben.compareTo(apvNeu) < 0) {
-                    apvNeu = apvAlt;
-                }
-            } catch (Exception e) {
-                OPDE.fatal(e);
-            } finally {
-                em.close();
+            // Zur Verhinderung von Division durch 0
+            if (apvAlt.equals(BigDecimal.ZERO)) {
+                apvAlt = BigDecimal.ONE;
             }
+
+            // Anzahl der per BHP verabreichten Einzeldosen. (in der Anwendungseinheit)
+            Query querySummeBHPDosis = em.createQuery(" " +
+                    " SELECT SUM(bhp.dosis) " +
+                    " FROM MedBuchungen bu " +
+                    " JOIN bu.bhp bhp" +
+                    " WHERE bu.bestand = :bestand ");
+
+            querySummeBHPDosis.setParameter("bestand", bestand);
+            BigDecimal summeBHPDosis = (BigDecimal) querySummeBHPDosis.getSingleResult();
+
+            // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
+            // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
+            // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
+            // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
+            // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
+            // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
+            BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt, 4, BigDecimal.ROUND_UP);
+            // Zur Verhinderung von Division durch 0
+            if (inhaltRechnerisch.equals(BigDecimal.ZERO)) {
+                inhaltRechnerisch = inhaltZuBeginn;
+            }
+
+            // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
+            // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
+            // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
+            // das apvNeu kleiner als das apvAlt.
+            // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
+            // dann 1 und apvNeu ist gleich apvAlt.
+            // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
+            // der apvNeu wird größer als der apvAlt.
+            apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch, 4, BigDecimal.ROUND_UP).multiply(apvAlt);
+
+
+            // Zu große APV Abweichungen verhindern. Alle außerhalb eines 20% Korridors wird ignoriert.
+            BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
+            BigDecimal halbeBreite = apvAlt.multiply(apvkorridor);
+            BigDecimal korridorUnten = apvAlt.subtract(halbeBreite);
+            BigDecimal korridorOben = apvAlt.add(halbeBreite);
+
+            // Liegt der neue apv AUSSERHALB des maximalen Korridors, so wird er verworfen
+            if (apvAlt.compareTo(korridorUnten) < 0 || korridorOben.compareTo(apvNeu) < 0) {
+                apvNeu = apvAlt;
+            }
+
         }
         return apvNeu;
     }

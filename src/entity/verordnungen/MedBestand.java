@@ -40,7 +40,7 @@ import java.util.Date;
         // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
         // beigefügt.
         @NamedNativeQuery(name = "MedBestand.findByVorratMitRestsumme", query = " " +
-                " SELECT best.*, sum.saldo " +
+                " SELECT best.BestID, sum.saldo " +
                 " FROM MPBestand best " +
                 " LEFT OUTER JOIN " +
                 "      ( " +
@@ -51,14 +51,7 @@ import java.util.Date;
                 "      ) sum ON sum.BestID = best.BestID " +
                 " WHERE best.VorID = ? " +
                 " AND ( ? = 1 OR best.Aus = '9999-12-31 23:59:59' ) " +
-                " ORDER BY best.ein, best.anbruch ", resultSetMapping = "MedBestand.findByVorratMitRestsummeResultMapping")
-})
-
-@SqlResultSetMappings({
-        @SqlResultSetMapping(name = "MedBestand.findByVorratMitRestsummeResultMapping",
-                entities = @EntityResult(entityClass = MedBestand.class),
-                columns = @ColumnResult(name = "sum.saldo")
-        )
+                " ORDER BY best.ein, best.anbruch ")
 })
 
 public class MedBestand implements Serializable, Comparable<MedBestand> {

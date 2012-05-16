@@ -1,6 +1,7 @@
 package tablemodels;
 
 import entity.verordnungen.*;
+import op.tools.Pair;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
@@ -16,22 +17,22 @@ import java.util.List;
 public class TMBestand extends AbstractTableModel{
     public static final int COL_NAME = 0;
     public static final int COL_MENGE = 1;
-    protected List<Object[]> data;
+    protected List<Pair<MedBestand, BigDecimal>> data;
 
-    public TMBestand(List<Object[]> data) {
+    public TMBestand(List<Pair<MedBestand, BigDecimal>> data) {
         this.data = data;
     }
 
-    public List<Object[]> getData() {
+    public List<Pair<MedBestand, BigDecimal>> getData() {
         return data;
     }
 
     public BigDecimal getBestandsMenge(int row) {
-        return (BigDecimal) data.get(row)[1];
+        return data.get(row).getSecond();
     }
 
     public MedBestand getBestand(int row) {
-        return (MedBestand) data.get(row)[0];
+        return data.get(row).getFirst();
     }
 
     @Override

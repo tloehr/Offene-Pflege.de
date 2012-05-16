@@ -33,30 +33,36 @@ import javax.swing.*;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle;
 import javax.swing.border.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 
 import entity.Bewohner;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import java.awt.*;
 
 /**
  * @author tloehr
  */
-public class DlgBestandAnbrechen extends javax.swing.JDialog {
+public class DlgBestandAnbrechen extends MyJDialog {
 
     private MedVorrat vorrat;
-    private Frame parent;
+    private Closure actionBlock;
+    private MedBestand bestand;
 
     /**
      * Creates new form DlgBestandAnbrechen
      */
-    public DlgBestandAnbrechen(java.awt.Frame parent, Darreichung darreichung, Bewohner bewohner) {
-        super(parent, true);
+    public DlgBestandAnbrechen(Darreichung darreichung, Bewohner bewohner, Closure actionBlock) {
+        super(OPDE.getMainframe());
         this.vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
-        this.parent = parent;
+        this.bestand = null;
+        this.actionBlock = actionBlock;
         initComponents();
         initDialog();
     }
@@ -70,11 +76,10 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new JLabel();
-        jPanel1 = new JPanel();
         jLabel2 = new JLabel();
         cmbBestID = new JComboBox();
         jLabel3 = new JLabel();
+        panel1 = new JPanel();
         btnClose = new JButton();
         btnOK = new JButton();
 
@@ -82,109 +87,59 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "4*(default, $lcgap), default",
+            "default, 2*($lgap, fill:default), $lgap, default"));
 
-        //---- jLabel1 ----
-        jLabel1.setFont(new Font("Dialog", Font.BOLD, 16));
-        jLabel1.setText("Bestand anbrechen");
+        //---- jLabel2 ----
+        jLabel2.setText("Die Packung mit der Nummer:");
+        contentPane.add(jLabel2, CC.xy(3, 3));
 
-        //======== jPanel1 ========
+        //---- cmbBestID ----
+        cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
+        }));
+        cmbBestID.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbBestIDItemStateChanged(e);
+            }
+        });
+        contentPane.add(cmbBestID, CC.xy(5, 3));
+
+        //---- jLabel3 ----
+        jLabel3.setText("anbrechen.");
+        contentPane.add(jLabel3, CC.xy(7, 3));
+
+        //======== panel1 ========
         {
-            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
-            //---- jLabel2 ----
-            jLabel2.setText("Die Packung mit der Nummer:");
-
-            //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
-            }));
-            cmbBestID.addItemListener(new ItemListener() {
+            //---- btnClose ----
+            btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnClose.addActionListener(new ActionListener() {
                 @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbBestIDItemStateChanged(e);
+                public void actionPerformed(ActionEvent e) {
+                    btnCloseActionPerformed(e);
                 }
             });
+            panel1.add(btnClose);
 
-            //---- jLabel3 ----
-            jLabel3.setText("anbrechen.");
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbBestID, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
-                        .addContainerGap(240, Short.MAX_VALUE))
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(cmbBestID, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
+            //---- btnOK ----
+            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnOK.setEnabled(false);
+            btnOK.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnOKActionPerformed(e);
+                }
+            });
+            panel1.add(btnOK);
         }
-
-        //---- btnClose ----
-        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnClose.setText("Schlie\u00dfen");
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCloseActionPerformed(e);
-            }
-        });
-
-        //---- btnOK ----
-        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnOK.setText("\u00dcbernehmen");
-        btnOK.setEnabled(false);
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnOKActionPerformed(e);
-            }
-        });
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addComponent(btnOK)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnClose)))
-                    .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jLabel1)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(18, 18, 18)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                        .addComponent(btnOK, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnClose, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addContainerGap(13, Short.MAX_VALUE))
-        );
+        contentPane.add(panel1, CC.xy(7, 5));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -196,13 +151,15 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         //String classname = this.getName() + ".btnOKActionPerformed()";
         if (cmbBestID.getSelectedIndex() > 0) {
-            MedBestandTools.anbrechen((MedBestand) cmbBestID.getSelectedItem());
+            bestand = (MedBestand) cmbBestID.getSelectedItem();
+            MedBestandTools.anbrechen(bestand);
         }
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
     @Override
     public void dispose() {
+        actionBlock.execute(bestand);
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -225,9 +182,6 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
 
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
-
-        SYSTools.centerOnParent(parent, this);
-        setVisible(true);
     }
 
     private void cmbBestIDItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbBestIDItemStateChanged
@@ -240,11 +194,10 @@ public class DlgBestandAnbrechen extends javax.swing.JDialog {
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel1;
-    private JPanel jPanel1;
     private JLabel jLabel2;
     private JComboBox cmbBestID;
     private JLabel jLabel3;
+    private JPanel panel1;
     private JButton btnClose;
     private JButton btnOK;
     // End of variables declaration//GEN-END:variables

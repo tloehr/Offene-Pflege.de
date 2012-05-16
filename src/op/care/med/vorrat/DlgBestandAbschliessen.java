@@ -31,7 +31,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.CleanablePanel;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -40,7 +39,6 @@ import org.eclipse.persistence.exceptions.OptimisticLockException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -56,8 +54,6 @@ public class DlgBestandAbschliessen extends MyJDialog {
 
     private MedBestand bestand;
     private Closure actionBlock;
-    private EntityManager em;
-//    private java.util.List<Verordnung> verordnungenByVorrat;
 
     /**
      * Creates new form DlgBestandAnbruch
@@ -65,10 +61,10 @@ public class DlgBestandAbschliessen extends MyJDialog {
     public DlgBestandAbschliessen(MedBestand bestand, Closure actionBlock) {
         super();
         this.actionBlock = actionBlock;
-//        this.verordnung = verordnung;
         this.bestand = bestand;
         initComponents();
         initDialog();
+        setVisible(true);
     }
 
     /**
@@ -91,9 +87,9 @@ public class DlgBestandAbschliessen extends MyJDialog {
         rbAbgelaufen = new JRadioButton();
         jSeparator1 = new JSeparator();
         jLabel2 = new JLabel();
-        cmbBestID = new JComboBox();
         jLabel3 = new JLabel();
         rbGefallen = new JRadioButton();
+        cmbBestID = new JComboBox();
         panel1 = new JPanel();
         btnClose = new JButton();
         btnOk = new JButton();
@@ -109,7 +105,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
                 "$rgap, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, $rgap",
-                "$rgap, $lgap, default, $lgap, fill:default:grow, 6*($lgap, fill:default), $lgap, $rgap, $lgap, default, $lgap, $rgap"));
+                "$rgap, $lgap, default, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, $rgap"));
 
             //---- jLabel1 ----
             jLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -181,23 +177,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
             jLabel2.setText("Als n\u00e4chstes Packung soll die Nummer");
             jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
             jLabel2.setHorizontalAlignment(SwingConstants.TRAILING);
-            jPanel1.add(jLabel2, CC.xywh(3, 17, 2, 1));
-
-            //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
-            }));
-            cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbBestID.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbBestIDItemStateChanged(e);
-                }
-            });
-            jPanel1.add(cmbBestID, CC.xywh(5, 17, 2, 1));
+            jPanel1.add(jLabel2, CC.xy(3, 17));
 
             //---- jLabel3 ----
             jLabel3.setText("angebrochen werden.");
@@ -214,6 +194,22 @@ public class DlgBestandAbschliessen extends MyJDialog {
                 }
             });
             jPanel1.add(rbGefallen, CC.xywh(3, 13, 5, 1));
+
+            //---- cmbBestID ----
+            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
+            cmbBestID.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbBestIDItemStateChanged(e);
+                }
+            });
+            jPanel1.add(cmbBestID, CC.xy(5, 17));
 
             //======== panel1 ========
             {
@@ -272,22 +268,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
     }
 
     private void initDialog() {
-//        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
-        em = OPDE.createEM();
-        em.getTransaction().begin();
-
-        try {
-
-            bestand = em.merge(bestand);
-            em.lock(bestand, LockModeType.PESSIMISTIC_WRITE);
-
-        } catch (PessimisticLockException ple) {
-            OPDE.debug(ple);
-            em.getTransaction().rollback();
-            em.close();
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
+////        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
 
         String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getBestID() + "</b></font> abschließen.";
         text += "<br/>" + MedBestandTools.getBestandTextAsHTML(bestand) + "</br>";
@@ -296,7 +277,6 @@ public class DlgBestandAbschliessen extends MyJDialog {
         txtInfo.setText(SYSTools.toHTML(text));
 
         EntityManager em = OPDE.createEM();
-
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedBestand b " +
                 " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
@@ -370,13 +350,15 @@ public class DlgBestandAbschliessen extends MyJDialog {
             em.getTransaction().begin();
 
             bestand = em.merge(bestand);
+            em.lock(bestand, LockModeType.OPTIMISTIC);
 
             OPDE.info("Bestands Nr. " + bestand.getBestID() + " wird abgeschlossen");
             OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUKennung());
 
             MedBestand nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
-                nextBest = (MedBestand) cmbBestID.getSelectedItem();
+                nextBest = em.merge((MedBestand) cmbBestID.getSelectedItem());
+                em.lock(nextBest, LockModeType.OPTIMISTIC);
             }
 
             if (rbStellen.isSelected()) {
@@ -392,16 +374,13 @@ public class DlgBestandAbschliessen extends MyJDialog {
 
                 if (rbGefallen.isSelected()) {
                     MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
-                    //DBHandling.closeBestand(bestid, "Packung ist runtergefallen.", false, DBHandling.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
                     MedBestandTools.abschliessen(em, bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
-                    //DBHandling.closeBestand(bestid, "Packung ist abgelaufen.", false, DBHandling.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
                     MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
-                    apv = MedBestandTools.berechneAPV(bestand);
-                    //DBHandling.closeBestand(bestid, "Korrekturbuchung zum Packungsabschluss", true, DBHandling.STATUS_KORREKTUR_AUTO_LEER);
+                    apv = MedBestandTools.berechneAPV(em, bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
                 if (nextBest != null) {
@@ -413,33 +392,26 @@ public class DlgBestandAbschliessen extends MyJDialog {
                     if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null && MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
                         // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                         // Die müssen dann jetzt nämlich abgeschlossen werden.
-
                         for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat())) {
                             if (verordnung.isBisPackEnde()) {
-                                try {
-                                    em.lock(verordnung, LockModeType.OPTIMISTIC);
-                                    verordnung.setAbDatum(new Date());
-                                    verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
-                                    BHPTools.aufräumen(em, verordnung);
-                                    em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
-                                    em.getTransaction().rollback();
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
+                                em.lock(verordnung, LockModeType.OPTIMISTIC);
+                                verordnung.setAbDatum(new Date());
+                                verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
+                                BHPTools.aufräumen(em, verordnung);
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
                             }
                         }
                     }
                 }
             }
             em.getTransaction().commit();
-        } catch (Exception e) {
+        } catch (OptimisticLockException ole) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder Bestand wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 4));
             em.getTransaction().rollback();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             OPDE.fatal(e);
         } finally {
             em.close();
@@ -459,9 +431,9 @@ public class DlgBestandAbschliessen extends MyJDialog {
     private JRadioButton rbAbgelaufen;
     private JSeparator jSeparator1;
     private JLabel jLabel2;
-    private JComboBox cmbBestID;
     private JLabel jLabel3;
     private JRadioButton rbGefallen;
+    private JComboBox cmbBestID;
     private JPanel panel1;
     private JButton btnClose;
     private JButton btnOk;

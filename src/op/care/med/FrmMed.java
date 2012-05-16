@@ -34,14 +34,13 @@ import entity.EntityTools;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.vorrat.DlgBestand;
-import op.care.med.vorrat.DlgVorrat;
+import op.care.med.vorrat.PnlVorrat;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
@@ -92,7 +91,7 @@ public class FrmMed extends javax.swing.JFrame {
         treeMed.setVisible(false);
         lstPraep.setModel(new DefaultListModel());
         lstPraep.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
-        btnVorrat.setEnabled(true);
+//        btnVorrat.setEnabled(true);
 
         SYSTools.center(this);
         setSize(850, 370);
@@ -111,7 +110,6 @@ public class FrmMed extends javax.swing.JFrame {
         btnNew = new JButton();
         btnMed = new JButton();
         btnBuchen = new JButton();
-        btnVorrat = new JButton();
         txtSuche = new JTextField();
         jScrollPane2 = new JScrollPane();
         lstPraep = new JList();
@@ -167,17 +165,6 @@ public class FrmMed extends javax.swing.JFrame {
                 }
             });
             jToolBar1.add(btnBuchen);
-
-            //---- btnVorrat ----
-            btnVorrat.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png")));
-            btnVorrat.setText("Vorrat");
-            btnVorrat.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnVorratActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnVorrat);
         }
         contentPane.add(jToolBar1, CC.xywh(1, 1, 3, 1));
 
@@ -243,11 +230,6 @@ public class FrmMed extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
-
-
-    private void btnVorratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorratActionPerformed
-        new DlgVorrat(this);
-    }//GEN-LAST:event_btnVorratActionPerformed
 
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
         new DlgBestand(this);
@@ -373,7 +355,7 @@ public class FrmMed extends javax.swing.JFrame {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                             MedPackung mypack = new MedPackung(darreichung);
                             new DlgPack(thisFrame, "Neu", mypack);
-                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
+//                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
                             createTree();
                         }
                     });
@@ -485,7 +467,6 @@ public class FrmMed extends javax.swing.JFrame {
     private JButton btnNew;
     private JButton btnMed;
     private JButton btnBuchen;
-    private JButton btnVorrat;
     private JTextField txtSuche;
     private JScrollPane jScrollPane2;
     private JList lstPraep;

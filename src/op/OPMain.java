@@ -456,7 +456,7 @@ public class OPMain extends javax.swing.JFrame {
             SYSLoginTools.logout();
 
             System.gc();
-            OPDE.getEMF().getCache().evictAll();
+//            OPDE.getEMF().getCache().evictAll();
             this.setVisible(true);
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 

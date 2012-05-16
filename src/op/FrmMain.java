@@ -602,50 +602,9 @@ public class FrmMain extends JFrame {
                 }
             }
         });
+        dlgLogin.pack();
         dlgLogin.setVisible(true);
     }
-
-//    public void hideAlert() {
-//
-//        alert.hidePopup();
-////        getGlassPane().removeMouseListener(mouseAdapter);
-////        alert.setContentPane(null);
-//    }
-//
-//    public void showAlert(JComponent dlg) {
-//
-//        alert = new Alert();
-//
-//        getGlassPane().addMouseListener(mouseAdapter);
-//
-//        alert.setOwner(pbMsg);
-//        alert.setResizable(false);
-//        alert.setMovable(false);
-//        alert.setTransient(false);
-//
-//        alert.removeExcludedComponent(pbMsg);
-//        alert.setDefaultFocusComponent(dlg);
-//        alert.setAlwaysOnTop(true);
-//        alert.setTimeout(0);
-//
-////        CustomAnimation showAnimation = new CustomAnimation(CustomAnimation.TYPE_ENTRANCE, CustomAnimation.EFFECT_FADE, CustomAnimation.SMOOTHNESS_MEDIUM, CustomAnimation.SPEED_MEDIUM);
-////        showAnimation.setVisibleBounds(PortingUtils.getLocalScreenBounds());
-////        alert.setShowAnimation(showAnimation);
-////
-////        CustomAnimation hideAnimation = new CustomAnimation(CustomAnimation.TYPE_EXIT, CustomAnimation.EFFECT_FADE, CustomAnimation.SMOOTHNESS_MEDIUM, CustomAnimation.SPEED_MEDIUM);
-////        hideAnimation.setVisibleBounds(PortingUtils.getLocalScreenBounds());
-////        alert.setHideAnimation(hideAnimation);
-//
-//        alert.setContentPane(dlg);
-//        Point p = new Point(pbMsg.getX(), pbMsg.getY());
-//        // Convert a coordinate relative to a component's bounds to screen coordinates
-//        SwingUtilities.convertPointToScreen(p, pbMsg);
-//        alert.showPopup(p.x + (int) dlg.getPreferredSize().getWidth() / 2, p.y + (int) pbMsg.getPreferredSize().getHeight());
-//
-//
-////        alert.showPopup(SwingConstants.SOUTH, pbMsg);
-//    }
-
 
     private void cleanup() {
         if (currentVisiblePanel != null) {
@@ -666,10 +625,7 @@ public class FrmMain extends JFrame {
         }
 
         SYSLoginTools.logout();
-
         System.gc();
-        OPDE.getEMF().getCache().evictAll();
-
         cleanup();
 
     }

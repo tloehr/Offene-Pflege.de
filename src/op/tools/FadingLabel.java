@@ -68,10 +68,11 @@ public class FadingLabel extends JLabel {
                 repaint();
             }
 
-//            @Override
-//            public void end(Animator source) {
-//                setForeground(new Color(getForeground().getRed(), getForeground().getGreen(), getForeground().getBlue()));
-//            }
+            @Override
+            public void end(Animator source) {
+                setForeground(new Color(getForeground().getRed(), getForeground().getGreen(), getForeground().getBlue()));
+                repaint();
+            }
         }).build();
     }
 
