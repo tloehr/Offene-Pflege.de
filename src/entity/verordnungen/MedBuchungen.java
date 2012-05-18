@@ -25,6 +25,9 @@ public class MedBuchungen implements Serializable {
     @Basic(optional = false)
     @Column(name = "BuchID")
     private Long buchID;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Menge")
     private BigDecimal menge;

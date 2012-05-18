@@ -28,32 +28,28 @@ package op.care.bhp;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.BWInfoTools;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.UniqueTools;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.care.verordnung.DlgVerordnung;
+import op.care.med.vorrat.PnlBuchungen;
 import op.threads.DisplayMessage;
 import op.tools.*;
-import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
-import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.JXTitledSeparator;
 import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMBHP;
-import tablemodels.TMBarbetrag;
 import tablerenderer.RNDBHP;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -61,10 +57,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * @author tloehr
@@ -160,6 +153,12 @@ public class PnlBHP extends NursingRecordsPanel {
         final int col = tblBHP.columnAtPoint(p);
         final int row = tblBHP.rowAtPoint(p);
 
+        Point p2 = evt.getPoint();
+        // Convert a coordinate relative to a component's bounds to screen coordinates
+        SwingUtilities.convertPointToScreen(p2, tblBHP);
+
+        final Point screenposition = p2;
+
         ListSelectionModel lsm = tblBHP.getSelectionModel();
         lsm.setSelectionInterval(row, row);
 
@@ -214,11 +213,11 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                     EntityManager em = OPDE.createEM();
 
-                    bhp = em.merge(bhp);
-//                    verordnung = em.merge(verordnung);
-
                     try {
                         em.getTransaction().begin();
+
+                        bhp = em.merge(bhp);
+                        vorrat = em.merge(vorrat);
 
                         em.lock(bhp.getVerordnung(), LockModeType.OPTIMISTIC);
                         em.lock(bhp, LockModeType.OPTIMISTIC);
@@ -252,12 +251,15 @@ public class PnlBHP extends NursingRecordsPanel {
                             deleted = true;
                         }
                         em.getTransaction().commit();
+                        em.refresh(bhp);
                     } catch (OptimisticLockException ole) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
                         em.getTransaction().rollback();
                         deleted = true; // damit alles neu geladen wird.
                     } catch (Exception ex) {
-                        em.getTransaction().rollback();
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
                         OPDE.fatal(ex);
                     } finally {
                         em.close();
@@ -316,7 +318,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 menu.add(itemPopupXDiscard);
                 itemPopupXDiscard.setEnabled(myBHP.getStatus() == BHPTools.STATUS_OFFEN);
 
-                menu.add(new JSeparator());
+//                menu.add(new JSeparator());
             }
             //-----------------------------------------
             String str = "Verweigert";
@@ -355,6 +357,37 @@ public class PnlBHP extends NursingRecordsPanel {
             menu.add(itemPopupXPreserve);
             itemPopupXPreserve.setEnabled(changeable && myBHP.getStatus() == BHPTools.STATUS_OFFEN);
 
+            if (bhp.getVerordnung().hasMedi()) {
+
+
+                final MedBestand bestand = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, bhp.getVerordnung().getDarreichung()));
+
+                if (bestand != null) {
+
+                    menu.add(new JSeparator());
+
+                    JMenuItem itemPopupBuchungen = new JMenuItem("Buchungen von Bestands Nr. "+bestand.getBestID()+" anzeigen");
+                    itemPopupBuchungen.addActionListener(new java.awt.event.ActionListener() {
+
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                            final JidePopup popup = new JidePopup();
+
+                            PnlBuchungen dlg = new PnlBuchungen(bestand, null);
+
+                            popup.setMovable(false);
+                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                            popup.getContentPane().add(dlg);
+                            popup.setOwner(tblBHP);
+                            popup.removeExcludedComponent(tblBHP);
+                            popup.setDefaultFocusComponent(dlg);
+                            popup.showPopup(screenposition.x, screenposition.y);
+                        }
+                    });
+                    menu.add(itemPopupBuchungen);
+                    itemPopupBuchungen.setEnabled(true);
+                }
+            }
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
 
         }
@@ -434,7 +467,7 @@ public class PnlBHP extends NursingRecordsPanel {
         cmbSchicht.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
-                if (!initPhase){
+                if (!initPhase) {
                     reloadTable();
                 }
             }

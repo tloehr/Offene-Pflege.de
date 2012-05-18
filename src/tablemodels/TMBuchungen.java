@@ -19,10 +19,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class TMBuchungen extends AbstractTableModel {
-    public static final int COL_Datum = 0;
-    public static final int COL_Text = 1;
-    public static final int COL_Menge = 2;
-    public static final int COL_User = 3;
+    public static final int COL_ID = 0;
+    public static final int COL_Datum = 1;
+    public static final int COL_Text = 2;
+    public static final int COL_Menge = 3;
+    public static final int COL_User = 4;
     protected List<MedBuchungen> data;
     protected DateFormat df;
 
@@ -42,7 +43,7 @@ public class TMBuchungen extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -50,6 +51,10 @@ public class TMBuchungen extends AbstractTableModel {
         Object result = "";
 
         switch (col){
+            case COL_ID : {
+                result = data.get(row).getBuchID();
+                break;
+            }
             case COL_Datum : {
                 result = df.format(data.get(row).getPit());
                 break;
@@ -63,7 +68,7 @@ public class TMBuchungen extends AbstractTableModel {
                 break;
             }
             case COL_User : {
-                result = data.get(row).getUser().getUKennung();
+                result = data.get(row).getUser().getNameUndVorname();
                 break;
             }
             default: {

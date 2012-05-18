@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default, default, labelcompgap, default</string> 
+        <string>18dlu, default, labelcompgap, 18dlu</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, 48dlu, linegap, fill:default, linegap, fill:default, linegap, default</string> 
+        <string>18dlu, linegap, 48dlu, linegap, fill:default, linegap, fill:default, linegap, 18dlu</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -496,8 +496,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>440</int> 
-        <int>245</int> 
+        <int>470</int> 
+        <int>295</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

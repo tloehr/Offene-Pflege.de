@@ -28,6 +28,11 @@ public class TMVorraete extends AbstractTableModel {
         return menge == null ? BigDecimal.ZERO : menge;
     }
 
+    public void setBestandsMenge(int row, BigDecimal menge) {
+        data.set(row, new Pair<MedVorrat, BigDecimal>(getVorrat(row), menge));
+    }
+
+
     public List<Pair<MedVorrat, BigDecimal>> getData() {
         return data;
     }

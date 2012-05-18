@@ -364,7 +364,7 @@ public class VerordnungTools {
                     BigDecimal vorratSumme = null;
                     BigDecimal bestandSumme = null;
                     try {
-                        vorratSumme = MedVorratTools.getSumme(em, bestandImAnbruch.getVorrat());
+                        vorratSumme = MedVorratTools.getVorratSumme(em, bestandImAnbruch.getVorrat());
                         bestandSumme = MedBestandTools.getBestandSumme(em, bestandImAnbruch);
                     } catch (Exception e) {
                         OPDE.fatal(e);

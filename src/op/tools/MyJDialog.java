@@ -22,10 +22,12 @@ import java.util.concurrent.TimeUnit;
 public class MyJDialog extends JDialog {
     private Animator fadeIn, fadeOut;
     private MyJDialog thisDialog;
+    private boolean isDisposed;
 
 
     public MyJDialog() {
         super();
+        isDisposed = false;
         setResizable(false);
         setUndecorated(true);
         initAnimator();
@@ -33,9 +35,19 @@ public class MyJDialog extends JDialog {
 
     public MyJDialog(Frame frame) {
         super(frame, true);
+        isDisposed = false;
         setResizable(false);
         setUndecorated(true);
         initAnimator();
+    }
+
+
+    @Override
+    public void dispose() {
+//        OPDE.debug("DISPOSE");
+        setVisible(false);
+
+//        super.dispose();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     protected void initAnimator() {
@@ -47,7 +59,7 @@ public class MyJDialog extends JDialog {
 
             @Override
             public void timingEvent(Animator animator, double fraction) {
-                OPDE.debug(fraction);
+//                OPDE.debug(fraction);
                 if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
                     try {
                         Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
@@ -65,13 +77,14 @@ public class MyJDialog extends JDialog {
 
             @Override
             public void timingEvent(Animator animator, double fraction) {
-                OPDE.debug(fraction);
+//                OPDE.debug(fraction);
                 if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
                     try {
                         Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
                         Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
                         mSetWindowOpacity.invoke(null, thisDialog, new Float(fraction));
                         repaint();
+//                        OPDE.debug("FADING AWAY");
                     } catch (Exception ex) {
                         OPDE.warn(ex);
                     }
@@ -80,15 +93,19 @@ public class MyJDialog extends JDialog {
 
             @Override
             public void end(Animator source) {
-                supervisible(false);
+                isDisposed = true;
+                superdispose();
             }
         }).build();
     }
 
     @Override
-    public void setVisible(boolean b) {
+    public void setVisible(boolean visible) {
+        if (isDisposed){
+            return;
+        }
         setLocation(OPDE.getMainframe().getLocationForDialog(getSize()));
-        if (b) {
+        if (visible) {
             if (fadeIn != null && !fadeIn.isRunning()) {
                 if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
                     try {
@@ -123,9 +140,13 @@ public class MyJDialog extends JDialog {
         }
     }
 
-
-    private void supervisible(boolean b) {
-        super.setVisible(b);
+    private void superdispose() {
+        super.dispose();
     }
+
+//    private void supervisible(boolean b) {
+////        OPDE.debug("super.visible("+Boolean.toString(b)+")");
+//        super.setVisible(b);
+//    }
 
 }

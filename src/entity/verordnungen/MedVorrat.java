@@ -67,6 +67,9 @@ public class MedVorrat implements Serializable {
     @Basic(optional = false)
     @Column(name = "VorID")
     private Long vorID;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Text")
     private String text;

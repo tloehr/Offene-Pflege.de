@@ -170,8 +170,8 @@ public class DlgLogin extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "2*(default), $lcgap, default",
-            "default, $lgap, 48dlu, 2*($lgap, fill:default), $lgap, default"));
+            "18dlu, default, $lcgap, 18dlu",
+            "18dlu, $lgap, 48dlu, 2*($lgap, fill:default), $lgap, 18dlu"));
 
         //======== jPanel1 ========
         {

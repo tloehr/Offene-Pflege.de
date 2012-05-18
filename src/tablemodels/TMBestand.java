@@ -1,6 +1,8 @@
 package tablemodels;
 
-import entity.verordnungen.*;
+import entity.verordnungen.DarreichungTools;
+import entity.verordnungen.MedBestand;
+import entity.verordnungen.MedBestandTools;
 import op.tools.Pair;
 
 import javax.swing.table.AbstractTableModel;
@@ -14,7 +16,7 @@ import java.util.List;
  * Time: 12:10
  * To change this template use File | Settings | File Templates.
  */
-public class TMBestand extends AbstractTableModel{
+public class TMBestand extends AbstractTableModel {
     public static final int COL_NAME = 0;
     public static final int COL_MENGE = 1;
     protected List<Pair<MedBestand, BigDecimal>> data;
@@ -31,8 +33,23 @@ public class TMBestand extends AbstractTableModel{
         return data.get(row).getSecond();
     }
 
+    public void setBestandsMenge(int row, BigDecimal menge) {
+        data.set(row, new Pair<MedBestand, BigDecimal>(getBestand(row), menge));
+    }
+
     public MedBestand getBestand(int row) {
         return data.get(row).getFirst();
+    }
+
+    public int findPositionOf(MedBestand bestand) {
+        int pos = -1;
+        for (Pair<MedBestand, BigDecimal> pair : data) {
+            if (pair.getFirst().equals(bestand)) {
+                pos = data.indexOf(pair);
+                break;
+            }
+        }
+        return pos;
     }
 
     @Override
@@ -48,12 +65,12 @@ public class TMBestand extends AbstractTableModel{
     @Override
     public Object getValueAt(int row, int col) {
         Object result = "";
-        switch (col){
-            case COL_NAME : {
+        switch (col) {
+            case COL_NAME: {
                 result = MedBestandTools.getBestandAsHTML(getBestand(row));
                 break;
             }
-            case COL_MENGE : {
+            case COL_MENGE: {
                 result = getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + DarreichungTools.getPackungsEinheit(getBestand(row).getDarreichung());
                 break;
             }

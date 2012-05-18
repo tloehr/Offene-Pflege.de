@@ -27,11 +27,13 @@
 
 package op.care.med.vorrat;
 
+import java.awt.event.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.verordnungen.*;
-import op.OPDE;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
-import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -43,32 +45,28 @@ import java.math.BigDecimal;
 /**
  *
  */
-public class DlgEditBuchung extends javax.swing.JDialog {
+public class DlgEditBuchung extends JPanel {
     private BigDecimal menge;
-    private Component parent;
+    private Closure actionBlock;
     private BigDecimal bestandsumme;
     private BigDecimal packgroesse;
     private MedBestand bestand;
     private MedBuchungen buchung;
 
-
-    public DlgEditBuchung(java.awt.Frame parent, MedBestand bestand) {
-        super(parent, true);
-        this.parent = parent;
+    public DlgEditBuchung(MedBestand bestand, Closure actionBlock) {
         this.bestand = bestand;
+        this.actionBlock = actionBlock;
+        this.buchung = null;
         initDialog();
     }
 
-    public DlgEditBuchung(JDialog parent, MedBestand bestand) {
-        super(parent, true);
-        this.parent = parent;
-        this.bestand = bestand;
-        initDialog();
+    private void txtMengeFocusGained(FocusEvent e) {
+        SYSTools.markAllTxt(txtMenge);
     }
 
     private void initDialog() {
         initComponents();
-        setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
+//        setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
         bestandsumme = MedBestandTools.getBestandSumme(bestand);
 
         lblEinheit.setText(DarreichungTools.getPackungsEinheit(bestand.getDarreichung()));
@@ -79,7 +77,6 @@ public class DlgEditBuchung extends javax.swing.JDialog {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }
 
-        SYSTools.centerOnParent(parent, this);
         txtMenge.setText("0.00");
         setVisible(true);
     }
@@ -92,140 +89,104 @@ public class DlgEditBuchung extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new JLabel();
-        jSeparator1 = new JSeparator();
-        jScrollPane1 = new JScrollPane();
+        jLabel3 = new JLabel();
+        scrollPane1 = new JScrollPane();
         txtText = new JTextArea();
         txtMenge = new JTextField();
         jLabel2 = new JLabel();
-        btnBuchung = new JButton();
-        btnCancel = new JButton();
         lblEinheit = new JLabel();
+        panel1 = new JPanel();
+        btnCancel = new JButton();
+        btnBuchung = new JButton();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container contentPane = getContentPane();
+        setLayout(new FormLayout(
+            "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
+            "default, $lgap, 40dlu, 2*($lgap, fill:default), $lgap, default"));
 
-        //---- jLabel1 ----
-        jLabel1.setFont(new Font("Dialog", Font.BOLD, 16));
-        jLabel1.setText("Einzelbuchung");
+        //---- jLabel3 ----
+        jLabel3.setText("Buchungstext");
+        jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(jLabel3, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
 
-        //======== jScrollPane1 ========
+        //======== scrollPane1 ========
         {
-
-            //---- txtText ----
-            txtText.setColumns(20);
-            txtText.setRows(5);
-            jScrollPane1.setViewportView(txtText);
+            scrollPane1.setViewportView(txtText);
         }
+        add(scrollPane1, CC.xywh(5, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
         //---- txtMenge ----
         txtMenge.setHorizontalAlignment(SwingConstants.RIGHT);
         txtMenge.setText("jTextField1");
+        txtMenge.setFont(new Font("Arial", Font.PLAIN, 14));
         txtMenge.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
                 txtMengeCaretUpdate(e);
             }
         });
+        txtMenge.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtMengeFocusGained(e);
+            }
+        });
+        add(txtMenge, CC.xy(5, 5));
 
         //---- jLabel2 ----
-        jLabel2.setText("Menge:");
-
-        //---- btnBuchung ----
-        btnBuchung.setText("Buchen");
-        btnBuchung.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnBuchungActionPerformed(e);
-            }
-        });
-
-        //---- btnCancel ----
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancelActionPerformed(e);
-            }
-        });
+        jLabel2.setText("Menge");
+        jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(jLabel2, CC.xy(3, 5));
 
         //---- lblEinheit ----
         lblEinheit.setHorizontalAlignment(SwingConstants.TRAILING);
         lblEinheit.setText("jLabel4");
+        lblEinheit.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(lblEinheit, CC.xy(7, 5));
 
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jScrollPane1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
-                                        .addComponent(jLabel1, GroupLayout.Alignment.LEADING)
-                                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addComponent(btnBuchung)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel))
-                                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                                .addComponent(jLabel2)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtMenge, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblEinheit, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(lblEinheit)
-                                        .addComponent(txtMenge, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnBuchung))
-                                .addContainerGap())
-        );
-        pack();
-        setLocationRelativeTo(getOwner());
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            panel1.add(btnCancel);
+
+            //---- btnBuchung ----
+            btnBuchung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnBuchung.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnBuchungActionPerformed(e);
+                }
+            });
+            panel1.add(btnBuchung);
+        }
+        add(panel1, CC.xywh(5, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        dispose();
+        actionBlock.execute(null);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnBuchungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchungActionPerformed
         save();
-        dispose();
+        actionBlock.execute(buchung);
     }//GEN-LAST:event_btnBuchungActionPerformed
 
     private void save() {
         buchung = new MedBuchungen(bestand, menge, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
         buchung.setText(txtText.getText());
+    }
 
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            em.persist(buchung);
-            bestand = em.merge(bestand);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-
+    public JComponent getDefaultFocusComponent(){
+        return txtText;
     }
 
     public MedBuchungen getBuchung() {
@@ -245,15 +206,15 @@ public class DlgEditBuchung extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel1;
-    private JSeparator jSeparator1;
-    private JScrollPane jScrollPane1;
+    private JLabel jLabel3;
+    private JScrollPane scrollPane1;
     private JTextArea txtText;
     private JTextField txtMenge;
     private JLabel jLabel2;
-    private JButton btnBuchung;
-    private JButton btnCancel;
     private JLabel lblEinheit;
+    private JPanel panel1;
+    private JButton btnCancel;
+    private JButton btnBuchung;
     // End of variables declaration//GEN-END:variables
 
 }

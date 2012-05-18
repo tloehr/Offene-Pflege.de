@@ -406,7 +406,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 //                            em.getEntityManagerFactory().getCache().evict(Verordnung.class, myverordnung);
                         } catch (OptimisticLockException ole) {
                             em.getTransaction().rollback();
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Diese Verordnung wurde zwischenzeitlich schon gelöscht.", DisplayMessage.IMMEDIATELY, 2));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Diese Verordnung wurde zwischenzeitlich schon gelöscht.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
                         } catch (Exception e) {
                             em.getTransaction().rollback();
                             OPDE.fatal(e);

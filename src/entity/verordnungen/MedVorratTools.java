@@ -41,7 +41,7 @@ public class MedVorratTools {
         };
     }
 
-    public static BigDecimal getSumme(MedVorrat vorrat) {
+    public static BigDecimal getVorratSumme(MedVorrat vorrat) {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedBestand bestand : vorrat.getBestaende()) {
@@ -53,7 +53,7 @@ public class MedVorratTools {
         return result;
     }
 
-    public static BigDecimal getSumme(EntityManager em, MedVorrat vorrat) throws Exception {
+    public static BigDecimal getVorratSumme(EntityManager em, MedVorrat vorrat) throws Exception {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedBestand bestand : vorrat.getBestaende()) {
@@ -81,9 +81,6 @@ public class MedVorratTools {
      * @param bhp        BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
-
-        vorrat = em.merge(vorrat);
-        bhp = em.merge(bhp);
 
         OPDE.debug("entnahmeVorrat/5: vorrat: " + vorrat);
 
@@ -135,7 +132,7 @@ public class MedVorratTools {
 
 
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
-        MedBestand bestand = MedBestandTools.getBestandImAnbruch(vorrat);
+        MedBestand bestand = em.merge(MedBestandTools.getBestandImAnbruch(vorrat));
 
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
@@ -303,6 +300,5 @@ public class MedVorratTools {
             em.close();
         }
     }
-
 
 }

@@ -112,6 +112,10 @@ public class OPDE {
         return debug;
     }
 
+    public static int getErrorMessageTime(){
+        return 4;
+    }
+
     public static boolean isAnimation() {
         return animation;
     }
