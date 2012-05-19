@@ -140,6 +140,10 @@ public class MedVorrat implements Serializable {
         return bis;
     }
 
+    public boolean isAbgeschlossen(){
+        return bis.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    }
+
     public void setBis(Date bis) {
         this.bis = bis;
     }

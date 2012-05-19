@@ -28,8 +28,6 @@ package op;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.alert.Alert;
-import com.jidesoft.animation.CustomAnimation;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.plaf.basic.ThemePainter;
@@ -40,7 +38,6 @@ import com.jidesoft.status.TimeStatusBarItem;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
-import com.jidesoft.utils.PortingUtils;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
@@ -54,7 +51,6 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import op.vorgang.PnlVorgang;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -62,11 +58,15 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.Iterator;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author __USER__
@@ -85,15 +85,13 @@ public class FrmMain extends JFrame {
     private DisplayManager displayManager;
     private CleanablePanel currentVisiblePanel;
     private Bewohner currentBewohner;
-    private JFrame thisFrame;
+    private JideButton previousProgButton;
     private DlgLogin dlgLogin;
-    private CollapsiblePane panelPflegeakte;
     private LabelStatusBarItem labelUSER;
     private JScrollPane jspSearch, jspApps;
     private CollapsiblePanes panesSearch, panesApps;
     private Closure bwchange;
-    private Alert alert;
-    private MouseAdapter mouseAdapter;
+    private HashMap<Bewohner, JideButton> bwButtonMap;
 
 
     public FrmMain() {
@@ -103,10 +101,8 @@ public class FrmMain extends JFrame {
         currentVisiblePanel = null;
         currentBewohner = null;
 
-        thisFrame = this;
         setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
 //        this.setVisible(true);
-
 
 
         if (OPDE.isDebug()) {
@@ -181,7 +177,7 @@ public class FrmMain extends JFrame {
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
-        if (b){
+        if (b) {
             showLogin();
         }
     }
@@ -191,17 +187,16 @@ public class FrmMain extends JFrame {
     }
 
     private void button1ActionPerformed(ActionEvent e) {
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTML("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden."), DisplayMessage.IMMEDIATELY, 4));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTML("Testmessage: " + DateFormat.getDateTimeInstance().format(new Date())), 2));
     }
 
     private void afterLogin() {
 
-        createSearchPane();
+        prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getNameUndVorname());
 
         displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
         displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
-
 
     }
 
@@ -241,16 +236,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
-                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                        "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
+                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -377,11 +372,19 @@ public class FrmMain extends JFrame {
                 JideButton progButton = GUITools.createHyperlinkButton(shortDescription, null, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
+
+                        if (previousProgButton != null) {
+                            previousProgButton.setBackground(Color.WHITE);
+                            previousProgButton.setOpaque(false);
+                        }
+                        previousProgButton = (JideButton) actionEvent.getSource();
+                        previousProgButton.setBackground(Color.YELLOW);
+                        previousProgButton.setOpaque(true);
+
                         displayManager.setMainMessage(shortDescription);
                         displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
                         setPanelTo(loadPanel(javaclass));
-//                        thisPanel = currentVisiblePanel;
-                        collapseAllOthers(mypane);
+
                     }
                 });
 
@@ -397,7 +400,7 @@ public class FrmMain extends JFrame {
         panesApps.setBackground(mypane.getBackground());
     }
 
-    private void createSearchPane() {
+    private void prepareSearchArea() {
 
         panesSearch = new CollapsiblePanes();
         panesSearch.setLayout(new JideBoxLayout(panesSearch, JideBoxLayout.Y_AXIS));
@@ -411,29 +414,8 @@ public class FrmMain extends JFrame {
         splitPaneLeft.add(jspApps);
         splitPaneLeft.add(jspSearch);
 
-//        if (splitPaneLeft.getPaneCount() > 0) {
-//            splitPaneLeft.setPaneAt(jspApps, 0);
-//            splitPaneLeft.setPaneAt(jspSearch, 1);
-//        } else {
-//
-//
-//        }
-
         createProgramListe();
         createPflegedokumentation();
-
-//        if (panesToAdd != null) {
-//            if (!SYSTools.catchNull(titleForAdditionalPanes).isEmpty()) {
-//                TitledSeparator sep = new TitledSeparator();
-//                sep.setLabelComponent(new JLabel(titleForAdditionalPanes, null, JLabel.LEFT));
-//                sep.setTextAlignment(SwingConstants.RIGHT);
-//                sep.setBarAlignment(SwingConstants.CENTER);
-//                panesSearch.add(sep);
-//            }
-//            for (CollapsiblePane pane : panesToAdd) {
-//                panesSearch.add(pane);
-//            }
-//        }
 
         panesApps.addExpansion();
     }
@@ -450,6 +432,8 @@ public class FrmMain extends JFrame {
     }
 
     private CollapsiblePane createBewohnerListe(Stationen station) {
+        bwButtonMap = new HashMap<Bewohner, JideButton>();
+
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
         query.setParameter("station", station);
@@ -479,9 +463,19 @@ public class FrmMain extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (currentBewohner != innerbewohner) {
+
+                        if (previousProgButton != null) {
+                            previousProgButton.setBackground(Color.WHITE);
+                            previousProgButton.setOpaque(false);
+                        }
+
+                        previousProgButton = (JideButton) actionEvent.getSource();
+                        previousProgButton.setBackground(Color.YELLOW);
+                        previousProgButton.setOpaque(true);
+
                         currentBewohner = innerbewohner;
 
-                        if (currentVisiblePanel instanceof NursingRecordsPanel) { // tritt nur beim ersten mal auf. Dann werden die Tabs freigeschaltet und erstmalig gefüllt.
+                        if (currentVisiblePanel instanceof NursingRecordsPanel) {
                             ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
                         } else {
                             setPanelTo(new PnlPflege(innerbewohner, jspSearch));
@@ -494,24 +488,104 @@ public class FrmMain extends JFrame {
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
             button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGeschlecht() == BewohnerTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
+//            button.putClientProperty("bewohner", innerbewohner);
 
             labelPanel.add(button);
+            bwButtonMap.put(innerbewohner, button);
         }
 
         mypane.setContentPane(labelPanel);
         return mypane;
     }
 
+    public void change2Bewohner(Bewohner bw) {
+        if (previousProgButton != null) {
+            previousProgButton.setBackground(Color.WHITE);
+            previousProgButton.setOpaque(false);
+        }
+        currentBewohner = bw;
 
-    public Point getLocationForDialog(Dimension dimOfDialog){
+        previousProgButton = bwButtonMap.get(bw);
+        previousProgButton.setBackground(Color.YELLOW);
+        previousProgButton.setOpaque(true);
 
 
+        List<Component> list = findPathForComponent(panesApps, previousProgButton);
+
+        if (list != null && !list.isEmpty()) {
+            for (Component comp : list){
+                if (comp instanceof CollapsiblePane){
+                    try {
+                        ((CollapsiblePane) comp).setCollapsed(false);
+                        previousProgButton.scrollRectToVisible(previousProgButton.getBounds());
+                    } catch (PropertyVetoException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                    break;
+                }
+            }
+        }
+
+//        OPDE.debug();
+
+        // Richtigen Button auch anzeigen. Auch wenn der Pane eingeklappt ist.
+//        for (int pane = 0; pane < panesApps.getComponents().length; pane++) {
+//            if (panesApps.getComponent(pane) instanceof CollapsiblePane) {
+//                CollapsiblePane collapsiblePane = (CollapsiblePane) panesApps.getComponent(pane);
+//                for (int comp = 0; comp < collapsiblePane.getComponents().length; comp++) {
+//                    if (collapsiblePane.getComponent(comp) instanceof JPanel) {
+//                        JPanel panel = (JPanel) collapsiblePane.getComponent(comp);
+//                        for (int pnlcontent = 0; pnlcontent < panel.getComponents().length; pnlcontent++) {
+//                            OPDE.debug(panel.getComponent(pnlcontent));
+//                            if (panel.getComponent(pnlcontent) instanceof JideButton) {
+//                                JideButton bwButton = (JideButton) panel.getComponent(pnlcontent);
+//                                if (bwButtonMap.get(bw).equals(bwButton)) {
+//                                    try {
+//                                        collapsiblePane.setCollapsed(false);
+//                                    } catch (PropertyVetoException e) {
+//                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                                    }
+//
+//                                    break;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+    }
 
 
+    private java.util.List<Component> findPathForComponent(Container container, Component comp) {
+        java.util.List<Component> result = null;
+
+        java.util.List<Component> containerList = Arrays.asList(container.getComponents());
+
+        for (Component component : containerList) {
+            if (component.equals(comp)) { // ANKER
+                result = new ArrayList<Component>();
+                result.add(comp);
+                break;
+            } else {
+                if (component instanceof Container) {
+                    result = findPathForComponent((Container) component, comp);
+                    if (result != null) {
+                        result.add(component);
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public Point getLocationForDialog(Dimension dimOfDialog) {
 
 
         //Dimension them = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight()+10);
+        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight() + 10);
         SwingUtilities.convertPointToScreen(point, this);
         return point;
     }
@@ -530,47 +604,10 @@ public class FrmMain extends JFrame {
         Iterator<Stationen> it = query.getResultList().iterator();
         em.close();
 
-//        CollapsiblePane currentStationsPane = null;
-
-//        TitledSeparator sep = new TitledSeparator();
-//        sep.setLabelComponent(new JLabel("Pflegeakte", null, JLabel.LEFT));
-//        sep.setTextAlignment(SwingConstants.RIGHT);
-//        sep.setBarAlignment(SwingConstants.CENTER);
-//        sep.setSeparatorBorder(new PartialGradientLineBorder(new Color[]{Color.BLACK, Color.WHITE}, 5, PartialSide.SOUTH));
-
-//        JPanel dokuPanel = new JPanel();
-//        dokuPanel.setLayout(new VerticalLayout());
-//        dokuPanel.setBackground(Color.WHITE);
-//        JideButton buttonVerlegung = GUITools.createHyperlinkButton("Verlegungsbericht", new ImageIcon(getClass().getResource("/artwork/16x16/infored.png")), new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-
-//
-//            }
-//        });
-//
-//        dokuPanel.add(buttonVerlegung);
-
-//        dokuPanel.add(pflegeSearchPanel);
-
         while (it.hasNext()) {
             panesApps.add(createBewohnerListe(it.next()));
         }
 
-//        panelPflegeakte = new CollapsiblePane("Pflegeakte", new ImageIcon(getClass().getResource("/artwork/16x16/pflegeakte.png")));
-//        panelPflegeakte.setSlidingDirection(SwingConstants.SOUTH);
-//        panelPflegeakte.setStyle(CollapsiblePane.PLAIN_STYLE);
-//        panelPflegeakte.setContentPane(dokuPanel);
-
-//        // Wenn die Pflegeakte ausgeklappt wird, dann werden alle Programme eingeklappt.
-//        panelPflegeakte.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-//            @Override
-//            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                collapseAllOthers(panelPflegeakte);
-//            }
-//        });
-
-//        panesApps.add(panelPflegeakte);
     }
 
     private void setPanelTo(CleanablePanel pnl) {
@@ -580,8 +617,6 @@ public class FrmMain extends JFrame {
 
         currentVisiblePanel = pnl;
         pnlMain.add(currentVisiblePanel, CC.xywh(5, 4, 2, 2, CC.FILL, CC.FILL));
-//        pnlMain.validate();
-//        pnlMain.repaint();
     }
 
     public void dispose() {
@@ -630,20 +665,20 @@ public class FrmMain extends JFrame {
 
     }
 
-    private void collapseAllOthers(CollapsiblePane thisPane) {
-        for (int comp = 0; comp < panesApps.getComponentCount(); comp++) {
-            OPDE.debug("collapseAllOthers: " + (panesApps.getComponent(comp) != thisPane));
-            if (panesApps.getComponent(comp) != thisPane && panesApps.getComponent(comp) instanceof CollapsiblePane) {
-                if (!((CollapsiblePane) panesApps.getComponent(comp)).isCollapsed()) {
-                    try {
-                        ((CollapsiblePane) panesApps.getComponent(comp)).setCollapsed(true);
-                    } catch (PropertyVetoException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                }
-            }
-        }
-    }
+//    private void collapseAllOthers(CollapsiblePane thisPane) {
+//        for (int comp = 0; comp < panesApps.getComponentCount(); comp++) {
+//            OPDE.debug("collapseAllOthers: " + (panesApps.getComponent(comp) != thisPane));
+//            if (panesApps.getComponent(comp) != thisPane && panesApps.getComponent(comp) instanceof CollapsiblePane) {
+//                if (!((CollapsiblePane) panesApps.getComponent(comp)).isCollapsed()) {
+//                    try {
+//                        ((CollapsiblePane) panesApps.getComponent(comp)).setCollapsed(true);
+//                    } catch (PropertyVetoException e) {
+//                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;

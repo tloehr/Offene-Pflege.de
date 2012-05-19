@@ -59,7 +59,6 @@ public class MyJDialog extends JDialog {
 
             @Override
             public void timingEvent(Animator animator, double fraction) {
-//                OPDE.debug(fraction);
                 if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
                     try {
                         Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
@@ -77,14 +76,12 @@ public class MyJDialog extends JDialog {
 
             @Override
             public void timingEvent(Animator animator, double fraction) {
-//                OPDE.debug(fraction);
                 if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
                     try {
                         Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
                         Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
                         mSetWindowOpacity.invoke(null, thisDialog, new Float(fraction));
                         repaint();
-//                        OPDE.debug("FADING AWAY");
                     } catch (Exception ex) {
                         OPDE.warn(ex);
                     }
@@ -114,7 +111,7 @@ public class MyJDialog extends JDialog {
                         mSetWindowOpacity.invoke(null, thisDialog, 0.0f);
                         repaint();
                     } catch (Exception ex) {
-                        OPDE.fatal(ex);
+                        OPDE.warn(ex);
                     }
                 }
                 fadeIn.start();
@@ -132,7 +129,7 @@ public class MyJDialog extends JDialog {
                         mSetWindowOpacity.invoke(null, thisDialog, 1.0f);
                         repaint();
                     } catch (Exception ex) {
-                        OPDE.fatal(ex);
+                        OPDE.warn(ex);
                     }
                 }
                 fadeOut.start();
@@ -143,10 +140,4 @@ public class MyJDialog extends JDialog {
     private void superdispose() {
         super.dispose();
     }
-
-//    private void supervisible(boolean b) {
-////        OPDE.debug("super.visible("+Boolean.toString(b)+")");
-//        super.setVisible(b);
-//    }
-
 }

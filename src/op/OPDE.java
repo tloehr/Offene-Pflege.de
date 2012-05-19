@@ -227,11 +227,6 @@ public class OPDE {
         e.printStackTrace();
         SYSPrint.print(SYSTools.getThrowableAsHTML(e), false);
         System.exit(1);
-//        if (host != null) {
-////            SYSHostsTools.shutdown(1);
-//        } else {
-//            System.exit(1);
-//        }
     }
 
     public static void error(Object message) {

@@ -7,6 +7,7 @@ package op.care.med.vorrat;
 import com.jidesoft.popup.JidePopup;
 import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedBuchungen;
+import entity.verordnungen.MedBuchungenTools;
 import op.OPDE;
 import op.system.DlgYesNo;
 import op.threads.DisplayMessage;
@@ -87,11 +88,11 @@ public class PnlBuchungen extends JPanel {
 
             // Menüeinträge
 
-            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            JMenuItem itemPopupDelete = new JMenuItem("Löschen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgYesNo("Möchten Sie die Buchung Nr. " + tm.getData().get(row).getBuchID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/trashcan_empty.png")), new Closure() {
+                    new DlgYesNo("Möchten Sie die Buchung Nr. " + tm.getData().get(row).getBuchID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -100,7 +101,6 @@ public class PnlBuchungen extends JPanel {
                                     em.getTransaction().begin();
                                     MedBuchungen mybuchung = em.merge(tm.getData().get(row));
                                     bestand = em.merge(bestand);
-//                                    em.merge(bestand.getVorrat());
 
                                     em.lock(mybuchung, LockModeType.OPTIMISTIC);
                                     em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -109,7 +109,7 @@ public class PnlBuchungen extends JPanel {
                                     em.remove(mybuchung);
                                     em.getTransaction().commit();
 
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Buchung Nr. "+tm.getData().get(row).getBuchID()+" wurde gelöscht.", 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Buchung Nr. " + tm.getData().get(row).getBuchID() + " wurde gelöscht.", 2));
                                 } catch (OptimisticLockException ole) {
                                     em.getTransaction().rollback();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
@@ -127,33 +127,10 @@ public class PnlBuchungen extends JPanel {
                         }
                     });
 
-//                    JOptionPane pane = new JOptionPane("Möchten Sie die Buchung wirklich löschen ?", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, new ImageIcon(getClass().getResource("/artwork/48x48/trashcan_empty.png")));
-//                    JDialog dialog = pane.createDialog(OPDE.getMainframe(), "");
-//                    dialog.setLocation(OPDE.getMainframe().getLocationForDialog(dialog.getSize()));
-//                    dialog.setVisible(true);
-//
-//                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie die Buchung wirklich löschen ?") == JOptionPane.YES_OPTION) {
-//                        EntityTools.delete(buchung);
-//                        reloadBuchungTable();
-//                        refreshBothTables();
-//                    }
                 }
             });
             menuBuch.add(itemPopupDelete);
 
-
-            JMenuItem itemPopupReset = new JMenuItem("Alle Buchungen zurücksetzen.");
-            itemPopupReset.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    if (JOptionPane.showConfirmDialog(thisComponent, "Sind Sie sicher ?") == JOptionPane.YES_OPTION) {
-//                        MedBestandTools.zuruecksetzen(bestand);
-//                        reloadBuchungTable();
-//                        refreshBothTables();
-//                    }
-                }
-            });
-            menuBuch.add(itemPopupReset);
             menuBuch.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }
@@ -205,8 +182,46 @@ public class PnlBuchungen extends JPanel {
         reloadTable();
     }
 
-    public boolean hasBestand(){
+    public boolean hasBestand() {
         return bestand != null;
+    }
+
+    public DlgYesNo resetBuchungen() {
+        return new DlgYesNo("Alle Buchungen von Bestand Nr." + bestand.getBestID() + " zurücksetzen. Sind Sie sicher ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/undo.png")), new Closure() {
+            @Override
+            public void execute(Object answer) {
+                if (answer.equals(JOptionPane.YES_OPTION)) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+
+                        bestand = em.merge(bestand);
+                        em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                        Query query = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
+                        query.setParameter("bestand", bestand);
+                        query.setParameter("notStatus", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
+                        query.executeUpdate();
+
+                        em.getTransaction().commit();
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde zurück gesetzt.", 2));
+                        em.refresh(bestand);
+                    } catch (OptimisticLockException ole) {
+                        em.getTransaction().rollback();
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                    reloadTable();
+                    actionAfterUpdate.execute(bestand);
+                }
+            }
+        });
     }
 
     public JidePopup getNeueBuchungPopup(JComponent owner) {
@@ -231,7 +246,7 @@ public class PnlBuchungen extends JPanel {
 
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neue Buchung wurde eingegeben.", 2));
 
-                        reloadTable();
+                        em.refresh(bestand);
 
                     } catch (OptimisticLockException ole) {
                         em.getTransaction().rollback();
@@ -245,6 +260,7 @@ public class PnlBuchungen extends JPanel {
                         em.close();
                     }
                 }
+                reloadTable();
                 popup.hidePopup();
                 actionAfterUpdate.execute(myBuchung);
             }
@@ -267,7 +283,6 @@ public class PnlBuchungen extends JPanel {
             Query query = em.createNamedQuery("MedBuchungen.findByBestand");
 
             bestand = em.merge(bestand);
-            em.refresh(bestand);
 
             query.setParameter("bestand", bestand);
 

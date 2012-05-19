@@ -91,32 +91,23 @@ public class MedBestandTools {
         return bestand;
     }
 
-
-    /**
-     * Bricht einen Bestand an. Berechnet das neue APV selbstständig.
-     *
-     * @param bestand
-     * @return der geänderte Bestand. Direkt persistiert und committed.
-     */
-    public static MedBestand anbrechen(MedBestand bestand) {
-        BigDecimal apv;
-        MedBestand result = null;
-
-        apv = getPassendesAPV(bestand);
-
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            result = anbrechen(em, bestand, apv);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-        return result;
-    }
+//
+//    /**
+//     * Bricht einen Bestand an. Berechnet das neue APV selbstständig.
+//     *
+//     * @param bestand
+//     * @return der geänderte Bestand. Direkt persistiert und committed.
+//     */
+//    public static MedBestand anbrechen(EntityManager em, MedBestand bestand) throws Exception {
+//        BigDecimal apv;
+//        MedBestand result = null;
+//
+//        apv = getPassendesAPV(bestand);
+//
+//        result = anbrechen(em, bestand, apv);
+//
+//        return result;
+//    }
 
     /**
      * Bricht einen Bestand an.
@@ -124,7 +115,7 @@ public class MedBestandTools {
      * @param bestand
      * @return
      */
-    public static MedBestand anbrechen(EntityManager em, MedBestand bestand, BigDecimal apv) throws Exception {
+    public static void anbrechen(EntityManager em, MedBestand bestand, BigDecimal apv) throws Exception {
         if (apv == null) {
             throw new NullPointerException("apv darf nicht null sein");
         }
@@ -135,7 +126,6 @@ public class MedBestandTools {
             apv = BigDecimal.ONE;
         }
         bestand.setApv(apv);
-        return em.merge(bestand);
     }
 
     public static HashMap getBestand4Printing(MedBestand bestand) {
@@ -234,7 +224,7 @@ public class MedBestandTools {
     public static MedBestand abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
         BigDecimal bestandsumme = getBestandSumme(em, bestand);
 
-        bestand = em.merge(bestand);
+//        bestand = em.merge(bestand);
         em.lock(bestand, LockModeType.OPTIMISTIC);
 
         MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
@@ -414,27 +404,34 @@ public class MedBestandTools {
 
     }
 
-    /**
-     * Setzt für einen Bestand <b>alle</b> Buchungen zurück, bis auf die Anfangsbuchung.
-     *
-     * @param bestand
-     */
-    public static void zuruecksetzen(MedBestand bestand) {
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            Query query = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
-            query.setParameter("bestand", bestand);
-            query.setParameter("notStatus", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
-            query.executeUpdate();
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            em.getTransaction().rollback();
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
-        }
-    }
+//    /**
+//     * Setzt für einen Bestand <b>alle</b> Buchungen zurück, bis auf die Anfangsbuchung.
+//     *
+//     * @param bestand
+//     */
+//    public static void zuruecksetzen(MedBestand bestand) {
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//            bestand = em.merge(bestand);
+//            em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//            Query query = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
+//            query.setParameter("bestand", bestand);
+//            query.setParameter("notStatus", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
+//            query.executeUpdate();
+//            em.getTransaction().commit();
+//        } catch (OptimisticLockException ole) {
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
+//            em.getTransaction().rollback();
+//        } catch (Exception ex) {
+//            if (em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            OPDE.fatal(ex);
+//        } finally {
+//            em.close();
+//        }
+//    }
 
 //    public static boolean hasAbgesetzteBestaende(BHP bhp) {
 //        boolean result = false;

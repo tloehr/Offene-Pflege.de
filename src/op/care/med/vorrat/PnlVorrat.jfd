@@ -50,14 +50,6 @@
           </object> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.MouseListener</string> 
-            <string>mousePressed</string> 
-            <string>jspVorratMousePressed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
             <string>java.awt.event.ComponentListener</string> 
             <string>componentResized</string> 
             <string>jspVorratComponentResized</string> 
@@ -259,14 +251,6 @@
             <string>java.awt.event.ComponentListener</string> 
             <string>componentResized</string> 
             <string>jspBestandComponentResized</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.MouseListener</string> 
-            <string>mousePressed</string> 
-            <string>jspBestandMousePressed</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 

@@ -1,5 +1,7 @@
 package op.threads;
 
+import entity.system.SYSLoginTools;
+import entity.system.SyslogTools;
 import op.OPDE;
 
 import javax.swing.*;
@@ -97,7 +99,9 @@ public class DisplayManager extends Thread {
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
             lblSub.setText(currentSubMessage.getMessage());
-            // df.format(new Date()) + ": " +
+            if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY){
+                SyslogTools.addLog(currentSubMessage.getMessage(), SyslogTools.ERROR);
+            }
         } else {
             pbIntermediateZyklen++;
             if (currentSubMessage == null || currentSubMessage.isObsolete()) {

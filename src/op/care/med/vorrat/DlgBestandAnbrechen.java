@@ -152,7 +152,7 @@ public class DlgBestandAnbrechen extends MyJDialog {
         //String classname = this.getName() + ".btnOKActionPerformed()";
         if (cmbBestID.getSelectedIndex() > 0) {
             bestand = (MedBestand) cmbBestID.getSelectedItem();
-            MedBestandTools.anbrechen(bestand);
+//            MedBestandTools.anbrechen(bestand);
         }
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed

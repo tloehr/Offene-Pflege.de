@@ -5,6 +5,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -146,7 +147,8 @@ public class MedVorratTools {
 
             if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
-                    MedBestand naechsterBestand = bestand.getNaechsterBestand();
+                    MedBestand naechsterBestand = em.merge(bestand.getNaechsterBestand());
+                    em.lock(naechsterBestand, LockModeType.OPTIMISTIC);
 
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Bzw. die Packung wurde mit dieser Gabe geleert.
@@ -155,7 +157,8 @@ public class MedVorratTools {
 
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
-                    naechsterBestand = MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(em, bestand));
+
+                    MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(em, bestand));
                 } else {
                     MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
 //                    em.persist(buchung);

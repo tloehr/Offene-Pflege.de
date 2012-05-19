@@ -63,7 +63,7 @@ public class SyslogTools {
             System.exit(1);
         }
 
-        em.persist(new Syslog(localMachine.getHostName(), localMachine.getHostAddress(), OPDE.getLocalProps().getProperty("hostkey"), new Date(), message, level, OPDE.getLogin()));
+        em.persist(new Syslog(localMachine.getHostName(), localMachine.getHostAddress(), OPDE.getLocalProps().getProperty("hostkey"), new Date(), message, level, em.merge(OPDE.getLogin())));
 
     }
 

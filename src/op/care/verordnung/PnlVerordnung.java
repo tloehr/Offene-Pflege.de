@@ -383,7 +383,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             JMenuItem itemPopupDelete = new JMenuItem("Löschen");
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    JOptionPane pane = new JOptionPane("Soll die Verordnung wirklich gelöscht werden.", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, new ImageIcon(getClass().getResource("/artwork/48x48/trashcan_empty.png")));
+                    JOptionPane pane = new JOptionPane("Soll die Verordnung wirklich gelöscht werden.", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")));
                     JDialog dialog = pane.createDialog(OPDE.getMainframe(), "");
                     dialog.setLocation(OPDE.getMainframe().getLocationForDialog(dialog.getSize()));
                     dialog.setVisible(true);
