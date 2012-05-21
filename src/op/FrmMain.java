@@ -183,7 +183,10 @@ public class FrmMain extends JFrame {
     }
 
     private void btnReloadSubmessageActionPerformed(ActionEvent e) {
-        displayManager.showLastSubMessageAgain();
+//        displayManager.showLastSubMessageAgain();
+
+        OPDE.fatal(new Exception("TESTEXCEPTION"));
+
     }
 
     private void button1ActionPerformed(ActionEvent e) {

@@ -359,10 +359,11 @@ public class SYSPrint {
      * @param html
      * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
      */
-    public static void print(String html, boolean addPrintJScript) {
+    public static File print(String html, boolean addPrintJScript) {
+        File temp = null;
         try {
             // Create temp file.
-            File temp = File.createTempFile("opde", ".html");
+            temp = File.createTempFile("opde", ".html");
 
 
             String text = "<html><head>";
@@ -388,9 +389,9 @@ public class SYSPrint {
             out.close();
             handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
         } catch (IOException e) {
-            OPDE.fatal(e);
+            OPDE.debug(e);
         }
-
+        return temp;
     }
 
 //    public static void showFile(Component parent, String filename) {

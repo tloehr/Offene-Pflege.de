@@ -108,9 +108,9 @@ public class BHPTools {
         // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
         // die wirklichen Treffer nachher genauer ermittelt werden.
 
-        OPDE.info(SYSTools.getWindowTitle("BHPImport"));
+//        OPDE.info(SYSTools.getWindowTitle("BHPImport"));
 
-        OPDE.info("Schreibe nach: " + OPDE.getUrl());
+        OPDE.debug("[BHPImport] Schreibe nach: " + OPDE.getUrl());
 
         select.setParameter("andatum", new Date(SYSCalendar.startOfDay(stichtag)));
         select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(stichtag)));
@@ -120,7 +120,7 @@ public class BHPTools {
 
         numbhp = erzeugen(em, list, stichtag, true);
 
-        OPDE.info("BHPImport abgeschlossen. Stichtag: " + DateFormat.getDateInstance().format(stichtag));
+        OPDE.info("[BHPImport] Durchgeführt. Stichtag: " + DateFormat.getDateInstance().format(stichtag) + " Anzaghl erzeugter BHPs: "+numbhp);
 
 //            SYSRunningClassesTools.endModule(me);
 
@@ -222,7 +222,7 @@ public class BHPTools {
 
                 row++;
 
-                OPDE.info("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
+                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
                 OPDE.debug("==========================================");
                 System.out.println("Planung: " + planung.getBhppid());
                 OPDE.debug("BWKennung: " + planung.getVerordnung().getBewohner().getBWKennung());

@@ -67,7 +67,7 @@ public class TMVorraete extends AbstractTableModel {
         Object result = "";
         switch (col) {
             case COL_NAME: {
-                result = getVorrat(row).getText();
+                result = "["+getVorrat(row).getVorID() +"] " + getVorrat(row).getText();
                 break;
             }
             case COL_MENGE: {

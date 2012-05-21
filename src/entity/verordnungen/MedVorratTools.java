@@ -134,6 +134,7 @@ public class MedVorratTools {
 
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedBestand bestand = em.merge(MedBestandTools.getBestandImAnbruch(vorrat));
+        em.lock(bestand, LockModeType.OPTIMISTIC);
 
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
@@ -275,33 +276,33 @@ public class MedVorratTools {
     }
 
 
-    /**
-     * Schliesst einen Vorrat und alle zugehörigen, noch vorhandenen Bestände ab. Inklusive der notwendigen Abschlussbuchungen.
-     *
-     * @param vorrat
-     */
-    public static void abschliessen(MedVorrat vorrat) {
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-
-            // Alle Bestände abschliessen.
-            for (MedBestand bestand : vorrat.getBestaende()) {
-                if (!bestand.isAbgeschlossen()) {
-                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
-                }
-            }
-
-            // Vorrat abschliessen
-            vorrat.setBis(new Date());
-
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            em.getTransaction().rollback();
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
-        }
-    }
+//    /**
+//     * Schliesst einen Vorrat und alle zugehörigen, noch vorhandenen Bestände ab. Inklusive der notwendigen Abschlussbuchungen.
+//     *
+//     * @param vorrat
+//     */
+//    public static void abschliessen(MedVorrat vorrat) {
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//
+//            // Alle Bestände abschliessen.
+//            for (MedBestand bestand : vorrat.getBestaende()) {
+//                if (!bestand.isAbgeschlossen()) {
+//                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+//                }
+//            }
+//
+//            // Vorrat abschliessen
+//            vorrat.setBis(new Date());
+//
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            em.getTransaction().rollback();
+//            OPDE.fatal(ex);
+//        } finally {
+//            em.close();
+//        }
+//    }
 
 }

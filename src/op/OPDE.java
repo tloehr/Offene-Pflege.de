@@ -43,6 +43,14 @@ import org.apache.log4j.*;
 import org.eclipse.persistence.config.QueryHints;
 import org.eclipse.persistence.logging.JavaLog;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -50,7 +58,9 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.InetAddress;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -112,7 +122,7 @@ public class OPDE {
         return debug;
     }
 
-    public static int getErrorMessageTime(){
+    public static int getErrorMessageTime() {
         return 4;
     }
 
@@ -225,7 +235,66 @@ public class OPDE {
         logger.fatal(e.getMessage(), e);
         SyslogTools.fatal(e.getMessage());
         e.printStackTrace();
-        SYSPrint.print(SYSTools.getThrowableAsHTML(e), false);
+
+        String html = SYSTools.getThrowableAsHTML(e);
+
+        File temp = SYSPrint.print(html, false);
+
+        if (props.containsKey("mail.smtp.host")) { //Stellvertretend für die anderen Keys.
+            try {
+
+                InetAddress localMachine = InetAddress.getLocalHost();
+
+                javax.mail.Authenticator auth = new javax.mail.Authenticator() {
+                    @Override
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(props.getProperty("mail.sender"), props.getProperty("mail.password"));
+                    }
+                };
+
+                Session session = Session.getDefaultInstance(props, auth);
+
+                Message msg = new MimeMessage(session);
+                msg.setFrom(new InternetAddress(props.getProperty("mail.sender"), props.getProperty("mail.sender.personal")));
+                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(props.getProperty("mail.recipient"), props.getProperty("mail.recipient.personal")));
+                msg.setSubject("OPDE Exception: " + e.getMessage());
+
+
+                BodyPart messageBodyPart = new MimeBodyPart();
+
+                messageBodyPart.setText("" +
+                        "Es ist ein Fehler in OPDE aufgetreten.\n" +
+                        "Auf Host: " + localMachine.getHostName() + "\n" +
+                        "IP-Adresse: " + localMachine.getHostAddress() + "\n" +
+                        "Angemelet war: " + getLogin().getUser().getUKennung() + "\n" +
+                        "Zeitpunkt: " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
+                        "Siehe Anhang für Stacktrace");
+
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(messageBodyPart);
+                messageBodyPart = new MimeBodyPart();
+
+                DataSource source = new FileDataSource(temp);
+                messageBodyPart.setDataHandler(new DataHandler(source));
+                messageBodyPart.setFileName(temp.getName());
+
+                multipart.addBodyPart(messageBodyPart);
+                msg.setContent(multipart);
+                msg.saveChanges();
+
+                Transport.send(msg);
+            } catch (MessagingException e1) {
+                OPDE.info(e1);
+                OPDE.info("Mail-System nicht korrekt konfiguriert");
+                e1.printStackTrace();
+            } catch (UnsupportedEncodingException e1) {
+                OPDE.info(e1);
+                e1.printStackTrace();
+            } catch (java.net.UnknownHostException uhe) {
+                OPDE.info(uhe);
+            }
+        }
+
         System.exit(1);
     }
 
@@ -499,7 +568,8 @@ public class OPDE {
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     em.getTransaction().rollback();
-                    // TODO:Notify per EMail das das nicht geklappt hat.
+
+
                     fatal(ex);
                 } finally {
                     em.close();

@@ -224,9 +224,6 @@ public class MedBestandTools {
     public static MedBestand abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
         BigDecimal bestandsumme = getBestandSumme(em, bestand);
 
-//        bestand = em.merge(bestand);
-        em.lock(bestand, LockModeType.OPTIMISTIC);
-
         MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
         abschlussBuchung.setText(text);
         em.persist(abschlussBuchung);

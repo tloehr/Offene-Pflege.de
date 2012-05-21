@@ -100,7 +100,7 @@ public class DisplayManager extends Thread {
             currentSubMessage.setProcessed(System.currentTimeMillis());
             lblSub.setText(currentSubMessage.getMessage());
             if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY){
-                SyslogTools.addLog(currentSubMessage.getMessage(), SyslogTools.ERROR);
+                SyslogTools.addLog("["+currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
             }
         } else {
             pbIntermediateZyklen++;

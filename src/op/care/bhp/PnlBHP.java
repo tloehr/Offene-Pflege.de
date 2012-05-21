@@ -463,6 +463,7 @@ public class PnlBHP extends NursingRecordsPanel {
         panelFilter.setCollapsible(false);
 
         cmbSchicht = new JComboBox(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
+        cmbSchicht.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
         cmbSchicht.addItemListener(new ItemListener() {
             @Override
@@ -475,6 +476,7 @@ public class PnlBHP extends NursingRecordsPanel {
         labelPanel.add(cmbSchicht);
 
         jdcDatum = new JDateChooser(new Date());
+        jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
         jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(bewohner));
 
         jdcDatum.setBackground(Color.WHITE);
@@ -509,28 +511,28 @@ public class PnlBHP extends NursingRecordsPanel {
         homeButton.setOpaque(false);
         homeButton.setContentAreaFilled(false);
 
-        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev.png")));
+        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back.png")));
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
             }
         });
-        backButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev_pressed.png")));
+        backButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back_pressed.png")));
         backButton.setBorder(null);
         backButton.setBorderPainted(false);
         backButton.setOpaque(false);
         backButton.setContentAreaFilled(false);
 
 
-        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd.png")));
+        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play.png")));
         fwdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
             }
         });
-        fwdButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd_pressed.png")));
+        fwdButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play_pressed.png")));
         fwdButton.setBorder(null);
         fwdButton.setBorderPainted(false);
         fwdButton.setOpaque(false);

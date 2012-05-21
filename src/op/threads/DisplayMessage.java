@@ -1,6 +1,7 @@
 package op.threads;
 
 
+import op.OPDE;
 import sun.security.x509.UniqueIdentity;
 
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     private int secondsToShow;
     private int percentage;
     private String uid;
+    private String classname;
 
 
     public DisplayMessage(String message) {
@@ -35,6 +37,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.secondsToShow = 0;
         this.percentage = 0;
         uid = UUID.randomUUID().toString();
+        this.classname = "";
     }
 
     public DisplayMessage(String message, int secondsToShow) {
@@ -45,6 +48,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.secondsToShow = secondsToShow;
         this.percentage = 0;
         uid = UUID.randomUUID().toString();
+        this.classname = "";
     }
 
     public DisplayMessage(String message, int priority, int secondsToShow) {
@@ -55,6 +59,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.secondsToShow = secondsToShow;
         this.percentage = 0;
         uid = UUID.randomUUID().toString();
+        this.classname = "";
     }
 
     public DisplayMessage(String message, int priority, long timestamp, long processed, int secondsToShow) {
@@ -65,6 +70,18 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.secondsToShow = secondsToShow;
         this.percentage = 0;
         uid = UUID.randomUUID().toString();
+        this.classname = "";
+    }
+
+    public DisplayMessage(String message, String classname) {
+        this.message = message;
+        this.priority = IMMEDIATELY;
+        this.timestamp = System.currentTimeMillis();
+        this.processed = 0;
+        this.secondsToShow = OPDE.getErrorMessageTime();
+        this.percentage = 0;
+        uid = UUID.randomUUID().toString();
+        this.classname = classname;
     }
 
     public String getMessage() {
@@ -113,6 +130,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
 
     public void setPercentage(int percentage) {
         this.percentage = percentage;
+    }
+
+    public String getClassname() {
+        return classname;
+    }
+
+    public void setClassname(String classname) {
+        this.classname = classname;
     }
 
     public String getUID() {
