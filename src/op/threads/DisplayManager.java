@@ -1,8 +1,6 @@
 package op.threads;
 
-import entity.system.SYSLoginTools;
 import entity.system.SyslogTools;
-import op.OPDE;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,6 +39,7 @@ public class DisplayManager extends Thread {
         progressBarMessage = null;
         jp.setStringPainted(false);
         jp.setValue(0);
+        jp.setMaximum(100);
         lblMain = lblM;
         lblSub = lblS;
         this.lblDB = lblDB;
@@ -67,7 +66,7 @@ public class DisplayManager extends Thread {
     }
 
     public void addSubMessage(DisplayMessage msg) {
-        OPDE.debug(msg);
+//        OPDE.debug(msg);
         messageQ.add(msg);
         Collections.sort(messageQ);
     }
@@ -99,8 +98,8 @@ public class DisplayManager extends Thread {
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
             lblSub.setText(currentSubMessage.getMessage());
-            if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY){
-                SyslogTools.addLog("["+currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
+            if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
+                SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
             }
         } else {
             pbIntermediateZyklen++;
@@ -113,7 +112,7 @@ public class DisplayManager extends Thread {
             }
         }
 
-        if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY){
+        if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
             jp.setForeground(Color.RED);
             lblSub.setForeground(Color.RED);
         } else {
@@ -129,6 +128,11 @@ public class DisplayManager extends Thread {
 //            System.out.println(zyklen/5%2);
             jp.setValue(progressBarMessage.getPercentage());
             jp.setString(progressBarMessage.getMessage());
+        } else {
+            if (jp.getValue() > 0) {
+                jp.setValue(0);
+                jp.setString(null);
+            }
         }
 //        } else {
 //            if ((progressBarMessage != null && zyklen/5%2 == 1 && zyklen % 5 == 0) || zyklen % 10 == 0 || zyklen == 0) {

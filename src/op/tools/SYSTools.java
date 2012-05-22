@@ -26,6 +26,7 @@
  */
 package op.tools;
 
+import com.jidesoft.swing.JideSplitPane;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import org.jdesktop.core.animation.timing.Animator;
@@ -1682,8 +1683,36 @@ public class SYSTools {
         return new Double(max * pos).intValue();
     }
 
-    public static Double getDividerInRelativePosition(JSplitPane mysplit, int pos) {
+    public static Integer getDividerInAbsolutePosition(JideSplitPane mysplit, double pos) {
         int max;
+
+        if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+            max = mysplit.getWidth();
+        } else {
+            max = mysplit.getHeight();
+        }
+        return new Double(max * pos).intValue();
+    }
+
+    public static Double getDividerInRelativePosition(JSplitPane mysplit) {
+        int max;
+        int pos = mysplit.getDividerLocation();
+
+        if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+            max = mysplit.getWidth();
+        } else {
+            max = mysplit.getHeight();
+        }
+        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
+        OPDE.debug("DIVIDER MAX POSITION: " + max);
+        OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
+        return new Double(pos) / new Double(max);
+    }
+
+    public static Double getDividerInRelativePosition(JideSplitPane mysplit) {
+        int max;
+        int pos = mysplit.getDividerLocation(0);
+
         if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
             max = mysplit.getWidth();
         } else {

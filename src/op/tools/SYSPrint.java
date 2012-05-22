@@ -110,16 +110,16 @@ public class SYSPrint {
         return ESCPOS_PRINT_COLOR2 + in + ESCPOS_PRINT_COLOR1;
     }
 
-    public static void printLabel(MedBestand bestand) {
-        String text = "";
-        if (OPDE.getProps().containsKey("labelprinter")) {
-            PRINTER = OPDE.getProps().get("labelprinter").toString();
-        }
-
-        text = MedBestandTools.getBestandText4Print(bestand);
-
-        printLabel(text);
-    }
+//    public static void printLabel(MedBestand bestand) {
+//        String text = "";
+//        if (OPDE.getProps().containsKey("etiprinter1")) {
+//            PRINTER = OPDE.getProps().get("etiprinter1").toString();
+//        }
+//
+//        text = MedBestandTools.getBestandText4Print(bestand);
+//
+//        printLabel(text);
+//    }
 
     private static void printLabel(String text) {
 

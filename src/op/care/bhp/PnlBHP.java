@@ -105,6 +105,12 @@ public class PnlBHP extends NursingRecordsPanel {
         SYSTools.unregisterListeners(this);
     }
 
+    @Override
+   public void reload() {
+        reloadTable();
+   }
+
+
     /**
      * This method is called from within the constructor to
      * initialize the form.

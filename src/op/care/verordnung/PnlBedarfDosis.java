@@ -94,6 +94,11 @@ public class PnlBedarfDosis extends CleanablePanel {
         // TODO add your code here
     }
 
+     @Override
+    public void reload() {
+
+    }
+
     private void txtMaxTimesActionPerformed(ActionEvent e) {
         // TODO add your code here
     }

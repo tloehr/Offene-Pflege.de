@@ -97,7 +97,7 @@ public class PnlVorrat extends NursingRecordsPanel {
 
     private Bewohner bewohner;
     private boolean ignoreEvent;
-//    private Component thisDialog;
+    //    private Component thisDialog;
     private JPopupMenu menuV;
     //    private JPopupMenu menuB;
     private PnlBuchungen pnlBuchungen;
@@ -283,6 +283,11 @@ public class PnlVorrat extends NursingRecordsPanel {
         tcm1.getColumn(TMVorraete.COL_MENGE).setPreferredWidth(dim.width / 4);
         tcm1.getColumn(TMVorraete.COL_NAME).setHeaderValue("Vorratsbezeichnung");
         tcm1.getColumn(TMVorraete.COL_MENGE).setHeaderValue("Gesamtsumme");
+    }
+
+    @Override
+    public void reload() {
+        reloadVorratTable();
     }
 
     private void initDialog() {

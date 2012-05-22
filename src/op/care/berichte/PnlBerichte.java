@@ -212,6 +212,13 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     }
 
+    @Override
+   public void reload() {
+        reloadTable();
+
+   }
+
+
 //    private void btnApplyActionPerformed(ActionEvent e) {
 //        boolean success = false;
 //        TimelineCallbackAdapter standardAdapter = new TimelineCallbackAdapter() {

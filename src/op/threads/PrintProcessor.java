@@ -3,11 +3,10 @@ package op.threads;
 import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedBestandTools;
 import op.OPDE;
-import op.system.Printer;
+import op.system.PrinterType;
 import op.tools.PrintListElement;
 
 import javax.print.DocFlavor;
-import javax.swing.*;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +22,7 @@ public class PrintProcessor extends Thread {
     private boolean interrupted;
     private List<PrintListElement> printQueue;
     HashMap<String, ArrayList<PrintListElement>> preparedPrintJobs;
-    JProgressBar pb;
+//    JProgressBar pb;
 
     public void addPrintJobs(List<PrintListElement> jobs) {
         printQueue.addAll(jobs);
@@ -45,11 +44,8 @@ public class PrintProcessor extends Thread {
         super();
         preparedPrintJobs = new HashMap<String,ArrayList<PrintListElement>>();
         setName("PrintProcessor");
-        this.pb = new JProgressBar();
         interrupted = false;
         printQueue = new ArrayList();
-        pb.setValue(0);
-        pb.setMinimum(0);
     }
 
     public void run() {
@@ -58,10 +54,8 @@ public class PrintProcessor extends Thread {
                 if (!printQueue.isEmpty()) {
                     String currentPrinterName = "";
                     String combinedPrintJob = "";
-                    Printer currentPrinterType = null;
+                    PrinterType currentPrinterType = null;
                     int size = printQueue.size();
-                    pb.setMaximum(size);
-                    pb.setStringPainted(true);
 
                     int progressbar = 1;
 
@@ -93,9 +87,9 @@ public class PrintProcessor extends Thread {
 
                             OPDE.getPrinters().print(getPrintableObject(thisElement), thisElement.getPrintername(), DocFlavor.SERVICE_FORMATTED.PRINTABLE);
 
-                            pb.setValue(progressbar);
-                            pb.setString("Drucke Nr. " + progressbar);
-                            OPDE.debug("Drucke Nr. " + progressbar);
+//                            pb.setValue(progressbar);
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("Drucke Nr. " + progressbar, progressbar, printQueue.size()));
+//                            OPDE.debug("Drucke Nr. " + progressbar);
                             progressbar++;
 
                         } else {
@@ -115,7 +109,7 @@ public class PrintProcessor extends Thread {
                         byte[] encoded = null;
                         DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
                         String printername = "";
-                        Printer printerType = null;
+                        PrinterType printerType = null;
                         String printjob = "";
 
                         Collection<ArrayList<PrintListElement>> collection = preparedPrintJobs.values();
@@ -127,9 +121,8 @@ public class PrintProcessor extends Thread {
                             for (PrintListElement printListElement : printListElements) {
                                 printjob += getPrintableObject(printListElement);
 
-                                pb.setValue(progressbar);
-                                pb.setString("Drucke Nr. " + progressbar);
-                                OPDE.debug("Drucke Nr. " + progressbar);
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("Drucke Nr. " + progressbar, progressbar, printQueue.size()));
+
                                 progressbar++;
 
                             }
@@ -141,9 +134,8 @@ public class PrintProcessor extends Thread {
                                 encoded = printjob.getBytes(printerType.getEncoding());
                                 OPDE.getPrinters().print(encoded, printername, flavor);
 
-                                pb.setValue(progressbar);
-                                pb.setString("Drucke Nr. " + progressbar);
-                                OPDE.debug("Drucke Nr. " + progressbar);
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("Drucke Nr. " + progressbar, progressbar, printQueue.size()));
+
                                 progressbar++;
 
                             } catch (UnsupportedEncodingException e) {
@@ -153,12 +145,9 @@ public class PrintProcessor extends Thread {
                         }
                         preparedPrintJobs.clear();
                     }
-                    pb.setValue(size);
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
                 }
                 Thread.sleep(2000); // Millisekunden
-                pb.setValue(0);
-                pb.setString("");
-                pb.setStringPainted(false);
             } catch (InterruptedException ie) {
                 interrupted = true;
                 OPDE.debug("PrintProcessor interrupted!");

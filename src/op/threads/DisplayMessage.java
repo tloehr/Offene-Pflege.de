@@ -2,6 +2,7 @@ package op.threads;
 
 
 import op.OPDE;
+import sun.beans.editors.DoubleEditor;
 import sun.security.x509.UniqueIdentity;
 
 import java.util.UUID;
@@ -15,12 +16,12 @@ import java.util.UUID;
  */
 public class DisplayMessage implements Comparable<DisplayMessage> {
 
-    public static final int IMMEDIATELY = 10;
-    public static final int NORMAL = 30;
-    public static final int INDEFFERENT = 40;
+    public static final short IMMEDIATELY = 10;
+    public static final short NORMAL = 30;
+    public static final short INDEFFERENT = 40;
 
     private String message;
-    private int priority;
+    private short priority;
     private long timestamp;
     private long processed;
     private int secondsToShow;
@@ -51,7 +52,18 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.classname = "";
     }
 
-    public DisplayMessage(String message, int priority, int secondsToShow) {
+    public DisplayMessage(String message, int progress, int max) {
+        this.message = message;
+        this.priority = NORMAL;
+        this.timestamp = System.currentTimeMillis();
+        this.processed = 0;
+        this.secondsToShow = 0;
+        this.percentage = new Double(new Double(progress) / new Double(max) * 100d).intValue();
+        uid = UUID.randomUUID().toString();
+        this.classname = "";
+    }
+
+    public DisplayMessage(String message, short priority, int secondsToShow) {
         this.message = message;
         this.priority = priority;
         this.timestamp = System.currentTimeMillis();
@@ -62,7 +74,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.classname = "";
     }
 
-    public DisplayMessage(String message, int priority, long timestamp, long processed, int secondsToShow) {
+    public DisplayMessage(String message, short priority, long timestamp, long processed, int secondsToShow) {
         this.message = message;
         this.priority = priority;
         this.timestamp = timestamp;
@@ -92,11 +104,11 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.message = message;
     }
 
-    public int getPriority() {
+    public short getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(short priority) {
         this.priority = priority;
     }
 
@@ -161,7 +173,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public int compareTo(DisplayMessage other) {
-        int sort = new Integer(priority).compareTo(other.priority);
+        int sort = new Short(priority).compareTo(other.priority);
         if (sort == 0){
             sort = new Long(timestamp).compareTo(other.timestamp);
         }

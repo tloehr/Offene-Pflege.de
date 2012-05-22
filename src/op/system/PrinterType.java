@@ -13,7 +13,7 @@ import java.util.HashMap;
  *
  * @author tloehr
  */
-public class Printer {
+public class PrinterType {
     private String name;
     private String label;
     private String reset;
@@ -37,7 +37,7 @@ public class Printer {
         return footer;
     }
 
-    public Printer(String name, String label, String type, String encoding, String pageprinter) {
+    public PrinterType(String name, String label, String type, String encoding, String pageprinter) {
         this.name = name;
         this.label = label;
         this.type = type;

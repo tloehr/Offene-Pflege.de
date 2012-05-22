@@ -2,7 +2,7 @@ package op.tools;
 
 import entity.verordnungen.MedBestand;
 import op.system.Form;
-import op.system.Printer;
+import op.system.PrinterType;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +13,7 @@ import op.system.Printer;
  */
 public class PrintListElement implements Comparable {
 
-    private Printer printer;
+    private PrinterType printer;
     private String printername; // Name des Druckers innerhalb des Betriebssystems.
     private Form form;
 
@@ -31,7 +31,7 @@ public class PrintListElement implements Comparable {
         return object;
     }
 
-    public PrintListElement(Object object, Printer printer, Form form, String printername) {
+    public PrintListElement(Object object, PrinterType printer, Form form, String printername) {
         this.object = object;
         this.printer = printer;
         this.form = form;
@@ -43,7 +43,7 @@ public class PrintListElement implements Comparable {
         return printername;
     }
 
-    public Printer getPrinter() {
+    public PrinterType getPrinter() {
         return printer;
     }
 

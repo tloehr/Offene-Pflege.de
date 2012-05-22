@@ -120,7 +120,7 @@ public class BHPTools {
 
         numbhp = erzeugen(em, list, stichtag, true);
 
-        OPDE.info("[BHPImport] Durchgeführt. Stichtag: " + DateFormat.getDateInstance().format(stichtag) + " Anzaghl erzeugter BHPs: "+numbhp);
+        OPDE.important("[BHPImport] Durchgeführt. Stichtag: " + DateFormat.getDateInstance().format(stichtag) + " Anzaghl erzeugter BHPs: "+numbhp);
 
 //            SYSRunningClassesTools.endModule(me);
 

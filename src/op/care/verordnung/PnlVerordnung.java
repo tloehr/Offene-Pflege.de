@@ -38,6 +38,7 @@ import entity.UniqueTools;
 import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgBestandAbschliessen;
 import op.care.med.vorrat.DlgBestandAnbrechen;
 import op.threads.DisplayMessage;
@@ -108,6 +109,11 @@ public class PnlVerordnung extends NursingRecordsPanel {
         this.bewohner = bewohner;
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
         reloadTable();
+    }
+
+     @Override
+    public void reload() {
+         reloadTable();
     }
 
     /**
@@ -654,15 +660,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-//                    new DlgBericht(bewohner, new Closure() {
-//                        @Override
-//                        public void execute(Object bericht) {
-//                            if (bericht != null) {
-//                                EntityTools.persist(bericht);
-//                                reloadTable();
-//                            }
-//                        }
-//                    }));
+                    new DlgBestand(bewohner, "");
                 }
             });
             mypanel.add(buchenButton);

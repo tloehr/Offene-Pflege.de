@@ -148,33 +148,33 @@ public class MedBestandTools {
     }
 
 
-    public static String getBestandText4Print(MedBestand bestand) {
-        String result = "";
-
-        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
-        result += SYSPrint.EPL2_labelformat(57, 19, 3);
-        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getDarreichung())); // bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz())
-        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
-            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUKennung() + ")");
-        }
-
-        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getBestID()));
-        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getVorrat().getBewohner()));
-        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getVorrat().getBewohner()));
-
-        result += SYSPrint.EPL2_PRINT;
-
-
-        // Konvertierung auf PC850 weg. Umlauten.
-        try {
-            byte[] conv = result.getBytes("Cp850");
-            result = new String(conv);
-        } catch (UnsupportedEncodingException ex) {
-            //ex.printStackTrace();
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    public static String getBestandText4Print(MedBestand bestand) {
+//        String result = "";
+//
+//        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
+//        result += SYSPrint.EPL2_labelformat(57, 19, 3);
+//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getDarreichung())); // bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz())
+//        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
+//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUKennung() + ")");
+//        }
+//
+//        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getBestID()));
+//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getVorrat().getBewohner()));
+//        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getVorrat().getBewohner()));
+//
+//        result += SYSPrint.EPL2_PRINT;
+//
+//
+//        // Konvertierung auf PC850 weg. Umlauten.
+//        try {
+//            byte[] conv = result.getBytes("Cp850");
+//            result = new String(conv);
+//        } catch (UnsupportedEncodingException ex) {
+//            //ex.printStackTrace();
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
 
     public static BigDecimal getBestandSumme(MedBestand bestand) {

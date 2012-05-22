@@ -87,6 +87,11 @@ public class PnlPlanung extends NursingRecordsPanel {
     }
 
     @Override
+    public void reload() {
+         reloadTable();
+    }
+
+    @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bwkennung = bewohner.getBWKennung();
         this.bewohner = bewohner;

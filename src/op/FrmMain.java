@@ -43,11 +43,13 @@ import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.system.SYSLoginTools;
+import entity.system.SYSPropsTools;
 import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
 import op.system.DlgLogin;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
+import op.threads.PrintProcessor;
 import op.tools.*;
 import op.vorgang.PnlVorgang;
 import org.apache.commons.collections.Closure;
@@ -62,6 +64,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -83,6 +87,13 @@ public class FrmMain extends JFrame {
     }
 
     private DisplayManager displayManager;
+
+    private PrintProcessor printProcessor;
+
+    public PrintProcessor getPrintProcessor() {
+        return printProcessor;
+    }
+
     private CleanablePanel currentVisiblePanel;
     private Bewohner currentBewohner;
     private JideButton previousProgButton;
@@ -115,6 +126,10 @@ public class FrmMain extends JFrame {
         displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, lblDB);
         displayManager.start();
 
+        printProcessor = new PrintProcessor();
+        printProcessor.start();
+
+
         bwchange = new Closure() {
             @Override
             public void execute(Object o) {
@@ -137,6 +152,8 @@ public class FrmMain extends JFrame {
         statusBar.add(time, JideBoxLayout.FLEXIBLE);
         final MemoryStatusBarItem gc = new MemoryStatusBarItem();
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
+
+//        SYSPropsTools.storeProp(internalClassID + ":splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString());
 
         initPhase = false;
 
@@ -182,15 +199,16 @@ public class FrmMain extends JFrame {
         }
     }
 
-    private void btnReloadSubmessageActionPerformed(ActionEvent e) {
-//        displayManager.showLastSubMessageAgain();
-
-        OPDE.fatal(new Exception("TESTEXCEPTION"));
-
+    private void btnReloadActionPerformed(ActionEvent e) {
+        if (currentVisiblePanel != null) {
+            currentVisiblePanel.reload();
+        }
     }
 
-    private void button1ActionPerformed(ActionEvent e) {
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTML("Testmessage: " + DateFormat.getDateTimeInstance().format(new Date())), 2));
+    private void splitPaneLeftPropertyChange(PropertyChangeEvent e) {
+        if (!initPhase) {
+            SYSPropsTools.storeProp(internalClassID + ":splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString(), OPDE.getLogin().getUser());
+        }
     }
 
     private void afterLogin() {
@@ -216,7 +234,7 @@ public class FrmMain extends JFrame {
         lblMainMsg = new FadingLabel();
         btnVerlegung = new JButton();
         panel1 = new JPanel();
-        btnReloadSubmessage = new JButton();
+        btnReload = new JButton();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
         lblDB = new JLabel();
@@ -263,6 +281,7 @@ public class FrmMain extends JFrame {
                 btnVerlegung.setBorderPainted(false);
                 btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infoyellow.png")));
+                btnVerlegung.setToolTipText("Verlegungsbericht drucken");
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -276,19 +295,20 @@ public class FrmMain extends JFrame {
                     panel1.setOpaque(false);
                     panel1.setLayout(new GridLayout(1, 0, 10, 0));
 
-                    //---- btnReloadSubmessage ----
-                    btnReloadSubmessage.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
-                    btnReloadSubmessage.setBorder(null);
-                    btnReloadSubmessage.setBorderPainted(false);
-                    btnReloadSubmessage.setOpaque(false);
-                    btnReloadSubmessage.setContentAreaFilled(false);
-                    btnReloadSubmessage.addActionListener(new ActionListener() {
+                    //---- btnReload ----
+                    btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
+                    btnReload.setBorder(null);
+                    btnReload.setBorderPainted(false);
+                    btnReload.setOpaque(false);
+                    btnReload.setContentAreaFilled(false);
+                    btnReload.setToolTipText("Ansicht aktualisieren");
+                    btnReload.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            btnReloadSubmessageActionPerformed(e);
+                            btnReloadActionPerformed(e);
                         }
                     });
-                    panel1.add(btnReloadSubmessage);
+                    panel1.add(btnReload);
 
                     //---- btnExit ----
                     btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
@@ -296,6 +316,7 @@ public class FrmMain extends JFrame {
                     btnExit.setBorderPainted(false);
                     btnExit.setOpaque(false);
                     btnExit.setContentAreaFilled(false);
+                    btnExit.setToolTipText("Abmelden");
                     btnExit.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -330,6 +351,12 @@ public class FrmMain extends JFrame {
             splitPaneLeft.setOneTouchExpandable(true);
             splitPaneLeft.setProportionalLayout(true);
             splitPaneLeft.setShowGripper(true);
+            splitPaneLeft.addPropertyChangeListener("dividerLocation", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    splitPaneLeftPropertyChange(e);
+                }
+            });
             pnlMain.add(splitPaneLeft, CC.xy(3, 4, CC.FILL, CC.FILL));
 
             //---- statusBar ----
@@ -419,6 +446,13 @@ public class FrmMain extends JFrame {
 
         createProgramListe();
         createPflegedokumentation();
+
+        // TODO: Das klappt irgendwie nicht.
+//        try {
+//            splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, Double.parseDouble(OPDE.getProps().getProperty(internalClassID + ":splitPaneLeftDividerLocation"))));
+//        } catch (NullPointerException npe) {
+//            splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, 0.5d));
+//        }
 
         panesApps.addExpansion();
     }
@@ -516,8 +550,8 @@ public class FrmMain extends JFrame {
         List<Component> list = findPathForComponent(panesApps, previousProgButton);
 
         if (list != null && !list.isEmpty()) {
-            for (Component comp : list){
-                if (comp instanceof CollapsiblePane){
+            for (Component comp : list) {
+                if (comp instanceof CollapsiblePane) {
                     try {
                         ((CollapsiblePane) comp).setCollapsed(false);
                         previousProgButton.scrollRectToVisible(previousProgButton.getBounds());
@@ -689,7 +723,7 @@ public class FrmMain extends JFrame {
     private FadingLabel lblMainMsg;
     private JButton btnVerlegung;
     private JPanel panel1;
-    private JButton btnReloadSubmessage;
+    private JButton btnReload;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
     private JLabel lblDB;

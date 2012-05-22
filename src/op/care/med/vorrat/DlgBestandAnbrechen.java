@@ -59,7 +59,7 @@ public class DlgBestandAnbrechen extends MyJDialog {
      * Creates new form DlgBestandAnbrechen
      */
     public DlgBestandAnbrechen(Darreichung darreichung, Bewohner bewohner, Closure actionBlock) {
-        super(OPDE.getMainframe());
+        super();
         this.vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
         this.bestand = null;
         this.actionBlock = actionBlock;

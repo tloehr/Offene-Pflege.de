@@ -1001,6 +1001,7 @@ public class DlgVerordnung extends MyJDialog {
         cbPackEnde.setSelected(false);
 
         if (!isBedarf()) {
+            planungenToDelete.addAll(verordnung.getPlanungen());
             verordnung.getPlanungen().clear();
             reloadTable();
         } else {

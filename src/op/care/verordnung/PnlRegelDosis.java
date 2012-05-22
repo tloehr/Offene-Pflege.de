@@ -129,6 +129,11 @@ public class PnlRegelDosis extends CleanablePanel {
 //        currentSelectedTime = null;
     }
 
+     @Override
+    public void reload() {
+
+    }
+
     private void panelMainComponentResized(ComponentEvent e) {
         SYSTools.showSide(splitRegular, splitRegularPos);
     }

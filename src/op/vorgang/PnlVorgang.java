@@ -165,6 +165,11 @@ public class PnlVorgang extends NursingRecordsPanel {
         ignoreEvents = false;
     }
 
+     @Override
+    public void reload() {
+
+    }
+
 //    private void removeSearchPanels() {
 //        if (panelSearch.getComponentCount() > positionToAddPanels) {
 //            int count = panelSearch.getComponentCount();

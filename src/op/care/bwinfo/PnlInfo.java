@@ -130,6 +130,11 @@ public class PnlInfo extends NursingRecordsPanel {
 
     }
 
+     @Override
+    public void reload() {
+
+    }
+
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {

@@ -232,7 +232,7 @@ public class FrmMed extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
-        new DlgBestand(this);
+        new DlgBestand();
     }//GEN-LAST:event_btnBuchenActionPerformed
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed

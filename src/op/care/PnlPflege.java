@@ -50,7 +50,7 @@ public class PnlPflege extends NursingRecordsPanel {
     public static final int TAB_FILES = 10;
 
     private boolean initPhase;
-    private String[] tabs = new String[]{"Übersicht","Pflegeberichte","DFN","BHP","Werte","Verordnungen","Vorräte","Informationen","Planungen","Vorgänge","Dokumente"};
+    private String[] tabs = new String[]{"Übersicht", "Pflegeberichte", "DFN", "BHP", "Werte", "Verordnungen", "Vorräte", "Informationen", "Planungen", "Vorgänge", "Dokumente"};
     private Bewohner currentBewohner = null;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
@@ -93,6 +93,14 @@ public class PnlPflege extends NursingRecordsPanel {
         currentBewohner = bewohner;
         ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).change2Bewohner(bewohner);
     }
+
+    @Override
+    public void reload() {
+        if (previousPanel != null) {
+            previousPanel.reload();
+        }
+    }
+
 
     private void jtpPflegeakteStateChanged(ChangeEvent e) {
         if (initPhase) {
@@ -209,8 +217,8 @@ public class PnlPflege extends NursingRecordsPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow",
-                "default:grow"));
+                    "default:grow",
+                    "default:grow"));
 
             //======== jtpPflegeakte ========
             {
@@ -229,7 +237,7 @@ public class PnlPflege extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        for (int i = 0; i < tabs.length; i++){
+        for (int i = 0; i < tabs.length; i++) {
             jtpPflegeakte.add(tabs[i], new JPanel());
         }
         jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlBerichte.internalClassID, InternalClassACL.EXECUTE));

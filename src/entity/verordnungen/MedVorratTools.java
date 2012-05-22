@@ -191,7 +191,7 @@ public class MedVorratTools {
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             bestand = em.merge(new MedBestand(vorrat, darreichung, packung, text));
             bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
-            MedBuchungen buchung = em.merge(new MedBuchungen(bestand, menge));
+            em.merge(new MedBuchungen(bestand, menge));
         }
         return bestand;
     }
@@ -234,7 +234,7 @@ public class MedVorratTools {
      * @param vorrat
      * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
      */
-    public static MedBestand anbrechenNaechste(MedVorrat vorrat) throws Exception {
+    public static MedBestand anbrechenNaechste(MedVorrat vorrat) {
         MedBestand result = null;
 
 

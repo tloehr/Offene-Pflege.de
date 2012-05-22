@@ -26,21 +26,12 @@ public class MyJDialog extends JDialog {
 
 
     public MyJDialog() {
-        super();
+        super(OPDE.getMainframe(), true);
         isDisposed = false;
         setResizable(false);
         setUndecorated(true);
         initAnimator();
     }
-
-    public MyJDialog(Frame frame) {
-        super(frame, true);
-        isDisposed = false;
-        setResizable(false);
-        setUndecorated(true);
-        initAnimator();
-    }
-
 
     @Override
     public void dispose() {

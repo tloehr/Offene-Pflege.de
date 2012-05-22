@@ -158,6 +158,10 @@
               <string>/artwork/22x22/infoyellow.png</string> 
              </object> 
             </void> 
+            <void method="setProperty"> 
+             <string>toolTipText</string> 
+             <string>Verlegungsbericht drucken</string> 
+            </void> 
             <void property="name"> 
              <string>btnVerlegung</string> 
             </void> 
@@ -229,14 +233,18 @@
                <string>contentAreaFilled</string> 
                <boolean>false</boolean> 
               </void> 
+              <void method="setProperty"> 
+               <string>toolTipText</string> 
+               <string>Ansicht aktualisieren</string> 
+              </void> 
               <void property="name"> 
-               <string>btnReloadSubmessage</string> 
+               <string>btnReload</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>btnReloadSubmessageActionPerformed</string> 
+                <string>btnReloadActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -267,6 +275,10 @@
               <void method="setProperty"> 
                <string>contentAreaFilled</string> 
                <boolean>false</boolean> 
+              </void> 
+              <void method="setProperty"> 
+               <string>toolTipText</string> 
+               <string>Abmelden</string> 
               </void> 
               <void property="name"> 
                <string>btnExit</string> 
@@ -449,6 +461,15 @@
           </void> 
           <void property="name"> 
            <string>splitPaneLeft</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.beans.PropertyChangeListener</string> 
+            <string>propertyChange</string> 
+            <string>splitPaneLeftPropertyChange</string> 
+            <boolean>true</boolean> 
+            <string>dividerLocation</string> 
+           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 

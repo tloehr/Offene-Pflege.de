@@ -96,6 +96,11 @@ public class PnlBWInfo extends NursingRecordsPanel {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+     @Override
+    public void reload() {
+         reloadTable();
+    }
+
     public void initPanel() {
         ignoreEvent = true;
         cmbKategorie.setModel(DBHandling.ladeKategorien(mode, true, mode == BWInfo.ART_ALLES));

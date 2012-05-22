@@ -134,11 +134,23 @@ public class SYSPropsTools {
         storeProp(name, Boolean.toString(cb.isSelected()), OPDE.getLogin().getUser());
     }
 
+    public static void storeState(String name, JToggleButton btn) {
+        storeProp(name, Boolean.toString(btn.isSelected()), OPDE.getLogin().getUser());
+    }
+
     public static void restoreState(String name, JCheckBox cb) {
         if (OPDE.getProps().containsKey(name)) {
             cb.setSelected(OPDE.getProps().getProperty(name).equalsIgnoreCase("true"));
         } else {
             cb.setSelected(false);
+        }
+    }
+
+    public static void restoreState(String name, JToggleButton btn) {
+        if (OPDE.getProps().containsKey(name)) {
+            btn.setSelected(OPDE.getProps().getProperty(name).equalsIgnoreCase("true"));
+        } else {
+            btn.setSelected(false);
         }
     }
 

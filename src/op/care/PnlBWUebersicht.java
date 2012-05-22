@@ -111,6 +111,12 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }
 
     @Override
+    public void reload() {
+        reloadDisplay();
+    }
+
+
+    @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));

@@ -425,7 +425,7 @@ public class VerordnungTools {
 
         long timeend = System.currentTimeMillis();
 
-        OPDE.debug("time end: " + (timeend - timestart) + " millis");
+//        OPDE.debug("time end: " + (timeend - timestart) + " millis");
 
         return result;
     }

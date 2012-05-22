@@ -89,6 +89,11 @@ public class PnlFiles extends NursingRecordsPanel {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+     @Override
+    public void reload() {
+         loadTable();
+    }
+
     void loadTable() {
 
         List<SYSFiles> files = new ArrayList<SYSFiles>(SYSFilesTools.findByBewohner(bewohner));

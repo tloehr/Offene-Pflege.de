@@ -35,13 +35,13 @@ import entity.system.SyslogTools;
 import entity.verordnungen.BHPTools;
 import op.care.DFNImport;
 import op.system.FrmInit;
-import op.system.Printers;
+import op.system.PrinterTypes;
 import op.threads.DisplayManager;
+import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
 import org.eclipse.persistence.config.QueryHints;
-import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -61,7 +61,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -75,7 +74,7 @@ public class OPDE {
     //    public static OPMain ocmain;
     public static FrmMain mainframe;
     protected static String url;
-    protected static Printers printers;
+    protected static PrinterTypes printers;
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
@@ -93,7 +92,7 @@ public class OPDE {
     //    protected static SYSHosts host;
 //    protected static BackgroundMonitor bm;
     // Vielleicht später
-    protected static ArrayList<ImageIcon> animationCache;
+//    protected static ArrayList<ImageIcon> animationCache;
     protected static boolean animation = false;
     protected static boolean debug;
     protected static String opwd = "";
@@ -110,13 +109,13 @@ public class OPDE {
         return opwd + System.getProperty("file.separator") + "cache";
     }
 
-    public static Printers getPrinters() {
+    public static PrinterTypes getPrinters() {
         return printers;
     }
 
-    public static ArrayList<ImageIcon> getAnimationCache() {
-        return animationCache;
-    }
+//    public static ArrayList<ImageIcon> getAnimationCache() {
+//        return animationCache;
+//    }
 
     public static boolean isDebug() {
         return debug;
@@ -228,6 +227,10 @@ public class OPDE {
 
     public static void info(Object message) {
         logger.info(message);
+    }
+
+    public static void important(Object message) {
+        logger.info(message);
         SyslogTools.info(message.toString());
     }
 
@@ -240,7 +243,7 @@ public class OPDE {
 
         File temp = SYSPrint.print(html, false);
 
-        if (props.containsKey("mail.smtp.host")) { //Stellvertretend für die anderen Keys.
+        if (!isDebug() && props.containsKey("mail.smtp.host")) { //Stellvertretend für die anderen Keys.
             try {
 
                 InetAddress localMachine = InetAddress.getLocalHost();
@@ -357,7 +360,7 @@ public class OPDE {
     public static void main(String[] args) throws Exception {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
-        animationCache = new ArrayList(96);
+//        animationCache = new ArrayList(96);
 
         // Das hier fängt alle ungefangenen Exceptions auf.
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -398,23 +401,11 @@ public class OPDE {
 
         opts.addOption(dfnimport);
 
-//        Option bhpimport = null;
-//
-//        if (isDebug()) {
-//            bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-//            bhpimport.setOptionalArg(true);
-//            bhpimport.setArgName("Anzahl der Tage, ");
-//        } else {
-//            bhpimport = OptionBuilder.withLongOpt("bhpimport").withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-//        }
-
-
         Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
         bhpimport.setOptionalArg(true);
         bhpimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
 
         opts.addOption(bhpimport);
-
 
         BasicParser parser = new BasicParser();
         CommandLine cl = null;
@@ -452,7 +443,7 @@ public class OPDE {
             anonym = false;
         }
 
-        printers = new Printers();
+        printers = new PrinterTypes();
 
         if (loadLocalProperties()) {
 
@@ -478,13 +469,6 @@ public class OPDE {
                 logger.setLevel(Level.INFO);
             }
 
-//        if (isDebug()) {
-//            url = "jdbc:mysql://" + localProps.getProperty("devdbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbdevcat");
-//        } else {
-//            url = "jdbc:mysql://" + localProps.getProperty("dbsrv") + ":" + localProps.getProperty("dbport") + "/" + localProps.getProperty("dbcat");
-//        }
-
-
             String hostkey = OPDE.getLocalProps().getProperty("hostkey");
             String cryptpassword = localProps.getProperty("javax.persistence.jdbc.password");
 
@@ -500,25 +484,14 @@ public class OPDE {
 
             jpaProps.put(QueryHints.JDBC_TIMEOUT, "3");
 
-
-//            if (isDebug()) {
             // Cache abschalten
             jpaProps.put("eclipselink.cache.shared.default", "false");
-            jpaProps.put("eclipselink.logging.level", JavaLog.FINE_LABEL);
-//            }
+
+//            jpaProps.put("eclipselink.logging.level", JavaLog.FINEST_LABEL);
+            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
-            // Cache lösche mit
-            // em.getEntityManagerFactory().getCache().evictAll();
-
-//            host = SYSHostsTools.getHost(hostkey);
-
-//            if (host == null) {
-//                fatal(new Exception("Host kann nicht doppelt starten. Warten sie ca. 2 Minuten. Wenn es dann nicht besser wird, fragen Sie den Administrator."));
-//            }
-
-//            bm = new BackgroundMonitor();
-//            bm.start();
 
             String header = SYSTools.getWindowTitle("");
 
@@ -574,7 +547,7 @@ public class OPDE {
                 } finally {
                     em.close();
                 }
-//                SYSHostsTools.shutdown(0);
+
                 System.exit(0);
             }
 
@@ -588,10 +561,9 @@ public class OPDE {
 
             Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
 
-//            ocmain = new OPMain(); // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             mainframe = new FrmMain();
             mainframe.setVisible(true);
-
         }
     }
 
@@ -599,14 +571,10 @@ public class OPDE {
     public static DisplayManager getDisplayManager() {
         return mainframe.getDisplayManager();
     }
-//
-//    public static void showJDialogAsSheet(JComponent dlg) {
-//        mainframe.showAlert(dlg);
-//    }
-//
-//    public static void hideSheet() {
-//        mainframe.hideAlert();
-//    }
+
+    public static PrintProcessor getPrintProcessor(){
+        return mainframe.getPrintProcessor();
+    }
 
     public static FrmMain getMainframe() {
         return mainframe;
@@ -644,28 +612,14 @@ public class OPDE {
     public static Database getDb() {
         return db;
     }
-//    public static ArrayList getGroups() {
-//        return groups;
-//    }
-//
-//    public static void setGroups(ArrayList gr) {
-//        groups = gr;
-//    }
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());
     }
 
-    //    public static boolean isPDL() {
-//        return groups.contains("pdl");
+//    public static boolean isExamen() {
+//        return UsersTools.isExamen(login.getUser());
 //    }
-//
-//    public static boolean isSTPDL() {
-//        return groups.contains("stpdl");
-//    }
-    public static boolean isExamen() {
-        return UsersTools.isExamen(login.getUser());
-    }
 
     public static OCSec getOCSec() {
         return ocsec;

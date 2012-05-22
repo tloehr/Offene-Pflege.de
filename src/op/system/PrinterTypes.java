@@ -29,7 +29,7 @@ import java.util.HashMap;
  *
  * @author tloehr
  */
-public class Printers {
+public class PrinterTypes {
 
     public static final String ESCPOS_INIT_PRINTER = new String(new char[]{27, 40});
     public static final String ESCPOS_DOUBLE_HEIGHT_ON = new String(new char[]{27, 33, 16});
@@ -55,7 +55,7 @@ public class Printers {
     public static final int DRUCK_BON2 = 4;
     public static final int DRUCK_LASER = 5;
     //public static int[] drucker
-    private HashMap<String, Printer> printers;
+    private HashMap<String, PrinterType> printers;
     private final String CONFIGFILE = "printers.xml";
     private HashMap tags;
 
@@ -66,7 +66,7 @@ public class Printers {
 //
 //    private HashBean[] printerTypeArray;
 
-    public HashMap<String, Printer> getPrinters() {
+    public HashMap<String, PrinterType> getPrinters() {
         return printers;
     }
 
@@ -81,7 +81,7 @@ public class Printers {
 //        return (!found ? null : p);
 //    }
 
-    public Printers() {
+    public PrinterTypes() {
         initTags();
         try {
             XMLReader parser = XMLReaderFactory.createXMLReader();
@@ -98,7 +98,7 @@ public class Printers {
 
     private class XMLHandler extends DefaultHandler {
 
-        Printer printer = null;
+        PrinterType printer = null;
         HashMap<String, Form> forms = null;
         Form form = null;
         String reset = null;
@@ -124,7 +124,7 @@ public class Printers {
             String label = attributes.getValue("label");
             //Main.logger.debug("startElement: " + this.toString() + ": " + tagName + "    name: " + name);
             if (tagName.equalsIgnoreCase("printer")) {
-                printer = new Printer(attributes.getValue("name"), attributes.getValue("label"), attributes.getValue("type"), attributes.getValue("encoding"), attributes.getValue("pageprinter"));
+                printer = new PrinterType(attributes.getValue("name"), attributes.getValue("label"), attributes.getValue("type"), attributes.getValue("encoding"), attributes.getValue("pageprinter"));
             } else if (tagName.equalsIgnoreCase("reset")) {
                 reset = "";
             } else if (tagName.equalsIgnoreCase("cr")) {

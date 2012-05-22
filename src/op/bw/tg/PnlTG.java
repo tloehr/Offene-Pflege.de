@@ -282,6 +282,11 @@ public class PnlTG extends CleanablePanel {
 
     }
 
+     @Override
+    public void reload() {
+         reloadTable();
+    }
+
     @Override
     public void cleanup() {
         searchPanes.removeAll();

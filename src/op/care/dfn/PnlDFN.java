@@ -86,6 +86,12 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     @Override
+   public void reload() {
+        reloadTable();
+   }
+
+
+    @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         this.bwkennung = bewohner.getBWKennung();

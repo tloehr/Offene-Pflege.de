@@ -26,29 +26,29 @@
  */
 package op.care.uebergabe;
 
-import java.awt.event.*;
-import java.beans.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import op.FrmMain;
 import op.OCSec;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.FrmMain;
 import op.tools.*;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,6 +96,11 @@ public class PnlUebergabe extends CleanablePanel {
         return pflege;
     }
 
+    @Override
+    public void reload() {
+        reloadTable();
+    }
+
 
     /**
      * This method is called from within the constructor to
@@ -126,8 +131,8 @@ public class PnlUebergabe extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default:grow",
-            "3*(fill:default, $lgap), fill:default"));
+                "default:grow",
+                "3*(fill:default, $lgap), fill:default"));
 
         //======== jToolBar1 ========
         {
@@ -184,15 +189,15 @@ public class PnlUebergabe extends CleanablePanel {
 
             //---- tblUebergabe ----
             tblUebergabe.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ));
             tblUebergabe.addMouseListener(new MouseAdapter() {
                 @Override
@@ -253,11 +258,11 @@ public class PnlUebergabe extends CleanablePanel {
                 });
 
                 //---- cmbEinrichtung ----
-                cmbEinrichtung.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbEinrichtung.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbEinrichtung.addItemListener(new ItemListener() {
                     @Override
@@ -277,42 +282,42 @@ public class PnlUebergabe extends CleanablePanel {
                 GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
                 jPanel4.setLayout(jPanel4Layout);
                 jPanel4Layout.setHorizontalGroup(
-                    jPanel4Layout.createParallelGroup()
-                        .addGroup(jPanel4Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jLabel2)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnBack)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnLastLogin)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnToday)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(cmbEinrichtung, 0, 0, Short.MAX_VALUE)
-                            .addContainerGap())
+                        jPanel4Layout.createParallelGroup()
+                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnBack)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnLastLogin)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnToday)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cmbEinrichtung, 0, 0, Short.MAX_VALUE)
+                                        .addContainerGap())
                 );
                 jPanel4Layout.setVerticalGroup(
-                    jPanel4Layout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel4Layout.createParallelGroup()
-                                .addComponent(jLabel2, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                                .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGroup(jPanel4Layout.createSequentialGroup()
-                                    .addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-                                    .addGap(2, 2, 2))
-                                .addGroup(jPanel4Layout.createSequentialGroup()
-                                    .addComponent(btnLastLogin)
-                                    .addGap(1, 1, 1))
-                                .addComponent(btnToday, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-                                .addGroup(jPanel4Layout.createSequentialGroup()
-                                    .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addGap(3, 3, 3)))
-                            .addGap(62, 62, 62))
+                        jPanel4Layout.createParallelGroup()
+                                .addGroup(GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addGroup(jPanel4Layout.createParallelGroup()
+                                                .addComponent(jLabel2, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                                                .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                                        .addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(2, 2, 2))
+                                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                                        .addComponent(btnLastLogin)
+                                                        .addGap(1, 1, 1))
+                                                .addComponent(btnToday, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(jPanel4Layout.createSequentialGroup()
+                                                        .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(3, 3, 3)))
+                                        .addGap(62, 62, 62))
                 );
-                jPanel4Layout.linkSize(SwingConstants.VERTICAL, new Component[] {cmbEinrichtung, jdcDatum});
+                jPanel4Layout.linkSize(SwingConstants.VERTICAL, new Component[]{cmbEinrichtung, jdcDatum});
             }
             pnlFilter.addTab("Zeiraum", jPanel4);
 
@@ -341,26 +346,26 @@ public class PnlUebergabe extends CleanablePanel {
                 GroupLayout jPanel5Layout = new GroupLayout(jPanel5);
                 jPanel5.setLayout(jPanel5Layout);
                 jPanel5Layout.setHorizontalGroup(
-                    jPanel5Layout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(txtSuche1, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnSearch)
-                            .addContainerGap())
+                        jPanel5Layout.createParallelGroup()
+                                .addGroup(GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(txtSuche1, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnSearch)
+                                        .addContainerGap())
                 );
                 jPanel5Layout.setVerticalGroup(
-                    jPanel5Layout.createParallelGroup()
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel5Layout.createParallelGroup()
+                        jPanel5Layout.createParallelGroup()
                                 .addGroup(jPanel5Layout.createSequentialGroup()
-                                    .addComponent(txtSuche1, GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                                    .addGap(3, 3, 3))
-                                .addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE))
-                            .addContainerGap(52, Short.MAX_VALUE))
+                                        .addContainerGap()
+                                        .addGroup(jPanel5Layout.createParallelGroup()
+                                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                                        .addComponent(txtSuche1, GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                                                        .addGap(3, 3, 3))
+                                                .addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE))
+                                        .addContainerGap(52, Short.MAX_VALUE))
                 );
-                jPanel5Layout.linkSize(SwingConstants.VERTICAL, new Component[] {btnSearch, txtSuche1});
+                jPanel5Layout.linkSize(SwingConstants.VERTICAL, new Component[]{btnSearch, txtSuche1});
             }
             pnlFilter.addTab("Suchbegriff", jPanel5);
 

@@ -73,6 +73,11 @@ public class PnlSchichtleitung extends CleanablePanel {
         reloadDisplay();
     }
 
+     @Override
+    public void reload() {
+         reloadDisplay();
+    }
+
     /**
      * This method is called from within the constructor to
      * initialize the form.

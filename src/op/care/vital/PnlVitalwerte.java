@@ -593,6 +593,11 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         reloadTable();
     }
 
+     @Override
+    public void reload() {
+         reloadTable();
+    }
+
     private void cbStuhlgangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbStuhlgangActionPerformed
         filter[STUHLGANG] = ((JCheckBox) evt.getSource()).isSelected();
         if (!initPhase) {
