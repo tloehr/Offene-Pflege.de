@@ -170,7 +170,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         this.lDatum = lDatum;
         this.user = user;
         this.verordnung = verordnung;
-        this.verordnung.getPlanungen().add(this);
+//        this.verordnung.getPlanungen().add(this);
     }
 
     public Long getBhppid() {
@@ -390,9 +390,9 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     public void setVerordnung(Verordnung verordnung) {
         this.verordnung = verordnung;
-        if (!this.verordnung.getPlanungen().contains(this)) {
-            this.verordnung.getPlanungen().add(this);
-        }
+//        if (!this.verordnung.getPlanungen().contains(this)) {
+//            this.verordnung.getPlanungen().add(this);
+//        }
     }
 
     public Users getUser() {

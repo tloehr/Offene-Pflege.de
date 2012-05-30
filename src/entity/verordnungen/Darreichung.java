@@ -28,7 +28,7 @@ public class Darreichung implements Serializable {
 
     public Darreichung(MedProdukte medProdukt) {
         this.medProdukt = medProdukt;
-        this.medProdukt.getDarreichungen().add(this);
+//        this.medProdukt.getDarreichungen().add(this);
         this.packungen = new ArrayList<MedPackung>();
         this.bestaende = new ArrayList<MedBestand>();
     }
@@ -37,7 +37,7 @@ public class Darreichung implements Serializable {
         this.medProdukt = medProdukt;
         this.zusatz = zusatz;
         this.medForm = medForm;
-        this.medProdukt.getDarreichungen().add(this);
+//        this.medProdukt.getDarreichungen().add(this);
         this.packungen = new ArrayList<MedPackung>();
         this.bestaende = new ArrayList<MedBestand>();
     }

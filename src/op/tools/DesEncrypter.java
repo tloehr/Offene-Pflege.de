@@ -1,6 +1,5 @@
 package op.tools;
 
-import op.OPDE;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -8,11 +7,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.swing.tree.ExpandVetoException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
-import java.util.Enumeration;
 
 /**
  * http://www.exampledepot.com/egs/javax.crypto/PassKey.html
@@ -28,7 +27,7 @@ public class DesEncrypter {
         try {
 
             NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-            if (ni == null){ // Das ist nötig, weil ein Linux in einer VMWare hier ein NULL liefert.
+            if (ni == null) { // Das ist nötig, weil ein Linux in einer VMWare hier ein NULL liefert.
                 ni = NetworkInterface.getNetworkInterfaces().nextElement();
             }
 
@@ -69,19 +68,15 @@ public class DesEncrypter {
         return null;
     }
 
-    public String decrypt(String str) {
-        try {
-            // Decode base64 to get bytes
-            byte[] dec = new sun.misc.BASE64Decoder().decodeBuffer(str);
+    public String decrypt(String str) throws Exception {
 
-            // Decrypt
-            byte[] utf8 = dcipher.doFinal(dec);
+        // Decode base64 to get bytes
+        byte[] dec = new sun.misc.BASE64Decoder().decodeBuffer(str);
 
-            // Decode using utf-8
-            return new String(utf8, "UTF8");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        // Decrypt
+        byte[] utf8 = dcipher.doFinal(dec);
+
+        // Decode using utf-8
+        return new String(utf8, "UTF8");
     }
 }

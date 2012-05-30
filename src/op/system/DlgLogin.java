@@ -343,9 +343,9 @@ public class DlgLogin extends MyJDialog {
                 dispose();
             }
 
-        } catch (SQLException se) {
+        } catch (Exception se) {
             OPDE.fatal(se);
-            System.exit(se.getErrorCode());
+            System.exit(1);
         }
     }//GEN-LAST:event_DoLogin
 

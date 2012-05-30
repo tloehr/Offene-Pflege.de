@@ -204,8 +204,8 @@ public class DlgBestand extends MyJDialog {
         cmbPackung = new JComboBox();
         jLabel7 = new JLabel();
         txtBemerkung = new JTextField();
-        panel1 = new JPanel();
         btnPrint = new JToggleButton();
+        panel1 = new JPanel();
         btnClose = new JButton();
         btnApply = new JButton();
 
@@ -215,8 +215,8 @@ public class DlgBestand extends MyJDialog {
         setMinimumSize(new Dimension(640, 425));
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "$ugap, $lcgap, default, $lcgap, 39dlu, $lcgap, default, $lcgap, default:grow, $lcgap, $ugap",
-                "$ugap, 8*($lgap, fill:default), $lgap, $ugap"));
+            "$ugap, $lcgap, default, $lcgap, 39dlu, $lcgap, default, $lcgap, default:grow, $lcgap, $ugap",
+            "$ugap, 7*($lgap, fill:default), 10dlu, fill:default, $lgap, $ugap"));
 
         //---- jLabel1 ----
         jLabel1.setText("PZN oder Suchbegriff");
@@ -258,7 +258,7 @@ public class DlgBestand extends MyJDialog {
         contentPane.add(jLabel3, CC.xy(3, 5));
 
         //---- cmbMProdukt ----
-        cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+        cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbMProdukt.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -276,7 +276,7 @@ public class DlgBestand extends MyJDialog {
         contentPane.add(lblVorrat, CC.xy(3, 11));
 
         //---- cmbVorrat ----
-        cmbVorrat.setModel(new DefaultComboBoxModel(new String[]{
+        cmbVorrat.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbVorrat.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -304,7 +304,7 @@ public class DlgBestand extends MyJDialog {
         contentPane.add(txtBWSuche, CC.xy(5, 15));
 
         //---- cmbBW ----
-        cmbBW.setModel(new DefaultComboBoxModel(new String[]{
+        cmbBW.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbBW.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -343,7 +343,7 @@ public class DlgBestand extends MyJDialog {
         contentPane.add(jLabel6, CC.xy(3, 7));
 
         //---- cmbPackung ----
-        cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+        cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
 
         }));
         cmbPackung.setFont(new Font("sansserif", Font.PLAIN, 14));
@@ -370,20 +370,20 @@ public class DlgBestand extends MyJDialog {
         });
         contentPane.add(txtBemerkung, CC.xywh(5, 13, 6, 1));
 
+        //---- btnPrint ----
+        btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
+        btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-off.png")));
+        btnPrint.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                btnPrintItemStateChanged(e);
+            }
+        });
+        contentPane.add(btnPrint, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
+
         //======== panel1 ========
         {
-            panel1.setLayout(new HorizontalLayout(10));
-
-            //---- btnPrint ----
-            btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
-            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-off.png")));
-            btnPrint.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    btnPrintItemStateChanged(e);
-                }
-            });
-            panel1.add(btnPrint);
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
             //---- btnClose ----
             btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_eject.png")));
@@ -407,7 +407,6 @@ public class DlgBestand extends MyJDialog {
             panel1.add(btnApply);
         }
         contentPane.add(panel1, CC.xywh(9, 17, 2, 1, CC.RIGHT, CC.DEFAULT));
-        pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -461,8 +460,6 @@ public class DlgBestand extends MyJDialog {
     private void save() {
         EntityManager em = OPDE.createEM();
 
-        // TODO: Wird doppelt eingebucht. Bei neuem Vorrat
-
         try {
             em.getTransaction().begin();
 
@@ -483,12 +480,12 @@ public class DlgBestand extends MyJDialog {
                 vorrat.setText(darreichung.getMedProdukt().getBezeichnung());
             }
 
-            MedBestand bestand = MedVorratTools.einbuchenVorrat(em, vorrat, packung, darreichung, txtBemerkung.getText(), menge);
+            MedBestand bestand = em.merge(MedVorratTools.einbuchenVorrat(vorrat, packung, darreichung, txtBemerkung.getText(), menge));
+            vorrat.getBestaende().add(bestand);
 
             if (MedBestandTools.getBestandImAnbruch(vorrat) == null) {
                 MedVorratTools.anbrechenNaechste(vorrat);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neuer Vorrat wurde direkt angebrochen", 2));
-
             }
 
             em.getTransaction().commit();
@@ -721,11 +718,11 @@ public class DlgBestand extends MyJDialog {
         if (cmbPackung.getSelectedIndex() < 0) {
             txtEntry = !txtBemerkung.getText().isEmpty();
         }
-        OPDE.debug("setApply(): med:" + medEingegeben);
-        OPDE.debug("setApply(): packung:" + packungEingegeben);
-        OPDE.debug("setApply(): menge:" + mengeEingegeben);
-        OPDE.debug("setApply(): bw:" + bwEingegeben);
-        OPDE.debug("setApply(): txt:" + txtEntry);
+//        OPDE.debug("setApply(): med:" + medEingegeben);
+//        OPDE.debug("setApply(): packung:" + packungEingegeben);
+//        OPDE.debug("setApply(): menge:" + mengeEingegeben);
+//        OPDE.debug("setApply(): bw:" + bwEingegeben);
+//        OPDE.debug("setApply(): txt:" + txtEntry);
         btnApply.setEnabled(medEingegeben && (mengeEingegeben || packungEingegeben) && bwEingegeben && txtEntry);
     }
 
@@ -748,8 +745,8 @@ public class DlgBestand extends MyJDialog {
     private JComboBox cmbPackung;
     private JLabel jLabel7;
     private JTextField txtBemerkung;
-    private JPanel panel1;
     private JToggleButton btnPrint;
+    private JPanel panel1;
     private JButton btnClose;
     private JButton btnApply;
     // Ende der Variablendeklaration//GEN-END:variables

@@ -509,7 +509,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                         bestand = em.merge(bestand);
                         em.lock(bestand, LockModeType.OPTIMISTIC);
                         BigDecimal apv = MedBestandTools.getPassendesAPV(bestand);
-                        MedBestandTools.anbrechen(em, bestand, apv);
+                        MedBestandTools.anbrechen(bestand, apv);
                         em.getTransaction().commit();
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde angebrochen", 2));
                         reloadBestandTable();
@@ -576,7 +576,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                         try {
                             em.getTransaction().begin();
                             bestand = em.merge(bestand);
-                            MedBestandTools.abschliessen(em, bestand, "", MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+                            MedBestandTools.abschliessen(bestand, "", MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
                             em.getTransaction().commit();
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde abgeschlossen", 2));
                             reloadBestandTable();
@@ -714,8 +714,8 @@ public class PnlVorrat extends NursingRecordsPanel {
             SYSTools.unregisterListeners(menuV);
             menuV = new JPopupMenu();
 
+            // <** TEST 0001
             JMenuItem itemPopupDelete = new JMenuItem("Vorrat löschen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -724,13 +724,14 @@ public class PnlVorrat extends NursingRecordsPanel {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
+                                OPDE.getDisplayManager().setDBActionMessage(true);
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
 
                                     vorrat = em.merge(vorrat);
                                     em.lock(vorrat, LockModeType.OPTIMISTIC);
-                                    em.remove(bestand);
+                                    em.remove(vorrat);
 
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + vorrat.getVorID() + " und alle zugehörigen Bestände und Buchungen wurden gelöscht.", 2));
@@ -745,6 +746,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
+                                OPDE.getDisplayManager().setDBActionMessage(false);
                             }
                         }
                     });
@@ -753,7 +755,10 @@ public class PnlVorrat extends NursingRecordsPanel {
                 }
             });
             menuV.add(itemPopupDelete);
+            // TEST 0001 **>
 
+
+            // <** TEST 0002
             JMenuItem itemPopupClose = new JMenuItem("Vorrat abschließen und ausbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png")));
             itemPopupClose.addActionListener(new java.awt.event.ActionListener() {
 
@@ -762,6 +767,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
+                                OPDE.getDisplayManager().setDBActionMessage(true);
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
@@ -773,8 +779,9 @@ public class PnlVorrat extends NursingRecordsPanel {
                                     // Alle Bestände abschliessen.
                                     for (MedBestand bestand : vorrat.getBestaende()) {
                                         if (!bestand.isAbgeschlossen()) {
-                                            em.lock(em.merge(bestand), LockModeType.OPTIMISTIC);
-                                            MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                                            bestand = em.merge(bestand);
+                                            em.lock(bestand, LockModeType.OPTIMISTIC);
+                                            MedBestandTools.abschliessen(bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
                                         }
                                     }
 
@@ -783,6 +790,7 @@ public class PnlVorrat extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + vorrat.getVorID() + " und alle zugehörigen Bestände abgeschlossen", 2));
+
                                 } catch (OptimisticLockException ole) {
                                     em.getTransaction().rollback();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Vorrat wurde zwischenzeitlich geändert", internalClassID));
@@ -794,6 +802,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
+                                OPDE.getDisplayManager().setDBActionMessage(false);
                             }
                         }
                     });
@@ -801,24 +810,12 @@ public class PnlVorrat extends NursingRecordsPanel {
                 }
             });
             menuV.add(itemPopupClose);
+            // TEST 0002 **>
 
             menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }//GEN-LAST:event_tblVorratMousePressed
 
-//    /**
-//     * Diese Methode legt einen neuen Vorrat in der Tabelle MPVorrat an. Ein
-//     * Vorrat braucht nur eine allgemeine Bezeichnung zu haben.
-//     */
-//    private void newVorrat() {
-//        String neuerVorrat = JOptionPane.showInputDialog(this, "Bitte geben Sie die Bezeichnung für den neuen Vorrat ein.");
-//
-//        if (!SYSTools.catchNull(neuerVorrat).isEmpty()) {
-//            MedVorrat vorrat = new MedVorrat(bewohner, neuerVorrat);
-//            EntityTools.persist(vorrat);
-//            reloadVorratTable();
-//        }
-//    }
 
     private void reloadVorratTable() {
         reloadVorratTable(null);

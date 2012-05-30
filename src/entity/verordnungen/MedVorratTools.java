@@ -154,14 +154,15 @@ public class MedVorratTools {
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Bzw. die Packung wurde mit dieser Gabe geleert.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
-                    MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    MedBestandTools.abschliessen(bestand, "Automatischer Abschluss bei leerer Packung", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
 
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
 
-                    MedBestandTools.anbrechen(em, naechsterBestand, MedBestandTools.berechneAPV(em, bestand));
+                    MedBestandTools.anbrechen(naechsterBestand, MedBestandTools.berechneAPV(em, bestand));
                 } else {
                     MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
+                    bestand.getBuchungen().add(buchung);
 //                    em.persist(buchung);
                     OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
                 }
@@ -170,8 +171,9 @@ public class MedVorratTools {
                     entnahmeVorrat(em, vorrat, wunschmenge.subtract(entnahme), bhp);
                 }
             } else {
-                MedBuchungen buchung = new MedBuchungen(bestand, entnahme.negate(), bhp);
-                em.persist(buchung);
+                MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
+                bestand.getBuchungen().add(buchung);
+//                em.persist(buchung);
                 OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
             }
 
@@ -179,19 +181,26 @@ public class MedVorratTools {
     }
 
     /**
-     * bucht ein Medikament in einen Vorrat ein. Aber nur dann, wenn es keinen anderen Vorrat gibt,
-     * der mit seiner DafID schon passt.
-     * <p/>
-     * Falls diese DafID noch den Dummy "Startbestand" hat, wird dieser zuerst gelöscht.
-     *
-     * @return true, bei Erfolg. false, sonst.
+     * Diese Methode bucht ein Medikament in einen Vorrat ein.
+     * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
+     * Der muss dann nur noch persistiert werden.
+
+     * @param em Persistence Context
+     * @param vorrat
+     * @param packung
+     * @param darreichung
+     * @param text
+     * @param menge
+     * @return
+     * @throws Exception
      */
-    public static MedBestand einbuchenVorrat(EntityManager em, MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) throws Exception {
+    public static MedBestand einbuchenVorrat(MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge)  {
         MedBestand bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            bestand = em.merge(new MedBestand(vorrat, darreichung, packung, text));
+            bestand = new MedBestand(vorrat, darreichung, packung, text);
             bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
-            em.merge(new MedBuchungen(bestand, menge));
+            MedBuchungen buchung = new MedBuchungen(bestand, menge);
+            bestand.getBuchungen().add(buchung);
         }
         return bestand;
     }

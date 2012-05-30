@@ -50,7 +50,6 @@ public class MedBuchungen implements Serializable {
         this.menge = menge;
         this.bhp = null;
         this.status = MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND;
-        bestand.getBuchungen().add(this);
         this.user = OPDE.getLogin().getUser();
     }
 
@@ -61,8 +60,8 @@ public class MedBuchungen implements Serializable {
         this.bhp = bhp;
         this.status = MedBuchungenTools.STATUS_AUSBUCHEN_NORMAL;
         this.user = OPDE.getLogin().getUser();
-        bestand.getBuchungen().add(this);
-        bhp.getBuchungen().add(this);
+//        bestand.getBuchungen().add(this);
+//        bhp.getBuchungen().add(this);
     }
 
 //    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
@@ -83,7 +82,6 @@ public class MedBuchungen implements Serializable {
         this.bhp = null;
         this.status = status;
         this.user = OPDE.getLogin().getUser();
-        bestand.getBuchungen().add(this);
     }
 
     public Long getBuchID() {

@@ -90,29 +90,21 @@ public class PnlBedarfDosis extends CleanablePanel {
 
     }
 
-    private void txtMaxTimesCaretUpdate(CaretEvent e) {
-        // TODO add your code here
-    }
-
      @Override
     public void reload() {
 
     }
 
     private void txtMaxTimesActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        txtEDosis.requestFocus();
     }
 
     private void txtMaxTimesFocusGained(FocusEvent e) {
         SYSTools.markAllTxt((JTextField) e.getSource());
     }
 
-    private void txtEDosisCaretUpdate(CaretEvent e) {
-        // TODO add your code here
-    }
-
     private void txtEDosisActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        btnSave.doClick();
     }
 
     private void txtEDosisFocusGained(FocusEvent e) {

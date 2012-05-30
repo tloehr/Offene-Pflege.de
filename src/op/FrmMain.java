@@ -46,6 +46,7 @@ import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
+import op.care.med.PnlMed;
 import op.system.DlgLogin;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -140,17 +141,21 @@ public class FrmMain extends JFrame {
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
         label.setText(OPDE.getLocalProps().getProperty("javax.persistence.jdbc.url"));
+        label.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(label, JideBoxLayout.FLEXIBLE);
         labelUSER = new LabelStatusBarItem("Line");
         labelUSER.setText("--");
         labelUSER.setAlignment(JLabel.CENTER);
+        labelUSER.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(labelUSER, JideBoxLayout.FLEXIBLE);
         final TimeStatusBarItem time = new TimeStatusBarItem();
+        time.setFont(new Font("Arial", Font.PLAIN, 14));
         time.setUpdateInterval(10000);
         time.setTextFormat(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT));
         time.setAlignment(JLabel.CENTER);
         statusBar.add(time, JideBoxLayout.FLEXIBLE);
         final MemoryStatusBarItem gc = new MemoryStatusBarItem();
+        gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
 
 //        SYSPropsTools.storeProp(internalClassID + ":splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString());
@@ -464,6 +469,8 @@ public class FrmMain extends JFrame {
             panel = new PnlTG(jspSearch, bwchange);
         } else if (classname.equals("op.vorgang.PnlVorgang")) {
             panel = new PnlVorgang(null, null, this, null);
+        } else if (classname.equals("op.care.med.PnlMed")) {
+            panel = new PnlMed(jspSearch);
         }
         return panel;
     }

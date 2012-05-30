@@ -24,6 +24,8 @@ public class InternalClass implements Comparable<InternalClass> {
     private String longDescription;
     private String javaClass;
     private boolean mainClass;
+    private String iconname;
+
     // Enthält die möglichen acls für diese Klasse
     // inklusive der Beschreibungen (wenn vorhanden).
     private List<InternalClassACL> acls;
@@ -38,6 +40,7 @@ public class InternalClass implements Comparable<InternalClass> {
         this.javaClass = javaClass;
         acls = new ArrayList();
         this.intClass = null;
+        this.iconname = "";
     }
 
 
@@ -53,6 +56,13 @@ public class InternalClass implements Comparable<InternalClass> {
         return this.intClass != null;
     }
 
+    public String getIconname() {
+        return iconname;
+    }
+
+    public void setIconname(String iconname) {
+        this.iconname = iconname;
+    }
 
     /**
      * Get the value of longDescription

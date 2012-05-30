@@ -27,6 +27,8 @@
 
 package op.care.med;
 
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import entity.EntityTools;
 import entity.verordnungen.*;
 import op.OPDE;
@@ -46,14 +48,14 @@ import java.awt.event.ItemListener;
 /**
  * @author tloehr
  */
-public class DlgProdukt extends javax.swing.JDialog {
+public class PnlNewProdukt extends javax.swing.JDialog {
 
     private MedProdukte produkt;
 
     /**
      * Creates new form DlgProdukt
      */
-    public DlgProdukt(JFrame parent, MedProdukte produkt, String template) {
+    public PnlNewProdukt(JFrame parent, MedProdukte produkt, String template) {
         super(parent, true);
         this.produkt = produkt;
         initComponents();
@@ -81,12 +83,8 @@ public class DlgProdukt extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new JLabel();
-        jSeparator1 = new JSeparator();
         jLabel2 = new JLabel();
         txtBezeichnung = new JTextField();
-        jSeparator2 = new JSeparator();
-        btnCancel = new JButton();
         btnOK = new JButton();
         cmbHersteller = new JComboBox();
         jLabel3 = new JLabel();
@@ -94,35 +92,27 @@ public class DlgProdukt extends javax.swing.JDialog {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
-
-        //---- jLabel1 ----
-        jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
-        jLabel1.setText("Neues Medizinprodukt");
+        contentPane.setLayout(new FormLayout(
+            "2*(default, $lcgap), default:grow, $lcgap, default",
+            "default, 2*($lgap, fill:default), $lgap, default, $lgap, fill:default, $lgap, default"));
 
         //---- jLabel2 ----
-        jLabel2.setText("Produktname:");
+        jLabel2.setText("Produktname");
+        jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(jLabel2, CC.xy(3, 3));
 
         //---- txtBezeichnung ----
+        txtBezeichnung.setFont(new Font("Arial", Font.PLAIN, 14));
         txtBezeichnung.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
                 txtBezeichnungCaretUpdate(e);
             }
         });
-
-        //---- btnCancel ----
-        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancelActionPerformed(e);
-            }
-        });
+        contentPane.add(txtBezeichnung, CC.xy(5, 3));
 
         //---- btnOK ----
         btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
-        btnOK.setText("OK");
         btnOK.setEnabled(false);
         btnOK.addActionListener(new ActionListener() {
             @Override
@@ -130,6 +120,7 @@ public class DlgProdukt extends javax.swing.JDialog {
                 btnOKActionPerformed(e);
             }
         });
+        contentPane.add(btnOK, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
 
         //---- cmbHersteller ----
         cmbHersteller.setModel(new DefaultComboBoxModel(new String[] {
@@ -138,63 +129,19 @@ public class DlgProdukt extends javax.swing.JDialog {
             "Eintrag 3",
             "Eintrag 4"
         }));
+        cmbHersteller.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbHersteller.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 cmbHerstellerItemStateChanged(e);
             }
         });
+        contentPane.add(cmbHersteller, CC.xy(5, 5));
 
         //---- jLabel3 ----
-        jLabel3.setText("Hersteller:");
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(contentPaneLayout.createParallelGroup()
-                                .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
-                                .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
-                                .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE)
-                                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                        .addComponent(btnOK)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnCancel))
-                                .addGroup(contentPaneLayout.createSequentialGroup()
-                                        .addGroup(contentPaneLayout.createParallelGroup()
-                                                .addComponent(jLabel2)
-                                                .addComponent(jLabel3))
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(contentPaneLayout.createParallelGroup()
-                                                .addComponent(cmbHersteller, 0, 377, Short.MAX_VALUE)
-                                                .addComponent(txtBezeichnung, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE))))
-                        .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel2)
-                                .addComponent(txtBezeichnung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel3)
-                                .addComponent(cmbHersteller, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnCancel)
-                                .addComponent(btnOK))
-                        .addContainerGap())
-        );
+        jLabel3.setText("Hersteller");
+        jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(jLabel3, CC.xy(3, 5));
         setSize(490, 220);
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -234,12 +181,8 @@ public class DlgProdukt extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private JLabel jLabel1;
-    private JSeparator jSeparator1;
     private JLabel jLabel2;
     private JTextField txtBezeichnung;
-    private JSeparator jSeparator2;
-    private JButton btnCancel;
     private JButton btnOK;
     private JComboBox cmbHersteller;
     private JLabel jLabel3;

@@ -29,8 +29,9 @@ public class GUITools {
         button.setFocusable(true);
 
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.addActionListener(actionListener);
-
+        if (actionListener != null) {
+            button.addActionListener(actionListener);
+        }
         return button;
     }
 

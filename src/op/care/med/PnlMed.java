@@ -28,74 +28,86 @@
 
 package op.care.med;
 
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
-import entity.EntityTools;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.popup.JidePopup;
+import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
+import com.jidesoft.wizard.WizardDialog;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.care.med.prodassistant.MedProductWizard;
 import op.care.med.vorrat.DlgBestand;
-import op.care.med.vorrat.PnlVorrat;
+import op.tools.CleanablePanel;
+import op.tools.GUITools;
+import op.tools.InternalClassACL;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 
 /**
  * @author tloehr
  */
-public class FrmMed extends javax.swing.JFrame {
+public class PnlMed extends CleanablePanel {
 
+    public static final String internalClassID = "opde.medication";
     private DefaultTreeModel tree;
     private MedProdukte produkt;
     private String template;
-    private boolean ignoreCaret;
+    //    private boolean ignoreCaret;
     private JPopupMenu menu;
-    private JDialog parent, myMedAssistantDialog;
-    private JFrame thisFrame;
+    private JDialog myMedAssistantDialog;
+    //    private CollapsiblePane panelText, panelTime;
+    private CollapsiblePanes searchPanes;
+    private JScrollPane jspSearch;
 
     /**
      * Creates new form FrmMed
      */
-    public FrmMed() {
-        thisFrame = this;
+    public PnlMed(JScrollPane jspSearch) {
         this.template = "";
+        this.jspSearch = jspSearch;
+        initComponents();
         initDialog();
     }
 
-    /**
-     * Creates new form FrmMed
-     */
-    public FrmMed(String template) {
-        this.template = template;
-        thisFrame = this;
-        initDialog();
+    @Override
+    public void cleanup() {
+        SYSTools.unregisterListeners(menu);
+        menu = null;
+        SYSTools.unregisterListeners(this);
+    }
+
+    @Override
+    public void reload() {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private void initDialog() {
-        initComponents();
-
-        this.setTitle(SYSTools.getWindowTitle("Medikamentenverwaltung"));
-        // erstmal alles leer
+        prepareSearchArea();
         produkt = null;
         treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
         treeMed.setVisible(false);
         lstPraep.setModel(new DefaultListModel());
         lstPraep.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
-//        btnVorrat.setEnabled(true);
-
-        SYSTools.center(this);
-        setSize(850, 370);
-        setVisible(true);
     }
 
     /**
@@ -106,83 +118,29 @@ public class FrmMed extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jToolBar1 = new JToolBar();
-        btnNew = new JButton();
-        btnMed = new JButton();
-        btnBuchen = new JButton();
-        txtSuche = new JTextField();
+        txtSuche = new JXSearchField();
         jScrollPane2 = new JScrollPane();
         lstPraep = new JList();
         jScrollPane1 = new JScrollPane();
         treeMed = new JTree();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                formWindowOpened(e);
-            }
-        });
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-            "pref, $lcgap, default:grow",
-            "2*(fill:default, $lgap), fill:default:grow"));
-
-        //======== jToolBar1 ========
-        {
-            jToolBar1.setFloatable(false);
-
-            //---- btnNew ----
-            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
-            btnNew.setText("Neues Medikament");
-            btnNew.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnNewActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnNew);
-
-            //---- btnMed ----
-            btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")));
-            btnMed.setText("Assistent");
-            btnMed.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnMedActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnMed);
-
-            //---- btnBuchen ----
-            btnBuchen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")));
-            btnBuchen.setText("Buchen");
-            btnBuchen.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBuchenActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnBuchen);
-        }
-        contentPane.add(jToolBar1, CC.xywh(1, 1, 3, 1));
+        setLayout(new FormLayout(
+                "113dlu, $lcgap, default:grow",
+                "fill:default, $lgap, fill:default:grow"));
 
         //---- txtSuche ----
-        txtSuche.setFont(new Font("Arial", Font.PLAIN, 16));
-        txtSuche.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                txtSucheCaretUpdate(e);
-            }
-        });
+        txtSuche.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtSuche.setSearchMode(org.jdesktop.swingx.JXSearchField.SearchMode.REGULAR);
+        txtSuche.setUseNativeSearchFieldIfPossible(false);
+        txtSuche.setInstantSearchDelay(5000);
         txtSuche.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 txtSucheActionPerformed(e);
             }
         });
-        contentPane.add(txtSuche, CC.xy(1, 3));
+        add(txtSuche, CC.xy(1, 1));
 
         //======== jScrollPane2 ========
         {
@@ -190,19 +148,25 @@ public class FrmMed extends javax.swing.JFrame {
             //---- lstPraep ----
             lstPraep.setModel(new AbstractListModel() {
                 String[] values = {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4",
-                    "Item 5"
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4",
+                        "Item 5"
                 };
+
                 @Override
-                public int getSize() { return values.length; }
+                public int getSize() {
+                    return values.length;
+                }
+
                 @Override
-                public Object getElementAt(int i) { return values[i]; }
+                public Object getElementAt(int i) {
+                    return values[i];
+                }
             });
             lstPraep.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            lstPraep.setFont(new Font("Arial", Font.PLAIN, 16));
+            lstPraep.setFont(new Font("Arial", Font.PLAIN, 14));
             lstPraep.addListSelectionListener(new ListSelectionListener() {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
@@ -211,13 +175,13 @@ public class FrmMed extends javax.swing.JFrame {
             });
             jScrollPane2.setViewportView(lstPraep);
         }
-        contentPane.add(jScrollPane2, CC.xy(1, 5));
+        add(jScrollPane2, CC.xy(1, 3));
 
         //======== jScrollPane1 ========
         {
 
             //---- treeMed ----
-            treeMed.setFont(new Font("Arial", Font.PLAIN, 16));
+            treeMed.setFont(new Font("Arial", Font.PLAIN, 14));
             treeMed.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -226,9 +190,7 @@ public class FrmMed extends javax.swing.JFrame {
             });
             jScrollPane1.setViewportView(treeMed);
         }
-        contentPane.add(jScrollPane1, CC.xywh(3, 3, 1, 3));
-        pack();
-        setLocationRelativeTo(getOwner());
+        add(jScrollPane1, CC.xywh(3, 1, 1, 3));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
@@ -240,20 +202,20 @@ public class FrmMed extends javax.swing.JFrame {
         //new DlgMed(this, template);
 //        ArrayList result = new ArrayList();
 //        result.add(txtSuche.getText());
-
-        myMedAssistantDialog = new JDialog(this, "Medikamenten Assistent", true);
-        myMedAssistantDialog.setSize(1280, 800);
-        PnlProdAssistant myPnl = new PnlProdAssistant(new Closure() {
-            @Override
-            public void execute(Object o) {
-                OPDE.debug(o);
-                myMedAssistantDialog.dispose();
-                myMedAssistantDialog = null;
-            }
-        }, null);
-        myMedAssistantDialog.setContentPane(myPnl);
-        SYSTools.centerOnParent(this, myMedAssistantDialog);
-        myMedAssistantDialog.setVisible(true);
+//
+//        myMedAssistantDialog = new JDialog(this, "Medikamenten Assistent", true);
+//        myMedAssistantDialog.setSize(1280, 800);
+//        PnlProdAssistant myPnl = new PnlProdAssistant(new Closure() {
+//            @Override
+//            public void execute(Object o) {
+//                OPDE.debug(o);
+//                myMedAssistantDialog.dispose();
+//                myMedAssistantDialog = null;
+//            }
+//        }, null);
+//        myMedAssistantDialog.setContentPane(myPnl);
+//        SYSTools.centerOnParent(this, myMedAssistantDialog);
+//        myMedAssistantDialog.setVisible(true);
 
 //        new DlgMediAssistent(this, result);
 //        if (result.size() > 0) {
@@ -264,15 +226,15 @@ public class FrmMed extends javax.swing.JFrame {
 //        }
     }//GEN-LAST:event_btnMedActionPerformed
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        if (!template.equals("")) {
-            btnNew.doClick();
-        }
-    }//GEN-LAST:event_formWindowOpened
+//    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+//        if (!template.equals("")) {
+//            btnNew.doClick();
+//        }
+//    }//GEN-LAST:event_formWindowOpened
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        DlgProdukt prd = new DlgProdukt(this, produkt, template);
-        produkt = prd.getProdukt();
+//        PnlNewProdukt prd = new PnlNewProdukt(this, produkt, template);
+//        produkt = prd.getProdukt();
         createTree();
     }//GEN-LAST:event_btnNewActionPerformed
 
@@ -283,8 +245,16 @@ public class FrmMed extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_lstPraepValueChanged
 
-    private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
-        if (ignoreCaret) return;
+    private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
+//        if (lstPraep.getModel().getSize() > 0) {
+//            ListElement le = (ListElement) lstPraep.getModel().getElementAt(0);
+//            if (le != null) {
+//                medpid = le.getPk();
+//                createTree();
+//            }
+//        }
+
+
         treeMed.setCellRenderer(new DefaultTreeCellRenderer());
         treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
         treeMed.setVisible(false);
@@ -297,16 +267,8 @@ public class FrmMed extends javax.swing.JFrame {
             lstPraep.setModel(SYSTools.list2dlm(query.getResultList()));
             em.close();
         }
-    }//GEN-LAST:event_txtSucheCaretUpdate
 
-    private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
-//        if (lstPraep.getModel().getSize() > 0) {
-//            ListElement le = (ListElement) lstPraep.getModel().getElementAt(0);
-//            if (le != null) {
-//                medpid = le.getPk();
-//                createTree();
-//            }
-//        }
+
     }//GEN-LAST:event_txtSucheActionPerformed
 
     private void treeMedMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMedMousePressed
@@ -335,40 +297,40 @@ public class FrmMed extends javax.swing.JFrame {
 //                int nodetype = ((Integer) le.getObject()).intValue();
 
 
-                if (dmtn.getUserObject() instanceof Darreichung) {
-                    final Darreichung darreichung = (Darreichung) dmtn.getUserObject();
-                    itemedit = new JMenuItem("Bearbeiten");
-                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgDAF(thisFrame, "", darreichung);
-                            createTree();
-                        }
-                    });
-                    itemdelete = new JMenuItem("Entfernen");
-                    itemdelete.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            btnDeleteDAF(darreichung);
-                        }
-                    });
-                    itempack = new JMenuItem("Neue Verpackung");
-                    itempack.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            MedPackung mypack = new MedPackung(darreichung);
-                            new DlgPack(thisFrame, "Neu", mypack);
-//                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
-                            createTree();
-                        }
-                    });
-                } else if (dmtn.getUserObject() instanceof MedPackung) {
-                    final MedPackung packung = (MedPackung) dmtn.getUserObject();
-                    itemedit = new JMenuItem("Bearbeiten");
-                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgPack(thisFrame, "Bearbeiten", packung);
-                            createTree();
-                        }
-                    });
-                }
+//                if (dmtn.getUserObject() instanceof Darreichung) {
+//                    final Darreichung darreichung = (Darreichung) dmtn.getUserObject();
+//                    itemedit = new JMenuItem("Bearbeiten");
+//                    itemedit.addActionListener(new java.awt.event.ActionListener() {
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            new DlgDAF(thisFrame, "", darreichung);
+//                            createTree();
+//                        }
+//                    });
+//                    itemdelete = new JMenuItem("Entfernen");
+//                    itemdelete.addActionListener(new java.awt.event.ActionListener() {
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            btnDeleteDAF(darreichung);
+//                        }
+//                    });
+//                    itempack = new JMenuItem("Neue Verpackung");
+//                    itempack.addActionListener(new java.awt.event.ActionListener() {
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            MedPackung mypack = new MedPackung(darreichung);
+//                            new DlgPack(thisFrame, "Neu", mypack);
+////                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
+//                            createTree();
+//                        }
+//                    });
+//                } else if (dmtn.getUserObject() instanceof MedPackung) {
+//                    final MedPackung packung = (MedPackung) dmtn.getUserObject();
+//                    itemedit = new JMenuItem("Bearbeiten");
+//                    itemedit.addActionListener(new java.awt.event.ActionListener() {
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            new DlgPack(thisFrame, "Bearbeiten", packung);
+//                            createTree();
+//                        }
+//                    });
+//                }
 
                 if (itemedit != null || itemdelete != null || itemnew != null) {
                     menu.add(new JSeparator(JSeparator.HORIZONTAL));
@@ -384,32 +346,25 @@ public class FrmMed extends javax.swing.JFrame {
 
     private void btnNeuDAF(java.awt.event.ActionEvent evt) {
 
-        Darreichung darreichung = new Darreichung(produkt);
-
-        new DlgDAF(this, "", darreichung);
-        createTree();
+//        Darreichung darreichung = new Darreichung(produkt);
+//
+//        new DlgDAF(this, "", darreichung);
+//        createTree();
     }
 
 
     private void btnEditDAF(Darreichung darreichung) {
-        new DlgDAF(this, "", darreichung);
-        createTree();
+//        new DlgDAF(this, "", darreichung);
+//        createTree();
     }
 
     private void btnDeleteDAF(Darreichung darreichung) {
-        if (JOptionPane.showConfirmDialog(this, "Damit werden auch alle Zuordnungen und Packungen gelöscht.\n\nSind Sie sicher ?", DarreichungTools.toPrettyString(darreichung) + " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        EntityTools.delete(darreichung);
-        createTree();
-    }
-
-    public void dispose() {
-        SYSTools.unregisterListeners(menu);
-        menu = null;
-        SYSTools.unregisterListeners(this);
-        super.dispose();
+//        if (JOptionPane.showConfirmDialog(this, "Damit werden auch alle Zuordnungen und Packungen gelöscht.\n\nSind Sie sicher ?", DarreichungTools.toPrettyString(darreichung) + " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+//            return;
+//        }
+//
+//        EntityTools.delete(darreichung);
+//        createTree();
     }
 
     private void createTree() {
@@ -463,11 +418,7 @@ public class FrmMed extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JToolBar jToolBar1;
-    private JButton btnNew;
-    private JButton btnMed;
-    private JButton btnBuchen;
-    private JTextField txtSuche;
+    private JXSearchField txtSuche;
     private JScrollPane jScrollPane2;
     private JList lstPraep;
     private JScrollPane jScrollPane1;
@@ -503,5 +454,97 @@ public class FrmMed extends javax.swing.JFrame {
             return this;
         }
 
+    }
+
+
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+
+        searchPanes.add(addCommands());
+
+        searchPanes.addExpansion();
+
+    }
+
+    private CollapsiblePane addCommands() {
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane("Medikamente");
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament von Hand eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                }
+            });
+            mypanel.add(addButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            final JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament mit Assistent eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")), null);
+
+            addButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+
+                    final JidePopup popup = new JidePopup();
+
+
+                    WizardDialog wizard = new MedProductWizard().getWizard();
+
+
+                    popup.setMovable(false);
+                    popup.setResizable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.getContentPane().add(wizard.getContentPane());
+                    popup.setOwner(addButton);
+                    popup.removeExcludedComponent(addButton);
+                    popup.setDefaultFocusComponent(wizard.getContentPane());
+                    popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                            OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+                            popup.getContentPane().getComponentCount();
+                        }
+                    });
+
+
+                    Point p = new Point(addButton.getX(), addButton.getY());
+                    // Convert a coordinate relative to a component's bounds to screen coordinates
+                    SwingUtilities.convertPointToScreen(p, addButton);
+                    popup.showPopup(p.x, p.y - (int) wizard.getPreferredSize().getHeight() - (int) addButton.getPreferredSize().getHeight());
+                }
+            });
+
+            mypanel.add(addButton);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+            JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgBestand(null, "");
+                }
+            });
+            mypanel.add(buchenButton);
+        }
+
+        searchPane.setContentPane(mypanel);
+        return searchPane;
     }
 }

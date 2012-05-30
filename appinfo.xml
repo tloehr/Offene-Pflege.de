@@ -14,8 +14,10 @@
             Module, Erklärungen und ACLs, die von OPDE unterstützt werden. Hier steht drin, welche Klasse welche Fähigkeiten hat.
             Die einzelnen Rechte (hier ACLs) genannt, werden direkt im Programm-Code unterstützt. Bei der Vergabe von Zugriffsrechten
             werden diese Rechte als Mögliche Zuordnungen zu Gruppen angeboten.
+
+            Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
-        <class name="admin.residents.cash" short="Barbetragsverwaltung" long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true" javaclass="op.bw.tg.PnlTG">
+        <class name="admin.residents.cash" short="Barbeträge" long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true" javaclass="op.bw.tg.PnlTG" icon="coins.png">
             <execute doc="Der Benutzer erhält Zugriff auf die Barbetragsverawaltung."/>
             <delete doc="Benutzer kann Belege löschen."/>
             <insert doc="Benutzer kann Belege eintragen."/>
@@ -57,8 +59,11 @@
         </class>
         <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         </class>
-        <class name="opde.tickets" short="Vorgangsverwaltung" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true" javaclass="op.vorgang.PnlVorgang">
+        <class name="opde.tickets" short="Vorgänge" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true" javaclass="op.vorgang.PnlVorgang" icon="utilities-file-archiver.png">
             <manager doc="Man darf auf die Vorgänge anderer Mitarbeiter zugreifen."/>
+            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+        </class>
+        <class name="opde.medication" short="Medikamente" long="Medikamente eingeben, buchen, korrigieren. All das können Sie hier." main="true" javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
             <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
         </class>
     </classes>

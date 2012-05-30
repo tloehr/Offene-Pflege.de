@@ -129,8 +129,8 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default:grow",
-                "fill:default:grow"));
+            "default:grow",
+            "fill:default:grow"));
 
         //======== jspVerordnung ========
         {
@@ -144,15 +144,15 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
             //---- tblVerordnung ----
             tblVerordnung.setModel(new DefaultTableModel(
-                    new Object[][]{
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                    },
-                    new String[]{
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                new Object[][] {
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                },
+                new String[] {
+                    "Title 1", "Title 2", "Title 3", "Title 4"
+                }
             ));
             tblVerordnung.setToolTipText(null);
             tblVerordnung.addMouseListener(new MouseAdapter() {
@@ -279,7 +279,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 reloadTable();
                             }
                         }
-                    }).setVisible(true);
+                    });
                 }
             });
 
@@ -342,7 +342,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                             }
 
                         }
-                    }).setVisible(true);
+                    });
                 }
             });
             menu.add(itemPopupChange);
@@ -630,7 +630,8 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
-                                Verordnung verordnung = (Verordnung) o;
+                                Pair<Verordnung, List<VerordnungPlanung>> result = (Pair<Verordnung, List<VerordnungPlanung>>) o;
+                                Verordnung verordnung = result.getFirst();
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
@@ -666,24 +667,24 @@ public class PnlVerordnung extends NursingRecordsPanel {
             mypanel.add(buchenButton);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
-            JideButton vorratButton = GUITools.createHyperlinkButton("Vorräte bearbeiten", new ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png")), new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-//                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, new Closure() {
-//                        @Override
-//                        public void execute(Object bericht) {
-//                            if (bericht != null) {
-//                                EntityTools.persist(bericht);
-//                                reloadTable();
-//                            }
-//                            OPDE.hideSheet();
-//                        }
-//                    }));
-                }
-            });
-            mypanel.add(vorratButton);
-        }
+//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+//            JideButton vorratButton = GUITools.createHyperlinkButton("Vorräte bearbeiten", new ImageIcon(getClass().getResource("/artwork/22x22/sheetremocolums.png")), new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+////                    OPDE.showJDialogAsSheet(new DlgBericht(bewohner, new Closure() {
+////                        @Override
+////                        public void execute(Object bericht) {
+////                            if (bericht != null) {
+////                                EntityTools.persist(bericht);
+////                                reloadTable();
+////                            }
+////                            OPDE.hideSheet();
+////                        }
+////                    }));
+//                }
+//            });
+//            mypanel.add(vorratButton);
+//        }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
             JideButton printButton = GUITools.createHyperlinkButton("Verordnungen drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {

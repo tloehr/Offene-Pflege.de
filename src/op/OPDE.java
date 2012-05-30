@@ -56,6 +56,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
@@ -97,6 +98,7 @@ public class OPDE {
     protected static boolean debug;
     protected static String opwd = "";
     protected static String css = "";
+    public static Font arial14;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -204,7 +206,7 @@ public class OPDE {
      * @throws SQLException
      */
     @Deprecated
-    public static void initDB() throws SQLException {
+    public static void initDB() throws Exception {
         if (db != null) return;
         String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
         String dbpw = localProps.getProperty("javax.persistence.jdbc.password");
@@ -360,6 +362,7 @@ public class OPDE {
     public static void main(String[] args) throws Exception {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
+         arial14 = new Font("Arial", Font.PLAIN, 14);
 //        animationCache = new ArrayList(96);
 
         // Das hier fängt alle ungefangenen Exceptions auf.

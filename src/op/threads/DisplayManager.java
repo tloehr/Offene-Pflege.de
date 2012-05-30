@@ -24,6 +24,7 @@ public class DisplayManager extends Thread {
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
     private final Color defaultColor = new Color(105, 80, 69);
+    private long dbZyklenRest = 0;
 
 //    private DateFormat df;
 
@@ -87,6 +88,8 @@ public class DisplayManager extends Thread {
 
     public void setDBActionMessage(boolean action) {
         this.dbAction = action;
+        lblDB.setVisible(action); // Damit es sofort sichtbar oder unsichtbar wird.
+        dbZyklenRest = (zyklen + 1) % 2; // Damit es sofort blinkt.
     }
 
     private void processSubMessage() {
@@ -152,9 +155,7 @@ public class DisplayManager extends Thread {
 
     private void processDBMessage() {
         if (dbAction) {
-            lblDB.setVisible(zyklen % 2 == 0);
-        } else {
-            lblDB.setVisible(false);
+            lblDB.setVisible(zyklen % 2 == dbZyklenRest);
         }
     }
 
@@ -165,7 +166,6 @@ public class DisplayManager extends Thread {
             processDBMessage();
             processProgressBar();
             processSubMessage();
-
 
             try {
                 zyklen++;

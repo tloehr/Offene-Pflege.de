@@ -90,7 +90,11 @@ public class DFNImport {
 
 
 
-        OPDE.initDB();
+        try {
+            OPDE.initDB();
+        } catch (Exception e){
+            System.exit(1);
+        }
 
         Connection db = OPDE.getDb().db;
 

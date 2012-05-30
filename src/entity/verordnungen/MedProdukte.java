@@ -34,6 +34,12 @@ public class MedProdukte implements Serializable {
         this.darreichungen = new ArrayList<Darreichung>();
     }
 
+    public MedProdukte(String bezeichnung) {
+        this.hersteller = null;
+        this.bezeichnung = bezeichnung;
+        this.darreichungen = new ArrayList<Darreichung>();
+    }
+
     public Long getMedPID() {
         return medPID;
     }

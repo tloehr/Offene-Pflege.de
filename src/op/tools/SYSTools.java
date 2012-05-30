@@ -692,6 +692,14 @@ public class SYSTools {
         return dlm;
     }
 
+    public static DefaultComboBoxModel list2cmb(List list) {
+        DefaultComboBoxModel cmb = new DefaultComboBoxModel();
+        for (Object o : list) {
+            cmb.addElement(o);
+        }
+        return cmb;
+    }
+
     /**
      * Erstellt aus einem Result Set ein ComboBox Modell. Wobei davon ausgegangen wird, dass in der ersten Spalte immer der PK steht.
      *

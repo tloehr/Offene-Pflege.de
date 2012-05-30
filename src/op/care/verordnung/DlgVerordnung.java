@@ -73,8 +73,6 @@ public class DlgVerordnung extends MyJDialog {
     //    private java.awt.Frame parent;
 //    private boolean ignoreSitCaret;
     private boolean ignoreEvent;
-    private long version;
-
 
     private JPopupMenu menu;
     private PropertyChangeListener myPropertyChangeListener;
@@ -97,9 +95,10 @@ public class DlgVerordnung extends MyJDialog {
         this.verordnung = verordnung;
         planungenToDelete = new ArrayList<VerordnungPlanung>();
         this.editMode = mode;
-
         initComponents();
         initDialog();
+        pack();
+        setVisible(true);
     }
 
     private void jdcANPropertyChange(PropertyChangeEvent e) {
@@ -114,13 +113,14 @@ public class DlgVerordnung extends MyJDialog {
 
         final JidePopup popup = new JidePopup();
 
-        JPanel dlg = null;
+        JPanel dlg;
         if (isBedarf()) {
             dlg = new PnlBedarfDosis(null, new Closure() {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
                         ((VerordnungPlanung) o).setVerordnung(verordnung);
+                        verordnung.getPlanungen().add(((VerordnungPlanung) o));
                         reloadTable();
                         popup.hidePopup();
                     }
@@ -132,6 +132,7 @@ public class DlgVerordnung extends MyJDialog {
                 public void execute(Object o) {
                     if (o != null) {
                         ((VerordnungPlanung) o).setVerordnung(verordnung);
+                        verordnung.getPlanungen().add(((VerordnungPlanung) o));
                         reloadTable();
                         popup.hidePopup();
                     }

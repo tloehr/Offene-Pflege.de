@@ -115,7 +115,7 @@ public class MedBestandTools {
      * @param bestand
      * @return
      */
-    public static void anbrechen(EntityManager em, MedBestand bestand, BigDecimal apv) throws Exception {
+    public static void anbrechen(MedBestand bestand, BigDecimal apv) throws Exception {
         if (apv == null) {
             throw new NullPointerException("apv darf nicht null sein");
         }
@@ -214,30 +214,30 @@ public class MedBestandTools {
     /**
      * Schliesst einen Bestand ab. Erzeugt dazu direkt eine passende Abschlussbuchung, die den Bestand auf null bringt.
      *
-     * @param em,      EntityManager in dessen Transaktion das ganze abläuft.
+     * <b>tested:</b> Test0002
+     *
+     *
      * @param bestand, der abzuschliessen ist.
      * @param text,    evtl. gewünschter Text für die Abschlussbuchung
      * @param status,  für die Abschlussbuchung
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
+     *
+     *
+     *
+     *
+     *
      */
-    public static MedBestand abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
-        BigDecimal bestandsumme = getBestandSumme(em, bestand);
+    public static void abschliessen(MedBestand bestand, String text, short status) throws Exception {
+        BigDecimal bestandsumme = getBestandSumme(bestand);
 
         MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
         abschlussBuchung.setText(text);
-        em.persist(abschlussBuchung);
+        bestand.getBuchungen().add(abschlussBuchung);
 
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
 
-
-//        if (mitNeuberechnung) { // Wenn gewünscht wird bei Abschluss der Packung der APV neu berechnet.
-//            apvNeu = berechneBuchungsWert(bestand);
-//
-//            OPDE.info("Neuberechnung von DafID:" + bestand.getDarreichung().getDafID() + ", " + bestand.getDarreichung().getMedProdukt().getBezeichnung());
-//        }
-        return bestand;
     }
 
     private static MedBuchungen getAnfangsBuchung(MedBestand bestand) {

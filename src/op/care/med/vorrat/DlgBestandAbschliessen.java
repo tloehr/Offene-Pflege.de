@@ -373,18 +373,18 @@ public class DlgBestandAbschliessen extends MyJDialog {
                 BigDecimal apv = bestand.getApv();
 
                 if (rbGefallen.isSelected()) {
-                    MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
+                    MedBestandTools.abschliessen(bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedBestandTools.abschliessen(em, bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
+                    MedBestandTools.abschliessen(bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
-                    MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
+                    MedBestandTools.abschliessen(bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
                     apv = MedBestandTools.berechneAPV(em, bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
                 if (nextBest != null) {
-                    MedBestandTools.anbrechen(em, nextBest, apv);
+                    MedBestandTools.anbrechen(nextBest, apv);
                     OPDE.info(classname + ": Nächste Packung mit Bestands Nr.: " + nextBest.getBestID() + " wird nun angebrochen.");
                 } else {
                     // es wurde kein nächster angebrochen ?
