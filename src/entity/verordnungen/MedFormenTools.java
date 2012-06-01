@@ -63,4 +63,9 @@ public class MedFormenTools {
         return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getZubereitung() + ", " + form.getAnwText());
     }
 
+    public static String toPrettyString4Packung(MedFormen form) {
+
+        return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getAnwText() + " " + form.getZubereitung());
+    }
+
 }

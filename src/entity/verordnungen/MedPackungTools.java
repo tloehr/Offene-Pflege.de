@@ -48,8 +48,8 @@ public class MedPackungTools {
      * werden abgeschnitten. Und es wird anhand der Datenbank geprüft, ob die PZN noch frei ist oder nicht.
      *
      * @param pzn      die geprüfte und bereinigte PZN. <code>null</code> bei falscher oder belegter PZN.
-     * @param ignoreMe lässt die betreffende Packung bei der Suche ausser acht. Null, wenn nict gewünscht.
-     * @return
+     * @param ignoreMe lässt die betreffende Packung bei der Suche ausser acht. Null, wenn nicht gewünscht.
+     * @return gibt die PZN zurück, wenn sie gültig ist. NULL sonst.
      */
     public static String checkNewPZN(String pzn, MedPackung ignoreMe) {
         pzn = parsePZN(pzn);

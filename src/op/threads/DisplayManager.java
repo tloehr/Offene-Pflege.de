@@ -1,6 +1,7 @@
 package op.threads;
 
 import entity.system.SyslogTools;
+import op.tools.SYSConst;
 
 import javax.swing.*;
 import java.awt.*;
@@ -118,6 +119,9 @@ public class DisplayManager extends Thread {
         if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
             jp.setForeground(Color.RED);
             lblSub.setForeground(Color.RED);
+        } else if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.WARNING) {
+            jp.setForeground(SYSConst.darkorange);
+            lblSub.setForeground(SYSConst.darkorange);
         } else {
             lblSub.setForeground(defaultColor);
             jp.setForeground(defaultColor);

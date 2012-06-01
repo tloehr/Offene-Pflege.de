@@ -10,6 +10,7 @@ import entity.verordnungen.*;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
 
 import javax.persistence.EntityManager;
@@ -34,6 +35,7 @@ public class PnlZusatz extends JPanel {
     private Darreichung darreichung;
     private MedFormen form;
     private Closure validate;
+    private boolean ignoreEvent = false;
 
     public PnlZusatz(Closure validate, MedProdukte produkt) {
         this.validate = validate;
@@ -51,6 +53,7 @@ public class PnlZusatz extends JPanel {
             lstDaf.setCellRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
         }
         lblMsg.setVisible(!produkt.getDarreichungen().isEmpty());
+        jsp1.setVisible(!produkt.getDarreichungen().isEmpty());
         lstDaf.setVisible(!produkt.getDarreichungen().isEmpty());
 
         EntityManager em = OPDE.createEM();
@@ -75,27 +78,27 @@ public class PnlZusatz extends JPanel {
     }
 
     private void txtZusatzActionPerformed(ActionEvent e) {
-        if (txtZusatz.getText().isEmpty()) {
-            return;
+        cmbFormen.setEnabled(true);
+        darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), form);
+        validate.execute(darreichung);
+        if (lstDaf.isVisible() && lstDaf.getSelectedIndex() != 0){
+            lstDaf.setSelectedIndex(0);
         }
-        lstDaf.setSelectedIndex(0);
-//        darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), null);
-//        validate.execute(darreichung);
     }
 
     private void lstDafValueChanged(ListSelectionEvent e) {
+        if (ignoreEvent){
+            return;
+        }
         if (!e.getValueIsAdjusting()) {
-            if (lstDaf.getSelectedIndex() == 0) {
-                if (txtZusatz.getText().trim().isEmpty()) {
-                    darreichung = null;
-                } else {
-                    darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), form);
-                }
-            } else {
-                txtZusatz.setText(null);
+            if (lstDaf.getSelectedIndex() > 0) {
+                ignoreEvent = true;
                 darreichung = (Darreichung) lstDaf.getSelectedValue();
+                txtZusatz.setText(null);
+                cmbFormen.setEnabled(false);
+                validate.execute(darreichung);
+                ignoreEvent = false;
             }
-            validate.execute(darreichung);
         }
     }
 
@@ -106,16 +109,13 @@ public class PnlZusatz extends JPanel {
         lblPV.setVisible(!form.anwUndPackEinheitenGleich());
         txtA.setVisible(!form.anwUndPackEinheitenGleich());
 
-        if (!form.anwUndPackEinheitenGleich()){
+        if (!form.anwUndPackEinheitenGleich()) {
             txtA.setText("1");
-            lblPV.setText(" "+form.getAnwEinheit());
+            lblPV.setText(" " + form.getAnwText() + " entsprechen 1 " + MedFormenTools.EINHEIT[form.getPackEinheit()]);
         }
 
-        if (txtZusatz.getText().trim().isEmpty()) {
-            darreichung = null;
-        } else {
-            darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), form);
-        }
+        darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), form);
+
         validate.execute(darreichung);
     }
 
@@ -123,22 +123,22 @@ public class PnlZusatz extends JPanel {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtZusatz = new JXSearchField();
         cmbFormen = new JComboBox();
-        lblAPV = new JLabel();
         panel1 = new JPanel();
+        lblAPV = new JLabel();
         txtA = new JTextField();
         lblPV = new JLabel();
         lblMsg = new JLabel();
-        scrollPane1 = new JScrollPane();
+        jsp1 = new JScrollPane();
         lstDaf = new JList();
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "2*(default, $lgap), default, $rgap, default, $lgap, default, 14dlu, default, $lgap, default:grow, $lgap, default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "2*(default, $lgap), default, $rgap, pref, 14dlu, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtZusatz.setInstantSearchDelay(500);
+        txtZusatz.setInstantSearchDelay(0);
         txtZusatz.setPrompt("Zusatzbezeichnung");
         txtZusatz.addActionListener(new ActionListener() {
             @Override
@@ -158,29 +158,33 @@ public class PnlZusatz extends JPanel {
         });
         add(cmbFormen, CC.xy(3, 5));
 
-        //---- lblAPV ----
-        lblAPV.setText("In welchem Verh\u00e4ltnis stehen Anwendung und Verpackung ?");
-        lblAPV.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblAPV, CC.xy(3, 7));
-
         //======== panel1 ========
         {
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+            panel1.setLayout(new HorizontalLayout(10));
+
+            //---- lblAPV ----
+            lblAPV.setText("Verh\u00e4ltnis zwischen Anwendung und Packung:");
+            lblAPV.setFont(new Font("Arial", Font.PLAIN, 14));
+            panel1.add(lblAPV);
+
+            //---- txtA ----
+            txtA.setColumns(10);
+            txtA.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(txtA);
 
             //---- lblPV ----
-            lblPV.setText("text");
+            lblPV.setText("x entspricht 1 g");
             lblPV.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(lblPV);
         }
-        add(panel1, CC.xy(3, 9));
+        add(panel1, CC.xy(3, 7, CC.RIGHT, CC.DEFAULT));
 
         //---- lblMsg ----
         lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
         lblMsg.setText("Es gibt bereits Darreichungsformen. Ist es eins von diesen ?");
-        add(lblMsg, CC.xy(3, 11));
+        add(lblMsg, CC.xy(3, 9));
 
-        //======== scrollPane1 ========
+        //======== jsp1 ========
         {
 
             //---- lstDaf ----
@@ -192,21 +196,21 @@ public class PnlZusatz extends JPanel {
                     lstDafValueChanged(e);
                 }
             });
-            scrollPane1.setViewportView(lstDaf);
+            jsp1.setViewportView(lstDaf);
         }
-        add(scrollPane1, CC.xy(3, 13, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xy(3, 11, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JXSearchField txtZusatz;
     private JComboBox cmbFormen;
-    private JLabel lblAPV;
     private JPanel panel1;
+    private JLabel lblAPV;
     private JTextField txtA;
     private JLabel lblPV;
     private JLabel lblMsg;
-    private JScrollPane scrollPane1;
+    private JScrollPane jsp1;
     private JList lstDaf;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

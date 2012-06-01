@@ -26,6 +26,7 @@
 package op;
 
 import com.jidesoft.utils.Lm;
+import com.jidesoft.wizard.WizardStyle;
 import entity.EntityTools;
 import entity.Users;
 import entity.UsersTools;
@@ -70,6 +71,9 @@ import java.util.Properties;
 
 public class OPDE {
 
+    public static final int INFO_TIME = 2;
+    public static final int WARNING_TIME = 4;
+    public static final int ERROR_TIME = 4;
     public static long uptime;
     protected static Database db;
     //    public static OPMain ocmain;
@@ -124,7 +128,7 @@ public class OPDE {
     }
 
     public static int getErrorMessageTime() {
-        return 4;
+        return ERROR_TIME;
     }
 
     public static boolean isAnimation() {
@@ -562,7 +566,11 @@ public class OPDE {
                 css = "";
             }
 
+            // JideSoft
             Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
+            WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
+            // JideSoft
+
 
             // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             mainframe = new FrmMain();

@@ -44,6 +44,7 @@ import op.tools.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.InternalClassACL;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -486,7 +487,7 @@ public class PnlMed extends CleanablePanel {
 
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament von Hand eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                 }
@@ -495,7 +496,7 @@ public class PnlMed extends CleanablePanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            final JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament mit Assistent eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")), null);
+            final JideButton addButton = GUITools.createHyperlinkButton("Medikamenten-Assistent", new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")), null);
 
             addButton.addActionListener(new ActionListener() {
                 @Override
@@ -505,15 +506,23 @@ public class PnlMed extends CleanablePanel {
                     final JidePopup popup = new JidePopup();
 
 
-                    WizardDialog wizard = new MedProductWizard().getWizard();
+                    WizardDialog wizard = new MedProductWizard(new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            popup.hidePopup();
+                            // keine Maßnahme nötig
+                        }
+                    }).getWizard();
 
 
                     popup.setMovable(false);
+                    popup.setPreferredSize((new Dimension(800,450)));
                     popup.setResizable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                     popup.getContentPane().add(wizard.getContentPane());
                     popup.setOwner(addButton);
                     popup.removeExcludedComponent(addButton);
+                    popup.setTransient(false);
                     popup.setDefaultFocusComponent(wizard.getContentPane());
                     popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
                         @Override

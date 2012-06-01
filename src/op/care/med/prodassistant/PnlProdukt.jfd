@@ -20,6 +20,13 @@
         <string>default, default, unrelgap, default, linegap, default:grow, linegap, default</string> 
        </void> 
       </object> 
+      <void method="setProperty"> 
+       <string>preferredSize</string> 
+       <object class="java.awt.Dimension"> 
+        <int>610</int> 
+        <int>198</int> 
+       </object> 
+      </void> 
       <void property="name"> 
        <string>this</string> 
       </void> 
@@ -108,7 +115,7 @@
          <class>javax.swing.JScrollPane</class> 
         </object> 
         <void property="name"> 
-         <string>scrollPane1</string> 
+         <string>jsp1</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 

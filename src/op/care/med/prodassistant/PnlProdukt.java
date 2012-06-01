@@ -6,8 +6,6 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.MedFormen;
-import entity.verordnungen.MedFormenTools;
 import entity.verordnungen.MedProdukte;
 import entity.verordnungen.MedProdukteTools;
 import op.OPDE;
@@ -23,8 +21,6 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * @author Torsten Löhr
@@ -41,8 +37,9 @@ public class PnlProdukt extends JPanel {
         initPanel();
     }
 
-    private void initPanel(){
+    private void initPanel() {
         lblProdMsg.setVisible(false);
+        jsp1.setVisible(false);
         lstProd.setVisible(false);
     }
 
@@ -53,18 +50,18 @@ public class PnlProdukt extends JPanel {
         listProd = query.getResultList();
         em.close();
 
-        listProd.add(0, "<html><b>Nein, keins von diesen</b></html>");
-
         lblProdMsg.setVisible(!listProd.isEmpty());
+        jsp1.setVisible(!listProd.isEmpty());
         lstProd.setVisible(!listProd.isEmpty());
 
         if (!listProd.isEmpty()) {
+            listProd.add(0, "<html><b>Nein, keins von diesen</b></html>");
             DefaultListModel lmProd;
             lmProd = SYSTools.list2dlm(listProd);
             lstProd.setModel(lmProd);
             lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
         } else {
-            produkt = new MedProdukte(txtProd.getText().trim());
+            produkt = txtProd.getText().trim().isEmpty() ? null : new MedProdukte(txtProd.getText().trim());
             validate.execute(produkt);
         }
     }
@@ -72,7 +69,7 @@ public class PnlProdukt extends JPanel {
     private void lstProdValueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             if (lstProd.getSelectedIndex() == 0) {
-                produkt = new MedProdukte(txtProd.getText().trim());
+                produkt = txtProd.getText().trim().isEmpty() ? null : new MedProdukte(txtProd.getText().trim());
             } else {
                 produkt = (MedProdukte) lstProd.getSelectedValue();
             }
@@ -84,13 +81,14 @@ public class PnlProdukt extends JPanel {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtProd = new JXSearchField();
         lblProdMsg = new JLabel();
-        scrollPane1 = new JScrollPane();
+        jsp1 = new JScrollPane();
         lstProd = new JList();
 
         //======== this ========
+        setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtProd ----
         txtProd.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -110,7 +108,7 @@ public class PnlProdukt extends JPanel {
         lblProdMsg.setHorizontalAlignment(SwingConstants.CENTER);
         add(lblProdMsg, CC.xy(3, 4));
 
-        //======== scrollPane1 ========
+        //======== jsp1 ========
         {
 
             //---- lstProd ----
@@ -123,16 +121,16 @@ public class PnlProdukt extends JPanel {
                     lstProdValueChanged(e);
                 }
             });
-            scrollPane1.setViewportView(lstProd);
+            jsp1.setViewportView(lstProd);
         }
-        add(scrollPane1, CC.xy(3, 6, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xy(3, 6, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JXSearchField txtProd;
     private JLabel lblProdMsg;
-    private JScrollPane scrollPane1;
+    private JScrollPane jsp1;
     private JList lstProd;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
