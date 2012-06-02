@@ -63,9 +63,15 @@ public class MedFormenTools {
         return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getZubereitung() + ", " + form.getAnwText());
     }
 
-    public static String toPrettyString4Packung(MedFormen form) {
+    public static String toPrettyStringPackung(MedFormen form) {
+        String result = "";
+        if (SYSTools.catchNull(form.getZubereitung()).isEmpty()){
+            result = EINHEIT[form.getPackEinheit()] + " " + form.getAnwText();
+        } else {
+            result = EINHEIT[form.getPackEinheit()] + " " + form.getZubereitung();
+        }
 
-        return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getAnwText() + " " + form.getZubereitung());
+        return result;
     }
 
 }

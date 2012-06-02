@@ -38,10 +38,15 @@ public class PnlZusatz extends JPanel {
     private boolean ignoreEvent = false;
 
     public PnlZusatz(Closure validate, MedProdukte produkt) {
+        OPDE.debug("CONSTRUCTOR PNLZUSATZ");
         this.validate = validate;
         this.produkt = produkt;
         initComponents();
         initPanel();
+    }
+
+    public void setProdukt(MedProdukte produkt) {
+        this.produkt = produkt;
     }
 
     private void initPanel() {

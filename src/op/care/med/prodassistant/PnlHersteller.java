@@ -25,11 +25,15 @@ public class PnlHersteller extends JPanel {
     private MedProdukte produkt;
     private Closure validate;
 
-    public PnlHersteller(Closure validate) {
+    public PnlHersteller(Closure validate, MedProdukte produkt) {
         this.validate = validate;
-//        this.produkt = produkt;
+        this.produkt = produkt;
         initComponents();
         initPanel();
+    }
+
+    public void setProdukt(MedProdukte produkt) {
+        this.produkt = produkt;
     }
 
     private void initPanel(){
@@ -45,6 +49,7 @@ public class PnlHersteller extends JPanel {
     }
 
     private void lstHerstellerValueChanged(ListSelectionEvent e) {
+        produkt.setHersteller((MedHersteller) lstHersteller.getSelectedValue());
         validate.execute((MedHersteller) lstHersteller.getSelectedValue());
     }
 

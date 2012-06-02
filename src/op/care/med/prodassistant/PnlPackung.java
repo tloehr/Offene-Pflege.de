@@ -35,14 +35,17 @@ public class PnlPackung extends JPanel {
     private MedPackung packung;
     private Closure validate;
 
-    public PnlPackung(Closure validate, Darreichung darreichung) {
+    public PnlPackung(Closure validate) {
         pzn = null;
         inhalt = null;
         packung = null;
         this.validate = validate;
-        this.darreichung = darreichung;
         initComponents();
         initPanel();
+    }
+
+    public void setDarreichung(Darreichung darreichung) {
+        this.darreichung = darreichung;
     }
 
     private void initPanel() {
@@ -89,8 +92,8 @@ public class PnlPackung extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "4*(default, $lgap), default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "4*(default, $lgap), default"));
 
         //---- txtPZN ----
         txtPZN.setFont(new Font("Arial", Font.PLAIN, 14));

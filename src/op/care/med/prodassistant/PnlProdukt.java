@@ -31,6 +31,7 @@ public class PnlProdukt extends JPanel {
     private Closure validate;
 
     public PnlProdukt(Closure validate) {
+        OPDE.debug("CONSTRUCTOR PNLPRODUKT");
         produkt = null;
         this.validate = validate;
         initComponents();

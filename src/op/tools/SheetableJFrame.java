@@ -203,7 +203,7 @@ public class SheetableJFrame extends JFrame {
                             source.getHeight());
             Graphics2D offscreenGraphics =
                     (Graphics2D) offscreenImage.getGraphics();
-            source.paint(offscreenGraphics);
+
         }
 
         public Dimension getPreferredSize() {

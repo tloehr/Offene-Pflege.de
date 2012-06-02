@@ -63,18 +63,18 @@ import java.io.*;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 //import op.threads.BackgroundMonitor;
 
 public class OPDE {
+    public static final String internalClassID = "opde";
 
     public static final int INFO_TIME = 2;
     public static final int WARNING_TIME = 4;
     public static final int ERROR_TIME = 4;
     public static long uptime;
+    public static ResourceBundle lang;
     protected static Database db;
     //    public static OPMain ocmain;
     public static FrmMain mainframe;
@@ -366,8 +366,8 @@ public class OPDE {
     public static void main(String[] args) throws Exception {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
-         arial14 = new Font("Arial", Font.PLAIN, 14);
-//        animationCache = new ArrayList(96);
+        arial14 = new Font("Arial", Font.PLAIN, 14);
+        lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
 
         // Das hier fängt alle ungefangenen Exceptions auf.
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -583,7 +583,7 @@ public class OPDE {
         return mainframe.getDisplayManager();
     }
 
-    public static PrintProcessor getPrintProcessor(){
+    public static PrintProcessor getPrintProcessor() {
         return mainframe.getPrintProcessor();
     }
 
