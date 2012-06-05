@@ -82,8 +82,9 @@ public class MedBestandTools {
         if (vorrat != null && vorrat.getBestaende() != null) {
             Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
             while (itBestand.hasNext()) {
-                bestand = itBestand.next();
-                if (bestand.isAngebrochen() && !bestand.isAbgeschlossen()) {
+                MedBestand b = itBestand.next();
+                if (b.isAngebrochen() && !b.isAbgeschlossen()) {
+                    bestand = b;
                     break;
                 }
             }
@@ -377,7 +378,7 @@ public class MedBestandTools {
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
         result += DarreichungTools.toPrettyString(bestand.getDarreichung());
 
-        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).isEmpty()) {
+        if (bestand.getPackung() != null) {
             result += ", " + MedPackungTools.toPrettyString(bestand.getPackung());
         }
 

@@ -4,19 +4,25 @@
 
 package op.care.med.prodassistant;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.swing.*;
-import javax.swing.event.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
 import entity.verordnungen.MedHersteller;
 import entity.verordnungen.MedHerstellerTools;
 import entity.verordnungen.MedProdukte;
 import op.OPDE;
 import org.apache.commons.collections.Closure;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author Torsten Löhr
@@ -24,10 +30,12 @@ import org.apache.commons.collections.Closure;
 public class PnlHersteller extends JPanel {
     private MedProdukte produkt;
     private Closure validate;
+    private Dialog parent;
 
-    public PnlHersteller(Closure validate, MedProdukte produkt) {
+    public PnlHersteller(Closure validate, MedProdukte produkt, Dialog parent) {
         this.validate = validate;
         this.produkt = produkt;
+        this.parent = parent;
         initComponents();
         initPanel();
     }
@@ -36,7 +44,7 @@ public class PnlHersteller extends JPanel {
         this.produkt = produkt;
     }
 
-    private void initPanel(){
+    private void initPanel() {
         EntityManager em = OPDE.createEM();
         Query query2 = em.createNamedQuery("MedHersteller.findAll");
         lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedHersteller[]{})));
@@ -45,12 +53,34 @@ public class PnlHersteller extends JPanel {
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        final JidePopup popup = new JidePopup();
+
+        DlgHersteller dlg = new DlgHersteller(new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    lstHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{(MedHersteller) o}));
+                    lstHersteller.setSelectedIndex(0);
+                    popup.hidePopup();
+                }
+            }
+        });
+
+        popup.setMovable(false);
+        popup.setResizable(false);
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+        popup.getContentPane().add(dlg);
+        popup.setOwner(btnAdd);
+        popup.removeExcludedComponent(btnAdd);
+        popup.setTransient(true);
+        popup.setDefaultFocusComponent(dlg);
+
+        popup.showPopup(new Insets(-5, 0, -5, 0), btnAdd);
     }
 
     private void lstHerstellerValueChanged(ListSelectionEvent e) {
         produkt.setHersteller((MedHersteller) lstHersteller.getSelectedValue());
-        validate.execute((MedHersteller) lstHersteller.getSelectedValue());
+        validate.execute(lstHersteller.getSelectedValue());
     }
 
     private void initComponents() {
@@ -84,6 +114,8 @@ public class PnlHersteller extends JPanel {
         btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
         btnAdd.setContentAreaFilled(false);
         btnAdd.setBorder(null);
+        btnAdd.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+        btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

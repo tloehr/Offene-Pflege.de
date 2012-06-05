@@ -29,10 +29,12 @@ package op.care.verordnung;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
+import com.jidesoft.wizard.WizardDialog;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.care.med.prodassistant.MedProductWizard;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -259,10 +261,11 @@ public class DlgVerordnung extends MyJDialog {
         } else {
             OPDE.getDisplayManager().setDBActionMessage(true);
             EntityManager em = OPDE.createEM();
-            if (txtMed.getText().matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
-                String pzn = txtMed.getText();
 
-                pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
+            String pzn = MedPackungTools.parsePZN(txtMed.getText());
+
+            if (pzn != null) {
+
                 Query pznQuery = em.createNamedQuery("MedPackung.findByPzn");
                 pznQuery.setParameter("pzn", pzn);
 
@@ -415,6 +418,8 @@ public class DlgVerordnung extends MyJDialog {
                 btnEmptySit2.setBorder(null);
                 btnEmptySit2.setContentAreaFilled(false);
                 btnEmptySit2.setToolTipText("Auswahl l\u00f6schen");
+                btnEmptySit2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnEmptySit2.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel-pressed.png")));
                 btnEmptySit2.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -429,6 +434,8 @@ public class DlgVerordnung extends MyJDialog {
                 btnMed.setBorder(null);
                 btnMed.setContentAreaFilled(false);
                 btnMed.setToolTipText("Neues Medikament eintragen");
+                btnMed.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnMed.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
                 btnMed.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -498,6 +505,8 @@ public class DlgVerordnung extends MyJDialog {
                 btnEmptySit.setBorder(null);
                 btnEmptySit.setContentAreaFilled(false);
                 btnEmptySit.setToolTipText("Auswahl l\u00f6schen");
+                btnEmptySit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnEmptySit.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel-pressed.png")));
                 btnEmptySit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -512,6 +521,8 @@ public class DlgVerordnung extends MyJDialog {
                 btnSituation.setBorder(null);
                 btnSituation.setContentAreaFilled(false);
                 btnSituation.setToolTipText("Neue  Situation eintragen");
+                btnSituation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnSituation.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
                 btnSituation.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -580,6 +591,8 @@ public class DlgVerordnung extends MyJDialog {
                     btnAddDosis.setBorder(null);
                     btnAddDosis.setContentAreaFilled(false);
                     btnAddDosis.setToolTipText("Neue Dosierung eintragen");
+                    btnAddDosis.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnAddDosis.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
                     btnAddDosis.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -598,6 +611,7 @@ public class DlgVerordnung extends MyJDialog {
             cbPackEnde.setEnabled(false);
             cbPackEnde.setMargin(new Insets(0, 0, 0, 0));
             cbPackEnde.setFont(new Font("Arial", Font.PLAIN, 14));
+            cbPackEnde.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             cbPackEnde.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
@@ -611,6 +625,7 @@ public class DlgVerordnung extends MyJDialog {
             cbStellplan.setBorder(BorderFactory.createEmptyBorder());
             cbStellplan.setMargin(new Insets(0, 0, 0, 0));
             cbStellplan.setFont(new Font("Arial", Font.PLAIN, 14));
+            cbStellplan.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             jPanel1.add(cbStellplan, CC.xywh(1, 9, 5, 1));
         }
         contentPane.add(jPanel1, CC.xy(5, 3));
@@ -667,6 +682,7 @@ public class DlgVerordnung extends MyJDialog {
                 cbAB.setText("Abgesetzt");
                 cbAB.setBorder(BorderFactory.createEmptyBorder());
                 cbAB.setMargin(new Insets(0, 0, 0, 0));
+                cbAB.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 cbAB.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -783,6 +799,7 @@ public class DlgVerordnung extends MyJDialog {
 
             //---- btnClose ----
             btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnClose.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -794,6 +811,7 @@ public class DlgVerordnung extends MyJDialog {
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnSave.setEnabled(false);
+            btnSave.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnSave.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -922,17 +940,40 @@ public class DlgVerordnung extends MyJDialog {
     }//GEN-LAST:event_cmbMassItemStateChanged
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
-        //String template = ( txtMed.getText().matches("^ß?\\d{7}") ? "" : txtMed.getText());
-        //new DlgMed(this, template);
-//        ArrayList result = new ArrayList();
-//        result.add(txtMed.getText());
-//        new DlgMediAssistent(this, result);
-//        if (result.size() > 0) {
-//            ignoreEvent = true;
-//            txtMed.setText(result.get(0).toString());
-//            ignoreEvent = false;
-//            txtMedCaretUpdate(null);
-//        }
+
+        String pzn = MedPackungTools.parsePZN(txtMed.getText());
+        final JidePopup popup = new JidePopup();
+
+        WizardDialog wizard = new MedProductWizard(new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null){
+                    MedPackung packung = (MedPackung) o;
+                    txtMed.setText(packung.getPzn());
+                }
+                popup.hidePopup();
+            }
+        }, (pzn == null ? pzn : txtMed.getText().trim())).getWizard();
+
+        popup.setMovable(false);
+        popup.setPreferredSize((new Dimension(800, 450)));
+        popup.setResizable(false);
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+        popup.getContentPane().add(wizard.getContentPane());
+        popup.setOwner(btnMed);
+        popup.removeExcludedComponent(btnMed);
+        popup.setTransient(true);
+        popup.setDefaultFocusComponent(wizard.getContentPane());
+        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+                popup.getContentPane().getComponentCount();
+            }
+        });
+
+        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
+
     }//GEN-LAST:event_btnMedActionPerformed
 
 
@@ -1057,7 +1098,6 @@ public class DlgVerordnung extends MyJDialog {
         verordnung.setStellplan(cbStellplan.isSelected());
 
         verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
-
 
 
 //            } else { // if(editMode == CHANGE_MODE) { // =================== VERÄNDERUNG ====================

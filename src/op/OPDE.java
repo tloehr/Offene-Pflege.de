@@ -493,10 +493,7 @@ public class OPDE {
 
             // Cache abschalten
             jpaProps.put("eclipselink.cache.shared.default", "false");
-
-//            jpaProps.put("eclipselink.logging.level", JavaLog.FINEST_LABEL);
             jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
@@ -571,7 +568,6 @@ public class OPDE {
             WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
             // JideSoft
 
-
             // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             mainframe = new FrmMain();
             mainframe.setVisible(true);
@@ -627,10 +623,6 @@ public class OPDE {
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());
     }
-
-//    public static boolean isExamen() {
-//        return UsersTools.isExamen(login.getUser());
-//    }
 
     public static OCSec getOCSec() {
         return ocsec;

@@ -29,17 +29,21 @@ package op.care.med.vorrat;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
+import com.jidesoft.swing.*;
+import com.jidesoft.wizard.WizardDialog;
 import entity.Bewohner;
 import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.care.med.prodassistant.MedProductWizard;
 import op.system.Form;
 import op.system.PrinterType;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.PrintListElement;
 import op.tools.SYSTools;
-import org.jdesktop.swingx.HorizontalLayout;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 
 import javax.persistence.EntityManager;
@@ -50,6 +54,8 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,29 +66,35 @@ import java.util.List;
  */
 public class DlgBestand extends MyJDialog {
     private boolean ignoreEvent;
-    private Bewohner bewohner;
-    private String template;
 
-    private boolean medEingegeben = false;
-    private boolean mengeEingegeben = false;
-    private boolean bwEingegeben = false;
-    private boolean packungEingegeben = false;
+//    private String template;
+
+//    private boolean medEingegeben = false;
+//    private boolean mengeEingegeben = false;
+//    private boolean bwEingegeben = false;
+//    private boolean packungEingegeben = false;
+
     private BigDecimal menge;
-    private boolean flashVorrat = false;
-    private Thread thread = null;
-    JDialog myMedAssistantDialog = null;
+    private MedPackung packung;
+    private Darreichung darreichung;
+    private Bewohner bewohner;
+    private MedVorrat vorrat;
+
+    private OverlayComboBox cmbVorrat, cmbBW;
+    private DefaultOverlayable ovrVorrat, ovrBW;
+    private JLabel attentionIconVorrat, infoIconVorrat, correctIconVorrat, questionIconVorrat;
+    private JLabel attentionIconBW;
+
+    private OverlayTextField txtMenge;
+    private DefaultOverlayable ovrMenge;
+    private JLabel attentionIconMenge, correctIconMenge;
 
     private PrinterType etiprinter;
     private Form form1;
 
-    public DlgBestand() {
-        this(null, "");
-    }
-
-    public DlgBestand(Bewohner bewohner, String template) {
+    public DlgBestand(Bewohner bewohner) {
         super();
         this.bewohner = bewohner;
-        this.template = template;
         initComponents();
         initDialog();
     }
@@ -93,11 +105,14 @@ public class DlgBestand extends MyJDialog {
         }
 
         txtMenge.setText("");
-        medEingegeben = false;
+
         if (txtMedSuche.getText().trim().isEmpty()) {
             cmbMProdukt.setModel(new DefaultComboBoxModel());
             cmbPackung.setModel(new DefaultComboBoxModel());
-            packungEingegeben = false;
+            darreichung = null;
+            packung = null;
+            initCmbVorrat();
+
         } else {
 
             OPDE.getDisplayManager().setDBActionMessage(true);
@@ -108,10 +123,10 @@ public class DlgBestand extends MyJDialog {
                 Query query = em.createNamedQuery("MedPackung.findByPzn");
                 query.setParameter("pzn", pzn);
                 try {
-                    MedPackung pznsuche = (MedPackung) query.getSingleResult();
-                    cmbMProdukt.setModel(new DefaultComboBoxModel(new Darreichung[]{pznsuche.getDarreichung()}));
-                    cmbMProdukt.setSelectedItem(0);
-                    cmbMProduktItemStateChanged(null);
+                    packung = (MedPackung) query.getSingleResult();
+                    darreichung = packung.getDarreichung();
+                    cmbMProdukt.setModel(new DefaultComboBoxModel(new Darreichung[]{darreichung}));
+                    cmbMProdukt.getModel().setSelectedItem(darreichung);
                 } catch (NoResultException nre) {
                     cmbMProdukt.setModel(new DefaultComboBoxModel());
                     OPDE.debug(nre);
@@ -124,10 +139,9 @@ public class DlgBestand extends MyJDialog {
 
                 List<Darreichung> list = DarreichungTools.findDarreichungByMedProduktText(txtMedSuche.getText());
                 cmbMProdukt.setModel(new DefaultComboBoxModel(list.toArray()));
-                cmbMProduktItemStateChanged(null);
 
             }
-
+            cmbMProduktItemStateChanged(null);
 
             OPDE.getDisplayManager().setDBActionMessage(false);
         }
@@ -149,33 +163,65 @@ public class DlgBestand extends MyJDialog {
 
         menge = null;
         cmbMProdukt.setRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
-        if (bewohner != null) {
 
-            ignoreEvent = false;
+        attentionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
+        infoIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.INFO));
+        correctIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.CORRECT));
+        questionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.QUESTION));
 
+        cmbVorrat = new OverlayComboBox();
+        cmbVorrat.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                vorrat = (MedVorrat) itemEvent.getItem();
+            }
+        });
+        cmbVorrat.setFont(OPDE.arial14);
+        ovrVorrat = new DefaultOverlayable(cmbVorrat);
+        mainPane.add(ovrVorrat, CC.xywh(5, 11, 4, 1));
+
+        attentionIconBW = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
+        cmbBW = new OverlayComboBox();
+        cmbBW.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                cmbBWItemStateChanged(itemEvent);
+            }
+        });
+        cmbBW.setFont(OPDE.arial14);
+        ovrBW = new DefaultOverlayable(cmbBW);
+        mainPane.add(ovrBW, CC.xywh(7, 15, 2, 1));
+
+        if (bewohner == null) {
+            ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
+            attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
+        } else {
             txtBWSuche.setEnabled(false);
-            bwEingegeben = true;
             cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bewohner}));
         }
-        if (!template.isEmpty()) {
-            txtMedSuche.setText(template);
-        }
-//        if (darreichung != null) {
-//            cmbMProdukt.setModel(new DefaultComboBoxModel(new Darreichung[]{darreichung}));
-//            cmbMProduktItemStateChanged(null);
-//            txtMedSuche.setEnabled(false);
-//        }
+
+        attentionIconMenge = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
+        correctIconMenge = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.CORRECT));
+        txtMenge = new OverlayTextField();
+        txtMenge.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent caretEvent) {
+                txtMengeCaretUpdate(caretEvent);
+            }
+        });
+        txtMenge.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                txtMengeFocusGained(focusEvent);
+            }
+        });
+        txtMenge.setFont(OPDE.arial14);
+        ovrMenge = new DefaultOverlayable(txtMenge);
+        mainPane.add(ovrMenge, CC.xywh(5, 9, 4, 1));
 
         SYSPropsTools.restoreState(this.getClass().getName() + "::btnPrint", btnPrint);
 
-//        if (OPDE.getProps().containsKey(name)) {
-//            cbDruck.setSelected(OPDE.getProps().getProperty(name).equalsIgnoreCase("true"));
-//        } else {
-//            cbDruck.setSelected(false);
-//        }
-
         ignoreEvent = false;
-        pack();
         setVisible(true);
     }
 
@@ -187,6 +233,7 @@ public class DlgBestand extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
+        mainPane = new JPanel();
         jLabel1 = new JLabel();
         panel2 = new JPanel();
         txtMedSuche = new JXSearchField();
@@ -194,12 +241,9 @@ public class DlgBestand extends MyJDialog {
         jLabel3 = new JLabel();
         cmbMProdukt = new JComboBox();
         lblVorrat = new JLabel();
-        cmbVorrat = new JComboBox();
         jLabel4 = new JLabel();
         txtBWSuche = new JTextField();
-        cmbBW = new JComboBox();
         lblMenge = new JLabel();
-        txtMenge = new JTextField();
         jLabel6 = new JLabel();
         cmbPackung = new JComboBox();
         jLabel7 = new JLabel();
@@ -212,217 +256,176 @@ public class DlgBestand extends MyJDialog {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Medikamente einbuchen");
-        setMinimumSize(new Dimension(640, 425));
+        setMinimumSize(new Dimension(640, 300));
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-            "$ugap, $lcgap, default, $lcgap, 39dlu, $lcgap, default, $lcgap, default:grow, $lcgap, $ugap",
-            "$ugap, 7*($lgap, fill:default), 10dlu, fill:default, $lgap, $ugap"));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-        //---- jLabel1 ----
-        jLabel1.setText("PZN oder Suchbegriff");
-        jLabel1.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(jLabel1, CC.xy(3, 3));
-
-        //======== panel2 ========
+        //======== mainPane ========
         {
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
+            mainPane.setLayout(new FormLayout(
+                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
-            //---- txtMedSuche ----
-            txtMedSuche.setFont(new Font("sansserif", Font.PLAIN, 14));
-            txtMedSuche.addActionListener(new ActionListener() {
+            //---- jLabel1 ----
+            jLabel1.setText("PZN oder Suchbegriff");
+            jLabel1.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(jLabel1, CC.xy(3, 3));
+
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
+
+                //---- txtMedSuche ----
+                txtMedSuche.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtMedSuche.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtMedSucheActionPerformed(e);
+                    }
+                });
+                panel2.add(txtMedSuche);
+
+                //---- btnMed ----
+                btnMed.setBackground(Color.white);
+                btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnMed.setToolTipText("Medikamente bearbeiten");
+                btnMed.setBorder(null);
+                btnMed.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+                btnMed.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnMed.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnMedActionPerformed(e);
+                    }
+                });
+                panel2.add(btnMed);
+            }
+            mainPane.add(panel2, CC.xywh(5, 3, 4, 1));
+
+            //---- jLabel3 ----
+            jLabel3.setText("Produkt");
+            jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(jLabel3, CC.xy(3, 5));
+
+            //---- cmbMProdukt ----
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+
+            }));
+            cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
+            cmbMProdukt.addItemListener(new ItemListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtMedSucheActionPerformed(e);
+                public void itemStateChanged(ItemEvent e) {
+                    cmbMProduktItemStateChanged(e);
                 }
             });
-            panel2.add(txtMedSuche);
+            mainPane.add(cmbMProdukt, CC.xywh(5, 5, 4, 1));
 
-            //---- btnMed ----
-            btnMed.setBackground(Color.white);
-            btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-            btnMed.setToolTipText("Medikamente bearbeiten");
-            btnMed.setBorder(null);
-            btnMed.addActionListener(new ActionListener() {
+            //---- lblVorrat ----
+            lblVorrat.setText("vorhandene Vorr\u00e4te");
+            lblVorrat.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblVorrat, CC.xy(3, 11));
+
+            //---- jLabel4 ----
+            jLabel4.setText("Zuordnung zu Bewohner");
+            jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(jLabel4, CC.xy(3, 15));
+
+            //---- txtBWSuche ----
+            txtBWSuche.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtBWSuche.addCaretListener(new CaretListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnMedActionPerformed(e);
+                public void caretUpdate(CaretEvent e) {
+                    txtBWSucheCaretUpdate(e);
                 }
             });
-            panel2.add(btnMed);
+            mainPane.add(txtBWSuche, CC.xy(5, 15));
+
+            //---- lblMenge ----
+            lblMenge.setText("Buchungsmenge");
+            lblMenge.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblMenge, CC.xy(3, 9));
+
+            //---- jLabel6 ----
+            jLabel6.setText("Packung");
+            jLabel6.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(jLabel6, CC.xy(3, 7));
+
+            //---- cmbPackung ----
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+
+            }));
+            cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
+            cmbPackung.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbPackungItemStateChanged(e);
+                }
+            });
+            mainPane.add(cmbPackung, CC.xywh(5, 7, 4, 1));
+
+            //---- jLabel7 ----
+            jLabel7.setText("Bemerkung");
+            jLabel7.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(jLabel7, CC.xy(3, 13));
+
+            //---- txtBemerkung ----
+            txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtBemerkung.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtBemerkungCaretUpdate(e);
+                }
+            });
+            mainPane.add(txtBemerkung, CC.xywh(5, 13, 4, 1));
+
+            //---- btnPrint ----
+            btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-on.png")));
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-off.png")));
+            btnPrint.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnPrint.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    btnPrintItemStateChanged(e);
+                }
+            });
+            mainPane.add(btnPrint, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
+
+            //======== panel1 ========
+            {
+                panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+                //---- btnClose ----
+                btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
+                btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnClose.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnCloseActionPerformed(e);
+                    }
+                });
+                panel1.add(btnClose);
+
+                //---- btnApply ----
+                btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                btnApply.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnApply.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnApplyActionPerformed(e);
+                    }
+                });
+                panel1.add(btnApply);
+            }
+            mainPane.add(panel1, CC.xywh(7, 17, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
-        contentPane.add(panel2, CC.xywh(5, 3, 6, 1));
-
-        //---- jLabel3 ----
-        jLabel3.setText("Produkt");
-        jLabel3.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(jLabel3, CC.xy(3, 5));
-
-        //---- cmbMProdukt ----
-        cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
-
-        }));
-        cmbMProdukt.setFont(new Font("sansserif", Font.PLAIN, 14));
-        cmbMProdukt.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbMProduktItemStateChanged(e);
-            }
-        });
-        contentPane.add(cmbMProdukt, CC.xywh(5, 5, 6, 1));
-
-        //---- lblVorrat ----
-        lblVorrat.setText("vorhandene Vorr\u00e4te:");
-        lblVorrat.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(lblVorrat, CC.xy(3, 11));
-
-        //---- cmbVorrat ----
-        cmbVorrat.setModel(new DefaultComboBoxModel(new String[] {
-
-        }));
-        cmbVorrat.setFont(new Font("sansserif", Font.PLAIN, 14));
-        cmbVorrat.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                cmbVorratMouseEntered(e);
-            }
-        });
-        contentPane.add(cmbVorrat, CC.xywh(5, 11, 6, 1));
-
-        //---- jLabel4 ----
-        jLabel4.setText("Zuordnung zu Bewohner:");
-        jLabel4.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(jLabel4, CC.xy(3, 15));
-
-        //---- txtBWSuche ----
-        txtBWSuche.setFont(new Font("sansserif", Font.PLAIN, 14));
-        txtBWSuche.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                txtBWSucheCaretUpdate(e);
-            }
-        });
-        contentPane.add(txtBWSuche, CC.xy(5, 15));
-
-        //---- cmbBW ----
-        cmbBW.setModel(new DefaultComboBoxModel(new String[] {
-
-        }));
-        cmbBW.setFont(new Font("sansserif", Font.PLAIN, 14));
-        cmbBW.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbBWItemStateChanged(e);
-            }
-        });
-        contentPane.add(cmbBW, CC.xywh(7, 15, 4, 1));
-
-        //---- lblMenge ----
-        lblMenge.setText("Buchungsmenge");
-        lblMenge.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(lblMenge, CC.xy(3, 9));
-
-        //---- txtMenge ----
-        txtMenge.setFont(new Font("sansserif", Font.PLAIN, 14));
-        txtMenge.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                txtMengeCaretUpdate(e);
-            }
-        });
-        txtMenge.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtMengeFocusGained(e);
-            }
-        });
-        contentPane.add(txtMenge, CC.xywh(5, 9, 6, 1));
-
-        //---- jLabel6 ----
-        jLabel6.setText("Packung");
-        jLabel6.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(jLabel6, CC.xy(3, 7));
-
-        //---- cmbPackung ----
-        cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
-
-        }));
-        cmbPackung.setFont(new Font("sansserif", Font.PLAIN, 14));
-        cmbPackung.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbPackungItemStateChanged(e);
-            }
-        });
-        contentPane.add(cmbPackung, CC.xywh(5, 7, 6, 1));
-
-        //---- jLabel7 ----
-        jLabel7.setText("Bemerkung:");
-        jLabel7.setFont(new Font("sansserif", Font.PLAIN, 14));
-        contentPane.add(jLabel7, CC.xy(3, 13));
-
-        //---- txtBemerkung ----
-        txtBemerkung.setFont(new Font("sansserif", Font.PLAIN, 14));
-        txtBemerkung.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                txtBemerkungCaretUpdate(e);
-            }
-        });
-        contentPane.add(txtBemerkung, CC.xywh(5, 13, 6, 1));
-
-        //---- btnPrint ----
-        btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
-        btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-off.png")));
-        btnPrint.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnPrintItemStateChanged(e);
-            }
-        });
-        contentPane.add(btnPrint, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
-
-        //======== panel1 ========
-        {
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-
-            //---- btnClose ----
-            btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_eject.png")));
-            btnClose.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCloseActionPerformed(e);
-                }
-            });
-            panel1.add(btnClose);
-
-            //---- btnApply ----
-            btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnApply.setEnabled(false);
-            btnApply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnApplyActionPerformed(e);
-                }
-            });
-            panel1.add(btnApply);
-        }
-        contentPane.add(panel1, CC.xywh(9, 17, 2, 1, CC.RIGHT, CC.DEFAULT));
+        contentPane.add(mainPane);
+        pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtMengeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMengeFocusGained
         SYSTools.markAllTxt((JTextField) evt.getSource());
     }//GEN-LAST:event_txtMengeFocusGained
-
-    private void cbDruckItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbDruckItemStateChanged
-
-    }//GEN-LAST:event_cbDruckItemStateChanged
-
-    private void cmbVorratMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmbVorratMouseEntered
-        if (thread != null && flashVorrat) {
-            thread.interrupt();
-        }
-    }//GEN-LAST:event_cmbVorratMouseEntered
 
     private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
         setApply();
@@ -433,27 +436,40 @@ public class DlgBestand extends MyJDialog {
     }//GEN-LAST:event_txtMedSucheFocusGained
 
     private void cmbBWItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbBWItemStateChanged
-        bewohner = (Bewohner) cmbBW.getSelectedItem();
-        bwEingegeben = bewohner != null;
-        if (medEingegeben) { // Vorrat erneut ermitteln
-            initCmbVorrat((Darreichung) cmbMProdukt.getSelectedItem());
+        if (ignoreEvent || (evt != null && evt.getStateChange() != ItemEvent.SELECTED)) {
+            return;
         }
+        bewohner = (Bewohner) cmbBW.getSelectedItem();
+        OPDE.debug("cmbPackungItemStateChanged: " + cmbBW.getSelectedItem());
+        initCmbVorrat();
         setApply();
     }//GEN-LAST:event_cmbBWItemStateChanged
 
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
-        if (thread != null && flashVorrat) {
-            thread.interrupt();
+        String text = "";
+
+        if (bewohner == null) {
+            text += "Keine(n) BewohnerIn ausgewählt. ";
         }
-        save();
-        if (template != null && !template.equals("")) {
-            dispose();
-        } else {
-            txtMenge.setText("0");
+        if (darreichung == null) {
+            text += "Kein Medikament ausgewählt. ";
+        }
+        if (menge == null && packung == null) {
+            text += "Keine korrekte Mengenangabe. ";
+        }
+        if (vorrat == null) {
+            text += "Keinen Vorrat ausgewählt. ";
+        }
+
+        if (text.isEmpty()) {
+            save();
+
+            txtMenge.setText("");
             txtBemerkung.setText("");
             txtMedSuche.setText("");
             txtMedSuche.requestFocus();
-            btnApply.setEnabled(false);
+        } else {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Buchen nicht möglich: " + text, DisplayMessage.WARNING));
         }
     }//GEN-LAST:event_btnApplyActionPerformed
 
@@ -464,17 +480,15 @@ public class DlgBestand extends MyJDialog {
             em.getTransaction().begin();
 
             // Wenn die packung null ist, dann ist eine Sonderpackung
-            MedPackung packung = null;
-            if (cmbPackung.getSelectedItem() instanceof MedPackung) {
-                packung = em.merge((MedPackung) cmbPackung.getSelectedItem());
+            if (packung != null) {
+                packung = em.merge(packung);
                 if (menge == null) {
                     menge = packung.getInhalt();
                 }
             }
 
-            Darreichung darreichung = em.merge((Darreichung) cmbMProdukt.getSelectedItem());
-
-            MedVorrat vorrat = em.merge((MedVorrat) cmbVorrat.getSelectedItem());
+            darreichung = em.merge(darreichung);
+            vorrat = em.merge(vorrat);
 
             if (vorrat.getVorID() == null) { // neuen Vorrat anlegen
                 vorrat.setText(darreichung.getMedProdukt().getBezeichnung());
@@ -504,90 +518,101 @@ public class DlgBestand extends MyJDialog {
     }
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
-//        ArrayList result = new ArrayList();
-//        result.add(txtSuche.getText());
-//
-//        myMedAssistantDialog = new JDialog(this, "Medikamenten Assistent", true);
-//        myMedAssistantDialog.setSize(1280, 800);
-//        PnlProdAssistant myPnl = new PnlProdAssistant(new Closure() {
-//            @Override
-//            public void execute(Object o) {
-//                OPDE.debug(o);
-//                if (o != null) {
-//                    if (o instanceof MedPackung) {
-//                        txtMedSuche.setText(SYSTools.catchNull(((MedPackung) o).getPzn()));
-//                    } else { // Darreichung
-//                        cmbMProdukt.setModel(new DefaultComboBoxModel(new Darreichung[]{(Darreichung) o}));
-//                    }
-//                }
-//                myMedAssistantDialog.dispose();
-//                myMedAssistantDialog = null;
-//            }
-//        }, txtMedSuche.getText());
-//        myMedAssistantDialog.setContentPane(myPnl);
-//        SYSTools.centerOnParent(this, myMedAssistantDialog);
-//        myMedAssistantDialog.setVisible(true);
-//        txtMedSucheCaretUpdate(null);
+
+        String pzn = MedPackungTools.parsePZN(txtMedSuche.getText());
+        final JidePopup popup = new JidePopup();
+
+        WizardDialog wizard = new MedProductWizard(new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    MedPackung packung = (MedPackung) o;
+                    txtMedSuche.setText(packung.getPzn());
+                }
+                popup.hidePopup();
+
+            }
+        }, (pzn == null ? pzn : txtMedSuche.getText().trim())).getWizard();
+
+        popup.setMovable(false);
+        popup.setPreferredSize((new Dimension(800, 450)));
+        popup.setResizable(false);
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+        popup.getContentPane().add(wizard.getContentPane());
+        popup.setOwner(btnMed);
+        popup.removeExcludedComponent(btnMed);
+        popup.setTransient(true);
+        popup.setDefaultFocusComponent(wizard.getContentPane());
+        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+                popup.getContentPane().getComponentCount();
+            }
+        });
+
+        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
+
+
     }//GEN-LAST:event_btnMedActionPerformed
 
+    @Override
     public void dispose() {
-        if (thread != null && flashVorrat) {
-            thread.interrupt();
-        }
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
+        if (ovrMenge.getOverlayComponents().length > 0) {
+            ovrMenge.removeOverlayComponent(ovrMenge.getOverlayComponents()[0]);
+        }
+
         if (txtMenge.getText().trim().isEmpty()) {
-            lblMenge.setIcon(null);
-            txtMenge.setToolTipText(null);
             menge = null;
-            return;
-        }
-
-        menge = SYSTools.checkBigDecimal(txtMenge.getText().trim());
-
-        if (menge != null) {
-            if (menge.compareTo(BigDecimal.ZERO) <= 0) {
-//                lblMenge.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
-                txtMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
-                menge = null;
-            } else if (packungEingegeben && menge.compareTo(((MedPackung) cmbPackung.getSelectedItem()).getInhalt()) > 0) {
-                lblMenge.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
-                txtMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
-                menge = ((MedPackung) cmbPackung.getSelectedItem()).getInhalt();
-            } else {
-                lblMenge.setIcon(null);
-                txtMenge.setToolTipText(null);
-            }
         } else {
-            lblMenge.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
-            txtMenge.setToolTipText(SYSTools.toHTML("<i>Die Mengenangabe ist falsch.</i>"));
+
+            menge = SYSTools.checkBigDecimal(txtMenge.getText().trim());
+
+            if (menge != null) {
+                if (menge.compareTo(BigDecimal.ZERO) <= 0) {
+//                lblMenge.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+                    ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
+                    attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
+                    menge = null;
+                } else if (packung != null && menge.compareTo(packung.getInhalt()) > 0) {
+                    ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
+                    attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
+                    menge = packung.getInhalt();
+                } else {
+                    ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_WEST);
+                }
+            } else {
+                ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
+                attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Die Mengenangabe ist falsch.</i>"));
+            }
         }
 
-        mengeEingegeben = menge != null;
-
-        setApply();
     }//GEN-LAST:event_txtMengeCaretUpdate
 
     private void txtBWSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBWSucheCaretUpdate
         if (ignoreEvent || !txtBWSuche.isEnabled()) {
             return;
         }
-        if (txtBWSuche.getText().equals("")) {
+
+        if (txtBWSuche.getText().isEmpty()) {
             cmbBW.setModel(new DefaultComboBoxModel());
-            bwEingegeben = false;
+            bewohner = null;
         } else {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
             EntityManager em = OPDE.createEM();
-            if (txtBWSuche.getText().length() == 3) { // Könnte eine Suche nach der Kennung sein
-                Bewohner mybw = em.find(Bewohner.class, txtBWSuche.getText());
-                if (mybw != null) {
-                    dcbm = new DefaultComboBoxModel(new Bewohner[]{mybw});
+            if (txtBWSuche.getText().trim().length() == 3) { // Könnte eine Suche nach der Kennung sein
+                bewohner = em.find(Bewohner.class, txtBWSuche.getText().trim());
+                if (bewohner != null) {
+                    dcbm = new DefaultComboBoxModel(new Bewohner[]{bewohner});
                 }
             }
-            if (dcbm.getSize() == 0) { //Nachname ?
+
+            if (dcbm.getSize() == 0) { // Vielleicht Suche nach Nachname
 
                 Query query = em.createQuery(" SELECT b FROM Bewohner b WHERE b.station IS NOT NULL AND b.nachname like :nachname ORDER BY b.nachname, b.vorname ");
                 query.setParameter("nachname", txtBWSuche.getText().trim() + "%");
@@ -595,20 +620,28 @@ public class DlgBestand extends MyJDialog {
 
                 dcbm = new DefaultComboBoxModel(listbw.toArray());
             }
+
             if (dcbm.getSize() > 0) {
                 cmbBW.setModel(dcbm);
                 cmbBW.setSelectedIndex(0);
-                bwEingegeben = true;
-                cmbBWItemStateChanged(null);
+                bewohner = (Bewohner) cmbBW.getSelectedItem();
             } else {
                 cmbBW.setModel(new DefaultComboBoxModel());
                 bewohner = null;
-                bwEingegeben = false;
             }
             em.close();
-
         }
-        setApply();
+
+        if (ovrBW.getOverlayComponents().length > 0) {
+            ovrBW.removeOverlayComponent(ovrBW.getOverlayComponents()[0]);
+        }
+        if (bewohner == null) {
+            ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
+            attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
+        }
+
+
+        initCmbVorrat();
     }//GEN-LAST:event_txtBWSucheCaretUpdate
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
@@ -616,118 +649,108 @@ public class DlgBestand extends MyJDialog {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void cmbPackungItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPackungItemStateChanged
-        if (ignoreEvent) {
+        if (ignoreEvent || (evt != null && evt.getStateChange() != ItemEvent.SELECTED)) {
             return;
         }
-        packungEingegeben = cmbPackung.getSelectedItem() != null;
+
+        OPDE.debug("cmbPackungItemStateChanged: " + cmbPackung.getSelectedItem());
+        if (cmbPackung.getSelectedItem() instanceof MedPackung) {
+            packung = (MedPackung) cmbPackung.getSelectedItem();
+        } else {
+            packung = null;
+        }
         txtMenge.setText("");
-        setApply();
+
     }//GEN-LAST:event_cmbPackungItemStateChanged
 
-//    private void flash() {
-//        flashVorrat = true;
-//        thread = new Thread() {
-//            public void run() {
-//                try {
-//                    OPDE.debug("thread");
-//                    while (flashVorrat) {
-//                        if (lblVorrat.getForeground() != Color.RED) {
-//                            lblVorrat.setForeground(Color.RED);
-//                        } else {
-//                            lblVorrat.setForeground(Color.WHITE);
-//                        }
-//                        Thread.sleep(500);
-//                    }
-//                    lblVorrat.setForeground(Color.BLACK);
-//                    flashVorrat = false;
-//                } catch (InterruptedException e) {
-//                    lblVorrat.setForeground(Color.BLACK);
-//                    flashVorrat = false;
-//                }
-//            }
-//        };
-//        thread.start();
-//    }
+    private void initCmbVorrat() {
 
-    private void initCmbVorrat(Darreichung darreichung) {
-        boolean foundExactMatch = false;
-        cmbVorrat.setRenderer(MedVorratTools.getMedVorratRenderer());
-        if (darreichung == null) {
-            cmbVorrat.setModel(new DefaultComboBoxModel());
-        } else {
-            List<MedVorrat> vorraete = new ArrayList<MedVorrat>();
-            MedVorrat myVorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
-            foundExactMatch = myVorrat != null;
-            if (!foundExactMatch) {
-                vorraete = DarreichungTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
-            } else {
-                vorraete.add(myVorrat);
-            }
-            cmbVorrat.setModel(new DefaultComboBoxModel(vorraete.toArray()));
+        if (ovrVorrat.getOverlayComponents().length > 0) {
+            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
         }
-        if (!foundExactMatch) {
-            DefaultComboBoxModel dcbm = (DefaultComboBoxModel) cmbVorrat.getModel();
-            dcbm.insertElementAt(new MedVorrat(bewohner, "<AUTOMATISCH>"), 0);
-            cmbVorrat.setSelectedIndex(0);
-            if (dcbm.getSize() > 1) {
-                cmbVorrat.setToolTipText("<html>Keinen <b>exakt</b> passender Vorrat gefunden. Wählen Sie selbst einen passenden aus oder verwenden Sie <b>automatisch</b>.<html>");
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>Keinen <b>exakt</b> passender Vorrat gefunden. Wählen Sie selbst einen passenden aus oder verwenden Sie <b>automatisch</b>.<html>", 2));
-                cmbVorrat.setEnabled(true);
+
+        if (bewohner != null) {
+//            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
+//            ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_WEST);
+//
+
+
+            cmbVorrat.setRenderer(MedVorratTools.getMedVorratRenderer());
+            if (darreichung == null) {
+                cmbVorrat.setModel(new DefaultComboBoxModel());
+                vorrat = null;
             } else {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>Ein neuer Vorrat wird <b>automatisch</b> erstellt.</html>", 2));
-                cmbVorrat.setEnabled(false);
+                List<MedVorrat> vorraete = new ArrayList<MedVorrat>();
+                vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
+
+                if (vorrat == null) {
+                    vorraete = DarreichungTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
+                } else {
+                    vorraete.add(vorrat);
+                }
+                cmbVorrat.setModel(new DefaultComboBoxModel(vorraete.toArray()));
             }
-        } else {
-//            MedVorrat vorrat = (MedVorrat) cmbVorrat.getSelectedItem();
-//            if (vorrat != null) {
-//                cmbVorrat.setToolTipText("Bestand: " + MedVorratTools.getSumme(vorrat) + " " + MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()]);
-//            }
-            cmbVorrat.setEnabled(false);
+
+//            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
+            if (darreichung != null) {
+                if (vorrat == null) {
+                    DefaultComboBoxModel dcbm = (DefaultComboBoxModel) cmbVorrat.getModel();
+                    dcbm.insertElementAt(new MedVorrat(bewohner, "<AUTOMATISCH>"), 0);
+                    cmbVorrat.setSelectedIndex(0);
+
+                    if (dcbm.getSize() > 1) {
+                        ovrVorrat.addOverlayComponent(attentionIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                        attentionIconVorrat.setToolTipText("<html>Keinen <b>exakt</b> passender Vorrat gefunden. Wählen Sie selbst einen passenden aus oder verwenden Sie <b>automatisch</b>.<html>");
+                    } else {
+                        ovrVorrat.addOverlayComponent(infoIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                        infoIconVorrat.setToolTipText("<html>Ein neuer Vorrat wird <b>automatisch</b> erstellt.</html>");
+                    }
+                } else {
+                    correctIconVorrat.setToolTipText(null);
+                    ovrVorrat.addOverlayComponent(correctIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                }
+            } else {
+                ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                questionIconVorrat.setToolTipText("<html>Kein Medikament ausgewählt.<html>");
+            }
         }
     }
 
     private void cmbMProduktItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMProduktItemStateChanged
-        if (ignoreEvent) {
+        if (ignoreEvent || (evt != null && evt.getStateChange() != ItemEvent.SELECTED)) {
             return;
         }
-        medEingegeben = cmbMProdukt.getModel().getSize() > 0;
-        if (medEingegeben) {
-            Darreichung myDarreichung = (Darreichung) cmbMProdukt.getSelectedItem();
-            DefaultComboBoxModel dcbm = new DefaultComboBoxModel(myDarreichung.getPackungen().toArray());
+
+        darreichung = (Darreichung) cmbMProdukt.getSelectedItem();
+
+        if (darreichung != null) {
+            DefaultComboBoxModel dcbm = new DefaultComboBoxModel(darreichung.getPackungen().toArray());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
             cmbPackung.setRenderer(MedPackungTools.getMedPackungRenderer());
-
-            if (cmbPackung.getModel().getSize() > 0) {
-                cmbPackung.setSelectedIndex(cmbPackung.getModel().getSize() - 1);
-                packungEingegeben = true;
-//                cmbPackungItemStateChanged(null);
-            }
-            initCmbVorrat(myDarreichung);
+            cmbPackung.setSelectedIndex(cmbPackung.getModel().getSize() - 1);
+            cmbPackungItemStateChanged(null);
         } else {
             cmbPackung.setModel(new DefaultComboBoxModel());
-            packungEingegeben = false;
-            initCmbVorrat(null);
+            packung = null;
         }
-//        medEingegeben = cmbMProdukt.getModel().getSize() > 0;
-        setApply();
+
+        initCmbVorrat();
+
     }//GEN-LAST:event_cmbMProduktItemStateChanged
 
     private void setApply() {
-        boolean txtEntry = true;
-        if (cmbPackung.getSelectedIndex() < 0) {
-            txtEntry = !txtBemerkung.getText().isEmpty();
-        }
-//        OPDE.debug("setApply(): med:" + medEingegeben);
-//        OPDE.debug("setApply(): packung:" + packungEingegeben);
-//        OPDE.debug("setApply(): menge:" + mengeEingegeben);
-//        OPDE.debug("setApply(): bw:" + bwEingegeben);
-//        OPDE.debug("setApply(): txt:" + txtEntry);
-        btnApply.setEnabled(medEingegeben && (mengeEingegeben || packungEingegeben) && bwEingegeben && txtEntry);
+//        boolean txtEntry = true;
+//        if (cmbPackung.getSelectedIndex() < 0) {
+//            txtEntry = !txtBemerkung.getText().isEmpty();
+//        }
+//
+//        btnApply.setEnabled(medEingegeben && (mengeEingegeben || packungEingegeben) && bwEingegeben && txtEntry);
     }
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
+    private JPanel mainPane;
     private JLabel jLabel1;
     private JPanel panel2;
     private JXSearchField txtMedSuche;
@@ -735,12 +758,9 @@ public class DlgBestand extends MyJDialog {
     private JLabel jLabel3;
     private JComboBox cmbMProdukt;
     private JLabel lblVorrat;
-    private JComboBox cmbVorrat;
     private JLabel jLabel4;
     private JTextField txtBWSuche;
-    private JComboBox cmbBW;
     private JLabel lblMenge;
-    private JTextField txtMenge;
     private JLabel jLabel6;
     private JComboBox cmbPackung;
     private JLabel jLabel7;

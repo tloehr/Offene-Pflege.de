@@ -33,6 +33,14 @@ public class MyJDialog extends JDialog {
         initAnimator();
     }
 
+    public MyJDialog(Dialog owner) {
+        super(owner, true);
+        isDisposed = false;
+        setResizable(false);
+        setUndecorated(true);
+        initAnimator();
+    }
+
     @Override
     public void dispose() {
 //        OPDE.debug("DISPOSE");

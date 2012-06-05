@@ -95,6 +95,19 @@
          <string>border</string> 
          <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
         </void> 
+        <void method="setProperty"> 
+         <string>selectedIcon</string> 
+         <object class="com.jformdesigner.model.SwingIcon"> 
+          <int>0</int> 
+          <string>/artwork/22x22/bw/add-pressed.png</string> 
+         </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>cursor</string> 
+         <object class="java.awt.Cursor"> 
+          <int>12</int> 
+         </object> 
+        </void> 
         <void property="name"> 
          <string>btnAdd</string> 
         </void> 

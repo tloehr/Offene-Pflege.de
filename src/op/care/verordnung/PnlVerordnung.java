@@ -661,7 +661,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgBestand(bewohner, "");
+                    new DlgBestand(bewohner);
                 }
             });
             mypanel.add(buchenButton);

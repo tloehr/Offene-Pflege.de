@@ -196,6 +196,19 @@
              <string>toolTipText</string> 
              <string>Auswahl löschen</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object id="Cursor0" class="java.awt.Cursor"> 
+              <int>12</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>selectedIcon</string> 
+             <object id="SwingIcon1" class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/bw/button_cancel-pressed.png</string> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>btnEmptySit2</string> 
             </void> 
@@ -234,6 +247,17 @@
             <void method="setProperty"> 
              <string>toolTipText</string> 
              <string>Neues Medikament eintragen</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object idref="Cursor0"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>selectedIcon</string> 
+             <object id="SwingIcon2" class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/bw/add-pressed.png</string> 
+             </object> 
             </void> 
             <void property="name"> 
              <string>btnMed</string> 
@@ -439,6 +463,14 @@
              <string>toolTipText</string> 
              <string>Auswahl löschen</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object idref="Cursor0"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>selectedIcon</string> 
+             <object idref="SwingIcon1"/> 
+            </void> 
             <void property="name"> 
              <string>btnEmptySit</string> 
             </void> 
@@ -477,6 +509,14 @@
             <void method="setProperty"> 
              <string>toolTipText</string> 
              <string>Neue  Situation eintragen</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object idref="Cursor0"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>selectedIcon</string> 
+             <object idref="SwingIcon2"/> 
             </void> 
             <void property="name"> 
              <string>btnSituation</string> 
@@ -799,6 +839,17 @@
                <string>toolTipText</string> 
                <string>Neue Dosierung eintragen</string> 
               </void> 
+              <void method="setProperty"> 
+               <string>cursor</string> 
+               <object idref="Cursor0"/> 
+              </void> 
+              <void method="setProperty"> 
+               <string>selectedIcon</string> 
+               <object class="com.jformdesigner.model.SwingIcon"> 
+                <int>0</int> 
+                <string>/artwork/22x22/bw/add-pressed.png</string> 
+               </object> 
+              </void> 
               <void property="name"> 
                <string>btnAddDosis</string> 
               </void> 
@@ -875,6 +926,10 @@
            <string>font</string> 
            <object idref="Font0"/> 
           </void> 
+          <void method="setProperty"> 
+           <string>cursor</string> 
+           <object idref="Cursor0"/> 
+          </void> 
           <void property="name"> 
            <string>cbPackEnde</string> 
           </void> 
@@ -927,6 +982,10 @@
           <void method="setProperty"> 
            <string>font</string> 
            <object idref="Font0"/> 
+          </void> 
+          <void method="setProperty"> 
+           <string>cursor</string> 
+           <object idref="Cursor0"/> 
           </void> 
           <void property="name"> 
            <string>cbStellplan</string> 
@@ -1154,6 +1213,10 @@
               <int>0</int> 
               <int>0</int> 
              </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object idref="Cursor0"/> 
             </void> 
             <void property="name"> 
              <string>cbAB</string> 
@@ -1594,6 +1657,10 @@
             <string>/artwork/22x22/cancel.png</string> 
            </object> 
           </void> 
+          <void method="setProperty"> 
+           <string>cursor</string> 
+           <object idref="Cursor0"/> 
+          </void> 
           <void property="name"> 
            <string>btnClose</string> 
           </void> 
@@ -1620,6 +1687,10 @@
           <void method="setProperty"> 
            <string>enabled</string> 
            <boolean>false</boolean> 
+          </void> 
+          <void method="setProperty"> 
+           <string>cursor</string> 
+           <object idref="Cursor0"/> 
           </void> 
           <void property="name"> 
            <string>btnSave</string> 

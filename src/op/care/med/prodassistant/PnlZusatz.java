@@ -80,6 +80,9 @@ public class PnlZusatz extends JPanel {
         lblAPV.setVisible(!form.anwUndPackEinheitenGleich());
         lblPV.setVisible(!form.anwUndPackEinheitenGleich());
         txtA.setVisible(!form.anwUndPackEinheitenGleich());
+
+        darreichung = new Darreichung(produkt, "", form);
+        validate.execute(darreichung);
     }
 
     private void txtZusatzActionPerformed(ActionEvent e) {

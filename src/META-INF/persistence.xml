@@ -71,12 +71,6 @@
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.user" value="opdeuser"/>
-            <!--<property name="eclipselink.session.customizer" value="op.system.JPAEclipseLinkSessionCustomizer"/> -->
-            <!--<property name="eclipselink.weaving" value="static"/>
-            <property name="eclipselink.logging.level.sql" value="FINEST"/>
-            <property name="eclipselink.logging.level" value="FINEST"/>
-            <property name="eclipselink.logging.level.cache" value="FINEST"/>-->
-            <!-- http://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging#Log_Levels -->
         </properties>
     </persistence-unit>
 </persistence>

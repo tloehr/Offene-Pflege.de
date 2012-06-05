@@ -194,50 +194,6 @@ public class PnlMed extends CleanablePanel {
         add(jScrollPane1, CC.xywh(3, 1, 1, 3));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnBuchenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchenActionPerformed
-        new DlgBestand();
-    }//GEN-LAST:event_btnBuchenActionPerformed
-
-    private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
-//String template = ( txtMed.getText().matches("^ß?\\d{7}") ? "" : txtMed.getText());
-        //new DlgMed(this, template);
-//        ArrayList result = new ArrayList();
-//        result.add(txtSuche.getText());
-//
-//        myMedAssistantDialog = new JDialog(this, "Medikamenten Assistent", true);
-//        myMedAssistantDialog.setSize(1280, 800);
-//        PnlProdAssistant myPnl = new PnlProdAssistant(new Closure() {
-//            @Override
-//            public void execute(Object o) {
-//                OPDE.debug(o);
-//                myMedAssistantDialog.dispose();
-//                myMedAssistantDialog = null;
-//            }
-//        }, null);
-//        myMedAssistantDialog.setContentPane(myPnl);
-//        SYSTools.centerOnParent(this, myMedAssistantDialog);
-//        myMedAssistantDialog.setVisible(true);
-
-//        new DlgMediAssistent(this, result);
-//        if (result.size() > 0) {
-//            ignoreCaret = true;
-//            txtSuche.setText(result.get(0).toString());
-//            ignoreCaret = false;
-//            txtSucheCaretUpdate(null);
-//        }
-    }//GEN-LAST:event_btnMedActionPerformed
-
-//    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-//        if (!template.equals("")) {
-//            btnNew.doClick();
-//        }
-//    }//GEN-LAST:event_formWindowOpened
-
-    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-//        PnlNewProdukt prd = new PnlNewProdukt(this, produkt, template);
-//        produkt = prd.getProdukt();
-        createTree();
-    }//GEN-LAST:event_btnNewActionPerformed
 
     private void lstPraepValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstPraepValueChanged
         if (!evt.getValueIsAdjusting() && lstPraep.getSelectedValue() != null) {
@@ -247,15 +203,6 @@ public class PnlMed extends CleanablePanel {
     }//GEN-LAST:event_lstPraepValueChanged
 
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
-//        if (lstPraep.getModel().getSize() > 0) {
-//            ListElement le = (ListElement) lstPraep.getModel().getElementAt(0);
-//            if (le != null) {
-//                medpid = le.getPk();
-//                createTree();
-//            }
-//        }
-
-
         treeMed.setCellRenderer(new DefaultTreeCellRenderer());
         treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
         treeMed.setVisible(false);
@@ -512,17 +459,17 @@ public class PnlMed extends CleanablePanel {
                             popup.hidePopup();
                             // keine Maßnahme nötig
                         }
-                    }).getWizard();
+                    }, null).getWizard();
 
 
                     popup.setMovable(false);
-                    popup.setPreferredSize((new Dimension(800,450)));
+                    popup.setPreferredSize((new Dimension(800, 450)));
                     popup.setResizable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                     popup.getContentPane().add(wizard.getContentPane());
                     popup.setOwner(addButton);
                     popup.removeExcludedComponent(addButton);
-                    popup.setTransient(false);
+                    popup.setTransient(true);
                     popup.setDefaultFocusComponent(wizard.getContentPane());
                     popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
                         @Override
@@ -533,10 +480,11 @@ public class PnlMed extends CleanablePanel {
                     });
 
 
-                    Point p = new Point(addButton.getX(), addButton.getY());
-                    // Convert a coordinate relative to a component's bounds to screen coordinates
-                    SwingUtilities.convertPointToScreen(p, addButton);
-                    popup.showPopup(p.x, p.y - (int) wizard.getPreferredSize().getHeight() - (int) addButton.getPreferredSize().getHeight());
+//                    Point p = new Point(addButton.getX(), addButton.getY());
+////                    // Convert a coordinate relative to a component's bounds to screen coordinates
+//                    SwingUtilities.convertPointToScreen(p, addButton);
+
+                    popup.showPopup(new Insets(-5, 0, -5, 0), addButton);
                 }
             });
 
@@ -547,7 +495,7 @@ public class PnlMed extends CleanablePanel {
             JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgBestand(null, "");
+                    new DlgBestand(null);
                 }
             });
             mypanel.add(buchenButton);

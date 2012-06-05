@@ -89,10 +89,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         this.apv = BigDecimal.ONE;
 
         this.vorrat = vorrat;
-//        this.vorrat.getBestaende().add(this);
-
         this.darreichung = darreichung;
-//        this.darreichung.getBestaende().add(this);
         this.packung = packung;
         this.text = text;
         this.ein = new Date();

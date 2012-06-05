@@ -6,6 +6,7 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.verordnungen.MedPackungTools;
 import entity.verordnungen.MedProdukte;
 import entity.verordnungen.MedProdukteTools;
 import op.OPDE;
@@ -29,11 +30,13 @@ public class PnlProdukt extends JPanel {
     private java.util.List listProd;
     private MedProdukte produkt;
     private Closure validate;
+    private String template;
 
-    public PnlProdukt(Closure validate) {
-        OPDE.debug("CONSTRUCTOR PNLPRODUKT");
+    public PnlProdukt(Closure validate, String template) {
         produkt = null;
         this.validate = validate;
+        this.template = template;
+
         initComponents();
         initPanel();
     }
@@ -42,6 +45,7 @@ public class PnlProdukt extends JPanel {
         lblProdMsg.setVisible(false);
         jsp1.setVisible(false);
         lstProd.setVisible(false);
+        txtProd.setText(template);
     }
 
     private void txtProdActionPerformed(ActionEvent e) {
@@ -51,18 +55,29 @@ public class PnlProdukt extends JPanel {
         listProd = query.getResultList();
         em.close();
 
-        lblProdMsg.setVisible(!listProd.isEmpty());
-        jsp1.setVisible(!listProd.isEmpty());
-        lstProd.setVisible(!listProd.isEmpty());
-
         if (!listProd.isEmpty()) {
-            listProd.add(0, "<html><b>Nein, keins von diesen</b></html>");
-            DefaultListModel lmProd;
-            lmProd = SYSTools.list2dlm(listProd);
-            lstProd.setModel(lmProd);
-            lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+            if (listProd.size() == 1 && ((MedProdukte) listProd.get(0)).getBezeichnung().equalsIgnoreCase(txtProd.getText().trim())) {
+                // Die Eingabe des Produktnamens entspricht GENAU einem bestehenden Produkt. Dann muss das das gleiche sein.
+                produkt = (MedProdukte) listProd.get(0);
+                lblProdMsg.setVisible(false);
+                jsp1.setVisible(false);
+                lstProd.setVisible(false);
+                validate.execute(produkt);
+            } else {
+                lblProdMsg.setVisible(true);
+                jsp1.setVisible(true);
+                lstProd.setVisible(true);
+                listProd.add(0, "<html><b>Nein, keins von diesen</b></html>");
+                DefaultListModel lmProd;
+                lmProd = SYSTools.list2dlm(listProd);
+                lstProd.setModel(lmProd);
+                lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+            }
         } else {
             produkt = txtProd.getText().trim().isEmpty() ? null : new MedProdukte(txtProd.getText().trim());
+            lblProdMsg.setVisible(false);
+            jsp1.setVisible(false);
+            lstProd.setVisible(false);
             validate.execute(produkt);
         }
     }
@@ -88,8 +103,8 @@ public class PnlProdukt extends JPanel {
         //======== this ========
         setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtProd ----
         txtProd.setFont(new Font("Arial", Font.PLAIN, 14));

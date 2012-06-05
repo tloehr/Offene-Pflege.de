@@ -184,8 +184,6 @@ public class MedVorratTools {
      * Diese Methode bucht ein Medikament in einen Vorrat ein.
      * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
      * Der muss dann nur noch persistiert werden.
-
-     * @param em Persistence Context
      * @param vorrat
      * @param packung
      * @param darreichung

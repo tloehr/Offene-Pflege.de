@@ -34,11 +34,13 @@ public class PnlPackung extends JPanel {
     private Darreichung darreichung;
     private MedPackung packung;
     private Closure validate;
+    private String template;
 
-    public PnlPackung(Closure validate) {
+    public PnlPackung(Closure validate, String template) {
         pzn = null;
         inhalt = null;
         packung = null;
+        this.template = template;
         this.validate = validate;
         initComponents();
         initPanel();
@@ -50,6 +52,7 @@ public class PnlPackung extends JPanel {
 
     private void initPanel() {
         cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
+        txtPZN.setText(template);
     }
 
     public void setLabelEinheit(String text){
