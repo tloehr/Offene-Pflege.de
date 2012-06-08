@@ -1,6 +1,10 @@
 package tablemodels;
 
+import entity.verordnungen.DarreichungTools;
+import entity.verordnungen.MedFormenTools;
 import entity.verordnungen.MedVorrat;
+import entity.verordnungen.MedVorratTools;
+import op.OPDE;
 import op.tools.Pair;
 
 import javax.swing.table.AbstractTableModel;
@@ -67,11 +71,11 @@ public class TMVorraete extends AbstractTableModel {
         Object result = "";
         switch (col) {
             case COL_NAME: {
-                result = "["+getVorrat(row).getVorID() +"] " + getVorrat(row).getText();
+                result = MedVorratTools.getVorratAsHTML(getVorrat(row));
                 break;
             }
             case COL_MENGE: {
-                result = getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP);
+                result = "<font face=\"" + OPDE.arial14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + MedFormenTools.EINHEIT[MedVorratTools.getForm(getVorrat(row)).getPackEinheit()] + "</font>";
                 break;
             }
             default: {

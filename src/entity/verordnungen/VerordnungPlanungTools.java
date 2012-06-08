@@ -1,5 +1,6 @@
 package entity.verordnungen;
 
+import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -44,7 +45,7 @@ public class VerordnungPlanungTools {
      * @return
      */
     public static String getWiederholung(VerordnungPlanung planung, boolean writeTaeglich) {
-        String result = "";
+        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
 
         if (planung.isTaeglich()) {
             if (planung.getTaeglich() > 1) {
@@ -117,11 +118,11 @@ public class VerordnungPlanungTools {
             result += df.format(planung.getLDatum());
         }
 
-        return result;
+        return result + "</font>";
     }
 
     public static String getDosisAsHTML(VerordnungPlanung planung, VerordnungPlanung vorherigePlanung, boolean singleUsageOnly) {
-        String result = "";
+        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
 
         // Wenn die vorherige Planung null ist, dann muss das hier der De erste durchlauf sein
         // gleichzeitig brauchen wir einen Header dann, wenn der Status sich unterscheidet.
@@ -192,7 +193,7 @@ public class VerordnungPlanungTools {
         } else {
             result = "!!FEHLER!!";
         }
-        return result;
+        return result + "</font>";
     }
 
 
@@ -206,7 +207,7 @@ public class VerordnungPlanungTools {
             result += "<br/>";
         } else if (planung.verwendetUhrzeit()) {
 
-            result += "<b><ul>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + "</ul></b> Uhr ";
+            result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + " Uhr</u></b> ";
             result += HTMLTools.printDouble(planung.getUhrzeitDosis());
             result += planung.getVerordnung().hasMedi() ? " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()] : "x";
             result += "<br/>";

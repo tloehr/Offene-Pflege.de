@@ -28,8 +28,6 @@
 
 package op.care.med;
 
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
@@ -53,12 +51,12 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -72,19 +70,16 @@ public class PnlMed extends CleanablePanel {
     public static final String internalClassID = "opde.medication";
     private DefaultTreeModel tree;
     private MedProdukte produkt;
-    private String template;
-    //    private boolean ignoreCaret;
     private JPopupMenu menu;
-    private JDialog myMedAssistantDialog;
-    //    private CollapsiblePane panelText, panelTime;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
+    private JXSearchField txtSuche;
+    private JList lstPraep;
 
     /**
      * Creates new form FrmMed
      */
     public PnlMed(JScrollPane jspSearch) {
-        this.template = "";
         this.jspSearch = jspSearch;
         initComponents();
         initDialog();
@@ -107,8 +102,6 @@ public class PnlMed extends CleanablePanel {
         produkt = null;
         treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
         treeMed.setVisible(false);
-        lstPraep.setModel(new DefaultListModel());
-        lstPraep.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
     }
 
     /**
@@ -119,79 +112,20 @@ public class PnlMed extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        txtSuche = new JXSearchField();
-        jScrollPane2 = new JScrollPane();
-        lstPraep = new JList();
         jScrollPane1 = new JScrollPane();
         treeMed = new JTree();
 
         //======== this ========
-        setLayout(new FormLayout(
-                "113dlu, $lcgap, default:grow",
-                "fill:default, $lgap, fill:default:grow"));
-
-        //---- txtSuche ----
-        txtSuche.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtSuche.setSearchMode(org.jdesktop.swingx.JXSearchField.SearchMode.REGULAR);
-        txtSuche.setUseNativeSearchFieldIfPossible(false);
-        txtSuche.setInstantSearchDelay(5000);
-        txtSuche.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtSucheActionPerformed(e);
-            }
-        });
-        add(txtSuche, CC.xy(1, 1));
-
-        //======== jScrollPane2 ========
-        {
-
-            //---- lstPraep ----
-            lstPraep.setModel(new AbstractListModel() {
-                String[] values = {
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4",
-                        "Item 5"
-                };
-
-                @Override
-                public int getSize() {
-                    return values.length;
-                }
-
-                @Override
-                public Object getElementAt(int i) {
-                    return values[i];
-                }
-            });
-            lstPraep.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            lstPraep.setFont(new Font("Arial", Font.PLAIN, 14));
-            lstPraep.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    lstPraepValueChanged(e);
-                }
-            });
-            jScrollPane2.setViewportView(lstPraep);
-        }
-        add(jScrollPane2, CC.xy(1, 3));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         //======== jScrollPane1 ========
         {
 
             //---- treeMed ----
             treeMed.setFont(new Font("Arial", Font.PLAIN, 14));
-            treeMed.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    treeMedMousePressed(e);
-                }
-            });
             jScrollPane1.setViewportView(treeMed);
         }
-        add(jScrollPane1, CC.xywh(3, 1, 1, 3));
+        add(jScrollPane1);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -203,10 +137,10 @@ public class PnlMed extends CleanablePanel {
     }//GEN-LAST:event_lstPraepValueChanged
 
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
-        treeMed.setCellRenderer(new DefaultTreeCellRenderer());
+//        treeMed.setCellRenderer(new DefaultTreeCellRenderer());
         treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
-        treeMed.setVisible(false);
-        if (txtSuche.getText().equals("")) {
+//        treeMed.setVisible(false);
+        if (txtSuche.getText().isEmpty()) {
             lstPraep.setModel(new DefaultListModel());
         } else {
             EntityManager em = OPDE.createEM();
@@ -215,8 +149,6 @@ public class PnlMed extends CleanablePanel {
             lstPraep.setModel(SYSTools.list2dlm(query.getResultList()));
             em.close();
         }
-
-
     }//GEN-LAST:event_txtSucheActionPerformed
 
     private void treeMedMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMedMousePressed
@@ -328,8 +260,6 @@ public class PnlMed extends CleanablePanel {
         DefaultMutableTreeNode root;
         root = new DefaultMutableTreeNode(produkt);
         SYSTools.addAllNodes(root, getDAF());
-
-
         return root;
     }
 
@@ -366,40 +296,37 @@ public class PnlMed extends CleanablePanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JXSearchField txtSuche;
-    private JScrollPane jScrollPane2;
-    private JList lstPraep;
     private JScrollPane jScrollPane1;
     private JTree treeMed;
     // End of variables declaration//GEN-END:variables
 
-    private class TreeRenderer extends JLabel implements TreeCellRenderer {
-
-
+    private class TreeRenderer extends DefaultTreeCellRenderer {
         TreeRenderer() {
             super();
         }
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            JLabel component = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
             if (node.getUserObject() instanceof MedProdukte) {
-                setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
+                component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
                 MedProdukte myprod = (MedProdukte) node.getUserObject();
-                setText(myprod.getBezeichnung() + ", " + myprod.getHersteller().getFirma() + ", " + myprod.getHersteller().getOrt());
+                component.setText(myprod.getBezeichnung() + ", " + myprod.getHersteller().getFirma() + ", " + myprod.getHersteller().getOrt());
             } else if (node.getUserObject() instanceof Darreichung) {
-                setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
-                setText(DarreichungTools.toPrettyStringMedium((Darreichung) node.getUserObject()));
+                component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
+                component.setText(DarreichungTools.toPrettyStringMedium((Darreichung) node.getUserObject()));
             } else if (node.getUserObject() instanceof MedPackung) {
-                setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
-                setText(MedPackungTools.toPrettyString((MedPackung) node.getUserObject()));
+                component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
+                component.setText(MedPackungTools.toPrettyString((MedPackung) node.getUserObject()));
             } else {
-                setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
-                setText("");
+                component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
+                component.setText(null);
             }
+            component.setFont(OPDE.arial14);
+//            setBackground(selected ? SYSConst.lightblue : Color.WHITE);
 
-
-            return this;
+            return component;
         }
 
     }
@@ -412,9 +339,58 @@ public class PnlMed extends CleanablePanel {
 
 
         searchPanes.add(addCommands());
+        searchPanes.add(addFilters());
 
         searchPanes.addExpansion();
 
+    }
+
+    private CollapsiblePane addFilters() {
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout());
+
+        CollapsiblePane panelFilter = new CollapsiblePane("Suchen");
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
+
+        try {
+            panelFilter.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        txtSuche = new JXSearchField("Suchen");
+        txtSuche.setFont(OPDE.arial14);
+        txtSuche.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                txtSucheActionPerformed(actionEvent);
+            }
+        });
+        txtSuche.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                SYSTools.markAllTxt(txtSuche);
+            }
+        });
+        labelPanel.add(txtSuche);
+
+        lstPraep = new JList(new DefaultListModel());
+        lstPraep.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+        lstPraep.setFont(OPDE.arial14);
+        lstPraep.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                lstPraepValueChanged(listSelectionEvent);
+            }
+        });
+        lstPraep.setFixedCellWidth(200);
+
+        labelPanel.add(new JScrollPane(lstPraep));
+
+        panelFilter.setContentPane(labelPanel);
+        return panelFilter;
     }
 
     private CollapsiblePane addCommands() {
@@ -433,14 +409,14 @@ public class PnlMed extends CleanablePanel {
         }
 
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                }
-            });
-            mypanel.add(addButton);
-        }
+//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+//            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                }
+//            });
+//            mypanel.add(addButton);
+//        }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
             final JideButton addButton = GUITools.createHyperlinkButton("Medikamenten-Assistent", new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")), null);
@@ -479,11 +455,6 @@ public class PnlMed extends CleanablePanel {
                         }
                     });
 
-
-//                    Point p = new Point(addButton.getX(), addButton.getY());
-////                    // Convert a coordinate relative to a component's bounds to screen coordinates
-//                    SwingUtilities.convertPointToScreen(p, addButton);
-
                     popup.showPopup(new Insets(-5, 0, -5, 0), addButton);
                 }
             });
@@ -491,7 +462,7 @@ public class PnlMed extends CleanablePanel {
             mypanel.add(addButton);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
             JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

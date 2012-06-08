@@ -1,6 +1,7 @@
 package op.threads;
 
 import entity.system.SyslogTools;
+import op.OPDE;
 import op.tools.SYSConst;
 
 import javax.swing.*;
@@ -20,19 +21,21 @@ public class DisplayManager extends Thread {
 
     private boolean interrupted, dbAction;
     private JProgressBar jp;
-    private JLabel lblMain, lblSub, lblDB;
+    private JLabel lblMain, lblSub;
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
     private final Color defaultColor = new Color(105, 80, 69);
     private long dbZyklenRest = 0;
+    private Icon icon1, icon2;
+    private SwingWorker worker;
 
 //    private DateFormat df;
 
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS, JLabel lblDB) {
+    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS) {
         super();
         setName("DisplayManager");
         interrupted = false;
@@ -44,7 +47,9 @@ public class DisplayManager extends Thread {
         jp.setMaximum(100);
         lblMain = lblM;
         lblSub = lblS;
-        this.lblDB = lblDB;
+        icon1 = new ImageIcon(getClass().getResource("/artwork/22x22/db.png"));
+        icon2 = new ImageIcon(getClass().getResource("/artwork/22x22/db_update.png"));
+//        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
         lblSub.setText(" ");
         messageQ = new ArrayList<DisplayMessage>();
@@ -88,9 +93,32 @@ public class DisplayManager extends Thread {
     }
 
     public void setDBActionMessage(boolean action) {
-        this.dbAction = action;
-        lblDB.setVisible(action); // Damit es sofort sichtbar oder unsichtbar wird.
-        dbZyklenRest = (zyklen + 1) % 2; // Damit es sofort blinkt.
+//        if (this.dbAction == action) {
+//            return;
+//        }
+//        this.dbAction = action;
+//
+//        if (action) {
+//            worker = new SwingWorker() {
+//                @Override
+//                protected Object doInBackground() throws Exception {
+//                    boolean visible = true;
+//                    while (!isCancelled()) {
+//                        lblDB.setIcon(visible ? icon1 : icon2);
+//                        lblDB.repaint();
+//                        OPDE.debug("lbldb: "+visible);
+//                        visible = !visible;
+//                        Thread.sleep(150);
+//                    }
+//
+//                    return null;
+//                }
+//            };
+//            worker.execute();
+//        } else {
+//            worker.cancel(true);
+//        }
+//        dbZyklenRest = (zyklen + 1) % 2; // Damit es sofort blinkt.
     }
 
     private void processSubMessage() {
@@ -157,17 +185,16 @@ public class DisplayManager extends Thread {
 //        }
     }
 
-    private void processDBMessage() {
-        if (dbAction) {
-            lblDB.setVisible(zyklen % 2 == dbZyklenRest);
-        }
-    }
+//    private void processDBMessage() {
+//        if (dbAction) {
+//            lblDB.setVisible(zyklen % 2 == dbZyklenRest);
+//        }
+//    }
 
 
     public void run() {
         while (!interrupted) {
 
-            processDBMessage();
             processProgressBar();
             processSubMessage();
 

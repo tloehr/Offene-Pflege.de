@@ -68,12 +68,7 @@ public class DlgVerordnung extends MyJDialog {
 
     public static final int ALLOW_ALL_EDIT = 0;
     public static final int NO_CHANGE_MED_AND_SIT = 1;
-//    public static final int EDIT_MODE = 2; // Korrigieren
-//    public static final int CHANGE_MODE = 3; // Ändern
-//    public static final int EDIT_OF_CHANGE_MODE = 4; // Das ist dann, wenn man eine Veränderung (Change) nachträglich nochmal korrigiert.
 
-    //    private java.awt.Frame parent;
-//    private boolean ignoreSitCaret;
     private boolean ignoreEvent;
 
     private JPopupMenu menu;
@@ -83,10 +78,6 @@ public class DlgVerordnung extends MyJDialog {
     private Verordnung verordnung;
     private List<VerordnungPlanung> planungenToDelete = null;
     private Pair<Verordnung, List<VerordnungPlanung>> returnPackage = null;
-
-//    private EntityManager em;
-
-//    private DisplayMessage currentSubMessage = null;
 
 
     /**
@@ -101,10 +92,6 @@ public class DlgVerordnung extends MyJDialog {
         initDialog();
         pack();
         setVisible(true);
-    }
-
-    private void jdcANPropertyChange(PropertyChangeEvent e) {
-        saveOK();
     }
 
     private void btnAddDosisActionPerformed(ActionEvent e) {
@@ -164,22 +151,12 @@ public class DlgVerordnung extends MyJDialog {
         popup.showPopup(p.x, p.y - (int) dlg.getPreferredSize().getHeight() - (int) btnAddDosis.getPreferredSize().getHeight());
     }
 
-    private void thisKeyPressed(KeyEvent e) {
-        OPDE.debug(e.getKeyCode());
-    }
-
-    private void thisKeyTyped(KeyEvent e) {
-        OPDE.debug(e.getKeyCode());
-
-    }
-
     private void txtSitActionPerformed(ActionEvent e) {
         if (txtSit.getText().isEmpty()) {
             cmbSit.setModel(new DefaultComboBoxModel());
         } else {
             cmbSit.setModel(new DefaultComboBoxModel(SituationenTools.findSituationByText(txtSit.getText()).toArray()));
         }
-        saveOK();
     }
 
     private void saveSituation(String text) {
@@ -229,21 +206,15 @@ public class DlgVerordnung extends MyJDialog {
         popup.setMovable(false);
         popup.setOwner(btnSituation);
         popup.removeExcludedComponent(btnSituation);
-//        popup.getContentPane().add(editor);
+
         popup.getContentPane().add(saveButton);
         popup.setDefaultFocusComponent(editor);
 
-//        Point p3 = new Point(btnSituation.getX(), btnSituation.getY());
-//        SwingUtilities.convertPointToScreen(p3, btnSituation);
         popup.showPopup();
     }
 
     private void cmbSitPropertyChange(PropertyChangeEvent e) {
         cmbSitItemStateChanged(null);
-    }
-
-    private void cbPackEndeItemStateChanged(ItemEvent e) {
-        saveOK();
     }
 
     private void btnEmptySitActionPerformed(ActionEvent e) {
@@ -254,6 +225,7 @@ public class DlgVerordnung extends MyJDialog {
         if (txtMed.getText().isEmpty()) {
             cmbMed.setModel(new DefaultComboBoxModel());
             cmbMass.setEnabled(true);
+            txtMass.setEnabled(true);
             cbStellplan.setEnabled(true);
             cbStellplan.setSelected(false);
             cbPackEnde.setSelected(false);
@@ -290,6 +262,7 @@ public class DlgVerordnung extends MyJDialog {
                 cmbMed.setToolTipText("");
                 cmbMass.setSelectedIndex(-1);
                 cmbMass.setEnabled(true);
+                txtMass.setEnabled(true);
                 cbStellplan.setEnabled(true);
                 cbStellplan.setSelected(false);
                 cbPackEnde.setSelected(false);
@@ -299,8 +272,8 @@ public class DlgVerordnung extends MyJDialog {
         }
     }
 
-    private void jdcABPropertyChange(PropertyChangeEvent e) {
-        saveOK();
+    private void txtMassActionPerformed(ActionEvent e) {
+        cmbMass.setModel(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_BHP, txtMass.getText()).toArray()));
     }
 
     /**
@@ -323,7 +296,7 @@ public class DlgVerordnung extends MyJDialog {
         panel3 = new JPanel();
         btnEmptySit = new JButton();
         btnSituation = new JButton();
-        xSearchField1 = new JXSearchField();
+        txtMass = new JXSearchField();
         jPanel8 = new JPanel();
         jspDosis = new JScrollPane();
         tblDosis = new JTable();
@@ -358,27 +331,17 @@ public class DlgVerordnung extends MyJDialog {
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                thisKeyTyped(e);
-            }
-            @Override
-            public void keyPressed(KeyEvent e) {
-                thisKeyPressed(e);
-            }
-        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
-            "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
+                "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "68dlu, $lcgap, 242dlu:grow, $lcgap, pref",
-                "3*(16dlu, $lgap), 2*(default, $lgap), fill:default:grow"));
+                    "68dlu, $lcgap, 242dlu:grow, $lcgap, pref",
+                    "3*(16dlu, $lgap), 2*(default, $lgap), fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -390,14 +353,20 @@ public class DlgVerordnung extends MyJDialog {
                     txtMedActionPerformed(e);
                 }
             });
+            txtMed.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtMedFocusGained(e);
+                }
+            });
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
@@ -447,19 +416,13 @@ public class DlgVerordnung extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbMass ----
-            cmbMass.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbMass.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbMass.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbMass.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbMassItemStateChanged(e);
-                }
-            });
             jPanel1.add(cmbMass, CC.xywh(3, 5, 3, 1));
 
             //---- txtSit ----
@@ -474,11 +437,11 @@ public class DlgVerordnung extends MyJDialog {
             jPanel1.add(txtSit, CC.xy(1, 3));
 
             //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbSit.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbSit.addItemListener(new ItemListener() {
@@ -533,41 +496,41 @@ public class DlgVerordnung extends MyJDialog {
             }
             jPanel1.add(panel3, CC.xy(5, 3));
 
-            //---- xSearchField1 ----
-            xSearchField1.setFont(new Font("Arial", Font.PLAIN, 14));
-            xSearchField1.setPrompt("Massnahmen");
-            jPanel1.add(xSearchField1, CC.xy(1, 5));
+            //---- txtMass ----
+            txtMass.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtMass.setPrompt("Massnahmen");
+            txtMass.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtMassActionPerformed(e);
+                }
+            });
+            jPanel1.add(txtMass, CC.xy(1, 5));
 
             //======== jPanel8 ========
             {
                 jPanel8.setBorder(new TitledBorder(null, "Dosis / H\u00e4ufigkeit", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                    new Font("Arial", Font.PLAIN, 14)));
+                        new Font("Arial", Font.PLAIN, 14)));
                 jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
-                    "default:grow",
-                    "fill:default:grow, $lgap, pref"));
+                        "default:grow",
+                        "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
                 {
                     jspDosis.setToolTipText(null);
-                    jspDosis.addComponentListener(new ComponentAdapter() {
-                        @Override
-                        public void componentResized(ComponentEvent e) {
-                            jspDosisComponentResized(e);
-                        }
-                    });
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ));
                     tblDosis.setSurrendersFocusOnKeystroke(true);
                     tblDosis.setToolTipText(null);
@@ -612,12 +575,6 @@ public class DlgVerordnung extends MyJDialog {
             cbPackEnde.setMargin(new Insets(0, 0, 0, 0));
             cbPackEnde.setFont(new Font("Arial", Font.PLAIN, 14));
             cbPackEnde.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            cbPackEnde.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cbPackEndeItemStateChanged(e);
-                }
-            });
             jPanel1.add(cbPackEnde, CC.xywh(1, 7, 5, 1));
 
             //---- cbStellplan ----
@@ -634,15 +591,15 @@ public class DlgVerordnung extends MyJDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                "149dlu",
-                "3*(fill:default, $lgap), fill:default:grow"));
+                    "149dlu",
+                    "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== jPanel4 ========
             {
                 jPanel4.setBorder(new TitledBorder("Absetzung"));
                 jPanel4.setLayout(new FormLayout(
-                    "default, $lcgap, 120dlu",
-                    "4*(fill:17dlu, $lgap), fill:17dlu"));
+                        "default, $lcgap, 120dlu",
+                        "4*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- jLabel3 ----
                 jLabel3.setText("Am:");
@@ -650,12 +607,6 @@ public class DlgVerordnung extends MyJDialog {
 
                 //---- jdcAB ----
                 jdcAB.setEnabled(false);
-                jdcAB.addPropertyChangeListener("date", new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent e) {
-                        jdcABPropertyChange(e);
-                    }
-                });
                 jPanel4.add(jdcAB, CC.xy(3, 3));
 
                 //---- jLabel4 ----
@@ -663,19 +614,13 @@ public class DlgVerordnung extends MyJDialog {
                 jPanel4.add(jLabel4, CC.xy(1, 5));
 
                 //---- cmbAB ----
-                cmbAB.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbAB.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbAB.setEnabled(false);
-                cmbAB.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbABItemStateChanged(e);
-                    }
-                });
                 jPanel4.add(cmbAB, CC.xy(3, 5));
 
                 //---- cbAB ----
@@ -696,19 +641,13 @@ public class DlgVerordnung extends MyJDialog {
                 jPanel4.add(lblAB, CC.xy(3, 9));
 
                 //---- cmbKHAb ----
-                cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbKHAb.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbKHAb.setEnabled(false);
-                cmbKHAb.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbKHAbItemStateChanged(e);
-                    }
-                });
                 jPanel4.add(cmbKHAb, CC.xy(3, 7));
             }
             jPanel3.add(jPanel4, CC.xy(1, 3));
@@ -735,35 +674,21 @@ public class DlgVerordnung extends MyJDialog {
             {
                 jPanel2.setBorder(new TitledBorder("Ansetzung"));
                 jPanel2.setLayout(new FormLayout(
-                    "default, $lcgap, 119dlu:grow",
-                    "17dlu, 3*($lgap, fill:17dlu)"));
+                        "default, $lcgap, 119dlu:grow",
+                        "17dlu, 3*($lgap, fill:17dlu)"));
 
                 //---- jLabel1 ----
                 jLabel1.setText("Am:");
                 jPanel2.add(jLabel1, CC.xy(1, 1));
-
-                //---- jdcAN ----
-                jdcAN.addPropertyChangeListener("date", new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent e) {
-                        jdcANPropertyChange(e);
-                    }
-                });
                 jPanel2.add(jdcAN, CC.xy(3, 1));
 
                 //---- cmbAN ----
-                cmbAN.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbAN.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
-                cmbAN.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbANItemStateChanged(e);
-                    }
-                });
                 jPanel2.add(cmbAN, CC.xy(3, 3));
 
                 //---- jLabel2 ----
@@ -775,18 +700,12 @@ public class DlgVerordnung extends MyJDialog {
                 jPanel2.add(lblAN, CC.xy(3, 7));
 
                 //---- cmbKHAn ----
-                cmbKHAn.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbKHAn.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
-                cmbKHAn.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbKHAnItemStateChanged(e);
-                    }
-                });
                 jPanel2.add(cmbKHAn, CC.xy(3, 5));
             }
             jPanel3.add(jPanel2, CC.xy(1, 1));
@@ -825,18 +744,6 @@ public class DlgVerordnung extends MyJDialog {
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
-    private void cmbABItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbABItemStateChanged
-        saveOK();
-    }//GEN-LAST:event_cmbABItemStateChanged
-
-    private void cmbKHAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAbItemStateChanged
-        saveOK();
-    }//GEN-LAST:event_cmbKHAbItemStateChanged
-
-    private void cmbKHAnItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAnItemStateChanged
-        saveOK();
-    }//GEN-LAST:event_cmbKHAnItemStateChanged
-
     public void initDialog() {
 
         fillAerzteUndKHs();
@@ -868,6 +775,7 @@ public class DlgVerordnung extends MyJDialog {
         }
 
         cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
+        txtMass.setEnabled(cmbMed.getModel().getSize() == 0);
         cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
         cbStellplan.setSelected(verordnung.isStellplan());
 
@@ -881,14 +789,9 @@ public class DlgVerordnung extends MyJDialog {
         cmbSit.setEnabled(editMode == ALLOW_ALL_EDIT);
 
         if (cmbMed.getSelectedItem() != null) {
-//                lblVerordnung.setText();
-//            currentSubMessage = new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem()));
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
             cbPackEnde.setEnabled(true);
         } else {
-//            currentSubMessage = new DisplayMessage(((Massnahmen) cmbMass.getSelectedItem()).getBezeichnung());
-//            OPDE.getDisplayManager().addSubMessage(currentSubMessage);
-//                lblVerordnung.setText();
             cbPackEnde.setEnabled(false);
         }
         if (!verordnung.isAbgesetzt()) {
@@ -904,40 +807,16 @@ public class DlgVerordnung extends MyJDialog {
             cmbAB.setToolTipText(cmbAB.getSelectedItem().toString());
             cmbKHAb.setToolTipText(cmbKHAb.getSelectedItem().toString());
         }
-//        }
 
-
-//        ignoreSitCaret = false;
         ignoreEvent = false;
-
-//        SYSTools.centerOnParent(parent, this);
         txtMed.requestFocus();
 
-//        myPropertyChangeListener = new java.beans.PropertyChangeListener() {
-//
-//            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-//                if (evt.getPropertyName().equals("value")) {
-//                    JDateChooser jdcDatum = (JDateChooser) ((JComponent) evt.getSource()).getParent();
-//                    SYSCalendar.checkJDC(jdcDatum);
-//                }
-//            }
-//        };
-//
-//        jdcAN.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
-//        jdcAB.getDateEditor().addPropertyChangeListener(myPropertyChangeListener);
-
         reloadTable();
-//        setVisible(true);
     }
 
     private void txtMedFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMedFocusGained
         SYSTools.markAllTxt(txtMed);
     }//GEN-LAST:event_txtMedFocusGained
-
-    private void cmbMassItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMassItemStateChanged
-//        verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
-        saveOK();
-    }//GEN-LAST:event_cmbMassItemStateChanged
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
 
@@ -947,7 +826,7 @@ public class DlgVerordnung extends MyJDialog {
         WizardDialog wizard = new MedProductWizard(new Closure() {
             @Override
             public void execute(Object o) {
-                if (o != null){
+                if (o != null) {
                     MedPackung packung = (MedPackung) o;
                     txtMed.setText(packung.getPzn());
                 }
@@ -964,13 +843,6 @@ public class DlgVerordnung extends MyJDialog {
         popup.removeExcludedComponent(btnMed);
         popup.setTransient(true);
         popup.setDefaultFocusComponent(wizard.getContentPane());
-        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
-                popup.getContentPane().getComponentCount();
-            }
-        });
 
         popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
 
@@ -978,50 +850,54 @@ public class DlgVerordnung extends MyJDialog {
 
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
+        cmbMass.setModel(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_BHP).toArray()));
         cmbMass.setSelectedItem(((Darreichung) cmbMed.getSelectedItem()).getMedForm().getMassnahme());
         cmbMass.setEnabled(false);
+        txtMass.setText(null);
+        txtMass.setEnabled(false);
         cbStellplan.setEnabled(false);
         cbStellplan.setSelected(false);
+        cbPackEnde.setSelected(false);
+        cbPackEnde.setEnabled(cmbMed.getSelectedItem() != null);
 //        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
-        saveOK();
+
     }//GEN-LAST:event_cmbMedItemStateChanged
-
-    private void cbPackEndeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPackEndeActionPerformed
-
-    }//GEN-LAST:event_cbPackEndeActionPerformed
 
     private boolean isBedarf() {
         return cmbSit.getSelectedItem() != null;
     }
 
-    private void saveOK() {
-        if (ignoreEvent) return;
+    private boolean saveOK() {
+        if (ignoreEvent) return false;
         boolean ansetzungOK = jdcAN.getDate() != null && (cmbAN.getSelectedIndex() > 0 || cmbKHAn.getSelectedIndex() > 0);
         boolean absetzungOK = !cbAB.isSelected() || (jdcAB.getDate() != null && (cmbAB.getSelectedIndex() > 0 || cmbKHAb.getSelectedIndex() > 0));
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
         boolean massOK = cmbMass.getSelectedItem() != null;
         boolean dosisVorhanden = tblDosis.getModel().getRowCount() > 0;
-        btnSave.setEnabled(ansetzungOK && absetzungOK && medOK && massOK && dosisVorhanden);
-        cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
+//        btnSave.setEnabled(ansetzungOK && absetzungOK && medOK && massOK && dosisVorhanden);
+//        cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
 
-        if (!btnSave.isEnabled()) {
-            String ursache = "<html><body>Es fehlen noch Angaben, bevor Sie speichern können.<ul>";
-            ursache += (ansetzungOK ? "" : "<li>Die Informationen zum <b>an</b>setzenden Arzt oder KH sind unvollständig.</li>");
-            ursache += (absetzungOK ? "" : "<li>Die Informationen zum <b>ab</b>setzenden Arzt oder KH sind unvollständig.</li>");
-            ursache += (medOK ? "" : "<li>Die Medikamentenangabe ist falsch.</li>");
-            ursache += (massOK ? "" : "<li>Die Angaben über die Massnahmen sind falsch.</li>");
-            ursache += (dosisVorhanden ? "" : "<li>Sie müssen mindestens eine Dosierung angegeben.</li>");
-            ursache += "</ul></body></html>";
-            btnSave.setToolTipText(ursache);
-        } else {
-            btnSave.setToolTipText(null);
+
+        String ursache = "";
+        ursache += (ansetzungOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder KH sind unvollständig. ");
+        ursache += (absetzungOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Arzt</b> oder KH sind unvollständig. ");
+        ursache += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
+        ursache += (massOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
+        ursache += (dosisVorhanden ? "" : "Sie müssen mindestens eine <b>Dosierung</b> angegeben. ");
+
+
+        if (!ursache.isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>" + ursache + "</html>", 4));
         }
+        return ansetzungOK & absetzungOK & medOK & massOK & dosisVorhanden;
+
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        save();
-        returnPackage = new Pair(verordnung, planungenToDelete);
-        dispose();
+        if (save()) {
+            returnPackage = new Pair(verordnung, planungenToDelete);
+            dispose();
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     @Override
@@ -1039,28 +915,27 @@ public class DlgVerordnung extends MyJDialog {
     private void cmbSitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSitItemStateChanged
         if (ignoreEvent) return;
 
-        cbPackEnde.setEnabled(!isBedarf());
+        cbPackEnde.setEnabled(!isBedarf() && !cbAB.isSelected());
         cbPackEnde.setSelected(false);
 
-        if (!isBedarf()) {
-            planungenToDelete.addAll(verordnung.getPlanungen());
-            verordnung.getPlanungen().clear();
-            reloadTable();
-        } else {
-            saveOK();
-        }
+        cbStellplan.setEnabled(!isBedarf());
+        cbStellplan.setSelected(false);
+
+        planungenToDelete.addAll(verordnung.getPlanungen());
+        verordnung.getPlanungen().clear();
+
+        reloadTable();
+
+//        saveOK();
 
     }//GEN-LAST:event_cmbSitItemStateChanged
 
     private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
-//        if (ignoreEvent) {
-//            return;
-//        }
-//        verordnung.setBemerkung(txtBemerkung.getText());
-        saveOK();
+
     }//GEN-LAST:event_txtBemerkungCaretUpdate
 
-    private void save() {
+    private boolean save() {
+        if (!saveOK()) return false;
 
         if (cbAB.isSelected()) {
 
@@ -1098,77 +973,7 @@ public class DlgVerordnung extends MyJDialog {
         verordnung.setStellplan(cbStellplan.isSelected());
 
         verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
-
-
-//            } else { // if(editMode == CHANGE_MODE) { // =================== VERÄNDERUNG ====================
-//                // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
-//                // Dann werden die nicht mehr benötigten BHPs entfernt.
-//                // Dann wird die neue Verordnung angesetzt.
-//                VerordnungTools.absetzen(em, verordnung, verordnung.getAnArzt(), verordnung.getAnKH());
-//
-//                // die neue Verordnung beginnt eine Sekunde, nachdem die vorherige Abgesetzt wurde.
-////                verordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
-//                em.persist(verordnung);
-//            }
-//
-//
-//            if (!verordnung.isBedarf()) {
-//                if (editMode == CHANGE_MODE || editMode == EDIT_OF_CHANGE_MODE) {
-//                    // ab der aktuellen Uhrzeit
-//                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), verordnung.getAnDatum());
-//                } else {
-//                    // für den ganzen Tag
-//                    BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), null);
-//                }
-//            }
-
-//            em.getTransaction().commit();
-
-//            if (OPDE.isDebug()) {
-//            if (editMode != CHANGE_MODE) {
-//                OPDE.debug("Verordnung wurde neu erstellt bzw. korrigiert");
-//                OPDE.debug(verordnung);
-//                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
-//                    @Override
-//                    public void execute(Object o) {
-//                        OPDE.debug(o);
-//                    }
-//                });
-//            } else {
-//                OPDE.debug("Verordnung wurde neu geändert und gegen eine neue ersetzt.");
-//                OPDE.debug("ALT");
-//                OPDE.debug("==============");
-//                OPDE.debug(verordnung);
-//                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
-//                    @Override
-//                    public void execute(Object o) {
-//                        OPDE.debug(o);
-//                    }
-//                });
-//                OPDE.debug("==============");
-//                OPDE.debug("NEU");
-//                OPDE.debug("==============");
-//                OPDE.debug(verordnung);
-//                CollectionUtils.forAllDo(verordnung.getPlanungen(), new Closure() {
-//                    @Override
-//                    public void execute(Object o) {
-//                        OPDE.debug(o);
-//                    }
-//                });
-//            }
-//        } // DEBUG OUTPUT
-
-//        } catch (OptimisticLockException ole) {
-//            em.getTransaction().rollback();
-//            em.refresh(em.merge(verordnung));
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Während Ihrer Eingabe wurde diese Verordnung von einem anderen Benutzer geändert. Ihre Eingabe wird rückgängig gemacht.", DisplayMessage.IMMEDIATELY, 4));
-//        } catch (Exception e) {
-//            em.getTransaction().rollback();
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-
+        return true;
     }
 
 
@@ -1212,15 +1017,30 @@ public class DlgVerordnung extends MyJDialog {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
                 final JidePopup popup = new JidePopup();
-                PnlRegelDosis dlg = new PnlRegelDosis(planung, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            reloadTable();
-                            popup.hidePopup();
+
+                CleanablePanel dlg;
+                if (verordnung.isBedarf()) {
+                    dlg = new PnlBedarfDosis(planung, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                reloadTable();
+                                popup.hidePopup();
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    dlg = new PnlRegelDosis(planung, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                reloadTable();
+                                popup.hidePopup();
+                            }
+                        }
+                    });
+                }
+
                 popup.setMovable(false);
                 popup.setOwner(tblDosis);
                 popup.removeExcludedComponent(tblDosis);
@@ -1253,16 +1073,9 @@ public class DlgVerordnung extends MyJDialog {
 
     }//GEN-LAST:event_tblDosisMousePressed
 
-    private void jspDosisComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspDosisComponentResized
-    }//GEN-LAST:event_jspDosisComponentResized
-
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
-
-    private void cmbANItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbANItemStateChanged
-        saveOK();
-    }//GEN-LAST:event_cmbANItemStateChanged
 
     private void cbABActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbABActionPerformed
         jdcAB.setEnabled(cbAB.isSelected());
@@ -1273,7 +1086,9 @@ public class DlgVerordnung extends MyJDialog {
         jdcAB.setDate(new Date());
         jdcAB.setMinSelectableDate(jdcAN.getDate());
         lblAB.setText(cbAB.isSelected() ? OPDE.getLogin().getUser().getUKennung() : "");
-        saveOK();
+        cbPackEnde.setSelected(false);
+        cbPackEnde.setEnabled(!cbAB.isSelected());
+
     }//GEN-LAST:event_cbABActionPerformed
 
 
@@ -1302,7 +1117,6 @@ public class DlgVerordnung extends MyJDialog {
         cmbKHAn.setSelectedIndex(0);
         cmbKHAb.setSelectedIndex(0);
 
-//        em.close();
     }
 
     private void reloadTable() {
@@ -1316,15 +1130,6 @@ public class DlgVerordnung extends MyJDialog {
         jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
         tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setCellRenderer(new RNDHTML());
         tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setHeaderValue("Anwendung");
-        //tblDosis.getColumnModel().getColumn(1).setCellRenderer(new RNDStandard());
-
-//        if (tblDosis.getModel().getRowCount() > 0) { // Sobald etwas in der Tabelle steht, darf man die Situation nicht mehr verändern.
-//            txtSit.setEnabled(false);
-//            txtSit.setText("");
-//        } else {
-//            txtSit.setEnabled(true);
-//        }
-        saveOK();
 
     }
 
@@ -1341,7 +1146,7 @@ public class DlgVerordnung extends MyJDialog {
     private JPanel panel3;
     private JButton btnEmptySit;
     private JButton btnSituation;
-    private JXSearchField xSearchField1;
+    private JXSearchField txtMass;
     private JPanel jPanel8;
     private JScrollPane jspDosis;
     private JTable tblDosis;

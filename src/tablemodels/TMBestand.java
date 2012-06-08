@@ -3,6 +3,7 @@ package tablemodels;
 import entity.verordnungen.DarreichungTools;
 import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedBestandTools;
+import op.OPDE;
 import op.tools.Pair;
 
 import javax.swing.table.AbstractTableModel;
@@ -71,7 +72,7 @@ public class TMBestand extends AbstractTableModel {
                 break;
             }
             case COL_MENGE: {
-                result = getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + DarreichungTools.getPackungsEinheit(getBestand(row).getDarreichung());
+                result = "<font face=\"" + OPDE.arial14.getFamily() + "\">"+ getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + DarreichungTools.getPackungsEinheit(getBestand(row).getDarreichung())+"</font>";
                 break;
             }
             default: {

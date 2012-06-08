@@ -306,14 +306,14 @@ public class PnlRegelDosis extends CleanablePanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, 208dlu, $lcgap, $rgap",
+                "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
                 "$rgap, 2*($lgap, pref), 2*($lgap, default), $lgap, $rgap"));
 
             //======== splitRegular ========
             {
                 splitRegular.setDividerSize(0);
                 splitRegular.setEnabled(false);
-                splitRegular.setDividerLocation(400);
+                splitRegular.setDividerLocation(30);
                 splitRegular.setDoubleBuffered(true);
 
                 //======== pnlTageszeit ========
@@ -500,7 +500,7 @@ public class PnlRegelDosis extends CleanablePanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                        "default, $ugap, 28dlu, pref",
+                        "default, $ugap, 28dlu, $ugap, pref",
                         "default:grow, $rgap, default"));
 
                     //---- lblUhrzeit ----
@@ -512,7 +512,7 @@ public class PnlRegelDosis extends CleanablePanel {
                     pnlUhrzeit.add(lblUhrzeit, CC.xy(3, 1, CC.DEFAULT, CC.BOTTOM));
 
                     //---- btnToTimeOfDay ----
-                    btnToTimeOfDay.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1leftarrow.png")));
+                    btnToTimeOfDay.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
                     btnToTimeOfDay.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -546,7 +546,7 @@ public class PnlRegelDosis extends CleanablePanel {
                             cmbUhrzeitItemStateChanged(e);
                         }
                     });
-                    pnlUhrzeit.add(cmbUhrzeit, CC.xy(4, 3));
+                    pnlUhrzeit.add(cmbUhrzeit, CC.xy(5, 3));
                 }
                 splitRegular.setRightComponent(pnlUhrzeit);
             }

@@ -85,6 +85,8 @@
         <property key="station" value="1"/>
         <property key="stellplan_pagebreak_after_element_no" value="23"/>
         <property key="barbetrag_pagebreak_after_element_no" value="30"/>
+        <property key="bhp_max_minutes_to_withdraw" value="30"/>
+        <property key="dfn_max_minutes_to_withdraw" value="30"/>
     </properties>
 
 </app>

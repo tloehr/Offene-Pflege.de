@@ -94,11 +94,11 @@ import java.util.List;
 
 @SqlResultSetMappings({
 
-        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
-                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
-                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "VorID"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
-                }
-        ),
+//        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
+//                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
+//                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "VorID"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
+//                }
+//        ),
         @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
                 entities = @EntityResult(entityClass = Verordnung.class),
                 columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
@@ -159,27 +159,27 @@ import java.util.List;
 /**
  * Dieser Query wird zur Erzeugung eines Stellplans verwendet.
  */
-        @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
-                " SELECT v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
-                " FROM BHPVerordnung v " +
-                " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
-                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
-                " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
-                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
-                " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
-                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
-                " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
-                " LEFT OUTER JOIN ( " +
-                "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
-                "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
-                "      WHERE M.Bis = '9999-12-31 23:59:59' " +
-                " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
-                " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
-                " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
-                " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
-                " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
-                " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)",
-                resultSetMapping = "Verordnung.findAllForStellplanResultMapping"),
+//        @NamedNativeQuery(name = "Verordnung.findAllForStellplan", query = " " +
+//                " SELECT v.*, st.*, bhp.*, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
+//                " FROM BHPVerordnung v " +
+//                " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
+//                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
+//                " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
+//                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
+//                " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
+//                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
+//                " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
+//                " LEFT OUTER JOIN ( " +
+//                "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
+//                "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
+//                "      WHERE M.Bis = '9999-12-31 23:59:59' " +
+//                " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
+//                " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
+//                " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
+//                " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+//                " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+//                " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)",
+//                resultSetMapping = "Verordnung.findAllForStellplanResultMapping"),
 
         @NamedNativeQuery(name = "Verordnung.findAllBedarf", query = " " +
                 " SELECT v.*, s.*, p.*, vor.Saldo, bisher.tagesdosis, d.DafID, bestand.APV, bestand.Summe, bestand.BestID " +
@@ -489,6 +489,10 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
     }
 
     public boolean isAbgesetzt() {
+        return abDatum.before(new Date());
+    }
+
+    public boolean isBegrenzt() {
         return abDatum.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 

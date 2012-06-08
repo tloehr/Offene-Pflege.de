@@ -124,7 +124,7 @@ public class FrmMain extends JFrame {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, lblDB);
+        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
         displayManager.start();
 
         printProcessor = new PrintProcessor();
@@ -238,12 +238,10 @@ public class FrmMain extends JFrame {
         pnlMainMessage = new JPanel();
         lblMainMsg = new FadingLabel();
         btnVerlegung = new JButton();
-        panel1 = new JPanel();
-        btnReload = new JButton();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
-        lblDB = new JLabel();
         pbMsg = new JProgressBar();
+        btnReload = new JButton();
         splitPaneLeft = new JideSplitPane();
         statusBar = new StatusBar();
 
@@ -262,16 +260,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "$rgap, $lcgap, pref, $lcgap, default:grow, $lcgap, pref, $lcgap, $rgap",
-                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
+                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -295,42 +293,20 @@ public class FrmMain extends JFrame {
                 });
                 pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 3));
 
-                //======== panel1 ========
-                {
-                    panel1.setOpaque(false);
-                    panel1.setLayout(new GridLayout(1, 0, 10, 0));
-
-                    //---- btnReload ----
-                    btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
-                    btnReload.setBorder(null);
-                    btnReload.setBorderPainted(false);
-                    btnReload.setOpaque(false);
-                    btnReload.setContentAreaFilled(false);
-                    btnReload.setToolTipText("Ansicht aktualisieren");
-                    btnReload.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnReloadActionPerformed(e);
-                        }
-                    });
-                    panel1.add(btnReload);
-
-                    //---- btnExit ----
-                    btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
-                    btnExit.setBorder(null);
-                    btnExit.setBorderPainted(false);
-                    btnExit.setOpaque(false);
-                    btnExit.setContentAreaFilled(false);
-                    btnExit.setToolTipText("Abmelden");
-                    btnExit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnExitActionPerformed(e);
-                        }
-                    });
-                    panel1.add(btnExit);
-                }
-                pnlMainMessage.add(panel1, CC.xywh(7, 3, 1, 3));
+                //---- btnExit ----
+                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
+                btnExit.setBorder(null);
+                btnExit.setBorderPainted(false);
+                btnExit.setOpaque(false);
+                btnExit.setContentAreaFilled(false);
+                btnExit.setToolTipText("Abmelden");
+                btnExit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnExitActionPerformed(e);
+                    }
+                });
+                pnlMainMessage.add(btnExit, CC.xywh(9, 3, 1, 3));
 
                 //---- lblSubMsg ----
                 lblSubMsg.setText("OPDE");
@@ -339,16 +315,26 @@ public class FrmMain extends JFrame {
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
 
-                //---- lblDB ----
-                lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
-                lblDB.setVisible(false);
-                pnlMainMessage.add(lblDB, CC.xy(3, 7));
-
                 //---- pbMsg ----
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
                 pbMsg.setForeground(new Color(105, 80, 69));
                 pnlMainMessage.add(pbMsg, CC.xywh(5, 7, 3, 1, CC.FILL, CC.DEFAULT));
+
+                //---- btnReload ----
+                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
+                btnReload.setBorder(null);
+                btnReload.setBorderPainted(false);
+                btnReload.setOpaque(false);
+                btnReload.setContentAreaFilled(false);
+                btnReload.setToolTipText("Ansicht aktualisieren");
+                btnReload.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnReloadActionPerformed(e);
+                    }
+                });
+                pnlMainMessage.add(btnReload, CC.xy(9, 7));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1));
 
@@ -451,13 +437,6 @@ public class FrmMain extends JFrame {
 
         createProgramListe();
         createPflegedokumentation();
-
-        // TODO: Das klappt irgendwie nicht.
-//        try {
-//            splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, Double.parseDouble(OPDE.getProps().getProperty(internalClassID + ":splitPaneLeftDividerLocation"))));
-//        } catch (NullPointerException npe) {
-//            splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, 0.5d));
-//        }
 
         panesApps.addExpansion();
     }
@@ -729,12 +708,10 @@ public class FrmMain extends JFrame {
     private JPanel pnlMainMessage;
     private FadingLabel lblMainMsg;
     private JButton btnVerlegung;
-    private JPanel panel1;
-    private JButton btnReload;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
-    private JLabel lblDB;
     private JProgressBar pbMsg;
+    private JButton btnReload;
     private JideSplitPane splitPaneLeft;
     private StatusBar statusBar;
     // End of variables declaration//GEN-END:variables

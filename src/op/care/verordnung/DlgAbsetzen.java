@@ -63,7 +63,7 @@ public class DlgAbsetzen extends MyJDialog {
         this.verordnung = verordnung;
         initComponents();
         fillAerzteUndKHs();
-        pack();
+        setVisible(true);
     }
 
     /**

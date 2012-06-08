@@ -48,7 +48,6 @@ import tablerenderer.RNDBHP;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
@@ -74,6 +73,7 @@ public class PnlBHP extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JDateChooser jdcDatum;
     private JComboBox cmbSchicht;
+    private int BHP_MAX_MINUTES_TO_WITHDRAW;
 
 
     /**
@@ -81,6 +81,7 @@ public class PnlBHP extends NursingRecordsPanel {
      */
     public PnlBHP(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
+        BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("bhp_max_minutes_to_withdraw"));
         this.jspSearch = jspSearch;
         change2Bewohner(bewohner);
     }
@@ -106,9 +107,9 @@ public class PnlBHP extends NursingRecordsPanel {
     }
 
     @Override
-   public void reload() {
+    public void reload() {
         reloadTable();
-   }
+    }
 
 
     /**
@@ -186,8 +187,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 //          )
                 //      )
                 !abwesend &&
-                        // Absetzdatum in der Zukunft ?
-                        SYSCalendar.isInFuture(bhp.getVerordnungPlanung().getVerordnung().getAbDatum())
+                        !bhp.getVerordnung().isAbgesetzt()
                         // Offener Status geht immer
                         && (
                         bhp.getStatus() == BHPTools.STATUS_OFFEN
@@ -196,7 +196,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 ||
                                 (bhp.getUser().equals(OPDE.getLogin().getUser())
                                         // und es noch früh genug ist (30 Minuten)
-                                        && SYSCalendar.earlyEnough(bhp.getMDate().getTime(), 30)
+                                        && SYSCalendar.earlyEnough(bhp.getMDate().getTime(), BHP_MAX_MINUTES_TO_WITHDRAW)
                                         // und kein abgesetzter Bestand beteiligt ist. Das verhindert einfach, dass bei
                                         // eine Rückgabe eines Vorrates verhindert wird, wenn d
                                         && !bhp.hasAbgesetzteBestand()
@@ -225,7 +225,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         bhp = em.merge(bhp);
                         vorrat = em.merge(vorrat);
 
-                        em.lock(bhp.getVerordnung(), LockModeType.OPTIMISTIC);
+                        em.lock(bhp.getVerordnung(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                         em.lock(bhp, LockModeType.OPTIMISTIC);
 
                         bhp.setStatus(status);
@@ -278,6 +278,29 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                 }
             }
+        } else { // sagen warum das nicht ging
+
+
+            String msg = "";
+
+            if (abwesend) {
+                msg += "BewohnerIn ist abwesend. ";
+            } else if (bhp.getVerordnung().isAbgesetzt()) {
+                msg += "Die Verordnung ist abgesetzt. ";
+            }
+
+            if (bhp.getStatus() != BHPTools.STATUS_OFFEN) {
+                if (!bhp.getUser().equals(OPDE.getLogin().getUser())) {
+                    msg += "Nur derselbe Benutzer kann das Häkchen wieder wegnehmen. ";
+                } else if (!SYSCalendar.earlyEnough(bhp.getMDate().getTime(), BHP_MAX_MINUTES_TO_WITHDRAW)) {
+                    msg += "Zu spät, sie können das Häkchen nur " + BHP_MAX_MINUTES_TO_WITHDRAW + " Minuten lang wieder zurück nehmen. ";
+                } else if (bhp.hasAbgesetzteBestand()) {
+                    msg += "Beim Abhaken wurde eine Packung abgeschlossen und eine neue angebrochen. ";
+                }
+            }
+
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(msg, DisplayMessage.WARNING));
+
         }
 
 
@@ -372,7 +395,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                     menu.add(new JSeparator());
 
-                    JMenuItem itemPopupBuchungen = new JMenuItem("Buchungen von Bestands Nr. "+bestand.getBestID()+" anzeigen");
+                    JMenuItem itemPopupBuchungen = new JMenuItem("Buchungen von Bestands Nr. " + bestand.getBestID() + " anzeigen");
                     itemPopupBuchungen.addActionListener(new java.awt.event.ActionListener() {
 
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -394,8 +417,21 @@ public class PnlBHP extends NursingRecordsPanel {
                     itemPopupBuchungen.setEnabled(true);
                 }
             }
-            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
 
+            if (OPDE.isAdmin()) {
+                menu.add(new JSeparator());
+                final BHP mybhp = bhp;
+                JMenuItem itemPopupINFO = new JMenuItem("Infos anzeigen");
+                itemPopupINFO.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        String message = "BHPID: " + mybhp.getBHPid();
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, 10));
+                    }
+                });
+                menu.add(itemPopupINFO);
+            }
+
+            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }//GEN-LAST:event_tblBHPMousePressed
 

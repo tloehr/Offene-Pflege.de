@@ -35,22 +35,6 @@
        <string>defaultCloseOperation</string> 
        <int>2</int> 
       </void> 
-      <void method="addEvent"> 
-       <object class="com.jformdesigner.model.FormEvent"> 
-        <string>java.awt.event.KeyListener</string> 
-        <string>keyPressed</string> 
-        <string>thisKeyPressed</string> 
-        <boolean>true</boolean> 
-       </object> 
-      </void> 
-      <void method="addEvent"> 
-       <object class="com.jformdesigner.model.FormEvent"> 
-        <string>java.awt.event.KeyListener</string> 
-        <string>keyTyped</string> 
-        <string>thisKeyTyped</string> 
-        <boolean>true</boolean> 
-       </object> 
-      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JPanel</string> 
@@ -102,6 +86,14 @@
             <string>java.awt.event.ActionListener</string> 
             <string>actionPerformed</string> 
             <string>txtMedActionPerformed</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.FocusListener</string> 
+            <string>focusGained</string> 
+            <string>txtMedFocusGained</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
@@ -310,14 +302,6 @@
           </void> 
           <void property="name"> 
            <string>cmbMass</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>cmbMassItemStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -560,7 +544,15 @@
            <string>Massnahmen</string> 
           </void> 
           <void property="name"> 
-           <string>xSearchField1</string> 
+           <string>txtMass</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ActionListener</string> 
+            <string>actionPerformed</string> 
+            <string>txtMassActionPerformed</string> 
+            <boolean>true</boolean> 
+           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -624,14 +616,6 @@
             <void method="setProperty"> 
              <string>toolTipText</string> 
              <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.ComponentListener</string> 
-              <string>componentResized</string> 
-              <string>jspDosisComponentResized</string> 
-              <boolean>true</boolean> 
-             </object> 
             </void> 
             <void property="name"> 
              <string>jspDosis</string> 
@@ -790,14 +774,6 @@
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
-            <void method="setProperty"> 
-             <string>gridX</string> 
-             <int>1</int> 
-            </void> 
-            <void method="setProperty"> 
-             <string>gridY</string> 
-             <int>1</int> 
-            </void> 
            </object> 
           </void> 
           <void method="add"> 
@@ -932,14 +908,6 @@
           </void> 
           <void property="name"> 
            <string>cbPackEnde</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ItemListener</string> 
-            <string>itemStateChanged</string> 
-            <string>cbPackEndeItemStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1093,15 +1061,6 @@
             <void property="name"> 
              <string>jdcAB</string> 
             </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.beans.PropertyChangeListener</string> 
-              <string>propertyChange</string> 
-              <string>jdcABPropertyChange</string> 
-              <boolean>true</boolean> 
-              <string>date</string> 
-             </object> 
-            </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -1167,14 +1126,6 @@
             </void> 
             <void property="name"> 
              <string>cmbAB</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.ItemListener</string> 
-              <string>itemStateChanged</string> 
-              <string>cmbABItemStateChanged</string> 
-              <boolean>true</boolean> 
-             </object> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1298,14 +1249,6 @@
             </void> 
             <void property="name"> 
              <string>cmbKHAb</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.ItemListener</string> 
-              <string>itemStateChanged</string> 
-              <string>cmbKHAbItemStateChanged</string> 
-              <boolean>true</boolean> 
-             </object> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1446,15 +1389,6 @@
             <void property="name"> 
              <string>jdcAN</string> 
             </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.beans.PropertyChangeListener</string> 
-              <string>propertyChange</string> 
-              <string>jdcANPropertyChange</string> 
-              <boolean>true</boolean> 
-              <string>date</string> 
-             </object> 
-            </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -1493,14 +1427,6 @@
             </void> 
             <void property="name"> 
              <string>cmbAN</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.ItemListener</string> 
-              <string>itemStateChanged</string> 
-              <string>cmbANItemStateChanged</string> 
-              <boolean>true</boolean> 
-             </object> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1586,14 +1512,6 @@
             </void> 
             <void property="name"> 
              <string>cmbKHAn</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.ItemListener</string> 
-              <string>itemStateChanged</string> 
-              <string>cmbKHAnItemStateChanged</string> 
-              <boolean>true</boolean> 
-             </object> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 

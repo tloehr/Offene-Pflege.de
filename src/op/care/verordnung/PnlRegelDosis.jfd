@@ -30,7 +30,7 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>relgap, labelcompgap, 208dlu, labelcompgap, relgap</string> 
+          <string>relgap, labelcompgap, 223dlu, labelcompgap, relgap</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -72,7 +72,7 @@
           </void> 
           <void method="setProperty"> 
            <string>dividerLocation</string> 
-           <int>400</int> 
+           <int>30</int> 
           </void> 
           <void method="setProperty"> 
            <string>doubleBuffered</string> 
@@ -692,7 +692,7 @@
              <class>com.jgoodies.forms.layout.FormLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>default, unrelgap, 28dlu, pref</string> 
+              <string>default, unrelgap, 28dlu, unrelgap, pref</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
@@ -756,7 +756,7 @@
                <string>icon</string> 
                <object class="com.jformdesigner.model.SwingIcon"> 
                 <int>0</int> 
-                <string>/artwork/22x22/bw/1leftarrow.png</string> 
+                <string>/artwork/22x22/bw/1rightarrow.png</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -845,7 +845,7 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridX</string> 
-               <int>4</int> 
+               <int>5</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 

@@ -263,8 +263,8 @@ public class DlgBestand extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -308,7 +308,7 @@ public class DlgBestand extends MyJDialog {
             mainPane.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -351,7 +351,7 @@ public class DlgBestand extends MyJDialog {
             mainPane.add(jLabel6, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -701,6 +701,7 @@ public class DlgBestand extends MyJDialog {
                     if (dcbm.getSize() > 1) {
                         ovrVorrat.addOverlayComponent(attentionIconVorrat, DefaultOverlayable.SOUTH_WEST);
                         attentionIconVorrat.setToolTipText("<html>Keinen <b>exakt</b> passender Vorrat gefunden. Wählen Sie selbst einen passenden aus oder verwenden Sie <b>automatisch</b>.<html>");
+                        cmbVorrat.showPopup();
                     } else {
                         ovrVorrat.addOverlayComponent(infoIconVorrat, DefaultOverlayable.SOUTH_WEST);
                         infoIconVorrat.setToolTipText("<html>Ein neuer Vorrat wird <b>automatisch</b> erstellt.</html>");

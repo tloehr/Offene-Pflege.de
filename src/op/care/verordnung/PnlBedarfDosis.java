@@ -4,22 +4,24 @@
 
 package op.care.verordnung;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.math.BigDecimal;
-import java.util.Date;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.verordnungen.VerordnungPlanung;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.border.*;
+import org.jdesktop.swingx.border.DropShadowBorder;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author Torsten Löhr
@@ -27,23 +29,21 @@ import org.jdesktop.swingx.border.*;
 public class PnlBedarfDosis extends CleanablePanel {
     private VerordnungPlanung planung;
     private Closure actionBlock;
-    private Date currentSelectedTime;
-    private double splitRegularPos;
 
     public PnlBedarfDosis(VerordnungPlanung planung, Closure actionBlock) {
         this.actionBlock = actionBlock;
-        this.currentSelectedTime = null;
 
         if (planung == null) {
-            planung = new VerordnungPlanung(false);
+            planung = new VerordnungPlanung(true);
         }
         this.planung = planung;
         initComponents();
         initPanel();
     }
 
-    private void initPanel(){
-
+    private void initPanel() {
+        txtEDosis.setText(planung.getMaxEDosis().toPlainString());
+        txtMaxTimes.setText(planung.getMaxAnzahl().toString());
     }
 
     @Override
@@ -53,11 +53,11 @@ public class PnlBedarfDosis extends CleanablePanel {
 
     public void save() throws NumberFormatException {
 
-        if (Double.parseDouble(txtEDosis.getText()) == 0d){
+        if (Double.parseDouble(txtEDosis.getText()) == 0d) {
             throw new NumberFormatException("Alle Dosierungen sind Null.");
         }
 
-        if (Integer.parseInt(txtMaxTimes.getText()) == 0){
+        if (Integer.parseInt(txtMaxTimes.getText()) == 0) {
             throw new NumberFormatException("Die Anzahl ist Null.");
         }
 
@@ -90,7 +90,7 @@ public class PnlBedarfDosis extends CleanablePanel {
 
     }
 
-     @Override
+    @Override
     public void reload() {
 
     }
@@ -116,7 +116,7 @@ public class PnlBedarfDosis extends CleanablePanel {
             save();
             actionBlock.execute(planung);
         } catch (NumberFormatException nfe) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Eingabefehler bei der Dosierung. Bitte prüfen. "+nfe.getLocalizedMessage(), 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Eingabefehler bei der Dosierung. Bitte prüfen. " + nfe.getLocalizedMessage(), 2));
         }
     }
 
@@ -138,8 +138,8 @@ public class PnlBedarfDosis extends CleanablePanel {
         {
             jPanel2.setBorder(new DropShadowBorder(Color.black, 5, 0.5f, 12, true, true, true, true));
             jPanel2.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu, $lcgap, $rgap",
-                "default, fill:default, $lgap, $rgap"));
+                    "$rgap, $lcgap, default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu, $lcgap, $rgap",
+                    "default, fill:default, $lgap, $rgap"));
 
             //---- label1 ----
             label1.setText("Anzahl");

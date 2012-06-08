@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +41,28 @@ public class MedVorratTools {
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         };
+    }
+
+    public static String getVorratAsHTML(MedVorrat vorrat) {
+        String result = "";
+
+        String htmlcolor = vorrat.isAbgeschlossen() ? "gray" : "blue";
+
+        result += "<font face =\"" + OPDE.arial14.getFamily() + "\">";
+        result += "<font color=\"" + htmlcolor + "\"><b><u>" + vorrat.getVorID() + "</u></b></font>&nbsp; ";
+        result += vorrat.getText();
+
+
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+
+        result += "<br/><font color=\"blue\">Eingang: " + df.format(vorrat.getVon()) + "</font>";
+        if (vorrat.isAbgeschlossen()) {
+            result += "<br/><font color=\"green\">Abschluss: " + df.format(vorrat.getBis()) + "</font>";
+        }
+
+        result += "</font>";
+        return result;
+
     }
 
     public static BigDecimal getVorratSumme(MedVorrat vorrat) {
@@ -139,15 +162,35 @@ public class MedVorratTools {
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal restsumme = MedBestandTools.getBestandSumme(em, bestand); // wieviel der angebrochene Bestand noch hergibt.
+            BigDecimal restsumme = MedBestandTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
 
             // normalerweise wird immer das hergegeben, was auch gewünscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
 
-            //TODO: hier gibts noch ein Problem. Wenn eine Packung leer wird und NEXTBEST != null, dann sollte mit dem leer werden die Packung auch abgeschlossen werden und nicht erst mit der nächsten Buchung
 
-            if (bestand.hasNextBestand()) { // Jetzt gibt es direkt noch den Wunsch das nächste Päckchen anzubrechen.
+            /**
+             * Sagen wir, dass in der Packung nicht mehr so viel drin ist, wie gewünscht.
+             * Es gibt aber bereits eine NACHFOLGEPACKUNG. Dann brauchen wir DIESE hier
+             * erst mal auf und nehmen den Rest aus der nächsten.
+             *
+             */
+            if (bestand.hasNextBestand() && restsumme.compareTo(wunschmenge) <= 0) {
+                entnahme = restsumme;
+            }
+
+            // Also erst mal die Buchung für DIESEN Durchgang.
+            MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
+            bestand.getBuchungen().add(buchung);
+            OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
+
+            /**
+             * Gibt es schon eine neue Packung ? Wenn nicht, dann nehmen brechen wir ab.
+             * So lange keine neue Packung bekannt nehmen wir immer weiter aus dieser hier.
+             * Selbst wenn die dann ins Minus läuft.
+             */
+            if (bestand.hasNextBestand()) {
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
+
                     MedBestand naechsterBestand = em.merge(bestand.getNaechsterBestand());
                     em.lock(naechsterBestand, LockModeType.OPTIMISTIC);
 
@@ -159,24 +202,13 @@ public class MedVorratTools {
                     // dann den neuen (NextBest) Bestand anbrechen.
                     // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
 
-                    MedBestandTools.anbrechen(naechsterBestand, MedBestandTools.berechneAPV(em, bestand));
-                } else {
-                    MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
-                    bestand.getBuchungen().add(buchung);
-//                    em.persist(buchung);
-                    OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
+                    MedBestandTools.anbrechen(naechsterBestand, MedBestandTools.berechneAPV(bestand));
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
                     entnahmeVorrat(em, vorrat, wunschmenge.subtract(entnahme), bhp);
                 }
-            } else {
-                MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
-                bestand.getBuchungen().add(buchung);
-//                em.persist(buchung);
-                OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
             }
-
         }
     }
 
@@ -184,6 +216,7 @@ public class MedVorratTools {
      * Diese Methode bucht ein Medikament in einen Vorrat ein.
      * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
      * Der muss dann nur noch persistiert werden.
+     *
      * @param vorrat
      * @param packung
      * @param darreichung
@@ -192,7 +225,7 @@ public class MedVorratTools {
      * @return
      * @throws Exception
      */
-    public static MedBestand einbuchenVorrat(MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge)  {
+    public static MedBestand einbuchenVorrat(MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) {
         MedBestand bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             bestand = new MedBestand(vorrat, darreichung, packung, text);
@@ -280,6 +313,29 @@ public class MedVorratTools {
 //        }
 
         return result;
+    }
+
+    public static MedFormen getForm(MedVorrat vorrat) {
+
+        EntityManager em = OPDE.createEM();
+//         query = em.createNativeQuery(" " +
+//                " SELECT d.FormID FROM MPVorrat v" +
+//                " INNER JOIN MPBestand b ON v.VorID = b.VorID" +
+//                " INNER JOIN MPDarreichung d ON b.DafID = d.DafID" +
+//                " WHERE v.VorID = ?" +
+//                " LIMIT 0,1");
+        Query query = em.createQuery(" " +
+                " SELECT d.medForm FROM MedVorrat v " +
+                " JOIN v.bestaende b " +
+                " JOIN b.darreichung d" +
+                " WHERE v = :vorrat");
+        query.setParameter("vorrat", vorrat);
+        query.setMaxResults(1);
+
+        MedFormen form = (MedFormen) query.getSingleResult();
+        em.close();
+
+        return form;
     }
 
 

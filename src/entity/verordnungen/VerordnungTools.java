@@ -89,7 +89,26 @@ public class VerordnungTools {
         String html = "";
 
         try {
-            Query query = em.createNamedQuery("Verordnung.findAllForStellplan");
+            Query query = em.createNativeQuery("" +
+                    " SELECT v.VerID, st.StatID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
+                    " FROM BHPVerordnung v " +
+                    " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
+                    " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
+                    " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
+                    " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
+                    " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
+                    " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
+                    " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
+                    " LEFT OUTER JOIN ( " +
+                    "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
+                    "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
+                    "      WHERE M.Bis = '9999-12-31 23:59:59' " +
+                    " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
+                    " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
+                    " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
+                    " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+                    " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+                    " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, einrichtungen.getEKennung());
             html = getStellplan(query.getResultList());
 
@@ -122,13 +141,15 @@ public class VerordnungTools {
 
         Iterator it = data.iterator();
 
+        EntityManager em = OPDE.createEM();
+
         while (it.hasNext()) {
 
             Object[] objects = (Object[]) it.next();
 
-            Verordnung verordnung = (Verordnung) objects[0];
-            Stationen station = (Stationen) objects[1];
-            VerordnungPlanung planung = (VerordnungPlanung) objects[2];
+            Verordnung verordnung = em.find(Verordnung.class, ((BigInteger) objects[0]).longValue());
+            Stationen station = em.find(Stationen.class, ((BigInteger) objects[1]).longValue());
+            VerordnungPlanung planung = em.find(VerordnungPlanung.class, ((BigInteger) objects[2]).longValue());
 
             BigInteger bestid = (BigInteger) objects[3];
             //Vorrat wäre objects[4]
@@ -159,7 +180,7 @@ public class VerordnungTools {
             // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
             boolean grau = false;
             if (formid != null) {
-                MedFormen form = OPDE.createEM().find(MedFormen.class, formid.longValue());
+                MedFormen form = em.find(MedFormen.class, formid.longValue());
                 grau = form.getStellplan() > 0;
             }
 
@@ -213,6 +234,8 @@ public class VerordnungTools {
             pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
         }
 
+        em.close();
+
         html += "</table>"
                 + "</body>";
 
@@ -221,7 +244,7 @@ public class VerordnungTools {
     }
 
     public static String getMassnahme(Verordnung verordnung) {
-        String result = "";
+        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
 
         if (verordnung.isAbgesetzt()) {
             result += "<s>"; // Abgesetzte
@@ -261,7 +284,7 @@ public class VerordnungTools {
             result += "</s>"; // Abgesetzte
         }
 
-        return result;
+        return result+"</font>";
     }
 
     public static String getHinweis(Verordnung verordnung) {
@@ -278,7 +301,7 @@ public class VerordnungTools {
     }
 
     public static String getAN(Verordnung verordnung) {
-        String result = "";
+        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
         String datum = sdf.format(verordnung.getAnDatum());
 
@@ -296,18 +319,18 @@ public class VerordnungTools {
         result += "; " + verordnung.getAngesetztDurch().getNameUndVorname() + "</font>";
 
 
-        return result;
+        return result + "</font>";
     }
 
     public static String getAB(Verordnung verordnung) {
-        String result = "";
+        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
 
-        if (verordnung.isAbgesetzt()) {
+        if (verordnung.isBegrenzt()) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
             String datum = sdf.format(verordnung.getAbDatum());
 
 
-            result += "<font color=\"red\">" + datum + "; ";
+            result += "<font color=\""+(verordnung.isAbgesetzt() ? "red" : "lime")+"\">" + datum + "; ";
 
             result += verordnung.getAbKH() != null ? verordnung.getAbKH().getName() : "";
 
@@ -320,7 +343,7 @@ public class VerordnungTools {
             result += "; " + verordnung.getAbgesetztDurch().getNameUndVorname() + "</font>";
 
         }
-        return result;
+        return result + "</font>";
     }
 
     public static String getDosis(Verordnung verordnung) {
@@ -328,8 +351,8 @@ public class VerordnungTools {
     }
 
     public static String getDosis(Verordnung verordnung, boolean mitBestandsAnzeige, MedVorrat vorrat, MedBestand bestandImAnbruch) {
-        long timestart = System.currentTimeMillis();
-        String result = "";
+//        long timestart = System.currentTimeMillis();
+        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
         if (verordnung.getPlanungen().size() > 1) {
             Collections.sort(verordnung.getPlanungen());
         }
@@ -423,11 +446,11 @@ public class VerordnungTools {
         }
 
 
-        long timeend = System.currentTimeMillis();
+//        long timeend = System.currentTimeMillis();
 
 //        OPDE.debug("time end: " + (timeend - timestart) + " millis");
 
-        return result;
+        return result + "</font>";
     }
 
     /**

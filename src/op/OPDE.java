@@ -556,6 +556,7 @@ public class OPDE {
             }
 
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            setStandardFont();
 
             try {
                 css = SYSTools.readFileAsString(opwd + sep + "standard.css");
@@ -626,6 +627,40 @@ public class OPDE {
 
     public static OCSec getOCSec() {
         return ocsec;
+    }
+
+    public static void setStandardFont() {
+        UIManager.put("Button.font", arial14);
+        UIManager.put("ToggleButton.font", arial14);
+        UIManager.put("RadioButton.font", arial14);
+        UIManager.put("CheckBox.font", arial14);
+        UIManager.put("ColorChooser.font", arial14);
+        UIManager.put("ComboBox.font", arial14);
+        UIManager.put("Label.font", arial14);
+        UIManager.put("List.font", arial14);
+        UIManager.put("MenuBar.font", arial14);
+        UIManager.put("MenuItem.font", arial14);
+        UIManager.put("RadioButtonMenuItem.font", arial14);
+        UIManager.put("CheckBoxMenuItem.font", arial14);
+        UIManager.put("Menu.font", arial14);
+        UIManager.put("PopupMenu.font", arial14);
+        UIManager.put("OptionPane.font", arial14);
+        UIManager.put("Panel.font", arial14);
+        UIManager.put("ProgressBar.font", arial14);
+        UIManager.put("ScrollPane.font", arial14);
+        UIManager.put("Viewport.font", arial14);
+        UIManager.put("TabbedPane.font", arial14);
+        UIManager.put("Table.font", arial14);
+        UIManager.put("TableHeader.font", arial14);
+        UIManager.put("TextField.font", arial14);
+        UIManager.put("PasswordField.font", arial14);
+        UIManager.put("TextArea.font", arial14);
+        UIManager.put("TextPane.font", arial14);
+        UIManager.put("EditorPane.font", arial14);
+        UIManager.put("TitledBorder.font", arial14);
+        UIManager.put("ToolBar.font", arial14);
+        UIManager.put("ToolTip.font", arial14);
+        UIManager.put("Tree.font", arial14);
     }
 
     public static void newOCSec() {

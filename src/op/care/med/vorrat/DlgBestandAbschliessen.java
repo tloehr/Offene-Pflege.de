@@ -104,8 +104,8 @@ public class DlgBestandAbschliessen extends MyJDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "$rgap, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, $rgap",
-                "$rgap, $lgap, default, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, $rgap"));
+                "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
+                "14dlu, $lgap, default, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -154,7 +154,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
                     txtLetzteFocusLost(e);
                 }
             });
-            jPanel1.add(txtLetzte, CC.xywh(5, 9, 2, 1));
+            jPanel1.add(txtLetzte, CC.xy(5, 9));
 
             //---- lblEinheiten ----
             lblEinheiten.setText("Einheiten verbraucht.");
@@ -380,7 +380,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
                     MedBestandTools.abschliessen(bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
-                    apv = MedBestandTools.berechneAPV(em, bestand);
+                    apv = MedBestandTools.berechneAPV(bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
                 if (nextBest != null) {

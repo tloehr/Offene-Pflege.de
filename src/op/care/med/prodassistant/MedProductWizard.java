@@ -48,6 +48,7 @@ public class MedProductWizard {
                 prodtemplate = template.trim();
             }
         }
+        createWizard();
     }
 
     private void createWizard(){
@@ -174,8 +175,8 @@ public class MedProductWizard {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, OPDE.lang.getString("opde.wizards.buttontext.back"));
             fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, OPDE.lang.getString("opde.wizards.buttontext.next"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, OPDE.lang.getString("opde.wizards.buttontext.finish"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, OPDE.lang.getString("opde.wizards.buttontext.cancel"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, OPDE.lang.getString("opde.wizards.buttontext.finish"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, OPDE.lang.getString("opde.wizards.buttontext.cancel"));
 
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
@@ -208,7 +209,7 @@ public class MedProductWizard {
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(produkt == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.CANCEL);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
         @Override
@@ -262,7 +263,7 @@ public class MedProductWizard {
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(darreichung == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.CANCEL);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
         @Override
@@ -320,7 +321,7 @@ public class MedProductWizard {
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(packung == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.CANCEL);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
             updateNextPage();
         }
 
@@ -371,7 +372,7 @@ public class MedProductWizard {
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(hersteller == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.CANCEL);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
         @Override
@@ -424,7 +425,7 @@ public class MedProductWizard {
         @Override
         public void setupWizardButtons() {
             super.setupWizardButtons();
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.CANCEL);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
         private String check() {

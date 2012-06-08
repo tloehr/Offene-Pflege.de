@@ -194,7 +194,7 @@ public class MedBestandTools {
      * @return die Summe in der Packungs Einheit.
      */
     public static BigDecimal getBestandSumme(EntityManager em, MedBestand bestand) throws Exception {
-        BigDecimal result = BigDecimal.ZERO;
+        BigDecimal result;
 
         Query query = em.createQuery(" " +
                 " SELECT SUM(bu.menge) " +
@@ -255,7 +255,7 @@ public class MedBestandTools {
     /**
      * @param bestand, für den das Verhältnis neu berechnet werden soll.
      */
-    public static BigDecimal berechneAPV(EntityManager em, MedBestand bestand) throws Exception {
+    public static BigDecimal berechneAPV(MedBestand bestand) throws Exception {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
@@ -273,15 +273,7 @@ public class MedBestandTools {
                 apvAlt = BigDecimal.ONE;
             }
 
-            // Anzahl der per BHP verabreichten Einzeldosen. (in der Anwendungseinheit)
-            Query querySummeBHPDosis = em.createQuery(" " +
-                    " SELECT SUM(bhp.dosis) " +
-                    " FROM MedBuchungen bu " +
-                    " JOIN bu.bhp bhp" +
-                    " WHERE bu.bestand = :bestand ");
-
-            querySummeBHPDosis.setParameter("bestand", bestand);
-            BigDecimal summeBHPDosis = (BigDecimal) querySummeBHPDosis.getSingleResult();
+            BigDecimal summeBHPDosis = getBestandSumme(bestand);
 
             // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
             // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
@@ -375,6 +367,7 @@ public class MedBestandTools {
 
         String htmlcolor = bestand.isAbgeschlossen() ? "gray" : "red";
 
+        result += "<font face =\"" + OPDE.arial14.getFamily() + "\">";
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
         result += DarreichungTools.toPrettyString(bestand.getDarreichung());
 
@@ -397,6 +390,7 @@ public class MedBestandTools {
                 result += "<br/><font color=\"black\">Ausgebucht: " + df.format(bestand.getAus()) + "</font>";
             }
         }
+        result += "</font>";
 
         return result;
 
@@ -469,7 +463,7 @@ public class MedBestandTools {
     }
 
     public static BigDecimal getAPVperBW(MedVorrat vorrat) {
-        BigDecimal apv = null;
+        BigDecimal apv;
 
         if (!vorrat.getBestaende().isEmpty()) {
             apv = BigDecimal.ZERO;
@@ -479,7 +473,6 @@ public class MedBestandTools {
             // Arithmetisches Mittel
             apv = apv.divide(new BigDecimal(vorrat.getBestaende().size()), BigDecimal.ROUND_UP);
         } else {
-            // Im Zweifel ist das 1
             apv = BigDecimal.ONE;
         }
 

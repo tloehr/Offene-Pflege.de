@@ -11,6 +11,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.EditorKit;
+import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -40,6 +42,10 @@ public class RNDHTML implements TableCellRenderer {
     protected JPanel panel;
 
     public RNDHTML() {
+        this(null);
+    }
+
+    public RNDHTML(StyledEditorKit kit) {
 
         // Dieser Trick mit dem Einbetten der JTextPane ist nur wegen dem Nimbus Bug bei der Hintergrundfarbe einer Text Component.
         // http://solutioncrawler.wordpress.com/2009/10/07/nimbus-lookfeel-und-seine-eigenarten/
@@ -47,7 +53,11 @@ public class RNDHTML implements TableCellRenderer {
         txt.setEditable(false);
         txt.setContentType("text/html");
         txt.setOpaque(false);
-        txt.setBackground(new Color(0,0,0,0));
+        txt.setBackground(new Color(0, 0, 0, 0));
+
+        if (kit != null) {
+            txt.setEditorKit(kit);
+        }
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
