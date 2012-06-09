@@ -11,7 +11,6 @@ import entity.vorgang.VorgangElement;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
 
@@ -33,8 +32,6 @@ import java.util.Date;
         @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM BWerte b WHERE b.bwid = :bwid"),
         @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM BWerte b WHERE b.pit = :pit"),
         @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM BWerte b WHERE b.wert = :wert"),
-        @NamedQuery(name = "BWerte.findByBeziehung", query = "SELECT b FROM BWerte b WHERE b.beziehung = :beziehung"),
-        @NamedQuery(name = "BWerte.findBySortierung", query = "SELECT b FROM BWerte b WHERE b.sortierung = :sortierung"),
         @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM BWerte b WHERE b.replacedBy = :replacedBy"),
         @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM BWerte b WHERE b.replacementFor = :replacementFor"),
         @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM BWerte b WHERE b.cdate = :cdate"),
@@ -57,13 +54,6 @@ public class BWerte implements Serializable, VorgangElement {
     @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
-    @Column(name = "Beziehung")
-    private BigInteger beziehung;
-    @Column(name = "Sortierung")
-    private Short sortierung;
-    @Lob
-    @Column(name = "XML")
-    private String xml;
     @Basic(optional = false)
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
@@ -72,6 +62,9 @@ public class BWerte implements Serializable, VorgangElement {
     @Column(name = "_mdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
+    @Basic(optional = false)
+    @Column(name = "Type")
+    private Integer type;
     // ==
     // 1:1 Relationen
     // ==
@@ -133,36 +126,20 @@ public class BWerte implements Serializable, VorgangElement {
         this.wert = wert;
     }
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     public String getBemerkung() {
         return bemerkung;
     }
 
     public void setBemerkung(String bemerkung) {
         this.bemerkung = bemerkung;
-    }
-
-    public BigInteger getBeziehung() {
-        return beziehung;
-    }
-
-    public void setBeziehung(BigInteger beziehung) {
-        this.beziehung = beziehung;
-    }
-
-    public Short getSortierung() {
-        return sortierung;
-    }
-
-    public void setSortierung(Short sortierung) {
-        this.sortierung = sortierung;
-    }
-
-    public String getXml() {
-        return xml;
-    }
-
-    public void setXml(String xml) {
-        this.xml = xml;
     }
 
     public Users getEditedBy() {

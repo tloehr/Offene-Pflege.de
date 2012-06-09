@@ -436,23 +436,25 @@ public class DBHandling {
                                 lbl.setText("Gewichtstatistik: " + bwlabel);
                             }
                             s += "<h" + (headertiefe + 2) + ">" + bwlabel + "</h" + (headertiefe + 2) + "> ";
-                            ArrayList groesse = DBRetrieve.getLetztenBWert(bwkennung, "<groesse/>");
-                            startGewicht = rs.getDouble("Wert");
-                            if (groesse == null) {
-                                gr = -1d;
-                                s += "<b>Körpergröße wurde bisher nicht eingetragen. Somit kann kein BMI berechnet werden.</b>";
-                                startBMI = -1d;
-                                bmiPlusMinus = -1d;
-                                //bmiProzent = -1d;
-                                prevBMI = -1d;
-                            } else {
-                                gr = ((Double) groesse.get(1)).doubleValue();
-                                s += "Groesse: " + gr + " m";
-                                startBMI = (startGewicht / (gr * gr));
-                                bmiPlusMinus = 0d;
-                                //bmiProzent = 0d;
-                                prevBMI = 0d;
-                            }
+
+                            // TODO: Das hier muss wieder gefixt werden.
+//                            BWerte groesse = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GROESSE);
+//                            startGewicht = rs.getDouble("Wert");
+//                            if (groesse == null) {
+//                                gr = -1d;
+//                                s += "<b>Körpergröße wurde bisher nicht eingetragen. Somit kann kein BMI berechnet werden.</b>";
+//                                startBMI = -1d;
+//                                bmiPlusMinus = -1d;
+//                                //bmiProzent = -1d;
+//                                prevBMI = -1d;
+//                            } else {
+////                                gr = ((Double) groesse.get(1)).doubleValue();
+//                                s += "Groesse: " + groesse.getWert().toPlainString() + " m";
+//                                startBMI = (startGewicht / (gr * gr));
+//                                bmiPlusMinus = 0d;
+//                                //bmiProzent = 0d;
+//                                prevBMI = 0d;
+//                            }
 
                             s += "<table border=\"1\">" + "<tr><th>Datum</th><th>Gewicht</th><th>+-(%)</th><th>BMI</th><th>+-(%)</th></tr>";
                             gewichtPlusMinus = 0d;

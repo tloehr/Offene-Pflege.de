@@ -1,10 +1,12 @@
 package entity;
 
 
-import op.care.vital.DlgVital;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -28,7 +30,8 @@ public class BWerteTools {
     public static final int STUHLGANG = 9;
     public static final int ERBRECHEN = 10;
     public static final int BILANZ = 11;
-
+    public static final String[] WERTE = new String[]{"?? unbekannt ??", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
+    public static final String[] EINHEIT = new String[]{"?? unbekannt ??", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
 
     public static String getPITasHTML(BWerte bwert, boolean showids, boolean colorize) {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
@@ -45,6 +48,29 @@ public class BWerteTools {
             result += "<br/><i>(" + bwert.getBwid() + ")</i>";
         }
         return colorize ? "<font " + color + ">" + result + "</font>" : result;
+    }
+
+    public static BWerte getLetztenBWert(Bewohner bewohner, int type) {
+
+        BWerte result;
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(" " +
+                " SELECT b FROM BWerte b WHERE b.bewohner = :bewohner AND b.type = :type " +
+                " ORDER BY b.pit DESC ");
+        query.setMaxResults(1);
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("type", type);
+
+        try {
+            result = (BWerte) query.getSingleResult();
+        } catch (Exception e) {
+            result = null;
+        } finally {
+            em.close();
+        }
+
+        return result;
     }
 
     public static String getAsHTML(BWerte bwert, boolean colorize) {
@@ -74,7 +100,7 @@ public class BWerteTools {
             result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format(bwert.getCdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + " vorgenommen.";
             result += "<br/>Der Korrektureintrag hat die Nummer: " + bwert.getReplacedBy().getBwid() + "</i><br/>";
         }
-        result += "<b>" + bwert.getWert() + " " + getEinheit(bwert.getXml()) + "</b> (" + getArt(bwert.getXml()) + ")";
+        result += "<b>" + bwert.getWert() + " " + EINHEIT[bwert.getType()] + "</b> (" + WERTE[bwert.getType()] + ")";
 
         if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
             result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
@@ -95,39 +121,6 @@ public class BWerteTools {
     }
 
 
-//    public static String getArt(String xml) {
-//        String result;
-//        if (xml.indexOf("<RRSYS/>") >= 0) {
-//            result = "Blutdruck Systole";
-//        } else if (xml.indexOf("<RRDIA/>") >= 0) {
-//            result = "Blutdruck Diastole";
-//        } else if (xml.indexOf("<TEMP/>") >= 0) {
-//            result = "Temperatur";
-//        } else if (xml.indexOf("<PULS/>") >= 0) {
-//            result = "Puls";
-//        } else if (xml.indexOf("<BZ/>") >= 0) {
-//            result = "Blutzucker";
-//        } else if (xml.indexOf("<GEWICHT/>") >= 0) {
-//            result = "Gewicht";
-//        } else if (xml.indexOf("<GROESSE/>") >= 0) {
-//            result = "Groesse";
-//        } else if (xml.indexOf("<ATEM/>") >= 0) {
-//            result = "Atemfrequenz";
-//        } else if (xml.indexOf("<braden") >= 0) {
-//            result = "Bradenskala";
-//        } else if (xml.indexOf("<QUICK/>") >= 0) {
-//            result = "Quickwert";
-//        } else if (xml.indexOf("<STUHLGANG/>") >= 0) {
-//            result = "Stuhlgang";
-//        } else if (xml.indexOf("<ERBRECHEN/>") >= 0) {
-//            result = "Erbrochen";
-//        } else if (xml.indexOf("<BILANZ/>") >= 0) {
-//            result = "Ein-/Ausfuhrbilanz";
-//        } else {
-//            result = "?? unbekannt ??";
-//        }
-//        return result;
-//    }
 //
 //    public static String getEinheit(String xml) {
 //        String result;

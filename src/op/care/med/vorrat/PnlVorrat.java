@@ -581,7 +581,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     bestand = em.merge(bestand);
-                                    MedBestandTools.abschliessen(bestand, "", MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+                                    MedBestandTools.abschliessen(em, bestand, "", MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde abgeschlossen", 2));
                                     reloadBestandTable();
@@ -788,7 +788,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                                         if (!bestand.isAbgeschlossen()) {
                                             bestand = em.merge(bestand);
                                             em.lock(bestand, LockModeType.OPTIMISTIC);
-                                            MedBestandTools.abschliessen(bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                                            MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
                                         }
                                     }
 

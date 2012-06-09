@@ -145,19 +145,6 @@ public class BHPTools {
         Date now = new Date();
 
         int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
-
-//        String sql = "DELETE b.* FROM BHP b INNER JOIN BHPPlanung bhp ON b.BHPPID = bhp.BHPPID " +
-//                " WHERE bhp.VerID = ? AND Status = 0 AND Date(Soll)=Date(now()) AND " +
-//                " (" +
-//                "   ( " +
-//                "       ( SZeit > ? )" +
-//                "   ) " +
-//                "   OR " +
-//                "   (" +
-//                "       ( SZeit = 0 AND Time(Soll) >= Time(?) )" +
-//                "   )" +
-//                " )";
-
         Query query = em.createQuery("SELECT b FROM BHP b WHERE b.verordnung = :verordnung AND b.soll >= :bofday AND b.soll <= :eofday");
 
         query.setParameter("verordnung", verordnung);

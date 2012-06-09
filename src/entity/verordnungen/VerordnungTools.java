@@ -118,6 +118,88 @@ public class VerordnungTools {
         return html;
     }
 
+    /**
+     * Erzeugt eine Liste mit EntityBeans und Salden. Diese Liste enthält die zur Zeit verordnete Bedarfsverordnungen.
+     * Die Liste enthält ein Objekt Array mit dem folgenden Aufbau:
+     * <ol>
+     *     <li></li>
+     * </ol>
+     *
+     *
+     * @param bewohner
+     * @return Liste mit allen Bedarfsverordnungen. <code>null</code>, wenn nichts da war oder bei Fehler.
+     */
+    public static List getBedarfsliste(Bewohner bewohner) {
+        String sql = " SELECT v.VerID, s.SitID, p.BHPPID, vor.Saldo, bisher.tagesdosis, d.DafID, bestand.APV, bestand.Summe, bestand.BestID " +
+                " FROM BHPVerordnung v " +
+                " INNER JOIN Situationen s ON v.SitID = s.SitID " +
+                " INNER JOIN BHPPlanung p ON v.VerID = p.VerID" +
+                " LEFT OUTER JOIN MPDarreichung d ON v.DafID = d.DafID " +
+                // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
+                // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
+                // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
+                // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
+                // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
+                " LEFT OUTER JOIN " +
+                "      ( " +
+                "        SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
+                "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+                "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+                "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+                "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+                "           GROUP BY VorID" +
+                "           ) a  " +
+                "        INNER JOIN (" +
+                "           SELECT best.VorID, best.DafID FROM MPBestand best " +
+                "           ) b ON a.VorID = b.VorID " +
+                "      ) vor ON vor.DafID = v.DafID " +
+                // Hier wird berechnet, wieviel von der Tagesdosis der Bewohner heute schon bekommen hat.
+                " LEFT OUTER JOIN" +
+                "      (" +
+                "        SELECT b3.VerID, sum(b1.dosis) tagesdosis " +
+                "        FROM BHP b1" +
+                "        INNER JOIN BHPPlanung b2 ON b1.BHPPID = b2.BHPPID" +
+                "        INNER JOIN BHPVerordnung b3 ON b3.VerID = b2.VerID" +
+                "        WHERE b3.BWKennung=? AND b3.AbDatum = '9999-12-31 23:59:59'" +
+                "        AND DATE(b1.Ist) = Date(now()) AND b1.Status = " + BHPTools.STATUS_ERLEDIGT +
+                "        GROUP BY b3.VerID" +
+                "      ) bisher ON bisher.VerID = v.VerID" +
+                // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
+                // ursprünglich verordneten abweichen.
+                " LEFT OUTER JOIN( " +
+                "        SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
+                "        FROM MPBestand best1 " +
+                "        INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
+                "        WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+                "        GROUP BY best1.BestID" +
+                "      ) bestand ON bestand.VorID = vor.VorID " +
+                " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
+                " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
+                " WHERE v.BWKennung = ? AND v.AbDatum = '9999-12-31 23:59:59' " +
+                " ORDER BY s.Text";
+        EntityManager em = OPDE.createEM();
+
+        Query query = em.createNativeQuery(sql);
+        query.setParameter(1, bewohner.getBWKennung());
+        query.setParameter(2, bewohner.getBWKennung());
+        query.setParameter(3, bewohner.getBWKennung());
+        List<Object[]> listeRohfassung = query.getResultList();
+        ArrayList<Object[]> listeBedarf = null;
+
+        if (!listeRohfassung.isEmpty()){
+            listeBedarf = new ArrayList<Object[]>(listeRohfassung.size());
+            // v.VerID, s.SitID, p.BHPPID, vor.Saldo, bisher.tagesdosis, d.DafID, bestand.APV, bestand.Summe, bestand.BestID
+
+            for (Object[] rohdaten : listeRohfassung){
+                Verordnung verordnung = em.find(Verordnung.class, ((BigInteger) rohdaten[0]).longValue());
+                listeBedarf.add(new Object[]{verordnung});
+            }
+        }
+
+        em.close();
+        return listeBedarf;
+    }
+
 
     private static String getStellplan(List data) {
 
@@ -284,7 +366,7 @@ public class VerordnungTools {
             result += "</s>"; // Abgesetzte
         }
 
-        return result+"</font>";
+        return result + "</font>";
     }
 
     public static String getHinweis(Verordnung verordnung) {
@@ -330,7 +412,7 @@ public class VerordnungTools {
             String datum = sdf.format(verordnung.getAbDatum());
 
 
-            result += "<font color=\""+(verordnung.isAbgesetzt() ? "red" : "lime")+"\">" + datum + "; ";
+            result += "<font color=\"" + (verordnung.isAbgesetzt() ? "red" : "lime") + "\">" + datum + "; ";
 
             result += verordnung.getAbKH() != null ? verordnung.getAbKH().getName() : "";
 
@@ -457,7 +539,9 @@ public class VerordnungTools {
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
-    public static List<Verordnung> getVerordnungenByVorrat(EntityManager em, MedVorrat vorrat) throws Exception {
+    public static List<Verordnung> getVerordnungenByVorrat(MedVorrat vorrat) {
+        EntityManager em = OPDE.createEM();
+
         List<BigInteger> list = null;
         List<Verordnung> result = null;
         Query query = em.createNativeQuery(" SELECT DISTINCT ver.VerID FROM BHPVerordnung ver " +
@@ -465,7 +549,6 @@ public class VerordnungTools {
                 " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
                 " WHERE b.VorID=? AND ver.AbDatum > now() ");
         query.setParameter(1, vorrat.getVorID());
-//        query.setParameter(2, bisPackEnde);
         list = query.getResultList();
 
         if (!list.isEmpty()) {
@@ -474,6 +557,8 @@ public class VerordnungTools {
                 result.add(em.find(Verordnung.class, verid.longValue()));
             }
         }
+        em.close();
+
         return result;
     }
 

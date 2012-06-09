@@ -3,9 +3,7 @@ package entity.verordnungen;
 import entity.BewohnerTools;
 import entity.Stationen;
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSConst;
-import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -13,7 +11,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
@@ -214,31 +211,46 @@ public class MedBestandTools {
 
     /**
      * Schliesst einen Bestand ab. Erzeugt dazu direkt eine passende Abschlussbuchung, die den Bestand auf null bringt.
-     *
+     * <p/>
      * <b>tested:</b> Test0002
-     *
      *
      * @param bestand, der abzuschliessen ist.
      * @param text,    evtl. gewünschter Text für die Abschlussbuchung
      * @param status,  für die Abschlussbuchung
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
-     *
-     *
-     *
-     *
-     *
      */
-    public static void abschliessen(MedBestand bestand, String text, short status) throws Exception {
+    public static void abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
         BigDecimal bestandsumme = getBestandSumme(bestand);
-
         MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
         abschlussBuchung.setText(text);
         bestand.getBuchungen().add(abschlussBuchung);
-
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
 
+        if (bestand.hasNextBestand()) {
+            MedBestandTools.anbrechen(bestand.getNaechsterBestand(), berechneAPV(bestand));
+            OPDE.info("Nächste Packung mit Bestands Nr.: " + bestand.getNaechsterBestand().getBestID() + " wird nun angebrochen.");
+        } else {
+
+            // es wurde kein nächster angebrochen ?
+            // könnte es sein, dass dieser Vorrat keine Packungen mehr hat ?
+            if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
+                // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
+                // Die müssen dann jetzt nämlich abgeschlossen werden.
+                for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(bestand.getVorrat())) {
+                    if (verordnung.isBisPackEnde()) {
+                        verordnung = em.merge(verordnung);
+                        em.lock(verordnung, LockModeType.OPTIMISTIC);
+                        verordnung.setAbDatum(new Date());
+                        verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+                        verordnung.setAbArzt(verordnung.getAnArzt());
+                        verordnung.setAbKH(verordnung.getAnKH());
+                        BHPTools.aufräumen(em, verordnung);
+                    }
+                }
+            }
+        }
     }
 
     private static MedBuchungen getAnfangsBuchung(MedBestand bestand) {

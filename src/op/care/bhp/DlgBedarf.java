@@ -30,6 +30,7 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.verordnungen.*;
 import op.OPDE;
+import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import tablemodels.TMBedarf;
@@ -47,7 +48,7 @@ import java.util.Date;
 /**
  * @author root
  */
-public class DlgBedarf extends javax.swing.JDialog {
+public class DlgBedarf extends MyJDialog {
 
     private ListSelectionListener lsl;
     private Bewohner bewohner;
@@ -67,13 +68,12 @@ public class DlgBedarf extends javax.swing.JDialog {
         btnOK.setEnabled(!tm.isMaximaleTagesdosisErreicht(row));
     }
 
-    public DlgBedarf(java.awt.Frame parent, Bewohner bewohner) {
-        super(parent, true);
+    public DlgBedarf(Bewohner bewohner) {
+        super();
         this.bewohner = bewohner;
         initComponents();
         BewohnerTools.setBWLabel(lblBW, bewohner);
         loadTable();
-        SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
 

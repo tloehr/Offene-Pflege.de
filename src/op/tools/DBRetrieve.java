@@ -408,36 +408,36 @@ public class DBRetrieve {
         return hm;
     }
 
-    /**
-     * liest aus der Tabelle "BWerte" den jeweils letzten aktuell gemessenen Wert heraus.
-     *
-     * @param Kennung des Bewohners
-     * @param xml     code des gewünschten Wertes
-     * @return Eine Liste mit zwei Elementen (Date datum, double wert)
-     */
-    public static ArrayList getLetztenBWert(String bwkennung, String xml) {
-        ArrayList result = new ArrayList();
-
-        String sql = "SELECT PIT, WERT FROM BWerte WHERE BWKennung = ? AND XML = ? " +
-                " ORDER BY PIT DESC LIMIT 0,1 ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            //stmt.setString(3, bwkennung);
-            stmt.setString(2, xml);
-            //stmt.setString(4, xml);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                result.add(rs.getDate("PIT"));
-                result.add(rs.getDouble("Wert"));
-            } else {
-                result = null;
-            }
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-        return result;
-    }
+//    /**
+//     * liest aus der Tabelle "BWerte" den jeweils letzten aktuell gemessenen Wert heraus.
+//     *
+//     * @param Kennung des Bewohners
+//     * @param xml     code des gewünschten Wertes
+//     * @return Eine Liste mit zwei Elementen (Date datum, double wert)
+//     */
+//    public static ArrayList getLetztenBWert(String bwkennung, String xml) {
+//        ArrayList result = new ArrayList();
+//
+//        String sql = "SELECT PIT, WERT FROM BWerte WHERE BWKennung = ? AND XML = ? " +
+//                " ORDER BY PIT DESC LIMIT 0,1 ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, bwkennung);
+//            //stmt.setString(3, bwkennung);
+//            stmt.setString(2, xml);
+//            //stmt.setString(4, xml);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                result.add(rs.getDate("PIT"));
+//                result.add(rs.getDouble("Wert"));
+//            } else {
+//                result = null;
+//            }
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//        return result;
+//    }
 
     /**
      * Diese Methode sammelt das aktuelleste, letzte Attribut, gemäß einer BWINFTYP und einer BWKennung auf.

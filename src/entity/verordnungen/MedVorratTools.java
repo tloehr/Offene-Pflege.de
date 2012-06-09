@@ -197,12 +197,7 @@ public class MedVorratTools {
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Bzw. die Packung wurde mit dieser Gabe geleert.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
-                    MedBestandTools.abschliessen(bestand, "Automatischer Abschluss bei leerer Packung", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
-
-                    // dann den neuen (NextBest) Bestand anbrechen.
-                    // Das noch nichts commited wurde, übergeben wir hier den neuen APV direkt als BigDecimal mit.
-
-                    MedBestandTools.anbrechen(naechsterBestand, MedBestandTools.berechneAPV(bestand));
+                    MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.

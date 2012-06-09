@@ -35,11 +35,14 @@ import com.toedter.calendar.JDateChooser;
 import entity.BWInfoTools;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.UniqueTools;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.vorrat.PnlBuchungen;
+import op.care.verordnung.DlgVerordnung;
 import op.threads.DisplayMessage;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMBHP;
@@ -52,11 +55,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.List;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -74,7 +78,6 @@ public class PnlBHP extends NursingRecordsPanel {
     private JDateChooser jdcDatum;
     private JComboBox cmbSchicht;
     private int BHP_MAX_MINUTES_TO_WITHDRAW;
-
 
     /**
      * Creates ner form PnlBHP
@@ -241,8 +244,6 @@ public class PnlBHP extends NursingRecordsPanel {
                             bhp.setiZeit(SYSCalendar.ermittleZeit());
                         }
 
-//                        bhp = em.merge(bhp);
-
                         if (bhp.getVerordnung().hasMedi()) {
                             if (status == BHPTools.STATUS_ERLEDIGT) {
                                 MedVorratTools.entnahmeVorrat(em, vorrat, bhp.getDosis(), true, bhp);
@@ -278,8 +279,9 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                 }
             }
-        } else { // sagen warum das nicht ging
+        }
 
+        if (!changeable && !evt.isPopupTrigger()) { // sagen warum das nicht ging
 
             String msg = "";
 
@@ -302,7 +304,6 @@ public class PnlBHP extends NursingRecordsPanel {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(msg, DisplayMessage.WARNING));
 
         }
-
 
         // Nun noch Menüeinträge
         if (evt.isPopupTrigger()) {
@@ -331,6 +332,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             MedVorratTools.entnahmeVorrat(em, vorrat, innerbhp.getDosis(), innerbhp);
 
                             em.getTransaction().commit();
+                            tm.setBHP(row, innerbhp);
                             tm.fireTableRowsUpdated(row, row);
                         } catch (OptimisticLockException ole) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
@@ -364,12 +366,15 @@ public class PnlBHP extends NursingRecordsPanel {
                         em.getTransaction().begin();
                         BHP innerBHP = em.merge(myBHP);
                         em.lock(innerBHP, LockModeType.OPTIMISTIC);
+                        em.lock(innerBHP.getVerordnung(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
                         innerBHP.setStatus(BHPTools.STATUS_VERWEIGERT);
                         innerBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                         innerBHP.setIst(new Date());
                         innerBHP.setiZeit(SYSCalendar.ermittleZeit());
                         innerBHP.setMDate(new Date());
                         em.getTransaction().commit();
+                        tm.setBHP(row, innerBHP);
                         tm.fireTableRowsUpdated(row, row);
                     } catch (OptimisticLockException ole) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
@@ -537,7 +542,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setLayout(new HorizontalLayout());
+        buttonPanel.setLayout(new HorizontalLayout(5));
         buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
@@ -552,6 +557,7 @@ public class PnlBHP extends NursingRecordsPanel {
         homeButton.setBorderPainted(false);
         homeButton.setOpaque(false);
         homeButton.setContentAreaFilled(false);
+        homeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back.png")));
         backButton.addActionListener(new ActionListener() {
@@ -565,6 +571,7 @@ public class PnlBHP extends NursingRecordsPanel {
         backButton.setBorderPainted(false);
         backButton.setOpaque(false);
         backButton.setContentAreaFilled(false);
+        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
 
         JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play.png")));
@@ -579,6 +586,7 @@ public class PnlBHP extends NursingRecordsPanel {
         fwdButton.setBorderPainted(false);
         fwdButton.setOpaque(false);
         fwdButton.setContentAreaFilled(false);
+        fwdButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
         endButton.addActionListener(new ActionListener() {
@@ -592,6 +600,7 @@ public class PnlBHP extends NursingRecordsPanel {
         endButton.setBorderPainted(false);
         endButton.setOpaque(false);
         endButton.setContentAreaFilled(false);
+        endButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
 
         buttonPanel.add(homeButton);
@@ -625,6 +634,34 @@ public class PnlBHP extends NursingRecordsPanel {
             JideButton addButton = GUITools.createHyperlinkButton("Bei Bedarf", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    // Machen wir einen POPUP draus.
+                    new DlgBedarf(bewohner);
+//                     new DlgVerordnung(new Verordnung(bewohner), DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
+//                        @Override
+//                        public void execute(Object o) {
+//                            if (o != null) {
+//                                Pair<Verordnung, java.util.List<VerordnungPlanung>> result = (Pair<Verordnung, java.util.List<VerordnungPlanung>>) o;
+//                                Verordnung verordnung = result.getFirst();
+//                                EntityManager em = OPDE.createEM();
+//                                try {
+//                                    em.getTransaction().begin();
+//                                    verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
+//                                    verordnung = em.merge(verordnung);
+//                                    if (!verordnung.isBedarf()) {
+//                                        BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), true);
+//                                    }
+//                                    em.getTransaction().commit();
+//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + VerordnungTools.toPrettyString(verordnung), 2));
+//                                } catch (Exception e) {
+//                                    em.getTransaction().rollback();
+//                                    OPDE.fatal(e);
+//                                } finally {
+//                                    em.close();
+//                                }
+//                                reloadTable();
+//                            }
+//                        }
+//                    });
                 }
             });
             mypanel.add(addButton);

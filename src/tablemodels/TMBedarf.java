@@ -52,15 +52,14 @@ public class TMBedarf
     protected List<Object[]> listeBedarf;
     protected HashMap cache;
 
-    public TMBedarf(Bewohner bewohner) {
+    public TMBedarf(List<Object[]> lst) {
         this.cache = new HashMap();
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Verordnung.findAllBedarf");
-        query.setParameter(1, bewohner.getBWKennung());
-        query.setParameter(2, bewohner.getBWKennung());
-        query.setParameter(3, bewohner.getBWKennung());
-        listeBedarf = query.getResultList();
-        em.close();
+        this.listeBedarf = lst;
+//        listeBedarf = VerordnungTools.getBedarfsliste(bewohner);
+//        if (listeBedarf == null){
+//
+//        }
+//        OPDE.debug(listeBedarf);
     }
 
     @Override

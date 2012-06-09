@@ -26,12 +26,9 @@
  */
 package op.care;
 
-import entity.Bewohner;
-import entity.Einrichtungen;
-import entity.PflegeberichteTools;
+import entity.*;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
-import tablemodels.TMVerordnung;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
 import op.tools.DBRetrieve;
@@ -48,6 +45,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,14 +65,14 @@ public class DBHandling {
 
         String result = "<h1>Pflegeinformationen</h1>";
         String bwkennung = bewohner.getBWKennung();
-
+        DateFormat df = DateFormat.getDateInstance();
         if (print) {
             result += "<h2>" + SYSTools.getBWLabel(bwkennung) + "</h2>";
         }
         result += "<table border=\"1\" cellspacing=\"0\">";
         if (print) {
-            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
-            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(SYSCalendar.nowDB()) + " (" + DBRetrieve.getUsername(OPDE.getLogin().getUser().getUKennung()) + ")</b></td></tr>";
+//            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
+            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(SYSCalendar.nowDB()) + " (" + OPDE.getLogin().getUser().getNameUndVorname() + ")</b></td></tr>";
         }
 
         if (mitEinrichtung) {
@@ -84,22 +82,21 @@ public class DBHandling {
             }
         }
 
-        ArrayList gewicht = op.tools.DBRetrieve.getLetztenBWert(bwkennung, "<GEWICHT/>");
+        BWerte gewicht = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GEWICHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (gewicht == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
-            result += gewicht.get(1).toString() + " kg (" + SYSCalendar.printGCGermanStyle(SYSCalendar.toGC((Date) gewicht.get(0))) + ")";
+            result += gewicht.getWert().toPlainString() + " " + BWerteTools.EINHEIT[BWerteTools.GEWICHT] + " (" + df.format(gewicht.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
-
-        ArrayList groesse = op.tools.DBRetrieve.getLetztenBWert(bwkennung, "<GROESSE/>");
+        BWerte groesse = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GROESSE);
         result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
         if (groesse == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
         } else {
-            result += groesse.get(1).toString() + " m (" + SYSCalendar.printGCGermanStyle(SYSCalendar.toGC((Date) groesse.get(0))) + ")";
+            result += groesse.getWert().toPlainString() + " " + BWerteTools.EINHEIT[BWerteTools.GROESSE] + " (" + df.format(groesse.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -107,18 +104,19 @@ public class DBHandling {
         if (gewicht == null || groesse == null) {
             result += "Ein BMI kann noch nicht bestimmt werden.";
         } else {
-            Double bmi = ((Double) gewicht.get(1)).doubleValue() / (((Double) groesse.get(1)).doubleValue() * ((Double) groesse.get(1)).doubleValue());
-            bmi = Math.round(bmi * 100.) / 100.;
-            result += bmi;
+            BigDecimal bmi = gewicht.getWert().divide(groesse.getWert().pow(2), 2, BigDecimal.ROUND_HALF_UP);
+//            Double abmi = ((Double) gewicht.get(1)).doubleValue() / (((Double) groesse.get(1)).doubleValue() * ((Double) groesse.get(1)).doubleValue());
+//            bmi = Math.round(bmi * 100.) / 100.;
+            result += bmi.toPlainString();
         }
         result += "</b></td></tr>";
 
-        ArrayList bz = op.tools.DBRetrieve.getLetztenBWert(bwkennung, "<BZ/>");
+        BWerte bz = BWerteTools.getLetztenBWert(bewohner, BWerteTools.BZ);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
             result += "Bisher kein BZ Wert vorhanden.";
         } else {
-            result += bz.get(1).toString() + " mg/dl (" + SYSCalendar.printGCGermanStyle(SYSCalendar.toGC((Date) bz.get(0))) + ")";
+            result += bz.getWert().toPlainString() + " " + BWerteTools.EINHEIT[BWerteTools.BZ] + " (" + df.format(bz.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -171,7 +169,7 @@ public class DBHandling {
         if (bwinfoHAUF.getAttribute().size() > 0) {
             TMBWInfo tmbwihauf = new TMBWInfo(bwinfoHAUF.getAttribute(), true, false, false);
             result += "<tr><td valign=\"top\">Heimaufnahme</td><td valign=\"top\">";
-            DateFormat df = DateFormat.getDateInstance();
+//            DateFormat df = DateFormat.getDateInstance();
             result += "<b>" + df.format(bwinfoHAUF.getVonHauf()) + "</b>";
             result += "</td></tr>";
         }
@@ -271,7 +269,7 @@ public class DBHandling {
                             while (rs.next()) {
 
 
-                                DateFormat df = DateFormat.getDateInstance();
+//                                DateFormat df = DateFormat.getDateInstance();
                                 result += "<tr>";
                                 result += "<td>" + df.format(rs.getDate("PIT")) + "</td>";
                                 result += "<td>" + rs.getDouble("Einfuhr") + "</td>";
@@ -313,7 +311,7 @@ public class DBHandling {
                         rs.beforeFirst();
                         while (rs.next()) {
 
-                            DateFormat df = DateFormat.getDateInstance();
+//                            DateFormat df = DateFormat.getDateInstance();
                             result += "<tr>";
                             result += "<td>" + df.format(rs.getDate("PIT")) + "</td>";
                             result += "<td>" + rs.getDouble("Einfuhr") + "</td>";

@@ -373,35 +373,15 @@ public class DlgBestandAbschliessen extends MyJDialog {
                 BigDecimal apv = bestand.getApv();
 
                 if (rbGefallen.isSelected()) {
-                    MedBestandTools.abschliessen(bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
+                    MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedBestandTools.abschliessen(bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
+                    MedBestandTools.abschliessen(em,bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
-                    MedBestandTools.abschliessen(bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
+                    MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
                     apv = MedBestandTools.berechneAPV(bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
-                }
-                if (nextBest != null) {
-                    MedBestandTools.anbrechen(nextBest, apv);
-                    OPDE.info(classname + ": Nächste Packung mit Bestands Nr.: " + nextBest.getBestID() + " wird nun angebrochen.");
-                } else {
-                    // es wurde kein nächster angebrochen ?
-                    // könnte es sein, dass dieser Vorrat keine Packungen mehr hat ?
-                    if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null && MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
-                        // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
-                        // Die müssen dann jetzt nämlich abgeschlossen werden.
-                        for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(em, bestand.getVorrat())) {
-                            if (verordnung.isBisPackEnde()) {
-                                em.lock(verordnung, LockModeType.OPTIMISTIC);
-                                verordnung.setAbDatum(new Date());
-                                verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
-                                BHPTools.aufräumen(em, verordnung);
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
-                            }
-                        }
-                    }
                 }
             }
             em.getTransaction().commit();
