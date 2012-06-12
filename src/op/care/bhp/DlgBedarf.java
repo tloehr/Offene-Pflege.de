@@ -26,55 +26,60 @@
  */
 package op.care.bhp;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.Bewohner;
-import entity.BewohnerTools;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.tools.MyJDialog;
+import op.threads.DisplayMessage;
+import op.tools.CleanablePanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import tablemodels.TMBedarf;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.Date;
 
 /**
  * @author root
  */
-public class DlgBedarf extends MyJDialog {
+public class DlgBedarf extends CleanablePanel {
 
-    private ListSelectionListener lsl;
+    private Closure actionBlock;
     private Bewohner bewohner;
+    private BHP bhp;
 
-    /**
-     * Creates new form DlgBedarf
-     */
-    private void tblBedarfMousePressed(MouseEvent e) {
-        Point p = e.getPoint();
-        int row = tblBedarf.rowAtPoint(p);
-        final ListSelectionModel lsm = tblBedarf.getSelectionModel();
-        if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
-            lsm.setSelectionInterval(row, row);
-        }
-        TMBedarf tm = (TMBedarf) tblBedarf.getModel();
+//    /**
+//     * Creates new form DlgBedarf
+//     */
+//    private void tblBedarfMousePressed(MouseEvent e) {
+//        Point p = e.getPoint();
+//        int row = tblBedarf.rowAtPoint(p);
+//        final ListSelectionModel lsm = tblBedarf.getSelectionModel();
+//        if (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex()) {
+//            lsm.setSelectionInterval(row, row);
+//        }
+//        TMBedarf tm = (TMBedarf) tblBedarf.getModel();
+//
+//        btnOK.setEnabled(!tm.isMaximaleTagesdosisErreicht(row));
+//    }
 
-        btnOK.setEnabled(!tm.isMaximaleTagesdosisErreicht(row));
-    }
-
-    public DlgBedarf(Bewohner bewohner) {
+    public DlgBedarf(Bewohner bewohner, Closure actionBlock) {
         super();
         this.bewohner = bewohner;
+        this.actionBlock = actionBlock;
         initComponents();
-        BewohnerTools.setBWLabel(lblBW, bewohner);
         loadTable();
-        setVisible(true);
     }
 
     /**
@@ -85,35 +90,20 @@ public class DlgBedarf extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        lblTitle = new JLabel();
-        lblBW = new JLabel();
-        jSeparator1 = new JSeparator();
         jspBedarf = new JScrollPane();
         tblBedarf = new JTable();
-        btnOK = new JButton();
+        panel1 = new JPanel();
         btnCancel = new JButton();
+        btnOK = new JButton();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        Container contentPane = getContentPane();
-
-        //---- lblTitle ----
-        lblTitle.setFont(new Font("Dialog", Font.BOLD, 24));
-        lblTitle.setText("Bedarfsmedikation");
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
+        setPreferredSize(new Dimension(800, 400));
+        setLayout(new FormLayout(
+            "default:grow",
+            "fill:default:grow, $rgap, fill:default"));
 
         //======== jspBedarf ========
         {
-            jspBedarf.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    jspBedarfComponentResized(e);
-                }
-            });
 
             //---- tblBedarf ----
             tblBedarf.setModel(new DefaultTableModel(
@@ -127,101 +117,68 @@ public class DlgBedarf extends MyJDialog {
                     "Title 1", "Title 2", "Title 3", "Title 4"
                 }
             ));
-            tblBedarf.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    tblBedarfMousePressed(e);
-                }
-            });
             jspBedarf.setViewportView(tblBedarf);
         }
+        add(jspBedarf, CC.xy(1, 1));
 
-        //---- btnOK ----
-        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnOK.setText("\u00dcbernehmen");
-        btnOK.setEnabled(false);
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnOKActionPerformed(e);
-            }
-        });
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
 
-        //---- btnCancel ----
-        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancelActionPerformed(e);
-            }
-        });
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.setHorizontalAlignment(SwingConstants.RIGHT);
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            panel1.add(btnCancel);
 
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addComponent(lblTitle, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addComponent(btnOK)
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnCancel)))
-                    .addContainerGap())
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(lblTitle)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspBedarf, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnCancel)
-                        .addComponent(btnOK))
-                    .addContainerGap())
-        );
-        pack();
-        setLocationRelativeTo(getOwner());
+            //---- btnOK ----
+            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnOK.setHorizontalAlignment(SwingConstants.RIGHT);
+            btnOK.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnOKActionPerformed(e);
+                }
+            });
+            panel1.add(btnOK);
+        }
+        add(panel1, CC.xy(1, 3, CC.RIGHT, CC.DEFAULT));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jspBedarfComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBedarfComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
-        int textWidth = dim.width - (100);
+        int textWidth = dim.width;
         TableColumnModel tcm1 = tblBedarf.getColumnModel();
 //        if (tcm1.getColumnCount() < 4) {
 //            return;
 //        }
-        tcm1.getColumn(TMBedarf.COL_SIT).setPreferredWidth(textWidth / 3);
-        tcm1.getColumn(TMBedarf.COL_MSSN).setPreferredWidth(textWidth / 3);
-        tcm1.getColumn(TMBedarf.COL_Dosis).setPreferredWidth(textWidth / 3);
+//        tcm1.getColumn(TMBedarf.COL_SIT).setPreferredWidth(textWidth);
+//        tcm1.getColumn(TMBedarf.COL_MSSN).setPreferredWidth(textWidth / 3);
+//        tcm1.getColumn(TMBedarf.COL_Dosis).setPreferredWidth(textWidth / 3);
 //        tcm1.getColumn(TMBedarf.COL_Hinweis).setPreferredWidth(textWidth / 4);
 
-        tcm1.getColumn(0).setHeaderValue("Situation");
-        tcm1.getColumn(1).setHeaderValue("Massnahme");
-        tcm1.getColumn(2).setHeaderValue("Dosis / Häufig.");
+        tcm1.getColumn(0).setHeaderValue("Verordnung");
+//        tcm1.getColumn(1).setHeaderValue("Massnahme");
+//        tcm1.getColumn(2).setHeaderValue("Dosis / Häufig.");
 //        tcm1.getColumn(3).setHeaderValue("Hinweis");
 
     }//GEN-LAST:event_jspBedarfComponentResized
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         save();
-        dispose();
+        cleanup();
+        actionBlock.execute(bhp);
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        dispose();
+        cleanup();
+        actionBlock.execute(null);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
@@ -232,59 +189,75 @@ public class DlgBedarf extends MyJDialog {
     private void save() {
         int row = tblBedarf.getSelectedRow();
         TMBedarf tm = (TMBedarf) tblBedarf.getModel();
-        VerordnungPlanung vp = tm.getVerordnungPlanung(row);
-        MedBestand bestand = tm.getBestand(row);
-        Date now = new Date();
+        if (row < 0) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine Verordnung ausgewählt"));
+        } else if (tm.isMaximaleTagesdosisErreicht(row)) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Maximale Tagesdosis für diese Verordnung erreicht"));
+        } else {
 
-        BHP bhp = new BHP(vp);
-        bhp.setUser(OPDE.getLogin().getUser());
-        bhp.setIst(now);
-        bhp.setSoll(now);
-        bhp.setSollZeit(SYSConst.UZ);
-        bhp.setDosis(vp.getMaxEDosis());
-        bhp.setStatus(BHPTools.STATUS_ERLEDIGT);
-        bhp.setMDate(now);
-        bhp.setDauer((short) 0);
 
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            em.persist(bhp);
-            MedVorratTools.entnahmeVorrat(em, bestand.getVorrat(), vp.getMaxEDosis(), true, bhp);
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            em.getTransaction().rollback();
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
+            Date now = new Date();
+
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+
+                VerordnungPlanung vp = em.merge(tm.getVerordnungPlanung(row));
+
+                bhp = em.merge(new BHP(vp));
+                bhp.setUser(OPDE.getLogin().getUser());
+                bhp.setIst(now);
+                bhp.setSoll(now);
+                bhp.setSollZeit(SYSConst.UZ);
+                bhp.setDosis(vp.getMaxEDosis());
+                bhp.setStatus(BHPTools.STATUS_ERLEDIGT);
+                bhp.setMDate(now);
+                bhp.setDauer((short) 0);
+
+                if (tm.getBestand(row) != null) {
+                    MedBestand bestand = em.merge(tm.getBestand(row));
+                    MedVorratTools.entnahmeVorrat(em, bestand.getVorrat(), vp.getMaxEDosis(), true, bhp);
+                }
+
+                em.getTransaction().commit();
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
+            }
         }
     }
 
-    public void dispose() {
+    @Override
+    public void cleanup() {
         SYSTools.unregisterListeners(this);
-        super.dispose();
     }
 
+    @Override
+    public void reload() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     private void loadTable() {
-        tblBedarf.setModel(new TMBedarf(bewohner));
+        tblBedarf.setModel(new TMBedarf(VerordnungTools.getBedarfsliste(bewohner)));
         tblBedarf.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         jspBedarf.dispatchEvent(new ComponentEvent(jspBedarf, ComponentEvent.COMPONENT_RESIZED));
         tblBedarf.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-        tblBedarf.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
-        tblBedarf.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
-//        tblBedarf.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
+//        tblBedarf.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+//        tblBedarf.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+        tblBedarf.getColumnModel().getColumn(0).setHeaderValue("Verordnung");
     }
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private JLabel lblTitle;
-    private JLabel lblBW;
-    private JSeparator jSeparator1;
     private JScrollPane jspBedarf;
     private JTable tblBedarf;
-    private JButton btnOK;
+    private JPanel panel1;
     private JButton btnCancel;
+    private JButton btnOK;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

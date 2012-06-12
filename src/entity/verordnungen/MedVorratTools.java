@@ -128,31 +128,31 @@ public class MedVorratTools {
     }
 
 
-    /**
-     * Die Rückgabe eines Vorrats bezieht sich auf eine BHP für die die Buchungen zurückgerechnet werden
-     * sollen.
-     * <ol>
-     * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
-     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
-     * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
-     * </ol>
-     *
-     * @param em  der EntityManager der verwendet wird
-     * @param bhp die BHP, die zurück genommen wird.
-     * @result true bei Erfolg, false sonst.
-     */
-    public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
-
-        Query delQuery = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bhp = :bhp");
-        delQuery.setParameter("bhp", bhp);
-
-        // Das hier passiert, wenn bei der Entnahme mehr als ein Bestand betroffen ist.
-        // Dann kann man das nicht mehr rückgängig machen. Und es wird eine Exception geworfen.
-        if (delQuery.executeUpdate() > 1) { // es gibt genau eine Buchung.
-            throw new Exception("Rueckgabe Vorrat");
-        }
-
-    }
+//    /**
+//     * Die Rückgabe eines Vorrats bezieht sich auf eine BHP für die die Buchungen zurückgerechnet werden
+//     * sollen.
+//     * <ol>
+//     * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
+//     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
+//     * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
+//     * </ol>
+//     *
+//     * @param em  der EntityManager der verwendet wird
+//     * @param bhp die BHP, die zurück genommen wird.
+//     * @result true bei Erfolg, false sonst.
+//     */
+//    public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
+//
+//        Query delQuery = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bhp = :bhp");
+//        delQuery.setParameter("bhp", bhp);
+//
+//        // Das hier passiert, wenn bei der Entnahme mehr als ein Bestand betroffen ist.
+//        // Dann kann man das nicht mehr rückgängig machen. Und es wird eine Exception geworfen.
+//        if (delQuery.executeUpdate() > 1) { // es gibt genau eine Buchung.
+//            throw new Exception("Rueckgabe Vorrat");
+//        }
+//
+//    }
 
 
     public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
@@ -181,6 +181,7 @@ public class MedVorratTools {
             // Also erst mal die Buchung für DIESEN Durchgang.
             MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
             bestand.getBuchungen().add(buchung);
+            bhp.getBuchungen().add(buchung);
             OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
 
             /**
@@ -286,39 +287,12 @@ public class MedVorratTools {
             }
         }
 
-//
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            Query query = em.createQuery(" " +
-//                    " SELECT b FROM MedBestand b " +
-//                    " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
-//                    " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
-//            query.setParameter("vorrat", vorrat);
-//            query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
-//            query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
-//            query.setMaxResults(1);
-//            result = (MedBestand) query.getSingleResult();
-//            MedBestandTools.anbrechen(result);
-//        } catch (NoResultException nre) {
-//            OPDE.debug(nre);
-//        } catch (Exception ex) {
-//            OPDE.fatal(ex);
-//        } finally {
-//            em.close();
-//        }
-
         return result;
     }
 
     public static MedFormen getForm(MedVorrat vorrat) {
 
         EntityManager em = OPDE.createEM();
-//         query = em.createNativeQuery(" " +
-//                " SELECT d.FormID FROM MPVorrat v" +
-//                " INNER JOIN MPBestand b ON v.VorID = b.VorID" +
-//                " INNER JOIN MPDarreichung d ON b.DafID = d.DafID" +
-//                " WHERE v.VorID = ?" +
-//                " LIMIT 0,1");
         Query query = em.createQuery(" " +
                 " SELECT d.medForm FROM MedVorrat v " +
                 " JOIN v.bestaende b " +
@@ -332,35 +306,5 @@ public class MedVorratTools {
 
         return form;
     }
-
-
-//    /**
-//     * Schliesst einen Vorrat und alle zugehörigen, noch vorhandenen Bestände ab. Inklusive der notwendigen Abschlussbuchungen.
-//     *
-//     * @param vorrat
-//     */
-//    public static void abschliessen(MedVorrat vorrat) {
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-//
-//            // Alle Bestände abschliessen.
-//            for (MedBestand bestand : vorrat.getBestaende()) {
-//                if (!bestand.isAbgeschlossen()) {
-//                    MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
-//                }
-//            }
-//
-//            // Vorrat abschliessen
-//            vorrat.setBis(new Date());
-//
-//            em.getTransaction().commit();
-//        } catch (Exception ex) {
-//            em.getTransaction().rollback();
-//            OPDE.fatal(ex);
-//        } finally {
-//            em.close();
-//        }
-//    }
 
 }

@@ -38,18 +38,18 @@ public class GUITools {
 
     public static MouseAdapter getHyperlinkStyleMouseAdapter() {
         return new MouseAdapter() {
-            String text = "";
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-                text = ((JCheckBox) mouseEvent.getSource()).getText();
-                ((JCheckBox) mouseEvent.getSource()).setText("<html><u>" + text + "</u></html>");
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-                ((JCheckBox) mouseEvent.getSource()).setText(text);
-            }
+//            String text = "";
+//
+//            @Override
+//            public void mouseEntered(MouseEvent mouseEvent) {
+//                text = ((javax.swing.AbstractButton) mouseEvent.getSource()).getText();
+//                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText("<html><u>" + text + "</u></html>");
+//            }
+//
+//            @Override
+//            public void mouseExited(MouseEvent mouseEvent) {
+//                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText(text);
+//            }
         };
     }
 }

@@ -26,15 +26,12 @@
  */
 package tablemodels;
 
-import entity.Bewohner;
 import entity.verordnungen.*;
-import op.OPDE;
+import op.tools.SYSConst;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,23 +40,18 @@ import java.util.List;
  */
 public class TMBedarf
         extends AbstractTableModel {
-
-    public static final int COL_SIT = 0;
-    public static final int COL_MSSN = 1;
-    public static final int COL_Dosis = 2;
-    public static final int COL_Hinweis = 3;
+//
+//    public static final int COL_SIT = 0;
+//    public static final int COL_MSSN = 1;
+//    public static final int COL_Dosis = 2;
+//    public static final int COL_Hinweis = 3;
 
     protected List<Object[]> listeBedarf;
     protected HashMap cache;
 
     public TMBedarf(List<Object[]> lst) {
         this.cache = new HashMap();
-        this.listeBedarf = lst;
-//        listeBedarf = VerordnungTools.getBedarfsliste(bewohner);
-//        if (listeBedarf == null){
-//
-//        }
-//        OPDE.debug(listeBedarf);
+        this.listeBedarf = lst == null ? new ArrayList<Object[]>() : lst;
     }
 
     @Override
@@ -69,7 +61,7 @@ public class TMBedarf
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 1;
     }
 
     @Override
@@ -109,16 +101,12 @@ public class TMBedarf
         return (BigDecimal) listeBedarf.get(row)[6];
     }
 
-    public MedBestand getBestand(int row) {
-        MedBestand bestand = null;
+    public Darreichung getDarreichung(int row) {
+        return (Darreichung) listeBedarf.get(row)[5];
+    }
 
-        BigInteger bestid = (BigInteger) listeBedarf.get(row)[7];
-        if (bestid != null) {
-            EntityManager em = OPDE.createEM();
-            bestand = em.find(MedBestand.class, bestid.longValue());
-            em.close();
-        }
-        return bestand;
+    public MedBestand getBestand(int row) {
+        return (MedBestand) listeBedarf.get(row)[8];
     }
 
     public boolean isMaximaleTagesdosisErreicht(int row) {
@@ -126,6 +114,10 @@ public class TMBedarf
         BigDecimal maxTagesdosis = vp.getMaxEDosis().multiply(new BigDecimal(vp.getMaxAnzahl()));
         BigDecimal bisherigeTagesdosisPlusEineGabe = getTagesdosisBisher(row).add(vp.getMaxEDosis());
         return bisherigeTagesdosisPlusEineGabe.compareTo(maxTagesdosis) > 0;
+    }
+
+    public MedVorrat getVorrat(int row) {
+        return getBestand(row) == null ? null : getBestand(row).getVorrat();
     }
 
     /**
@@ -137,7 +129,7 @@ public class TMBedarf
         if (cache.containsKey(getVerordnung(row))) {
             result = cache.get(getVerordnung(row)).toString();
         } else {
-//            result = VerordnungTools.getDosis(getVerordnung(row), true, getBestand(row));
+            result = VerordnungTools.getDosis(getVerordnung(row), true, getVorrat(row), getBestand(row));
             cache.put(getVerordnung(row), result);
         }
         return result;
@@ -145,43 +137,24 @@ public class TMBedarf
 
     @Override
     public Object getValueAt(int row, int col) {
-        Object result = null;
 
-        switch (col) {
-            // Hier muss die Situation stehen. Dann gehts im DlgBedarf weiter
-            case COL_SIT: {
-                result = VerordnungTools.getHinweis(getVerordnung(row));
-                break;
-            }
-            case COL_MSSN: {
-                result = VerordnungTools.getMassnahme(getVerordnung(row));
-                break;
-            }
-            case COL_Dosis: {
-                String tmp = "<html><body>";
-                tmp += getDosis(row);
+        String result = "<font size=\"+1\">"+VerordnungTools.getMassnahme(getVerordnung(row))+"</font>";
 
-                if (getTagesdosisBisher(row).equals(BigDecimal.ZERO)) {
-                    tmp += "<br/><b>Diese Verordnung wurde heute nocht nicht angewendet.</b>";
-                } else if (isMaximaleTagesdosisErreicht(row)) {
-                    tmp += "<br/><b>Keine weitere Gabe des Medikamentes mehr möglich. Tagesdosis ist erreicht</b>";
-                } else {
-                    tmp += "<br/><b>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + "</b>";
-                }
+        result += SYSConst.html_fontface;
+        result += "<br/>" + getDosis(row);
 
-                tmp += "</body></html>";
-                result = tmp;
-                break;
-            }
-            case COL_Hinweis: {
-                result = VerordnungTools.getHinweis(getVerordnung(row));
-                break;
-            }
+        if (getTagesdosisBisher(row).equals(BigDecimal.ZERO)) {
+            result += "<br/>Diese Verordnung wurde heute noch nicht angewendet.";
+        } else if (isMaximaleTagesdosisErreicht(row)) {
+            result += "<br/><b>Keine weitere Gabe des Medikamentes mehr möglich. Tagesdosis ist erreicht</b>";
+        } else {
 
-            default: {
-                result = "!!FEHLER!!";
-            }
+            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : MedFormenTools.EINHEIT[getDarreichung(row).getMedForm().getAnwEinheit()];
         }
+
+        result += "</font>";
+        result += "<br/>" + VerordnungTools.getHinweis(getVerordnung(row));
+
 
         return result;
     }

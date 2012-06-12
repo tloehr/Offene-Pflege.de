@@ -136,7 +136,7 @@ public class DisplayManager extends Thread {
         } else {
             pbIntermediateZyklen++;
             if (currentSubMessage == null || currentSubMessage.isObsolete()) {
-                lblSub.setText(" ");
+                lblSub.setText(null);
                 if (currentSubMessage != null && !oldMessages.contains(currentSubMessage)) {
                     oldMessages.add(currentSubMessage);
                 }

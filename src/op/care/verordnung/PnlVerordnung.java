@@ -82,7 +82,8 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private JCheckBox cbAbgesetzt;
+    private JToggleButton tbAbgesetzt;
+
     private boolean initPhase;
 
 
@@ -537,7 +538,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
     }
 
     private void loadTable() {
-        tblVerordnung.setModel(new TMVerordnung(bewohner, cbAbgesetzt.isSelected(), true));
+        tblVerordnung.setModel(new TMVerordnung(bewohner, tbAbgesetzt.isSelected(), true));
         tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
@@ -549,7 +550,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
     private void reloadTable() {
         if (initPhase) return;
         TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
-        tm.reload(bewohner, cbAbgesetzt.isSelected());
+        tm.reload(bewohner, tbAbgesetzt.isSelected());
     }
 
     private void prepareSearchArea() {
@@ -568,26 +569,34 @@ public class PnlVerordnung extends NursingRecordsPanel {
     private CollapsiblePane addFilters() {
         JPanel labelPanel = new JPanel();
         labelPanel.setBackground(Color.WHITE);
-        labelPanel.setLayout(new VerticalLayout());
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+
+
 
         CollapsiblePane panelFilter = new CollapsiblePane("Filter");
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
 
-        cbAbgesetzt = new JCheckBox("Abgesetzte");
-        cbAbgesetzt.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-        cbAbgesetzt.addItemListener(new ItemListener() {
+        tbAbgesetzt = new JToggleButton("Abgesetzte");
+        tbAbgesetzt.setIcon(new ImageIcon(getClass().getResource("/artwork/cb-off-22.png")));
+        tbAbgesetzt.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/cb-on-22.png")));
+        tbAbgesetzt.setContentAreaFilled(false);
+        tbAbgesetzt.setBorderPainted(false);
+        tbAbgesetzt.setBorder(null);
+        tbAbgesetzt.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        tbAbgesetzt.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":cbAbgesetzt", cbAbgesetzt);
+                SYSPropsTools.storeState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
                 reloadTable();
             }
         });
-        cbAbgesetzt.setBackground(Color.WHITE);
+        tbAbgesetzt.setBackground(Color.WHITE);
+        tbAbgesetzt.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        labelPanel.add(cbAbgesetzt);
-        SYSPropsTools.restoreState(internalClassID + ":cbAbgesetzt", cbAbgesetzt);
+        labelPanel.add(tbAbgesetzt);
+        SYSPropsTools.restoreState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
 
         panelFilter.setContentPane(labelPanel);
 

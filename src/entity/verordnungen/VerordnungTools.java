@@ -122,9 +122,8 @@ public class VerordnungTools {
      * Erzeugt eine Liste mit EntityBeans und Salden. Diese Liste enthält die zur Zeit verordnete Bedarfsverordnungen.
      * Die Liste enthält ein Objekt Array mit dem folgenden Aufbau:
      * <ol>
-     *     <li></li>
+     * <li></li>
      * </ol>
-     *
      *
      * @param bewohner
      * @return Liste mit allen Bedarfsverordnungen. <code>null</code>, wenn nichts da war oder bei Fehler.
@@ -186,13 +185,21 @@ public class VerordnungTools {
         List<Object[]> listeRohfassung = query.getResultList();
         ArrayList<Object[]> listeBedarf = null;
 
-        if (!listeRohfassung.isEmpty()){
+        if (!listeRohfassung.isEmpty()) {
             listeBedarf = new ArrayList<Object[]>(listeRohfassung.size());
-            // v.VerID, s.SitID, p.BHPPID, vor.Saldo, bisher.tagesdosis, d.DafID, bestand.APV, bestand.Summe, bestand.BestID
 
-            for (Object[] rohdaten : listeRohfassung){
+            for (Object[] rohdaten : listeRohfassung) {
                 Verordnung verordnung = em.find(Verordnung.class, ((BigInteger) rohdaten[0]).longValue());
-                listeBedarf.add(new Object[]{verordnung});
+                Situationen situation = em.find(Situationen.class, ((BigInteger) rohdaten[1]).longValue());
+                VerordnungPlanung planung = em.find(VerordnungPlanung.class, ((BigInteger) rohdaten[2]).longValue());
+                BigDecimal vorratSaldo = (BigDecimal) rohdaten[3];
+                BigDecimal tagesdosisBisher = (BigDecimal) rohdaten[4];
+                Darreichung darreichung = rohdaten[5] == null ? null : em.find(Darreichung.class, ((BigInteger) rohdaten[5]).longValue());
+                BigDecimal apv = (BigDecimal) rohdaten[6];
+                BigDecimal bestandSumme = (BigDecimal) rohdaten[7];
+                MedBestand bestand = rohdaten[8] == null ? null : em.find(MedBestand.class, ((BigInteger) rohdaten[8]).longValue());
+
+                listeBedarf.add(new Object[]{verordnung, situation, planung, vorratSaldo, tagesdosisBisher, darreichung, apv, bestandSumme, bestand});
             }
         }
 
@@ -200,6 +207,14 @@ public class VerordnungTools {
         return listeBedarf;
     }
 
+
+    public static boolean hasBedarf(Bewohner bewohner) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT COUNT(v) FROM Verordnung v WHERE v.bewohner = :bewohner AND v.abDatum >= :now AND v.situation IS NOT NULL ");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("now", new Date());
+        return ((Long) query.getSingleResult()).longValue() > 0;
+    }
 
     private static String getStellplan(List data) {
 
@@ -326,7 +341,7 @@ public class VerordnungTools {
     }
 
     public static String getMassnahme(Verordnung verordnung) {
-        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+        String result = SYSConst.html_fontface;
 
         if (verordnung.isAbgesetzt()) {
             result += "<s>"; // Abgesetzte
@@ -370,7 +385,7 @@ public class VerordnungTools {
     }
 
     public static String getHinweis(Verordnung verordnung) {
-        String result = "";
+        String result = SYSConst.html_fontface;
 
         if (verordnung.isBedarf()) {
             result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
@@ -379,7 +394,7 @@ public class VerordnungTools {
             result += result.isEmpty() ? "" : "<br/>";
             result += "<b><u>Bemerkung:</u> </b>" + verordnung.getBemerkung();
         }
-        return result;
+        return result+"</font>";
     }
 
     public static String getAN(Verordnung verordnung) {
@@ -562,48 +577,6 @@ public class VerordnungTools {
         return result;
     }
 
-
-//    public static boolean absetzen(Verordnung verordnung, Arzt arzt, Krankenhaus krankenhaus) {
-//        EntityManager em = OPDE.createEM();
-//        boolean result = false;
-//        try {
-//            em.getTransaction().begin();
-//            verordnung = absetzen(em, verordnung, arzt, krankenhaus);
-//            em.getTransaction().commit();
-//            result = true;
-//        } catch (Exception e) {
-//            em.getTransaction().rollback();
-//        } finally {
-//            em.close();
-//        }
-//        return result;
-//    }
-
-//    /**
-//     * Setzt eine Verordnung ab. Die zugehörigen BHPs werden ab JETZT entfernt.
-//     *
-//     * @param verordnung  welche Verordnung soll abgesetzt werden.
-//     * @param arzt        welcher Arzt hat sie abgesetzt.
-//     * @param krankenhaus welches KH hat sie abgesetzt
-//     * @return erfolg
-//     */
-//    public static Verordnung absetzen(EntityManager em, Verordnung verordnung) throws Exception {
-////        if (arzt == null && krankenhaus == null) {
-////            throw new NullPointerException("Arzt und Krankenhaus dürfen nicht beide NULL sein.");
-////        }
-//        verordnung = em.merge(verordnung);
-//        em.lock(verordnung, LockModeType.OPTIMISTIC);
-//
-//        verordnung.setAbDatum(new Date());
-////        verordnung.setAbArzt(em.merge(arzt));
-////        verordnung.setAbKH(em.merge(krankenhaus));
-//        verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
-//
-//        BHPTools.aufräumen(em, verordnung);
-//
-//        return verordnung;
-//    }
-
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
      */
@@ -643,40 +616,6 @@ public class VerordnungTools {
         }
         return result;
     }
-
-//    /**
-//     * Löscht eine Verordnung und die zugehörigen BHPs und deren Planungen.
-//     */
-//    public static void loeschen(Verordnung verordnung) {
-//        OPDE.getDisplayManager().setDBActionMessage(true);
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-////            verordnung = em.merge(verordnung);
-////            Query queryBHP = em.createQuery(" " +
-////                    " DELETE FROM BHP bhp " +
-////                    " WHERE bhp.verordnungPlanung.verordnung = :verordnung ");
-////            queryBHP.setParameter("verordnung", verordnung);
-////            queryBHP.executeUpdate();
-////
-////            Query queryPlanung = em.createQuery(" " +
-////                    " DELETE FROM VerordnungPlanung vp" +
-////                    " WHERE vp.verordnung = :verordnung ");
-////            queryPlanung.setParameter("verordnung", verordnung);
-////            queryPlanung.executeUpdate();
-//
-//            em.remove(em.merge(verordnung));
-//            em.getTransaction().commit();
-//
-//        } catch (Exception ex) {
-//            OPDE.debug(ex.getMessage());
-//            em.getTransaction().rollback();
-//            OPDE.fatal(ex);
-//        } finally {
-//            em.close();
-//            OPDE.getDisplayManager().setDBActionMessage(false);
-//        }
-//    }
 
     /**
      * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.

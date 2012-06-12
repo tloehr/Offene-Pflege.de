@@ -26,6 +26,8 @@
  */
 package op.tools;
 
+import op.OPDE;
+
 import java.awt.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -135,6 +137,7 @@ public class SYSConst {
     public static final int BMI_UNTERGEWICHT = 0;
     public static final int BMI_NORMAL = 1;
     public static final int BMI_ÜBERGEWICHT = 2;
+    public static final String html_fontface = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
 
     public static HashMap getNachnamenAnonym() {
         HashMap hm = new HashMap();
