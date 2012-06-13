@@ -28,21 +28,21 @@ package op.care.vital;
 
 import entity.BWerte;
 import entity.BWerteTools;
+import entity.Bewohner;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.DlgException;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DateFormat;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Diese Klasse ist das TableModel für die Vitalwerte
@@ -50,58 +50,28 @@ import java.util.Date;
 public class TMWerte
         extends AbstractTableModel {
 
-    static final long serialVersionUID = 1;
-    PreparedStatement stmt;
-    private ArrayList content;
     public static final int COL_PIT = 0;
-    public static final int COL_BWKENNUNG = 1;
-    public static final int COL_ART = 2;
-    public static final int COL_WERT = 3;
-    public static final int COL_UKENNUNG = 4;
-    public static final int COL_BEMERKUNG = 5;
-    public static final int COL_CDATE = 6;
-    public static final int COL_BWID = 7;
-    public static final int COL_XML = 8;
-    public static final int COL_DBLWERT = 9;
-    public static final int COL_V1 = 9;
-    public static final int COL_V2 = 10;
-    public static final int COL_V3 = 11;
-    public static final int COL_PK1 = 12;
-    public static final int COL_PK2 = 13;
-    public static final int COL_PK3 = 14;
-    public static final int COL_VORNAME = 15;
-    public static final int COL_REPLACEDBY = 16;
-    public static final int COL_REPLACEMENTFOR = 17;
-    public static final int COL_EDITBY = 18;
-    public static final int COL_EINHEIT = 19;
-    public static final int COL_MDATE = 20;
-    public static final int COL_NACHNAME = 21;
-    public static final int TBL_PIT = 0;
-    public static final int TBL_HTML = 1;
-    public static final int TBL_OBJECT = 10;
-    boolean showids = false;
-    boolean showedits = false;
-    SimpleDateFormat sdf;
+    public static final int COL_CONTENT = 1;
+
+    private boolean showids = false;
+    private ArrayList<BWerte> content;
 
     /**
+     * Ein einfaches Tablemodel zur Anzeige der Bewohnerwerte für den gewünschten Bewohner. Rendert alles in HTML.
      *
-     *
-     *
-     *
-     *
+     * @param from
+     * @param bewohner
+     * @param showedits
+     * @param showids
      */
-    TMWerte(Date from, Date to, boolean[] filter, String currentBW, boolean showedits, boolean showids) {
+    TMWerte(Date from, Bewohner bewohner, boolean showedits, boolean showids) {
         super();
-        sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         this.showids = showids;
-        this.showedits = showedits;
+        EntityManager em = OPDE.createEM();
         try {
-            //stmt = OPDE.getDb().db.createStatement();
-            String s =
-                    " SELECT bw.BWID, bw.PIT, bw.UKennung, bw.Wert, bw.XML, bw.Bemerkung, bw.Beziehung, bw.Sortierung, bw._cdate, bw._mdate, bw.ReplacedBy, bw.ReplacementFor," +
-                            "       bw.EditBy, ocu.Vorname, ocu.Nachname " +
+            String sql =
+                    " SELECT bw.BWID " +
                             " FROM BWerte bw" +
-                            " INNER JOIN OCUsers ocu ON ocu.UKennung = bw.UKennung " +
                             // Hier kommen die angehangen Dokumente hinzu
 //                            " INNER JOIN " +
 //                            " (" +
@@ -124,120 +94,42 @@ public class TMWerte
 //                            " 		) va ON va.BWID = f2.BWID" +
 //                            " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
 //                            " ) vrg ON vrg.BWID = bw.BWID " +
-                            " WHERE bw.BWKennung = ? AND bw.PIT >= ? AND bw.PIT <= ? " +
-                            (showedits ? "" : " AND bw.ReplacedBy = 0 ");
-            //"ORDER BY Beziehung, Datum, Uhrzeit";
+                            " WHERE bw.BWKennung = ? AND bw.PIT >= ?  " +
+                            (showedits ? "" : " AND bw.ReplacedBy = 0 ") +
+                            " ORDER BY bw.PIT desc ";
 
-            // alle ist nur dann false, wenn keines der Häkchen gesetzt ist. Dann soll er AUCH alle anzeigen
-            boolean alle = false;
-            for (int i = 0; i < filter.length; i++) {
-                alle = alle | filter[i];
-            }
-            alle = !alle;
+            Query query = em.createNativeQuery(sql);
+            query.setParameter(1, bewohner.getBWKennung());
+            query.setParameter(2, from);
 
-            String f = "";
-            if (!alle) {
-                f += "AND (";
-                // Beziehung > 0 können nur Blutdruckwerte sein.
-                f += (filter[PnlVitalwerte.RR] ? "Beziehung > 0 OR " : "") +
-                        // Nur Pulswerte, die nicht zu einer Blutdruck 3er Beziehung gehören.
-                        (filter[PnlVitalwerte.PULS] ? "(XML like '%<PULS/>%' AND Beziehung = 0) OR " : "") +
-                        (filter[PnlVitalwerte.BZ] ? "XML like '%<BZ/>%' OR " : "") +
-                        (filter[PnlVitalwerte.TEMP] ? "XML like '%<TEMP/>%' OR " : "") +
-                        (filter[PnlVitalwerte.GEWICHT] ? "XML like '%<GEWICHT/>%' OR " : "") +
-                        (filter[PnlVitalwerte.BRADEN] ? "XML like '%<braden%' OR " : "") +
-                        (filter[PnlVitalwerte.GROESSE] ? "XML like '%<GROESSE/>%' OR " : "") +
-                        (filter[PnlVitalwerte.BILANZ] ? "XML like '%<BILANZ/>%' OR " : "") +
-                        (filter[PnlVitalwerte.QUICK] ? "XML like '%<QUICK/>%' OR " : "") +
-                        (filter[PnlVitalwerte.STUHLGANG] ? "XML like '%<STUHLGANG/>%' OR " : "") +
-                        (filter[PnlVitalwerte.ERBRECHEN] ? "XML like '%<ERBRECHEN/>%' OR " : "") +
-                        (filter[PnlVitalwerte.ATEM] ? "XML like '%<ATEM/>%' OR " : "");
-                f = f.substring(0, f.length() - 4); // Hier wird das letzt " OR " abgeschnitten.
-                f += ") ";
-            }
-            // Hier wird der ursprüngliche SQL Ausdruck mit einem evtl. Filter und der Sortierung zusammengefasst.
-            s += f + " ORDER BY PIT desc, Beziehung, Sortierung ";
-            stmt = OPDE.getDb().db.prepareStatement(s);
+            List<BigInteger> rawlist = query.getResultList();
+            content = new ArrayList<BWerte>(rawlist.size());
 
-            // Dieses doppelt und dreifach übergeben der Zeiträume an den
-            // SQL Ausdruck führt dazu, dass die Ausführung der Abfrage beschleunigt
-            // wird. Nämlich dadurch das der Suchraum frühzeitig eingeschränkt wird
-            // und nicht erst beim JOIN.
-            stmt.setString(1, currentBW);
-            stmt.setTimestamp(2, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
-            stmt.setTimestamp(3, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
-//            stmt.setString(4, currentBW);
-//            stmt.setTimestamp(5, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
-//            stmt.setTimestamp(6, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
-//            stmt.setString(7, currentBW);
-//            stmt.setTimestamp(8, new java.sql.Timestamp(SYSCalendar.startOfDay(from)));
-//            stmt.setTimestamp(9, new java.sql.Timestamp(SYSCalendar.endOfDay(to)));
-
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.last()) {
-                content = new ArrayList(rs.getRow());
-            } else {
-                content = new ArrayList();
+            int i = 0;
+            for (BigInteger bigint : rawlist) {
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, rawlist.size()));
+                content.add(em.find(BWerte.class, bigint.longValue()));
+                i++;
             }
 
-            if (rs.first()) {
-                rs.beforeFirst();
-                while (rs.next()) {
-                    Object[] o;
-                    /*
-                     * Diese Unterscheidung ist nötig, da es Werte wie den Blutdruck gibt, wo drei Datenbank
-                     * Zeilen zu einer Tabellenzeile zusammengefasst werden müssen.
-                     */
-                    if (rs.getInt("Beziehung") > 0) { // Hier ist der Start einer RRSYS, RRDIA, PULS Beziehung
-                        OPDE.info("Beziehung:" + rs.getInt("Beziehung"));
-                        // Durch die Sortierung des ResultSets nach Beziehung und dann erst nach Datum und Uhrzeit
-                        // ist sichergestellt, dass die RR Werte immer in der richtigen Reihenfolge zusammen stehen.
-                        int sys = (int) rs.getDouble("Wert");
-                        long sysbwid = rs.getLong("BWID");
-                        OPDE.info("sysbwid:" + sysbwid);
-                        rs.next();
-                        int dia = (int) rs.getDouble("Wert");
-                        long diabwid = rs.getLong("BWID");
-                        OPDE.info("diabwid:" + diabwid);
-                        rs.next();
-                        int puls = (int) rs.getDouble("Wert");
-                        long pulsbwid = rs.getLong("BWID");
-                        OPDE.info("pulsbwid:" + pulsbwid);
-                        String rrline = sys + "/" + dia + " P" + puls;
-                        // Die nachfolgenden Abfragen sind sowieso bei allen 3 Zeilen gleich, deswegen kann man
-                        // auch ruhig die Datum, etc. Werte aus der letzten Zeile des RR 3er Gespanns nehmen.
-                        o = new Object[]{
-                                rs.getTimestamp("PIT"), currentBW, "Blutdruck und Puls",
-                                rrline, rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
-                                rs.getLong("BWID"), "<RR/>", sys, dia, puls, sysbwid, diabwid, pulsbwid, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), "mmHg, S/m",
-                                rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
-                        };
-                    } else {
-                        o = new Object[]{
-                                rs.getTimestamp("PIT"), currentBW, DBHandling.getBWertArt(rs.getString("XML")),
-                                (rs.getDouble("Wert") == 0d ? "siehe Bemerkung" : new Double(rs.getDouble("Wert")).toString()),
-                                rs.getString("UKennung"), rs.getString("Bemerkung"), rs.getTimestamp("_cdate"),
-                                rs.getLong("BWID"), rs.getString("XML"), rs.getDouble("Wert"), 0d, 0d, 0L, 0L, 0L, rs.getString("ocu.Vorname"), rs.getLong("ReplacedBy"),
-                                rs.getLong("ReplacementFor"), rs.getString("EditBy"), DBHandling.getBWertEinheit(rs.getString("XML")),
-                                rs.getTimestamp("_mdate"), rs.getString("ocu.Nachname")
-                        };
 
-                    }
-                    content.add(o);
-                }
-            }
-            rs.close();
-            stmt.close();
-        } // try
-        catch (SQLException se) {
-            new DlgException(se);
-        } // catch
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
     }
 
     public int getRowCount() {
         return content.size();
+    }
+
+    public ArrayList<BWerte> getContent() {
+        return content;
+    }
+
+    public BWerte getBWert(int row){
+        return content.get(row);
     }
 
     public int getColumnCount() {
@@ -245,64 +137,46 @@ public class TMWerte
     }
 
     public Class getColumnClass(int c) {
-        if (c <= COL_BEMERKUNG) {
-            return String.class;
-        } else if (c == COL_CDATE) {
-            return java.sql.Timestamp.class;
-        } else if (c == COL_DBLWERT) {
-            return java.lang.Double.class;
-        } else if (c == COL_BWID) {
-            return Long.class;
-        } else {
-            return String.class;
-        }
+        return String.class;
     }
 
     public void cleanup() {
         content.clear();
     }
 
-    public Object getValueAt(int r, int c) {
-        String result = "";
-
-        Object[] o = (Object[]) content.get(r);
-
-        long replacedby = (Long) o[COL_REPLACEDBY];
-        long replacement4 = (Long) o[COL_REPLACEMENTFOR];
-        long bwid = (Long) o[COL_BWID];
-
-
-        String color = "";
-
-        if (replacedby == 0) {
-            color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(((Date) o[COL_PIT]).getTime()));
-        } else {
-            color = SYSConst.html_lightslategrey;
+    public Object getValueAt(int row, int col) {
+        if (getRowCount() == 0){
+            return "";
         }
+        String result = "";
+        String color = "";
+        BWerte wert = content.get(row);
 
-        String fonthead = "<font " + color + ">";
-        EntityManager em = OPDE.createEM();
-        BWerte bwert = em.find(BWerte.class, bwid);
+//        if (wert.isReplaced()) {
+//            color = SYSConst.html_lightslategrey;
+//        } else {
+//            color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(wert.getPit()));
+//        }
 
-        switch (c) {
-            case TBL_PIT: { // COL_DATUM
-                result = BWerteTools.getPITasHTML(bwert, showids, true);
+
+
+        switch (col) {
+            case COL_PIT: { // COL_DATUM
+                result = BWerteTools.getPITasHTML(wert, showids, true);
                 break;
             }
-            case TBL_HTML: {
-                result = BWerteTools.getAsHTML(bwert, true);
+            case COL_CONTENT: {
+                result = BWerteTools.getBWertAsHTML(wert, true);
 
                 break;
             }
-            case TBL_OBJECT: {
-                return o;
-            }
+
             default: {
                 result = null;
                 break;
             }
         }
-        em.close();
+
         return result;
     }
 }

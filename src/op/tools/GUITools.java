@@ -1,12 +1,11 @@
 package op.tools;
 
 import com.jidesoft.swing.JideButton;
+import entity.system.SYSPropsTools;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,5 +50,18 @@ public class GUITools {
 //                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText(text);
 //            }
         };
+    }
+
+    public static JToggleButton getNiceToggleButton(String title){
+        JToggleButton tb = new JToggleButton(title);
+        tb.setIcon(new ImageIcon(tb.getClass().getResource("/artwork/cb-off-22.png")));
+        tb.setSelectedIcon(new ImageIcon(tb.getClass().getResource("/artwork/cb-on-22.png")));
+        tb.setContentAreaFilled(false);
+        tb.setBorderPainted(false);
+        tb.setBorder(null);
+        tb.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        tb.setBackground(Color.WHITE);
+        tb.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return tb;
     }
 }

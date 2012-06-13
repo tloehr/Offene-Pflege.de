@@ -577,14 +577,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
-
-        tbAbgesetzt = new JToggleButton("Abgesetzte");
-        tbAbgesetzt.setIcon(new ImageIcon(getClass().getResource("/artwork/cb-off-22.png")));
-        tbAbgesetzt.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/cb-on-22.png")));
-        tbAbgesetzt.setContentAreaFilled(false);
-        tbAbgesetzt.setBorderPainted(false);
-        tbAbgesetzt.setBorder(null);
-        tbAbgesetzt.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        tbAbgesetzt = GUITools.getNiceToggleButton("Abgesetzte");
         tbAbgesetzt.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -592,8 +585,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        tbAbgesetzt.setBackground(Color.WHITE);
-        tbAbgesetzt.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         labelPanel.add(tbAbgesetzt);
         SYSPropsTools.restoreState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);

@@ -110,171 +110,106 @@ public class DBHandling {
         return result;
     }
 
-    public static int getBWertMode(String xml) {
-        int result;
-        if (xml.indexOf("<RRSYS/>") >= 0) {
-            result = DlgVital.MODE_RRSYS;
-        } else if (xml.indexOf("<RRDIA/>") >= 0) {
-            result = DlgVital.MODE_RRDIA;
-        } else if (xml.indexOf("<TEMP/>") >= 0) {
-            result = DlgVital.MODE_TEMP;
-        } else if (xml.indexOf("<RR/>") >= 0) {
-            result = DlgVital.MODE_RR;
-        } else if (xml.indexOf("<PULS/>") >= 0) {
-            result = DlgVital.MODE_PULS;
-        } else if (xml.indexOf("<BZ/>") >= 0) {
-            result = DlgVital.MODE_BZ;
-        } else if (xml.indexOf("<GEWICHT/>") >= 0) {
-            result = DlgVital.MODE_GEWICHT;
-        } else if (xml.indexOf("<GROESSE/>") >= 0) {
-            result = DlgVital.MODE_GROESSE;
-        } else if (xml.indexOf("<ATEM/>") >= 0) {
-            result = DlgVital.MODE_ATEM;
-        } else if (xml.indexOf("<QUICK/>") >= 0) {
-            result = DlgVital.MODE_QUICK;
-        } else if (xml.indexOf("<STUHLGANG/>") >= 0) {
-            result = DlgVital.MODE_STUHLGANG;
-        } else if (xml.indexOf("<ERBRECHEN/>") >= 0) {
-            result = DlgVital.MODE_ERBRECHEN;
-        } else if (xml.indexOf("<BILANZ/>") >= 0) {
-            result = DlgVital.MODE_BILANZ;
-        } else {
-            result = DlgVital.MODE_UNKNOWN;
-        }
-        return result;
-    }
 
-    public static String getBWertXML(int mode) {
 
-        String result;
+//    public static String getWertAsHTML(long bwid) {
+//        String result = "";
+//        HashMap bwert1 = DBRetrieve.getSingleRecord("BWerte", "BWID", bwid);
+//        // Jetzt kann es sein, dass der eine BewohnerWert einen Blutdruck mit Puls darstellt. Dann brauchen wir noch die anderen beiden Werte.
+//        // Das gilt nur für Records, deren Beziehung > 0 ist.
+//        // Die Spalte Sortierung sorgt nur dafür, das Systole, Diastole und Puls immer in der richtigen Reihenfolge stehen.
+//        String xml = bwert1.get("XML").toString();
+//        long beziehung = ((BigInteger) bwert1.get("Beziehung")).longValue();
+//
+//        if (beziehung > 0) {
+//            ResultSet rs = DBRetrieve.getResultSet("BWerte", "Beziehung", beziehung, "=", new String[]{"Sortierung"});
+//            // Durch die Sortierung des ResultSets nach Beziehung und dann erst nach Datum und Uhrzeit
+//            // ist sichergestellt, dass die RR Werte immer in der richtigen Reihenfolge zusammen stehen.
+//            int sys;
+//            try {
+//                sys = (int) rs.getDouble("Wert");
+//                rs.next();
+//                int dia = (int) rs.getDouble("Wert");
+//                rs.next();
+//                int puls = (int) rs.getDouble("Wert");
+//                result = "<b>Blutdruck/Puls</b> " + sys + "/" + dia + " P" + puls;
+//            } catch (SQLException ex) {
+//                OPDE.fatal(ex);
+//            }
+//        } else {
+//            result = "<b>" + getBWertArt(xml) + "</b> " + bwert1.get("Wert").toString();
+//        }
+//
+//        if (!SYSTools.catchNull(bwert1.get("Bemerkung")).equals("")) {
+//            result += " (" + bwert1.get("Bemerkung").toString() + ")";
+//        }
+//
+//        return result;
+//    }
 
-        switch (mode) {
-            case DlgVital.MODE_RRSYS: {
-                result = "<RRSYS/>";
-                break;
-            }
-            case DlgVital.MODE_RRDIA: {
-                result = "<RRDIA/>";
-                break;
-            }
-            case DlgVital.MODE_TEMP: {
-                result = "<TEMP/>";
-                break;
-            }
-            case DlgVital.MODE_RR: {
-                result = "<RR/>";
-                break;
-            }
-            case DlgVital.MODE_PULS: {
-                result = "<PULS/>";
-                break;
-            }
-            case DlgVital.MODE_BZ: {
-                result = "<BZ/>";
-                break;
-            }
-            case DlgVital.MODE_GEWICHT: {
-                result = "<GEWICHT/>";
-                break;
-            }
-            case DlgVital.MODE_GROESSE: {
-                result = "<GROESSE/>";
-                break;
-            }
-            case DlgVital.MODE_ATEM: {
-                result = "<ATEM/>";
-                break;
-            }
-            case DlgVital.MODE_QUICK: {
-                result = "<QUICK/>";
-                break;
-            }
-            case DlgVital.MODE_ERBRECHEN: {
-                result = "<ERBRECHEN/>";
-                break;
-            }
-            case DlgVital.MODE_STUHLGANG: {
-                result = "<STUHLGANG/>";
-                break;
-            }
-            case DlgVital.MODE_BILANZ: {
-                result = "<BILANZ/>";
-                break;
-            }
-            default: {
-                result = "<UNKNOWN/>";
-                break;
-            }
-        }
-        return result;
-    }
+//    public static String getWerteAsHTML(TMWerte tm, String bwkennung, int[] sel) {
+//
+//        String html = SYSConst.html_fontface;
+//
+//        html += "<h1>Bewohner-Werte für " + SYSTools.getBWLabel(bwkennung) + "</h1>";
+//
+//        int num = tm.getRowCount();
+//        if (num > 0) {
+//            html += "<table border=\"1\" cellspacing=\"0\"><tr>" +
+//                    "<th style=\"width:30%\">Info</th><th style=\"width:70%\">Wert</th></tr>";
+//            for (int v = 0; v < num; v++) {
+//                if (sel == null || Arrays.binarySearch(sel, v) > -1) {
+//                    html += "<tr>";
+//                    html += "<td>" + tm.getValueAt(v, TMWerte.COL_PIT).toString() + "</td>";
+//                    html += "<td>" + tm.getValueAt(v, TMWerte.COL_CONTENT).toString() + "</td>";
+//                    html += "</tr>";
+//                }
+//            }
+//            html += "</table>";
+//        } else {
+//            html += "<i>keine Werte in der Auswahl vorhanden</i>";
+//        }
+//
+//        html = "<html><head>" +
+//                "<title>" + SYSTools.getWindowTitle("") + "</title>" +
+//                "<script type=\"text/javascript\">" +
+//                "window.onload = function() {" +
+//                "window.print();" +
+//                "}</script></head><body>" + html + "</body></html>";
+//        return html+"</font>";
+//    }
 
-    public static String getWertAsHTML(long bwid) {
-        String result = "";
-        HashMap bwert1 = DBRetrieve.getSingleRecord("BWerte", "BWID", bwid);
-        // Jetzt kann es sein, dass der eine BewohnerWert einen Blutdruck mit Puls darstellt. Dann brauchen wir noch die anderen beiden Werte.
-        // Das gilt nur für Records, deren Beziehung > 0 ist.
-        // Die Spalte Sortierung sorgt nur dafür, das Systole, Diastole und Puls immer in der richtigen Reihenfolge stehen.
-        String xml = bwert1.get("XML").toString();
-        long beziehung = ((BigInteger) bwert1.get("Beziehung")).longValue();
-
-        if (beziehung > 0) {
-            ResultSet rs = DBRetrieve.getResultSet("BWerte", "Beziehung", beziehung, "=", new String[]{"Sortierung"});
-            // Durch die Sortierung des ResultSets nach Beziehung und dann erst nach Datum und Uhrzeit
-            // ist sichergestellt, dass die RR Werte immer in der richtigen Reihenfolge zusammen stehen.
-            int sys;
-            try {
-                sys = (int) rs.getDouble("Wert");
-                rs.next();
-                int dia = (int) rs.getDouble("Wert");
-                rs.next();
-                int puls = (int) rs.getDouble("Wert");
-                result = "<b>Blutdruck/Puls</b> " + sys + "/" + dia + " P" + puls;
-            } catch (SQLException ex) {
-                OPDE.fatal(ex);
-            }
-        } else {
-            result = "<b>" + getBWertArt(xml) + "</b> " + bwert1.get("Wert").toString();
-        }
-
-        if (!SYSTools.catchNull(bwert1.get("Bemerkung")).equals("")) {
-            result += " (" + bwert1.get("Bemerkung").toString() + ")";
-        }
-
-        return result;
-    }
-
-    public static String getWerteAsHTML(TMWerte tm, String bwkennung, int[] sel) {
-
-        String html = "";
-
-        html += "<h1>Bewohner-Werte für " + SYSTools.getBWLabel(bwkennung) + "</h1>";
-
-        int num = tm.getRowCount();
-        if (num > 0) {
-            html += "<table border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th style=\"width:30%\">Info</th><th style=\"width:70%\">Wert</th></tr>";
-            for (int v = 0; v < num; v++) {
-                if (sel == null || Arrays.binarySearch(sel, v) > -1) {
-                    html += "<tr>";
-                    html += "<td>" + tm.getValueAt(v, TMWerte.TBL_PIT).toString() + "</td>";
-                    html += "<td>" + tm.getValueAt(v, TMWerte.TBL_HTML).toString() + "</td>";
-                    html += "</tr>";
-                }
-            }
-            html += "</table>";
-        } else {
-            html += "<i>keine Werte in der Auswahl vorhanden</i>";
-        }
-
-        html = "<html><head>" +
-                "<title>" + SYSTools.getWindowTitle("") + "</title>" +
-                "<script type=\"text/javascript\">" +
-                "window.onload = function() {" +
-                "window.print();" +
-                "}</script></head><body>" + html + "</body></html>";
-        return html;
-    }
+//    /**
+//     * Ermittelt das Datum des ersten Bewohnerwertes den ein bestimmter Bewohner besitzt.
+//     *
+//     * @param bwkennung
+//     * @return
+//     */
+//    public static Date firstWert(String bwkennung) {
+//        Date result;
+//        String sql =
+//                " SELECT PIT " +
+//                        " FROM BWerte " +
+//                        " WHERE BWKennung = ? AND ReplacedBy = 0" +
+//                        " ORDER BY PIT " +
+//                        " LIMIT 0, 1 ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, bwkennung);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                result = new Date(rs.getTimestamp("PIT").getTime());
+//            } else {
+//                result = SYSCalendar.today_date();
+//            }
+//            rs.close();
+//            stmt.close();
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//            result = SYSCalendar.today_date();
+//        }
+//        return result;
+//    }
 
     /**
      * Ermittelt das Datum des ersten Bewohnerwertes den ein bestimmter Bewohner besitzt.
@@ -282,62 +217,30 @@ public class DBHandling {
      * @param bwkennung
      * @return
      */
-    public static Date firstWert(String bwkennung) {
-        Date result;
-        String sql =
-                " SELECT PIT " +
-                        " FROM BWerte " +
-                        " WHERE BWKennung = ? AND ReplacedBy = 0" +
-                        " ORDER BY PIT " +
-                        " LIMIT 0, 1 ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                result = new Date(rs.getTimestamp("PIT").getTime());
-            } else {
-                result = SYSCalendar.today_date();
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            result = SYSCalendar.today_date();
-        }
-        return result;
-    }
-
-    /**
-     * Ermittelt das Datum des ersten Bewohnerwertes den ein bestimmter Bewohner besitzt.
-     *
-     * @param bwkennung
-     * @return
-     */
-    public static Date lastWert(String bwkennung, int wertart) {
-        Date result;
-        String sql =
-                " SELECT PIT " +
-                        " FROM BWerte " +
-                        " WHERE BWKennung = ? AND ReplacedBy = 0 AND XML = ? " +
-                        " ORDER BY PIT DESC" +
-                        " LIMIT 0, 1 ";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            stmt.setString(2, getBWertXML(wertart));
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                result = new Date(rs.getTimestamp("PIT").getTime());
-            } else {
-                result = SYSConst.DATE_BIS_AUF_WEITERES;
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException ex) {
-            new DlgException(ex);
-            result = SYSConst.DATE_BIS_AUF_WEITERES;
-        }
-        return result;
-    }
+//    public static Date lastWert(String bwkennung, int wertart) {
+//        Date result;
+//        String sql =
+//                " SELECT PIT " +
+//                        " FROM BWerte " +
+//                        " WHERE BWKennung = ? AND ReplacedBy = 0 AND XML = ? " +
+//                        " ORDER BY PIT DESC" +
+//                        " LIMIT 0, 1 ";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, bwkennung);
+//            stmt.setString(2, getBWertXML(wertart));
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                result = new Date(rs.getTimestamp("PIT").getTime());
+//            } else {
+//                result = SYSConst.DATE_BIS_AUF_WEITERES;
+//            }
+//            rs.close();
+//            stmt.close();
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//            result = SYSConst.DATE_BIS_AUF_WEITERES;
+//        }
+//        return result;
+//    }
 }

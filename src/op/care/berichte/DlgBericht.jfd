@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default:grow</string> 
+        <string>default, default:grow, labelcompgap, default</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>fill:default:grow</string> 
+        <string>default, linegap, fill:default:grow, linegap, default</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -59,6 +59,14 @@
            <string>text</string> 
            <string>Datum</string> 
           </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object id="Font0" class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>14</int> 
+           </object> 
+          </void> 
           <void property="name"> 
            <string>label1</string> 
           </void> 
@@ -80,11 +88,7 @@
           <string>com.toedter.calendar.JDateChooser</string> 
           <void method="setProperty"> 
            <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Lucida Grande</string> 
-            <int>1</int> 
-            <int>16</int> 
-           </object> 
+           <object idref="Font0"/> 
           </void> 
           <void property="name"> 
            <string>jdcDatum</string> 
@@ -139,6 +143,10 @@
            <string>text</string> 
            <string>Uhrzeit</string> 
           </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
           <void property="name"> 
            <string>label2</string> 
           </void> 
@@ -160,11 +168,7 @@
           <string>javax.swing.JTextField</string> 
           <void method="setProperty"> 
            <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Lucida Grande</string> 
-            <int>1</int> 
-            <int>16</int> 
-           </object> 
+           <object idref="Font0"/> 
           </void> 
           <void property="name"> 
            <string>txtUhrzeit</string> 
@@ -205,6 +209,10 @@
            <string>text</string> 
            <string>Dauer</string> 
           </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
           <void property="name"> 
            <string>label3</string> 
           </void> 
@@ -234,11 +242,7 @@
           </void> 
           <void method="setProperty"> 
            <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Lucida Grande</string> 
-            <int>1</int> 
-            <int>16</int> 
-           </object> 
+           <object idref="Font0"/> 
           </void> 
           <void property="name"> 
            <string>txtDauer</string> 
@@ -284,6 +288,10 @@
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
             <string>javax.swing.JTextArea</string> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="Font0"/> 
+            </void> 
             <void property="name"> 
              <string>txtBericht</string> 
             </void> 
@@ -411,11 +419,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>2</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 

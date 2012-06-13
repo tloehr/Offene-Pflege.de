@@ -292,6 +292,12 @@
            <string>contentAreaFilled</string> 
            <boolean>false</boolean> 
           </void> 
+          <void method="setProperty"> 
+           <string>cursor</string> 
+           <object class="java.awt.Cursor"> 
+            <int>12</int> 
+           </object> 
+          </void> 
           <void property="name"> 
            <string>btnAbout</string> 
           </void> 

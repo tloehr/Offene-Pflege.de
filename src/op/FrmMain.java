@@ -61,10 +61,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.SoftBevelBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -104,6 +101,7 @@ public class FrmMain extends JFrame {
     private CollapsiblePanes panesSearch, panesApps;
     private Closure bwchange;
     private HashMap<Bewohner, JideButton> bwButtonMap;
+    private MouseListener blockingListener;
 
 
     public FrmMain() {
@@ -112,10 +110,6 @@ public class FrmMain extends JFrame {
 
         currentVisiblePanel = null;
         currentBewohner = null;
-
-        setTitle(SYSTools.getWindowTitle("Pflegedokumentation"));
-//        this.setVisible(true);
-
 
         if (OPDE.isDebug()) {
             setSize(1440, 900);
@@ -135,6 +129,20 @@ public class FrmMain extends JFrame {
             @Override
             public void execute(Object o) {
                 currentBewohner = (Bewohner) o;
+            }
+        };
+
+        blockingListener = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                OPDE.debug("PING");
+                mouseEvent.consume();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                OPDE.debug("PING");
+                mouseEvent.consume();
             }
         };
 
@@ -199,6 +207,7 @@ public class FrmMain extends JFrame {
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
+
         if (b) {
             showLogin();
         }
@@ -260,16 +269,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
-                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                        "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
+                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -604,6 +613,48 @@ public class FrmMain extends JFrame {
         return result;
     }
 
+    public void setBlocked(boolean blocked) {
+        if (blocked) {
+
+//            JPanel glass = new JPanel(new FormLayout(
+//                    "default:grow",
+//                    "default:grow, pref, default:grow"));
+//
+//            JProgressBar waiter = new JProgressBar();
+//            waiter.setIndeterminate(true);
+//            waiter.setString(OPDE.lang.getString("misc.msg.wait"));
+//            waiter.setStringPainted(true);
+//            waiter.setFont(OPDE.arial28);
+//            waiter.setForeground(Color.ORANGE);
+//            glass.setOpaque(false);
+//            glass.add(waiter, CC.xy(1, 2, CC.FILL, CC.DEFAULT));
+//
+//            glass.addMouseListener(new MouseAdapter() {
+//            });
+//            glass.addMouseMotionListener(new MouseMotionAdapter() {
+//            });
+//            glass.addKeyListener(new KeyAdapter() {
+//            });
+//
+//            setGlassPane(glass);
+
+            getGlassPane().addMouseListener(new MouseAdapter() {
+            });
+            getGlassPane().addMouseMotionListener(new MouseMotionAdapter() {
+            });
+            getGlassPane().addKeyListener(new KeyAdapter() {
+            });
+
+            JPanel glass = new JPanel();
+            glass.setOpaque(false);
+            getGlassPane().setVisible(true);
+            setGlassPane(glass);
+        } else {
+            getGlassPane().setVisible(false);
+            setGlassPane(new JPanel());
+        }
+    }
+
     public Point getLocationForDialog(Dimension dimOfDialog) {
 
 
@@ -646,6 +697,10 @@ public class FrmMain extends JFrame {
         displayManager.interrupt();
         cleanup();
         super.dispose();
+    }
+
+    public JideSplitPane getSplitPaneLeft() {
+        return splitPaneLeft;
     }
 
     private void showLogin() {

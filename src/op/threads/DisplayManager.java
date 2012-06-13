@@ -1,7 +1,7 @@
 package op.threads;
 
 import entity.system.SyslogTools;
-import op.OPDE;
+import op.tools.FadingLabel;
 import op.tools.SYSConst;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ public class DisplayManager extends Thread {
 
     private boolean interrupted, dbAction;
     private JProgressBar jp;
-    private JLabel lblMain, lblSub;
+    private FadingLabel lblMain, lblSub;
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
@@ -35,7 +35,7 @@ public class DisplayManager extends Thread {
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS) {
+    public DisplayManager(JProgressBar p, FadingLabel lblM, FadingLabel lblS) {
         super();
         setName("DisplayManager");
         interrupted = false;
@@ -57,6 +57,7 @@ public class DisplayManager extends Thread {
     }
 
     public void setMainMessage(String message) {
+        lblMain.setToolTipText(message);
         lblMain.setText(message);
     }
 
@@ -73,18 +74,17 @@ public class DisplayManager extends Thread {
     }
 
     public void addSubMessage(DisplayMessage msg) {
-//        OPDE.debug(msg);
         messageQ.add(msg);
         Collections.sort(messageQ);
     }
 
-    public void showLastSubMessageAgain() {
-        if (!oldMessages.isEmpty()) {
-            DisplayMessage lastMessage = oldMessages.get(oldMessages.size() - 1);
-            messageQ.add(lastMessage);
-            processSubMessage();
-        }
-    }
+//    public void showLastSubMessageAgain() {
+//        if (!oldMessages.isEmpty()) {
+//            DisplayMessage lastMessage = oldMessages.get(oldMessages.size() - 1);
+//            messageQ.add(lastMessage);
+//            processSubMessage();
+//        }
+//    }
 
     public void clearSubMessages() {
         messageQ.clear();
@@ -160,8 +160,14 @@ public class DisplayManager extends Thread {
 
     private void processProgressBar() {
         if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-//            System.out.println(zyklen/5%2);
-            jp.setValue(progressBarMessage.getPercentage());
+
+            if (progressBarMessage.getPercentage() < 0) {
+                jp.setIndeterminate(true);
+            } else {
+                jp.setIndeterminate(false);
+                jp.setValue(progressBarMessage.getPercentage());
+            }
+
             jp.setString(progressBarMessage.getMessage());
         } else {
             if (jp.getValue() > 0) {
@@ -194,6 +200,9 @@ public class DisplayManager extends Thread {
 
     public void run() {
         while (!interrupted) {
+
+            lblMain.repaint();
+            lblSub.repaint();
 
             processProgressBar();
             processSubMessage();

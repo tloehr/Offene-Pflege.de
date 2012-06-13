@@ -70,7 +70,6 @@ public class FadingLabel extends JLabel {
                     }
                     prevString = newLabelText;
                 }
-
                 opacity = new Double(fraction).floatValue();
                 repaint();
             }

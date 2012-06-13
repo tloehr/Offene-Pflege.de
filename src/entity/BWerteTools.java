@@ -2,13 +2,16 @@ package entity;
 
 
 import op.OPDE;
+import op.care.vital.TMWerte;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +36,14 @@ public class BWerteTools {
     public static final String[] WERTE = new String[]{"?? unbekannt ??", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
     public static final String[] EINHEIT = new String[]{"?? unbekannt ??", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
 
+    /**
+     * Rendert eine HTML Darstellung des Datums und des Benutzers eines bestimmten Bewohner Wertes
+     *
+     * @param bwert
+     * @param showids
+     * @param colorize
+     * @return
+     */
     public static String getPITasHTML(BWerte bwert, boolean showids, boolean colorize) {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String color = "";
@@ -50,6 +61,29 @@ public class BWerteTools {
         return colorize ? "<font " + color + ">" + result + "</font>" : result;
     }
 
+    /**
+     * Ermittelt den ersten bisher eingetragenen Wert für einen Bewohner.
+     *
+     * @param bewohner
+     * @return
+     */
+    public static BWerte getFirstWert(Bewohner bewohner) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM BWerte b WHERE b.bewohner = :bewohner ORDER BY b.pit ");
+        query.setParameter("bewohner", bewohner);
+        query.setMaxResults(1);
+        BWerte p = (BWerte) query.getSingleResult();
+        em.close();
+        return p;
+    }
+
+    /**
+     * Ermittelt den jeweils zuletzt eingetragenen Wert.
+     *
+     * @param bewohner um den es geht
+     * @param type     des gesuchten Wertes
+     * @return der Wert. <code>null</code>, wenn es keinen gibt.
+     */
     public static BWerte getLetztenBWert(Bewohner bewohner, int type) {
 
         BWerte result;
@@ -73,7 +107,14 @@ public class BWerteTools {
         return result;
     }
 
-    public static String getAsHTML(BWerte bwert, boolean colorize) {
+    /**
+     * Rendert eine HTML Darstellung eines bestimmten Bewohner Wertes
+     *
+     * @param bwert
+     * @param colorize
+     * @return
+     */
+    public static String getBWertAsHTML(BWerte bwert, boolean colorize) {
         String result = "";
         String color = "";
         if (colorize) {
@@ -118,6 +159,37 @@ public class BWerteTools {
 //                    result += "<font color=\"red\">&#9679;</font>";
 //                }
         return colorize ? "<font " + color + ">" + result + "</font>" : result;
+    }
+
+
+    public static String getBWerteAsHTML(List<BWerte> bwerte) {
+
+        if (bwerte.isEmpty()) {
+            return "<i>keine Werte in der Auswahl vorhanden</i>";
+        }
+
+        String html = "";
+
+        html += "<h1>Bewohner-Werte für " + BewohnerTools.getBWLabelText(bwerte.get(0).getBewohner()) + "</h1>";
+
+        html += "<table border=\"1\" cellspacing=\"0\"><tr>" +
+                "<th style=\"width:30%\">Info</th><th style=\"width:70%\">Wert</th></tr>";
+
+        for (BWerte wert : bwerte) {
+            html += "<tr>";
+            html += "<td>" + getPITasHTML(wert, false, false) + "</td>";
+            html += "<td>" + getBWertAsHTML(wert, false) + "</td>";
+            html += "</tr>";
+            html += "</table>";
+        }
+
+        html = "<html><head>" +
+                "<title>" + SYSTools.getWindowTitle("") + "</title>" +
+                "<script type=\"text/javascript\">" +
+                "window.onload = function() {" +
+                "window.print();" +
+                "}</script></head><body>" + html + "</body></html>";
+        return html + "</font>";
     }
 
 

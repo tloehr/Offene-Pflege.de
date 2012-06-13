@@ -39,7 +39,6 @@ public class PnlPflege extends NursingRecordsPanel {
     public static final int TAB_UEBERSICHT = 0;
     public static final int TAB_PB = 1;
     public static final int TAB_DFN = 2;
-    //    public static final int TAB_SOZIAL = 3;
     public static final int TAB_BHP = 3;
     public static final int TAB_VITAL = 4;
     public static final int TAB_VERORDNUNG = 5;
@@ -131,7 +130,7 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_VITAL: {
-                previousPanel = new PnlVitalwerte(new JFrame(), currentBewohner);
+                previousPanel = new PnlVitalwerte(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VITAL, previousPanel);
 
                 break;

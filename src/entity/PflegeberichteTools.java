@@ -73,7 +73,7 @@ public class PflegeberichteTools {
         return success;
     }
 
-    public static Pflegeberichte firstBericht(Bewohner bewohner) {
+    public static Pflegeberichte getFirstBericht(Bewohner bewohner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
         query.setParameter("bewohner", bewohner);

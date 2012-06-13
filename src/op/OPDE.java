@@ -102,7 +102,7 @@ public class OPDE {
     protected static boolean debug;
     protected static String opwd = "";
     protected static String css = "";
-    public static Font arial14;
+    public static Font arial14, arial28;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -367,6 +367,7 @@ public class OPDE {
         // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         uptime = SYSCalendar.now();
         arial14 = new Font("Arial", Font.PLAIN, 14);
+        arial28 = new Font("Arial", Font.PLAIN, 28);
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
 
         // Das hier fängt alle ungefangenen Exceptions auf.

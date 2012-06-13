@@ -28,7 +28,6 @@ package op.controlling;
 
 import entity.*;
 import op.OPDE;
-import op.care.vital.DlgVital;
 import op.share.bwinfo.BWInfo;
 import op.tools.*;
 
@@ -1356,7 +1355,7 @@ public class DBHandling {
 
                 rs.beforeFirst();
                 while (rs.next()) {
-                    Date last = op.care.vital.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
+                    Date last = new Date();//op.care.vital.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
                     BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
                     HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
                     int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());

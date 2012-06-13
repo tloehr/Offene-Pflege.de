@@ -46,8 +46,16 @@
             <select doc="Benutzer kann sich die Dateianhänge ansehen."/>
             <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
             <print doc="Benutzer kann Berichte ausdrucken"/>
-            <cancel doc="Benutzer kann Berichte stornieren."/>
-            <update doc="Benutzer kann Berichte dokumentenecht verändern."/>
+            <cancel doc="Benutzer kann Berichte löschen."/>
+            <update doc="Benutzer kann Berichte verändern."/>
+        </class>
+        <class name="nursingrecords.vitalparameters" short="Pflegeakte/Bewohnerwerte" long="Das Modul zur Bearbeitung und Anzeige von Vitalwerten.">
+            <insert doc="Benutzer kann neue Werte eingeben."/>
+            <select doc="Benutzer kann sich die Dateianhänge ansehen."/>
+            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+            <print doc="Benutzer kann Werte ausdrucken"/>
+            <cancel doc="Benutzer kann Werte löschen."/>
+            <update doc="Benutzer kann Werte verändern."/>
         </class>
         <class name="nursingrecords.main" short="Pflegeakte" long="Das Modul, welches die gesamte Pflegeakte beinhaltet.">
             <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>

@@ -8,7 +8,7 @@
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
      <object class="com.jformdesigner.model.FormWindow"> 
-      <string>op.tools.SheetableJFrame</string> 
+      <string>javax.swing.JFrame</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>javax.swing.BoxLayout</class> 
       </object> 

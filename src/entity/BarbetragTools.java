@@ -38,14 +38,15 @@ public class BarbetragTools {
         String html = "<html>\n"
                 + "<head>\n"
                 + "<title>" + header + "</title>\n"
-                + "<style type=\"text/css\" media=\"all\">\n"
-                + "body { padding:10px; }\n"
-                + "#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}\n"
-                + "#fonth1 { font-size:24px; font-family:Arial,sans-serif;}\n"
-                + "#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}\n"
-                + "#fonttext { font-size:12px; font-family:Arial,sans-serif;}\n"
-                + "#fonttextgrau { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif;}\n"
-                + "</style>\n"
+                + OPDE.getCSS()
+//                + "<style type=\"text/css\" media=\"all\">\n"
+//                + "body { padding:10px; }\n"
+//                + "#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}\n"
+//                + "#fonth1 { font-size:24px; font-family:Arial,sans-serif;}\n"
+//                + "#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}\n"
+//                + "#fonttext { font-size:12px; font-family:Arial,sans-serif;}\n"
+//                + "#fonttextgrau { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif;}\n"
+//                + "</style>\n"
                 + HTMLTools.JSCRIPT_PRINT
                 + "</head>\n"
                 + "<body>\n";

@@ -171,8 +171,8 @@ public class DlgBericht extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default:grow",
-            "fill:default:grow"));
+            "default, default:grow, $lcgap, default",
+            "default, $lgap, fill:default:grow, $lgap, default"));
 
         //======== panel1 ========
         {
@@ -182,19 +182,21 @@ public class DlgBericht extends MyJDialog {
 
             //---- label1 ----
             label1.setText("Datum");
+            label1.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(label1, CC.xy(3, 3));
 
             //---- jdcDatum ----
-            jdcDatum.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+            jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(jdcDatum, CC.xy(5, 3));
             panel1.add(pnlTags, CC.xywh(7, 3, 1, 7, CC.FILL, CC.DEFAULT));
 
             //---- label2 ----
             label2.setText("Uhrzeit");
+            label2.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(label2, CC.xy(3, 5));
 
             //---- txtUhrzeit ----
-            txtUhrzeit.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+            txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
             txtUhrzeit.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -211,12 +213,13 @@ public class DlgBericht extends MyJDialog {
 
             //---- label3 ----
             label3.setText("Dauer");
+            label3.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(label3, CC.xy(3, 7));
 
             //---- txtDauer ----
             txtDauer.setText("3");
             txtDauer.setToolTipText("Dauer in Minuten");
-            txtDauer.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+            txtDauer.setFont(new Font("Arial", Font.PLAIN, 14));
             txtDauer.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -233,6 +236,7 @@ public class DlgBericht extends MyJDialog {
             {
 
                 //---- txtBericht ----
+                txtBericht.setFont(new Font("Arial", Font.PLAIN, 14));
                 txtBericht.addCaretListener(new CaretListener() {
                     @Override
                     public void caretUpdate(CaretEvent e) {
@@ -269,7 +273,7 @@ public class DlgBericht extends MyJDialog {
             }
             panel1.add(panel2, CC.xywh(3, 11, 5, 1, CC.RIGHT, CC.FILL));
         }
-        contentPane.add(panel1, CC.xy(1, 1));
+        contentPane.add(panel1, CC.xy(2, 3));
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

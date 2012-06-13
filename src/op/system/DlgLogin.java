@@ -241,6 +241,7 @@ public class DlgLogin extends MyJDialog {
             btnAbout.setBorder(null);
             btnAbout.setOpaque(false);
             btnAbout.setContentAreaFilled(false);
+            btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnAbout.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

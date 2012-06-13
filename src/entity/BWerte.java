@@ -102,6 +102,11 @@ public class BWerte implements Serializable, VorgangElement {
     public BWerte() {
     }
 
+    public BWerte(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
+
     public Long getBwid() {
         return bwid;
     }
@@ -225,7 +230,7 @@ public class BWerte implements Serializable, VorgangElement {
 
     @Override
     public String getContentAsHTML() {
-        return BWerteTools.getAsHTML(this, false);
+        return BWerteTools.getBWertAsHTML(this, false);
     }
 
     @Override
