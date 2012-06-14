@@ -59,6 +59,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.processed = 0;
         this.secondsToShow = 0;
         this.percentage = new Double(new Double(progress) / new Double(max) * 100d).intValue();
+//        OPDE.debug("DisplayMessage: "+percentage+" %");
         uid = UUID.randomUUID().toString();
         this.classname = "";
     }

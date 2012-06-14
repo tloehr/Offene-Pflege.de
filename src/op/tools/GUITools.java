@@ -54,8 +54,8 @@ public class GUITools {
 
     public static JToggleButton getNiceToggleButton(String title){
         JToggleButton tb = new JToggleButton(title);
-        tb.setIcon(new ImageIcon(tb.getClass().getResource("/artwork/cb-off-22.png")));
-        tb.setSelectedIcon(new ImageIcon(tb.getClass().getResource("/artwork/cb-on-22.png")));
+        tb.setIcon(new ImageIcon(tb.getClass().getResource("/artwork/22x22/cb-off.png")));
+        tb.setSelectedIcon(new ImageIcon(tb.getClass().getResource("/artwork/22x22/cb-on.png")));
         tb.setContentAreaFilled(false);
         tb.setBorderPainted(false);
         tb.setBorder(null);

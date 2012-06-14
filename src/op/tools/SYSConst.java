@@ -139,6 +139,10 @@ public class SYSConst {
     public static final int BMI_ÜBERGEWICHT = 2;
     public static final String html_fontface = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
 
+    public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
+    public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
+    public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);
+
     public static HashMap getNachnamenAnonym() {
         HashMap hm = new HashMap();
         hm.put("a", new String[]{"Anders", "Ackerman", "Acord", "Adams", "Addison"});

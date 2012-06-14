@@ -2,7 +2,6 @@ package entity;
 
 
 import op.OPDE;
-import op.care.vital.TMWerte;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -33,8 +32,11 @@ public class BWerteTools {
     public static final int STUHLGANG = 9;
     public static final int ERBRECHEN = 10;
     public static final int BILANZ = 11;
-    public static final String[] WERTE = new String[]{"?? unbekannt ??", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
-    public static final String[] EINHEIT = new String[]{"?? unbekannt ??", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
+    public static final String[] WERTE = new String[]{"unbekannt", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
+    public static final String[] EINHEIT = new String[]{"unbekannt", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
+    public static final String RRSYS="systolisch";
+    public static final String RRDIA="diatolisch";
+
 
     /**
      * Rendert eine HTML Darstellung des Datums und des Benutzers eines bestimmten Bewohner Wertes
@@ -124,12 +126,12 @@ public class BWerteTools {
                 color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bwert.getPit()));
             }
         }
-        if (!bwert.getAttachedFiles().isEmpty()) {
-            result += "<font color=\"green\">&#9679;</font>";
-        }
-        if (!bwert.getAttachedVorgaenge().isEmpty()) {
-            result += "<font color=\"red\">&#9679;</font>";
-        }
+//        if (!bwert.getAttachedFiles().isEmpty()) {
+//            result += "<font color=\"green\">&#9679;</font>";
+//        }
+//        if (!bwert.getAttachedVorgaenge().isEmpty()) {
+//            result += "<font color=\"red\">&#9679;</font>";
+//        }
         DateFormat df = DateFormat.getDateTimeInstance();
         if (bwert.isDeleted()) {
             result += "<i>Gelöschter Eintrag. Gelöscht am/um: " + df.format(bwert.getMdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + "</i><br/>";
@@ -146,18 +148,6 @@ public class BWerteTools {
         if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
             result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
         }
-
-
-//                if (fianzahl > 0) {
-//                    //URL url = this.getClass().getResource("/artwork/16x16/attach.png");
-//                    //System.out.println(url.getPath());
-//                    result += "<font color=\"green\">&#9679;</font>";
-//                }
-//                if (vrganzahl > 0) {
-//                    //URL url = this.getClass().getResource("/artwork/16x16/mail-tagged.png");
-//                    //System.out.println(url.getPath());
-//                    result += "<font color=\"red\">&#9679;</font>";
-//                }
         return colorize ? "<font " + color + ">" + result + "</font>" : result;
     }
 
@@ -191,139 +181,4 @@ public class BWerteTools {
                 "}</script></head><body>" + html + "</body></html>";
         return html + "</font>";
     }
-
-
-//
-//    public static String getEinheit(String xml) {
-//        String result;
-//        if (xml.indexOf("<RRSYS/>") >= 0) {
-//            result = "mmHg";
-//        } else if (xml.indexOf("<RRDIA/>") >= 0) {
-//            result = "mmHg";
-//        } else if (xml.indexOf("<TEMP/>") >= 0) {
-//            result = "°C";
-//        } else if (xml.indexOf("<PULS/>") >= 0) {
-//            result = "s/m";
-//        } else if (xml.indexOf("<BZ/>") >= 0) {
-//            result = "mg/dl";
-//        } else if (xml.indexOf("<GEWICHT/>") >= 0) {
-//            result = "kg";
-//        } else if (xml.indexOf("<GROESSE/>") >= 0) {
-//            result = "m";
-//        } else if (xml.indexOf("<ATEM/>") >= 0) {
-//            result = "A/m";
-//        } else if (xml.indexOf("<braden") >= 0) {
-//            result = "Bradenskala";
-//        } else if (xml.indexOf("<QUICK/>") >= 0) {
-//            result = "%";
-//        } else if (xml.indexOf("<STUHLGANG/>") >= 0) {
-//            result = "";
-//        } else if (xml.indexOf("<ERBRECHEN/>") >= 0) {
-//            result = "";
-//        } else if (xml.indexOf("<BILANZ/>") >= 0) {
-//            result = "ml";
-//        } else {
-//            result = "?? unbekannt ??";
-//        }
-//        return result;
-//    }
-//
-//    public static int getMode(String xml) {
-//        int result;
-//        if (xml.indexOf("<RRSYS/>") >= 0) {
-//            result = DlgVital.MODE_RRSYS;
-//        } else if (xml.indexOf("<RRDIA/>") >= 0) {
-//            result = DlgVital.MODE_RRDIA;
-//        } else if (xml.indexOf("<TEMP/>") >= 0) {
-//            result = DlgVital.MODE_TEMP;
-//        } else if (xml.indexOf("<RR/>") >= 0) {
-//            result = DlgVital.MODE_RR;
-//        } else if (xml.indexOf("<PULS/>") >= 0) {
-//            result = DlgVital.MODE_PULS;
-//        } else if (xml.indexOf("<BZ/>") >= 0) {
-//            result = DlgVital.MODE_BZ;
-//        } else if (xml.indexOf("<GEWICHT/>") >= 0) {
-//            result = DlgVital.MODE_GEWICHT;
-//        } else if (xml.indexOf("<GROESSE/>") >= 0) {
-//            result = DlgVital.MODE_GROESSE;
-//        } else if (xml.indexOf("<ATEM/>") >= 0) {
-//            result = DlgVital.MODE_ATEM;
-//        } else if (xml.indexOf("<QUICK/>") >= 0) {
-//            result = DlgVital.MODE_QUICK;
-//        } else if (xml.indexOf("<STUHLGANG/>") >= 0) {
-//            result = DlgVital.MODE_STUHLGANG;
-//        } else if (xml.indexOf("<ERBRECHEN/>") >= 0) {
-//            result = DlgVital.MODE_ERBRECHEN;
-//        } else if (xml.indexOf("<BILANZ/>") >= 0) {
-//            result = DlgVital.MODE_BILANZ;
-//        } else {
-//            result = DlgVital.MODE_UNKNOWN;
-//        }
-//        return result;
-//    }
-//
-//    public static String getXML(int mode) {
-//
-//        String result;
-//
-//        switch (mode) {
-//            case DlgVital.MODE_RRSYS: {
-//                result = "<RRSYS/>";
-//                break;
-//            }
-//            case DlgVital.MODE_RRDIA: {
-//                result = "<RRDIA/>";
-//                break;
-//            }
-//            case DlgVital.MODE_TEMP: {
-//                result = "<TEMP/>";
-//                break;
-//            }
-//            case DlgVital.MODE_RR: {
-//                result = "<RR/>";
-//                break;
-//            }
-//            case DlgVital.MODE_PULS: {
-//                result = "<PULS/>";
-//                break;
-//            }
-//            case DlgVital.MODE_BZ: {
-//                result = "<BZ/>";
-//                break;
-//            }
-//            case DlgVital.MODE_GEWICHT: {
-//                result = "<GEWICHT/>";
-//                break;
-//            }
-//            case DlgVital.MODE_GROESSE: {
-//                result = "<GROESSE/>";
-//                break;
-//            }
-//            case DlgVital.MODE_ATEM: {
-//                result = "<ATEM/>";
-//                break;
-//            }
-//            case DlgVital.MODE_QUICK: {
-//                result = "<QUICK/>";
-//                break;
-//            }
-//            case DlgVital.MODE_ERBRECHEN: {
-//                result = "<ERBRECHEN/>";
-//                break;
-//            }
-//            case DlgVital.MODE_STUHLGANG: {
-//                result = "<STUHLGANG/>";
-//                break;
-//            }
-//            case DlgVital.MODE_BILANZ: {
-//                result = "<BILANZ/>";
-//                break;
-//            }
-//            default: {
-//                result = "<UNKNOWN/>";
-//                break;
-//            }
-//        }
-//        return result;
-//    }
 }

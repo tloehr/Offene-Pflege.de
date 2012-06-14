@@ -24,40 +24,6 @@ import java.util.*;
 public class VerordnungTools {
 
     /**
-     * Diese Methode ermittelt eine Liste aller Verordnungen gemäß der unten genannten Einschränkungen.
-     *
-     * @param bewohner dessen Verordnungen wir suchen
-     * @return Eine Liste aus Objekt Arrays, die folgenden Aufbau hat:
-     *         <center><code><b>{Verordnung, Vorrat, Saldo des Vorrats,
-     *         Bestand (im Anbruch), Saldo des Bestandes, Bezeichnung des Medikamentes, Bezeichnung der Massnahme}</b></code></center>
-     *         Es gibt Verordnungen, die keine Medikamente besitzen, bei denen steht dann <code>null</code> an den entsprechenden
-     *         Stellen.
-     */
-    public static List<Object[]> getVerordnungenUndVorraeteUndBestaende(Bewohner bewohner, boolean archiv) {
-        List<Object[]> listResult = new ArrayList<Object[]>();
-
-        EntityManager em = OPDE.createEM();
-        Query queryVerordnung = em.createQuery("SELECT v FROM Verordnung v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.bewohner = :bewohner ");
-        if (!archiv) {
-            queryVerordnung.setParameter("now", new Date());
-        }
-        queryVerordnung.setParameter("bewohner", bewohner);
-        List<Verordnung> listeVerordnung = queryVerordnung.getResultList();
-
-        for (Verordnung verordnung : listeVerordnung) {
-
-            MedVorrat vorrat = verordnung.getDarreichung() == null ? null : DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
-            MedBestand aktiverBestand = MedBestandTools.getBestandImAnbruch(vorrat);
-            listResult.add(new Object[]{verordnung, vorrat, aktiverBestand});
-        }
-
-        em.close();
-
-        return listResult;
-    }
-
-
-    /**
      * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
      * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
      * Aufgrund der ungleichen HTML Standards (insbesonders der Druckdarstellung im CSS2.0 und später auch CSS2.1)

@@ -615,40 +615,13 @@ public class FrmMain extends JFrame {
 
     public void setBlocked(boolean blocked) {
         if (blocked) {
-
-//            JPanel glass = new JPanel(new FormLayout(
-//                    "default:grow",
-//                    "default:grow, pref, default:grow"));
-//
-//            JProgressBar waiter = new JProgressBar();
-//            waiter.setIndeterminate(true);
-//            waiter.setString(OPDE.lang.getString("misc.msg.wait"));
-//            waiter.setStringPainted(true);
-//            waiter.setFont(OPDE.arial28);
-//            waiter.setForeground(Color.ORANGE);
-//            glass.setOpaque(false);
-//            glass.add(waiter, CC.xy(1, 2, CC.FILL, CC.DEFAULT));
-//
-//            glass.addMouseListener(new MouseAdapter() {
-//            });
-//            glass.addMouseMotionListener(new MouseMotionAdapter() {
-//            });
-//            glass.addKeyListener(new KeyAdapter() {
-//            });
-//
-//            setGlassPane(glass);
-
-            getGlassPane().addMouseListener(new MouseAdapter() {
-            });
-            getGlassPane().addMouseMotionListener(new MouseMotionAdapter() {
-            });
-            getGlassPane().addKeyListener(new KeyAdapter() {
-            });
-
             JPanel glass = new JPanel();
+            glass.addMouseListener(new MouseAdapter() {});
+            glass.addMouseMotionListener(new MouseMotionAdapter() {});
+            glass.addKeyListener(new KeyAdapter() {});
             glass.setOpaque(false);
-            getGlassPane().setVisible(true);
             setGlassPane(glass);
+            getGlassPane().setVisible(true);
         } else {
             getGlassPane().setVisible(false);
             setGlassPane(new JPanel());

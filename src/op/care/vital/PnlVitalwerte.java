@@ -26,18 +26,15 @@
  */
 package op.care.vital;
 
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
-import com.jidesoft.swing.DefaultOverlayable;
-import com.jidesoft.swing.InfiniteProgressPanel;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.BWerte;
 import entity.BWerteTools;
 import entity.Bewohner;
+import entity.BewohnerTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -45,6 +42,7 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
+import tablemodels.TMWerte;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -62,7 +60,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -80,30 +77,26 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JDateChooser jdcVon;
     private JToggleButton tbShowIDs, tbShowReplaced;
-    private DefaultOverlayable overlayTable;
-    private InfiniteProgressPanel progressPanel;
 
     /**
      * Creates new form pnlVitalwerte
      */
     public PnlVitalwerte(Bewohner bewohner, JScrollPane jspSearch) {
         initPhase = true;
-
+        this.bewohner = bewohner;
         this.jspSearch = jspSearch;
 
         initComponents();
         prepareSearchArea();
-//        initPanel();
+        initPanel();
         change2Bewohner(bewohner);
         initPhase = false;
     }
 
-//    private void jdcDatumFocusLost(java.awt.event.FocusEvent evt) {
-//        if (jdcDatum.getDate() == null) {
-//            jdcDatum.setDate(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.WEEK_OF_MONTH));
-//        }
-//        jdcDatum.firePropertyChange("date", 0, 0);
-//    }
+    private void initPanel() {
+        tblVital.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+    }
 
     /**
      * This method is called from within the constructor to
@@ -130,15 +123,15 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
             //---- tblVital ----
             tblVital.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ));
             tblVital.addMouseListener(new MouseAdapter() {
                 @Override
@@ -151,27 +144,10 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         add(jspTblVW);
     }// </editor-fold>//GEN-END:initComponents
 
-//    private void initPanel() {
-//        overlayTable = new DefaultOverlayable(jspTblVW);
-//
-//        progressPanel = new InfiniteProgressPanel(){
-//            @Override
-//            public Dimension getPreferredSize() {
-//                return new Dimension(200,200);
-//            }
-//        };
-////        progressPanel.setBounds(300, 300, 200, 200);
-//
-//        overlayTable.addOverlayComponent(progressPanel);
-//        progressPanel.stop();
-//        overlayTable.setOverlayVisible(false);
-//        remove(jspTblVW);
-//        add(overlayTable);
-//    }
-
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
         reloadTable();
     }
 
@@ -226,31 +202,25 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
         tcm1.getColumn(0).setHeaderValue("Datum / PflegerIn");
         tcm1.getColumn(1).setHeaderValue("Wert");
+
+
     }//GEN-LAST:event_jspTblVWComponentResized
 
     private void reloadTable() {
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        TableModel oldmodel = tblVital.getModel();
+        tblVital.setModel(new DefaultTableModel());
+        if (oldmodel != null && oldmodel instanceof TMWerte) {
+            ((TMWerte) oldmodel).cleanup();
+        }
 
         SwingWorker worker = new SwingWorker() {
+            TMWerte model;
+
             @Override
             protected Object doInBackground() throws Exception {
-                TMWerte oldModel = null;
-
-                tblVital.setModel(new TMWerte(jdcVon.getDate(), bewohner, tbShowReplaced.isSelected(), tbShowIDs.isSelected()));
-                if (oldModel != null) {
-                    oldModel.cleanup();
-                }
-                tblVital.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                //tblTB.setDefaultRenderer(String.class, new TBTableRenderer());
-
-                jspTblVW.dispatchEvent(new ComponentEvent(jspTblVW, ComponentEvent.COMPONENT_RESIZED));
-
-                // Hier kann die Klasse RNDBerichte verwendet werden. Sie ist einfach in
-                // HTML Renderer ohne Zebra Muster. Genau was wir hier wollen.
-                tblVital.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-                tblVital.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
-
+                model = new TMWerte(jdcVon.getDate(), bewohner, tbShowReplaced.isSelected(), tbShowIDs.isSelected());
                 return null;
             }
 
@@ -258,14 +228,14 @@ public class PnlVitalwerte extends NursingRecordsPanel {
             protected void done() {
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
+                tblVital.setModel(model);
+                tblVital.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+                tblVital.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+                jspTblVW.dispatchEvent(new ComponentEvent(jspTblVW, ComponentEvent.COMPONENT_RESIZED));
             }
         };
         worker.execute();
     }
-
-    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-//        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void tblVitalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVitalMousePressed
 
@@ -482,7 +452,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
             }
         });
         labelPanel.add(tbShowReplaced);
-        SYSPropsTools.restoreState(internalClassID + ":tbShowIDs", tbShowReplaced);
+        SYSPropsTools.restoreState(internalClassID + ":tbShowReplaced", tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
         tbShowIDs = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showpks"));
@@ -524,7 +494,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
-                    new DlgWert(new BWerte(bewohner), new Closure() {
+                    new DlgWert(new BWerte(bewohner, OPDE.getLogin().getUser()), new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {

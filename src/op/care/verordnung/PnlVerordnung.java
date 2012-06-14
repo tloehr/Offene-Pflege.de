@@ -56,6 +56,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
@@ -102,7 +103,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
         initComponents();
         prepareSearchArea();
         this.bewohner = bewohner;
-        loadTable();
+        change2Bewohner(bewohner);
         initPhase = false;
     }
 
@@ -518,18 +519,20 @@ public class PnlVerordnung extends NursingRecordsPanel {
     }//GEN-LAST:event_tblVerordnungMousePressed
 
     private void jspVerordnungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVerordnungComponentResized
+
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         Dimension dim = jsp.getSize();
 
         TableColumnModel tcm1 = tblVerordnung.getColumnModel();
 
-        tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(dim.width / 5);  // 1/5 tel der Gesamtbreite
-        tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(dim.width / 5 * 3);  // 3/5 tel der Gesamtbreite
-        tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(dim.width / 5);  // 1/5 tel der Gesamtbreite
-        tcm1.getColumn(0).setHeaderValue("Medikament / Massnahme");
-        tcm1.getColumn(1).setHeaderValue("Dosierung / Häufigkeit");
-        tcm1.getColumn(2).setHeaderValue("Hinweise");
-
+        if (tcm1.getColumnCount() > 0) {
+            tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(dim.width / 3);  // 1/5 tel der Gesamtbreite
+            tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(dim.width / 3);  // 3/5 tel der Gesamtbreite
+            tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(dim.width / 3);  // 1/5 tel der Gesamtbreite
+            tcm1.getColumn(0).setHeaderValue("Medikament / Massnahme");
+            tcm1.getColumn(1).setHeaderValue("Dosierung / Häufigkeit");
+            tcm1.getColumn(2).setHeaderValue("Hinweise");
+        }
     }//GEN-LAST:event_jspVerordnungComponentResized
 
     public void cleanup() {
@@ -537,20 +540,49 @@ public class PnlVerordnung extends NursingRecordsPanel {
 //        SYSRunningClassesTools.endModule(myRunningClass);
     }
 
-    private void loadTable() {
-        tblVerordnung.setModel(new TMVerordnung(bewohner, tbAbgesetzt.isSelected(), true));
-        tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
-        tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-        tblVerordnung.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
-        tblVerordnung.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
-    }
+//    private void loadTable() {
+//        tblVerordnung.setModel(new TMVerordnung(bewohner, tbAbgesetzt.isSelected(), true));
+//        tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//
+//        jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
+//        tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+//        tblVerordnung.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+//        tblVerordnung.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+//    }
 
     private void reloadTable() {
-        if (initPhase) return;
-        TMVerordnung tm = (TMVerordnung) tblVerordnung.getModel();
-        tm.reload(bewohner, tbAbgesetzt.isSelected());
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        TableModel oldmodel = tblVerordnung.getModel();
+        tblVerordnung.setModel(new DefaultTableModel());
+        if (oldmodel != null && oldmodel instanceof TMVerordnung) {
+            ((TMVerordnung) oldmodel).cleanup();
+        }
+
+        SwingWorker worker = new SwingWorker() {
+            TMVerordnung model;
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                model = new TMVerordnung(bewohner, tbAbgesetzt.isSelected(), true);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+
+                tblVerordnung.setModel(model);
+                tblVerordnung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+                jspVerordnung.dispatchEvent(new ComponentEvent(jspVerordnung, ComponentEvent.COMPONENT_RESIZED));
+                tblVerordnung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+                tblVerordnung.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+                tblVerordnung.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+            }
+        };
+        worker.execute();
     }
 
     private void prepareSearchArea() {
@@ -570,7 +602,6 @@ public class PnlVerordnung extends NursingRecordsPanel {
         JPanel labelPanel = new JPanel();
         labelPanel.setBackground(Color.WHITE);
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
-
 
 
         CollapsiblePane panelFilter = new CollapsiblePane("Filter");

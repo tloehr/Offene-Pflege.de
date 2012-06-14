@@ -24,11 +24,11 @@ import java.util.Date;
         /**
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
-        @NamedQuery(name = "BWerte.findByVorgang", query = " "
-                + " SELECT b, av.pdca FROM BWerte b "
-                + " JOIN b.attachedVorgaenge av"
-                + " JOIN av.vorgang v"
-                + " WHERE v = :vorgang "),
+//        @NamedQuery(name = "BWerte.findByVorgang", query = " "
+//                + " SELECT b, av.pdca FROM BWerte b "
+//                + " JOIN b.attachedVorgaenge av"
+//                + " JOIN av.vorgang v"
+//                + " WHERE v = :vorgang "),
         @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM BWerte b WHERE b.bwid = :bwid"),
         @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM BWerte b WHERE b.pit = :pit"),
         @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM BWerte b WHERE b.wert = :wert"),
@@ -36,7 +36,7 @@ import java.util.Date;
         @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM BWerte b WHERE b.replacementFor = :replacementFor"),
         @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM BWerte b WHERE b.cdate = :cdate"),
         @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM BWerte b WHERE b.mdate = :mdate")})
-public class BWerte implements Serializable, VorgangElement {
+public class BWerte implements Serializable, VorgangElement, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,6 +48,12 @@ public class BWerte implements Serializable, VorgangElement {
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
+    @Basic(optional = false)
+    @Column(name = "Wert2")
+    private BigDecimal wert2;
+    @Basic(optional = false)
+    @Column(name = "Wert3")
+    private BigDecimal wert3;
     @Basic(optional = false)
     @Column(name = "Wert")
     private BigDecimal wert;
@@ -86,10 +92,10 @@ public class BWerte implements Serializable, VorgangElement {
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Bewohner bewohner;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
-    private Collection<Sysbwerte2file> attachedFiles;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
-    private Collection<SYSBWerte2VORGANG> attachedVorgaenge;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
+//    private Collection<Sysbwerte2file> attachedFiles;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
+//    private Collection<SYSBWerte2VORGANG> attachedVorgaenge;
 //    // ==
 //    // M:N Relationen
 //    // ==
@@ -102,10 +108,25 @@ public class BWerte implements Serializable, VorgangElement {
     public BWerte() {
     }
 
-    public BWerte(Bewohner bewohner) {
-        this.bewohner = bewohner;
+    public BWerte(Bewohner bewohner, Users user) {
+        this(new Date(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", new Date(), new Date(), BWerteTools.UNKNOWN, null, null, null, user, bewohner);
     }
 
+    public BWerte(Date pit, BigDecimal wert2, BigDecimal wert3, BigDecimal wert, String bemerkung, Date cdate, Date mdate, Integer type, Users editedBy, BWerte replacedBy, BWerte replacementFor, Users user, Bewohner bewohner) {
+        this.pit = pit;
+        this.wert2 = wert2;
+        this.wert3 = wert3;
+        this.wert = wert;
+        this.bemerkung = bemerkung;
+        this.cdate = cdate;
+        this.mdate = mdate;
+        this.type = type;
+        this.editedBy = editedBy;
+        this.replacedBy = replacedBy;
+        this.replacementFor = replacementFor;
+        this.user = user;
+        this.bewohner = bewohner;
+    }
 
     public Long getBwid() {
         return bwid;
@@ -187,14 +208,6 @@ public class BWerte implements Serializable, VorgangElement {
         this.mdate = mdate;
     }
 
-    public Collection<Sysbwerte2file> getAttachedFiles() {
-        return attachedFiles;
-    }
-
-    public Collection<SYSBWerte2VORGANG> getAttachedVorgaenge() {
-        return attachedVorgaenge;
-    }
-
     public Bewohner getBewohner() {
         return bewohner;
     }
@@ -213,6 +226,22 @@ public class BWerte implements Serializable, VorgangElement {
 
     public void setBewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
+    }
+
+    public BigDecimal getWert2() {
+        return wert2;
+    }
+
+    public void setWert2(BigDecimal wert2) {
+        this.wert2 = wert2;
+    }
+
+    public BigDecimal getWert3() {
+        return wert3;
+    }
+
+    public void setWert3(BigDecimal wert3) {
+        this.wert3 = wert3;
     }
 
     public Users getUser() {
@@ -248,6 +277,11 @@ public class BWerte implements Serializable, VorgangElement {
         int hash = 0;
         hash += (bwid != null ? bwid.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    protected BWerte clone() throws CloneNotSupportedException {
+        return new BWerte(pit, wert2, wert3, wert, bemerkung, new Date(), new Date(), type, editedBy, replacedBy, replacementFor, user, bewohner);
     }
 
     @Override

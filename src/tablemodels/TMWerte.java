@@ -24,22 +24,18 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.vital;
+package tablemodels;
 
 import entity.BWerte;
 import entity.BWerteTools;
 import entity.Bewohner;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +51,7 @@ public class TMWerte
 
     private boolean showids = false;
     private ArrayList<BWerte> content;
+    private Bewohner bewohner;
 
     /**
      * Ein einfaches Tablemodel zur Anzeige der Bewohnerwerte für den gewünschten Bewohner. Rendert alles in HTML.
@@ -64,9 +61,10 @@ public class TMWerte
      * @param showedits
      * @param showids
      */
-    TMWerte(Date from, Bewohner bewohner, boolean showedits, boolean showids) {
+    public TMWerte(Date from, Bewohner bewohner, boolean showedits, boolean showids) {
         super();
         this.showids = showids;
+        this.bewohner = bewohner;
         EntityManager em = OPDE.createEM();
         try {
             String sql =
@@ -95,7 +93,7 @@ public class TMWerte
 //                            " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
 //                            " ) vrg ON vrg.BWID = bw.BWID " +
                             " WHERE bw.BWKennung = ? AND bw.PIT >= ?  " +
-                            (showedits ? "" : " AND bw.ReplacedBy = 0 ") +
+                            (showedits ? "" : " AND bw.ReplacedBy IS NULL ") +
                             " ORDER BY bw.PIT desc ";
 
             Query query = em.createNativeQuery(sql);
@@ -107,11 +105,13 @@ public class TMWerte
 
             int i = 0;
             for (BigInteger bigint : rawlist) {
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, rawlist.size()));
+                if (i % 100 == 0) {
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i, rawlist.size()));
+                }
+
                 content.add(em.find(BWerte.class, bigint.longValue()));
                 i++;
             }
-
 
         } catch (Exception se) {
             OPDE.fatal(se);
@@ -128,7 +128,7 @@ public class TMWerte
         return content;
     }
 
-    public BWerte getBWert(int row){
+    public BWerte getBWert(int row) {
         return content.get(row);
     }
 
@@ -145,11 +145,10 @@ public class TMWerte
     }
 
     public Object getValueAt(int row, int col) {
-        if (getRowCount() == 0){
-            return "";
-        }
+
         String result = "";
         String color = "";
+
         BWerte wert = content.get(row);
 
 //        if (wert.isReplaced()) {
@@ -157,7 +156,6 @@ public class TMWerte
 //        } else {
 //            color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(wert.getPit()));
 //        }
-
 
 
         switch (col) {

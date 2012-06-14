@@ -209,7 +209,7 @@ public class DisplayManager extends Thread {
 
             try {
                 zyklen++;
-                Thread.sleep(500);
+                Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;
                 System.out.println("DisplayManager interrupted!");

@@ -887,7 +887,7 @@ public class DlgVerordnung extends MyJDialog {
 
 
         if (!ursache.isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>" + ursache + "</html>", 4));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>" + ursache + "</html>", DisplayMessage.WARNING));
         }
         return ansetzungOK & absetzungOK & medOK & massOK & dosisVorhanden;
 

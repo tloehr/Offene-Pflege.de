@@ -27,11 +27,12 @@
 package tablemodels;
 
 import entity.Bewohner;
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedVorrat;
-import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungTools;
+import entity.verordnungen.*;
+import op.OPDE;
+import op.threads.DisplayMessage;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
 import java.util.*;
@@ -39,8 +40,7 @@ import java.util.*;
 /**
  * @author tloehr
  */
-public class TMVerordnung
-        extends AbstractTableModel {
+public class TMVerordnung extends AbstractTableModel {
 
     public static final int COL_MSSN = 0;
     public static final int COL_Dosis = 1;
@@ -57,8 +57,27 @@ public class TMVerordnung
 
         this.bewohner = bewohner;
         this.abgesetzt = archiv;
+        cache = new HashMap();
 
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, archiv);
+        listeVerordnungen = new ArrayList<Object[]>();
+
+        EntityManager em = OPDE.createEM();
+        Query queryVerordnung = em.createQuery("SELECT v FROM Verordnung v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.bewohner = :bewohner ");
+        if (!archiv) {
+            queryVerordnung.setParameter("now", new Date());
+        }
+        queryVerordnung.setParameter("bewohner", bewohner);
+        List<Verordnung> listeVerordnung = queryVerordnung.getResultList();
+        em.close();
+
+        int i = 0;
+        for (Verordnung verordnung : listeVerordnung) {
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i / 2, listeVerordnung.size()));
+            MedVorrat vorrat = verordnung.getDarreichung() == null ? null : DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
+            MedBestand aktiverBestand = MedBestandTools.getBestandImAnbruch(vorrat);
+            listeVerordnungen.add(new Object[]{verordnung, vorrat, aktiverBestand});
+            i++;
+        }
 
         comparator = new Comparator<Object[]>() {
             @Override
@@ -80,10 +99,17 @@ public class TMVerordnung
             }
         };
 
-        Collections.sort(listeVerordnungen,  comparator);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.sorting"), 50, 100));
+        Collections.sort(listeVerordnungen, comparator);
 
-        this.cache = new HashMap();
+        // Cache vorbereiten
+        for (int row = 0; row < listeVerordnungen.size(); row++) {
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.caching"), i / 2 + row / 2, listeVerordnungen.size()));
+            getDosis(row);
+        }
+
         this.mitBestand = bestand;
+
     }
 
     public Verordnung getVerordnung(int row) {
@@ -120,18 +146,18 @@ public class TMVerordnung
         return selection;
     }
 
-    public void reload(Bewohner bewohner, boolean archiv) {
-        this.bewohner = bewohner;
-        this.abgesetzt = archiv;
-        reload();
-    }
+//    public void reload(Bewohner bewohner, boolean archiv) {
+//        this.bewohner = bewohner;
+//        this.abgesetzt = archiv;
+//        reload();
+//    }
 
-    public void reload() {
-        cache.clear();
-        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, this.abgesetzt);
-        Collections.sort(listeVerordnungen, comparator);
-        fireTableDataChanged();
-    }
+//    public void reload() {
+//        cache.clear();
+//        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, this.abgesetzt);
+//        Collections.sort(listeVerordnungen, comparator);
+//        fireTableDataChanged();
+//    }
 
     @Override
     public int getRowCount() {
@@ -147,6 +173,10 @@ public class TMVerordnung
     @Override
     public Class getColumnClass(int c) {
         return String.class;
+    }
+
+    public void cleanup() {
+        listeVerordnungen.clear();
     }
 
     /**

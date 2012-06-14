@@ -320,15 +320,15 @@ public class PnlTG extends CleanablePanel {
         //======== pnlBarbetrag ========
         {
             pnlBarbetrag.setLayout(new FormLayout(
-                    "default:grow, $lcgap, pref",
-                    "fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                "default:grow, $lcgap, pref",
+                "fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
             //======== jPanel4 ========
             {
                 jPanel4.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 jPanel4.setLayout(new FormLayout(
-                        "default:grow",
-                        "fill:default:grow"));
+                    "default:grow",
+                    "fill:default:grow"));
 
                 //======== jspData ========
                 {
@@ -341,15 +341,15 @@ public class PnlTG extends CleanablePanel {
 
                     //---- tblTG ----
                     tblTG.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ));
                     tblTG.setFont(new Font("sansserif", Font.PLAIN, 14));
                     tblTG.addMouseListener(new MouseAdapter() {
@@ -368,8 +368,8 @@ public class PnlTG extends CleanablePanel {
             {
                 jPanel5.setBorder(LineBorder.createBlackLineBorder());
                 jPanel5.setLayout(new FormLayout(
-                        "default:grow(0.30000000000000004), $lcgap, default:grow(0.7000000000000001), $lcgap, 30dlu:grow(0.30000000000000004)",
-                        "fill:default"));
+                    "default:grow(0.30000000000000004), $lcgap, default:grow(0.7000000000000001), $lcgap, 30dlu:grow(0.30000000000000004)",
+                    "fill:default"));
 
                 //---- txtDatum ----
                 txtDatum.setEnabled(false);
@@ -384,7 +384,6 @@ public class PnlTG extends CleanablePanel {
                     public void focusGained(FocusEvent e) {
                         txtDatumFocusGained(e);
                     }
-
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtDatumFocusLost(e);
@@ -405,7 +404,6 @@ public class PnlTG extends CleanablePanel {
                     public void focusGained(FocusEvent e) {
                         txtBelegtextFocusGained(e);
                     }
-
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtBelegtextFocusLost(e);
@@ -427,7 +425,6 @@ public class PnlTG extends CleanablePanel {
                     public void focusGained(FocusEvent e) {
                         txtBetragFocusGained(e);
                     }
-
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtBetragFocusLost(e);

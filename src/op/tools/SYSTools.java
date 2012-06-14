@@ -2057,6 +2057,32 @@ public class SYSTools {
         return text;
     }
 
+    public static BigDecimal parseDecimal(String test) {
+        NumberFormat nf = DecimalFormat.getNumberInstance();
+        test = test.replace(".", ",");
+        Number num;
+        try {
+            num = nf.parse(test);
+        } catch (ParseException ex) {
+            num = null;
+        }
+
+        BigDecimal wert = null;
+        if (num != null) {
+            if (num instanceof Long) {
+                wert = new BigDecimal(num.longValue());
+            } else if (num instanceof Double) {
+                wert = new BigDecimal(num.doubleValue());
+            } else if (num instanceof BigDecimal) {
+                wert = (BigDecimal) num;
+            } else {
+                wert = null;
+            }
+        }
+
+        return wert;
+    }
+
     public static BigDecimal parseCurrency(String test) {
         NumberFormat nf = DecimalFormat.getCurrencyInstance();
         test = test.replace(".", ",");
@@ -2069,12 +2095,6 @@ public class SYSTools {
                 num = nf.parse(test1);
             } catch (ParseException ex1) {
                 num = null;
-//                try {
-//                    test += " " + SYSConst.eurosymbol;
-//                    num = nf.parse(test);
-//                } catch (ParseException ex2) {
-//                    lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
-//                }
             }
         }
 
