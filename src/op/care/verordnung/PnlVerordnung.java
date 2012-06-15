@@ -387,7 +387,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             menu.add(itemPopupQuit);
             itemPopupQuit.setEnabled(absetzenAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
             // -------------------------------------------------
-            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            JMenuItem itemPopupDelete = new JMenuItem("Löschen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     new DlgYesNo("Soll die Verordnung wirklich gelöscht werden.", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {

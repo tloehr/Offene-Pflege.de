@@ -37,6 +37,7 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.system.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -252,21 +253,15 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
 
-        TableModel tm = tblVital.getModel();
-//        if (tm.getRowCount() > 0 && row > -1) {
-//            final Object[] o = (Object[]) tm.getValueAt(lsm.getLeadSelectionIndex(), TMWerte.TBL_OBJECT);
-//            long replacedby = (Long) o[TMWerte.COL_REPLACEDBY];
-//            final long bwid = (Long) o[TMWerte.COL_BWID];
-//
-//            boolean alreadyEdited = replacedby != 0;
-//            //boolean sameUser = (ukennung.compareTo(OPDE.getLogin().getUser().getUKennung()) == 0);
-//
-//            boolean bearbeitenMöglich = !alreadyEdited && singleRowSelected;
-//
-//            if (evt.isPopupTrigger()) {
-//
+        TMWerte tm = (TMWerte) tblVital.getModel();
+        if (tm.getRowCount() > 0 && row > -1) {
+            final BWerte wert = tm.getBWert(lsm.getLeadSelectionIndex());
+            boolean bearbeitenMöglich = !wert.isReplaced() && !wert.isDeleted() && singleRowSelected;
+
+            if (evt.isPopupTrigger()) {
+
 //                // KORRIGIEREN
-//                JMenuItem itemPopupEdit = new JMenuItem("Korrigieren");
+//                JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
 //                itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
 //
 //                    public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -275,68 +270,77 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 //                    }
 //                });
 //                menu.add(itemPopupEdit);
-//
-//                JMenuItem itemPopupDelete = new JMenuItem("Löschen");
-//                itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-//
-//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                        if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diesen Eintrag wirklich löschen ?",
-//                                "Wert löschen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-//                            HashMap hm = new HashMap();
-//                            hm.put("ReplacementFor", bwid);
-//                            hm.put("ReplacedBy", bwid);
-//                            hm.put("EditBy", OPDE.getLogin().getUser().getUKennung());
-//                            op.tools.DBHandling.updateRecord("BWerte", hm, "BWID", bwid);
-//                            reloadTable();
-//                        }
-//                    }
-//                });
-//                menu.add(itemPopupDelete);
-//
-//                JMenuItem itemPopupPrint = new JMenuItem("Markierte Werte drucken");
-//                itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
-//
-//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                        int[] sel = tblVital.getSelectedRows();
-//                        printWerte(sel);
-//                    }
-//                });
-//                menu.add(itemPopupPrint);
-//
-//                ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, bearbeitenMöglich);
-//                ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, bearbeitenMöglich);
-//
-////                if (!alreadyEdited && singleRowSelected) {
-////                    menu.add(new JSeparator());
-////                    // #0000003
-////                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
-////
-////                    Query query = em.createNamedQuery("BWerte.findByBwid");
-////                    query.setParameter("bwid", bwid);
-////                    entity.BWerte bwert = (entity.BWerte) query.getSingleResult();
-////                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));
-////
-////                    // #0000035
-////                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWerte", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
-////                }
-//
-//                EntityManager em = OPDE.createEM();
-//                BWerte aktuellerWert = em.find(BWerte.class, bwid);
-//
-//                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
+
+                // Löschen
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+                    JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
+                    itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            new DlgYesNo(OPDE.lang.getString("misc.querstions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                                @Override
+                                public void execute(Object answer) {
+                                    if (answer.equals(JOptionPane.YES_OPTION)) {
+                                        EntityManager em = OPDE.createEM();
+                                        try {
+                                            em.getTransaction().begin();
+                                            em.merge(wert);
+                                            wert.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+                                            em.getTransaction().commit();
+                                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.deleted") + ": " + OPDE.lang.getString("misc.misg.vitalparameter") + " " + OPDE.lang.getString("misc.msg.no") + " " + wert.getBwid()));
+                                        } catch (Exception e) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            OPDE.fatal(e);
+                                        } finally {
+                                            em.close();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    menu.add(itemPopupDelete);
+                    itemPopupDelete.setEnabled(bearbeitenMöglich);
+                }
+
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+                    JMenuItem itemPopupPrint = new JMenuItem("Markierte Werte drucken");
+                    itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
+
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            int[] sel = tblVital.getSelectedRows();
+                            printWerte(sel);
+                        }
+                    });
+                    menu.add(itemPopupPrint);
+                }
+
+//                if (!alreadyEdited && singleRowSelected) {
 //                    menu.add(new JSeparator());
-//                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, aktuellerWert, standardActionListener));
-//                }
+//                    // #0000003
+//                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
 //
+//                    Query query = em.createNamedQuery("BWerte.findByBwid");
+//                    query.setParameter("bwid", bwid);
+//                    entity.BWerte bwert = (entity.BWerte) query.getSingleResult();
+//                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));
+//
+//                    // #0000035
+//                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWerte", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
+//                }
+
+
 //                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
 //                    menu.add(new JSeparator());
 //                    menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerWert, bewohner, standardActionListener));
 //                }
-//                em.close();
-//
-//            }
-//        }
-//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+
+
+            }
+        }
+        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_tblVitalMousePressed
 
     private void prepareSearchArea() {
@@ -511,8 +515,8 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
+                                reloadTable();
                             }
-                            reloadTable();
                         }
                     });
                 }

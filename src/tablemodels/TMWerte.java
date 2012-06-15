@@ -93,7 +93,7 @@ public class TMWerte
 //                            " 	WHERE f2.BWKennung=? AND f2.PIT >= ? AND f2.PIT <= ? " +
 //                            " ) vrg ON vrg.BWID = bw.BWID " +
                             " WHERE bw.BWKennung = ? AND bw.PIT >= ?  " +
-                            (showedits ? "" : " AND bw.ReplacedBy IS NULL ") +
+                            (showedits ? "" : " AND bw.EditBy IS NULL ") +
                             " ORDER BY bw.PIT desc ";
 
             Query query = em.createNativeQuery(sql);

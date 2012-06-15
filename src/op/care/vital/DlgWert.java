@@ -12,6 +12,7 @@ import entity.BWerteTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.PnlUhrzeitDatum;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
@@ -42,6 +43,7 @@ public class DlgWert extends MyJDialog {
     private Closure actionBlock;
     private int type;
     private Time uhrzeit;
+    private PnlUhrzeitDatum pnlUhrzeitDatum;
 
     public DlgWert(BWerte wert, Closure actionBlock) {
         super();
@@ -51,10 +53,6 @@ public class DlgWert extends MyJDialog {
         initDialog();
         pack();
         setVisible(true);
-    }
-
-    private void txtUhrzeitFocusLost(FocusEvent e) {
-        txtUhrzeitActionPerformed(null);
     }
 
     private boolean saveOK() {
@@ -73,7 +71,6 @@ public class DlgWert extends MyJDialog {
 
         ursache += (bemerkungOK ? "" : "Bei Stuhlgang oder Erbrechen müssen Sie <b>unbedingt</b> eine Bemerkung eintragen. ");
 
-
         if (!ursache.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>" + ursache + "</html>", DisplayMessage.WARNING));
         }
@@ -91,7 +88,7 @@ public class DlgWert extends MyJDialog {
         if (!saveOK()) return false;
         PnlWerte123 pnl123 = tabWert.getSelectedComponent() instanceof PnlWerte123 ? (PnlWerte123) tabWert.getSelectedComponent() : null;
 
-        wert.setPit(SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit));
+        wert.setPit(pnlUhrzeitDatum.getPIT());
         wert.setBemerkung(txtBemerkung.getText().trim());
         wert.setCdate(new Date());
         wert.setType(type);
@@ -103,6 +100,10 @@ public class DlgWert extends MyJDialog {
     }
 
     private void initDialog() {
+
+        pnlUhrzeitDatum = new PnlUhrzeitDatum(new Date());
+        contentPanel.add(pnlUhrzeitDatum, CC.xy(3, 3));
+
         for (int tabnum = 1; tabnum < BWerteTools.WERTE.length; tabnum++) {
             if (tabnum == BWerteTools.RR) {
                 tabWert.addTab(BWerteTools.WERTE[BWerteTools.RR], new PnlWerte123(new BigDecimal(120), new BigDecimal(80), new BigDecimal(60), BWerteTools.RRSYS, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.RRDIA, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.WERTE[BWerteTools.PULS], BWerteTools.EINHEIT[BWerteTools.PULS]));
@@ -115,21 +116,9 @@ public class DlgWert extends MyJDialog {
                 tabWert.addTab(BWerteTools.WERTE[tabnum], new PnlWerte123(BigDecimal.ONE, BWerteTools.WERTE[tabnum], BWerteTools.EINHEIT[tabnum]));
             }
         }
-        jdcDatum.setDate(new Date());
-        uhrzeit = new Time(new Date().getTime());
-        txtUhrzeit.setText(DateFormat.getTimeInstance().format(uhrzeit));
-
-    }
-
-    private void txtUhrzeitActionPerformed(ActionEvent e) {
-        GregorianCalendar gc;
-        try {
-            gc = SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText());
-        } catch (NumberFormatException nfe) {
-            gc = new GregorianCalendar();
-        }
-        txtUhrzeit.setText(DateFormat.getTimeInstance().format(new Date(gc.getTimeInMillis())));
-        uhrzeit = new Time(gc.getTimeInMillis());
+//        jdcDatum.setDate(new Date());
+//        uhrzeit = new Time(new Date().getTime());
+//        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
 
     }
 
@@ -152,10 +141,6 @@ public class DlgWert extends MyJDialog {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         contentPanel = new JPanel();
-        label1 = new JLabel();
-        jdcDatum = new JDateChooser();
-        label2 = new JLabel();
-        txtUhrzeit = new JTextField();
         tabWert = new JTabbedPane();
         scrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
@@ -170,38 +155,8 @@ public class DlgWert extends MyJDialog {
         //======== contentPanel ========
         {
             contentPanel.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 184dlu, $lcgap, 14dlu",
-                    "2*(14dlu, $lgap), 14dlu, 5dlu, fill:132dlu:grow, $lgap, fill:43dlu:grow, $lgap, 23dlu, $lgap, 14dlu"));
-
-            //---- label1 ----
-            label1.setText("Datum");
-            label1.setFont(new Font("Arial", Font.PLAIN, 14));
-            contentPanel.add(label1, CC.xy(3, 3));
-
-            //---- jdcDatum ----
-            jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-            contentPanel.add(jdcDatum, CC.xy(5, 3));
-
-            //---- label2 ----
-            label2.setText("Uhrzeit");
-            label2.setFont(new Font("Arial", Font.PLAIN, 14));
-            contentPanel.add(label2, CC.xy(3, 5));
-
-            //---- txtUhrzeit ----
-            txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtUhrzeit.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtUhrzeitFocusLost(e);
-                }
-            });
-            txtUhrzeit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtUhrzeitActionPerformed(e);
-                }
-            });
-            contentPanel.add(txtUhrzeit, CC.xy(5, 5));
+                "14dlu, $lcgap, 184dlu, $lcgap, 14dlu",
+                "14dlu, $lgap, pref, $lgap, 5dlu, fill:132dlu:grow, $lgap, fill:43dlu:grow, $lgap, 23dlu, $lgap, 14dlu"));
 
             //======== tabWert ========
             {
@@ -214,13 +169,13 @@ public class DlgWert extends MyJDialog {
                     }
                 });
             }
-            contentPanel.add(tabWert, CC.xywh(3, 7, 3, 1));
+            contentPanel.add(tabWert, CC.xy(3, 6));
 
             //======== scrollPane1 ========
             {
                 scrollPane1.setViewportView(txtBemerkung);
             }
-            contentPanel.add(scrollPane1, CC.xywh(3, 9, 3, 1, CC.DEFAULT, CC.FILL));
+            contentPanel.add(scrollPane1, CC.xy(3, 8, CC.DEFAULT, CC.FILL));
 
             //======== panel1 ========
             {
@@ -248,7 +203,7 @@ public class DlgWert extends MyJDialog {
                 });
                 panel1.add(btnSave);
             }
-            contentPanel.add(panel1, CC.xy(5, 11, CC.RIGHT, CC.DEFAULT));
+            contentPanel.add(panel1, CC.xy(3, 10, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(contentPanel, BorderLayout.NORTH);
         pack();
@@ -258,10 +213,6 @@ public class DlgWert extends MyJDialog {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel contentPanel;
-    private JLabel label1;
-    private JDateChooser jdcDatum;
-    private JLabel label2;
-    private JTextField txtUhrzeit;
     private JTabbedPane tabWert;
     private JScrollPane scrollPane1;
     private JTextArea txtBemerkung;

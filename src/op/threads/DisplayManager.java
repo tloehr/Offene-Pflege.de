@@ -155,7 +155,7 @@ public class DisplayManager extends Thread {
             jp.setForeground(defaultColor);
         }
 
-        jp.setIndeterminate(currentSubMessage != null && pbIntermediateZyklen < 4); // 4x 500ms lang bei neuen Nachrichten leuchten
+        jp.setIndeterminate(currentSubMessage != null && pbIntermediateZyklen < 40); // 40x 50ms lang bei neuen Nachrichten leuchten
     }
 
     private void processProgressBar() {

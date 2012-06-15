@@ -44,6 +44,9 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
     @Basic(optional = false)
     @Column(name = "BWID")
     private Long bwid;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -212,6 +215,10 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         return bewohner;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isReplaced() {
         return replacedBy != null;
     }
@@ -220,8 +227,18 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         return replacementFor != null;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isDeleted() {
         return editedBy != null && replacedBy == null && replacementFor == null;
+    }
+
+    public void setDeletedBy(Users deletedBy){
+        editedBy = deletedBy;
+        replacedBy = null;
+        replacementFor = null;
     }
 
     public void setBewohner(Bewohner bewohner) {

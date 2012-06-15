@@ -137,7 +137,9 @@ public class SYSConst {
     public static final int BMI_UNTERGEWICHT = 0;
     public static final int BMI_NORMAL = 1;
     public static final int BMI_ÜBERGEWICHT = 2;
-    public static final String html_fontface = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+    public static final String html_arial14 = "face=\"" + OPDE.arial14.getFamily() + "\"";
+    public static final String html_fontface = "<font "+html_arial14+" >";
+
 
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);

@@ -96,14 +96,23 @@ public class PnlWerte123 extends JPanel {
 
     private void txtWert1FocusLost(FocusEvent e) {
         wert1 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (wert1 != null){
+            ((JTextField) e.getSource()).setText(wert1.toPlainString());
+        }
     }
 
     private void txtWert2FocusLost(FocusEvent e) {
         wert2 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (wert2 != null){
+            ((JTextField) e.getSource()).setText(wert2.toPlainString());
+        }
     }
 
     private void txtWert3FocusLost(FocusEvent e) {
         wert3 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (wert3 != null){
+            ((JTextField) e.getSource()).setText(wert3.toPlainString());
+        }
     }
 
     private void initComponents() {

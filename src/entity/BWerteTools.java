@@ -34,8 +34,8 @@ public class BWerteTools {
     public static final int BILANZ = 11;
     public static final String[] WERTE = new String[]{"unbekannt", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
     public static final String[] EINHEIT = new String[]{"unbekannt", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
-    public static final String RRSYS="systolisch";
-    public static final String RRDIA="diatolisch";
+    public static final String RRSYS = "systolisch";
+    public static final String RRDIA = "diatolisch";
 
 
     /**
@@ -50,7 +50,7 @@ public class BWerteTools {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String color = "";
         if (colorize) {
-            if (bwert.isReplaced()) {
+            if (bwert.isReplaced() || bwert.isDeleted()) {
                 color = SYSConst.html_lightslategrey;
             } else {
                 color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bwert.getPit()));
@@ -60,7 +60,7 @@ public class BWerteTools {
         if (showids) {
             result += "<br/><i>(" + bwert.getBwid() + ")</i>";
         }
-        return colorize ? "<font " + color + ">" + result + "</font>" : result;
+        return colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result;
     }
 
     /**
@@ -120,7 +120,7 @@ public class BWerteTools {
         String result = "";
         String color = "";
         if (colorize) {
-            if (bwert.isReplaced()) {
+            if (bwert.isReplaced() || bwert.isDeleted()) {
                 color = SYSConst.html_lightslategrey;
             } else {
                 color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bwert.getPit()));
@@ -134,21 +134,30 @@ public class BWerteTools {
 //        }
         DateFormat df = DateFormat.getDateTimeInstance();
         if (bwert.isDeleted()) {
-            result += "<i>Gelöschter Eintrag. Gelöscht am/um: " + df.format(bwert.getMdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + "</i><br/>";
+            result += "<i><b>Gelöschter Eintrag.</b><br/>Gelöscht am/um: " + df.format(bwert.getMdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + "</i><br/>";
         }
         if (bwert.isReplacement()) {
-            result += "<i>Dies ist ein Eintrag, der nachbearbeitet wurde.<br/>Am/um: " + df.format(bwert.getCdate()) + "<br/>Der Originaleintrag hatte die Nummer: " + bwert.getReplacementFor().getBwid() + "</i><br/>";
+            result += "<i>Dies ist ein Eintrag, der <b>nachbearbeitet</b> wurde.<br/>Am/um: " + df.format(bwert.getCdate()) + "<br/>Der Originaleintrag hatte die Nummer: " + bwert.getReplacementFor().getBwid() + "</i><br/>";
         }
         if (bwert.isReplaced()) {
-            result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format(bwert.getCdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + " vorgenommen.";
+            result += "<i>Dies ist ein Eintrag, der durch eine <b>Nachbearbeitung</b> ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format(bwert.getCdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + " vorgenommen.";
             result += "<br/>Der Korrektureintrag hat die Nummer: " + bwert.getReplacedBy().getBwid() + "</i><br/>";
         }
-        result += "<b>" + bwert.getWert() + " " + EINHEIT[bwert.getType()] + "</b> (" + WERTE[bwert.getType()] + ")";
+
+        if (bwert.getType() == RR) {
+            result += "<b>" + bwert.getWert() + "/" + bwert.getWert2() + " " + EINHEIT[RR] + " " + WERTE[PULS] + ": " + bwert.getWert3() + " " + EINHEIT[PULS] + "</b>";
+        } else if (bwert.getType() == STUHLGANG || bwert.getType() == ERBRECHEN) {
+            result += "<i>Kein Wert. Siehe Bemerkung</i>";
+        } else {
+            result += "<b>" + bwert.getWert() + " " + EINHEIT[bwert.getType()] + "</b>";
+        }
+
+        result += " (" + WERTE[bwert.getType()] + ")";
 
         if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
             result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
         }
-        return colorize ? "<font " + color + ">" + result + "</font>" : result;
+        return colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result;
     }
 
 
@@ -175,10 +184,13 @@ public class BWerteTools {
 
         html = "<html><head>" +
                 "<title>" + SYSTools.getWindowTitle("") + "</title>" +
+                OPDE.getCSS() +
                 "<script type=\"text/javascript\">" +
                 "window.onload = function() {" +
                 "window.print();" +
                 "}</script></head><body>" + html + "</body></html>";
-        return html + "</font>";
+        return html;
     }
+
+
 }
