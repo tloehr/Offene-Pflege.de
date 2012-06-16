@@ -28,6 +28,7 @@ package op.care.vital;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
@@ -194,15 +195,17 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         // Zu Beginn der Applikation steht noch ein standardmodell drin.
         // das hat nur 4 Spalten. solange braucht sich dieser handler nicht
         // damit zu befassen.
-        if (tcm1.getColumnCount() < 2) {
+        if (tcm1.getColumnCount() < 3) {
             return;
         }
 
         tcm1.getColumn(0).setPreferredWidth(200);
-        tcm1.getColumn(1).setPreferredWidth(width);
+        tcm1.getColumn(1).setPreferredWidth(width / 3 * 1);
+        tcm1.getColumn(2).setPreferredWidth(width / 3 * 2);
 
-        tcm1.getColumn(0).setHeaderValue("Datum / PflegerIn");
-        tcm1.getColumn(1).setHeaderValue("Wert");
+        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader1"));
+        tcm1.getColumn(1).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader2"));
+        tcm1.getColumn(2).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader3"));
 
 
     }//GEN-LAST:event_jspTblVWComponentResized
@@ -232,6 +235,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                 tblVital.setModel(model);
                 tblVital.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
                 tblVital.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+                tblVital.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
                 jspTblVW.dispatchEvent(new ComponentEvent(jspTblVW, ComponentEvent.COMPONENT_RESIZED));
             }
         };
@@ -241,11 +245,18 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     private void tblVitalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVitalMousePressed
 
         Point p = evt.getPoint();
+        Point p2 = evt.getPoint();
+        // Convert a coordinate relative to a component's bounds to screen coordinates
+        SwingUtilities.convertPointToScreen(p2, tblVital);
+        final Point screenposition = p2;
+
         ListSelectionModel lsm = tblVital.getSelectionModel();
 
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
-        int row = tblVital.rowAtPoint(p);
+        final int row = tblVital.rowAtPoint(p);
+        final int col = tblVital.columnAtPoint(p);
+
         if (singleRowSelected) {
             lsm.setSelectionInterval(row, row);
         }
@@ -260,53 +271,145 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
             if (evt.isPopupTrigger()) {
 
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+
 //                // KORRIGIEREN
-//                JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-//                itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
-//
-//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                        new DlgVital(parent, o);
-//                        reloadTable();
-//                    }
-//                });
-//                menu.add(itemPopupEdit);
+                    JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
+                    itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
+
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                            final JidePopup popup = new JidePopup();
+                            popup.setMovable(false);
+                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
+
+                            final JComponent editor;
+
+                            switch (col) {
+                                case TMWerte.COL_PIT: {
+                                    editor = new PnlUhrzeitDatum(wert.getPit());
+                                    break;
+                                }
+
+                                case TMWerte.COL_CONTENT: {
+
+                                    if (wert.getType() == BWerteTools.RR) {
+                                        editor = new PnlWerte123(wert.getWert(), wert.getWert2(), wert.getWert3(), BWerteTools.RRSYS, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.RRDIA, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.WERTE[BWerteTools.PULS], BWerteTools.EINHEIT[BWerteTools.PULS]);
+                                    } else if (wert.getType() == BWerteTools.ERBRECHEN || wert.getType() == BWerteTools.STUHLGANG) {
+                                        editor = null;
+                                    } else {
+                                        editor = new PnlWerte123(wert.getWert(), BWerteTools.WERTE[wert.getType()], BWerteTools.EINHEIT[wert.getType()]);
+                                    }
+                                    break;
+                                }
+
+                                case TMWerte.COL_COMMENT: {
+                                    editor = new JTextArea(SYSTools.catchNull(wert.getBemerkung()), 10, 40);
+                                    ((JTextArea) editor).setLineWrap(true);
+                                    ((JTextArea) editor).setWrapStyleWord(true);
+                                    ((JTextArea) editor).setEditable(true);
+                                    break;
+                                }
+                                default: {
+                                    editor = null;
+                                }
+                            }
+
+                            if (editor != null) {
+
+                                JScrollPane pnl = new JScrollPane(editor);
+                                pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                                popup.getContentPane().add(pnl);
+
+                                final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                                saveButton.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent actionEvent) {
+
+                                        BWerte newOne = wert.clone();
+                                        popup.hidePopup();
+                                        String errorMsg = "";
+
+                                        switch (col) {
+                                            case TMWerte.COL_PIT: {
+                                                newOne.setPit(((PnlUhrzeitDatum) editor).getPIT());
+                                                break;
+                                            }
+                                            case TMWerte.COL_CONTENT: {
+                                                PnlWerte123 pnl123 = (PnlWerte123) editor;
+                                                newOne.setWert(pnl123.getWert1());
+                                                newOne.setWert2(pnl123.getWert2());
+                                                newOne.setWert3(pnl123.getWert3());
+                                                break;
+                                            }
+                                            case TMWerte.COL_COMMENT: {
+                                                newOne.setBemerkung(((JTextArea) editor).getText().trim());
+                                                break;
+                                            }
+                                            default: {
+                                                newOne = null;
+                                            }
+                                        }
+
+                                        if (newOne.isWrongValues()) {
+                                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry"), DisplayMessage.WARNING));
+                                        } else if (col == TMWerte.COL_COMMENT && newOne.getBemerkung().equals(wert.getBemerkung())) {
+                                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nochanges"), DisplayMessage.WARNING));
+                                        }
+
+                                        newOne = BWerteTools.changeWert(wert, newOne);
+                                        ((TMWerte) tblVital.getModel()).setBWert(row, newOne);
+                                    }
+                                });
+
+                                popup.setOwner(tblVital);
+                                popup.removeExcludedComponent(tblVital);
+                                popup.getContentPane().add(new JPanel().add(saveButton));
+                                popup.setDefaultFocusComponent(editor);
+                                popup.showPopup(screenposition.x, screenposition.y);
+                            }
+                        }
+
+                    });
+                    menu.add(itemPopupEdit);
+                }
+
 
                 // Löschen
                 if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
-                    JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-                    itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgYesNo(OPDE.lang.getString("misc.querstions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+
+                    JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
+                    itemPopupDelete.addActionListener(new java.awt.event.ActionListener()
+
+                    {
+
+                        public void actionPerformed
+                                (java.awt.event.ActionEvent
+                                         evt) {
+                            new DlgYesNo(OPDE.lang.getString("misc.questions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
                                 @Override
                                 public void execute(Object answer) {
                                     if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
-                                            em.merge(wert);
-                                            wert.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-                                            em.getTransaction().commit();
-                                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.deleted") + ": " + OPDE.lang.getString("misc.misg.vitalparameter") + " " + OPDE.lang.getString("misc.msg.no") + " " + wert.getBwid()));
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
+                                        BWerte mywert = BWerteTools.deleteWert(wert);
+                                        ((TMWerte) tblVital.getModel()).setBWert(row, mywert);
+
+                                        if (!tbShowReplaced.isSelected()) {
+                                            reloadTable();
                                         }
                                     }
                                 }
                             });
                         }
-                    });
+                    }
+
+                    );
                     menu.add(itemPopupDelete);
                     itemPopupDelete.setEnabled(bearbeitenMöglich);
                 }
 
                 if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-                    JMenuItem itemPopupPrint = new JMenuItem("Markierte Werte drucken");
+                    JMenuItem itemPopupPrint = new JMenuItem("Markierte Werte drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
                     itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
 
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -316,6 +419,8 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                     });
                     menu.add(itemPopupPrint);
                 }
+            }
+
 
 //                if (!alreadyEdited && singleRowSelected) {
 //                    menu.add(new JSeparator());
@@ -338,8 +443,8 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 //                }
 
 
-            }
         }
+
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_tblVitalMousePressed
 
@@ -525,7 +630,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.printselected"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     printWerte(null);

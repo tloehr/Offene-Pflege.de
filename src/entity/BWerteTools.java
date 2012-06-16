@@ -1,15 +1,20 @@
 package entity;
 
 
+import entity.vorgang.SYSBWerte2VORGANG;
+import entity.vorgang.Vorgaenge;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -154,9 +159,9 @@ public class BWerteTools {
 
         result += " (" + WERTE[bwert.getType()] + ")";
 
-        if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
-            result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
-        }
+//        if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
+//            result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
+//        }
         return colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result;
     }
 
@@ -190,6 +195,97 @@ public class BWerteTools {
                 "window.print();" +
                 "}</script></head><body>" + html + "</body></html>";
         return html;
+    }
+
+
+    /**
+     * setzt einen Pflegebericht auf "gelöscht". Das heisst, er ist dann inaktiv. Es werden auch Datei und Vorgangs
+     * Zuordnungen entfernt.
+     *
+     * @param bericht
+     * @return den geänderten und somit gelöschten Wert. Null bei Fehler.
+     */
+    public static BWerte deleteWert(BWerte wert) {
+        BWerte mywert = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+
+            mywert = em.merge(wert);
+            mywert.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+
+//            // Datei Zuordnungen entfernen
+//            Iterator<Syspb2file> files = bericht.getAttachedFiles().iterator();
+//            while (files.hasNext()) {
+//                Syspb2file oldAssignment = files.next();
+//                em.remove(oldAssignment);
+//            }
+//            bericht.getAttachedFiles().clear();
+
+            // Vorgangszuordnungen entfernen
+            Iterator<SYSBWerte2VORGANG> vorgaenge = mywert.getAttachedVorgaenge().iterator();
+            while (vorgaenge.hasNext()) {
+                SYSBWerte2VORGANG oldAssignment = vorgaenge.next();
+                em.remove(oldAssignment);
+            }
+            mywert.getAttachedVorgaenge().clear();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return mywert;
+    }
+
+    /**
+     * Führt die notwendigen Änderungen an den Entities durch, wenn ein Wert geändert wurde. Dazu gehört auch die
+     * Vorgänge umzubiegen. Der alte Wert verliert seine Vorgänge. Es werden auch die
+     * notwendigen Querverweise zwischen dem alten und dem neuen Wert erstellt.
+     *
+     * @param oldOne der Wert, der durch den <code>newOne</code> ersetzt werden soll.
+     * @param newOne siehe oben
+     * @return den neuen Wert.
+     */
+    public static BWerte changeWert(BWerte oldOne, BWerte newOne) {
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
+        try {
+
+            oldOne = em.merge(oldOne);
+            newOne = em.merge(newOne);
+
+            em.lock(oldOne, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+            newOne.setReplacementFor(oldOne);
+            newOne.setUser(em.merge(OPDE.getLogin().getUser()));
+
+            oldOne.setEditedBy(em.merge(OPDE.getLogin().getUser()));
+            oldOne.setCdate(new Date());
+            oldOne.setReplacedBy(newOne);
+
+            // Vorgänge umbiegen
+            for (SYSBWerte2VORGANG oldAssignment : oldOne.getAttachedVorgaenge()) {
+                Vorgaenge vorgang = oldAssignment.getVorgang();
+                em.lock(vorgang, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                SYSBWerte2VORGANG newAssignment = em.merge(new SYSBWerte2VORGANG(vorgang, newOne));
+                newOne.getAttachedVorgaenge().add(newAssignment);
+                em.remove(oldAssignment);
+            }
+            oldOne.getAttachedVorgaenge().clear();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return newOne;
     }
 
 

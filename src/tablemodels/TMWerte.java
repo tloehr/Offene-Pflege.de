@@ -31,6 +31,9 @@ import entity.BWerteTools;
 import entity.Bewohner;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -48,6 +51,7 @@ public class TMWerte
 
     public static final int COL_PIT = 0;
     public static final int COL_CONTENT = 1;
+    public static final int COL_COMMENT = 2;
 
     private boolean showids = false;
     private ArrayList<BWerte> content;
@@ -132,8 +136,13 @@ public class TMWerte
         return content.get(row);
     }
 
+    public void setBWert(int row, BWerte wert) {
+        content.set(row, wert);
+        fireTableRowsUpdated(row, row);
+    }
+
     public int getColumnCount() {
-        return 2;
+        return 3;
     }
 
     public Class getColumnClass(int c) {
@@ -147,7 +156,7 @@ public class TMWerte
     public Object getValueAt(int row, int col) {
 
         String result = "";
-        String color = "";
+//        String color = "";
 
         BWerte wert = content.get(row);
 
@@ -165,7 +174,18 @@ public class TMWerte
             }
             case COL_CONTENT: {
                 result = BWerteTools.getBWertAsHTML(wert, true);
-
+                break;
+            }
+            case COL_COMMENT: {
+                if (!SYSTools.catchNull(wert.getBemerkung()).isEmpty()) {
+                    String color = "";
+                    if (wert.isReplaced() || wert.isDeleted()) {
+                        color = SYSConst.html_lightslategrey;
+                    } else {
+                        color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(wert.getPit()));
+                    }
+                    result += "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>Bemerkung:</b> " + wert.getBemerkung() + "</font>";
+                }
                 break;
             }
 

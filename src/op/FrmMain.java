@@ -112,7 +112,7 @@ public class FrmMain extends JFrame {
         currentBewohner = null;
 
         if (OPDE.isDebug()) {
-            setSize(1440, 900);
+            setSize(1366, 768);
             //setSize(1280, 1024);
         } else {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);

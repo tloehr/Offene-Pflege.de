@@ -97,8 +97,9 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
     private Bewohner bewohner;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
 //    private Collection<Sysbwerte2file> attachedFiles;
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
-//    private Collection<SYSBWerte2VORGANG> attachedVorgaenge;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
+    private Collection<SYSBWerte2VORGANG> attachedVorgaenge;
+
 //    // ==
 //    // M:N Relationen
 //    // ==
@@ -211,12 +212,23 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         this.mdate = mdate;
     }
 
+    public Collection<SYSBWerte2VORGANG> getAttachedVorgaenge() {
+        return attachedVorgaenge;
+    }
+
     public Bewohner getBewohner() {
         return bewohner;
     }
 
+    public boolean isWrongValues(){
+        if (type == BWerteTools.RR){
+            return wert == null || wert2 == null || wert3 == null;
+        } else {
+            return wert == null;
+        }
+    }
+
     /**
-     *
      * @return
      */
     public boolean isReplaced() {
@@ -228,15 +240,15 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public boolean isDeleted() {
         return editedBy != null && replacedBy == null && replacementFor == null;
     }
 
-    public void setDeletedBy(Users deletedBy){
+    public void setDeletedBy(Users deletedBy) {
         editedBy = deletedBy;
+        cdate = new Date();
         replacedBy = null;
         replacementFor = null;
     }
@@ -297,7 +309,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
     }
 
     @Override
-    protected BWerte clone() throws CloneNotSupportedException {
+    public BWerte clone() {
         return new BWerte(pit, wert2, wert3, wert, bemerkung, new Date(), new Date(), type, editedBy, replacedBy, replacementFor, user, bewohner);
     }
 

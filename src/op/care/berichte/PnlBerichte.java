@@ -35,7 +35,6 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.TitledSeparator;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.files.SYSFilesTools;
@@ -161,7 +160,7 @@ public class PnlBerichte extends NursingRecordsPanel {
 
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton("Neuen Bericht eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgBericht(bewohner, new Closure() {
@@ -179,7 +178,7 @@ public class PnlBerichte extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-            JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 //                    SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
@@ -213,10 +212,10 @@ public class PnlBerichte extends NursingRecordsPanel {
     }
 
     @Override
-   public void reload() {
+    public void reload() {
         reloadTable();
 
-   }
+    }
 
     /**
      * This method is called from within the constructor to
@@ -231,8 +230,8 @@ public class PnlBerichte extends NursingRecordsPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default:grow",
-            "fill:default:grow"));
+                "default:grow",
+                "fill:default:grow"));
 
         //======== jspTblTB ========
         {
@@ -245,15 +244,15 @@ public class PnlBerichte extends NursingRecordsPanel {
 
             //---- tblTB ----
             tblTB.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+                    new Object[][]{
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                    },
+                    new String[]{
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
             ));
             tblTB.addMouseListener(new MouseAdapter() {
                 @Override
@@ -358,130 +357,131 @@ public class PnlBerichte extends NursingRecordsPanel {
              */
             final boolean bearbeitenMöglich = !alreadyEdited && singleRowSelected && bericht.getUsersAcknowledged().isEmpty();
 
-            final JMenuItem itemPopupEdit = new JMenuItem("Bericht korrigieren");
-            itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                    final JidePopup popup = new JidePopup();
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
 
-                    final JComponent editor;
-                    final Collection<PBerichtTAGS> mytags = new ArrayList(bericht.getTags());
+                final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
+                itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                    switch (col) {
-                        case TMPflegeberichte.COL_PIT: {
-                            editor = new JTextArea(DateFormat.getDateTimeInstance().format(bericht.getPit()));
-                            ((JTextArea) editor).setEditable(true);
-                            break;
-                        }
-                        case TMPflegeberichte.COL_Flags: {
-                            if (bearbeitenMöglich && (sameUser || OPDE.isAdmin())) {
+                        final JidePopup popup = new JidePopup();
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                                ItemListener il = new ItemListener() {
-                                    @Override
-                                    public void itemStateChanged(ItemEvent itemEvent) {
-                                        JCheckBox cb = (JCheckBox) itemEvent.getSource();
-                                        PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
-                                        if (itemEvent.getStateChange() == ItemEvent.DESELECTED) {
-                                            mytags.remove(tag);
-                                        } else {
-                                            mytags.add(tag);
+                        final JComponent editor;
+                        final Collection<PBerichtTAGS> mytags = new ArrayList(bericht.getTags());
+
+                        switch (col) {
+                            case TMPflegeberichte.COL_PIT: {
+                                editor = new JTextArea(DateFormat.getDateTimeInstance().format(bericht.getPit()));
+                                ((JTextArea) editor).setEditable(true);
+                                break;
+                            }
+                            case TMPflegeberichte.COL_Flags: {
+                                if (sameUser || OPDE.isAdmin()) {
+                                    ItemListener il = new ItemListener() {
+                                        @Override
+                                        public void itemStateChanged(ItemEvent itemEvent) {
+                                            JCheckBox cb = (JCheckBox) itemEvent.getSource();
+                                            PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
+                                            if (itemEvent.getStateChange() == ItemEvent.DESELECTED) {
+                                                mytags.remove(tag);
+                                            } else {
+                                                mytags.add(tag);
+                                            }
                                         }
-                                    }
-                                };
+                                    };
 
-                                editor = PBerichtTAGSTools.createCheckBoxPanelForTags(il, bericht.getTags(), new VerticalLayout());
-
-                            } else {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie können diesen Bericht nicht ändern.", 2));
+                                    editor = PBerichtTAGSTools.createCheckBoxPanelForTags(il, bericht.getTags(), new VerticalLayout());
+                                } else {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.cantedit")));
+                                    editor = null;
+                                }
+                                break;
+                            }
+                            case TMPflegeberichte.COL_HTML: {
+                                editor = new JTextArea(bericht.getText(), 10, 40);
+                                ((JTextArea) editor).setLineWrap(true);
+                                ((JTextArea) editor).setWrapStyleWord(true);
+                                ((JTextArea) editor).setEditable(true);
+                                break;
+                            }
+                            default: {
                                 editor = null;
                             }
-                            break;
                         }
-                        case TMPflegeberichte.COL_HTML: {
-                            editor = new JTextArea(bericht.getText(), 10, 40);
-                            ((JTextArea) editor).setLineWrap(true);
-                            ((JTextArea) editor).setWrapStyleWord(true);
-                            ((JTextArea) editor).setEditable(true);
-                            break;
-                        }
-                        default: {
-                            editor = null;
-                        }
-                    }
 
-                    if (editor != null && bearbeitenMöglich) {
-                        popup.getContentPane().add(new JScrollPane(editor));
-                        final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                        saveButton.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent actionEvent) {
-                                EntityManager em = OPDE.createEM();
-                                try {
+                        if (editor != null) {
+                            popup.getContentPane().add(new JScrollPane(editor));
+                            final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                            saveButton.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent actionEvent) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
 
-                                    Pflegeberichte newBericht = PflegeberichteTools.copyBericht(bericht);
-                                    popup.hidePopup();
+                                        Pflegeberichte newBericht = PflegeberichteTools.copyBericht(bericht);
+                                        popup.hidePopup();
 
-                                    switch (col) {
-                                        case TMPflegeberichte.COL_PIT: {
-                                            try {
-                                                newBericht.setPit(DateFormat.getDateTimeInstance().parse(((JTextArea) editor).getText()));
-                                                PflegeberichteTools.changeBericht(bericht, newBericht);
-                                                reloadTable();
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Datum geändert", 2));
-                                            } catch (ParseException pe) {
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Falsche Datumseingabe", 2));
+                                        switch (col) {
+                                            case TMPflegeberichte.COL_PIT: {
+                                                try {
+                                                    newBericht.setPit(DateFormat.getDateTimeInstance().parse(((JTextArea) editor).getText()));
+                                                    PflegeberichteTools.changeBericht(bericht, newBericht);
+                                                    reloadTable();
+                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+                                                } catch (ParseException pe) {
+                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry")));
+                                                }
+                                                break;
                                             }
-                                            break;
-                                        }
-                                        case TMPflegeberichte.COL_Flags: {
-                                            bericht.getTags().clear();
-                                            bericht.getTags().addAll(mytags);
-                                            bericht = EntityTools.merge(bericht);
-                                            reloadTable();
-                                            break;
-                                        }
-                                        case TMPflegeberichte.COL_HTML: {
-                                            if (!((JTextArea) editor).getText().trim().isEmpty()) {
-                                                newBericht.setText(((JTextArea) editor).getText().trim());
-                                                PflegeberichteTools.changeBericht(bericht, newBericht);
+                                            case TMPflegeberichte.COL_Flags: {
+                                                bericht.getTags().clear();
+                                                bericht.getTags().addAll(mytags);
+                                                bericht = EntityTools.merge(bericht);
                                                 reloadTable();
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bericht geändert", 2));
-                                            } else {
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Kann keinen leeren Bericht speichern", 2));
+                                                break;
                                             }
-                                            break;
-                                        }
-                                        default: {
+                                            case TMPflegeberichte.COL_HTML: {
+                                                if (!((JTextArea) editor).getText().trim().isEmpty()) {
+                                                    newBericht.setText(((JTextArea) editor).getText().trim());
+                                                    PflegeberichteTools.changeBericht(bericht, newBericht);
+                                                    reloadTable();
+                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+                                                } else {
+                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+                                                }
+                                                break;
+                                            }
+                                            default: {
 
+                                            }
                                         }
+
+
+                                    } catch (Exception e) {
+                                        em.getTransaction().rollback();
+                                    } finally {
+                                        em.close();
                                     }
-
-
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                } finally {
-                                    em.close();
                                 }
-                            }
-                        });
+                            });
 
-                        popup.setOwner(tblTB);
-                        popup.removeExcludedComponent(tblTB);
-                        popup.getContentPane().add(new JPanel().add(saveButton));
-                        popup.setDefaultFocusComponent(editor);
-                        popup.showPopup(screenposition.x, screenposition.y);
-                    } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie können diesen Bericht nicht ändern.", 2));
+                            popup.setOwner(tblTB);
+                            popup.removeExcludedComponent(tblTB);
+                            popup.getContentPane().add(new JPanel().add(saveButton));
+                            popup.setDefaultFocusComponent(editor);
+                            popup.showPopup(screenposition.x, screenposition.y);
+                        } else {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.cantedit")));
+                        }
                     }
-                }
-            });
-            menu.add(itemPopupEdit);
-            itemPopupEdit.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+                });
+                menu.add(itemPopupEdit);
+                itemPopupEdit.setEnabled(bearbeitenMöglich);
+            }
 
-
-            JMenuItem itemPopupPrint = new JMenuItem("Markierte Berichte drucken");
+            JMenuItem itemPopupPrint = new JMenuItem(OPDE.lang.getString("misc.commands.printselected"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
             itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -582,15 +582,15 @@ public class PnlBerichte extends NursingRecordsPanel {
                 reloadTable();
             }
         });
-        labelPanel.add(new JXTitledSeparator("Berichte anzeigen von"));
+        labelPanel.add(new JXTitledSeparator("Berichte anzeigen"));
         labelPanel.add(jdcVon);
-        JideButton button2Weeks = GUITools.createHyperlinkButton("vor 2 Wochen", null, new ActionListener() {
+        JideButton button2Weeks = GUITools.createHyperlinkButton("2 Wochen zurück", null, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 jdcVon.setDate(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
             }
         });
-        JideButton button4Weeks = GUITools.createHyperlinkButton("vor 4 Wochen", null, new ActionListener() {
+        JideButton button4Weeks = GUITools.createHyperlinkButton("4 Wochen zurück", null, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 jdcVon.setDate(SYSCalendar.addField(new Date(), -4, GregorianCalendar.WEEK_OF_MONTH));

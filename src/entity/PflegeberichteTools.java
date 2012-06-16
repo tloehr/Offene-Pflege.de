@@ -65,8 +65,10 @@ public class PflegeberichteTools {
             em.getTransaction().commit();
             success = true;
         } catch (Exception e) {
-            OPDE.getLogger().error(e.getMessage(), e);
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
         } finally {
             em.close();
         }
@@ -136,8 +138,10 @@ public class PflegeberichteTools {
 
             success = true;
         } catch (Exception e) {
-            OPDE.error(e.getMessage());
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
         } finally {
             em.close();
         }
@@ -171,22 +175,22 @@ public class PflegeberichteTools {
         return target;
     }
 
-    public static boolean saveBericht(Pflegeberichte newBericht) {
-        boolean success = false;
-        EntityManager em = OPDE.createEM();
-        em.getTransaction().begin();
-        try {
-            em.persist(newBericht);
-            em.getTransaction().commit();
-            success = true;
-        } catch (Exception e) {
-            OPDE.getLogger().error(e.getMessage(), e);
-            em.getTransaction().rollback();
-        } finally {
-            em.close();
-        }
-        return success;
-    }
+//    public static boolean saveBericht(Pflegeberichte newBericht) {
+//        boolean success = false;
+//        EntityManager em = OPDE.createEM();
+//        em.getTransaction().begin();
+//        try {
+//            em.persist(newBericht);
+//            em.getTransaction().commit();
+//            success = true;
+//        } catch (Exception e) {
+//            OPDE.getLogger().error(e.getMessage(), e);
+//            em.getTransaction().rollback();
+//        } finally {
+//            em.close();
+//        }
+//        return success;
+//    }
 
     /**
      * Berichtdarstellung für die Vorgänge.
