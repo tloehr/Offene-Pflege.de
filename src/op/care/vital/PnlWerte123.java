@@ -139,6 +139,8 @@ public class PnlWerte123 extends JPanel {
 
         //---- txtWert1 ----
         txtWert1.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWert1.setColumns(10);
+        txtWert1.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWert1.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -159,6 +161,8 @@ public class PnlWerte123 extends JPanel {
 
         //---- txtWert2 ----
         txtWert2.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWert2.setColumns(10);
+        txtWert2.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWert2.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -179,6 +183,8 @@ public class PnlWerte123 extends JPanel {
 
         //---- txtWert3 ----
         txtWert3.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWert3.setColumns(10);
+        txtWert3.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWert3.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {

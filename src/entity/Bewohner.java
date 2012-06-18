@@ -175,7 +175,7 @@ public class Bewohner implements Serializable {
     }
 
     public String getVorname() {
-        int index = (geschlecht == SYSConst.GESCHLECHT_MÄNNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
+        int index = (geschlecht == SYSConst.GESCHLECHT_MAENNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
         return SYSTools.anonymizeName(vorname, index);
     }
 

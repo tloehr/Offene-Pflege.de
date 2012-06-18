@@ -65,7 +65,7 @@ public class TMWerte
      * @param showedits
      * @param showids
      */
-    public TMWerte(Date from, Bewohner bewohner, boolean showedits, boolean showids) {
+    public TMWerte(Date from, Bewohner bewohner, int type, boolean showedits, boolean showids) {
         super();
         this.showids = showids;
         this.bewohner = bewohner;
@@ -98,11 +98,16 @@ public class TMWerte
 //                            " ) vrg ON vrg.BWID = bw.BWID " +
                             " WHERE bw.BWKennung = ? AND bw.PIT >= ?  " +
                             (showedits ? "" : " AND bw.EditBy IS NULL ") +
+                            (type <= 0 ? "" : " AND bw.Type = ? ") +
                             " ORDER BY bw.PIT desc ";
 
             Query query = em.createNativeQuery(sql);
             query.setParameter(1, bewohner.getBWKennung());
             query.setParameter(2, from);
+
+            if (type > 0){
+                query.setParameter(3, type);
+            }
 
             List<BigInteger> rawlist = query.getResultList();
             content = new ArrayList<BWerte>(rawlist.size());
@@ -177,15 +182,7 @@ public class TMWerte
                 break;
             }
             case COL_COMMENT: {
-                if (!SYSTools.catchNull(wert.getBemerkung()).isEmpty()) {
-                    String color = "";
-                    if (wert.isReplaced() || wert.isDeleted()) {
-                        color = SYSConst.html_lightslategrey;
-                    } else {
-                        color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(wert.getPit()));
-                    }
-                    result += "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>Bemerkung:</b> " + wert.getBemerkung() + "</font>";
-                }
+                result = BWerteTools.getBemerkungAsHTML(wert, true);
                 break;
             }
 

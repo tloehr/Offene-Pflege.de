@@ -28,6 +28,8 @@ package op.care.sysfiles;
 import java.awt.event.*;
 import javax.persistence.EntityManager;
 import javax.swing.table.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.files.SYSFiles;
@@ -39,6 +41,7 @@ import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 import tablemodels.TMSYSFiles;
 import tablerenderer.RNDHTML;
+import txhandlers.TXHFiles;
 
 import javax.swing.*;
 import java.awt.Desktop.Action;
@@ -66,16 +69,26 @@ public class PnlFiles extends NursingRecordsPanel {
      */
     public PnlFiles(JFrame pflege, Bewohner bewohner) {
         initComponents();
-        this.bewohner = bewohner;
-        EntityManager em = OPDE.createEM();
-        bewohner = em.find(Bewohner.class, bewohner.getBWKennung());
-        em.close();
-        this.parent = pflege;
-        BewohnerTools.setBWLabel(lblBW, bewohner);
-        tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        btnNew.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
 
-        loadTable();
+//        EntityManager em = OPDE.createEM();
+//        bewohner = em.find(Bewohner.class, bewohner.getBWKennung());
+//        em.close();
+        this.parent = pflege;
+
+        tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        btnNew.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
+
+        initPanel();
+        change2Bewohner(bewohner);
+    }
+
+
+    private void initPanel(){
+
+        tblUpload.setModel(new DefaultTableModel());
+        tblUpload.setTransferHandler(new TXHFiles());
+
+
     }
 
     @Override
@@ -86,15 +99,17 @@ public class PnlFiles extends NursingRecordsPanel {
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.bewohner = bewohner;
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        reloadTable();
     }
 
      @Override
     public void reload() {
-         loadTable();
+         reloadTable();
     }
 
-    void loadTable() {
+    void reloadTable() {
 
         List<SYSFiles> files = new ArrayList<SYSFiles>(SYSFilesTools.findByBewohner(bewohner));
         Collections.sort(files);
@@ -114,113 +129,60 @@ public class PnlFiles extends NursingRecordsPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jToolBar1 = new JToolBar();
-        btnNew = new JButton();
-        btnLogout = new JButton();
-        lblBW = new JLabel();
+        pnlMain = new JPanel();
+        jspUpload = new JScrollPane();
+        tblUpload = new JTable();
         jspFiles = new JScrollPane();
         tblFiles = new JTable();
 
         //======== this ========
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== jToolBar1 ========
+        //======== pnlMain ========
         {
-            jToolBar1.setFloatable(false);
-            jToolBar1.setRollover(true);
+            pnlMain.setLayout(new FormLayout(
+                "default:grow",
+                "fill:150dlu, $rgap, fill:default:grow"));
 
-            //---- btnNew ----
-            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
-            btnNew.setText("Neu / Upload");
-            btnNew.setFocusable(false);
-            btnNew.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnNewActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnNew);
+            //======== jspUpload ========
+            {
+                jspUpload.setViewportView(tblUpload);
+            }
+            pnlMain.add(jspUpload, CC.xy(1, 1));
 
-            //---- btnLogout ----
-            btnLogout.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/lock.png")));
-            btnLogout.setText("Abmelden");
-            btnLogout.setFocusable(false);
-            btnLogout.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnLogoutbtnLogoutHandler(e);
-                }
-            });
-            jToolBar1.add(btnLogout);
+            //======== jspFiles ========
+            {
+                jspFiles.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspFilesComponentResized(e);
+                    }
+                });
+
+                //---- tblFiles ----
+                tblFiles.setModel(new DefaultTableModel(
+                    new Object[][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                    },
+                    new String[] {
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+                ));
+                tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tblFiles.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        tblFilesMousePressed(e);
+                    }
+                });
+                jspFiles.setViewportView(tblFiles);
+            }
+            pnlMain.add(jspFiles, CC.xy(1, 3));
         }
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("jLabel3");
-
-        //======== jspFiles ========
-        {
-            jspFiles.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    jspFilesComponentResized(e);
-                }
-            });
-
-            //---- tblFiles ----
-            tblFiles.setModel(new DefaultTableModel(
-                new Object[][] {
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                },
-                new String[] {
-                    "Title 1", "Title 2", "Title 3", "Title 4"
-                }
-            ) {
-                Class<?>[] columnTypes = new Class<?>[] {
-                    Object.class, Object.class, Object.class, Object.class
-                };
-                @Override
-                public Class<?> getColumnClass(int columnIndex) {
-                    return columnTypes[columnIndex];
-                }
-            });
-            tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            tblFiles.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    tblFilesMousePressed(e);
-                }
-            });
-            jspFiles.setViewportView(tblFiles);
-        }
-
-        GroupLayout layout = new GroupLayout(this);
-        setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(12, 12, 12)
-                    .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
-                    .addContainerGap())
-                .addComponent(jToolBar1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspFiles, GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblBW, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspFiles, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
+        add(pnlMain);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
@@ -269,7 +231,7 @@ public class PnlFiles extends NursingRecordsPanel {
                     if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diese Datei wirklich löschen ?",
                             "Datei löschen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         SYSFilesTools.deleteFile(sysfile);
-                        loadTable();
+                        reloadTable();
                     }
                 }
             });
@@ -298,10 +260,9 @@ public class PnlFiles extends NursingRecordsPanel {
     }//GEN-LAST:event_jspFilesComponentResized
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JToolBar jToolBar1;
-    private JButton btnNew;
-    private JButton btnLogout;
-    private JLabel lblBW;
+    private JPanel pnlMain;
+    private JScrollPane jspUpload;
+    private JTable tblUpload;
     private JScrollPane jspFiles;
     private JTable tblFiles;
     // End of variables declaration//GEN-END:variables

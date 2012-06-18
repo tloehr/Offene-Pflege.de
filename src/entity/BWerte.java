@@ -212,6 +212,10 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         this.mdate = mdate;
     }
 
+    public boolean isOhneWert(){
+        return type == BWerteTools.ERBRECHEN || type == BWerteTools.STUHLGANG;
+    }
+
     public Collection<SYSBWerte2VORGANG> getAttachedVorgaenge() {
         return attachedVorgaenge;
     }

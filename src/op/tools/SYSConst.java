@@ -29,7 +29,7 @@ package op.tools;
 import op.OPDE;
 
 import java.awt.*;
-import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -106,16 +106,14 @@ public class SYSConst {
     public static final Date DATE_VON_ANFANG_AN = new Date(VON_ANFANG_AN.getTimeInMillis());
     public static final Date DATE_BIS_AUF_WEITERES = new Date(BIS_AUF_WEITERES.getTimeInMillis());
     public static final Date DATE_BIS_AUF_WEITERES_WO_TIME = new Date(BIS_AUF_WEITERES_WO_TIME.getTimeInMillis());
-    public static final Timestamp TS_VON_ANFANG_AN = new Timestamp(VON_ANFANG_AN.getTimeInMillis());
-    public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(BIS_AUF_WEITERES.getTimeInMillis());
+    //    public static final Timestamp TS_VON_ANFANG_AN = new Timestamp(VON_ANFANG_AN.getTimeInMillis());
+//    public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(BIS_AUF_WEITERES.getTimeInMillis());
     public static final String MYSQL_DATETIME_VON_ANFANG_AN = "'1000-01-01 00:00:00'";
     public static final String MYSQL_DATETIME_BIS_AUF_WEITERES = "'9999-12-31 23:59:59'";
-    public static final int GESCHLECHT_MÄNNLICH = 1;
+    public static final int GESCHLECHT_MAENNLICH = 1;
     public static final int GESCHLECHT_WEIBLICH = 2;
-    public static final String GESCHLECHT[] = {"", "männlich", "weiblich"};
-    public static final String STAERKE[] = {"g", "mg", "µg", "E", "mcm", "TSD E", "MIO E", "mmol", "ml"}; // Für Medikamente
-    public static final String EINHEIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
-    public static final String STOFFTYP[] = {"Wirkstoff", "Hilfsstoff", "Sonstiger Stoff"};
+    //    public static final String GESCHLECHT[] = {"", "männlich", "weiblich"};
+    public static final String EINHEIT[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
 
     public static final byte UZ = 0; // Solluhrzeit
     public static final byte FM = 1; // Nacht Morgens
@@ -134,11 +132,19 @@ public class SYSConst {
     public static final int ZEIT_SPAET = 2;
     public static final int ZEIT_NACHT_AB = 3;
     public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
+
+
     public static final int BMI_UNTERGEWICHT = 0;
     public static final int BMI_NORMAL = 1;
     public static final int BMI_ÜBERGEWICHT = 2;
     public static final String html_arial14 = "face=\"" + OPDE.arial14.getFamily() + "\"";
-    public static final String html_fontface = "<font "+html_arial14+" >";
+    public static final String html_fontface = "<font " + html_arial14 + " >";
+
+    public static final String html_report_footer = "<hr/>" +
+            html_fontface +
+            "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
+            + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+            + "<br/>http://www.offene-pflege.de</font>\n";
 
 
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);

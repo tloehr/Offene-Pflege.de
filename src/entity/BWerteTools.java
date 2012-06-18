@@ -4,6 +4,7 @@ package entity;
 import entity.vorgang.SYSBWerte2VORGANG;
 import entity.vorgang.Vorgaenge;
 import op.OPDE;
+import op.care.vital.PnlVitalwerte;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -37,8 +38,8 @@ public class BWerteTools {
     public static final int STUHLGANG = 9;
     public static final int ERBRECHEN = 10;
     public static final int BILANZ = 11;
-    public static final String[] WERTE = new String[]{"unbekannt", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
-    public static final String[] EINHEIT = new String[]{"unbekannt", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
+    public static final String[] WERTE = new String[]{"", "Blutdruck", "Puls", "Temperatur", "Blutzucker", "Gewicht", "Größe", "Atemfrequenz", "Quickwert", "Stuhlgang", "Erbrochen", "Ein-/Ausfuhrbilanz"};
+    public static final String[] EINHEIT = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
     public static final String RRSYS = "systolisch";
     public static final String RRDIA = "diatolisch";
 
@@ -65,7 +66,7 @@ public class BWerteTools {
         if (showids) {
             result += "<br/><i>(" + bwert.getBwid() + ")</i>";
         }
-        return colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result;
+        return SYSTools.htmlUmlautConversion(colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
     }
 
     /**
@@ -139,20 +140,20 @@ public class BWerteTools {
 //        }
         DateFormat df = DateFormat.getDateTimeInstance();
         if (bwert.isDeleted()) {
-            result += "<i><b>Gelöschter Eintrag.</b><br/>Gelöscht am/um: " + df.format(bwert.getMdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + "</i><br/>";
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getMdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getNameUndVorname() + "</i><br/>";
         }
-        if (bwert.isReplacement()) {
-            result += "<i>Dies ist ein Eintrag, der <b>nachbearbeitet</b> wurde.<br/>Am/um: " + df.format(bwert.getCdate()) + "<br/>Der Originaleintrag hatte die Nummer: " + bwert.getReplacementFor().getBwid() + "</i><br/>";
+        if (bwert.isReplacement() && !bwert.isReplaced()) {
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCdate()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + bwert.getReplacementFor().getBwid() + "</i><br/>";
         }
         if (bwert.isReplaced()) {
-            result += "<i>Dies ist ein Eintrag, der durch eine <b>Nachbearbeitung</b> ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format(bwert.getCdate()) + " von " + bwert.getEditedBy().getNameUndVorname() + " vorgenommen.";
-            result += "<br/>Der Korrektureintrag hat die Nummer: " + bwert.getReplacedBy().getBwid() + "</i><br/>";
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getNameUndVorname();
+            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + bwert.getReplacedBy().getBwid() + "</i><br/>";
         }
 
         if (bwert.getType() == RR) {
             result += "<b>" + bwert.getWert() + "/" + bwert.getWert2() + " " + EINHEIT[RR] + " " + WERTE[PULS] + ": " + bwert.getWert3() + " " + EINHEIT[PULS] + "</b>";
         } else if (bwert.getType() == STUHLGANG || bwert.getType() == ERBRECHEN) {
-            result += "<i>Kein Wert. Siehe Bemerkung</i>";
+            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
         } else {
             result += "<b>" + bwert.getWert() + " " + EINHEIT[bwert.getType()] + "</b>";
         }
@@ -162,30 +163,50 @@ public class BWerteTools {
 //        if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
 //            result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
 //        }
-        return colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result;
+        return SYSTools.htmlUmlautConversion(colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
+    }
+
+    public static String getBemerkungAsHTML(BWerte wert, boolean colorize) {
+        String result = "";
+        if (!SYSTools.catchNull(wert.getBemerkung()).isEmpty()) {
+            String color = "";
+            if (colorize) {
+                if (wert.isReplaced() || wert.isDeleted()) {
+                    color = SYSConst.html_lightslategrey;
+                } else {
+                    color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(wert.getPit()));
+                }
+            }
+            result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + OPDE.lang.getString("misc.msg.comment") + ":</b> " + wert.getBemerkung() + "</font>";
+        }
+        return SYSTools.htmlUmlautConversion(result);
     }
 
 
     public static String getBWerteAsHTML(List<BWerte> bwerte) {
 
         if (bwerte.isEmpty()) {
-            return "<i>keine Werte in der Auswahl vorhanden</i>";
+            return "<i>" + OPDE.lang.getString("misc.msg.emptyselection") + "</i>";
         }
 
         String html = "";
 
-        html += "<h1>Bewohner-Werte für " + BewohnerTools.getBWLabelText(bwerte.get(0).getBewohner()) + "</h1>";
+        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + BewohnerTools.getBWLabelText(bwerte.get(0).getBewohner()) + "</h1>";
 
-        html += "<table border=\"1\" cellspacing=\"0\"><tr>" +
-                "<th style=\"width:30%\">Info</th><th style=\"width:70%\">Wert</th></tr>";
+        html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
+                "<th style=\"width:20%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader1") +
+                "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader2") + "</th>" +
+                "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader3") + "</th></tr>\n";
 
         for (BWerte wert : bwerte) {
             html += "<tr>";
             html += "<td>" + getPITasHTML(wert, false, false) + "</td>";
             html += "<td>" + getBWertAsHTML(wert, false) + "</td>";
-            html += "</tr>";
-            html += "</table>";
+            html += "<td>" + getBemerkungAsHTML(wert, false) + "</td>";
+            html += "</tr>\n";
         }
+
+        html += "</table>\n";
 
         html = "<html><head>" +
                 "<title>" + SYSTools.getWindowTitle("") + "</title>" +
@@ -193,16 +214,17 @@ public class BWerteTools {
                 "<script type=\"text/javascript\">" +
                 "window.onload = function() {" +
                 "window.print();" +
-                "}</script></head><body>" + html + "</body></html>";
-        return html;
+                "}</script></head><body>\n" + html + "\n" + SYSConst.html_report_footer + "</body></html>";
+
+        return SYSTools.htmlUmlautConversion(html);
     }
 
 
     /**
-     * setzt einen Pflegebericht auf "gelöscht". Das heisst, er ist dann inaktiv. Es werden auch Datei und Vorgangs
+     * setzt einen Bewohnerwert auf "gelöscht". Das heisst, er ist dann inaktiv. Es werden auch Datei und Vorgangs
      * Zuordnungen entfernt.
      *
-     * @param bericht
+     * @param wert
      * @return den geänderten und somit gelöschten Wert. Null bei Fehler.
      */
     public static BWerte deleteWert(BWerte wert) {

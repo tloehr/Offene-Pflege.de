@@ -601,8 +601,8 @@ public class PnlVerordnung extends NursingRecordsPanel {
     private CollapsiblePane addFilters() {
         JPanel labelPanel = new JPanel();
         labelPanel.setBackground(Color.WHITE);
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
-
+//        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+        labelPanel.setLayout(new VerticalLayout(5));
 
         CollapsiblePane panelFilter = new CollapsiblePane("Filter");
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
@@ -612,6 +612,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
         tbAbgesetzt.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                if (initPhase) return;
                 SYSPropsTools.storeState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
                 reloadTable();
             }

@@ -118,6 +118,8 @@ public class FrmMain extends JFrame {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
+        setTitle(SYSTools.getWindowTitle(""));
+
         displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
         displayManager.start();
 

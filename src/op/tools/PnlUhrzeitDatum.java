@@ -24,10 +24,22 @@ import java.util.GregorianCalendar;
  */
 public class PnlUhrzeitDatum extends JPanel {
     private Time uhrzeit;
+    private Date preset;
+
+
+    public PnlUhrzeitDatum() {
+        this(new Date(), new Date());
+    }
 
     public PnlUhrzeitDatum(Date preset) {
+        this(preset, new Date());
+    }
+
+    public PnlUhrzeitDatum(Date preset, Date max) {
         initComponents();
+        this.preset = preset;
         jdcDatum.setDate(preset);
+        jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_BIS_AUF_WEITERES : max);
         uhrzeit = new Time(preset.getTime());
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
     }
@@ -55,9 +67,14 @@ public class PnlUhrzeitDatum extends JPanel {
             gc = SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText());
         } catch (NumberFormatException nfe) {
             gc = new GregorianCalendar();
+            gc.setTime(preset);
         }
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(gc.getTimeInMillis())));
         uhrzeit = new Time(gc.getTimeInMillis());
+    }
+
+    private void txtUhrzeitFocusGained(FocusEvent e) {
+        SYSTools.markAllTxt(txtUhrzeit);
     }
 
     private void initComponents() {
@@ -69,8 +86,8 @@ public class PnlUhrzeitDatum extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "16dlu, $lgap, 16dlu"));
+            "default, $lcgap, default:grow",
+            "16dlu, $lgap, 16dlu"));
 
         //---- label1 ----
         label1.setText("Datum");
@@ -84,6 +101,10 @@ public class PnlUhrzeitDatum extends JPanel {
         //---- txtUhrzeit ----
         txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
         txtUhrzeit.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtUhrzeitFocusGained(e);
+            }
             @Override
             public void focusLost(FocusEvent e) {
                 txtUhrzeitFocusLost(e);

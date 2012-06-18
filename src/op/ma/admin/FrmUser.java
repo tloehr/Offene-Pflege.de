@@ -566,10 +566,10 @@ public class FrmUser extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addGroup(pnlLeftUserLayout.createParallelGroup()
                                     .addGroup(pnlLeftUserLayout.createSequentialGroup()
-                                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                                         .addContainerGap())
                                     .addGroup(pnlLeftUserLayout.createSequentialGroup()
-                                        .addComponent(jLabel8, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                                        .addComponent(jLabel8, GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
                                         .addGap(24, 24, 24))
                                     .addGroup(pnlLeftUserLayout.createSequentialGroup()
                                         .addComponent(jPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -581,7 +581,7 @@ public class FrmUser extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addComponent(jLabel8)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
+                                .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     );
@@ -778,21 +778,21 @@ public class FrmUser extends javax.swing.JFrame {
                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                             .addComponent(jLabel6)
                                             .addGap(35, 35, 35)
-                                            .addComponent(txtUKennung, GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE)
+                                            .addComponent(txtUKennung, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
                                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                             .addComponent(lblUKennungFree))
                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                             .addComponent(jLabel5)
                                             .addGap(58, 58, 58)
-                                            .addComponent(txtEMail, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
+                                            .addComponent(txtEMail, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                             .addGroup(jPanel4Layout.createParallelGroup()
                                                 .addComponent(jLabel1)
                                                 .addComponent(jLabel2))
                                             .addGap(33, 33, 33)
                                             .addGroup(jPanel4Layout.createParallelGroup()
-                                                .addComponent(txtVorname, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-                                                .addComponent(txtName, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))))
+                                                .addComponent(txtVorname, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                                                .addComponent(txtName, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))))
                                     .addContainerGap())
                         );
                         jPanel4Layout.setVerticalGroup(
@@ -832,12 +832,12 @@ public class FrmUser extends javax.swing.JFrame {
                                         .addContainerGap())
                                     .addGroup(pnlRightUserLayout.createSequentialGroup()
                                         .addGroup(pnlRightUserLayout.createParallelGroup()
-                                            .addComponent(jsp1, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
-                                            .addComponent(jLabel3, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
+                                            .addComponent(jsp1, GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                                            .addComponent(jLabel3, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))
                                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(pnlRightUserLayout.createParallelGroup()
-                                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
-                                            .addComponent(jLabel4, GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE))
+                                            .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+                                            .addComponent(jLabel4, GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE))
                                         .addContainerGap())
                                     .addComponent(jPanel3, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                     );
@@ -851,10 +851,10 @@ public class FrmUser extends javax.swing.JFrame {
                                     .addComponent(jLabel3))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(pnlRightUserLayout.createParallelGroup()
-                                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
-                                    .addComponent(jsp1, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                                    .addComponent(jsp1, GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     );
                 }
 
@@ -979,7 +979,7 @@ public class FrmUser extends javax.swing.JFrame {
                         pnlLeftGrpLayout.createParallelGroup()
                             .addGroup(GroupLayout.Alignment.TRAILING, pnlLeftGrpLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
+                                .addComponent(jScrollPane3, GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jPanel8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     );
@@ -1058,10 +1058,10 @@ public class FrmUser extends javax.swing.JFrame {
                                 .addGroup(GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jScrollPane4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane6, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-                                        .addComponent(jLabel7, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-                                        .addComponent(jLabel9, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE))
+                                        .addComponent(jScrollPane4, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane6, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                                        .addComponent(jLabel7, GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                                        .addComponent(jLabel9, GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
                                     .addContainerGap())
                         );
                         jPanel2Layout.setVerticalGroup(
@@ -1070,11 +1070,11 @@ public class FrmUser extends javax.swing.JFrame {
                                     .addContainerGap()
                                     .addComponent(jLabel7)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jLabel9)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jScrollPane6, GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane6, GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
                                     .addContainerGap())
                         );
                     }
@@ -1106,8 +1106,8 @@ public class FrmUser extends javax.swing.JFrame {
                                 .addGroup(GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jScrollPane5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
-                                        .addComponent(jLabel10, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE))
+                                        .addComponent(jScrollPane5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                                        .addComponent(jLabel10, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE))
                                     .addContainerGap())
                         );
                         jPanel6Layout.setVerticalGroup(
@@ -1116,7 +1116,7 @@ public class FrmUser extends javax.swing.JFrame {
                                     .addContainerGap()
                                     .addComponent(jLabel10)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jScrollPane5, GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane5, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                                     .addContainerGap())
                         );
                     }
@@ -1226,9 +1226,9 @@ public class FrmUser extends javax.swing.JFrame {
                                         .addComponent(jLabel12))
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addGroup(jPanel9Layout.createParallelGroup()
-                                        .addComponent(txtGroupDescription, GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                                        .addComponent(txtGroupDescription, GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                                         .addGroup(GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
-                                            .addComponent(txtGKennung, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                                            .addComponent(txtGKennung, GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                             .addComponent(lblGKennungFree)
                                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -1240,7 +1240,7 @@ public class FrmUser extends javax.swing.JFrame {
                                 .addGroup(jPanel9Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addGroup(jPanel9Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addComponent(txtGKennung)
+                                        .addComponent(txtGKennung, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
                                         .addComponent(jLabel11)
                                         .addComponent(lblGKennungFree, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
                                         .addComponent(cbExamen, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE))
@@ -1277,7 +1277,7 @@ public class FrmUser extends javax.swing.JFrame {
                                     .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel7, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jPanel7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     );
                 }
 
@@ -1306,14 +1306,14 @@ public class FrmUser extends javax.swing.JFrame {
             contentPaneLayout.createParallelGroup()
                 .addGroup(contentPaneLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 1075, Short.MAX_VALUE)
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
                     .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup()
                 .addGroup(contentPaneLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
+                    .addComponent(jtpMain, GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                     .addContainerGap())
         );
         pack();

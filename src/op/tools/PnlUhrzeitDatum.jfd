@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -88,6 +88,14 @@
           <string>java.awt.event.ActionListener</string> 
           <string>actionPerformed</string> 
           <string>txtUhrzeitActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.FocusListener</string> 
+          <string>focusGained</string> 
+          <string>txtUhrzeitFocusGained</string> 
           <boolean>true</boolean> 
          </object> 
         </void> 

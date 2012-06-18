@@ -62,6 +62,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -72,6 +74,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     private Bewohner bewohner;
 
     private boolean initPhase;
+    private JComboBox cmbAuswahl;
     private JPopupMenu menu;
     public static final String internalClassID = "nursingrecords.vitalparameters";
 
@@ -97,7 +100,6 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
     private void initPanel() {
         tblVital.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
     }
 
     /**
@@ -160,6 +162,16 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
     private void printWerte(int[] sel) {
         try {
+            TMWerte tm = (TMWerte) tblVital.getModel();
+            ArrayList<BWerte> printlist = tm.getContent();
+
+            if (sel != null) {
+                printlist = new ArrayList<BWerte>(sel.length);
+                for (int row : sel) {
+                    printlist.add(tm.getBWert(row));
+                }
+            }
+
             // Create temp file.
             File temp = File.createTempFile(internalClassID, ".html");
 
@@ -169,8 +181,8 @@ public class PnlVitalwerte extends NursingRecordsPanel {
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
-            TMWerte tm = (TMWerte) tblVital.getModel();
-            out.write(BWerteTools.getBWerteAsHTML(tm.getContent()));
+
+            out.write(BWerteTools.getBWerteAsHTML(printlist));
 
             out.close();
             SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
@@ -220,11 +232,11 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         }
 
         SwingWorker worker = new SwingWorker() {
-            TMWerte model;
+            TableModel model;
 
             @Override
             protected Object doInBackground() throws Exception {
-                model = new TMWerte(jdcVon.getDate(), bewohner, tbShowReplaced.isSelected(), tbShowIDs.isSelected());
+                model = new TMWerte(jdcVon.getDate(), bewohner, cmbAuswahl.getSelectedIndex(), tbShowReplaced.isSelected(), tbShowIDs.isSelected());
                 return null;
             }
 
@@ -267,7 +279,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         TMWerte tm = (TMWerte) tblVital.getModel();
         if (tm.getRowCount() > 0 && row > -1) {
             final BWerte wert = tm.getBWert(lsm.getLeadSelectionIndex());
-            boolean bearbeitenMöglich = !wert.isReplaced() && !wert.isDeleted() && singleRowSelected;
+            boolean bearbeitenMoeglich = !wert.isReplaced() && !wert.isDeleted() && singleRowSelected;
 
             if (evt.isPopupTrigger()) {
 
@@ -295,7 +307,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
                                     if (wert.getType() == BWerteTools.RR) {
                                         editor = new PnlWerte123(wert.getWert(), wert.getWert2(), wert.getWert3(), BWerteTools.RRSYS, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.RRDIA, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.WERTE[BWerteTools.PULS], BWerteTools.EINHEIT[BWerteTools.PULS]);
-                                    } else if (wert.getType() == BWerteTools.ERBRECHEN || wert.getType() == BWerteTools.STUHLGANG) {
+                                    } else if (wert.isOhneWert()) {
                                         editor = null;
                                     } else {
                                         editor = new PnlWerte123(wert.getWert(), BWerteTools.WERTE[wert.getType()], BWerteTools.EINHEIT[wert.getType()]);
@@ -317,9 +329,12 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
                             if (editor != null) {
 
-                                JScrollPane pnl = new JScrollPane(editor);
-                                pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
-                                popup.getContentPane().add(pnl);
+                                JScrollPane pnlEditor = new JScrollPane(editor);
+
+                                JPanel pnl = new JPanel(new BorderLayout(10, 10));
+
+                                pnl.add(pnlEditor, BorderLayout.CENTER);
+
 
                                 final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                                 saveButton.addActionListener(new ActionListener() {
@@ -328,7 +343,6 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
                                         BWerte newOne = wert.clone();
                                         popup.hidePopup();
-                                        String errorMsg = "";
 
                                         switch (col) {
                                             case TMWerte.COL_PIT: {
@@ -355,16 +369,25 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry"), DisplayMessage.WARNING));
                                         } else if (col == TMWerte.COL_COMMENT && newOne.getBemerkung().equals(wert.getBemerkung())) {
                                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nochanges"), DisplayMessage.WARNING));
+                                        } else {
+                                            newOne = BWerteTools.changeWert(wert, newOne);
+                                            reloadTable();
                                         }
-
-                                        newOne = BWerteTools.changeWert(wert, newOne);
-                                        ((TMWerte) tblVital.getModel()).setBWert(row, newOne);
                                     }
                                 });
 
+                                saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
+
+                                JPanel buttonPanel = new JPanel();
+                                buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+                                buttonPanel.add(saveButton);
+                                pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                                pnl.add(buttonPanel, BorderLayout.SOUTH);
+
                                 popup.setOwner(tblVital);
                                 popup.removeExcludedComponent(tblVital);
-                                popup.getContentPane().add(new JPanel().add(saveButton));
+                                popup.getContentPane().add(pnl);
+
                                 popup.setDefaultFocusComponent(editor);
                                 popup.showPopup(screenposition.x, screenposition.y);
                             }
@@ -372,6 +395,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
                     });
                     menu.add(itemPopupEdit);
+                    itemPopupEdit.setEnabled(bearbeitenMoeglich && (!wert.isOhneWert() || col != TMWerte.COL_CONTENT));
                 }
 
 
@@ -405,7 +429,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
                     );
                     menu.add(itemPopupDelete);
-                    itemPopupDelete.setEnabled(bearbeitenMöglich);
+                    itemPopupDelete.setEnabled(bearbeitenMoeglich);
                 }
 
                 if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
@@ -467,6 +491,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
         jdcVon = new JDateChooser();
         jdcVon.setDate(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.WEEK_OF_MONTH));
+        jdcVon.setMaxSelectableDate(new Date());
         jdcVon.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
@@ -548,14 +573,27 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
         labelPanel.add(buttonPanel);
 
-        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.filter"));
-        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
-        panelFilter.setCollapsible(false);
+
+        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(BWerteTools.WERTE);
+        dcbm.removeElementAt(0);
+        dcbm.insertElementAt("<i>"+OPDE.lang.getString("misc.commands.noselection")+"</i>", 0);
+        cmbAuswahl = new JComboBox(dcbm);
+        cmbAuswahl.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+                SYSPropsTools.storeState(internalClassID + ":cmbAuswahl", cmbAuswahl);
+                reloadTable();
+            }
+        });
+        labelPanel.add(cmbAuswahl);
+        SYSPropsTools.restoreState(internalClassID + ":cmbAuswahl", cmbAuswahl);
 
         tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showreplaced"));
         tbShowReplaced.addItemListener(new ItemListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
                 SYSPropsTools.storeState(internalClassID + ":tbShowReplaced", tbShowReplaced);
                 reloadTable();
             }
@@ -567,7 +605,8 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         tbShowIDs = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showpks"));
         tbShowIDs.addItemListener(new ItemListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
                 SYSPropsTools.storeState(internalClassID + ":tbShowIDs", tbShowIDs);
                 reloadTable();
             }
@@ -577,7 +616,9 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         labelPanel.add(tbShowIDs);
         SYSPropsTools.restoreState(internalClassID + ":tbShowIDs", tbShowIDs);
 
-
+        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.filter"));
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
         panelFilter.setContentPane(labelPanel);
 
         return panelFilter;
@@ -630,7 +671,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.printselected"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     printWerte(null);
