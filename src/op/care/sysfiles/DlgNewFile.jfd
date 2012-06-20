@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -13,11 +13,11 @@
        <class>org.jdesktop.layout.GroupLayout</class> 
        <void method="setProperty"> 
         <string>$horizontalGroup</string> 
-        <string>par l {seq {space :::p, par l {comp cbBeleg::l:p::p, comp jLabel1::l:p::p, comp jScrollPane1::l::653:x, seq t {comp txtFile::::576:x, space :::p, comp lblFileExist:::p::p, space :::p, comp btnSelectFile:::p::p}, seq t {comp btnOk:::p::p, space :::p, comp btnCancel:::p::p}}, space :::p}}</string> 
+        <string>par l {seq {space :::p, par l {comp jLabel1::l:p::p, comp jScrollPane1::l::374:x, seq t {comp txtFile::::272:x, space :::p, comp lblFileExist:::p::p, space :::p, comp btnSelectFile:::p::p}, seq t {comp btnOk:::p::p, space :::p, comp btnCancel:::p::p}}, space :::p}}</string> 
        </void> 
        <void method="setProperty"> 
         <string>$verticalGroup</string> 
-        <string>par l {seq l {space :::p, par t:::p {comp txtFile::t:::x:1, comp lblFileExist::t:::x:1, comp btnSelectFile::l::38:x:1}, space s:::p, comp jLabel1:::p::p, space :::p, comp jScrollPane1::::243:x, space s:::p, comp cbBeleg:::p::p, space u:::p, par b {comp btnCancel::b:p::p, comp btnOk::b:p::p}, space :p::p}}</string> 
+        <string>par l {seq l {space :::p, par t:::p {comp txtFile::t:::x:1, comp lblFileExist::t:::x:1, comp btnSelectFile::l::38:x:1}, space s:::p, comp jLabel1:::p::p, space :::p, comp jScrollPane1::::98:x, space :p:45:p, par b {comp btnCancel::b:p::p, comp btnOk::b:p::p}, space :p::p}}</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -131,26 +131,6 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JCheckBox</string> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>Einbuchungsbeleg drucken</string> 
-        </void> 
-        <void property="name"> 
-         <string>cbBeleg</string> 
-        </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ActionListener</string> 
-          <string>actionPerformed</string> 
-          <string>cbBelegActionPerformed</string> 
-          <boolean>true</boolean> 
-         </object> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JButton</string> 
         <void method="setProperty"> 
          <string>icon</string> 
@@ -214,6 +194,13 @@
        <object class="java.awt.Dimension"> 
         <int>400</int> 
         <int>300</int> 
+       </object> 
+      </void> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>0</int> 
        </object> 
       </void> 
      </object> 

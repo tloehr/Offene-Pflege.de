@@ -25,7 +25,10 @@
  */
 package entity.files;
 
-import entity.*;
+import entity.BWInfo;
+import entity.BWerte;
+import entity.Bewohner;
+import entity.Pflegeberichte;
 import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.care.sysfiles.DlgNewFile;
@@ -33,6 +36,8 @@ import op.tools.DlgException;
 import op.tools.SYSTools;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.io.CopyStreamEvent;
+import org.apache.commons.net.io.CopyStreamListener;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -58,7 +63,7 @@ public class SYSFilesTools {
      * @param bewohner
      * @return
      */
-    public static Set<SYSFiles> findByBewohner(Bewohner bewohner) {
+    public static ArrayList<SYSFiles> findByBewohner(Bewohner bewohner) {
         Set<SYSFiles> files = new TreeSet<SYSFiles>();
         Query query;
         EntityManager em = OPDE.createEM();
@@ -80,7 +85,8 @@ public class SYSFilesTools {
         files.addAll(query.getResultList());
 
         em.close();
-        return files;
+
+        return new ArrayList<SYSFiles>(files);
     }
 
     /**
@@ -100,59 +106,78 @@ public class SYSFilesTools {
      * @param file File Obkjekt der zu speichernden Datei
      * @return EB der neuen Datei. null bei Fehler.
      */
-    public static SYSFiles putFile(File file) {
+    public static SYSFiles putFile(EntityManager em, FTPClient ftp, File file, Bewohner bewohner) throws Exception {
         SYSFiles sysfile = null;
-        EntityManager em = OPDE.createEM();
-        try {
 
-            FTPClient ftp = new FTPClient();
-            ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
-            ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
-            ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
-            ftp.setFileType(FTP.BINARY_FILE_TYPE);
-            String md5 = SYSTools.getMD5Checksum(file);
-            Query query = em.createNamedQuery("SYSFiles.findByMd5");
-            query.setParameter("md5", md5);
+        String md5 = SYSTools.getMD5Checksum(file);
+        Query query = em.createNamedQuery("SYSFiles.findByMd5");
+        query.setParameter("md5", md5);
 
-            // Gibts die Datei schon ?
-            if (query.getResultList().isEmpty()) { // nein, noch nicht
-                try {
-                    long ts = file.lastModified();
-                    sysfile = new SYSFiles(file.getName(), md5, new Date(ts), file.length(), OPDE.getLogin().getUser());
-                    em.getTransaction().begin();
-                    em.persist(sysfile);
-                    em.getTransaction().commit();
-                    String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
-                    FileInputStream fis = new FileInputStream(file);
-                    ftp.storeFile(remoteFilename, fis);
-                    fis.close();
-                    ftp.disconnect();
-                } catch (Exception e1) {
-                    OPDE.fatal(e1);
-                    /*
-                     * Das ist etwas unelegant. Aber leider geht es nicht anders.
-                     * An sich hätte ich lieber mit der Transaction.rollback gearbeitet.
-                     * Ich brauche aber direkt nach dem Persist den primary key der entity.
-                     * Und den krieg ich nur, wenn ich das persist committe.
-                     * Falls dann doch noch was schief geht, lösche ich die Entität wieder.
-                     */
-                    em.getTransaction().begin();
-                    em.remove(sysfile);
-                    em.getTransaction().commit();
-                } finally {
-                    em.close();
-                }
-            } else { // Ansonsten die bestehende Datei zurückgeben
-                sysfile = (SYSFiles) query.getSingleResult();
-                em.close();
-            }
+        // Gibts die Datei schon ?
+        if (query.getResultList().isEmpty()) { // nein, noch nicht
+            long ts = file.lastModified();
+            sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(ts), file.length(), OPDE.getLogin().getUser(), bewohner));
+            FileInputStream fis = new FileInputStream(file);
+            ftp.storeFile(sysfile.getRemoteFilename(), fis);
+            fis.close();
+            ftp.disconnect();
+        } else { // Ansonsten die bestehende Datei zurückgeben
+            sysfile = (SYSFiles) query.getSingleResult();
 
-        } catch (Exception ex) {
-            //new DlgException(ex);
-            OPDE.fatal(ex);
         }
+
         return sysfile;
     }
+
+    public static List<SYSFiles> putFiles(File[] files, Bewohner bewohner) {
+
+        ArrayList<SYSFiles> successful = new ArrayList<SYSFiles>(files.length);
+        FTPClient ftp = getFTPClient();
+        ftp.setCopyStreamListener(new CopyStreamListener() {
+            @Override
+            public void bytesTransferred(CopyStreamEvent copyStreamEvent) {
+                OPDE.debug(copyStreamEvent.getTotalBytesTransferred() + " / " + copyStreamEvent.getStreamSize());
+            }
+
+            @Override
+            public void bytesTransferred(long l, int i, long l1) {
+
+            }
+        });
+
+        if (ftp != null) {
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                for (File file : files) {
+                    successful.add(putFile(em, ftp, file, bewohner));
+                }
+                em.getTransaction().commit();
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                // Bereits gespeicherte wieder löschen
+                for (SYSFiles sysfile : successful) {
+                    try {
+                        ftp.deleteFile(sysfile.getRemoteFilename());
+                    } catch (IOException e) {
+                        OPDE.fatal(e);
+                    }
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
+                try {
+                    ftp.disconnect();
+                } catch (IOException e) {
+                    OPDE.error(e);
+                }
+            }
+        }
+        return successful;
+    }
+
 
     /**
      * <code>getFile(SYSFiles file)</code> holt eine Datei vom FTP Server entsprechend der Angaben aus der EntityBean.
@@ -177,26 +202,19 @@ public class SYSFilesTools {
 
         try {
 
-            FTPClient ftp = new FTPClient();
-
-            ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
-            ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
-            ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
-            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+            FTPClient ftp = getFTPClient();
 
             String sep = System.getProperties().getProperty("file.separator"); // Fileseparator
-            String cachedir = OPDE.getProps().getProperty("opcache");
             // Gibts die Datei schon ?
-            File target = new File(cachedir + sep + sysfile.getFilename());
+            File target = new File(OPDE.getOPCache() + sep + sysfile.getFilename());
             // Gibts den Download schon ?
             if (target.exists() && SYSTools.getMD5Checksum(target).equals(sysfile.getMd5())) {
                 result = target;
             } else { // Nein, muss runtergeladen werden.
                 target.delete();
                 // Filetransfer...........................
-                String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
                 FileOutputStream fos = new FileOutputStream(target);
-                ftp.retrieveFile(remoteFilename, fos);
+                ftp.retrieveFile(sysfile.getRemoteFilename(), fos);
                 fos.close();
                 target.setLastModified(sysfile.getFiledate().getTime());
                 result = target;
@@ -211,84 +229,90 @@ public class SYSFilesTools {
         return result;
     }
 
-    /**
-     * <code>updateFile(File, long)</code> aktualisiert eine bestehende Datei auf dem FTP Server gemäß des PK aus der DB-Tabelle <i>OCFiles</i>
-     * Der Dateiname wird nicht geändert.
-     * Die Methode geht dabei wie folgt vor:
-     * <ol>
-     * <li>Es wird nachgeprüft, ob es einen passenden Eintrag in der DB-Tabelle <i>OCFiles</i> gibt.</li>
-     * <li>Dann wird die MD5 Summe der neuen Datei ermittelt. Stimmt sie mit der bestehenden überein, gibt es nichts zu tun.</li>
-     * <li>Wenn nicht, dann wird die Datei auf dem Server gelöscht und anschließend erneut raufgeladen.
-     * <li>Eintrag in der DBTabelle <i>OCFiles</i> wird mit der neuen MD5 Summe und den neuen Dateidaten aktualisiert.</li>
-     * </ol>
-     *
-     * @param file  File Objekt der neuen Datei.q
-     * @param ocfid pk aus der DB-Tabelle <i>OCFiles</i>
-     * @return true, wenn Austausch erfolgreich war. false, wenn nicht.
-     */
-    public static boolean updateFile(File file, SYSFiles sysfile) {
-        boolean success = false;
-        EntityManager em = OPDE.createEM();
-        try {
-            String newmd5 = SYSTools.getMD5Checksum(file);
-            em.getTransaction().begin();
-            // Ist überhaupt ein Austausch nötig ?
-            if (!sysfile.getMd5().equals(newmd5)) {
-                FTPClient ftp = new FTPClient();
-                ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
-                ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
-                ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
-                ftp.setFileType(FTP.BINARY_FILE_TYPE);
-
-                // neuen Timestamp bestimmen
-                long ts = file.lastModified();
-                // Löschen.................
-                String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
-
-                ftp.deleteFile(remoteFilename);
-                FileInputStream fis = new FileInputStream(file);
-                ftp.storeFile(remoteFilename, fis);
-                fis.close();
-
-                // Datenbank Eintrag erneuern
-                sysfile.setMd5(newmd5);
-                sysfile.setFiledate(new Date(ts));
-                sysfile.setFilesize(file.length());
-
-                em.merge(sysfile);
-                ftp.disconnect();
-                success = true;
-            }
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            OPDE.fatal(ex);
-            em.getTransaction().rollback();
-        }
-        return success;
-    }
+//    /**
+//     * <code>updateFile(File, long)</code> aktualisiert eine bestehende Datei auf dem FTP Server gemäß des PK aus der DB-Tabelle <i>OCFiles</i>
+//     * Der Dateiname wird nicht geändert.
+//     * Die Methode geht dabei wie folgt vor:
+//     * <ol>
+//     * <li>Es wird nachgeprüft, ob es einen passenden Eintrag in der DB-Tabelle <i>OCFiles</i> gibt.</li>
+//     * <li>Dann wird die MD5 Summe der neuen Datei ermittelt. Stimmt sie mit der bestehenden überein, gibt es nichts zu tun.</li>
+//     * <li>Wenn nicht, dann wird die Datei auf dem Server gelöscht und anschließend erneut raufgeladen.
+//     * <li>Eintrag in der DBTabelle <i>OCFiles</i> wird mit der neuen MD5 Summe und den neuen Dateidaten aktualisiert.</li>
+//     * </ol>
+//     *
+//     * @param file  File Objekt der neuen Datei.q
+//     * @param ocfid pk aus der DB-Tabelle <i>OCFiles</i>
+//     * @return true, wenn Austausch erfolgreich war. false, wenn nicht.
+//     */
+//    public static boolean updateFile(File file, SYSFiles sysfile) {
+//        boolean success = false;
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            String newmd5 = SYSTools.getMD5Checksum(file);
+//            em.getTransaction().begin();
+//            // Ist überhaupt ein Austausch nötig ?
+//            if (!sysfile.getMd5().equals(newmd5)) {
+//                FTPClient ftp = new FTPClient();
+//                ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
+//                ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
+//                ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
+//                ftp.setFileType(FTP.BINARY_FILE_TYPE);
+//
+//                // neuen Timestamp bestimmen
+//                long ts = file.lastModified();
+//                // Löschen.................
+//
+//                ftp.deleteFile(sysfile.getRemoteFilename());
+//                FileInputStream fis = new FileInputStream(file);
+//                ftp.storeFile(sysfile.getRemoteFilename(), fis);
+//                fis.close();
+//
+//                // Datenbank Eintrag erneuern
+//                sysfile.setMd5(newmd5);
+//                sysfile.setFiledate(new Date(ts));
+//                sysfile.setFilesize(file.length());
+//
+//                em.merge(sysfile);
+//                ftp.disconnect();
+//                success = true;
+//            }
+//            em.getTransaction().commit();
+//        } catch (Exception ex) {
+//            OPDE.fatal(ex);
+//            em.getTransaction().rollback();
+//        }
+//        return success;
+//    }
 
     public static boolean deleteFile(SYSFiles sysfile) {
         boolean success = false;
         EntityManager em = OPDE.createEM();
-        em.getTransaction().begin();
+
         try {
-            FTPClient ftp = new FTPClient();
-            ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
-            ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
-            ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
-            String remoteFilename = Long.toString(sysfile.getOcfid()) + ".opfile";
-            ftp.deleteFile(remoteFilename);
-            em.remove(sysfile);
-            ftp.disconnect();
+            em.getTransaction().begin();
+            em.remove(em.merge(sysfile));
             em.getTransaction().commit();
             success = true;
         } catch (Exception ex) {
-            OPDE.debug(ex);
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             success = false;
         } finally {
             em.close();
         }
+
+        if (success) {
+            try {
+                FTPClient ftp = getFTPClient();
+                ftp.deleteFile(sysfile.getRemoteFilename());
+                ftp.disconnect();
+            } catch (Exception e) {
+                OPDE.error(e);
+                success = false;
+            }
+        }
+
         return success;
     }
 
@@ -555,5 +579,32 @@ public class SYSFilesTools {
             result = new String[]{OPDE.getProps().getProperty(os + "-" + extension), file.getAbsolutePath()};
         }
         return result;
+    }
+
+    public static FTPClient getFTPClient() {
+        FTPClient ftp = new FTPClient();
+        try {
+            ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
+            ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
+            ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+        } catch (IOException e) {
+            OPDE.error(e);
+            ftp = null;
+        }
+        return ftp;
+    }
+
+    public static boolean isFTPServerReady() {
+        FTPClient ftp = getFTPClient();
+        boolean ready = ftp != null;
+        if (ready) {
+            try {
+                ftp.disconnect();
+            } catch (IOException e) {
+                OPDE.error(e);
+            }
+        }
+        return ready;
     }
 }

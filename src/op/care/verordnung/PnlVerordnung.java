@@ -604,7 +604,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 //        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
         labelPanel.setLayout(new VerticalLayout(5));
 
-        CollapsiblePane panelFilter = new CollapsiblePane("Filter");
+        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
@@ -631,7 +631,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane("Verordnungen");
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 

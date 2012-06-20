@@ -616,7 +616,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         labelPanel.add(tbShowIDs);
         SYSPropsTools.restoreState(internalClassID + ":tbShowIDs", tbShowIDs);
 
-        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.filter"));
+        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
         panelFilter.setContentPane(labelPanel);

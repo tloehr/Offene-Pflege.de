@@ -119,7 +119,6 @@ public class FrmInit extends JFrame {
     private void saveLocalProps() {
         try {
 
-//            SYSHosts host = createNewHost(false);
             String hostkey = UUID.randomUUID().toString();
             defaultProps.put("hostkey", hostkey);
 

@@ -49,7 +49,19 @@ public class PnlPflege extends NursingRecordsPanel {
     public static final int TAB_FILES = 10;
 
     private boolean initPhase;
-    private String[] tabs = new String[]{"Übersicht", "Pflegeberichte", "DFN", "BHP", "Werte", "Verordnungen", "Vorräte", "Informationen", "Planungen", "Vorgänge", "Dokumente"};
+    private String[] tabs = new String[]{
+            OPDE.lang.getString(internalClassID + ".tab1"),
+            OPDE.lang.getString(internalClassID + ".tab2"),
+            OPDE.lang.getString(internalClassID + ".tab3"),
+            OPDE.lang.getString(internalClassID + ".tab4"),
+            OPDE.lang.getString(internalClassID + ".tab5"),
+            OPDE.lang.getString(internalClassID + ".tab6"),
+            OPDE.lang.getString(internalClassID + ".tab7"),
+            OPDE.lang.getString(internalClassID + ".tab8"),
+            OPDE.lang.getString(internalClassID + ".tab9"),
+            OPDE.lang.getString(internalClassID + ".tab10"),
+            OPDE.lang.getString(internalClassID + ".tab11")
+    };
     private Bewohner currentBewohner = null;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
@@ -194,7 +206,7 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_FILES: {
-                previousPanel = new PnlFiles(new JFrame(), currentBewohner);
+                previousPanel = new PnlFiles(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_FILES, previousPanel);
 
                 break;

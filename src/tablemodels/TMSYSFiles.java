@@ -25,84 +25,32 @@
  */
 package tablemodels;
 
-import entity.files.*;
-import op.tools.HTMLTools;
+import entity.files.SYSFiles;
+import op.OPDE;
 import op.tools.SYSTools;
 
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author tloehr
  */
-public class TMSYSFiles extends DefaultTableModel {
+public class TMSYSFiles extends AbstractTableModel {
+    ArrayList<SYSFiles> mymodel;
 
-    private BeanTableModel<SYSFiles> mymodel;
-    private HashMap<Integer, String> assignmentCache;
-
-    public TMSYSFiles(List<SYSFiles> modelData) {
-        mymodel = new BeanTableModel(SYSFiles.class, modelData);
-        assignmentCache = new HashMap<Integer, String>();
-    }
-
-    @Override
-    public Object getValueAt(int row, int column) {
-        SYSFiles sysfile = mymodel.getRow(row);
-        String value = "";
-        switch (column) {
-            case 0: {
-                value = getAssignmentAsHTML(row);
-                break;
-            }
-            case 1: {
-                value = "<p>" + sysfile.getFilename() + "</p>";
-                break;
-            }
-            case 2: {
-                value = Double.toString(SYSTools.roundScale2(BigDecimal.valueOf(sysfile.getFilesize()).doubleValue() / 1024 / 1024)) + " mb";
-                break;
-            }
-//            case 2: {
-//                value = rezept.getVegetarisch();
-//                break;
-//            }
-            default: {
-                value = null;
-            }
-        }
-        return value;
+    public TMSYSFiles(ArrayList<SYSFiles> modelData) {
+        mymodel = modelData;
     }
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 2;
     }
 
     @Override
-    public Class<?> getColumnClass(int column) {
-        Class<?> myclass;
-        switch (column) {
-            case 0: {
-                myclass = String.class;
-                break;
-            }
-//            case 1: {
-//                myclass = Boolean.class;
-//                break;
-//            }
-//            case 2: {
-//                myclass = Boolean.class;
-//                break;
-//            }
-            default: {
-                myclass = String.class;
-            }
-        }
-        return myclass;
+    public Class getColumnClass(int column) {
+        return String.class;
     }
 
     @Override
@@ -111,7 +59,7 @@ public class TMSYSFiles extends DefaultTableModel {
     }
 
     public SYSFiles getRow(int row) {
-        return mymodel.getRow(row);
+        return mymodel.get(row);
     }
 
     @Override
@@ -119,15 +67,11 @@ public class TMSYSFiles extends DefaultTableModel {
         String name;
         switch (column) {
             case 0: {
-                name = "Zuordnungen";
+                name = "Datei";
                 break;
             }
             case 1: {
-                name = "Dateiname";
-                break;
-            }
-            case 2: {
-                name = "Dateigröße";
+                name = "Beschreibung";
                 break;
             }
             default: {
@@ -142,74 +86,44 @@ public class TMSYSFiles extends DefaultTableModel {
         int rowcount = 0;
 
         if (mymodel != null) {
-            rowcount = mymodel.getRowCount();
+            rowcount = mymodel.size();
         }
         return rowcount;
     }
 
-    String getAssignmentAsHTML(int row) {
-        SYSFiles sysfile = mymodel.getRow(row);
+    private String getAssignmentAsHTML(int row) {
+        SYSFiles sysfile = mymodel.get(row);
         String result = "";
         boolean start = true;
 
-        // Pflegeberichte
-        start = true;
-        List<Syspb2file> pbAssignments = (List<Syspb2file>) sysfile.getPbAssignCollection();
-        Iterator<Syspb2file> it2 = pbAssignments.iterator();
-        while (it2.hasNext()) {
-            if (start) {
-                start = false;
-                result += "<tr><th colspan=\"2\">Pflegebericht</th></tr>";
-            }
-            Syspb2file assign = it2.next();
-            result += HTMLTools.getTableRow(assign.getBemerkung(), DateFormat.getDateTimeInstance().format(assign.getPflegebericht().getPit()));
-        }
+        result += sysfile.getPbAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + ": " + sysfile.getPbAssignCollection().size() + ", ";
+        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.information") + ": " + sysfile.getBwiAssignCollection().size() + ", ";
+        result += sysfile.getVerAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + ": " + sysfile.getVerAssignCollection().size() + ", ";
 
-        // BWInfos
-        start = true;
-        List<Sysbwi2file> bwiAssignments = (List<Sysbwi2file>) sysfile.getBwiAssignCollection();
-        Iterator<Sysbwi2file> it1 = bwiAssignments.iterator();
-        while (it1.hasNext()) {
-            if (start) {
-                start = false;
-                result += "<tr><th colspan=\"2\">Bewohner Informationen</th></tr>";
-            }
-            Sysbwi2file assign = it1.next();
-            result += HTMLTools.getTableRow(assign.getBemerkung(), assign.getBwinfo().getBwinfotyp().getBWInfoKurz());
-        }
-
-
-        // Verordnungen
-        start = true;
-        List<Sysver2file> verAssignments = (List<Sysver2file>) sysfile.getVerAssignCollection();
-        Iterator<Sysver2file> it3 = verAssignments.iterator();
-        while (it3.hasNext()) {
-            if (start) {
-                start = false;
-                result += "<tr><th colspan=\"2\">Ärztliche Verordnungen</th></tr>";
-            }
-            Sysver2file assign = it3.next();
-            result += HTMLTools.getTableRow(assign.getBemerkung(), DateFormat.getDateTimeInstance().format(assign.getVerordnung().getAnDatum()));
-        }
-
-        // Direkte Zuordnung
-        start = true;
-        List<Sysbw2file> bwAssignments = (List<Sysbw2file>) sysfile.getBwAssignCollection();
-        Iterator<Sysbw2file> it4 = bwAssignments.iterator();
-        while (it4.hasNext()) {
-            if (start) {
-                start = false;
-                result += "<tr><th colspan=\"2\">Direkte Zuordnung zu BewohnerIn</th></tr>";
-            }
-            Sysbw2file assign = it4.next();
-            result += HTMLTools.getTableRow(assign.getBemerkung(), DateFormat.getDateTimeInstance().format(assign.getPit()));
-        }
-
-
-        if (!result.equals("")) {
-            result = "<table border=\"1\">" + result + "</table>";
+        if (!result.isEmpty()) {
+            result = result.substring(0, result.length() - 3);
         }
 
         return result;
+    }
+
+    @Override
+    public Object getValueAt(int row, int column) {
+        String value = "";
+        switch (column) {
+            case 0: {
+                value += mymodel.get(row).getFilename() + ", ";
+                value += OPDE.lang.getString("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
+                break;
+            }
+            case 1: {
+                value += SYSTools.catchNull(mymodel.get(row).getBeschreibung());
+                break;
+            }
+            default: {
+                value = null;
+            }
+        }
+        return value;
     }
 }

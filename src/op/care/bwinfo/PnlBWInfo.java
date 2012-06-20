@@ -4,25 +4,27 @@
 
 package op.care.bwinfo;
 
-import java.awt.*;
-import java.text.DateFormat;
-import java.util.*;
-import javax.swing.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.Bewohner;
 import entity.EntityTools;
 import entity.Krankenhaus;
 import entity.bwinfo.BWInfos;
 import entity.bwinfo.BWInfosTools;
-import org.jdesktop.swingx.*;
+import org.jdesktop.swingx.JXComboBox;
+import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.JXTaskPaneContainer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.text.DateFormat;
+import java.util.ArrayList;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlBWInfo extends JPanel {
-
-
+    public static final String internalClassID = "nursingrecords.information";
     private Bewohner bewohner;
 
     public PnlBWInfo(Bewohner bewohner) {
@@ -51,8 +53,8 @@ public class PnlBWInfo extends JPanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "2*(default, $lcgap), 90dlu:grow, 2*($lcgap, default)",
-                    "2*(default), $lgap, default:grow, $lgap, default"));
+                        "2*(default, $lcgap), 90dlu:grow, 2*($lcgap, default)",
+                        "2*(default), $lgap, default:grow, $lgap, default"));
 
                 //---- label1 ----
                 label1.setText("Hausarzt");
@@ -101,17 +103,17 @@ public class PnlBWInfo extends JPanel {
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-    private void initPanel(){
+    private void initPanel() {
 
     }
 
-    private void createKHAufenthalte(){
+    private void createKHAufenthalte() {
 
         BWInfos bwInfos = new BWInfos(4l, BWInfosTools.TypeID_KH, "Test", bewohner);
         java.util.List<BWInfos> list = new ArrayList<BWInfos>();
         list.add(bwInfos);
 
-        for (BWInfos info : list){
+        for (BWInfos info : list) {
 
             Krankenhaus kh = EntityTools.find(Krankenhaus.class, info.getFk());
 
@@ -124,7 +126,7 @@ public class PnlBWInfo extends JPanel {
 
     }
 
-    private void createKHAufenthalt(){
+    private void createKHAufenthalt() {
 
     }
 

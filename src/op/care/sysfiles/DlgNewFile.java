@@ -60,7 +60,7 @@ public class DlgNewFile extends javax.swing.JDialog {
         this.entities = entities;
         initComponents();
         setTitle(SYSTools.getWindowTitle("Neue Datei anhängen"));
-        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBeleg", cbBeleg);
+//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBeleg", cbBeleg);
         SYSTools.centerOnParent(parent, this);
         setVisible(true);
     }
@@ -80,7 +80,6 @@ public class DlgNewFile extends javax.swing.JDialog {
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextPane();
         jLabel1 = new JLabel();
-        cbBeleg = new JCheckBox();
         btnOk = new JButton();
         btnCancel = new JButton();
 
@@ -131,15 +130,6 @@ public class DlgNewFile extends javax.swing.JDialog {
         //---- jLabel1 ----
         jLabel1.setText("Bemerkung:");
 
-        //---- cbBeleg ----
-        cbBeleg.setText("Einbuchungsbeleg drucken");
-        cbBeleg.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cbBelegActionPerformed(e);
-            }
-        });
-
         //---- btnOk ----
         btnOk.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
         btnOk.setText("Ok");
@@ -167,11 +157,10 @@ public class DlgNewFile extends javax.swing.JDialog {
                 .addGroup(contentPaneLayout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(contentPaneLayout.createParallelGroup()
-                        .addComponent(cbBeleg)
                         .addComponent(jLabel1)
-                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
                         .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                            .addComponent(txtFile, GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+                            .addComponent(txtFile, GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(lblFileExist)
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -193,10 +182,8 @@ public class DlgNewFile extends javax.swing.JDialog {
                     .addGap(18, 18, 18)
                     .addComponent(jLabel1)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                    .addGap(18, 18, 18)
-                    .addComponent(cbBeleg)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+                    .addGap(45, 45, 45)
                     .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(btnCancel)
                         .addComponent(btnOk))
@@ -207,38 +194,38 @@ public class DlgNewFile extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbBelegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBelegActionPerformed
-        SYSPropsTools.storeState(this.getClass().getName() + "::cbBeleg", cbBeleg);
+//        SYSPropsTools.storeState(this.getClass().getName() + "::cbBeleg", cbBeleg);
     }//GEN-LAST:event_cbBelegActionPerformed
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
-        SYSFiles sysfile = SYSFilesTools.putFile(selectedFile);
-        Object relationEntity;
-
-        EntityManager em = OPDE.createEM();
-
-        try {
-            em.getTransaction().begin();
-            for (int i = 0; i < entities.length; i++) {
-                if (entities[i] instanceof Bewohner) {
-                    relationEntity = new Sysbw2file(txtBemerkung.getText().trim(), sysfile, (Bewohner) entities[i], OPDE.getLogin().getUser());
-                } else if (entities[i] instanceof Pflegeberichte) {
-                    relationEntity = new Syspb2file(txtBemerkung.getText().trim(), sysfile, (Pflegeberichte) entities[i], OPDE.getLogin().getUser(), new Date());
-                } else {
-                    relationEntity = null;
-                }
-
-                if (relationEntity != null) {
-                    em.persist(relationEntity);
-
-                }
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            OPDE.getLogger().error(e.getMessage(), e);
-            em.getTransaction().rollback();
-        } finally {
-            em.close();
-        }
+//        SYSFiles sysfile = SYSFilesTools.putFile(selectedFile);
+//        Object relationEntity;
+//
+//        EntityManager em = OPDE.createEM();
+//
+//        try {
+//            em.getTransaction().begin();
+//            for (int i = 0; i < entities.length; i++) {
+//                if (entities[i] instanceof Bewohner) {
+//                    relationEntity = new Sysbw2file(txtBemerkung.getText().trim(), sysfile, (Bewohner) entities[i], OPDE.getLogin().getUser());
+//                } else if (entities[i] instanceof Pflegeberichte) {
+//                    relationEntity = new Syspb2file(txtBemerkung.getText().trim(), sysfile, (Pflegeberichte) entities[i], OPDE.getLogin().getUser(), new Date());
+//                } else {
+//                    relationEntity = null;
+//                }
+//
+//                if (relationEntity != null) {
+//                    em.persist(relationEntity);
+//
+//                }
+//            }
+//            em.getTransaction().commit();
+//        } catch (Exception e) {
+//            OPDE.getLogger().error(e.getMessage(), e);
+//            em.getTransaction().rollback();
+//        } finally {
+//            em.close();
+//        }
         dispose();
     }//GEN-LAST:event_btnOkActionPerformed
 
@@ -293,7 +280,6 @@ public class DlgNewFile extends javax.swing.JDialog {
     private JScrollPane jScrollPane1;
     private JTextPane txtBemerkung;
     private JLabel jLabel1;
-    private JCheckBox cbBeleg;
     private JButton btnOk;
     private JButton btnCancel;
     // End of variables declaration//GEN-END:variables

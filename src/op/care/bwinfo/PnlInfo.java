@@ -103,16 +103,16 @@ public class PnlInfo extends NursingRecordsPanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup()
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-                        .addComponent(jspMain, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            layout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                .addComponent(jspMain, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspMain, GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE))
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspMain, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

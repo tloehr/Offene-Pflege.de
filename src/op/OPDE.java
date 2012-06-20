@@ -73,6 +73,9 @@ public class OPDE {
     public static final int INFO_TIME = 2;
     public static final int WARNING_TIME = 4;
     public static final int ERROR_TIME = 4;
+
+    public static final boolean MEDI_CALC = true;
+
     public static long uptime;
     public static ResourceBundle lang;
     protected static Database db;

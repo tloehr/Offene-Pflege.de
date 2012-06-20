@@ -25,30 +25,38 @@
  */
 package op.care.sysfiles;
 
-import java.awt.event.*;
-import javax.persistence.EntityManager;
-import javax.swing.table.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.swing.JideBoxLayout;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
+import net.iharder.dnd.FileDrop;
 import op.OPDE;
-import op.tools.CleanablePanel;
+import op.system.DlgYesNo;
+import op.threads.DisplayMessage;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMSYSFiles;
 import tablerenderer.RNDHTML;
-import txhandlers.TXHFiles;
 
 import javax.swing.*;
-import java.awt.Desktop.Action;
+import javax.swing.border.EtchedBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyVetoException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author tloehr
@@ -57,37 +65,30 @@ public class PnlFiles extends NursingRecordsPanel {
     // Wird für die Zuordnung beim Rechtesystem innerhalb
     // OCRights Tabelle benötigt.
 
+    private static final int DROPPANEL = 1;
+    private static final int TABLE = 0;
+
     public static final String internalClassID = "nursingrecords.files";
     private JPopupMenu menu;
     private Bewohner bewohner;
-    private javax.swing.JFrame parent;
-
-
+    private boolean ftpServerReady;
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
 
     /**
      * Creates new form PnlFiles
      */
-    public PnlFiles(JFrame pflege, Bewohner bewohner) {
+    public PnlFiles(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
-
-//        EntityManager em = OPDE.createEM();
-//        bewohner = em.find(Bewohner.class, bewohner.getBWKennung());
-//        em.close();
-        this.parent = pflege;
-
-        tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        btnNew.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT));
-
+        this.jspSearch = jspSearch;
+        ftpServerReady = SYSFilesTools.isFTPServerReady();
         initPanel();
         change2Bewohner(bewohner);
     }
 
 
-    private void initPanel(){
-
-        tblUpload.setModel(new DefaultTableModel());
-        tblUpload.setTransferHandler(new TXHFiles());
-
+    private void initPanel() {
+        prepareSearchArea();
 
     }
 
@@ -104,20 +105,21 @@ public class PnlFiles extends NursingRecordsPanel {
         reloadTable();
     }
 
-     @Override
+    @Override
     public void reload() {
-         reloadTable();
+        reloadTable();
     }
 
     void reloadTable() {
 
-        List<SYSFiles> files = new ArrayList<SYSFiles>(SYSFilesTools.findByBewohner(bewohner));
+        ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(SYSFilesTools.findByBewohner(bewohner));
         Collections.sort(files);
 
         tblFiles.setModel(new TMSYSFiles(files));
         tblFiles.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
         tblFiles.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
-        tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+        jspFiles.dispatchEvent(new ComponentEvent(jspFiles, ComponentEvent.COMPONENT_RESIZED));
+//        tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
     }
 
     /**
@@ -130,8 +132,6 @@ public class PnlFiles extends NursingRecordsPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         pnlMain = new JPanel();
-        jspUpload = new JScrollPane();
-        tblUpload = new JTable();
         jspFiles = new JScrollPane();
         tblFiles = new JTable();
 
@@ -140,15 +140,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
         //======== pnlMain ========
         {
-            pnlMain.setLayout(new FormLayout(
-                "default:grow",
-                "fill:150dlu, $rgap, fill:default:grow"));
-
-            //======== jspUpload ========
-            {
-                jspUpload.setViewportView(tblUpload);
-            }
-            pnlMain.add(jspUpload, CC.xy(1, 1));
+            pnlMain.setLayout(new BoxLayout(pnlMain, BoxLayout.X_AXIS));
 
             //======== jspFiles ========
             {
@@ -161,15 +153,15 @@ public class PnlFiles extends NursingRecordsPanel {
 
                 //---- tblFiles ----
                 tblFiles.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tblFiles.addMouseListener(new MouseAdapter() {
@@ -180,18 +172,10 @@ public class PnlFiles extends NursingRecordsPanel {
                 });
                 jspFiles.setViewportView(tblFiles);
             }
-            pnlMain.add(jspFiles, CC.xy(1, 3));
+            pnlMain.add(jspFiles);
         }
         add(pnlMain);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        new DlgNewFile(parent, bewohner);
-    }//GEN-LAST:event_btnNewActionPerformed
-
-    private void btnLogoutbtnLogoutHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutbtnLogoutHandler
-//        OPDE.ocmain.lockOC();
-    }//GEN-LAST:event_btnLogoutbtnLogoutHandler
 
     private void tblFilesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblFilesMousePressed
 
@@ -214,25 +198,29 @@ public class PnlFiles extends NursingRecordsPanel {
             menu = new JPopupMenu();
 
             // SELECT
-            JMenuItem itemPopupShow = new JMenuItem("Anzeigen");
+            JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png")));
             itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    SYSFilesTools.handleFile(sysfile, Action.OPEN);
+                    SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
                 }
             });
             menu.add(itemPopupShow);
             itemPopupShow.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT));
 
-            JMenuItem itemPopupDelete = new JMenuItem("Löschen");
+            JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diese Datei wirklich löschen ?",
-                            "Datei löschen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        SYSFilesTools.deleteFile(sysfile);
-                        reloadTable();
-                    }
+
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            SYSFilesTools.deleteFile(sysfile);
+                            reloadTable();
+                        }
+                    });
+
                 }
             });
             menu.add(itemPopupDelete);
@@ -241,7 +229,7 @@ public class PnlFiles extends NursingRecordsPanel {
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         } else {
             if (evt.getClickCount() == 2 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT)) { // DoppelClick
-                SYSFilesTools.handleFile(sysfile, Action.OPEN);
+                SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
             }
         }
 
@@ -253,16 +241,126 @@ public class PnlFiles extends NursingRecordsPanel {
         Dimension dim = jsp.getSize();
         // Größe der Text Spalte im TB ändern.
         // Summe der fixen Spalten  = 210 + ein bisschen
-        int textWidth = dim.width - 100 - 25;
+        int textWidth = dim.width - 25;
         tblFiles.getColumnModel().getColumn(0).setPreferredWidth(textWidth / 2);
         tblFiles.getColumnModel().getColumn(1).setPreferredWidth(textWidth / 2);
-        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(100);
+//        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(100);
     }//GEN-LAST:event_jspFilesComponentResized
+
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+
+        searchPanes.add(addCommands());
+//        searchPanes.add(addFilters());
+
+        searchPanes.addExpansion();
+
+    }
+
+    private CollapsiblePane addFilters() {
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+//        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+        labelPanel.setLayout(new VerticalLayout(5));
+
+        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
+
+//        tbAbgesetzt = GUITools.getNiceToggleButton("Abgesetzte");
+//        tbAbgesetzt.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (initPhase) return;
+//                SYSPropsTools.storeState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
+//                reloadTable();
+//            }
+//        });
+//
+//        labelPanel.add(tbAbgesetzt);
+//        SYSPropsTools.restoreState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
+
+        panelFilter.setContentPane(labelPanel);
+
+        return panelFilter;
+    }
+
+    private CollapsiblePane addCommands() {
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane cmdPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        cmdPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        cmdPane.setCollapsible(false);
+
+        try {
+            cmdPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JPanel dropPanel = new JPanel();
+        dropPanel.setLayout(new BorderLayout());
+        JLabel dropLabel = new JLabel(OPDE.lang.getString(internalClassID + ".drophere"), new ImageIcon(getClass().getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);
+        dropLabel.setFont(SYSConst.ARIAL20);
+        dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+        dropPanel.add(BorderLayout.CENTER, dropLabel);
+        dropPanel.setPreferredSize(new Dimension(180, 180));
+        dropPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        mypanel.add(dropPanel);
+
+        new FileDrop(dropPanel, new FileDrop.Listener() {
+            public void filesDropped(java.io.File[] files) {
+                java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, bewohner);
+                if (!successful.isEmpty()){
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
+                }
+                reloadTable();
+            }
+        });
+
+//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+//            JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                    new DlgBestand(bewohner);
+//                }
+//            });
+//            mypanel.add(buchenButton);
+//        }
+//
+//
+//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+//            JideButton printButton = GUITools.createHyperlinkButton("Verordnungen drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                    printVerordnungen(null);
+//                }
+//            });
+//            mypanel.add(printButton);
+//        }
+//
+//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+//            JideButton printButton = GUITools.createHyperlinkButton("Stellplan drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                    printStellplan();
+//                }
+//            });
+//            mypanel.add(printButton);
+//        }
+
+        cmdPane.setContentPane(mypanel);
+        return cmdPane;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;
-    private JScrollPane jspUpload;
-    private JTable tblUpload;
     private JScrollPane jspFiles;
     private JTable tblFiles;
     // End of variables declaration//GEN-END:variables

@@ -25,12 +25,14 @@
  */
 package entity.files;
 
+import entity.Bewohner;
 import entity.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author tloehr
@@ -40,6 +42,7 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
         @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
+        @NamedQuery(name = "SYSFiles.findByBWKennung", query = "SELECT s FROM SYSFiles s WHERE s.bewohner = :bewohner"),
         @NamedQuery(name = "SYSFiles.findByFilename", query = "SELECT s FROM SYSFiles s WHERE s.filename = :filename"),
         @NamedQuery(name = "SYSFiles.findByMd5", query = "SELECT s FROM SYSFiles s WHERE s.md5 = :md5"),
         @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
@@ -51,11 +54,6 @@ import java.util.Date;
                 + " JOIN s.pbAssignCollection sf "
                 + " JOIN sf.pflegebericht t "
                 + " WHERE t.bewohner = :bewohner "),
-        @NamedQuery(name = "SYSFiles.findByBWKennung", query = ""
-                + " SELECT s"
-                + " FROM SYSFiles s "
-                + " JOIN s.bwAssignCollection sf "
-                + " WHERE sf.bewohner = :bewohner "),
         @NamedQuery(name = "SYSFiles.findByBWKennung2BWI", query = ""
                 + " SELECT s"
                 + " FROM SYSFiles s "
@@ -97,6 +95,9 @@ public class SYSFiles implements Serializable, Comparable {
     @Basic(optional = false)
     @Column(name = "OCFID")
     private Long ocfid;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Filename")
     private String filename;
@@ -110,15 +111,23 @@ public class SYSFiles implements Serializable, Comparable {
     @Basic(optional = false)
     @Column(name = "Filesize")
     private long filesize;
+    @Column(name = "UUID", unique = true)
+    private String uuid;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
+    @Basic(optional = false)
+    @Column(name = "Beschreibung")
+    private String beschreibung;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Sysbw2file> bwAssignCollection;
+    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @ManyToOne
+    private Bewohner bewohner;
+    //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+//    private Collection<Sysbw2file> bwAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Syspb2file> pbAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
@@ -131,22 +140,24 @@ public class SYSFiles implements Serializable, Comparable {
     public SYSFiles() {
     }
 
-    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user) {
+    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user, Bewohner bewohner) {
         this.filename = filename;
         this.md5 = md5;
         this.filedate = filedate;
         this.filesize = filesize;
         this.user = user;
         this.pit = new Date();
+        this.bewohner = bewohner;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public Collection<Sysbwerte2file> getBwerteAssignCollection() {
         return bwerteAssignCollection;
     }
 
-    public Collection<Sysbw2file> getBwAssignCollection() {
-        return bwAssignCollection;
-    }
+//    public Collection<Sysbw2file> getBwAssignCollection() {
+//        return bwAssignCollection;
+//    }
 
     public Collection<Sysbwi2file> getBwiAssignCollection() {
         return bwiAssignCollection;
@@ -188,8 +199,32 @@ public class SYSFiles implements Serializable, Comparable {
         return md5;
     }
 
+    public Bewohner getBewohner() {
+        return bewohner;
+    }
+
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
     public void setMd5(String md5) {
         this.md5 = md5;
+    }
+
+    public String getRemoteFilename() {
+        return uuid + ".sysfile";
+    }
+
+    public String getBeschreibung() {
+        return beschreibung;
+    }
+
+    public void setBeschreibung(String beschreibung) {
+        this.beschreibung = beschreibung;
     }
 
     public Date getFiledate() {
