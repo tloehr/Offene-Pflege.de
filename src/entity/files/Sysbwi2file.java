@@ -48,8 +48,6 @@ public class Sysbwi2file implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Long id;
-    @Column(name = "Bemerkung")
-    private String bemerkung;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -110,14 +108,6 @@ public class Sysbwi2file implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getBemerkung() {
-        return bemerkung;
-    }
-
-    public void setBemerkung(String bemerkung) {
-        this.bemerkung = bemerkung;
     }
 
     @Override

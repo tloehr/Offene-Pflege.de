@@ -4,7 +4,6 @@
  */
 package entity;
 
-import entity.files.Sysbwerte2file;
 import entity.vorgang.SYSBWerte2VORGANG;
 import entity.vorgang.VorgangElement;
 

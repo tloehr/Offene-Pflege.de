@@ -26,7 +26,10 @@
 package tablemodels;
 
 import entity.files.SYSFiles;
+import entity.files.SYSFilesTools;
 import op.OPDE;
+import op.care.sysfiles.PnlFiles;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
@@ -37,6 +40,10 @@ import java.util.ArrayList;
  * @author tloehr
  */
 public class TMSYSFiles extends AbstractTableModel {
+    public static final int COL_PIT = 0;
+    public static final int COL_FILE = 1;
+    public static final int COL_DESCRIPTION = 2;
+
     ArrayList<SYSFiles> mymodel;
 
     public TMSYSFiles(ArrayList<SYSFiles> modelData) {
@@ -45,12 +52,16 @@ public class TMSYSFiles extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 2;
+        return 3;
     }
 
     @Override
     public Class getColumnClass(int column) {
         return String.class;
+    }
+    public void setSYSFile(int row, SYSFiles sysfile){
+        mymodel.set(row, sysfile);
+        fireTableRowsUpdated(row, row);
     }
 
     @Override
@@ -63,25 +74,6 @@ public class TMSYSFiles extends AbstractTableModel {
     }
 
     @Override
-    public String getColumnName(int column) {
-        String name;
-        switch (column) {
-            case 0: {
-                name = "Datei";
-                break;
-            }
-            case 1: {
-                name = "Beschreibung";
-                break;
-            }
-            default: {
-                name = Integer.toString(column);
-            }
-        }
-        return name;
-    }
-
-    @Override
     public int getRowCount() {
         int rowcount = 0;
 
@@ -91,20 +83,22 @@ public class TMSYSFiles extends AbstractTableModel {
         return rowcount;
     }
 
-    private String getAssignmentAsHTML(int row) {
+    private String getAttachmentsAsHTML(int row) {
         SYSFiles sysfile = mymodel.get(row);
         String result = "";
-        boolean start = true;
 
-        result += sysfile.getPbAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + ": " + sysfile.getPbAssignCollection().size() + ", ";
-        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.information") + ": " + sysfile.getBwiAssignCollection().size() + ", ";
-        result += sysfile.getVerAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + ": " + sysfile.getVerAssignCollection().size() + ", ";
+        result += sysfile.getPbAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + " " + sysfile.getPbAssignCollection().size() + ", ";
+        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.information") + " " + sysfile.getBwiAssignCollection().size() + ", ";
+        result += sysfile.getVerAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + " " + sysfile.getVerAssignCollection().size() + ", ";
 
-        if (!result.isEmpty()) {
-            result = result.substring(0, result.length() - 3);
+        String html = OPDE.lang.getString(PnlFiles.internalClassID+".Attachments")+": ";
+        if (result.isEmpty()) {
+            html += html = OPDE.lang.getString("misc.msg.none");
+        } else {
+            html += result; //result.substring(0, result.length() - 3);
         }
 
-        return result;
+        return html;
     }
 
     @Override
@@ -112,12 +106,21 @@ public class TMSYSFiles extends AbstractTableModel {
         String value = "";
         switch (column) {
             case 0: {
-                value += mymodel.get(row).getFilename() + ", ";
-                value += OPDE.lang.getString("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
+                value += SYSFilesTools.getDatumUndUser(mymodel.get(row));
                 break;
             }
             case 1: {
-                value += SYSTools.catchNull(mymodel.get(row).getBeschreibung());
+                value += SYSConst.html_fontface;
+                value += mymodel.get(row).getFilename() + ", ";
+                value += OPDE.lang.getString("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
+//                value += ", " + getAttachmentsAsHTML(row);
+                value += "</font>";
+                break;
+            }
+            case 2: {
+                value += SYSConst.html_fontface;
+                value += "<p>"+SYSTools.catchNull(mymodel.get(row).getBeschreibung())+"</p>";
+                value += "</font>";
                 break;
             }
             default: {

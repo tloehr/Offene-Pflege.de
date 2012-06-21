@@ -25,7 +25,6 @@
  */
 package entity;
 
-import entity.files.Sysbw2file;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -82,9 +81,6 @@ public class Bewohner implements Serializable {
     @Column(name = "adminonly")
     private short adminonly;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
-    private Collection<Sysbw2file> bwFilesCollection;
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
     private Collection<Barbetrag> konto;
 
@@ -131,10 +127,6 @@ public class Bewohner implements Serializable {
         this.version = version;
         this.editor = editor;
         this.adminonly = adminonly;
-    }
-
-    public Collection<Sysbw2file> getBwFilesCollection() {
-        return bwFilesCollection;
     }
 
     public String getBWKennung() {

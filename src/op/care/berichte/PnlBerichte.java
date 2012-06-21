@@ -41,6 +41,8 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
+import op.care.sysfiles.PnlFiles;
+import op.system.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -53,6 +55,7 @@ import tablerenderer.RNDHTML;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -85,7 +88,7 @@ public class PnlBerichte extends NursingRecordsPanel {
     private JDateChooser jdcVon;
     private JXSearchField txtSearch;
     private CollapsiblePane panelTime, panelSearchText, panelTags, panelSpecials;
-    private JCheckBox cbShowEdits, cbShowIDs;
+    private JToggleButton tbShowReplaced, tbShowIDs;
 
 
     private boolean dauerChanged;
@@ -96,6 +99,8 @@ public class PnlBerichte extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
+    //    private FileDrop.Listener fileDropListener;
+    private MouseEvent currentTableMouseMotionEvent;
 
     /**
      * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
@@ -112,18 +117,10 @@ public class PnlBerichte extends NursingRecordsPanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlBerichte(Bewohner bw, JScrollPane jspSearch) {
         this.initPhase = true;
-
         initComponents();
-
-//        btnSystemInfo.setSelected(SYSPropsTools.isBoolean(internalClassID + ":btnSystemInfo"));
-
         this.jspSearch = jspSearch;
-
-//        this.panelSearch.add(new JXHeader("Berichte", "", new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png"))));
-//        positionToAddPanels = this.panelSearch.getComponentCount();
-
         standardActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 reloadTable();
@@ -135,7 +132,7 @@ public class PnlBerichte extends NursingRecordsPanel {
 
         this.initPhase = false;
 
-        change2Bewohner(bewohner);
+        change2Bewohner(bw);
 
 
     }
@@ -181,6 +178,7 @@ public class PnlBerichte extends NursingRecordsPanel {
             JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+
 //                    SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
                 }
             });
@@ -188,24 +186,13 @@ public class PnlBerichte extends NursingRecordsPanel {
         }
 
 
-        txtSearch = new JXSearchField("Suchbegriff");
-        txtSearch.setInstantSearchDelay(500);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reloadTable();
-            }
-        });
-
-
-        searchPane.add(txtSearch);
-
         searchPane.setContentPane(mypanel);
         searchPanes.add(searchPane);
 
-        addSpecials();
-        addByTime();
-        addByTags();
+//        addSpecials();
+//        addByTime();
+        searchPane.add(addFilters());
+//        addByTags();
 
         searchPanes.addExpansion();
 
@@ -280,7 +267,7 @@ public class PnlBerichte extends NursingRecordsPanel {
         tcm1.getColumn(TMPflegeberichte.COL_Flags).setHeaderValue("Info");
         tcm1.getColumn(TMPflegeberichte.COL_HTML).setHeaderValue("Bericht");
 
-        OPDE.debug("jspTblTBComponentResized(java.awt.event.ComponentEvent evt)");
+//        OPDE.debug("jspTblTBComponentResized(java.awt.event.ComponentEvent evt)");
 
     }//GEN-LAST:event_jspTblTBComponentResized
 
@@ -323,14 +310,12 @@ public class PnlBerichte extends NursingRecordsPanel {
         Point p = evt.getPoint();
 
         Point p2 = evt.getPoint();
-        // Convert a coordinate relative to a component's bounds to screen coordinates
         SwingUtilities.convertPointToScreen(p2, tblTB);
-
         final Point screenposition = p2;
 
         final int row = tblTB.rowAtPoint(p);
         final int col = tblTB.columnAtPoint(p);
-        OPDE.debug("COLUMN: " + col);
+//        OPDE.debug("COLUMN: " + col);
 
         ListSelectionModel lsm = tblTB.getSelectionModel();
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
@@ -355,7 +340,7 @@ public class PnlBerichte extends NursingRecordsPanel {
              * Ein Bericht kann geändert werden (Korrektur)
              * - Wenn sie nicht im Übergabeprotokoll abgehakt wurde.
              */
-            final boolean bearbeitenMöglich = !alreadyEdited && singleRowSelected && bericht.getUsersAcknowledged().isEmpty();
+            final boolean bearbeitenMoeglich = !alreadyEdited && singleRowSelected && bericht.getUsersAcknowledged().isEmpty();
 
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
@@ -392,7 +377,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                                         }
                                     };
 
-                                    editor = PBerichtTAGSTools.createCheckBoxPanelForTags(il, bericht.getTags(), new VerticalLayout());
+                                    editor = PBerichtTAGSTools.createCheckBoxPanelForTags(il, bericht.getTags(), new GridLayout(8, 4));
                                 } else {
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.cantedit")));
                                     editor = null;
@@ -412,7 +397,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                         }
 
                         if (editor != null) {
-                            popup.getContentPane().add(new JScrollPane(editor));
+//                            popup.getContentPane().add(new JScrollPane(editor));
                             final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                             saveButton.addActionListener(new ActionListener() {
                                 @Override
@@ -467,9 +452,20 @@ public class PnlBerichte extends NursingRecordsPanel {
                                 }
                             });
 
+
+                            JPanel pnl = new JPanel(new BorderLayout(10, 10));
+                            JScrollPane pnlEditor = new JScrollPane(editor);
+
+                            pnl.add(pnlEditor, BorderLayout.CENTER);
+                            JPanel buttonPanel = new JPanel();
+                            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+                            buttonPanel.add(saveButton);
+                            pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                            pnl.add(buttonPanel, BorderLayout.SOUTH);
+
                             popup.setOwner(tblTB);
                             popup.removeExcludedComponent(tblTB);
-                            popup.getContentPane().add(new JPanel().add(saveButton));
+                            popup.getContentPane().add(pnl);
                             popup.setDefaultFocusComponent(editor);
                             popup.showPopup(screenposition.x, screenposition.y);
                         } else {
@@ -478,18 +474,62 @@ public class PnlBerichte extends NursingRecordsPanel {
                     }
                 });
                 menu.add(itemPopupEdit);
-                itemPopupEdit.setEnabled(bearbeitenMöglich);
+                itemPopupEdit.setEnabled(bearbeitenMoeglich);
             }
 
-            JMenuItem itemPopupPrint = new JMenuItem(OPDE.lang.getString("misc.commands.printselected"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
-            itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
 
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    int[] sel = tblTB.getSelectedRows();
-                    printBericht(sel);
-                }
-            });
-            menu.add(itemPopupPrint);
+                JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
+                itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+                    @Override
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    Pflegeberichte mybericht = PflegeberichteTools.deleteBericht(bericht);
+                                    ((TMPflegeberichte) tblTB.getModel()).setPflegebericht(row, mybericht);
+
+                                    if (!tbShowReplaced.isSelected()) {
+                                        reloadTable();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+                menu.add(itemPopupDelete);
+                itemPopupDelete.setEnabled(bearbeitenMoeglich);
+            }
+
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.PRINT)) {
+                JMenuItem itemPopupPrint = new JMenuItem(OPDE.lang.getString("misc.commands.printselected"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
+                itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        int[] sel = tblTB.getSelectedRows();
+                        printBericht(sel);
+                    }
+                });
+                menu.add(itemPopupPrint);
+            }
+
+            menu.add(new JSeparator());
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {
+                final JMenuItem itemPopupFileAttach = SYSFilesTools.getAttachMenuItem(bericht, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        reloadTable();
+                    }
+                });
+                menu.add(itemPopupFileAttach);
+                itemPopupFileAttach.setEnabled(bearbeitenMoeglich);
+            }
+
+            if (bericht.getAttachedFiles().size() > 0) {
+                final JMenuItem itemPopupFileList = SYSFilesTools.getFileListPopupMenu(tblTB, evt.getPoint(), bericht);
+                menu.add(itemPopupFileList);
+            }
+
 
 //            itemPopupEdit.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
 //            itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
@@ -501,18 +541,125 @@ public class PnlBerichte extends NursingRecordsPanel {
 
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
-                menu.add(new JSeparator());
-                menu.add(SYSFilesTools.getSYSFilesContextMenu(new JFrame(), bericht, standardActionListener));
-            }
-
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
-                menu.add(new JSeparator());
+//                menu.add(new JSeparator());
                 menu.add(VorgaengeTools.getVorgangContextMenu(new JFrame(), bericht, bewohner, standardActionListener));
             }
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         }
     }//GEN-LAST:event_tblTBMousePressed
+
+
+    private CollapsiblePane addFilters() {
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout(5));
+
+
+        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setInstantSearchDelay(500);
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reloadTable();
+            }
+        });
+
+        grmpf;
+
+        labelPanel.add(txtSearch);
+
+        jdcVon = new JDateChooser(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
+        jdcVon.setBackground(Color.WHITE);
+        jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (initPhase) {
+                    return;
+                }
+                if (!evt.getPropertyName().equals("date")) {
+                    return;
+                }
+                reloadTable();
+            }
+        });
+        labelPanel.add(new JXTitledSeparator("Berichte anzeigen"));
+        labelPanel.add(jdcVon);
+        JideButton button2Weeks = GUITools.createHyperlinkButton("2 Wochen zurück", null, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcVon.setDate(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
+            }
+        });
+        JideButton button4Weeks = GUITools.createHyperlinkButton("4 Wochen zurück", null, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcVon.setDate(SYSCalendar.addField(new Date(), -4, GregorianCalendar.WEEK_OF_MONTH));
+            }
+        });
+        JideButton buttonBeginning = GUITools.createHyperlinkButton("von Anfang an", null, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcVon.setDate(PflegeberichteTools.getFirstBericht(bewohner).getPit());
+            }
+        });
+
+        labelPanel.add(button2Weeks);
+        labelPanel.add(button4Weeks);
+        labelPanel.add(buttonBeginning);
+
+//        panelTime.setContentPane(labelPanel);
+
+
+//        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(BWerteTools.WERTE);
+//        dcbm.removeElementAt(0);
+//        dcbm.insertElementAt("<i>"+OPDE.lang.getString("misc.commands.noselection")+"</i>", 0);
+//        cmbAuswahl = new JComboBox(dcbm);
+//        cmbAuswahl.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent itemEvent) {
+//                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+//                SYSPropsTools.storeState(internalClassID + ":cmbAuswahl", cmbAuswahl);
+//                reloadTable();
+//            }
+//        });
+//        labelPanel.add(cmbAuswahl);
+//        SYSPropsTools.restoreState(internalClassID + ":cmbAuswahl", cmbAuswahl);
+
+        tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showreplaced"));
+        tbShowReplaced.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+                SYSPropsTools.storeState(internalClassID + ":tbShowReplaced", tbShowReplaced);
+                reloadTable();
+            }
+        });
+        labelPanel.add(tbShowReplaced);
+        SYSPropsTools.restoreState(internalClassID + ":tbShowReplaced", tbShowReplaced);
+        tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
+
+        tbShowIDs = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showpks"));
+        tbShowIDs.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+                SYSPropsTools.storeState(internalClassID + ":tbShowIDs", tbShowIDs);
+                reloadTable();
+            }
+        });
+        tbShowIDs.setHorizontalAlignment(SwingConstants.LEFT);
+
+        labelPanel.add(tbShowIDs);
+        SYSPropsTools.restoreState(internalClassID + ":tbShowIDs", tbShowIDs);
+
+        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
+        panelFilter.setContentPane(labelPanel);
+
+        return panelFilter;
+    }
 
     private void addByTags() {
         panelTags = new CollapsiblePane("nach Markierung");
@@ -624,59 +771,59 @@ public class PnlBerichte extends NursingRecordsPanel {
         searchPanes.add(panelTime);
     }
 
-    private void addSpecials() {
-        JPanel labelPanel = new JPanel();
-        labelPanel.setBackground(Color.WHITE);
-        labelPanel.setLayout(new VerticalLayout());
-
-
-        panelSpecials = new CollapsiblePane("Sonstiges");
-        panelSpecials.setStyle(CollapsiblePane.PLAIN_STYLE);
-        panelSpecials.setCollapsible(false);
-
-        txtSearch = new JXSearchField("Suchbegriff");
-        txtSearch.setInstantSearchDelay(500);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reloadTable();
-            }
-        });
-
-
-        labelPanel.add(txtSearch);
-
-        cbShowEdits = new JCheckBox("Änderungen anzeigen");
-        cbShowEdits.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-        cbShowEdits.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
-                reloadTable();
-            }
-        });
-        cbShowEdits.setBackground(Color.WHITE);
-        cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
-        cbShowIDs.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-        cbShowIDs.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
-                reloadTable();
-            }
-        });
-        cbShowIDs.setBackground(Color.WHITE);
-
-        labelPanel.add(cbShowEdits);
-        labelPanel.add(cbShowIDs);
-
-        panelSpecials.setContentPane(labelPanel);
-        searchPanes.add(panelSpecials);
-
-        SYSPropsTools.restoreState(internalClassID + ":cbShowEdits", cbShowEdits);
-        SYSPropsTools.restoreState(internalClassID + ":cbShowIDs", cbShowIDs);
-
-    }
+//    private void addSpecials() {
+//        JPanel labelPanel = new JPanel();
+//        labelPanel.setBackground(Color.WHITE);
+//        labelPanel.setLayout(new VerticalLayout());
+//
+//
+//        panelSpecials = new CollapsiblePane("Sonstiges");
+//        panelSpecials.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        panelSpecials.setCollapsible(false);
+//
+//        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+//        txtSearch.setInstantSearchDelay(500);
+//        txtSearch.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                reloadTable();
+//            }
+//        });
+//
+//
+//        labelPanel.add(txtSearch);
+//
+//        cbShowEdits = new JCheckBox("Änderungen anzeigen");
+//        cbShowEdits.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+//        cbShowEdits.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                SYSPropsTools.storeState(internalClassID + ":cbShowEdits", cbShowEdits);
+//                reloadTable();
+//            }
+//        });
+//        cbShowEdits.setBackground(Color.WHITE);
+//        cbShowIDs = new JCheckBox("Bericht Nummern anzeigen");
+//        cbShowIDs.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+//        cbShowIDs.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                SYSPropsTools.storeState(internalClassID + ":cbShowIDs", cbShowIDs);
+//                reloadTable();
+//            }
+//        });
+//        cbShowIDs.setBackground(Color.WHITE);
+//
+//        labelPanel.add(cbShowEdits);
+//        labelPanel.add(cbShowIDs);
+//
+//        panelSpecials.setContentPane(labelPanel);
+//        searchPanes.add(panelSpecials);
+//
+//        SYSPropsTools.restoreState(internalClassID + ":cbShowEdits", cbShowEdits);
+//        SYSPropsTools.restoreState(internalClassID + ":cbShowIDs", cbShowIDs);
+//
+//    }
 
     private void reloadTable() {
         if (initPhase) {
@@ -691,13 +838,13 @@ public class PnlBerichte extends NursingRecordsPanel {
 
 
         String tags = "";
-        if (!panelTags.isCollapsed()) {
-            Iterator<PBerichtTAGS> it = tagFilter.iterator();
-            while (it.hasNext()) {
-                tags += Long.toString(it.next().getPbtagid());
-                tags += (it.hasNext() ? "," : "");
-            }
-        }
+//        if (!panelTags.isCollapsed()) {
+//            Iterator<PBerichtTAGS> it = tagFilter.iterator();
+//            while (it.hasNext()) {
+//                tags += Long.toString(it.next().getPbtagid());
+//                tags += (it.hasNext() ? "," : "");
+//            }
+//        }
 
         String search = txtSearch.getText().trim();
 
@@ -709,7 +856,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                 + " WHERE p.bewohner = :bewohner "
                 + (search.isEmpty() ? " AND p.pit >= :von " : " AND p.text like :search ")
                 + (tags.isEmpty() ? "" : " AND t.pbtagid IN (" + tags + " ) ")
-                + (cbShowEdits.isSelected() ? "" : " AND p.editedBy is null ")
+                + (tbShowReplaced.isSelected() ? "" : " AND p.editedBy is null ")
                 + " ORDER BY p.pit DESC ");
         query.setParameter("bewohner", bewohner);
 
@@ -723,14 +870,16 @@ public class PnlBerichte extends NursingRecordsPanel {
         ArrayList<Pflegeberichte> listBerichte = new ArrayList<Pflegeberichte>(query.getResultList());
         em.close();
 
-        tblTB.setModel(new TMPflegeberichte(listBerichte, cbShowIDs.isSelected()));
+        tblTB.setModel(new TMPflegeberichte(listBerichte, tbShowReplaced.isSelected()));
         tblTB.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         jspTblTB.dispatchEvent(new ComponentEvent(jspTblTB, ComponentEvent.COMPONENT_RESIZED));
 
+
         tblTB.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
         tblTB.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
         tblTB.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+
 
         dispatchEvent(new ComponentEvent(this, ComponentEvent.COMPONENT_RESIZED));
 

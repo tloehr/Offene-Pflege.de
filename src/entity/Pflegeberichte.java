@@ -323,6 +323,13 @@ public class Pflegeberichte implements Serializable, VorgangElement {
         this.attachedFiles = attachedFiles;
     }
 
+    public void setDeletedBy(Users deletedBy) {
+        editedBy = deletedBy;
+        editpit = new Date();
+        replacedBy = null;
+        replacementFor = null;
+    }
+
     public boolean isBesonders() {
         boolean found = false;
 

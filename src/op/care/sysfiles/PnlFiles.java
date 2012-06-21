@@ -27,34 +27,33 @@ package op.care.sysfiles;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
-import net.iharder.dnd.FileDrop;
 import op.OPDE;
 import op.system.DlgYesNo;
+import op.system.FileDrop;
 import op.threads.DisplayMessage;
+import op.tools.GUITools;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import tablemodels.TMSYSFiles;
 import tablerenderer.RNDHTML;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -112,12 +111,23 @@ public class PnlFiles extends NursingRecordsPanel {
 
     void reloadTable() {
 
-        ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(SYSFilesTools.findByBewohner(bewohner));
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("SYSFiles.findByBWKennung", SYSFiles.class);
+        query.setParameter("bewohner", bewohner);
+        ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(query.getResultList());
         Collections.sort(files);
+        em.close();
 
         tblFiles.setModel(new TMSYSFiles(files));
         tblFiles.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
         tblFiles.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
+        tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+
+        tblFiles.getColumnModel().getColumn(0).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader1"));
+        tblFiles.getColumnModel().getColumn(1).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader2"));
+        tblFiles.getColumnModel().getColumn(2).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader3"));
+
+
         jspFiles.dispatchEvent(new ComponentEvent(jspFiles, ComponentEvent.COMPONENT_RESIZED));
 //        tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
     }
@@ -181,15 +191,19 @@ public class PnlFiles extends NursingRecordsPanel {
 
         Point p = evt.getPoint();
         ListSelectionModel lsm = tblFiles.getSelectionModel();
+        Point p2 = evt.getPoint();
+        SwingUtilities.convertPointToScreen(p2, tblFiles);
+        final Point screenposition = p2;
 
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
-        int row = tblFiles.rowAtPoint(p);
+        final int row = tblFiles.rowAtPoint(p);
+        final int col = tblFiles.columnAtPoint(p);
         if (singleRowSelected) {
             lsm.setSelectionInterval(row, row);
         }
 
-        TMSYSFiles tm = (TMSYSFiles) tblFiles.getModel();
+        final TMSYSFiles tm = (TMSYSFiles) tblFiles.getModel();
         final SYSFiles sysfile = tm.getRow(row);
 
         if (evt.isPopupTrigger()) {
@@ -206,25 +220,90 @@ public class PnlFiles extends NursingRecordsPanel {
                 }
             });
             menu.add(itemPopupShow);
-            itemPopupShow.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT));
+//            itemPopupShow.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT));
 
-            JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-            itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+            if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
 
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            SYSFilesTools.deleteFile(sysfile);
-                            reloadTable();
-                        }
-                    });
+                final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
+                itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                }
-            });
-            menu.add(itemPopupDelete);
-            itemPopupDelete.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+                        final JidePopup popup = new JidePopup();
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                        final JComponent editor = new JTextArea(sysfile.getBeschreibung(), 10, 40);
+                        ((JTextArea) editor).setLineWrap(true);
+                        ((JTextArea) editor).setWrapStyleWord(true);
+                        ((JTextArea) editor).setEditable(true);
+
+                        popup.getContentPane().add(new JScrollPane(editor));
+                        final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                        saveButton.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    popup.hidePopup();
+                                    SYSFiles mySysfile = em.merge(sysfile);
+                                    mySysfile.setBeschreibung(((JTextArea) editor).getText().trim());
+                                    em.getTransaction().commit();
+                                    tm.setSYSFile(row, mySysfile);
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
+                            }
+                        });
+
+                        saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
+                        JPanel pnl = new JPanel(new BorderLayout(10, 10));
+                        JScrollPane pnlEditor = new JScrollPane(editor);
+
+                        pnl.add(pnlEditor, BorderLayout.CENTER);
+                        JPanel buttonPanel = new JPanel();
+                        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+                        buttonPanel.add(saveButton);
+                        pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                        pnl.add(buttonPanel, BorderLayout.SOUTH);
+
+                        popup.setOwner(tblFiles);
+                        popup.removeExcludedComponent(tblFiles);
+                        popup.getContentPane().add(pnl);
+                        popup.setDefaultFocusComponent(editor);
+
+                        popup.showPopup(screenposition.x, screenposition.y);
+
+                    }
+                });
+                menu.add(itemPopupEdit);
+            }
+
+
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+                JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
+                itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + OPDE.lang.getString("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                SYSFilesTools.deleteFile(sysfile);
+                                reloadTable();
+                            }
+                        });
+
+                    }
+                });
+                menu.add(itemPopupDelete);
+                itemPopupDelete.setEnabled(singleRowSelected);
+            }
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         } else {
@@ -241,9 +320,10 @@ public class PnlFiles extends NursingRecordsPanel {
         Dimension dim = jsp.getSize();
         // Größe der Text Spalte im TB ändern.
         // Summe der fixen Spalten  = 210 + ein bisschen
-        int textWidth = dim.width - 25;
-        tblFiles.getColumnModel().getColumn(0).setPreferredWidth(textWidth / 2);
-        tblFiles.getColumnModel().getColumn(1).setPreferredWidth(textWidth / 2);
+        int textWidth = dim.width - 200;
+        tblFiles.getColumnModel().getColumn(0).setPreferredWidth(200);
+        tblFiles.getColumnModel().getColumn(1).setPreferredWidth(textWidth / 3 * 2);
+        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(textWidth / 3);
 //        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(100);
     }//GEN-LAST:event_jspFilesComponentResized
 
@@ -252,8 +332,9 @@ public class PnlFiles extends NursingRecordsPanel {
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
 
-
-        searchPanes.add(addCommands());
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            searchPanes.add(addCommands());
+        }
 //        searchPanes.add(addFilters());
 
         searchPanes.addExpansion();
@@ -303,57 +384,17 @@ public class PnlFiles extends NursingRecordsPanel {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        JPanel dropPanel = new JPanel();
-        dropPanel.setLayout(new BorderLayout());
-        JLabel dropLabel = new JLabel(OPDE.lang.getString(internalClassID + ".drophere"), new ImageIcon(getClass().getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);
-        dropLabel.setFont(SYSConst.ARIAL20);
-        dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
-        dropPanel.add(BorderLayout.CENTER, dropLabel);
-        dropPanel.setPreferredSize(new Dimension(180, 180));
-        dropPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        mypanel.add(dropPanel);
 
-        new FileDrop(dropPanel, new FileDrop.Listener() {
+        mypanel.add(GUITools.getDropPanel(new FileDrop.Listener() {
             public void filesDropped(java.io.File[] files) {
                 java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, bewohner);
-                if (!successful.isEmpty()){
+                if (!successful.isEmpty()) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
                 }
                 reloadTable();
             }
-        });
+        }));
 
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
-//            JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    new DlgBestand(bewohner);
-//                }
-//            });
-//            mypanel.add(buchenButton);
-//        }
-//
-//
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-//            JideButton printButton = GUITools.createHyperlinkButton("Verordnungen drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    printVerordnungen(null);
-//                }
-//            });
-//            mypanel.add(printButton);
-//        }
-//
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-//            JideButton printButton = GUITools.createHyperlinkButton("Stellplan drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    printStellplan();
-//                }
-//            });
-//            mypanel.add(printButton);
-//        }
 
         cmdPane.setContentPane(mypanel);
         return cmdPane;

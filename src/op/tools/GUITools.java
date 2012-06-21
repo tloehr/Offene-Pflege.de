@@ -1,9 +1,16 @@
 package op.tools;
 
 import com.jidesoft.swing.JideButton;
+import entity.files.SYSFiles;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
+import op.OPDE;
+import op.care.sysfiles.PnlFiles;
+import op.system.FileDrop;
+import op.threads.DisplayMessage;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -63,5 +70,21 @@ public class GUITools {
         tb.setBackground(Color.WHITE);
         tb.setAlignmentX(Component.LEFT_ALIGNMENT);
         return tb;
+    }
+
+    public static JPanel getDropPanel(FileDrop.Listener dropListener){
+        JPanel dropPanel = new JPanel();
+        dropPanel.setLayout(new BorderLayout());
+        JLabel dropLabel = new JLabel(OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"), new ImageIcon(Double.class.getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);
+        dropLabel.setFont(SYSConst.ARIAL20);
+        dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+        dropPanel.add(BorderLayout.CENTER, dropLabel);
+        dropPanel.setPreferredSize(new Dimension(180, 180));
+        dropPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+
+
+        new FileDrop(dropPanel, dropListener);
+        return dropPanel;
     }
 }

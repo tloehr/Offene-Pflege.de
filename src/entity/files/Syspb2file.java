@@ -48,8 +48,6 @@ public class Syspb2file implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Long id;
-    @Column(name = "Bemerkung")
-    private String bemerkung;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -67,8 +65,7 @@ public class Syspb2file implements Serializable {
     public Syspb2file() {
     }
 
-    public Syspb2file(String bemerkung, SYSFiles sysfile, Pflegeberichte pflegebericht, Users user, Date pit) {
-        this.bemerkung = bemerkung;
+    public Syspb2file(SYSFiles sysfile, Pflegeberichte pflegebericht, Users user, Date pit) {
         this.sysfile = sysfile;
         this.pflegebericht = pflegebericht;
         this.user = user;
@@ -105,14 +102,6 @@ public class Syspb2file implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getBemerkung() {
-        return bemerkung;
-    }
-
-    public void setBemerkung(String bemerkung) {
-        this.bemerkung = bemerkung;
     }
 
     @Override

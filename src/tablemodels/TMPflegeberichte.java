@@ -68,6 +68,11 @@ public class TMPflegeberichte
         return 3;
     }
 
+    public void setPflegebericht(int row, Pflegeberichte bericht){
+        pflegeberichte.set(row, bericht);
+        fireTableRowsUpdated(row, row);
+    }
+
     @Override
     public Class getColumnClass(int c) {
         return String.class;

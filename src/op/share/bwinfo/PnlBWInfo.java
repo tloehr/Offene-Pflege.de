@@ -627,7 +627,7 @@ public class PnlBWInfo extends NursingRecordsPanel {
                     Query query = em.createNamedQuery("BWInfo.findByBwinfoid");
                     query.setParameter("bwinfoid", bwinfoid);
                     entity.BWInfo bwinfo = (entity.BWInfo) query.getSingleResult();
-                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwinfo, fileActionListener));
+//                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwinfo, fileActionListener));
                     em.close();
                     //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, tblBWInfo, true, true, SYSFiles.CODE_PLANUNG, fileActionListener));
                 }

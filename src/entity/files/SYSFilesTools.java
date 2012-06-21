@@ -25,23 +25,28 @@
  */
 package entity.files;
 
-import entity.BWInfo;
-import entity.BWerte;
+import com.jidesoft.popup.JidePopup;
 import entity.Bewohner;
 import entity.Pflegeberichte;
 import entity.verordnungen.Verordnung;
 import op.OPDE;
-import op.care.sysfiles.DlgNewFile;
+import op.care.sysfiles.DlgDropFilesHere;
+import op.care.sysfiles.PnlFiles;
+import op.system.FileDrop;
+import op.threads.DisplayMessage;
 import op.tools.DlgException;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.io.CopyStreamEvent;
-import org.apache.commons.net.io.CopyStreamListener;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,7 +54,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,36 +65,23 @@ import java.util.List;
  */
 public class SYSFilesTools {
 
-    /**
-     * Sucht alle Dateien für einen bestimmten Bewohner raus und gibt diesen als Set von SYSFiles zurück.
-     *
-     * @param bewohner
-     * @return
-     */
-    public static ArrayList<SYSFiles> findByBewohner(Bewohner bewohner) {
-        Set<SYSFiles> files = new TreeSet<SYSFiles>();
-        Query query;
-        EntityManager em = OPDE.createEM();
-
-        query = em.createNamedQuery("SYSFiles.findByBWKennung", SYSFiles.class);
-        query.setParameter("bewohner", bewohner);
-        files.addAll(query.getResultList());
-
-        query = em.createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
-        query.setParameter("bewohner", bewohner);
-        files.addAll(query.getResultList());
-
-        query = em.createNamedQuery("SYSFiles.findByBWKennung2BWI", SYSFiles.class);
-        query.setParameter("bewohner", bewohner);
-        files.addAll(query.getResultList());
-
-        query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
-        query.setParameter("bewohner", bewohner);
-        files.addAll(query.getResultList());
-
-        em.close();
-
-        return new ArrayList<SYSFiles>(files);
+    public static ListCellRenderer getSYSFilesRenderer() {
+//        final int v = verbosity;
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof SYSFiles) {
+                    SYSFiles sysfile = (SYSFiles) o;
+                    text = sysfile.getFilename() + SYSTools.catchNull(sysfile.getBeschreibung(), " (", ")");
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
     }
 
     /**
@@ -120,7 +115,6 @@ public class SYSFilesTools {
             FileInputStream fis = new FileInputStream(file);
             ftp.storeFile(sysfile.getRemoteFilename(), fis);
             fis.close();
-            ftp.disconnect();
         } else { // Ansonsten die bestehende Datei zurückgeben
             sysfile = (SYSFiles) query.getSingleResult();
 
@@ -130,27 +124,38 @@ public class SYSFilesTools {
     }
 
     public static List<SYSFiles> putFiles(File[] files, Bewohner bewohner) {
+        return putFiles(files, bewohner, null);
+    }
+
+    public static List<SYSFiles> putFiles(File[] files, Object attachable) {
+        Bewohner bw = null;
+        if (attachable instanceof Pflegeberichte) {
+            bw = ((Pflegeberichte) attachable).getBewohner();
+        } else if (attachable instanceof Verordnung) {
+            bw = ((Verordnung) attachable).getBewohner();
+        }
+        return putFiles(files, bw, attachable);
+    }
+
+    public static List<SYSFiles> putFiles(File[] files, Bewohner bewohner, Object attachable) {
 
         ArrayList<SYSFiles> successful = new ArrayList<SYSFiles>(files.length);
         FTPClient ftp = getFTPClient();
-        ftp.setCopyStreamListener(new CopyStreamListener() {
-            @Override
-            public void bytesTransferred(CopyStreamEvent copyStreamEvent) {
-                OPDE.debug(copyStreamEvent.getTotalBytesTransferred() + " / " + copyStreamEvent.getStreamSize());
-            }
-
-            @Override
-            public void bytesTransferred(long l, int i, long l1) {
-
-            }
-        });
 
         if (ftp != null) {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
                 for (File file : files) {
-                    successful.add(putFile(em, ftp, file, bewohner));
+                    SYSFiles sysfile = putFile(em, ftp, file, bewohner);
+                    if (attachable != null) {
+                        if (attachable instanceof Pflegeberichte) {
+                            Syspb2file link = em.merge(new Syspb2file(sysfile, (Pflegeberichte) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getPbAssignCollection().add(link);
+                            ((Pflegeberichte) attachable).getAttachedFiles().add(link);
+                        }
+                    }
+                    successful.add(sysfile);
                 }
                 em.getTransaction().commit();
             } catch (Exception ex) {
@@ -229,61 +234,6 @@ public class SYSFilesTools {
         return result;
     }
 
-//    /**
-//     * <code>updateFile(File, long)</code> aktualisiert eine bestehende Datei auf dem FTP Server gemäß des PK aus der DB-Tabelle <i>OCFiles</i>
-//     * Der Dateiname wird nicht geändert.
-//     * Die Methode geht dabei wie folgt vor:
-//     * <ol>
-//     * <li>Es wird nachgeprüft, ob es einen passenden Eintrag in der DB-Tabelle <i>OCFiles</i> gibt.</li>
-//     * <li>Dann wird die MD5 Summe der neuen Datei ermittelt. Stimmt sie mit der bestehenden überein, gibt es nichts zu tun.</li>
-//     * <li>Wenn nicht, dann wird die Datei auf dem Server gelöscht und anschließend erneut raufgeladen.
-//     * <li>Eintrag in der DBTabelle <i>OCFiles</i> wird mit der neuen MD5 Summe und den neuen Dateidaten aktualisiert.</li>
-//     * </ol>
-//     *
-//     * @param file  File Objekt der neuen Datei.q
-//     * @param ocfid pk aus der DB-Tabelle <i>OCFiles</i>
-//     * @return true, wenn Austausch erfolgreich war. false, wenn nicht.
-//     */
-//    public static boolean updateFile(File file, SYSFiles sysfile) {
-//        boolean success = false;
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            String newmd5 = SYSTools.getMD5Checksum(file);
-//            em.getTransaction().begin();
-//            // Ist überhaupt ein Austausch nötig ?
-//            if (!sysfile.getMd5().equals(newmd5)) {
-//                FTPClient ftp = new FTPClient();
-//                ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
-//                ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
-//                ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
-//                ftp.setFileType(FTP.BINARY_FILE_TYPE);
-//
-//                // neuen Timestamp bestimmen
-//                long ts = file.lastModified();
-//                // Löschen.................
-//
-//                ftp.deleteFile(sysfile.getRemoteFilename());
-//                FileInputStream fis = new FileInputStream(file);
-//                ftp.storeFile(sysfile.getRemoteFilename(), fis);
-//                fis.close();
-//
-//                // Datenbank Eintrag erneuern
-//                sysfile.setMd5(newmd5);
-//                sysfile.setFiledate(new Date(ts));
-//                sysfile.setFilesize(file.length());
-//
-//                em.merge(sysfile);
-//                ftp.disconnect();
-//                success = true;
-//            }
-//            em.getTransaction().commit();
-//        } catch (Exception ex) {
-//            OPDE.fatal(ex);
-//            em.getTransaction().rollback();
-//        }
-//        return success;
-//    }
-
     public static boolean deleteFile(SYSFiles sysfile) {
         boolean success = false;
         EntityManager em = OPDE.createEM();
@@ -349,7 +299,7 @@ public class SYSFilesTools {
      * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm.
      * Falls die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
      *
-     * @param filename
+     * @param file
      * @param action
      */
     public static void handleFile(File file, java.awt.Desktop.Action action) {
@@ -368,22 +318,19 @@ public class SYSFilesTools {
                     try {
                         desktop.open(file);
                     } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(null, "Datei \n" + file.getName() + "\nkonnte nicht angezeigt werden.)",
-                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noviewer"), DisplayMessage.WARNING));
                     }
                 } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
                     try {
                         desktop.print(file);
                     } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(null, "Datei \n" + file.getName() + "\nkonnte nicht gedruckt werden.)",
-                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noprintprog"), DisplayMessage.WARNING));
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Datei \n" + file.getName() + "\nkonnte nicht bearbeitet werden.)",
-                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nofilehandler"), DisplayMessage.WARNING));
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nojavadesktop"), DisplayMessage.WARNING));
             }
         }
     }
@@ -399,186 +346,87 @@ public class SYSFilesTools {
         handleFile(getFile(sysfile), action);
     }
 
-    /**
-     * @param parent
-     * @param tablename
-     * @param fk
-     * @param bwk
-     * @param table
-     * @param documentsAllowed
-     * @param attachAllowed
-     * @param code
-     * @param callback
-     * @return
-     */
-    public static JMenu getSYSFilesContextMenu(java.awt.Frame parent, Object entity, ActionListener callback) {
-        EntityManager em = OPDE.createEM();
-        JMenu menu = new JMenu("<html>Dokumente <font color=\"green\">&#9679;</font></html>");
-        final Frame p = parent;
-        final ActionListener cb = callback;
-        JMenu menuFiles = null;
-        String namedQuery = "";
-        String queryParameter = "";
-        final Object ent = entity;
-        ArrayList<Object[]> filesList = new ArrayList();
-
-        // Was für eine Art von Objekt wurde übergeben ?
-        // Je nachdem, muss eine unterschiedliche Abfrage ausgeführt werden
-        if (entity instanceof Pflegeberichte) {
-            namedQuery = "SYSFiles.findByPB";
-            queryParameter = "pflegebericht";
-        } else if (entity instanceof BWInfo) {
-            namedQuery = "SYSFiles.findByBWInfo";
-            queryParameter = "bwinfo";
-        } else if (entity instanceof BWerte) {
-            namedQuery = "SYSFiles.findByBWert";
-            queryParameter = "wert";
-        } else if (entity instanceof Verordnung) {
-            namedQuery = "SYSFiles.findByVerordnung";
-            queryParameter = "verordnung";
-        } else {
-        }
-
-        // Wenn diese Methode weiss, wie sie mit
-        // dem Objekt umgehen muss, dann gehts weiter. Ansonsten
-        // gibts kein Menü.
-        if (!namedQuery.equals("")) {
-            Query query;
-            query = em.createNamedQuery(namedQuery, SYSFiles.class);
-            query.setParameter(queryParameter, entity);
-            filesList = new ArrayList(query.getResultList());
-            menuFiles = getFilesAsMenu("Anzeigen", filesList);
-        }
-
-
-        // -------------------------------------------------
-        JMenuItem itemPopupAddDoc = new JMenuItem("Dokument hinzufügen");
-        itemPopupAddDoc.addActionListener(new java.awt.event.ActionListener() {
-
+    public static JMenuItem getAttachMenuItem(Object attachable, Closure afterAttach) {
+//        final Bewohner mybw = bewohner;
+        final Object attach = attachable;
+        final Closure action = afterAttach;
+        final JMenuItem itemPopupAttach = new JMenuItem(OPDE.lang.getString(PnlFiles.internalClassID + ".attach"), new ImageIcon(Double.class.getResource("/artwork/22x22/kget_dock.png")));
+        itemPopupAttach.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new DlgNewFile(p, ent);
-                cb.actionPerformed(new ActionEvent(this, 0, "fileuploaded"));
-            }
-        });
-        menu.add(itemPopupAddDoc);
 
-        if (!filesList.isEmpty()) {
-            //final ListElement[] lesfinal = les.clone();
-            // -------------------------------------------------
-            for (int f = 0; f < filesList.size(); f++) {
-
-                Object[] resultlist = filesList.get(f);
-                final SYSFiles file = (SYSFiles) resultlist[0];
-                //final Syspb2file pb2file = (Syspb2file) resultlist[1];
-
-                menuFiles.getItem(f).addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        showFile(p, getFile(file));
+                final DlgDropFilesHere dlg = new DlgDropFilesHere();
+                dlg.setFileDropListener(new FileDrop.Listener() {
+                    @Override
+                    public void filesDropped(File[] files) {
+                        java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attach);
+                        if (!successful.isEmpty()) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
+                            dlg.dispose();
+                            action.execute(null);
+                        }
                     }
                 });
-
+                dlg.setVisible(true);
             }
-            menu.add(menuFiles);
-        }
-        em.close();
-        return menu;
+        });
+        return itemPopupAttach;
     }
 
-    /**
-     * @param menuText
-     * @param list
-     * @return
-     */
-    protected static JMenu getFilesAsMenu(String menuText, List<Object[]> list) {
-        JMenu result = null;
-        if (list.size() > 0) {
-            result = new JMenu(menuText);
-            Iterator<Object[]> files = list.iterator();
-            while (files.hasNext()) {
-                Object[] resultlist = files.next();
-                SYSFiles file = (SYSFiles) resultlist[0];
-                String bemerkung = "";
-                if (resultlist[1] instanceof Syspb2file) {
-                    bemerkung = ((Syspb2file) resultlist[1]).getBemerkung();
-                } else if (resultlist[1] instanceof Sysbwi2file) {
-                    bemerkung = ((Sysbwi2file) resultlist[1]).getBemerkung();
-                } else if (resultlist[1] instanceof Sysver2file) {
-                    bemerkung = ((Sysver2file) resultlist[1]).getBemerkung();
-                } else if (resultlist[1] instanceof Sysbwerte2file) {
-                    bemerkung = ((Sysbwerte2file) resultlist[1]).getBemerkung();
+    public static JMenuItem getFileListPopupMenu(JTable o, Point p, Object a) {
+        final Object attachable = a;
+        final JTable owner = o;
+        final Point point = p;
+        final JMenuItem itemPopupAttachments = new JMenuItem(OPDE.lang.getString(PnlFiles.internalClassID + ".Attachments"), new ImageIcon(Double.class.getResource("/artwork/22x22/bw/attach.png")));
+        itemPopupAttachments.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                final JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                ArrayList<SYSFiles> files = null;
+                EntityManager em = OPDE.createEM();
+                if (attachable instanceof Pflegeberichte) {
+                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
+                    query.setParameter("bericht", attachable);
+                    files = new ArrayList<SYSFiles>(query.getResultList());
+                    Collections.sort(files);
+                } else if (attachable instanceof Verordnung) {
+                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
+                    query.setParameter("bewohner", ((Pflegeberichte) attachable).getBewohner());
+                    files = new ArrayList<SYSFiles>(query.getResultList());
+                    Collections.sort(files);
                 }
-                JMenuItem mi = new JMenuItem(bemerkung + " [" + file.getFilename() + "]");
-                //mi.setToolTipText(pb2file.getBemerkung());
-                result.add(mi);
-            }
-        }
-        return result;
-    }
+                em.close();
 
-    public static void showFile(Component parent, File file) {
-        handleFile(parent, file, Desktop.Action.OPEN);
-    }
-
-    /**
-     * Verarbeitet die übergebene Datei entsprechend der Desktop Action. Berücksichtigt dabei die
-     * evtl. lokal definierten Applikationen.
-     *
-     * @param parent
-     * @param file
-     * @param action
-     */
-    public static void handleFile(Component parent, File file, java.awt.Desktop.Action action) {
-        Desktop desktop = null;
-        if (getLocalDefinedViewerApp(file) != null) {
-            try {
-                Runtime.getRuntime().exec(getLocalDefinedViewerApp(file));
-            } catch (IOException ex) {
-                OPDE.getLogger().error(ex);
-            }
-        } else {
-            if (Desktop.isDesktopSupported()) {
-                desktop = Desktop.getDesktop();
-                if (action == Desktop.Action.OPEN && desktop.isSupported(Desktop.Action.OPEN)) {
-                    try {
-                        desktop.open(file);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(parent, "Datei \n" + file.getAbsolutePath() + "\nkonnte nicht angezeigt werden.)",
-                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+                final JList list = new JList(files.toArray());
+                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                list.setCellRenderer(getSYSFilesRenderer());
+//                list.setBorder(new EmptyBorder(10, 10, 10, 10));
+                list.addListSelectionListener(new ListSelectionListener() {
+                    @Override
+                    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                        if (!listSelectionEvent.getValueIsAdjusting()) {
+                            handleFile((SYSFiles) list.getSelectedValue(), Desktop.Action.OPEN);
+                            popup.hidePopup();
+                        }
                     }
-                } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
-                    try {
-                        desktop.print(file);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(parent, "Datei \n" + file.getAbsolutePath() + "\nkonnte nicht gedruckt werden.)",
-                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(parent, "Datei \n" + file.getAbsolutePath() + "\nkonnte nicht bearbeitet werden.)",
-                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
+                });
+                JPanel borderPanel = new JPanel();
+                borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.LINE_AXIS));
+                borderPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+                borderPanel.add(new JScrollPane(list));
+                popup.setOwner(owner);
+                popup.removeExcludedComponent(owner);
+                popup.getContentPane().add(borderPanel);
+                popup.setDefaultFocusComponent(list);
 
-    /**
-     * Diese Methode findet aus den properties eine lokal definierte Applikation
-     * heraus. Das braucht man nur dann, wenn die Funktionen der Java eigenen
-     * Desktop API nicht funktionieren.
-     *
-     * @param file betreffende Datei
-     * @return String[] der das passende command array für den EXEC Aufruf erhält.
-     */
-    public static String[] getLocalDefinedViewerApp(File file) {
-        String os = System.getProperty("os.name").toLowerCase();
-        String extension = filenameExtension(file.getAbsolutePath());
-        String[] result = null;
-        if (OPDE.getProps().containsKey(os + "-" + extension)) {
-            result = new String[]{OPDE.getProps().getProperty(os + "-" + extension), file.getAbsolutePath()};
-        }
-        return result;
+                SwingUtilities.convertPointToScreen(point, owner);
+                popup.showPopup(point.x, point.y);
+
+            }
+        });
+        return itemPopupAttachments;
+
     }
 
     public static FTPClient getFTPClient() {
@@ -607,4 +455,13 @@ public class SYSFilesTools {
         }
         return ready;
     }
+
+    public static String getDatumUndUser(SYSFiles sysFiles) {
+        String result = "";
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
+        result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getNameUndVorname();
+
+        return SYSConst.html_fontface + result + "</font>";
+    }
+
 }

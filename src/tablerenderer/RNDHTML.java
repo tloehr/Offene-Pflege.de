@@ -4,6 +4,12 @@
  */
 package tablerenderer;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Closure;
+import entity.files.SYSFiles;
+import entity.files.SYSFilesTools;
+import op.OPDE;
+import op.system.FileDrop;
+import op.threads.DisplayMessage;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -32,20 +38,27 @@ import java.util.Map;
  */
 public class RNDHTML implements TableCellRenderer {
 
-    private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
+//    private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
     /**
      * map from table to map of rows to map of column heights
      */
     private final Map cellSizes = new HashMap();
+//    private Closure fileDropActivity = null;
 
     protected JTextPane txt;
     protected JPanel panel;
 
-    public RNDHTML() {
-        this(null);
-    }
+//    public RNDHTML() {
+//        this(null);
+//
+//    }
+//
+//    public RNDHTML(FileDrop.Listener fileDropListener) {
+//        this();
+//        new FileDrop(txt, fileDropListener);
+//    }
 
-    public RNDHTML(StyledEditorKit kit) {
+    public RNDHTML() {
 
         // Dieser Trick mit dem Einbetten der JTextPane ist nur wegen dem Nimbus Bug bei der Hintergrundfarbe einer Text Component.
         // http://solutioncrawler.wordpress.com/2009/10/07/nimbus-lookfeel-und-seine-eigenarten/
@@ -55,9 +68,9 @@ public class RNDHTML implements TableCellRenderer {
         txt.setOpaque(false);
         txt.setBackground(new Color(0, 0, 0, 0));
 
-        if (kit != null) {
-            txt.setEditorKit(kit);
-        }
+//        if (kit != null) {
+//            txt.setEditorKit(kit);
+//        }
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));

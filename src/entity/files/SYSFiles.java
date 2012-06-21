@@ -52,8 +52,7 @@ import java.util.UUID;
                 + " SELECT s"
                 + " FROM SYSFiles s "
                 + " JOIN s.pbAssignCollection sf "
-                + " JOIN sf.pflegebericht t "
-                + " WHERE t.bewohner = :bewohner "),
+                + " WHERE sf.pflegebericht = :bericht"),
         @NamedQuery(name = "SYSFiles.findByBWKennung2BWI", query = ""
                 + " SELECT s"
                 + " FROM SYSFiles s "
@@ -80,12 +79,7 @@ import java.util.UUID;
                 + " SELECT s, sf"
                 + " FROM SYSFiles s "
                 + " JOIN s.verAssignCollection sf "
-                + " WHERE sf.verordnung = :verordnung "),
-        @NamedQuery(name = "SYSFiles.findByBWert", query = ""
-                + " SELECT s, sf"
-                + " FROM SYSFiles s "
-                + " JOIN s.bwerteAssignCollection sf "
-                + " WHERE sf.wert = :wert ")
+                + " WHERE sf.verordnung = :verordnung ")
 })
 public class SYSFiles implements Serializable, Comparable {
 
@@ -111,8 +105,6 @@ public class SYSFiles implements Serializable, Comparable {
     @Basic(optional = false)
     @Column(name = "Filesize")
     private long filesize;
-    @Column(name = "UUID", unique = true)
-    private String uuid;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -134,8 +126,6 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<Sysbwi2file> bwiAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Sysver2file> verAssignCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Sysbwerte2file> bwerteAssignCollection;
 
     public SYSFiles() {
     }
@@ -148,12 +138,8 @@ public class SYSFiles implements Serializable, Comparable {
         this.user = user;
         this.pit = new Date();
         this.bewohner = bewohner;
-        this.uuid = UUID.randomUUID().toString();
     }
 
-    public Collection<Sysbwerte2file> getBwerteAssignCollection() {
-        return bwerteAssignCollection;
-    }
 
 //    public Collection<Sysbw2file> getBwAssignCollection() {
 //        return bwAssignCollection;
@@ -207,16 +193,8 @@ public class SYSFiles implements Serializable, Comparable {
         this.bewohner = bewohner;
     }
 
-    public String getUUID() {
-        return uuid;
-    }
-
-    public void setMd5(String md5) {
-        this.md5 = md5;
-    }
-
     public String getRemoteFilename() {
-        return uuid + ".sysfile";
+        return md5 + ".sysfile";
     }
 
     public String getBeschreibung() {

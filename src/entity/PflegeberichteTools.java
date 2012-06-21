@@ -36,35 +36,31 @@ public class PflegeberichteTools {
      * @param bericht
      * @return
      */
-    public static boolean deleteBericht(Pflegeberichte bericht) {
-        boolean success = false;
+    public static Pflegeberichte deleteBericht(Pflegeberichte bericht) {
+        Pflegeberichte mybericht = null;
         EntityManager em = OPDE.createEM();
         em.getTransaction().begin();
         try {
-            bericht.setEditedBy(OPDE.getLogin().getUser());
-            bericht.setEditpit(new Date());
+            mybericht = em.merge(bericht);
+            mybericht.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
 
             // Datei Zuordnungen entfernen
-            Iterator<Syspb2file> files = bericht.getAttachedFiles().iterator();
-            while (files.hasNext()) {
-                Syspb2file oldAssignment = files.next();
+
+            for (Syspb2file oldAssignment : mybericht.getAttachedFiles()) {
                 em.remove(oldAssignment);
             }
-            bericht.getAttachedFiles().clear();
+            mybericht.getAttachedFiles().clear();
 
             // Vorgangszuordnungen entfernen
-            Iterator<SYSPB2VORGANG> vorgaenge = bericht.getAttachedVorgaenge().iterator();
-            while (vorgaenge.hasNext()) {
+            for (SYSPB2VORGANG oldAssignment : mybericht.getAttachedVorgaenge()) {
                 // gleichfalls
-                SYSPB2VORGANG oldAssignment = vorgaenge.next();
                 em.remove(oldAssignment);
             }
-            bericht.getAttachedVorgaenge().clear();
+            mybericht.getAttachedVorgaenge().clear();
 
-            em.merge(bericht);
             em.getTransaction().commit();
-            success = true;
         } catch (Exception e) {
+            mybericht = null;
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -72,7 +68,7 @@ public class PflegeberichteTools {
         } finally {
             em.close();
         }
-        return success;
+        return mybericht;
     }
 
     public static Pflegeberichte getFirstBericht(Bewohner bewohner) {
@@ -101,38 +97,31 @@ public class PflegeberichteTools {
         EntityManager em = OPDE.createEM();
         em.getTransaction().begin();
         try {
+            oldBericht = em.merge(oldBericht);
+            newBericht = em.merge(newBericht);
             newBericht.setReplacementFor(oldBericht);
+
             // Dateien umbiegen
-            Iterator<Syspb2file> files = oldBericht.getAttachedFiles().iterator();
-            while (files.hasNext()) {
+//            Iterator<Syspb2file> files = oldBericht.getAttachedFiles().iterator();
+            for (Syspb2file oldAssignment : oldBericht.getAttachedFiles()) {
                 // Diesen Umweg muss ich wählen, dass Syspb2file eigentlich
                 // die JOIN Relation einer M:N Rel ist.
-                Syspb2file oldAssignment = files.next();
-                SYSFiles file = oldAssignment.getSysfile();
-                Syspb2file newAssignment = new Syspb2file(oldAssignment.getBemerkung(), file, newBericht, oldAssignment.getUser(), oldAssignment.getPit());
+                Syspb2file newAssignment = em.merge(new Syspb2file(oldAssignment.getSysfile(), newBericht, oldAssignment.getUser(), oldAssignment.getPit()));
                 newBericht.getAttachedFiles().add(newAssignment);
                 em.remove(oldAssignment);
             }
+            oldBericht.getAttachedFiles().clear();
 
             // Vorgänge umbiegen
-            Iterator<SYSPB2VORGANG> vorgaenge = oldBericht.getAttachedVorgaenge().iterator();
-            while (vorgaenge.hasNext()) {
-                // gleichfalls
-                SYSPB2VORGANG oldAssignment = vorgaenge.next();
-                Vorgaenge vorgang = oldAssignment.getVorgang();
-                SYSPB2VORGANG newAssignment = new SYSPB2VORGANG(vorgang, newBericht);
+            for (SYSPB2VORGANG oldAssignment : oldBericht.getAttachedVorgaenge()) {
+                SYSPB2VORGANG newAssignment = em.merge(new SYSPB2VORGANG(oldAssignment.getVorgang(), newBericht));
                 newBericht.getAttachedVorgaenge().add(newAssignment);
                 em.remove(oldAssignment);
             }
-
-            em.persist(newBericht);
-
-            oldBericht.getAttachedFiles().clear();
             oldBericht.getAttachedVorgaenge().clear();
-            oldBericht.setEditedBy(OPDE.getLogin().getUser());
+            oldBericht.setEditedBy(em.merge(OPDE.getLogin().getUser()));
             oldBericht.setEditpit(new Date());
             oldBericht.setReplacedBy(newBericht);
-            em.merge(oldBericht);
 
             em.getTransaction().commit();
 

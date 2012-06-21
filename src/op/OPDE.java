@@ -74,7 +74,7 @@ public class OPDE {
     public static final int WARNING_TIME = 4;
     public static final int ERROR_TIME = 4;
 
-    public static final boolean MEDI_CALC = true;
+    public static final boolean CALC_MEDI = true;
 
     public static long uptime;
     public static ResourceBundle lang;
@@ -136,6 +136,13 @@ public class OPDE {
 
     public static boolean isAnimation() {
         return animation;
+    }
+
+    /**
+     * @return zeigt an, ob die Medikamente gerechnet werden sollen oder nicht.
+     */
+    public static boolean isCalcMedi() {
+        return CALC_MEDI;
     }
 
     public static boolean isAnonym() {
