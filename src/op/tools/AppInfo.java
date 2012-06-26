@@ -175,37 +175,37 @@ public class AppInfo {
             if (tagName.equalsIgnoreCase("classes") || tagName.equalsIgnoreCase("database") || tagName.equalsIgnoreCase("properties")) {
                 environment = tagName;
             } else if (environment.equalsIgnoreCase("classes")) { // oder wir sind schon in einer Umgebung.
-
                 if (tagName.equalsIgnoreCase("class")) {
                     thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"), SYSTools.catchNull(attributes.getValue("main")).equalsIgnoreCase("true"), attributes.getValue("javaclass"));
+//                    OPDE.debug(thisClass.getInternalClassname());
                 } else if (tagName.equalsIgnoreCase("insert")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.INSERT));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.INSERT));
                 } else if (tagName.equalsIgnoreCase("select")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.SELECT));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.SELECT));
                 } else if (tagName.equalsIgnoreCase("delete")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.DELETE));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.DELETE));
                 } else if (tagName.equalsIgnoreCase("update")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.UPDATE));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.UPDATE));
                 } else if (tagName.equalsIgnoreCase("grant")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.GRANT));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.GRANT));
                 } else if (tagName.equalsIgnoreCase("execute")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.EXECUTE));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.EXECUTE));
                 } else if (tagName.equalsIgnoreCase("archive")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.ARCHIVE));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.ARCHIVE));
                 } else if (tagName.equalsIgnoreCase("manager")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.MANAGER));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.MANAGER));
                 } else if (tagName.equalsIgnoreCase("cancel")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.CANCEL));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.CANCEL));
                 } else if (tagName.equalsIgnoreCase("print")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.PRINT));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.PRINT));
                 } else if (tagName.equalsIgnoreCase("user1")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER1));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.USER1));
                 } else if (tagName.equalsIgnoreCase("user2")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER2));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.USER2));
                 } else if (tagName.equalsIgnoreCase("user3")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER3));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.USER3));
                 } else if (tagName.equalsIgnoreCase("user4")) {
-                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("doc"), InternalClassACL.USER4));
+                    thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.USER4));
                 }
 
             } else if (environment.equalsIgnoreCase("database")) {

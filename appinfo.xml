@@ -18,61 +18,66 @@
             Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
         <class name="admin.residents.cash" short="Barbeträge" long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true" javaclass="op.bw.tg.PnlTG" icon="coins.png">
-            <execute doc="Der Benutzer erhält Zugriff auf die Barbetragsverawaltung."/>
-            <delete doc="Benutzer kann Belege löschen."/>
-            <insert doc="Benutzer kann Belege eintragen."/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <delete langbundle="appinfo.default.acl.delete"/>
+            <insert langbundle="appinfo.default.acl.insert"/>
         </class>
         <class name="nursingrecords.main" short="Pflegeakte" long="Das hier ist die gesamte Pflegedokumentation">
-            <execute doc="Der Benutzer erhält Zugriff auf die Pflegeakte."/>
+            <execute langbundle="appinfo.default.acl.execute"/>
         </class>
         <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
         long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
-            <insert doc="Benutzer kann neue Verordnungen für den/die BewohnerIn hinzufügen."/>
-            <select doc="Benutzer kann sich die Verordnungen bzw. die Dateianhänge ansehen."/>
-            <execute doc="Der Benutzer darf dieses Modul anwählen."/>
-            <delete doc="Benutzer kann Verordnungen löschen."/>
-            <print doc="Benutzer kann Verordnungen drucken"/>
-            <update doc="Benutzer kann Verordnungen ändern/korrigieren/absetzen/Dateien anhängen/Bestände anbrechen und abschließen."/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <select  langbundle="appinfo.default.acl.select"/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <print langbundle="appinfo.default.acl.print"/>
+            <delete langbundle="appinfo.default.acl.delete"/>
+            <cancel langbundle="appinfo.default.acl.cancel"/>
+            <update langbundle="appinfo.default.acl.update"/>
         </class>
         <class name="nursingrecords.files" short="Pflegeakte/Dateien"
         long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Anzeige von Dateien, die dem/der BewohnerIn zugeordnet wurden.">
-            <insert doc="Benutzer kann neue Dateien für den/die BewohnerIn direkt hinzufügen."/>
-            <select doc="Benutzer kann sich die Dateien herunterladen und ansehen."/>
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
-            <delete doc="Benutzer kann beliebige Dateien löschen."/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <select  langbundle="appinfo.default.acl.select"/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <delete langbundle="appinfo.default.acl.delete"/>
         </class>
         <class name="nursingrecords.reports" short="Pflegeakte/Pflegeberichte" long="Das Modul zur Bearbeitung und Anzeige von Pflegeberichten.">
-            <insert doc="Benutzer kann neue Berichte eingeben."/>
-            <select doc="Benutzer kann sich die Dateianhänge ansehen."/>
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
-            <print doc="Benutzer kann Berichte ausdrucken"/>
-            <cancel doc="Benutzer kann Berichte löschen."/>
-            <update doc="Benutzer kann Berichte verändern."/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <select  langbundle="appinfo.default.acl.select"/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <print langbundle="appinfo.default.acl.print"/>
+            <cancel langbundle="appinfo.default.acl.cancel"/>
+            <update langbundle="appinfo.default.acl.update"/>
         </class>
         <class name="nursingrecords.vitalparameters" short="Pflegeakte/Bewohnerwerte" long="Das Modul zur Bearbeitung und Anzeige von Vitalwerten.">
-            <insert doc="Benutzer kann neue Werte eingeben."/>
-            <select doc="Benutzer kann sich die Dateianhänge ansehen."/>
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
-            <print doc="Benutzer kann Werte ausdrucken"/>
-            <cancel doc="Benutzer kann Werte löschen."/>
-            <update doc="Benutzer kann Werte verändern."/>
-        </class>
-        <class name="nursingrecords.main" short="Pflegeakte" long="Das Modul, welches die gesamte Pflegeakte beinhaltet.">
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <select  langbundle="appinfo.default.acl.select"/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <print langbundle="appinfo.default.acl.print"/>
+            <cancel langbundle="appinfo.default.acl.cancel"/>
+            <update langbundle="appinfo.default.acl.update"/>
         </class>
         <class name="nursingrecords.bhp" short="Pflegeakte/Behandlungspflege" long="">
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
-            <insert doc="Benutzer kann die Gabe einer Bedarfsmedikation eintragen."/>
-            <update doc="Benutzer kann BHPs abhaken bzw. innerhalb der vorgegebenen Frist auch wieder rückgängig machen."/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <update langbundle="appinfo.default.acl.update"/>
         </class>
         <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         </class>
         <class name="opde.tickets" short="Vorgänge" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true" javaclass="op.vorgang.PnlVorgang" icon="utilities-file-archiver.png">
-            <manager doc="Man darf auf die Vorgänge anderer Mitarbeiter zugreifen."/>
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+            <manager  langbundle="appinfo.default.acl.manager"/>
+            <execute langbundle="appinfo.default.acl.execute"/>
         </class>
         <class name="opde.medication" short="Medikamente" long="Medikamente eingeben, buchen, korrigieren. All das können Sie hier." main="true" javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
-            <execute doc="Der Benutzer erhält Zugriff auf dieses Modul."/>
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
+        <class name="nursingrecords.info" short="Pflegeakte/Informationen" long="Hier können Informationen zu den BewohnerInnen eingegeben werden." javaclass="op.care.info.PnlInfo">
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <update langbundle="appinfo.default.acl.update"/>
+            <user1 langbundle="appinfo.nursingrecords.info.acl.user1"/>
+            <user2 langbundle="appinfo.nursingrecords.info.acl.user2"/>
         </class>
     </classes>
 

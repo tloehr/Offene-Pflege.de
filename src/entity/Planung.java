@@ -4,6 +4,7 @@
  */
 package entity;
 
+import entity.info.BWInfoKat;
 import entity.vorgang.SYSPLAN2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.tools.SYSConst;

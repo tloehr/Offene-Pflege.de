@@ -43,7 +43,7 @@ public class TMPflegeberichte
     public static final int COL_PIT = 0;
     public static final int COL_Flags = 1;
     public static final int COL_HTML = 2;
-    public static final int COL_Text = 3;
+//    public static final int COL_Text = 3;
     public static final int COL_BERICHT = 99;
     boolean showIDs;
     ArrayList<Pflegeberichte> pflegeberichte = new ArrayList();
@@ -93,10 +93,10 @@ public class TMPflegeberichte
                 result = PflegeberichteTools.getTagsAsHTML(bericht);
                 break;
             }
-            case COL_Text: {
-                result = PflegeberichteTools.getAsText(bericht);
-                break;
-            }
+//            case COL_Text: {
+//                result = PflegeberichteTools.getAsText(bericht);
+//                break;
+//            }
             case COL_HTML: {
                 result = PflegeberichteTools.getAsHTML(bericht);
                 break;

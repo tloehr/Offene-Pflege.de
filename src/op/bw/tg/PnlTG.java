@@ -786,7 +786,7 @@ public class PnlTG extends CleanablePanel {
         mypanel.setBackground(Color.WHITE);
 //        mypanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
-        JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+        JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (bewohner != null) {

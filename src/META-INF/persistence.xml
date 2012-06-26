@@ -15,10 +15,10 @@
         <class>entity.vorgang.SYSPLAN2VORGANG</class>
         <class>entity.Bewohner</class>
         <class>entity.files.Sysbw2file</class>
-        <class>entity.BWInfoKat</class>
-        <class>entity.BWInfoTyp</class>
+        <class>entity.info.BWInfoKat</class>
+        <class>entity.info.BWInfoTyp</class>
         <class>entity.bwinfo.BWInfos</class>
-        <class>entity.BWInfo</class>
+        <class>entity.info.BWInfo</class>
         <class>entity.verordnungen.Verordnung</class>
         <class>entity.Groups</class>
         <class>entity.Users</class>
@@ -44,7 +44,7 @@
         <class>entity.Arzt</class>
         <class>entity.verordnungen.BHP</class>
         <class>entity.verordnungen.VerordnungPlanung</class>
-        <class>entity.BWInfoVorlagen</class>
+        <class>entity.info.BWInfoVorlagen</class>
         <class>entity.DFN</class>
         <class>entity.ICD</class>
         <class>entity.Krankenhaus</class>

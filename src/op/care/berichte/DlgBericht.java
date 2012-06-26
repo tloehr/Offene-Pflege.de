@@ -6,14 +6,19 @@ package op.care.berichte;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.swing.DefaultOverlayable;
+import com.jidesoft.swing.OverlayTextField;
+import com.jidesoft.swing.OverlayableIconsFactory;
+import com.jidesoft.swing.OverlayableUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.PBerichtTAGS;
 import entity.PBerichtTAGSTools;
 import entity.Pflegeberichte;
-import op.tools.CleanablePanel;
 import op.tools.MyJDialog;
+import op.tools.PnlUhrzeitDatum;
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -39,6 +44,10 @@ public class DlgBericht extends MyJDialog {
     private PropertyChangeListener pcl;
     private final int DAUER = 3;
     private Closure actionBlock;
+    private OverlayTextField txtDauer;
+    private DefaultOverlayable ovrDauer;
+    private JLabel attentionIcon;
+    private PnlUhrzeitDatum pnlUhrzeitDatum;
 
     public DlgBericht(Bewohner bewohner, Closure actionBlock) {
         super();
@@ -69,52 +78,34 @@ public class DlgBericht extends MyJDialog {
             }
         }, bericht.getTags(), new GridLayout(0, 1)));
 
-        DateFormat df = DateFormat.getTimeInstance();
-        jdcDatum.setDate(now);
-        jdcDatum.setMaxSelectableDate(now);
-        txtUhrzeit.setText(df.format(now));
+        pnlUhrzeitDatum = new PnlUhrzeitDatum(new Date());
+        panel1.add(pnlUhrzeitDatum, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
+
+
         txtBericht.setText("");
 
-
-        pcl = new PropertyChangeListener() {
+        txtDauer = new OverlayTextField(Integer.toString(DAUER));
+        txtDauer.addFocusListener(new FocusListener() {
             @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                Time uhrzeit = new Time(SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText()).getTimeInMillis());
-                bericht.setPit(SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit));
+            public void focusGained(FocusEvent focusEvent) {
+                txtDauerFocusGained(focusEvent);
             }
-        };
-        jdcDatum.addPropertyChangeListener(pcl);
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+                txtDauerFocusLost(focusEvent);
+            }
+        });
+        attentionIcon = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
+        ovrDauer = new DefaultOverlayable(txtDauer, attentionIcon, DefaultOverlayable.SOUTH_EAST);
+        ovrDauer.setOverlayVisible(true);
+        panel1.add(ovrDauer, CC.xy(5, 5));
 
         txtBericht.requestFocus();
-    }
-
-    @Override
-    public void dispose() {
-        jdcDatum.removePropertyChangeListener(pcl);
-        jdcDatum.cleanup();
-        super.dispose();
-    }
-
-    private void txtUhrzeitFocusLost(FocusEvent e) {
-        GregorianCalendar gc;
-        try {
-            gc = SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText());
-            txtUhrzeit.setText(SYSCalendar.toGermanTime(gc));
-
-        } catch (NumberFormatException nfe) {
-            gc = new GregorianCalendar();
-            txtUhrzeit.setText(SYSCalendar.toGermanTime(gc));
-        }
-        Time uhrzeit = new Time(gc.getTimeInMillis());
-        bericht.setPit(SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit));
-    }
-
-    private void txtUhrzeitActionPerformed(ActionEvent e) {
-        txtDauer.requestFocus();
+        setVisible(true);
     }
 
     private void txtDauerFocusGained(FocusEvent e) {
-        txtBericht.requestFocus();
+        SYSTools.markAllTxt(txtDauer);
     }
 
     private void txtDauerFocusLost(FocusEvent e) {
@@ -132,6 +123,7 @@ public class DlgBericht extends MyJDialog {
             dauer = DAUER;
             txtDauer.setText(Integer.toString(DAUER));
         }
+        ovrDauer.setOverlayVisible(dauer == DAUER);
         bericht.setDauer(dauer);
     }
 
@@ -145,6 +137,7 @@ public class DlgBericht extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
+        bericht.setPit(pnlUhrzeitDatum.getPIT());
         actionBlock.execute(bericht);
         dispose();
     }
@@ -152,13 +145,8 @@ public class DlgBericht extends MyJDialog {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
-        label1 = new JLabel();
-        jdcDatum = new JDateChooser();
         pnlTags = new JScrollPane();
-        label2 = new JLabel();
-        txtUhrzeit = new JTextField();
         label3 = new JLabel();
-        txtDauer = new JTextField();
         scrollPane1 = new JScrollPane();
         txtBericht = new JTextArea();
         panel2 = new JPanel();
@@ -178,59 +166,13 @@ public class DlgBericht extends MyJDialog {
         {
             panel1.setLayout(new FormLayout(
                 "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
-                "0dlu, 3*($lgap, default), $lgap, default:grow, $lgap, default, $lgap, $rgap"));
-
-            //---- label1 ----
-            label1.setText("Datum");
-            label1.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(label1, CC.xy(3, 3));
-
-            //---- jdcDatum ----
-            jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(jdcDatum, CC.xy(5, 3));
-            panel1.add(pnlTags, CC.xywh(7, 3, 1, 7, CC.FILL, CC.DEFAULT));
-
-            //---- label2 ----
-            label2.setText("Uhrzeit");
-            label2.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(label2, CC.xy(3, 5));
-
-            //---- txtUhrzeit ----
-            txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtUhrzeit.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtUhrzeitFocusLost(e);
-                }
-            });
-            txtUhrzeit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtUhrzeitActionPerformed(e);
-                }
-            });
-            panel1.add(txtUhrzeit, CC.xy(5, 5));
+                "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
+            panel1.add(pnlTags, CC.xywh(7, 3, 1, 5, CC.FILL, CC.FILL));
 
             //---- label3 ----
             label3.setText("Dauer");
             label3.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(label3, CC.xy(3, 7));
-
-            //---- txtDauer ----
-            txtDauer.setText("3");
-            txtDauer.setToolTipText("Dauer in Minuten");
-            txtDauer.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtDauer.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtDauerFocusGained(e);
-                }
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtDauerFocusLost(e);
-                }
-            });
-            panel1.add(txtDauer, CC.xy(5, 7));
+            panel1.add(label3, CC.xy(3, 5));
 
             //======== scrollPane1 ========
             {
@@ -245,7 +187,7 @@ public class DlgBericht extends MyJDialog {
                 });
                 scrollPane1.setViewportView(txtBericht);
             }
-            panel1.add(scrollPane1, CC.xywh(3, 9, 3, 1, CC.FILL, CC.FILL));
+            panel1.add(scrollPane1, CC.xywh(3, 7, 3, 1, CC.FILL, CC.FILL));
 
             //======== panel2 ========
             {
@@ -271,23 +213,18 @@ public class DlgBericht extends MyJDialog {
                 });
                 panel2.add(btnApply);
             }
-            panel1.add(panel2, CC.xywh(3, 11, 5, 1, CC.RIGHT, CC.FILL));
+            panel1.add(panel2, CC.xywh(3, 9, 5, 1, CC.RIGHT, CC.FILL));
         }
         contentPane.add(panel1, CC.xy(2, 3));
-        pack();
+        setSize(730, 455);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
-    private JLabel label1;
-    private JDateChooser jdcDatum;
     private JScrollPane pnlTags;
-    private JLabel label2;
-    private JTextField txtUhrzeit;
     private JLabel label3;
-    private JTextField txtDauer;
     private JScrollPane scrollPane1;
     private JTextArea txtBericht;
     private JPanel panel2;

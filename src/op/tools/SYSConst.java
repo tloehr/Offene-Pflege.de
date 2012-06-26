@@ -39,6 +39,10 @@ import java.util.HashMap;
  */
 public class SYSConst {
 
+    public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
+    public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
+    public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);
+
     public static Color darkgreen = new Color(0x00, 0x76, 0x00);
     public static Color darkred = new Color(0xbd, 0x00, 0x00);
     public static Color gold7 = new Color(0xff, 0xaa, 0x00);
@@ -137,7 +141,7 @@ public class SYSConst {
     public static final int BMI_UNTERGEWICHT = 0;
     public static final int BMI_NORMAL = 1;
     public static final int BMI_ÜBERGEWICHT = 2;
-    public static final String html_arial14 = "face=\"" + OPDE.arial14.getFamily() + "\"";
+    public static final String html_arial14 = "face=\"" + ARIAL14.getFamily() + "\"";
     public static final String html_fontface = "<font " + html_arial14 + " >";
 
     public static final String html_report_footer = "<hr/>" +
@@ -147,9 +151,7 @@ public class SYSConst {
             + "<br/>http://www.offene-pflege.de</font>\n";
 
 
-    public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
-    public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
-    public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);
+
 
     public static HashMap getNachnamenAnonym() {
         HashMap hm = new HashMap();

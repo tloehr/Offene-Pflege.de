@@ -620,6 +620,8 @@ public class DlgBWInfo extends javax.swing.JDialog {
         return xml;
     } // toXML()
 
+
+
     /**
      * Setzt die Min Max Grenzen der "VON", "BIS" controls neu.
      * BIS kann nicht vor VON gesetzt werden und VON nicht nach BIS.
@@ -1018,28 +1020,28 @@ public class DlgBWInfo extends javax.swing.JDialog {
                 outerpanel.add("p left", jl);
                 outerpanel.add("tab hfill", jcb);
 
-                if (!SYSTools.catchNull(attributes.getValue("help")).equals("")) {
-
-                    try {
-                        JButton jb = new JButton("Hilfe");
-                        final URI uri = new URI(attributes.getValue("help"));
-                        jb.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                if (Desktop.isDesktopSupported()) {
-                                    Desktop desktop = Desktop.getDesktop();
-                                    try {
-                                        desktop.browse(uri);
-                                    } catch (IOException iOException) {
-                                    }
-                                }
-                            }
-                        });
-                        outerpanel.add(jb);
-                    } catch (URISyntaxException uRISyntaxException) {
-                    }
-
-                }
+//                if (!SYSTools.catchNull(attributes.getValue("help")).equals("")) {
+//
+//                    try {
+//                        JButton jb = new JButton("Hilfe");
+//                        final URI uri = new URI(attributes.getValue("help"));
+//                        jb.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                if (Desktop.isDesktopSupported()) {
+//                                    Desktop desktop = Desktop.getDesktop();
+//                                    try {
+//                                        desktop.browse(uri);
+//                                    } catch (IOException iOException) {
+//                                    }
+//                                }
+//                            }
+//                        });
+//                        outerpanel.add(jb);
+//                    } catch (URISyntaxException uRISyntaxException) {
+//                    }
+//
+//                }
             }
             if (tagName.equalsIgnoreCase("item")) {
                 //itemNum++;

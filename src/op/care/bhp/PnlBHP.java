@@ -32,7 +32,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import entity.BWInfoTools;
+import entity.info.BWInfoTools;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.verordnungen.*;

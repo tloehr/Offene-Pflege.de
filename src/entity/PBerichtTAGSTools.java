@@ -4,10 +4,10 @@
  */
 package entity;
 
-import com.jidesoft.pane.CollapsiblePane;
+import entity.files.SYSFiles;
 import op.OPDE;
 import op.tools.GUITools;
-import org.jdesktop.swingx.JXTaskPane;
+import op.tools.SYSTools;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -27,6 +27,25 @@ import java.util.Iterator;
  * @author tloehr
  */
 public class PBerichtTAGSTools {
+
+    public static ListCellRenderer getPBerichtTAGSRenderer() {
+//        final int v = verbosity;
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof PBerichtTAGS) {
+                    PBerichtTAGS tag = (PBerichtTAGS) o;
+                    text = tag.getBezeichnung() + " ("+tag.getKurzbezeichnung()+")";
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
 
     /**
      * Erstellt ein JMenu bestehend aus Checkboxen. Für jede aktive PBerichtTag jeweils eine.
@@ -106,13 +125,11 @@ public class PBerichtTAGSTools {
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
         ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
         JPanel panel = new JPanel(layout);
-        Iterator<PBerichtTAGS> itTags = tags.iterator();
-        while (itTags.hasNext()) {
-            PBerichtTAGS tag = itTags.next();
+        for (PBerichtTAGS tag : tags) {
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
             cb.setForeground(tag.getColor());
             if (tag.isBesonders()) {
-                cb.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+                cb.setFont(OPDE.arial14);
             }
             cb.putClientProperty("UserObject", tag);
 

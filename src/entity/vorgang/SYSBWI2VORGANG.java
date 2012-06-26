@@ -1,6 +1,6 @@
 package entity.vorgang;
 
-import entity.BWInfo;
+import entity.info.BWInfo;
 
 import javax.persistence.*;
 

@@ -28,11 +28,9 @@ package op.share.bwinfo;
 
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OCSec;
 import op.OPDE;
-import op.tools.CleanablePanel;
 import op.tools.*;
 
 import javax.persistence.EntityManager;
@@ -626,7 +624,7 @@ public class PnlBWInfo extends NursingRecordsPanel {
                     EntityManager em = OPDE.createEM();
                     Query query = em.createNamedQuery("BWInfo.findByBwinfoid");
                     query.setParameter("bwinfoid", bwinfoid);
-                    entity.BWInfo bwinfo = (entity.BWInfo) query.getSingleResult();
+                    entity.info.BWInfo bwinfo = (entity.info.BWInfo) query.getSingleResult();
 //                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwinfo, fileActionListener));
                     em.close();
                     //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWInfo", ((Long) entry.get("bwinfoid")).longValue(), bwkennung, tblBWInfo, true, true, SYSFiles.CODE_PLANUNG, fileActionListener));

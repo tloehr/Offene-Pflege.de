@@ -8,10 +8,12 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
 import entity.Bewohner;
+import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.care.berichte.PnlBerichte;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
+import op.care.info.PnlInfo;
 import op.care.med.vorrat.PnlVorrat;
 import op.care.planung.PnlPlanung;
 import op.care.sysfiles.PnlFiles;
@@ -88,14 +90,9 @@ public class PnlPflege extends NursingRecordsPanel {
             }
             jtpPflegeakte.setComponentAt(i, null);
         }
-//        if (jtpMain.getComponentAt(MAINTAB_UEBERSICHT) != null && jtpMain.getComponentAt(MAINTAB_UEBERSICHT) instanceof CleanablePanel) {
-//            CleanablePanel cp = (CleanablePanel) jtpMain.getComponentAt(MAINTAB_UEBERSICHT);
-//            cp.cleanup();
-//            SYSTools.unregisterListeners((JComponent) jtpMain.getComponentAt(MAINTAB_UEBERSICHT));
-//            jtpMain.setComponentAt(MAINTAB_UEBERSICHT, null);
-//        }
-//
-//
+
+        jtpPflegeakte.setEnabledAt(TAB_FILES, SYSFilesTools.isFTPServerReady());
+        jtpPflegeakte.setEnabledAt(TAB_VORRAT, OPDE.isCalcMedi());
 
     }
 
@@ -148,7 +145,7 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_INFO: {
-                previousPanel = new op.care.bwinfo.PnlInfo(new JFrame(), currentBewohner);
+                previousPanel = new PnlInfo(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_INFO, previousPanel);
 
                 break;

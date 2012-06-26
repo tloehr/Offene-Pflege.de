@@ -4,6 +4,7 @@
 package op.tools;
 
 import entity.Acl;
+import op.OPDE;
 
 /**
  * Neben der Darstellung durch die EntityBean Acl, welche ich hier
@@ -39,8 +40,8 @@ public class InternalClassACL implements Comparable<InternalClassACL> {
         this.aclEntity = aclEntity;
     }
 
-    public InternalClassACL(String description, short acl) {
-        this.description = description;
+    public InternalClassACL(String langbundle, short acl) {
+        this.description = OPDE.lang.getString(langbundle);
         this.acl = acl;
         this.aclEntity = null;
     }

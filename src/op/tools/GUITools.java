@@ -44,18 +44,18 @@ public class GUITools {
 
     public static MouseAdapter getHyperlinkStyleMouseAdapter() {
         return new MouseAdapter() {
-//            String text = "";
-//
-//            @Override
-//            public void mouseEntered(MouseEvent mouseEvent) {
-//                text = ((javax.swing.AbstractButton) mouseEvent.getSource()).getText();
-//                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText("<html><u>" + text + "</u></html>");
-//            }
-//
-//            @Override
-//            public void mouseExited(MouseEvent mouseEvent) {
-//                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText(text);
-//            }
+            String text = "";
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+                text = SYSTools.removeTags(((javax.swing.AbstractButton) mouseEvent.getSource()).getText(), "html");
+                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText("<html><u>" + text + "</u></html>");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                ((javax.swing.AbstractButton) mouseEvent.getSource()).setText(SYSTools.toHTMLForScreen(text));
+            }
         };
     }
 

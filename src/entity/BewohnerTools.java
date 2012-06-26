@@ -4,6 +4,9 @@
  */
 package entity;
 
+import entity.info.BWInfo;
+import entity.info.BWInfoTools;
+import entity.info.BWInfoTypTools;
 import op.OPDE;
 import op.tools.DlgListSelector;
 import op.tools.SYSCalendar;

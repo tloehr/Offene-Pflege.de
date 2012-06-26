@@ -32,6 +32,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+
+
+
 /**
  * @author tloehr
  */
@@ -41,7 +44,6 @@ import java.util.Date;
         @NamedQuery(name = "Syspb2file.findAll", query = "SELECT s FROM Syspb2file s"),
         @NamedQuery(name = "Syspb2file.findById", query = "SELECT s FROM Syspb2file s WHERE s.id = :id")})
 public class Syspb2file implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

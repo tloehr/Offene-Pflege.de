@@ -1,4 +1,4 @@
-package entity;
+package entity.info;
 
 import op.OPDE;
 
@@ -22,6 +22,15 @@ public class BWInfoTypTools {
         List<BWInfoTyp> bwInfoTyps = query.getResultList();
         em.close();
         return bwInfoTyps.isEmpty() ? null : bwInfoTyps.get(0);
+    }
+
+    public static List<BWInfoTyp> findByKategorie(BWInfoKat kat) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("BWInfoTyp.findByKat");
+        query.setParameter("kat", kat);
+        List<BWInfoTyp> bwInfoTypen = query.getResultList();
+        em.close();
+        return bwInfoTypen;
     }
 
 }

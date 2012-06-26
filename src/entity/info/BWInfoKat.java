@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.info;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -100,7 +100,7 @@ public class BWInfoKat implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.BWInfoKat[bwikid=" + bwikid + "]";
+        return "entity.info.BWInfoKat[bwikid=" + bwikid + "]";
     }
 
 }

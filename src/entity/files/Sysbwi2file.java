@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.BWInfo;
+import entity.info.BWInfo;
 import entity.Users;
 
 import javax.persistence.*;

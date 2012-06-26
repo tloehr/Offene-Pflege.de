@@ -61,16 +61,9 @@ import java.util.Collections;
  * @author tloehr
  */
 public class PnlFiles extends NursingRecordsPanel {
-    // Wird für die Zuordnung beim Rechtesystem innerhalb
-    // OCRights Tabelle benötigt.
-
-    private static final int DROPPANEL = 1;
-    private static final int TABLE = 0;
-
     public static final String internalClassID = "nursingrecords.files";
     private JPopupMenu menu;
     private Bewohner bewohner;
-    private boolean ftpServerReady;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
@@ -80,7 +73,7 @@ public class PnlFiles extends NursingRecordsPanel {
     public PnlFiles(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
-        ftpServerReady = SYSFilesTools.isFTPServerReady();
+
         initPanel();
         change2Bewohner(bewohner);
     }
@@ -339,34 +332,6 @@ public class PnlFiles extends NursingRecordsPanel {
 
         searchPanes.addExpansion();
 
-    }
-
-    private CollapsiblePane addFilters() {
-        JPanel labelPanel = new JPanel();
-        labelPanel.setBackground(Color.WHITE);
-//        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
-        labelPanel.setLayout(new VerticalLayout(5));
-
-        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
-        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
-        panelFilter.setCollapsible(false);
-
-//        tbAbgesetzt = GUITools.getNiceToggleButton("Abgesetzte");
-//        tbAbgesetzt.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                if (initPhase) return;
-//                SYSPropsTools.storeState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
-//                reloadTable();
-//            }
-//        });
-//
-//        labelPanel.add(tbAbgesetzt);
-//        SYSPropsTools.restoreState(internalClassID + ":tbAbgesetzt", tbAbgesetzt);
-
-        panelFilter.setContentPane(labelPanel);
-
-        return panelFilter;
     }
 
     private CollapsiblePane addCommands() {

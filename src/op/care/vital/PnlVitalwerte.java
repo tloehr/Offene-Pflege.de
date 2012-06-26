@@ -589,7 +589,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         labelPanel.add(cmbAuswahl);
         SYSPropsTools.restoreState(internalClassID + ":cmbAuswahl", cmbAuswahl);
 
-        tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showreplaced"));
+        tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showreplaced"));
         tbShowReplaced.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -602,7 +602,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         SYSPropsTools.restoreState(internalClassID + ":tbShowReplaced", tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
-        tbShowIDs = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.showpks"));
+        tbShowIDs = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showpks"));
         tbShowIDs.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {

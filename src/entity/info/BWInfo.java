@@ -23,8 +23,10 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package entity;
+package entity.info;
 
+import entity.Bewohner;
+import entity.Users;
 import entity.files.Sysbwi2file;
 import entity.vorgang.SYSBWI2VORGANG;
 import entity.vorgang.VorgangElement;
@@ -50,10 +52,8 @@ import java.util.Date;
                 + " WHERE v = :vorgang "),
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
-        @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis"),
-        @NamedQuery(name = "BWInfo.findByReiter", query = "SELECT b FROM BWInfo b WHERE b.reiter = :reiter")})
+        @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis")})
 public class BWInfo implements Serializable, VorgangElement {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,10 +72,14 @@ public class BWInfo implements Serializable, VorgangElement {
     @Column(name = "XML")
     private String xml;
     @Lob
+    @Column(name = "HTML")
+    private String html;
+    @Lob
+    @Column(name = "Properties")
+    private String properties;
+    @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
-    @Column(name = "Reiter")
-    private BigInteger reiter;
     // ==
     // N:1 Relationen
     // ==
@@ -146,6 +150,14 @@ public class BWInfo implements Serializable, VorgangElement {
         return xml;
     }
 
+    public String getHtml() {
+        return html;
+    }
+
+    public void setHtml(String html) {
+        this.html = html;
+    }
+
     public void setXml(String xml) {
         this.xml = xml;
     }
@@ -158,12 +170,12 @@ public class BWInfo implements Serializable, VorgangElement {
         this.bemerkung = bemerkung;
     }
 
-    public BigInteger getReiter() {
-        return reiter;
+    public String getProperties() {
+        return properties;
     }
 
-    public void setReiter(BigInteger reiter) {
-        this.reiter = reiter;
+    public void setProperties(String properties) {
+        this.properties = properties;
     }
 
     public Users getAbgesetztDurch() {
@@ -193,6 +205,10 @@ public class BWInfo implements Serializable, VorgangElement {
     @Override
     public long getPITInMillis() {
         return von.getTime();
+    }
+
+    public boolean isAbgesetzt(){
+        return bis.before(new Date());
     }
 
     @Override
@@ -234,6 +250,6 @@ public class BWInfo implements Serializable, VorgangElement {
 
     @Override
     public String toString() {
-        return "entity.BWInfo[bwinfoid=" + bwinfoid + "]";
+        return "entity.info.BWInfo[bwinfoid=" + bwinfoid + "]";
     }
 }

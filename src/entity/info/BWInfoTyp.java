@@ -23,7 +23,7 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package entity;
+package entity.info;
 
 import op.OPDE;
 
@@ -40,7 +40,7 @@ import java.util.Collection;
         @NamedQuery(name = "BWInfoTyp.findAll", query = "SELECT b FROM BWInfoTyp b"),
         @NamedQuery(name = "BWInfoTyp.findByBwinftyp", query = "SELECT b FROM BWInfoTyp b WHERE b.bwinftyp = :bwinftyp"),
         @NamedQuery(name = "BWInfoTyp.findByBWInfoKurz", query = "SELECT b FROM BWInfoTyp b WHERE b.bWInfoKurz = :bWInfoKurz"),
-        @NamedQuery(name = "BWInfoTyp.findByBwikid", query = "SELECT b FROM BWInfoTyp b WHERE b.bwikid = :bwikid"),
+        @NamedQuery(name = "BWInfoTyp.findByKat", query = "SELECT b FROM BWInfoTyp b WHERE b.bwInfokat = :kat AND b.sortierung >= 0 ORDER BY b.sortierung, b.bWInfoKurz"),
         @NamedQuery(name = "BWInfoTyp.findBySortierung", query = "SELECT b FROM BWInfoTyp b WHERE b.sortierung = :sortierung"),
         @NamedQuery(name = "BWInfoTyp.findByIntervalMode", query = "SELECT b FROM BWInfoTyp b WHERE b.intervalMode = :intervalMode")})
 public class BWInfoTyp implements Serializable {
@@ -60,13 +60,17 @@ public class BWInfoTyp implements Serializable {
     @Lob
     @Column(name = "BWInfoLang")
     private String bWInfoLang;
-    @Basic(optional = false)
-    @Column(name = "BWIKID")
-    private long bwikid;
     @Column(name = "Sortierung")
     private Integer sortierung;
     @Column(name = "IntervalMode")
     private Short intervalMode;
+
+    // ==
+    // N:1 Relationen
+    // ==
+    @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
+    @ManyToOne
+    private BWInfoKat bwInfokat;
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfotyp")
@@ -79,12 +83,6 @@ public class BWInfoTyp implements Serializable {
         this.bwinftyp = bwinftyp;
     }
 
-    public BWInfoTyp(String bwinftyp, String xml, String bWInfoKurz, long bwikid) {
-        this.bwinftyp = bwinftyp;
-        this.xml = xml;
-        this.bWInfoKurz = bWInfoKurz;
-        this.bwikid = bwikid;
-    }
 
     public String getBwinftyp() {
         return bwinftyp;
@@ -118,12 +116,12 @@ public class BWInfoTyp implements Serializable {
         this.bWInfoLang = bWInfoLang;
     }
 
-    public long getBwikid() {
-        return bwikid;
+    public BWInfoKat getBwInfokat() {
+        return bwInfokat;
     }
 
-    public void setBwikid(long bwikid) {
-        this.bwikid = bwikid;
+    public void setBwInfokat(BWInfoKat bwInfokat) {
+        this.bwInfokat = bwInfokat;
     }
 
     public Integer getSortierung() {
@@ -165,6 +163,6 @@ public class BWInfoTyp implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.BWInfoTyp[bwinftyp=" + bwinftyp + "]";
+        return "entity.info.BWInfoTyp[bwinftyp=" + bwinftyp + "]";
     }
 }

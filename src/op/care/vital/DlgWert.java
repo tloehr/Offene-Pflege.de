@@ -6,14 +6,12 @@ package op.care.vital;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.toedter.calendar.JDateChooser;
 import entity.BWerte;
 import entity.BWerteTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.PnlUhrzeitDatum;
-import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -25,13 +23,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
-import java.sql.Time;
-import java.text.DateFormat;
+
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * @author Torsten Löhr
@@ -42,7 +36,7 @@ public class DlgWert extends MyJDialog {
     private BWerte wert;
     private Closure actionBlock;
     private int type;
-    private Time uhrzeit;
+
     private PnlUhrzeitDatum pnlUhrzeitDatum;
 
     public DlgWert(BWerte wert, Closure actionBlock) {

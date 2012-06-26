@@ -1108,6 +1108,30 @@ public class SYSTools {
     }
 
     /**
+     * Fügt html Tags vor und hinter den Eingangsstring ein.
+     *
+     * @param in Eingangsstring
+     * @return String mit HTML Erweiterungen.
+     */
+    public static String toHTMLForScreen(String in) {
+        String out = null;
+
+        if (!catchNull(in).equals("")) {
+            out = "<html>"
+                    + SYSConst.html_fontface
+                    + in + "</font></html>";
+        }
+        return out;
+    }
+
+
+    public static String getHTMLSubstring(String in, int maximum) {
+        String htmlshort = in.replaceAll("\\<.*?\\>", " "); // Alle HTML Tags entfernen.
+        int max = Math.min(maximum, htmlshort.length() - 1); // Nur die ersten 40 Zeichen zeigen...
+        return htmlshort.substring(0, max) + (htmlshort.length()-1 <= max ? "" : "...");
+    }
+
+    /**
      * Einfache Funktion, die einen Text mit einer HTML Dokumentenstruktur umschließt
      * und dadurch auch den Titel des Browsers setzt. Auf Wunsch wird auch direkt
      * ein javascript hinzugefügt, dass die Browser Druckfunktion startet.
@@ -1185,6 +1209,13 @@ public class SYSTools {
         result = SYSTools.replace(result, "</html>", "");
         result = SYSTools.replace(result, "<body>", "");
         result = SYSTools.replace(result, "</body>", "");
+        return result;
+    }
+
+    public static String removeTags(String input, String tag) {
+        String result = input;
+        result = SYSTools.replace(result, "<" + tag + ">", "");
+        result = SYSTools.replace(result, "</" + tag + ">", "");
         return result;
     }
 

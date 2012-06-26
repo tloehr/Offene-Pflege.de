@@ -4,10 +4,8 @@
 */
 package entity;
 
-import entity.files.SYSFiles;
 import entity.files.Syspb2file;
 import entity.vorgang.SYSPB2VORGANG;
-import entity.vorgang.Vorgaenge;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -254,7 +252,7 @@ public class PflegeberichteTools {
     }
 
     public static String getTagsAsHTML(Pflegeberichte bericht) {
-        String result = "<font " + getHTMLColor(bericht) + ">";
+        String result = "<font " + getHTMLColor(bericht)  + SYSConst.html_arial14 + ">";
         Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();
         while (itTags.hasNext()) {
             PBerichtTAGS tag = itTags.next();
@@ -271,10 +269,13 @@ public class PflegeberichteTools {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
+        if (!bericht.isDeleted() && !bericht.isReplaced()) {
+            result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + bericht.getDauer() + " " + OPDE.lang.getString("misc.msg.Minutes");
+        }
         if (showIDs) {
             result += "<br/><i>(" + bericht.getPbid() + ")</i>";
         }
-        return "<font " + getHTMLColor(bericht) + ">" + result + "</font>";
+        return "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">" + result + "</font>";
     }
 
     /**
@@ -285,19 +286,19 @@ public class PflegeberichteTools {
     public static String getAsHTML(Pflegeberichte bericht) {
         String result = "";
 
-        String fonthead = "<font " + getHTMLColor(bericht) + ">";
+        String fonthead = "<font " + getHTMLColor(bericht)  + SYSConst.html_arial14 + ">";
 
         DateFormat df = DateFormat.getDateTimeInstance();
         //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
         if (bericht.isDeleted()) {
-            result += "<i>Gelöschter Eintrag. Gelöscht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname() + "</i><br/>";
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bericht.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bericht.getEditedBy().getNameUndVorname() + "</i><br/>";
         }
-        if (bericht.isReplacement()) {
-            result += "<i>Dies ist ein Eintrag, der nachbearbeitet wurde.<br/>Am/um: " + df.format(bericht.getReplacementFor().getEditpit()) + "<br/>Der Originaleintrag hatte die Bericht-Nummer: " + +bericht.getReplacementFor().getPbid() + "</i><br/>";
+        if (bericht.isReplacement() && !bericht.isReplaced()) {
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bericht.getReplacementFor().getEditpit()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + bericht.getReplacementFor().getPbid() + "</i><br/>";
         }
         if (bericht.isReplaced()) {
-            result += "<i>Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.<br/>Änderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname() + " vorgenommen.";
-            result += "<br/>Der Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid() + "</i><br/>";
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bericht.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bericht.getEditedBy().getNameUndVorname();
+            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + bericht.getReplacedBy().getPbid() + "</i><br/>";
         }
         if (!bericht.getAttachedFiles().isEmpty()) {
             result += "<font color=\"green\">&#9679;</font>";
@@ -310,30 +311,30 @@ public class PflegeberichteTools {
         return result;
     }
 
-    public static String getAsText(Pflegeberichte bericht) {
-        String result = "";
-        DateFormat df = DateFormat.getDateTimeInstance();
-        if (bericht.isDeleted()) {
-            result += "Gelöschter Eintrag. Gelöscht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
-            result += "\n=========================\n\n";
-        }
-        if (bericht.isReplacement()) {
-            result += "Dies ist ein Eintrag, der nachbearbeitet wurde.\nAm/um: " + df.format(bericht.getReplacementFor().getEditpit()) + "\nDer Originaleintrag hatte die Bericht-Nummer: " + bericht.getReplacementFor().getPbid();
-            result += "\n=========================\n\n";
-        }
-        if (bericht.isReplaced()) {
-            result += "Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.\nÄnderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
-            result += "\nDer Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid();
-            result += "\n=========================\n\n";
-        }
-        result += bericht.getText();
-        return result;
-    }
+//    public static String getAsText(Pflegeberichte bericht) {
+//        String result = "";
+//        DateFormat df = DateFormat.getDateTimeInstance();
+//        if (bericht.isDeleted()) {
+//            result += "Gelöschter Eintrag. Gelöscht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
+//            result += "\n=========================\n\n";
+//        }
+//        if (bericht.isReplacement()) {
+//            result += "Dies ist ein Eintrag, der nachbearbeitet wurde.\nAm/um: " + df.format(bericht.getReplacementFor().getEditpit()) + "\nDer Originaleintrag hatte die Bericht-Nummer: " + bericht.getReplacementFor().getPbid();
+//            result += "\n=========================\n\n";
+//        }
+//        if (bericht.isReplaced()) {
+//            result += "Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.\nÄnderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
+//            result += "\nDer Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid();
+//            result += "\n=========================\n\n";
+//        }
+//        result += bericht.getText();
+//        return result;
+//    }
 
     public static String getBewohnerName(Pflegeberichte bericht) {
         String result = "";
         result = bericht.getBewohner().getNachname() + ", " + bericht.getBewohner().getVorname();
-        return "<font " + getHTMLColor(bericht) + ">" + result + "</font>";
+        return "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">" + result + "</font>";
     }
 
     /**
