@@ -32,6 +32,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
@@ -173,7 +174,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSPrint.print(SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+                SYSFilesTools.print(SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
             }
         });
         mypanel.add(printButton);
@@ -194,7 +195,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-        SYSPrint.print(SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+        SYSFilesTools.print(SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
     }//GEN-LAST:event_btnPrintActionPerformed
 
     private void cbMediActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbMediActionPerformed

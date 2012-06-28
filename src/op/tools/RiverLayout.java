@@ -15,7 +15,7 @@
  * Phone: +46 8 580 15668. Mobile: +46 70 486 77 38 
  */
 
-package se.datadosen.component;
+package op.tools;
 
 import java.awt.*;
 import java.util.HashMap;

@@ -242,7 +242,7 @@ public class PnlBerichte extends NursingRecordsPanel {
             out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false)));
 
             out.close();
-            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
         }
     }

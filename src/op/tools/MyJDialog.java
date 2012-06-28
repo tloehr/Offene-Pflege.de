@@ -50,6 +50,10 @@ public class MyJDialog extends JDialog {
     }
 
     protected void initAnimator() {
+        if (!OPDE.isAnimation()){
+            return;
+        }
+
         final TimingSource ts = new SwingTimerTimingSource();
         thisDialog = this;
         Animator.setDefaultTimingSource(ts);
@@ -100,6 +104,12 @@ public class MyJDialog extends JDialog {
         if (isDisposed){
             return;
         }
+
+        if (!OPDE.isAnimation()){
+            super.setVisible(visible);
+            return;
+        }
+
         setLocation(OPDE.getMainframe().getLocationForDialog(getSize()));
         if (visible) {
             if (fadeIn != null && !fadeIn.isRunning()) {

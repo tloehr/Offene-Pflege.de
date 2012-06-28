@@ -315,7 +315,7 @@ public class BWInfo {
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
                 rs.last();
-                OPDE.debug("BWInfo: Anzahl Datensätze: " + rs.getRow());
+//                OPDE.debug("BWInfo: Anzahl Datensätze: " + rs.getRow());
                 rs.beforeFirst();
 
                 while (rs.next()) {
@@ -385,7 +385,7 @@ public class BWInfo {
                 String name = SYSTools.catchNull(userObject[1]);
                 String label = SYSTools.catchNull(userObject[2]);
                 String value = SYSTools.catchNull(antwort.get(name));
-                OPDE.debug("toHTML(): key=" + key + "  name=" + name + "  value=" + value);
+//                OPDE.debug("toHTML(): key=" + key + "  name=" + name + "  value=" + value);
 
                 if (node.isLeaf()) {
                     if (key.equalsIgnoreCase("list")) {
@@ -432,7 +432,7 @@ public class BWInfo {
                             } else {
                                 html += "<li><b>keine gültige Zuordnung zu Tabelle: " + liststruct.get("table").toString() + "</b></li>";
                             }
-                            OPDE.debug(html);
+//                            OPDE.debug(html);
                         } catch (SQLException ex) {
                             new DlgException(ex);
                         }
@@ -443,7 +443,7 @@ public class BWInfo {
                         } else {
                             if (!value.equalsIgnoreCase("tnz")) {
                                 if (!name.equalsIgnoreCase("hauf") && (key.equalsIgnoreCase("optiongroup") || key.equalsIgnoreCase("scalegroup") || key.equalsIgnoreCase("combobox"))) {
-                                    OPDE.debug("toHTML().key = " + key);
+//                                    OPDE.debug("toHTML().key = " + key);
                                     DefaultMutableTreeNode thisNode = findNameInTree(struktur, value);
                                     String text = SYSTools.catchNull(((Object[]) thisNode.getUserObject())[2]);
                                     if (key.equalsIgnoreCase("scalegroup")) {
@@ -505,7 +505,7 @@ public class BWInfo {
             }
             html += "<b><font color=\"" + color + "\">Risiko-Einschätzung: " + scalesum + " (" + risiko + ")</font></b><br/>";
         }
-        OPDE.debug(html);
+//        OPDE.debug(html);
         return html;
 
     }
@@ -544,7 +544,7 @@ public class BWInfo {
             }
             String html = "";
             HashMap hm = new HashMap();
-            OPDE.debug("BWInfTyp: " + bwinftyp + "  BWInfoID:" + bwinfoid);
+//            OPDE.debug("BWInfTyp: " + bwinftyp + "  BWInfoID:" + bwinfoid);
             // Erst Struktur...
             String texts = "<?xml version=\"1.0\"?><xml>" + xmls + "</xml>";
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
@@ -623,7 +623,7 @@ public class BWInfo {
 
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
             if (!tagName.equalsIgnoreCase("xml")) {
-                OPDE.debug(this.toString() + ":" + tagName);
+//                OPDE.debug(this.toString() + ":" + tagName);
                 if (tagName.equalsIgnoreCase("java")) { // eine Java Klasse sorgt selbst für ihre Darstellung. Da gibts hier nicht viel zu tun.
                     String atr = attributes.getValue("html");
                     atr = atr.replaceAll("&lt;", "<");
@@ -677,7 +677,7 @@ public class BWInfo {
             // Baut eine Liste mit names und labels auf.
             String name = attributes.getValue("name");
             String label = attributes.getValue("label");
-            OPDE.debug("STARTELEMENT: " + this.toString() + ": " + tagName + "    name: " + name);
+//            OPDE.debug("STARTELEMENT: " + this.toString() + ": " + tagName + "    name: " + name);
 
             if (!tagName.equalsIgnoreCase("java")) {
                 if (tagName.equalsIgnoreCase("list")) {
@@ -707,14 +707,14 @@ public class BWInfo {
                                 scalesum = 0d;
                                 scaleriskmodel = new ArrayList();
                             } else if (tagName.equalsIgnoreCase("tabgroup")) {
-                                OPDE.debug("TabGroup STARTS: " + name);
+//                                OPDE.debug("TabGroup STARTS: " + name);
                                 tabgroup = new DefaultMutableTreeNode(new Object[]{"tabgroup", name, label, SYSTools.catchNull(attributes.getValue("size"))});
                             } else {
                                 if (tabgroup != null) {
-                                    OPDE.debug("Füge zur Tabgroup hinzu:" + ((Object[]) tabgroup.getUserObject())[1].toString() + "=>> " + tagName + "    " + name);
+//                                    OPDE.debug("Füge zur Tabgroup hinzu:" + ((Object[]) tabgroup.getUserObject())[1].toString() + "=>> " + tagName + "    " + name);
                                     tabgroup.add(new DefaultMutableTreeNode(new Object[]{tagName, name, label}));
                                 } else {
-                                    OPDE.debug("Füge zur STRUKTUR hinzu: =>> " + tagName + "    " + name);
+//                                    OPDE.debug("Füge zur STRUKTUR hinzu: =>> " + tagName + "    " + name);
                                     if (scalemode && tagName.equalsIgnoreCase("option")) {
                                         double score = Double.parseDouble(attributes.getValue("score"));
                                         struktur.add(new DefaultMutableTreeNode(new Object[]{tagName, name, label, score}));

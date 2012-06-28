@@ -17,6 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -29,6 +30,36 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class BWInfoTools {
+
+
+    public static final int ART_PFLEGE = 0;
+    public static final int ART_VERWALTUNG = 1;
+    public static final int ART_STAMMDATEN = 2;
+    public static final int ART_PFLEGE_STAMMDATEN = 100;
+    public static final int ART_VERWALTUNG_STAMMDATEN = 101;
+    public static final int ART_ALLES = 102;
+
+    /**
+     * Eine kompakte HTML Darstellung aus der aktuellen BWInfo
+     * Inkl. Bemerkungsfeld.
+     *
+     * @param bwinfo
+     */
+    public static String getHTML(BWInfo bwinfo) {
+        String html = "<h2 id=\"fonth2\" >" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</h2><div id=\"fonttext\">" + bwinfo.getHtml() + "</div>";
+
+        if (!SYSTools.catchNull(bwinfo.getBemerkung()).isEmpty()) {
+            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b></p>";
+            html += "<p id=\"fonttext\" >" + bwinfo.getBemerkung() + "</p>";
+        }
+
+        if (bwinfo.isAbgesetzt()) {
+            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.OutdatedSince") + ":</u></b> " + DateFormat.getDateInstance().format(bwinfo.getBis()) + "</p>";
+        }
+
+        return html;
+    }
+
     public static BWInfo getLastBWInfo(Bewohner bewohner, BWInfoTyp bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
@@ -128,7 +159,7 @@ public class BWInfoTools {
      * @param bwInfo
      * @return
      */
-    public static String toHTML(BWInfo bwInfo) {
+    public static String getContentAsHTML(BWInfo bwInfo) {
         ArrayList result = parseBWInfo(bwInfo);
 
         DefaultMutableTreeNode struktur = (DefaultMutableTreeNode) result.get(0);
@@ -251,14 +282,6 @@ public class BWInfoTools {
 
         DefaultMutableTreeNode struktur = s.getStruktur();
 
-
-//        // ...dann Inhalt
-//        String textc = "<?xml version=\"1.0\"?><xml>" + xmlc + "</xml>";
-//        InputSource ic = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(textc)));
-//        HandlerInhalt c = new HandlerInhalt(struktur);
-//        parser.setContentHandler(c);
-//        parser.parse(ic);
-
         Properties content = new Properties();
         try {
             StringReader reader = new StringReader(bwInfo.getProperties());
@@ -352,10 +375,6 @@ public class BWInfoTools {
 
         public void startDocument() throws SAXException {
             struktur = new DefaultMutableTreeNode(new InfoTreeNodeBean("root", "", ""));
-        }
-
-        public BigDecimal getScalesum() {
-            return scalesum;
         }
 
         public ArrayList<RiskBean> getScaleriskmodel() {
@@ -454,16 +473,15 @@ public class BWInfoTools {
         DefaultMutableTreeNode result = null;
         while (!found && en.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-//            System.out.println("findNameInTree/2: gesucht: " + name + "   gefunden: " + ((InfoTreeNodeBean) node.getUserObject()).getName());
             found = ((InfoTreeNodeBean) node.getUserObject()).getName().equalsIgnoreCase(name);
             if (found) {
-//                System.out.println("TREFFER!");
                 result = node;
             }
 
         }
         return result;
     }
+
 
 
 }

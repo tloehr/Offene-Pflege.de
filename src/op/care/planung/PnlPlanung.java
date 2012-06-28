@@ -27,6 +27,7 @@
 package op.care.planung;
 
 import entity.*;
+import entity.files.SYSFilesTools;
 import entity.vorgang.VorgaengeTools;
 import op.OCSec;
 import op.OPDE;
@@ -515,7 +516,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                 out.write(DBHandling.getPlanungenAsHTML(bwkennung, von, von));
             }
             out.close();
-            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
         }
     }//GEN-LAST:event_btnPrintActionPerformed

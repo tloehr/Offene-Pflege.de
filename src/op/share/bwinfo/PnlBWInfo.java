@@ -28,6 +28,7 @@ package op.share.bwinfo;
 
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OCSec;
 import op.OPDE;
@@ -522,7 +523,7 @@ public class PnlBWInfo extends NursingRecordsPanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     int[] sel = tblBWInfo.getSelectedRows();
-                    SYSPrint.print(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, sel), false);
+                    SYSFilesTools.print(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, sel), false);
                 }
             });
             menu.add(itemPopupPrint);
@@ -755,7 +756,7 @@ public class PnlBWInfo extends NursingRecordsPanel {
     }
 
     public void print() {
-        SYSPrint.print(SYSTools.htmlUmlautConversion(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, null)), false);
+        SYSFilesTools.print(SYSTools.htmlUmlautConversion(op.share.bwinfo.DBHandling.bwInfo2HTML((TMBWInfo) tblBWInfo.getModel(), bewohner, null)), false);
 
 //        HashMap params = new HashMap();
 //        params.put("BWName", SYSTools.unHTML(lblBW.getText()));

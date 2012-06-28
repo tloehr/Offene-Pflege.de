@@ -50,10 +50,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -462,6 +460,47 @@ public class SYSFilesTools {
         result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getNameUndVorname();
 
         return SYSConst.html_fontface + result + "</font>";
+    }
+
+    /**
+     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
+     * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
+     *
+     * @param html
+     * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
+     */
+    public static File print(String html, boolean addPrintJScript) {
+        File temp = null;
+        try {
+            // Create temp file.
+            temp = File.createTempFile("opde", ".html");
+
+            String text = "<html><head>";
+            if (addPrintJScript) {
+                text += "<script type=\"text/javascript\">" +
+                        "window.onload = function() {"
+                        + "window.print();"
+                        + "}</script>";
+            }
+            text += OPDE.getCSS();
+            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
+                    + "<hr/>" +
+                    "<div id=\"fonttext\">" +
+                    "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
+                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuild() + "</div></body></html>";
+
+
+            // Write to temp file
+            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+            out.write(text);
+
+            out.close();
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
+        } catch (IOException e) {
+            OPDE.error(e);
+        }
+        return temp;
     }
 
 }

@@ -42,6 +42,7 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
 import entity.StationenTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.bw.tg.PnlTG;
@@ -394,7 +395,7 @@ public class FrmMain extends JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSPrint.print(SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
+            SYSFilesTools.print(SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true, false)), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }

@@ -39,7 +39,7 @@
          </object> 
         </void> 
         <void property="name"> 
-         <string>label1</string> 
+         <string>labelDatum</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -124,7 +124,7 @@
          <object idref="Font0"/> 
         </void> 
         <void property="name"> 
-         <string>label2</string> 
+         <string>labelUhrzeit</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 

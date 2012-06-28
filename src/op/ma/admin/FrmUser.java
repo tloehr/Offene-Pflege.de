@@ -31,6 +31,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import entity.Groups;
 import entity.Users;
+import entity.files.SYSFilesTools;
 import entity.system.IntClassesTools;
 import op.OPDE;
 import op.tools.*;
@@ -1592,7 +1593,7 @@ public class FrmUser extends javax.swing.JFrame {
         html = SYSTools.replace(html, "<opde-ocuser-pw/>", pw);
         html = SYSTools.htmlUmlautConversion(html);
 
-        SYSPrint.print(html, true);
+        SYSFilesTools.print(html, true);
     }
 
     /**

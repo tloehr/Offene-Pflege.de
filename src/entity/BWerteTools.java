@@ -208,13 +208,13 @@ public class BWerteTools {
 
         html += "</table>\n";
 
-        html = "<html><head>" +
-                "<title>" + SYSTools.getWindowTitle("") + "</title>" +
-                OPDE.getCSS() +
-                "<script type=\"text/javascript\">" +
-                "window.onload = function() {" +
-                "window.print();" +
-                "}</script></head><body>\n" + html + "\n" + SYSConst.html_report_footer + "</body></html>";
+//        html = "<html><head>" +
+//                "<title>" + SYSTools.getWindowTitle("") + "</title>" +
+//                OPDE.getCSS() +
+//                "<script type=\"text/javascript\">" +
+//                "window.onload = function() {" +
+//                "window.print();" +
+//                "}</script></head><body>\n" + html + "\n" + SYSConst.html_report_footer + "</body></html>";
 
         return SYSTools.htmlUmlautConversion(html);
     }

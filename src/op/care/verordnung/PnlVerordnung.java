@@ -35,6 +35,8 @@ import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.UniqueTools;
+import entity.files.SYSFiles;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
@@ -175,7 +177,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             temp.deleteOnExit();
             List<Verordnung> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
             String html = SYSTools.htmlUmlautConversion(VerordnungTools.getVerordnungenAsHTML(listVerordnung));
-            SYSPrint.print(html, true);
+            SYSFilesTools.print(html, true);
         } catch (IOException e) {
             new DlgException(e);
         }
@@ -191,7 +193,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             String html = SYSTools.htmlUmlautConversion(VerordnungTools.getStellplanAsHTML(bewohner.getStation().getEinrichtung()));
             out.write(html);
             out.close();
-            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
             new DlgException(e);
         }

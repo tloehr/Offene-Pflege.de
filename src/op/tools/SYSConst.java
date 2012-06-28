@@ -28,6 +28,7 @@ package op.tools;
 
 import op.OPDE;
 
+import javax.swing.*;
 import java.awt.*;
 import java.text.DateFormat;
 import java.util.Date;
@@ -40,7 +41,9 @@ import java.util.HashMap;
 public class SYSConst {
 
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
+    public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
+    public static final Font ARIAL20BOLD = new Font("Arial", Font.BOLD, 20);
     public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);
 
     public static Color darkgreen = new Color(0x00, 0x76, 0x00);
@@ -151,8 +154,6 @@ public class SYSConst {
             + "<br/>http://www.offene-pflege.de</font>\n";
 
 
-
-
     public static HashMap getNachnamenAnonym() {
         HashMap hm = new HashMap();
         hm.put("a", new String[]{"Anders", "Ackerman", "Acord", "Adams", "Addison"});
@@ -254,5 +255,6 @@ public class SYSConst {
         hm.put("ü", new String[]{"Uberto", "Ulrich", "Uwe", "Udo", "Ulf"});
         return hm;
     }
+
 
 }

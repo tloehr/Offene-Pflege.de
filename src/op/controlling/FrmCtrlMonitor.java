@@ -30,6 +30,7 @@ import entity.PBerichtTAGS;
 import entity.PflegeberichteTools;
 import entity.Stationen;
 import entity.StationenTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.verordnungen.MedBestandTools;
 import op.OPDE;
@@ -1228,7 +1229,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
                     String get = SYSTools.catchNull(get());
 //                    String result = SYSTools.htmlUmlautConversion(SYSTools.catchNull(get()));
                     if (!SYSTools.catchNull(get).isEmpty()) {
-                        SYSPrint.print(get, false);
+                        SYSFilesTools.print(get, false);
                     }
                     btnPrint.setEnabled(true);
                     btnStop.setEnabled(false);

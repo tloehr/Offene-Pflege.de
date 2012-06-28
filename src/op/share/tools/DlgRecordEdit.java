@@ -28,8 +28,8 @@ package op.share.tools;
 
 import op.OPDE;
 import op.tools.DBHandling;
+import op.tools.RiverLayout;
 import op.tools.SYSTools;
-import se.datadosen.component.RiverLayout;
 
 import javax.swing.*;
 import java.sql.ResultSet;

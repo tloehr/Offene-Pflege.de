@@ -15,6 +15,11 @@ import java.util.List;
  */
 public class BWInfoTypTools {
 
+    public static final int MODE_INTERVAL_BYSECOND = 0;
+    public static final int MODE_INTERVAL_BYDAY = 1;
+    public static final int MODE_INTERVAL_NOCONSTRAINTS = 2;
+    public static final int MODE_INTERVAL_SINGLE_INCIDENTS = 3; // Das sind Ereignisse, bei denen von == bis gilt. Weitere Einschränkungen werden nicht gemacht.
+
     public static BWInfoTyp findByBWINFTYP(String bwinftyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfoTyp.findByBwinftyp");

@@ -26,6 +26,8 @@
  */
 package op.tools;
 
+import entity.files.SYSFiles;
+import entity.files.SYSFilesTools;
 import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedBestandTools;
 import op.OPDE;
@@ -121,72 +123,72 @@ public class SYSPrint {
 //        printLabel(text);
 //    }
 
-    private static void printLabel(String text) {
-
-        OPDE.debug(text);
-
-        DocFlavor flavor = DocFlavor.STRING.TEXT_PLAIN;//.STRING;//DocFlavor.INPUT_STREAM.TEXT_HTML_US_ASCII;
-
-        // Set print attributes:
-        PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-
-        aset.add(MediaSizeName.ISO_A4);
-
-        try {
-            PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null); // alle Drucker listen
-//            for (int i=0; i < prservices.length; i++){
-//                OPDE.debug(prservices[i].getName());
+//    private static void printLabel(String text) {
+//
+//        OPDE.debug(text);
+//
+//        DocFlavor flavor = DocFlavor.STRING.TEXT_PLAIN;//.STRING;//DocFlavor.INPUT_STREAM.TEXT_HTML_US_ASCII;
+//
+//        // Set print attributes:
+//        PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
+//
+//        aset.add(MediaSizeName.ISO_A4);
+//
+//        try {
+//            PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null); // alle Drucker listen
+////            for (int i=0; i < prservices.length; i++){
+////                OPDE.debug(prservices[i].getName());
+////            }
+//            int idxPrintService = 0;
+//            if (null == prservices || 0 >= prservices.length) {
+//                System.out.println("Print-Services:");
+//                // Drucker raussuchen
 //            }
-            int idxPrintService = 0;
-            if (null == prservices || 0 >= prservices.length) {
-                System.out.println("Print-Services:");
-                // Drucker raussuchen
-            }
-            for (int i = 0; i < prservices.length; i++) {
-                System.out.println("  " + i + ":  " + prservices[i]);
-                if (prservices[i].getName().equalsIgnoreCase(PRINTER)) {
-                    idxPrintService = i;
-                }
-            }
-            PrintService prserv = prservices[idxPrintService];
+//            for (int i = 0; i < prservices.length; i++) {
+//                System.out.println("  " + i + ":  " + prservices[i]);
+//                if (prservices[i].getName().equalsIgnoreCase(PRINTER)) {
+//                    idxPrintService = i;
+//                }
+//            }
+//            PrintService prserv = prservices[idxPrintService];
+//
+//            if (null != prserv) {
+//                OPDE.info("Ausgewaehlter Print-Service:");
+//                OPDE.info("      " + prserv);
+//                printPrintServiceAttributesAndDocFlavors(prserv);
+//                DocPrintJob pj = prserv.createPrintJob();
+//                //FileInputStream fis = new FileInputStream();
+//                // new java.io.BufferedReader(new java.io.StringReader(xmltext))
+//                Doc doc = new SimpleDoc(text, flavor, null);
+//
+//                pj.print(doc, aset);
+//            }
+//
+//
+//        } catch (PrintException pe) {
+//            System.err.println(pe);
+//        }
+//    }
 
-            if (null != prserv) {
-                OPDE.info("Ausgewaehlter Print-Service:");
-                OPDE.info("      " + prserv);
-                printPrintServiceAttributesAndDocFlavors(prserv);
-                DocPrintJob pj = prserv.createPrintJob();
-                //FileInputStream fis = new FileInputStream();
-                // new java.io.BufferedReader(new java.io.StringReader(xmltext))
-                Doc doc = new SimpleDoc(text, flavor, null);
-
-                pj.print(doc, aset);
-            }
-
-
-        } catch (PrintException pe) {
-            System.err.println(pe);
-        }
-    }
-
-    private static void printPrintServiceAttributesAndDocFlavors(PrintService prserv) {
-        String s1 = null, s2;
-        Attribute[] prattr = prserv.getAttributes().toArray();
-        DocFlavor[] prdfl = prserv.getSupportedDocFlavors();
-        if (null != prattr && 0 < prattr.length) {
-            for (int i = 0; i < prattr.length; i++) {
-                OPDE.debug("      PrintService-Attribute[" + i + "]: " + prattr[i].getName() + " = " + prattr[i]);
-            }
-        }
-        if (null != prdfl && 0 < prdfl.length) {
-            for (int i = 0; i < prdfl.length; i++) {
-                s2 = prdfl[i].getMimeType();
-                if (null != s2 && !s2.equals(s1)) {
-                    OPDE.debug("      PrintService-DocFlavor-Mime[" + i + "]: " + s2);
-                }
-                s1 = s2;
-            }
-        }
-    }
+//    private static void printPrintServiceAttributesAndDocFlavors(PrintService prserv) {
+//        String s1 = null, s2;
+//        Attribute[] prattr = prserv.getAttributes().toArray();
+//        DocFlavor[] prdfl = prserv.getSupportedDocFlavors();
+//        if (null != prattr && 0 < prattr.length) {
+//            for (int i = 0; i < prattr.length; i++) {
+//                OPDE.debug("      PrintService-Attribute[" + i + "]: " + prattr[i].getName() + " = " + prattr[i]);
+//            }
+//        }
+//        if (null != prdfl && 0 < prdfl.length) {
+//            for (int i = 0; i < prdfl.length; i++) {
+//                s2 = prdfl[i].getMimeType();
+//                if (null != s2 && !s2.equals(s1)) {
+//                    OPDE.debug("      PrintService-DocFlavor-Mime[" + i + "]: " + s2);
+//                }
+//                s1 = s2;
+//            }
+//        }
+//    }
 
 //    public static void printReport(boolean preview, TableModel tm, HashMap tmcolassign, String reportFilenameWOExtension) {
 //        printReport(preview, tm, tmcolassign, new HashMap(), reportFilenameWOExtension);
@@ -335,108 +337,107 @@ public class SYSPrint {
 ////        return (target != null ? target.getAbsolutePath() : "");
 //    }
 
-    private static PrintService getPrintService(String printer) {
+//    private static PrintService getPrintService(String printer) {
+//
+//        PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null); // alle Drucker listen
+//        int idxPrintService = 0;
+//        if (null == prservices || 0 >= prservices.length) {
+//            System.out.println("Print-Services:");
+//            // Drucker raussuchen
+//        }
+//        for (int i = 0; i < prservices.length; i++) {
+//            System.out.println("  " + i + ":  " + prservices[i]);
+//            if (prservices[i].getName().equalsIgnoreCase(printer)) {
+//                idxPrintService = i;
+//            }
+//        }
+//        return prservices[idxPrintService];
+//    }
 
-        PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null); // alle Drucker listen
-        int idxPrintService = 0;
-        if (null == prservices || 0 >= prservices.length) {
-            System.out.println("Print-Services:");
-            // Drucker raussuchen
-        }
-        for (int i = 0; i < prservices.length; i++) {
-            System.out.println("  " + i + ":  " + prservices[i]);
-            if (prservices[i].getName().equalsIgnoreCase(printer)) {
-                idxPrintService = i;
-            }
-        }
-        return prservices[idxPrintService];
-    }
-
-    /**
-     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
-     * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
-     *
-     * @param html
-     * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
-     */
-    public static File print(String html, boolean addPrintJScript) {
-        File temp = null;
-        try {
-            // Create temp file.
-            temp = File.createTempFile("opde", ".html");
-
-
-            String text = "<html><head>";
-            if (addPrintJScript) {
-                text += "<script type=\"text/javascript\">" +
-                        "window.onload = function() {"
-                        + "window.print();"
-                        + "}</script>";
-            }
-            text += OPDE.getCSS();
-            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                    + "<hr/>" +
-                    "<div font=\"fonttext\">" +
-                    "<b>Ende des Berichtes</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
-                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>http://www.offene-pflege.de</div></body></html>";
-
-
-            // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(text);
-
-            out.close();
-            handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
-        } catch (IOException e) {
-            OPDE.debug(e);
-        }
-        return temp;
-    }
+//    /**
+//     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
+//     * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
+//     *
+//     * @param html
+//     * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
+//     */
+//    public static File print(String html, boolean addPrintJScript) {
+//        File temp = null;
+//        try {
+//            // Create temp file.
+//            temp = File.createTempFile("opde", ".html");
+//
+//            String text = "<html><head>";
+//            if (addPrintJScript) {
+//                text += "<script type=\"text/javascript\">" +
+//                        "window.onload = function() {"
+//                        + "window.print();"
+//                        + "}</script>";
+//            }
+//            text += OPDE.getCSS();
+//            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
+//                    + "<hr/>" +
+//                    "<div font=\"fonttext\">" +
+//                    "<b>"+OPDE.lang.getString("misc.msg.endofreport")+"</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
+//                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+//                    + "<br/>http://www.offene-pflege.de</div></body></html>";
+//
+//
+//            // Write to temp file
+//            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+//            out.write(text);
+//
+//            out.close();
+//            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
+//        } catch (IOException e) {
+//            OPDE.debug(e);
+//        }
+//        return temp;
+//    }
 
 //    public static void showFile(Component parent, String filename) {
 //        handleFile(parent, filename, Desktop.Action.OPEN);
 //    }
 
-    public static void handleFile(String filename, java.awt.Desktop.Action action) {
-        Desktop desktop = null;
-
-            Component parent = new Frame();
-
-
-        if (SYSTools.getLocalDefinedApp(filename) != null) {
-            try {
-                Runtime.getRuntime().exec(SYSTools.getLocalDefinedApp(filename));
-            } catch (IOException ex) {
-                OPDE.getLogger().error(ex);
-            }
-        } else {
-
-            if (Desktop.isDesktopSupported()) {
-                desktop = Desktop.getDesktop();
-                if (action == Desktop.Action.OPEN && desktop.isSupported(Desktop.Action.OPEN)) {
-                    try {
-                        desktop.open(new File(filename));
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht angezeigt werden.)",
-                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
-                    try {
-                        desktop.print(new File(filename));
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht gedruckt werden.)",
-                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht bearbeitet werden.)",
-                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
+//    public static void handleFile(String filename, java.awt.Desktop.Action action) {
+//        Desktop desktop = null;
+//
+//            Component parent = new Frame();
+//
+//
+//        if (SYSTools.getLocalDefinedApp(filename) != null) {
+//            try {
+//                Runtime.getRuntime().exec(SYSTools.getLocalDefinedApp(filename));
+//            } catch (IOException ex) {
+//                OPDE.getLogger().error(ex);
+//            }
+//        } else {
+//
+//            if (Desktop.isDesktopSupported()) {
+//                desktop = Desktop.getDesktop();
+//                if (action == Desktop.Action.OPEN && desktop.isSupported(Desktop.Action.OPEN)) {
+//                    try {
+//                        desktop.open(new File(filename));
+//                    } catch (IOException ex) {
+//                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht angezeigt werden.)",
+//                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+//                    }
+//                } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
+//                    try {
+//                        desktop.print(new File(filename));
+//                    } catch (IOException ex) {
+//                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht gedruckt werden.)",
+//                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+//                    }
+//                } else {
+//                    JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht bearbeitet werden.)",
+//                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
+//            }
+//        }
+//    }
 
     public static String EPL2_print_ascii(int hstart, int vstart, int rotation, int font, int hmultiplier, int vmultiplier, boolean reverse, String data) {
         String result = "A" + hstart + "," + vstart + "," + rotation + "," + font + "," + hmultiplier + "," + vmultiplier + ","

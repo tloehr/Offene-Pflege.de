@@ -30,6 +30,7 @@ package op.care.schichtleitung;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.EinrichtungenTools;
+import entity.files.SYSFilesTools;
 import op.tools.CleanablePanel;
 import op.tools.*;
 
@@ -184,7 +185,7 @@ public class PnlSchichtleitung extends CleanablePanel {
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
             out.write(txtHTML.getText());
             out.close();
-            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
             new DlgException(e);
         }

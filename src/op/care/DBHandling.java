@@ -31,10 +31,7 @@ import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
-import op.tools.DBRetrieve;
-import op.tools.DlgException;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -63,13 +60,13 @@ public class DBHandling {
                                          boolean mitEinrichtung, boolean medi, boolean bilanz, boolean bericht,
                                          boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean bwi) {
 
-        String result = "<h1>Pflegeinformationen</h1>";
+        String result = "<h1 id=\"fonth1\">Pflegeinformationen</h1>";
         String bwkennung = bewohner.getBWKennung();
         DateFormat df = DateFormat.getDateInstance();
         if (print) {
-            result += "<h2>" + SYSTools.getBWLabel(bwkennung) + "</h2>";
+            result += "<h2 id=\"fonth2\">" + SYSTools.getBWLabel(bwkennung) + "</h2>";
         }
-        result += "<table border=\"1\" cellspacing=\"0\">";
+        result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
         if (print) {
 //            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
             result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(SYSCalendar.nowDB()) + " (" + OPDE.getLogin().getUser().getNameUndVorname() + ")</b></td></tr>";
@@ -396,19 +393,19 @@ public class DBHandling {
 //                "window.onload = function() {" +
 //                "window.print();" +
 //                "}</script></head><body>"+result;
-        String tmp = "<html><head>"
-                + "<title>" + SYSTools.getWindowTitle("") + "</title>";
-        if (print) {
-            tmp = tmp + "<script type=\"text/javascript\">"
-                    + "window.onload = function() {"
-                    + "window.print();"
-                    + "}</script></head><body>" + result
-                    + "<hr/><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de</body></html>";
-        } else {
-            tmp = tmp + result;
-        }
-        tmp += "</body></html>";
-        return tmp;
+//        String tmp = "<html><head>"
+//                + "<title>" + SYSTools.getWindowTitle("") + "</title>";
+//        if (print) {
+//            tmp = tmp + "<script type=\"text/javascript\">"
+//                    + "window.onload = function() {"
+//                    + "window.print();"
+//                    + "}</script></head><body>" + result
+//                    + "<hr/><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de</body></html>";
+//        } else {
+//            tmp = tmp + result;
+//        }
+//        tmp += "</body></html>";
+        return SYSTools.toHTML(result);
     }
 
     public static boolean hatEinfuhren(String bwkennung) {

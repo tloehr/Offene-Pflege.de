@@ -36,6 +36,7 @@ import entity.BWerte;
 import entity.BWerteTools;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.system.DlgYesNo;
@@ -185,7 +186,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
             out.write(BWerteTools.getBWerteAsHTML(printlist));
 
             out.close();
-            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
         }
 

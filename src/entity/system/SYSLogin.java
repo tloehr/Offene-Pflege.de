@@ -26,7 +26,7 @@ import javax.persistence.TemporalType;
 
 import entity.Users;
 import op.OPDE;
-import op.tools.SYSConst;
+//import op.tools.SYSConst;
 
 /**
  *
@@ -72,7 +72,7 @@ public class SYSLogin implements Serializable {
 //        this.host = OPDE.getHost();
         this.user = user;
         this.login = new Date();
-        this.logout = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.logout = op.tools.SYSConst.DATE_BIS_AUF_WEITERES;
     }
 
     public Users getUser() {

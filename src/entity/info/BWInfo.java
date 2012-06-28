@@ -30,10 +30,14 @@ import entity.Users;
 import entity.files.Sysbwi2file;
 import entity.vorgang.SYSBWI2VORGANG;
 import entity.vorgang.VorgangElement;
+import op.OPDE;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -53,7 +57,7 @@ import java.util.Date;
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis")})
-public class BWInfo implements Serializable, VorgangElement {
+public class BWInfo implements Serializable, VorgangElement, Cloneable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -110,8 +114,41 @@ public class BWInfo implements Serializable, VorgangElement {
     public BWInfo() {
     }
 
-    public BWInfo(Long bwinfoid) {
-        this.bwinfoid = bwinfoid;
+    public BWInfo(BWInfoTyp bwinfotyp, Bewohner bewohner) {
+        this.properties = "";
+        Date now = new Date();
+
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
+            this.von = now;
+            this.bis = now;
+        } else if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
+            this.von = new Date(SYSCalendar.startOfDay(now));
+            this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+        } else {
+            this.von = now;
+            this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+        }
+
+        this.bwinfotyp = bwinfotyp;
+        this.angesetztDurch = OPDE.getLogin().getUser();
+        this.bewohner = bewohner;
+        this.attachedFiles = new ArrayList<Sysbwi2file>();
+        this.attachedVorgaenge = new ArrayList<SYSBWI2VORGANG>();
+    }
+
+     public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Bewohner bewohner) {
+        this.von = von;
+        this.bis = bis;
+        this.xml = xml;
+        this.html = html;
+        this.properties = properties;
+        this.bemerkung = bemerkung;
+        this.bwinfotyp = bwinfotyp;
+        this.angesetztDurch = OPDE.getLogin().getUser();;
+        this.abgesetztDurch = null;
+        this.bewohner = bewohner;
+        this.attachedFiles = new ArrayList<Sysbwi2file>();
+        this.attachedVorgaenge = new ArrayList<SYSBWI2VORGANG>();
     }
 
     public Long getBwinfoid() {
@@ -135,7 +172,13 @@ public class BWInfo implements Serializable, VorgangElement {
     }
 
     public void setVon(Date von) {
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
+            von = new Date(SYSCalendar.startOfDay(bis));
+        }
         this.von = von;
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
+            this.bis = von;
+        }
     }
 
     public Date getBis() {
@@ -143,7 +186,13 @@ public class BWInfo implements Serializable, VorgangElement {
     }
 
     public void setBis(Date bis) {
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
+            bis = new Date(SYSCalendar.endOfDay(bis));
+        }
         this.bis = bis;
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
+            this.von = bis;
+        }
     }
 
     public String getXml() {
@@ -207,8 +256,16 @@ public class BWInfo implements Serializable, VorgangElement {
         return von.getTime();
     }
 
+    /**
+     * SingleIncidents können nicht abgesetzt sein. Ansonsten, dann, wenn bis vor dem aktuellen Zeitpunkt liegt.
+     * @return
+     */
     public boolean isAbgesetzt(){
-        return bis.before(new Date());
+        return bwinfotyp.getIntervalMode() != BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS && bis.before(new Date());
+    }
+
+    public boolean isSingleIncident(){
+        return bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS;
     }
 
     @Override
@@ -246,6 +303,13 @@ public class BWInfo implements Serializable, VorgangElement {
             return false;
         }
         return true;
+    }
+
+
+
+    @Override
+    public BWInfo clone()  {
+        return new BWInfo(von, bis, xml, html, properties, bemerkung, bwinfotyp, bewohner);
     }
 
     @Override

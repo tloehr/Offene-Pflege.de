@@ -30,6 +30,7 @@ import com.jidesoft.wizard.WizardStyle;
 import entity.EntityTools;
 import entity.Users;
 import entity.UsersTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSLogin;
 import entity.system.SYSPropsTools;
 import entity.system.SyslogTools;
@@ -257,7 +258,7 @@ public class OPDE {
 
         String html = SYSTools.getThrowableAsHTML(e);
 
-        File temp = SYSPrint.print(html, false);
+        File temp = SYSFilesTools.print(html, false);
 
         if (!isDebug() && props.containsKey("mail.smtp.host")) { //Stellvertretend für die anderen Keys.
             try {

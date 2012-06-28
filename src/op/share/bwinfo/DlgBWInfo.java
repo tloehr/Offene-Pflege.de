@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-import se.datadosen.component.RiverLayout;
+import op.tools.RiverLayout;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -44,8 +44,6 @@ import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

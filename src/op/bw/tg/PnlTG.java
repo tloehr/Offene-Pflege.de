@@ -34,6 +34,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.*;
+import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -536,7 +537,7 @@ public class PnlTG extends CleanablePanel {
             out.write(html);
 
             out.close();
-            SYSPrint.handleFile(temp.getAbsolutePath(), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
             new DlgException(e);
         }

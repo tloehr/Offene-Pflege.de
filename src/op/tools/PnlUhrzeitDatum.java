@@ -7,6 +7,7 @@ package op.tools;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
+import op.OPDE;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,6 +38,8 @@ public class PnlUhrzeitDatum extends JPanel {
 
     public PnlUhrzeitDatum(Date preset, Date max) {
         initComponents();
+        labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
+        labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time"));
         this.preset = preset;
         jdcDatum.setDate(preset);
         jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_BIS_AUF_WEITERES : max);
@@ -79,20 +82,20 @@ public class PnlUhrzeitDatum extends JPanel {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        label1 = new JLabel();
+        labelDatum = new JLabel();
         jdcDatum = new JDateChooser();
         txtUhrzeit = new JTextField();
-        label2 = new JLabel();
+        labelUhrzeit = new JLabel();
 
         //======== this ========
         setLayout(new FormLayout(
             "default, $lcgap, default:grow",
             "16dlu, $lgap, 16dlu"));
 
-        //---- label1 ----
-        label1.setText("Datum");
-        label1.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(label1, CC.xy(1, 1));
+        //---- labelDatum ----
+        labelDatum.setText("Datum");
+        labelDatum.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(labelDatum, CC.xy(1, 1));
 
         //---- jdcDatum ----
         jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -118,17 +121,17 @@ public class PnlUhrzeitDatum extends JPanel {
         });
         add(txtUhrzeit, CC.xy(3, 3));
 
-        //---- label2 ----
-        label2.setText("Uhrzeit");
-        label2.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(label2, CC.xy(1, 3));
+        //---- labelUhrzeit ----
+        labelUhrzeit.setText("Uhrzeit");
+        labelUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(labelUhrzeit, CC.xy(1, 3));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JLabel label1;
+    private JLabel labelDatum;
     private JDateChooser jdcDatum;
     private JTextField txtUhrzeit;
-    private JLabel label2;
+    private JLabel labelUhrzeit;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

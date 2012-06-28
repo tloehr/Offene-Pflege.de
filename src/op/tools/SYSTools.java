@@ -1116,7 +1116,7 @@ public class SYSTools {
     public static String toHTMLForScreen(String in) {
         String out = null;
 
-        if (!catchNull(in).equals("")) {
+        if (!catchNull(in).isEmpty()) {
             out = "<html>"
                     + SYSConst.html_fontface
                     + in + "</font></html>";
@@ -1126,6 +1126,9 @@ public class SYSTools {
 
 
     public static String getHTMLSubstring(String in, int maximum) {
+        if (in == null || in.isEmpty()){
+            return "";
+        }
         String htmlshort = in.replaceAll("\\<.*?\\>", " "); // Alle HTML Tags entfernen.
         int max = Math.min(maximum, htmlshort.length() - 1); // Nur die ersten 40 Zeichen zeigen...
         return htmlshort.substring(0, max) + (htmlshort.length()-1 <= max ? "" : "...");
@@ -2113,6 +2116,9 @@ public class SYSTools {
 
         return wert;
     }
+
+
+
 
     public static BigDecimal parseCurrency(String test) {
         NumberFormat nf = DecimalFormat.getCurrencyInstance();
