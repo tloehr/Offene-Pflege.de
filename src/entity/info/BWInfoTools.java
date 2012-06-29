@@ -3,6 +3,7 @@ package entity.info;
 import entity.Bewohner;
 import op.OPDE;
 import op.tools.*;
+import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -31,13 +32,10 @@ import java.util.*;
  */
 public class BWInfoTools {
 
-
     public static final int ART_PFLEGE = 0;
-    public static final int ART_VERWALTUNG = 1;
-    public static final int ART_STAMMDATEN = 2;
-    public static final int ART_PFLEGE_STAMMDATEN = 100;
-    public static final int ART_VERWALTUNG_STAMMDATEN = 101;
-    public static final int ART_ALLES = 102;
+    public static final int ART_VERWALTUNG = 1; // BRAUCHT RECHT USER1
+    public static final int ART_STAMMDATEN = 2; // BRAUCHT RECHT USER2
+
 
     /**
      * Eine kompakte HTML Darstellung aus der aktuellen BWInfo
@@ -82,6 +80,7 @@ public class BWInfoTools {
         return bwInfos;
     }
 
+
     public static Zeitraum getZeitraum(BWInfo bwinfo) {
         Zeitraum zeitraum = null;
         try {
@@ -90,6 +89,42 @@ public class BWInfoTools {
             new DlgException(ex);
         }
         return zeitraum;
+    }
+
+    public static Pair<Date, Date> getMinMaxAusdehnung(BWInfo info, ArrayList<BWInfo> sortedInfoList) {
+        Date min = null, max = null;
+
+        if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+            return new Pair<Date, Date>(null, null);
+        }
+
+        if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS) {
+            min = SYSConst.DATE_VON_ANFANG_AN;
+            max = SYSConst.DATE_BIS_AUF_WEITERES;
+            return new Pair<Date, Date>(min, max);
+        }
+
+        if (sortedInfoList.contains(info)) {
+            try {
+                int pos = sortedInfoList.indexOf(info);
+                BWInfo leftElement = sortedInfoList.get(pos - 1);
+                DateTime dtBis = new DateTime(leftElement.getBis());
+                min = dtBis.plusSeconds(1).toDate();
+            } catch (IndexOutOfBoundsException e) {
+                min = SYSConst.DATE_VON_ANFANG_AN;
+            }
+
+            try {
+                int pos = sortedInfoList.indexOf(info);
+                BWInfo righElement = sortedInfoList.get(pos + 1);
+                DateTime dtBis = new DateTime(righElement.getVon());
+                min = dtBis.minusSeconds(1).toDate();
+            } catch (IndexOutOfBoundsException e) {
+                min = SYSConst.DATE_BIS_AUF_WEITERES;
+            }
+        }
+
+        return new Pair<Date, Date>(min, max);
     }
 
 
@@ -481,7 +516,6 @@ public class BWInfoTools {
         }
         return result;
     }
-
 
 
 }

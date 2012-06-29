@@ -138,8 +138,8 @@ public class PnlBedarfDosis extends CleanablePanel {
         {
             jPanel2.setBorder(new DropShadowBorder(Color.black, 5, 0.5f, 12, true, true, true, true));
             jPanel2.setLayout(new FormLayout(
-                    "$rgap, $lcgap, default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu, $lcgap, $rgap",
-                    "default, fill:default, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu, $lcgap, 52dlu, $lcgap, $rgap",
+                "default, fill:default, $lgap, $rgap"));
 
             //---- label1 ----
             label1.setText("Anzahl");

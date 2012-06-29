@@ -672,15 +672,12 @@ public class FrmMain extends JFrame {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    dlgLogin.setVisible(false);
                     afterLogin();
                 } else {
                     System.exit(1);
                 }
             }
         });
-        dlgLogin.pack();
-        dlgLogin.setVisible(true);
     }
 
     private void cleanup() {

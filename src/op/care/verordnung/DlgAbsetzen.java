@@ -92,7 +92,7 @@ public class DlgAbsetzen extends MyJDialog {
 
         //---- label1 ----
         label1.setText("Wer hat die Verordnung abgesetzt ?");
-        label1.setFont(new Font("Arial", Font.PLAIN, 24));
+        label1.setFont(new Font("Arial", Font.PLAIN, 20));
         contentPane.add(label1, CC.xy(2, 3));
 
         //---- cmbArztAb ----

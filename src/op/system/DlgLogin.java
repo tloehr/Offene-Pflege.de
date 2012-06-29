@@ -27,10 +27,12 @@ package op.system;
 
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
+import com.sun.awt.AWTUtilities;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -47,16 +49,7 @@ import java.sql.SQLException;
  * @author __USER__
  */
 public class DlgLogin extends MyJDialog {
-
-    //    Thread thread = null;
     private Closure actionBlock;
-
-    /**
-     * Creates new form DlgLogin
-     */
-    private void thisWindowClosing(WindowEvent e) {
-        // TODO add your code here
-    }
 
     private void btnExitActionPerformed(ActionEvent e) {
         dispose();
@@ -65,6 +58,7 @@ public class DlgLogin extends MyJDialog {
     public DlgLogin(Closure actionBlock) {
         super();
         OPDE.setLogin(null);
+
         this.actionBlock = actionBlock;
 
         try {
@@ -76,7 +70,6 @@ public class DlgLogin extends MyJDialog {
         }
 
         initComponents();
-//        lblMessage.setText(SYSTools.catchNull(preMessage));
 
         String defaultlogin = "";
 
@@ -99,10 +92,7 @@ public class DlgLogin extends MyJDialog {
 
         txtUsername.requestFocus();
 
-        pack();
-//        SYSTools.centerOnParent(parent, this);
-//        btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/animation/opde-52.png")));
-//        setVisible(true);
+        setVisible(true);
 
     }
 
@@ -162,12 +152,6 @@ public class DlgLogin extends MyJDialog {
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                thisWindowClosing(e);
-            }
-        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "18dlu, default, $lcgap, 18dlu",
@@ -311,7 +295,7 @@ public class DlgLogin extends MyJDialog {
     @Override
     public void dispose() {
         actionBlock.execute(OPDE.getLogin());
-        SYSTools.unregisterListeners(this);
+//        SYSTools.unregisterListeners(this);
         super.dispose();
     }
 
