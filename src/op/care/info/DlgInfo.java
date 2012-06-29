@@ -150,8 +150,8 @@ public class DlgInfo extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                        "default:grow, $lcgap, 133dlu",
-                        "fill:default:grow, $lgap, 90dlu"));
+                    "default:grow, $lcgap, 133dlu",
+                    "fill:default:grow, $lgap, 90dlu"));
             }
             dialogPane.add(contentPanel, CC.xy(1, 1));
 
