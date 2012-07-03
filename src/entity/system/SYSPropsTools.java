@@ -39,27 +39,22 @@ public class SYSPropsTools {
 
         try {
             prop = (SYSProps) query.getSingleResult();
-//            em.lock(prop, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             prop.setValue(value);
 
         } catch (NoResultException nre) {
             prop = new SYSProps(key, value, user);
         }
 
-
         prop = em.merge(prop);
-//        if (em.contains(prop)) {
-//
-//        } else {
-//            em.persist(prop);
-//        }
-
         OPDE.setProp(key, value);
     }
 
     public static void storeProp(String key, String value, Users user) {
-        EntityManager em = OPDE.createEM();
+        if (OPDE.getProps().containsKey(key) && OPDE.getProps().getProperty(key).equals(value)){
+            return;
+        }
 
+        EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
             storeProp(em, key, value, user);
@@ -82,26 +77,34 @@ public class SYSPropsTools {
     }
 
 
-    public static void storeBoolean(String key, boolean value) {
-        storeProp(key, value ? "true" : "false", null);
+    public static void storeBoolean(String key, boolean value, Users user) {
+        storeProp(key, value ? "true" : "false", user);
     }
 
-    public static boolean isBoolean(String key) {
-        boolean bool = false;
+    public static boolean isBooleanTrue(String key) {
+        return isBooleanTrue(key, false);
+    }
+
+    public static boolean isBooleanTrue(String key, boolean defaultBoolean) {
+        boolean bool = defaultBoolean;
         if (OPDE.getProps().containsKey(key)) {
             bool = OPDE.getProps().getProperty(key).equalsIgnoreCase("true");
         }
         return bool;
     }
 
+    public static int getInteger(String key) {
+        int i = 0;
+        if (OPDE.getProps().containsKey(key)) {
+            i = Integer.parseInt(OPDE.getProps().getProperty(key));
+        }
+        return i;
+    }
+
 
     /**
      * Lädt Properties aus der Tabelle OCProps ein.
      * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
-     *
-     * @param ip       String mit der IP-Adresse oder '*'
-     * @param only4me, true, dann werden nur die Properties geladen, die zu der aktuellen Userkennung passen. false, alle.
-     * @return Ergebnis in einem Properties Objekt.
      */
     public static Properties loadProps(Users user) {
         EntityManager em = OPDE.createEM();

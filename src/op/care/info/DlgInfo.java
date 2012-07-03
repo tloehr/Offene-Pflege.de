@@ -7,6 +7,7 @@ package op.care.info;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.swing.JideComboBox;
 import entity.info.BWInfo;
 import entity.info.BWInfoTypTools;
 import op.OPDE;
@@ -32,10 +33,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -45,7 +43,7 @@ public class DlgInfo extends MyJDialog {
     private final int TYPE_DONT_CARE = 0;
     private final int TYPE_INT = 1;
     private final int TYPE_DOUBLE = 2;
-
+    private boolean scalemode = false;
     private final int TEXTFIELD_STANDARD_WIDTH = 35;
 
     boolean initPanel = false;
@@ -78,15 +76,16 @@ public class DlgInfo extends MyJDialog {
     }
 
     private void initDialog() {
+        content = new Properties();
         txtBemerkung = new JTextArea();
         txtBemerkung.setFont(SYSConst.ARIAL14);
         txtBemerkung.setWrapStyleWord(true);
         txtBemerkung.setLineWrap(true);
-
+        txtBemerkung.setText(SYSTools.catchNull(bwInfo.getBemerkung()));
         contentPanel.add(new JScrollPane(getPanel()), CC.xywh(1, 1, 3, 1, CC.FILL, CC.FILL));
         if (bwInfo.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             pnlUhrzeitDatum = new PnlUhrzeitDatum();
-            JLabel header = new JLabel(OPDE.lang.getString(internalClassID+".singleincident"));
+            JLabel header = new JLabel(OPDE.lang.getString(internalClassID + ".singleincident"));
             header.setFont(SYSConst.ARIAL20);
             JPanel panel = new JPanel(new VerticalLayout(5));
             header.setHorizontalAlignment(SwingConstants.CENTER);
@@ -108,7 +107,7 @@ public class DlgInfo extends MyJDialog {
 
     private void btnOKActionPerformed(ActionEvent e) {
 
-        if (pnlUhrzeitDatum != null){
+        if (pnlUhrzeitDatum != null) {
             OPDE.debug(pnlUhrzeitDatum.getPIT());
             bwInfo.setVon(pnlUhrzeitDatum.getPIT());
         }
@@ -144,14 +143,14 @@ public class DlgInfo extends MyJDialog {
         {
             dialogPane.setBorder(Borders.DIALOG_BORDER);
             dialogPane.setLayout(new FormLayout(
-                "default:grow",
-                "fill:default:grow, $rgap, fill:default"));
+                    "default:grow",
+                    "fill:default:grow, $rgap, fill:default"));
 
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                    "default:grow, $lcgap, 133dlu",
-                    "fill:default:grow, $lgap, 90dlu"));
+                        "default:grow, $lcgap, 133dlu",
+                        "fill:default:grow, $lgap, 90dlu"));
             }
             dialogPane.add(contentPanel, CC.xy(1, 1));
 
@@ -210,17 +209,7 @@ public class DlgInfo extends MyJDialog {
         JPanel jp = new JPanel();
         initPanel = true;
 
-        // Inhalt...
-        content = new Properties();
-        try {
-            StringReader reader = new StringReader(bwInfo.getProperties());
-            content.load(reader);
-            reader.close();
-        } catch (IOException ex) {
-            OPDE.fatal(ex);
-        }
-
-        // ...und Struktur
+        // Struktur...
         try {
             String xmltext = "<?xml version=\"1.0\"?><structure>" + bwInfo.getBwinfotyp().getXml() + "</structure>";
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
@@ -240,6 +229,9 @@ public class DlgInfo extends MyJDialog {
         }
 
 
+        // ... und Inhalt
+        setContent();
+
         initPanel = false;
         return jp;
     }
@@ -255,7 +247,7 @@ public class DlgInfo extends MyJDialog {
                 AbstractButton ab = (AbstractButton) e.nextElement();
                 if (ab.getModel().isSelected()) {
                     found = true;
-                    scalesum = scalesum.add((BigDecimal) components.get(bgName + "." + ab.getName()));
+                    scalesum = scalesum.add(((Pair<JComboBox, BigDecimal>) components.get(bgName + ":" + ab.getName())).getSecond());
                 }
             }
         }
@@ -276,7 +268,43 @@ public class DlgInfo extends MyJDialog {
             sumlabel.setText(scalesumlabeltext + ": " + scalesum + " (" + risiko + ")");
             sumlabel.setForeground(SYSTools.getColor(color));
         }
+    }
 
+
+    private void setContent() {
+        try {
+            StringReader reader = new StringReader(bwInfo.getProperties());
+            content.load(reader);
+            reader.close();
+        } catch (IOException ex) {
+            OPDE.fatal(ex);
+        }
+
+        OPDE.debug(content.toString());
+
+        for (Object key : components.keySet()) {
+            Object entry = components.get(key);
+
+            if (entry instanceof JRadioButton) {
+                String componentname = ((JRadioButton) entry).getName();
+                StringTokenizer st = new StringTokenizer(key.toString(), ":");
+
+                String tagname = st.nextToken();
+                String value = st.nextToken();
+                OPDE.debug("key: " + key.toString());
+                OPDE.debug("componentname: " + componentname);
+                ((JRadioButton) entry).setSelected(content.containsKey(tagname) && content.getProperty(tagname).equals(value));
+            } else if (entry instanceof Pair) { // Scale
+                ((Pair<JRadioButton, BigDecimal>) entry).getFirst().setSelected(true);
+            } else if (entry instanceof JCheckBox) {
+                ((JCheckBox) entry).setSelected(content.getProperty(key.toString()).equalsIgnoreCase("true"));
+            } else if (entry instanceof JTextField) {
+                ((JTextField) entry).setText(SYSTools.unescapeXML(content.getProperty(key.toString())));
+            } else if (entry instanceof JComboBox) {
+                SYSTools.selectInComboBox((JComboBox) entry, content.getProperty(key.toString()));
+//                 ((JComboBox) entry), content.getProperty(key.toString())
+            }
+        }
     }
 
     private class RadioButtonActionListener implements ActionListener {
@@ -287,20 +315,23 @@ public class DlgInfo extends MyJDialog {
             String groupname = pnlFrage.getName();
             String optionname = j.getName();
             content.put(groupname, optionname);
+            if (scalemode) {
+                calcScale();
+            }
         }
     }
 
-    private class ScaleOptionActionListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent evt) {
-            JRadioButton j = (JRadioButton) evt.getSource();
-            JPanel pnlFrage = (JPanel) j.getParent();
-            String groupname = pnlFrage.getName();
-            String optionname = j.getName();
-            content.put(groupname, optionname);
+//    private class ScaleOptionActionListener implements ActionListener {
+//
+//        public void actionPerformed(ActionEvent evt) {
+//            JRadioButton j = (JRadioButton) evt.getSource();
+//            JPanel pnlFrage = (JPanel) j.getParent();
+//            String groupname = pnlFrage.getName();
+//            String optionname = j.getName();
+//            content.put(groupname, optionname);
 //            calcScale();
-        }
-    }
+//        }
+//    }
 
     private class CheckBoxActionListener implements ActionListener {
 
@@ -318,14 +349,7 @@ public class DlgInfo extends MyJDialog {
             String cmbname = j.getName();
             ComboBoxModel cbm = j.getModel();
             ListElement le = (ListElement) cbm.getSelectedItem();
-            // Hier muss unterschieden werden, ob der PK ein Long oder ein String ist.
-            if (le.getPk() <= 0) {
-                content.put(cmbname, le.getData());
-            } else {
-                content.put(cmbname, Long.toString(le.getPk()));
-            }
-
-
+            content.put(cmbname, le.getData());
         }
     }
 
@@ -396,7 +420,7 @@ public class DlgInfo extends MyJDialog {
      * ("vorname", "Torsten"). Listen enthalten den Primary Key der entsprechenden Tabellenzeile (meist ist das ein <code>long</code> Wert: ("zimm", 38).
      */
     private class HandlerDatenStruktur extends DefaultHandler {
-        private boolean scalemode = false;
+
         private JPanel outerpanel;
         private JPanel innerpanel;
         private boolean tabgroup;
@@ -467,12 +491,13 @@ public class DlgInfo extends MyJDialog {
                 j.setName(compName);
                 innerpanel.add(layout, j);
 
+                j.addActionListener(new RadioButtonActionListener());
                 if (scalemode) {
-                    j.addActionListener(new ScaleOptionActionListener());
-                    components.put(groupname + "." + compName, score); // Hier weichen wir vom üblichen SChema ab und übergeben nicht die Component sondern den Score.
+//                    j.addActionListener(new ScaleOptionActionListener());
+                    components.put(groupname + ":" + compName, new Pair<JRadioButton, BigDecimal>(j, score)); // Hier weichen wir vom üblichen SChema ab und übergeben nicht nur die Component sondern auch den Score.
                 } else {
                     j.addActionListener(new RadioButtonActionListener());
-                    components.put(groupname + "." + compName, j); // für den späteren Direktzugriff
+                    components.put(groupname + ":" + compName, j); // für den späteren Direktzugriff
                 }
                 ((ButtonGroup) components.get(groupname)).add(j); // der Knopf wird zu der passenden ButtonGroup hinzugefügt.
 

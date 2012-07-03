@@ -37,7 +37,7 @@ public class EntityTools {
         EntityManager em = OPDE.createEM();
 
         try {
-            foundEntity = (T) em.find(entity, id);
+            foundEntity = em.find(entity, id);
         } catch (Exception e) {
             OPDE.fatal(e);
         }
@@ -47,14 +47,17 @@ public class EntityTools {
     public static <T> T merge(T entity) {
         T mergedEntity = null;
         EntityManager em = OPDE.createEM();
-
         try {
             em.getTransaction().begin();
             mergedEntity = em.merge(entity);
             em.getTransaction().commit();
         } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             OPDE.fatal(e);
-            em.getTransaction().rollback();
+        } finally {
+            em.close();
         }
         return mergedEntity;
     }

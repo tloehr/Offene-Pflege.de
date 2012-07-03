@@ -8,6 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.RangeSlider;
 import com.toedter.calendar.JDateChooser;
+import op.OPDE;
 import op.tools.Pair;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
@@ -25,9 +26,9 @@ import java.util.Date;
  * @author Torsten Löhr
  */
 public class PnlZeitraum extends JPanel {
-
+    private boolean ignore;
     private Date min, max, from, to;
-    DateTime dtmin;
+    DateTime dtmin, dtmax;
     int maximum;
     private Closure actionBlock;
 
@@ -38,12 +39,13 @@ public class PnlZeitraum extends JPanel {
         this.from = from;
         this.to = to;
         dtmin = new DateTime(min);
+        dtmax = new DateTime(max);
         initComponents();
         initPanel();
     }
 
     private void btnMaxActionPerformed(ActionEvent e) {
-        slider.setLowValue(maximum);
+        slider.setHighValue(maximum);
     }
 
     private void btnBackFromActionPerformed(ActionEvent e) {
@@ -66,6 +68,10 @@ public class PnlZeitraum extends JPanel {
         actionBlock.execute(new Pair<Date, Date>(jdcVon.getDate(), jdcBis.getDate()));
     }
 
+    private void btnCancelActionPerformed(ActionEvent e) {
+        actionBlock.execute(null);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
@@ -85,8 +91,8 @@ public class PnlZeitraum extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
-            "4*(default, $lgap), default"));
+                "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
+                "4*(default, $lgap), default"));
 
         //======== panel1 ========
         {
@@ -100,6 +106,7 @@ public class PnlZeitraum extends JPanel {
             btnMin.setBorder(null);
             btnMin.setSelectedIcon(null);
             btnMin.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_start_pressed.png")));
+            btnMin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnMin.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -115,6 +122,7 @@ public class PnlZeitraum extends JPanel {
             btnBackFrom.setBorderPainted(false);
             btnBackFrom.setBorder(null);
             btnBackFrom.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_rev_pressed.png")));
+            btnBackFrom.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnBackFrom.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -130,6 +138,7 @@ public class PnlZeitraum extends JPanel {
             btnFwdFrom.setBorderPainted(false);
             btnFwdFrom.setBorder(null);
             btnFwdFrom.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_fwd_pressed.png")));
+            btnFwdFrom.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnFwdFrom.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -142,6 +151,7 @@ public class PnlZeitraum extends JPanel {
 
         //---- jdcVon ----
         jdcVon.setFont(new Font("Arial", Font.PLAIN, 14));
+        jdcVon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         jdcVon.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
@@ -152,6 +162,7 @@ public class PnlZeitraum extends JPanel {
 
         //---- slider ----
         slider.setPaintLabels(true);
+        slider.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         slider.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
@@ -162,6 +173,7 @@ public class PnlZeitraum extends JPanel {
 
         //---- jdcBis ----
         jdcBis.setFont(new Font("Arial", Font.PLAIN, 14));
+        jdcBis.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         jdcBis.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
@@ -181,6 +193,7 @@ public class PnlZeitraum extends JPanel {
             btnBackTo.setBorderPainted(false);
             btnBackTo.setBorder(null);
             btnBackTo.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_rev_pressed.png")));
+            btnBackTo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnBackTo.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -196,6 +209,7 @@ public class PnlZeitraum extends JPanel {
             btnFwdTo.setBorderPainted(false);
             btnFwdTo.setBorder(null);
             btnFwdTo.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_fwd_pressed.png")));
+            btnFwdTo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnFwdTo.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -211,6 +225,7 @@ public class PnlZeitraum extends JPanel {
             btnMax.setBorderPainted(false);
             btnMax.setBorder(null);
             btnMax.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end_pressed.png")));
+            btnMax.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnMax.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -228,11 +243,19 @@ public class PnlZeitraum extends JPanel {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+            btnCancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
             panel3.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setText(null);
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+            btnOK.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnOK.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -247,7 +270,11 @@ public class PnlZeitraum extends JPanel {
 
 
     private void initPanel() {
-        slider.setRangeDraggable(true);
+        ignore = true;
+        OPDE.debug("min " + min + " max " + max);
+        OPDE.debug("from " + from + " to " + to);
+
+        slider.setRangeDraggable(false);
         jdcVon.setMinSelectableDate(min);
         jdcVon.setMaxSelectableDate(to);
         jdcVon.setDate(from);
@@ -264,36 +291,41 @@ public class PnlZeitraum extends JPanel {
         slider.setMaximum(maximum);
         slider.setLowValue(low);
         slider.setHighValue(high);
-
+        ignore = false;
     }
 
     private void sliderPropertyChange(PropertyChangeEvent e) {
+        ignore = true;
         if (e.getPropertyName().equals("lowValue")) {
-
-//            System.out.println(e.getNewValue());
-
             int val = (Integer) e.getNewValue();
-            jdcVon.setDate(dtmin.plusDays(val).toDate());
 
-
+            if (val > slider.getMinimum()) {
+                jdcVon.setDate(dtmin.plusDays(val).toDateMidnight().toDate()); // Innerhalb der Grenzen beginnen alle Tage immer um Mitternacht.
+            } else {
+                jdcVon.setDate(min); // Ansonsten genau an der Grenze
+            }
         }
         if (e.getPropertyName().equals("highValue")) {
-//            System.out.println(e.getNewValue());
             int val = (Integer) e.getNewValue();
-            jdcBis.setDate(dtmin.plusDays(val).toDate());
+            if (val < slider.getMaximum()) {
+                jdcVon.setDate(dtmin.plusDays(val+1).toDateMidnight().toDateTime().minusSeconds(1).toDate()); // Innerhalb der Grenzen enden alle Tage immer um 23:59:59.
+            } else {
+                jdcVon.setDate(max); // Ansonsten genau an der Grenze
+            }
         }
-
+        ignore = false;
 
     }
 
     private void jdcVonPropertyChange(PropertyChangeEvent e) {
+        if (ignore) return;
         int low = Days.daysBetween(new DateTime(min), new DateTime((Date) e.getNewValue())).getDays();
         jdcBis.setMinSelectableDate((Date) e.getNewValue());
         slider.setLowValue(low);
-
     }
 
     private void jdcBisPropertyChange(PropertyChangeEvent e) {
+        if (ignore) return;
         int high = Days.daysBetween(new DateTime(min), new DateTime((Date) e.getNewValue())).getDays();
         jdcVon.setMaxSelectableDate((Date) e.getNewValue());
         slider.setHighValue(high);

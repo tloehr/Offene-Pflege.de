@@ -105,22 +105,22 @@ public class BWInfoTools {
         }
 
         if (sortedInfoList.contains(info)) {
+            // Liste ist "verkehrt rum" sortiert. Daher ist das linke Element, das spätere.
+            int pos = sortedInfoList.indexOf(info);
             try {
-                int pos = sortedInfoList.indexOf(info);
                 BWInfo leftElement = sortedInfoList.get(pos - 1);
-                DateTime dtBis = new DateTime(leftElement.getBis());
-                min = dtBis.plusSeconds(1).toDate();
+                DateTime dtVon = new DateTime(leftElement.getVon());
+                max = dtVon.minusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
-                min = SYSConst.DATE_VON_ANFANG_AN;
+                max = SYSConst.DATE_BIS_AUF_WEITERES;
             }
 
             try {
-                int pos = sortedInfoList.indexOf(info);
-                BWInfo righElement = sortedInfoList.get(pos + 1);
-                DateTime dtBis = new DateTime(righElement.getVon());
-                min = dtBis.minusSeconds(1).toDate();
+                BWInfo rightElement = sortedInfoList.get(pos + 1);
+                DateTime dtBis = new DateTime(rightElement.getBis());
+                min = dtBis.plusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
-                min = SYSConst.DATE_BIS_AUF_WEITERES;
+                min = SYSConst.DATE_VON_ANFANG_AN;
             }
         }
 

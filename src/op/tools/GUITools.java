@@ -1,18 +1,17 @@
 package op.tools;
 
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
-import entity.files.SYSFiles;
-import entity.files.SYSFilesTools;
-import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
 import op.system.FileDrop;
-import op.threads.DisplayMessage;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,7 +58,7 @@ public class GUITools {
         };
     }
 
-    public static JToggleButton getNiceToggleButton(String title){
+    public static JToggleButton getNiceToggleButton(String title) {
         JToggleButton tb = new JToggleButton(title);
         tb.setIcon(new ImageIcon(tb.getClass().getResource("/artwork/22x22/cb-off.png")));
         tb.setSelectedIcon(new ImageIcon(tb.getClass().getResource("/artwork/22x22/cb-on.png")));
@@ -72,7 +71,51 @@ public class GUITools {
         return tb;
     }
 
-    public static JPanel getDropPanel(FileDrop.Listener dropListener){
+    /**
+     * Shows a JidePopup in relation to its owner. Calculates the new position that it leaves the owner
+     * visible. The popup is placed according to the <code>location</code> setting. The size of the content
+     * pane is taken into the calculation in order to find the necessary <code>x, y</code> coordinates on the screen.
+     *
+     * <ul>
+     * <li>SwingConstants.CENTER <i>You can use this, but I fail to see the sense in it.</i></li>
+     * <li>SwingConstants.SOUTH</li>
+     * <li>SwingConstants.NORTH</li>
+     * <li>SwingConstants.WEST</li>
+     * <li>SwingConstants.EAST</li>
+     * <li>SwingConstants.NORTH_EAST</li>
+     * <li>SwingConstants.NORTH_WEST</li>
+     * <li>SwingConstants.SOUTH_EAST</li>
+     * <li>SwingConstants.SOUTH_WEST</li>
+     * </ul>
+     *
+     * @param popup     the JidePopup to show
+     * @param location  where to show the popup in relation to the <code>reference</code>. Use the SwingConstants above.
+     */
+    public static void showPopup(JidePopup popup, int location) {
+
+        Container content = popup.getContentPane();
+        Point p2 = new Point(popup.getOwner().getX(), popup.getOwner().getY());
+        SwingUtilities.convertPointToScreen(p2, popup.getOwner());
+        final Point screenposition = p2;
+
+        int x = screenposition.x;
+        int y = screenposition.y;
+
+        switch (location) {
+            case SwingConstants.SOUTH_WEST: {
+                x = screenposition.x - content.getPreferredSize().width - popup.getOwner().getPreferredSize().width;
+                y = screenposition.y + popup.getOwner().getPreferredSize().height;
+                break;
+            }
+            default: {
+                // nop
+            }
+        }
+
+        popup.showPopup(x, y);
+    }
+
+    public static JPanel getDropPanel(FileDrop.Listener dropListener) {
         JPanel dropPanel = new JPanel();
         dropPanel.setLayout(new BorderLayout());
         JLabel dropLabel = new JLabel(OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"), new ImageIcon(Double.class.getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);

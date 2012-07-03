@@ -688,6 +688,7 @@ public class FrmMain extends JFrame {
 
     private void logout() {
         emptyFrame();
+        OPDE.saveLocalProps();
 
         labelUSER.setText("--");
 
@@ -699,6 +700,7 @@ public class FrmMain extends JFrame {
         }
 
         SYSLoginTools.logout();
+
         System.gc();
         cleanup();
 

@@ -6,12 +6,15 @@ package op.care.info;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.system.SYSPropsTools;
@@ -169,7 +172,7 @@ public class PnlInfo extends NursingRecordsPanel {
     private void reloadDisplay() {
         initPhase = true;
 
-        final boolean withworker = false;
+        final boolean withworker = true;
         if (withworker) {
 
             OPDE.getMainframe().setBlocked(true);
@@ -208,6 +211,11 @@ public class PnlInfo extends NursingRecordsPanel {
                 @Override
                 protected void done() {
                     txtHTML.setText(null);
+
+
+                    tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
+//                    SYSPropsTools.storeProp(internalClassID + ":tabKatSelectedIndex", Integer.toString(tabKat.getSelectedIndex()), OPDE.getLogin().getUser());
+
                     initPhase = false;
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
@@ -224,6 +232,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 tabKat.addTab(kat.getBezeichnung(), new JScrollPane(createCollapsiblePanesFor(kat)));
                 txtHTML.setText(null);
             }
+            tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
         }
         initPhase = false;
 
@@ -235,9 +244,9 @@ public class PnlInfo extends NursingRecordsPanel {
         try {
             cpane.setLayout(new JideBoxLayout(cpane, JideBoxLayout.Y_AXIS));
 
-            if (!bwinfotypen.containsKey(kat)) {
-                bwinfotypen.put(kat, BWInfoTypTools.findByKategorie(kat));
-            }
+//            if (!bwinfotypen.containsKey(kat)) {
+            bwinfotypen.put(kat, BWInfoTypTools.findByKategorie(kat));
+//            }
 
             for (BWInfoTyp typ : bwinfotypen.get(kat)) {
                 bwinfos.put(typ, BWInfoTools.findByBewohnerUndTyp(bewohner, typ));
@@ -397,12 +406,11 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private CollapsiblePane createPanelFor(final BWInfoTyp typ) {
 
-        final CollapsiblePane panel00 = new CollapsiblePane();
+        final CollapsiblePane panelForBWInfoTyp = new CollapsiblePane();
         try {
 
             final BWInfo ersterBWInfo = bwinfos.get(typ).isEmpty() ? null : bwinfos.get(typ).get(0);
             final boolean shallBeCollapsible = !bwinfos.get(typ).isEmpty() && (bwinfos.get(typ).size() > 1 || ersterBWInfo.isAbgesetzt() || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS);
-//            final BWInfoTyp mytyp = typ;
 
             JPanel titlePanel00 = new JPanel();
             titlePanel00.setLayout(new BoxLayout(titlePanel00, BoxLayout.LINE_AXIS));
@@ -411,7 +419,6 @@ public class PnlInfo extends NursingRecordsPanel {
             titlePanel00left.setLayout(new BoxLayout(titlePanel00left, BoxLayout.LINE_AXIS));
 
             JideButton title = GUITools.createHyperlinkButton(getHyperlinkButtonTextForPanelHead(typ), getIcon(typ), null);
-//            title.setEnabled(!bwinfos.get(typ).isEmpty());
             title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             title.setAlignmentX(Component.LEFT_ALIGNMENT);
             title.addActionListener(new ActionListener() {
@@ -438,7 +445,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     BWInfo mybwinfo;
-                    if (ersterBWInfo == null) {
+                    if (ersterBWInfo == null || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
                         mybwinfo = new BWInfo(typ, bewohner);
                     } else {
                         mybwinfo = ersterBWInfo.clone();
@@ -461,10 +468,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                     newinfo.setHtml(BWInfoTools.getContentAsHTML(newinfo));
                                     em.merge(newinfo);
                                     em.getTransaction().commit();
-                                    int i = tabKat.getSelectedIndex();
-                                    tabKat.removeTabAt(i);
-                                    tabKat.insertTab(newinfo.getBwinfotyp().getBwInfokat().getBezeichnung(), null, createCollapsiblePanesFor(newinfo.getBwinfotyp().getBwInfokat()), null, i);
-                                    tabKat.repaint();
+
+                                    refreshTabKat(newinfo.getBwinfotyp().getBwInfokat());
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -496,6 +501,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 btnView.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnView.setContentAreaFilled(false);
                 btnView.setBorder(null);
+                btnView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
                 bwinfo4html.put(ersterBWInfo, btnView);
                 btnView.addItemListener(new ItemListener() {
@@ -531,13 +537,12 @@ public class PnlInfo extends NursingRecordsPanel {
             titlePanel00.add(titlePanel00left);
             titlePanel00.add(titlePanel00right);
 
-            panel00.setTitleLabelComponent(titlePanel00);
-            panel00.setSlidingDirection(SwingConstants.SOUTH);
-            panel00.setStyle(CollapsiblePane.TREE_STYLE);
-            panel00.setHorizontalAlignment(SwingConstants.LEADING);
+            panelForBWInfoTyp.setTitleLabelComponent(titlePanel00);
+            panelForBWInfoTyp.setSlidingDirection(SwingConstants.SOUTH);
+            panelForBWInfoTyp.setStyle(CollapsiblePane.TREE_STYLE);
+            panelForBWInfoTyp.setHorizontalAlignment(SwingConstants.LEADING);
 
-            panel00.setEmphasized(bwinfos.get(typ).isEmpty());
-            panel00.setCollapsible(shallBeCollapsible);
+            panelForBWInfoTyp.setEmphasized(bwinfos.get(typ).isEmpty());
 
             JPanel labelPanel = new JPanel();
             labelPanel.setLayout(new VerticalLayout());
@@ -549,18 +554,34 @@ public class PnlInfo extends NursingRecordsPanel {
                 int startwert = ersterBWInfo.isAbgesetzt() || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS ? 0 : 1;
 //                OPDE.debug("startwert: "+startwert);
                 for (int infonum = startwert; infonum < bwinfos.get(typ).size(); infonum++) {
+
+
                     final BWInfo innerBWInfo = bwinfos.get(typ).get(infonum);
+
+                    final JideButton contentButton = GUITools.createHyperlinkButton(getHyperlinkButtonTextForPanelContent(innerBWInfo), null, null);
+                    contentButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    contentButton.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+                    contentButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            setAllViewButtonsOff();
+                            txtHTML.setText(SYSTools.toHTMLForScreen(BWInfoTools.getHTML(innerBWInfo)));
+                        }
+                    });
+
+
                     JPanel contentLine = new JPanel();
                     contentLine.setLayout(new BoxLayout(contentLine, BoxLayout.LINE_AXIS));
 
                     JPanel contentLineRight = new JPanel();
                     contentLineRight.setLayout(new BoxLayout(contentLineRight, BoxLayout.LINE_AXIS));
 
-                    JButton btnChangePeriod = new JButton(icon22changePeriod);
+                    final JButton btnChangePeriod = new JButton(icon22changePeriod);
                     btnChangePeriod.setPressedIcon(icon22changePeriodPressed);
                     btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnChangePeriod.setContentAreaFilled(false);
                     btnChangePeriod.setBorder(null);
+                    btnChangePeriod.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
                     ActionListener al;
                     if (typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -572,15 +593,11 @@ public class PnlInfo extends NursingRecordsPanel {
                                 popup.setMovable(false);
                                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                                popup.setOwner(panel00);
-                                popup.removeExcludedComponent(panel00);
+                                popup.setOwner(panelForBWInfoTyp);
+                                popup.removeExcludedComponent(panelForBWInfoTyp);
                                 popup.getContentPane().add(pnlZeitpunkt);
                                 popup.setDefaultFocusComponent(pnlZeitpunkt);
-                                Point p2 = new Point(panel00.getX(), panel00.getY());
-                                SwingUtilities.convertPointToScreen(p2, panel00);
-                                final Point screenposition = p2;
-
-                                popup.showPopup(screenposition.x, screenposition.y);
+                                GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
                             }
                         };
                     } else {
@@ -588,21 +605,31 @@ public class PnlInfo extends NursingRecordsPanel {
                             @Override
                             public void actionPerformed(ActionEvent actionEvent) {
                                 final JidePopup popup = new JidePopup();
-                                // TODO: HIER HÄNGTS. Wahrscheinlich bei minmaxausdehnung.
                                 Pair<Date, Date> ausdehnung = BWInfoTools.getMinMaxAusdehnung(innerBWInfo, new ArrayList<BWInfo>(bwinfos.get(typ)));
-                                PnlZeitraum pnlZeitraum = new PnlZeitraum(ausdehnung.getFirst(), ausdehnung.getSecond(), innerBWInfo.getVon(), innerBWInfo.getBis(), null);
+                                PnlZeitraum pnlZeitraum = new PnlZeitraum(ausdehnung.getFirst(), ausdehnung.getSecond(), innerBWInfo.getVon(), innerBWInfo.getBis(), new Closure() {
+                                    @Override
+                                    public void execute(Object o) {
+                                        popup.hidePopup();
+                                        if (o != null) {
+                                            Pair<Date, Date> period = (Pair<Date, Date>) o;
+                                            innerBWInfo.setVon(period.getFirst());
+                                            innerBWInfo.setBis(period.getSecond());
+                                            EntityTools.merge(innerBWInfo);
+//                                            contentButton.setText(getHyperlinkButtonTextForPanelContent(innerBWInfo));
+                                            refreshTabKat(innerBWInfo.getBwinfotyp().getBwInfokat());
+//                                            bwinfos.get(typ).set(f_infonum, innerBWInfo);
+                                        }
+
+                                    }
+                                });
                                 popup.setMovable(false);
                                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                                popup.setOwner(panel00);
-                                popup.removeExcludedComponent(panel00);
+                                popup.setOwner(btnChangePeriod);
+                                popup.removeExcludedComponent(btnChangePeriod);
                                 popup.getContentPane().add(pnlZeitraum);
                                 popup.setDefaultFocusComponent(pnlZeitraum);
-                                Point p2 = new Point(panel00.getX(), panel00.getY());
-                                SwingUtilities.convertPointToScreen(p2, panel00);
-                                final Point screenposition = p2;
-
-                                popup.showPopup(screenposition.x, screenposition.y);
+                                GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
                             }
                         };
                     }
@@ -629,29 +656,31 @@ public class PnlInfo extends NursingRecordsPanel {
                     contentLineRight.add(btnView);
                     contentLineRight.add(btnChangePeriod);
 
-                    JideButton button = GUITools.createHyperlinkButton(getHyperlinkButtonTextForPanelContent(innerBWInfo), null, null);
-                    button.setAlignmentX(Component.LEFT_ALIGNMENT);
-                    button.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-                    button.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            setAllViewButtonsOff();
-                            txtHTML.setText(SYSTools.toHTMLForScreen(BWInfoTools.getHTML(innerBWInfo)));
-                        }
-                    });
 
-                    contentLine.add(button);
+                    contentLine.add(contentButton);
                     contentLine.add(contentLineRight);
 
                     labelPanel.add(contentLine);
                 }
             }
 
-            panel00.setContentPane(labelPanel);
-            panel00.setCollapsed(true);
+            panelForBWInfoTyp.setContentPane(labelPanel);
+            panelForBWInfoTyp.setCollapsible(shallBeCollapsible);
+            panelForBWInfoTyp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+                @Override
+                public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                    SYSPropsTools.storeBoolean(internalClassID + ":panelCollapsed:" + typ.getBwinftyp(), false, OPDE.getLogin().getUser());
+                }
 
-            panel00.setVisible(tbEmpty.isSelected() || ersterBWInfo != null);
-            panel00.setVisible(tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
+                @Override
+                public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                    SYSPropsTools.storeBoolean(internalClassID + ":panelCollapsed:" + typ.getBwinftyp(), true, OPDE.getLogin().getUser());
+                }
+            });
+            if (shallBeCollapsible) {
+                panelForBWInfoTyp.setCollapsed(SYSPropsTools.isBooleanTrue(internalClassID + ":panelCollapsed:" + typ.getBwinftyp(), true));
+            }
+            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
 
         } catch (PropertyVetoException e) {
             OPDE.error(e);
@@ -660,7 +689,14 @@ public class PnlInfo extends NursingRecordsPanel {
         }
 
 
-        return panel00;
+        return panelForBWInfoTyp;
+    }
+
+    private void refreshTabKat(BWInfoKat kat) {
+        int i = tabKat.getSelectedIndex();
+        tabKat.removeTabAt(i);
+        tabKat.insertTab(kat.getBezeichnung(), null, createCollapsiblePanesFor(kat), null, i);
+        tabKat.repaint();
     }
 
 
@@ -679,6 +715,7 @@ public class PnlInfo extends NursingRecordsPanel {
         if (initPhase || tabKat.getTabCount() != kategorien.size()) return;
         String html = getHTML();
         txtHTML.setText(html.isEmpty() ? "<html>&nbsp;</html>" : SYSTools.toHTMLForScreen(html));
+        SYSPropsTools.storeProp(internalClassID + ":tabKatSelectedIndex", Integer.toString(tabKat.getSelectedIndex()), OPDE.getLogin().getUser());
     }
 
     private void txtHTMLPropertyChange(PropertyChangeEvent e) {
