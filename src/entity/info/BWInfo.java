@@ -31,12 +31,11 @@ import entity.files.Sysbwi2file;
 import entity.vorgang.SYSBWI2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.OPDE;
-import op.tools.SYSCalendar;
 import op.tools.SYSConst;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -122,7 +121,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
             this.von = now;
             this.bis = now;
         } else if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
-            this.von = new Date(SYSCalendar.startOfDay(now));
+            this.von = new DateTime().toDateMidnight().toDate();
             this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
         } else {
             this.von = now;
@@ -173,7 +172,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
 
     public void setVon(Date von) {
         if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
-            von = new Date(SYSCalendar.startOfDay(bis));
+            von = new DateTime(von).toDateMidnight().toDate();
         }
         this.von = von;
         if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
@@ -187,7 +186,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
 
     public void setBis(Date bis) {
         if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
-            bis = new Date(SYSCalendar.endOfDay(bis));
+            bis = new DateTime(bis).toDateMidnight().plusDays(1).toDateTime().minusMinutes(1).toDate();
         }
         this.bis = bis;
         if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){

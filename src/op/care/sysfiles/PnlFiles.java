@@ -205,7 +205,7 @@ public class PnlFiles extends NursingRecordsPanel {
             menu = new JPopupMenu();
 
             // SELECT
-            JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag1.png")));
+            JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag.png")));
             itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {

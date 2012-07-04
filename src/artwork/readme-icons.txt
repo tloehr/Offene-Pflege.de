@@ -12,3 +12,5 @@ Die obigen Icons stehen unter der GNU LGPL.
 - On/Off Icons von Jelle Elferink (www.jt11.nl). Verwendung mit freundlicher Genehmigung.
 	- cb-off.png
 	- cb-on.png
+
+- Number Icons von April Russo. CC-BY. http://russograffix.blogspot.de/2012/02/number-icons-cc-by.html

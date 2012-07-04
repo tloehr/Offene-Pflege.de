@@ -39,7 +39,6 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
-import op.care.dfn.TMDFN;
 import op.care.sysfiles.PnlFiles;
 import op.system.DlgYesNo;
 import op.threads.DisplayMessage;
@@ -479,30 +478,14 @@ public class PnlBerichte extends NursingRecordsPanel {
             }
 
             menu.add(new JSeparator());
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {
-                final JMenuItem itemPopupFileAttach = SYSFilesTools.getAttachMenuItem(bericht, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        reloadTable();
-                    }
-                });
-                menu.add(itemPopupFileAttach);
-                itemPopupFileAttach.setEnabled(bearbeitenMoeglich);
-            }
 
-            if (bericht.getAttachedFiles().size() > 0) {
-                final JMenuItem itemPopupFileList = SYSFilesTools.getFileListPopupMenu(tblTB, evt.getPoint(), bericht);
-                menu.add(itemPopupFileList);
-            }
-
-
-//            itemPopupEdit.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-//            itemPopupDelete.setEnabled(OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
-
-            // Nur anzeigen wenn derselbe User die Änderung versucht, der auch den Text geschrieben hat.
-//            if (bearbeitenMöglich && (sameUser || OPDE.isAdmin())) {
-//                menu.add(PBerichtTAGSTools.createMenuForTags(bericht));
-//            }
+            final JMenuItem itemPopupFiles = SYSFilesTools.getFileMenu(bericht, new Closure() {
+                @Override
+                public void execute(Object o) {
+                    reloadTable();
+                }
+            });
+            menu.add(itemPopupFiles);
 
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {

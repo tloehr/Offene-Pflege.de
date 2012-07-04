@@ -7,7 +7,6 @@ package op.care.info;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.swing.JideComboBox;
 import entity.info.BWInfo;
 import entity.info.BWInfoTypTools;
 import op.OPDE;
@@ -237,9 +236,12 @@ public class DlgInfo extends MyJDialog {
     }
 
     private void calcScale() {
+        if (!scalemode) return;
+
         BigDecimal scalesum = BigDecimal.ZERO;
 
         for (String bgName : scaleButtonGroups) {
+            OPDE.debug(components.toString());
             ButtonGroup bg = (ButtonGroup) components.get(bgName);
             Enumeration e = bg.getElements();
             boolean found = false;
@@ -286,16 +288,19 @@ public class DlgInfo extends MyJDialog {
             Object entry = components.get(key);
 
             if (entry instanceof JRadioButton) {
-                String componentname = ((JRadioButton) entry).getName();
                 StringTokenizer st = new StringTokenizer(key.toString(), ":");
-
                 String tagname = st.nextToken();
                 String value = st.nextToken();
-                OPDE.debug("key: " + key.toString());
-                OPDE.debug("componentname: " + componentname);
+//                OPDE.debug("key: " + key.toString());
+//                OPDE.debug("componentname: " + componentname);
                 ((JRadioButton) entry).setSelected(content.containsKey(tagname) && content.getProperty(tagname).equals(value));
             } else if (entry instanceof Pair) { // Scale
-                ((Pair<JRadioButton, BigDecimal>) entry).getFirst().setSelected(true);
+                StringTokenizer st = new StringTokenizer(key.toString(), ":");
+                String tagname = st.nextToken();
+                String value = st.nextToken();
+//                OPDE.debug("key: " + key.toString());
+//                OPDE.debug("componentname: " + componentname);
+                ((Pair<JRadioButton, BigDecimal>) entry).getFirst().setSelected(content.getProperty(tagname).equals(value));
             } else if (entry instanceof JCheckBox) {
                 ((JCheckBox) entry).setSelected(content.getProperty(key.toString()).equalsIgnoreCase("true"));
             } else if (entry instanceof JTextField) {
@@ -305,14 +310,15 @@ public class DlgInfo extends MyJDialog {
 //                 ((JComboBox) entry), content.getProperty(key.toString())
             }
         }
+
+        calcScale();
     }
 
     private class RadioButtonActionListener implements ActionListener {
-
         public void actionPerformed(ActionEvent evt) {
             JRadioButton j = (JRadioButton) evt.getSource();
-            JPanel pnlFrage = (JPanel) j.getParent();
-            String groupname = pnlFrage.getName();
+            JPanel innerpanel = (JPanel) j.getParent();
+            String groupname = innerpanel.getName();
             String optionname = j.getName();
             content.put(groupname, optionname);
             if (scalemode) {
@@ -320,18 +326,6 @@ public class DlgInfo extends MyJDialog {
             }
         }
     }
-
-//    private class ScaleOptionActionListener implements ActionListener {
-//
-//        public void actionPerformed(ActionEvent evt) {
-//            JRadioButton j = (JRadioButton) evt.getSource();
-//            JPanel pnlFrage = (JPanel) j.getParent();
-//            String groupname = pnlFrage.getName();
-//            String optionname = j.getName();
-//            content.put(groupname, optionname);
-//            calcScale();
-//        }
-//    }
 
     private class CheckBoxActionListener implements ActionListener {
 
@@ -637,7 +631,6 @@ public class DlgInfo extends MyJDialog {
                 sumlabel = new JLabel();
                 sumlabel.setFont(SYSConst.ARIAL20BOLD);
                 outerpanel.add("br", sumlabel);
-                calcScale();
             }
             if (qName.equalsIgnoreCase("combobox")) {
                 JComboBox j = (JComboBox) components.get(groupname);

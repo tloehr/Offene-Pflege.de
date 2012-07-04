@@ -91,8 +91,8 @@ public class PnlZeitraum extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
-                "4*(default, $lgap), default"));
+            "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
+            "4*(default, $lgap), default"));
 
         //======== panel1 ========
         {
