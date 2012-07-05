@@ -7,6 +7,7 @@ import org.eclipse.persistence.internal.xr.Result;
 
 import javax.persistence.Query;
 import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,10 +27,10 @@ public class BWInfoKatTools {
         katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER2) ? ",1 " : ""; // Verwaltung
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE b.katArt IN (" + katart + " ) ORDER BY b.bezeichnung ");
+        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE b.katArt IN (" + katart + " ) AND b.sortierung >= 0");
         List<BWInfoKat> result = query.getResultList();
         em.close();
-        OPDE.debug("ping");
+        Collections.sort(result);
         return result;
     }
 

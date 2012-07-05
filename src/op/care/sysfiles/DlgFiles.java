@@ -6,8 +6,11 @@ package op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.Pflegeberichte;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
+import entity.info.BWInfo;
+import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
@@ -16,6 +19,8 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -26,6 +31,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Torsten Löhr
@@ -36,6 +43,11 @@ public class DlgFiles extends MyJDialog {
     private Closure afterAttachAction;
     private JList list;
 
+    /**
+     * Creates a generic file attachment dialog to show existing files and add new ones.
+     * @param attachable object to add the files to
+     * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
+     */
     public DlgFiles(Object attachable, Closure afterAttachAction) {
         super();
         this.attachable = attachable;
@@ -46,9 +58,14 @@ public class DlgFiles extends MyJDialog {
     }
 
     private void initDialog() {
-//        dropPanel.setPreferredSize(new Dimension(300, 300));
-        contentPanel.add(getFileDropPanel(), CC.xy(1, 1));
-        contentPanel.add(getFileListPanel(), CC.xy(3, 1));
+
+        if (afterAttachAction == null) {
+            contentPanel.add(getFileListPanel(), CC.xywh(1, 1, 3, 1));
+        } else {
+            contentPanel.add(getFileDropPanel(), CC.xy(1, 1));
+            contentPanel.add(getFileListPanel(), CC.xy(3, 1));
+        }
+
 
     }
 
@@ -68,7 +85,7 @@ public class DlgFiles extends MyJDialog {
             public void filesDropped(File[] files) {
                 java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attachable);
                 if (!successful.isEmpty()) {
-                    list.setModel(SYSTools.list2dlm(SYSFilesTools.getAttachedFilesList(attachable)));
+                    list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
                     filesAttached = true;
                 }
@@ -90,7 +107,7 @@ public class DlgFiles extends MyJDialog {
         JPanel pnlFilesList = new JPanel();
         pnlFilesList.setLayout(new BoxLayout(pnlFilesList, BoxLayout.LINE_AXIS));
 
-        ArrayList<SYSFiles> files = SYSFilesTools.getAttachedFilesList(attachable);
+        ArrayList<SYSFiles> files = getAttachedFilesList(attachable);
 
         if (files.isEmpty()) {
             list.setModel(new DefaultListModel());
@@ -115,6 +132,30 @@ public class DlgFiles extends MyJDialog {
 
 
         return pnlFilesList;
+    }
+
+    private ArrayList<SYSFiles> getAttachedFilesList(Object attachable){
+        ArrayList<SYSFiles> files = null;
+        EntityManager em = OPDE.createEM();
+        if (attachable instanceof Pflegeberichte) {
+            Query query = em.createNamedQuery("SYSFiles.findByPB", SYSFiles.class);
+            query.setParameter("pflegebericht", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+            Collections.sort(files);
+        } else if (attachable instanceof Verordnung) {
+            Query query = em.createNamedQuery("SYSFiles.findByVerordnung", SYSFiles.class);
+            query.setParameter("verordnung", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+            Collections.sort(files);
+        } else if (attachable instanceof BWInfo) {
+            Query query = em.createNamedQuery("SYSFiles.findByBWInfo", SYSFiles.class);
+            query.setParameter("bwinfo", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+            Collections.sort(files);
+        }
+
+        em.close();
+        return files;
     }
 
 

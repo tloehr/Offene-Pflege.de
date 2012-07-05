@@ -40,6 +40,8 @@ import java.util.HashMap;
  */
 public class SYSConst {
 
+    public static final Font ARIAL10BOLD = new Font("Arial", Font.BOLD, 10);
+    public static final Font ARIAL12BOLD = new Font("Arial", Font.BOLD, 12);
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
     public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);

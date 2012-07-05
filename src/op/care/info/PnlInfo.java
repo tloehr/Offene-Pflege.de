@@ -21,6 +21,7 @@ import entity.info.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
+import op.care.sysfiles.PnlFiles;
 import op.system.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -50,7 +51,7 @@ import java.util.List;
 public class PnlInfo extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.info";
 
-    public final Icon icon12ONE = new ImageIcon(getClass().getResource("/artwork/12x12/1.png"));
+    public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
     public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
     public final Icon icon22addPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png"));
     public final Icon icon22attach = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach.png"));
@@ -70,15 +71,13 @@ public class PnlInfo extends NursingRecordsPanel {
     public final Icon icon22changePeriod = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page.png"));
     public final Icon icon22changePeriodPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page_pressed.png"));
     public final Icon icon16bysecond = new ImageIcon(getClass().getResource("/artwork/16x16/bw/bysecond.png"));
-    public final Icon icon16byday = new ImageIcon(getClass().getResource("/artwork/16x16/bw/bysecond.png"));
+    public final Icon icon16byday = new ImageIcon(getClass().getResource("/artwork/16x16/bw/byday.png"));
     public final Icon icon16pit = new ImageIcon(getClass().getResource("/artwork/16x16/bw/pointintime.png"));
 
     private final int MAX_HTML_LENGTH = 80;
-    private JPopupMenu menu;
     private Bewohner bewohner;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private boolean[] infolist;
 
     private HashMap<BWInfoTyp, CollapsiblePane> panelmap;
     private HashMap<BWInfoKat, List<BWInfoTyp>> bwinfotypen;
@@ -133,8 +132,6 @@ public class PnlInfo extends NursingRecordsPanel {
         });
 
         change2Bewohner(bewohner);
-
-
     }
 
     @Override
@@ -185,8 +182,12 @@ public class PnlInfo extends NursingRecordsPanel {
         final boolean withworker = true;
         if (withworker) {
 
+
             OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+            lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
+            ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardWait");
 
             tabKat.removeAll();
             bwinfos.clear();
@@ -218,6 +219,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
                     refreshDisplay();
                     initPhase = false;
+                    ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
                 }
@@ -234,6 +236,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 txtHTML.setText(null);
             }
             tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
+            refreshDisplay();
         }
         initPhase = false;
 
@@ -407,38 +410,62 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private CollapsiblePane createPanelFor(final BWInfoTyp typ) {
 
+        /***
+         *      _   _ _____    _    ____  _____ ____
+         *     | | | | ____|  / \  |  _ \| ____|  _ \
+         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
+         *     |  _  | |___ / ___ \| |_| | |___|  _ <
+         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
+         *
+         */
         final CollapsiblePane panelForBWInfoTyp = new CollapsiblePane();
         try {
 
             final BWInfo ersterBWInfo = bwinfos.get(typ).isEmpty() ? null : bwinfos.get(typ).get(0);
             final boolean shallBeCollapsible = !bwinfos.get(typ).isEmpty() && (bwinfos.get(typ).size() > 1 || ersterBWInfo.isAbgesetzt() || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS);
 
-            JPanel titlePanel00 = new JPanel();
-            titlePanel00.setLayout(new BoxLayout(titlePanel00, BoxLayout.LINE_AXIS));
+            JPanel titlePanel = new JPanel();
+            titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.LINE_AXIS));
 
-            JPanel titlePanel00left = new JPanel();
-            titlePanel00left.setLayout(new BoxLayout(titlePanel00left, BoxLayout.LINE_AXIS));
+            JPanel titlePanelleft = new JPanel();
+            titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
+            /***
+             *      _     _       _    _           _   _                _   _                _
+             *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
+             *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+             *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
+             *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+             *
+             */
             JideButton title = GUITools.createHyperlinkButton(getHyperlinkButtonTextForPanelHead(typ), getIcon(typ), null);
             title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             title.setAlignmentX(Component.LEFT_ALIGNMENT);
             title.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (ersterBWInfo != null) {
+                    if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()) {
                         setAllViewButtonsOff(typ.getBwInfokat());
                         txtHTML.setText(SYSTools.toHTML(BWInfoTools.getHTML(ersterBWInfo) + getUserInfoAsHTML(ersterBWInfo)));
                     }
                 }
             });
-            titlePanel00left.add(title);
+            titlePanelleft.add(title);
 
 
-            JPanel titlePanel00right = new JPanel();
-            titlePanel00right.setLayout(new BoxLayout(titlePanel00right, BoxLayout.LINE_AXIS));
+            JPanel titlePanelright = new JPanel();
+            titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
+            /***
+             *      ____        _   _               __     ___                 _   _                _
+             *     | __ ) _   _| |_| |_ ___  _ __   \ \   / (_) _____      __ | | | | ___  __ _  __| | ___ _ __
+             *     |  _ \| | | | __| __/ _ \| '_ \   \ \ / /| |/ _ \ \ /\ / / | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+             *     | |_) | |_| | |_| || (_) | | | |   \ V / | |  __/\ V  V /  |  _  |  __/ (_| | (_| |  __/ |
+             *     |____/ \__,_|\__|\__\___/|_| |_|    \_/  |_|\___| \_/\_/   |_| |_|\___|\__,_|\__,_|\___|_|
+             *
+             */
             if (ersterBWInfo != null) {
-                JToggleButton btnView = new JToggleButton(icon22view);
+                final JToggleButton btnView = new JToggleButton(icon22view);
                 btnView.setSelectedIcon(icon22viewPressed);
                 btnView.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnView.setContentAreaFilled(false);
@@ -450,16 +477,30 @@ public class PnlInfo extends NursingRecordsPanel {
                     @Override
                     public void itemStateChanged(ItemEvent itemEvent) {
                         if (initPhase) return;
+                        // Pressing the VIEW button on a header causes all members in that list to show themself, too.
+                        if (!panelForBWInfoTyp.isCollapsed()) {
+                            for (BWInfo info : bwinfos.get(typ)) {
+                                if (bwinfo4html.containsKey(info)) {
+                                    bwinfo4html.get(info).setSelected(btnView.isSelected());
+                                }
+                            }
+                        }
                         String html = getHTML();
                         txtHTML.setText(html.isEmpty() ? "<html>&nbsp;</html>" : SYSTools.toHTMLForScreen(html));
                     }
                 });
-
-                titlePanel00right.add(btnView);
-
+                btnView.setEnabled(!ersterBWInfo.isAbgesetzt());
+                titlePanelright.add(btnView);
             }
 
-
+            /***
+             *      ____        _   _                   _       _     _
+             *     | __ ) _   _| |_| |_ ___  _ __      / \   __| | __| |
+             *     |  _ \| | | | __| __/ _ \| '_ \    / _ \ / _` |/ _` |
+             *     | |_) | |_| | |_| || (_) | | | |  / ___ \ (_| | (_| |
+             *     |____/ \__,_|\__|\__\___/|_| |_| /_/   \_\__,_|\__,_|
+             *
+             */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
                 JButton btnAdd = new JButton(icon22add);
                 btnAdd.setPressedIcon(icon22addPressed);
@@ -509,9 +550,17 @@ public class PnlInfo extends NursingRecordsPanel {
                         });
                     }
                 });
-                titlePanel00right.add(btnAdd);
+                titlePanelright.add(btnAdd);
             }
 
+            /***
+             *      ____        _   _                _____    _ _ _
+             *     | __ ) _   _| |_| |_ ___  _ __   | ____|__| (_) |_
+             *     |  _ \| | | | __| __/ _ \| '_ \  |  _| / _` | | __|
+             *     | |_) | |_| | |_| || (_) | | | | | |__| (_| | | |_
+             *     |____/ \__,_|\__|\__\___/|_| |_| |_____\__,_|_|\__|
+             *
+             */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
                 JButton btnEdit = new JButton(icon22edit);
                 btnEdit.setPressedIcon(icon22editPressed);
@@ -552,6 +601,14 @@ public class PnlInfo extends NursingRecordsPanel {
                 btnEdit.setEnabled(mayBeEdited);
             }
 
+            /***
+             *      ____        _   _                ____  _
+             *     | __ ) _   _| |_| |_ ___  _ __   / ___|| |_ ___  _ __
+             *     |  _ \| | | | __| __/ _ \| '_ \  \___ \| __/ _ \| '_ \
+             *     | |_) | |_| | |_| || (_) | | | |  ___) | || (_) | |_) |
+             *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \__\___/| .__/
+             *                                                     |_|
+             */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) {
                 JButton btnStop = new JButton(icon22stop);
                 btnStop.setPressedIcon(icon22stopPressed);
@@ -587,7 +644,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     }
                 });
                 btnStop.setEnabled(ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && typ.getIntervalMode() != BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS);
-                titlePanel00right.add(btnStop);
+                titlePanelright.add(btnStop);
             }
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
@@ -623,42 +680,58 @@ public class PnlInfo extends NursingRecordsPanel {
                     }
                 });
                 btnDelete.setEnabled(ersterBWInfo != null);
-                titlePanel00right.add(btnDelete);
+                titlePanelright.add(btnDelete);
             }
 
-            JButton btnAttach = new JButton(icon22attach);
-            btnAttach.setPressedIcon(icon22attachPressed);
-            btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnAttach.setContentAreaFilled(false);
-            btnAttach.setBorder(null);
-            btnAttach.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgFiles(ersterBWInfo, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            //To change body of implemented methods use File | Settings | File Templates.
-                        }
-                    });
+            /***
+             *      ____        _   _                _____ _ _         _   _   _             _       _   _                _
+             *     | __ ) _   _| |_| |_ ___  _ __   |  ___(_) | ___   / \ | |_| |_ __ _  ___| |__   | | | | ___  __ _  __| | ___ _ __
+             *     |  _ \| | | | __| __/ _ \| '_ \  | |_  | | |/ _ \ / _ \| __| __/ _` |/ __| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+             *     | |_) | |_| | |_| || (_) | | | | |  _| | | |  __// ___ \ |_| || (_| | (__| | | | |  _  |  __/ (_| | (_| |  __/ |
+             *     |____/ \__,_|\__|\__\___/|_| |_| |_|   |_|_|\___/_/   \_\__|\__\__,_|\___|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+             *
+             */
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {
+                JButton btnAttach = new JButton(icon22attach);
+                btnAttach.setPressedIcon(icon22attachPressed);
+                btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnAttach.setContentAreaFilled(false);
+                btnAttach.setBorder(null);
+                btnAttach.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgFiles(ersterBWInfo, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                refreshTabKat(typ.getBwInfokat());
+                            }
+                        });
+                    }
+                });
+                btnAttach.setEnabled(ersterBWInfo != null && !ersterBWInfo.isAbgesetzt());
+
+                if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && ersterBWInfo.getAttachedFiles().size() > 0) {
+                    JLabel lblNum = new JLabel(Integer.toString(ersterBWInfo.getAttachedFiles().size()), icon16redStar, SwingConstants.CENTER);
+                    lblNum.setFont(SYSConst.ARIAL10BOLD);
+                    lblNum.setForeground(Color.YELLOW);
+                    lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+                    DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnAttach, lblNum, DefaultOverlayable.SOUTH_EAST);
+                    overlayableBtn.setOpaque(false);
+                    overlayableBtn.setOverlayVisible(ersterBWInfo != null);
+                    titlePanelright.add(overlayableBtn);
+                } else {
+                    titlePanelright.add(btnAttach);
                 }
-            });
-            btnAttach.setEnabled(ersterBWInfo != null);
+            }
 
-            DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnAttach, new JLabel(icon12ONE), DefaultOverlayable.SOUTH_EAST);
-            overlayableBtn.setOpaque(false);
-            overlayableBtn.setOverlayVisible(ersterBWInfo != null);
+            titlePanelleft.setOpaque(false);
+            titlePanelright.setOpaque(false);
+            titlePanel.setOpaque(false);
 
-            titlePanel00right.add(overlayableBtn);
+            titlePanel.add(titlePanelleft);
+            titlePanel.add(titlePanelright);
 
-
-            titlePanel00left.setOpaque(false);
-            titlePanel00right.setOpaque(false);
-            titlePanel00.setOpaque(false);
-
-            titlePanel00.add(titlePanel00left);
-            titlePanel00.add(titlePanel00right);
-
-            panelForBWInfoTyp.setTitleLabelComponent(titlePanel00);
+            panelForBWInfoTyp.setTitleLabelComponent(titlePanel);
             panelForBWInfoTyp.setSlidingDirection(SwingConstants.SOUTH);
             panelForBWInfoTyp.setStyle(CollapsiblePane.TREE_STYLE);
             panelForBWInfoTyp.setHorizontalAlignment(SwingConstants.LEADING);
@@ -668,8 +741,13 @@ public class PnlInfo extends NursingRecordsPanel {
             JPanel labelPanel = new JPanel();
             labelPanel.setLayout(new VerticalLayout());
 
-
-            // Hier wird der Content erzeugt
+            /***
+             *       ___ ___  _  _ _____ ___ _  _ _____
+             *      / __/ _ \| \| |_   _| __| \| |_   _|
+             *     | (_| (_) | .` | | | | _|| .` | | |
+             *      \___\___/|_|\_| |_| |___|_|\_| |_|
+             *
+             */
             if (!bwinfos.get(typ).isEmpty()) {
                 // In diesen Fällen steht im Kopf kein BWInfo Eintrag. Daher müssen die alle hier rein geschrieben werden.
                 int startwert = ersterBWInfo.isAbgesetzt() || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS || typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS ? 0 : 1;
@@ -697,6 +775,39 @@ public class PnlInfo extends NursingRecordsPanel {
                     JPanel contentLineRight = new JPanel();
                     contentLineRight.setLayout(new BoxLayout(contentLineRight, BoxLayout.LINE_AXIS));
 
+                    /***
+                     *      ____        _   _               __     ___                  ____            _             _
+                     *     | __ ) _   _| |_| |_ ___  _ __   \ \   / (_) _____      __  / ___|___  _ __ | |_ ___ _ __ | |_
+                     *     |  _ \| | | | __| __/ _ \| '_ \   \ \ / /| |/ _ \ \ /\ / / | |   / _ \| '_ \| __/ _ \ '_ \| __|
+                     *     | |_) | |_| | |_| || (_) | | | |   \ V / | |  __/\ V  V /  | |__| (_) | | | | ||  __/ | | | |_
+                     *     |____/ \__,_|\__|\__\___/|_| |_|    \_/  |_|\___| \_/\_/    \____\___/|_| |_|\__\___|_| |_|\__|
+                     *
+                     */
+                    JToggleButton btnView = new JToggleButton(icon22view);
+                    btnView.setSelectedIcon(icon22viewPressed);
+                    btnView.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnView.setContentAreaFilled(false);
+                    btnView.setBorder(null);
+
+                    bwinfo4html.put(innerBWInfo, btnView);
+                    btnView.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent itemEvent) {
+                            if (initPhase) return;
+                            String html = getHTML();
+                            txtHTML.setText(html.isEmpty() ? "<html>&nbsp;</html>" : SYSTools.toHTMLForScreen(html));
+                        }
+                    });
+                    contentLineRight.add(btnView);
+
+                    /***
+                     *      ____        _   _                 ____ _                              ____           _           _
+                     *     | __ ) _   _| |_| |_ ___  _ __    / ___| |__   __ _ _ __   __ _  ___  |  _ \ ___ _ __(_) ___   __| |
+                     *     |  _ \| | | | __| __/ _ \| '_ \  | |   | '_ \ / _` | '_ \ / _` |/ _ \ | |_) / _ \ '__| |/ _ \ / _` |
+                     *     | |_) | |_| | |_| || (_) | | | | | |___| | | | (_| | | | | (_| |  __/ |  __/  __/ |  | | (_) | (_| |
+                     *     |____/ \__,_|\__|\__\___/|_| |_|  \____|_| |_|\__,_|_| |_|\__, |\___| |_|   \___|_|  |_|\___/ \__,_|
+                     *                                                               |___/
+                     */
                     final JButton btnChangePeriod = new JButton(icon22changePeriod);
                     btnChangePeriod.setPressedIcon(icon22changePeriodPressed);
                     btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -736,9 +847,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                             innerBWInfo.setVon(period.getFirst());
                                             innerBWInfo.setBis(period.getSecond());
                                             EntityTools.merge(innerBWInfo);
-//                                            contentButton.setText(getHyperlinkButtonTextForPanelContent(innerBWInfo));
-                                            refreshTabKat(innerBWInfo.getBwinfotyp().getBwInfokat());
-//                                            bwinfos.get(typ).set(f_infonum, innerBWInfo);
+                                            refreshTabKat(typ.getBwInfokat());
                                         }
 
                                     }
@@ -754,29 +863,46 @@ public class PnlInfo extends NursingRecordsPanel {
                             }
                         };
                     }
-
-
                     btnChangePeriod.addActionListener(al);
-
-                    JToggleButton btnView = new JToggleButton(icon22view);
-                    btnView.setSelectedIcon(icon22viewPressed);
-                    btnView.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnView.setContentAreaFilled(false);
-                    btnView.setBorder(null);
-
-                    bwinfo4html.put(innerBWInfo, btnView);
-                    btnView.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent itemEvent) {
-                            if (initPhase) return;
-                            String html = getHTML();
-                            txtHTML.setText(html.isEmpty() ? "<html>&nbsp;</html>" : SYSTools.toHTMLForScreen(html));
-                        }
-                    });
-
-                    contentLineRight.add(btnView);
                     contentLineRight.add(btnChangePeriod);
 
+                    /***
+                     *      ____        _   _                _____ _ _         _   _   _             _        ____            _             _
+                     *     | __ ) _   _| |_| |_ ___  _ __   |  ___(_) | ___   / \ | |_| |_ __ _  ___| |__    / ___|___  _ __ | |_ ___ _ __ | |_
+                     *     |  _ \| | | | __| __/ _ \| '_ \  | |_  | | |/ _ \ / _ \| __| __/ _` |/ __| '_ \  | |   / _ \| '_ \| __/ _ \ '_ \| __|
+                     *     | |_) | |_| | |_| || (_) | | | | |  _| | | |  __// ___ \ |_| || (_| | (__| | | | | |__| (_) | | | | ||  __/ | | | |_
+                     *     |____/ \__,_|\__|\__\___/|_| |_| |_|   |_|_|\___/_/   \_\__|\__\__,_|\___|_| |_|  \____\___/|_| |_|\__\___|_| |_|\__|
+                     *
+                     */
+                    if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {
+                        JButton btnAttach = new JButton(icon22attach);
+                        btnAttach.setPressedIcon(icon22attachPressed);
+                        btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                        btnAttach.setContentAreaFilled(false);
+                        btnAttach.setBorder(null);
+                        btnAttach.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+                                // No Attachments anymore for OLD entries. Only view.
+                                new DlgFiles(innerBWInfo, null);
+                            }
+                        });
+
+                        if (innerBWInfo.getAttachedFiles().size() > 0) {
+                            JLabel lblNum = new JLabel(Integer.toString(innerBWInfo.getAttachedFiles().size()), icon16redStar, SwingConstants.CENTER);
+                            lblNum.setFont(SYSConst.ARIAL10BOLD);
+                            lblNum.setForeground(Color.YELLOW);
+                            lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+                            DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnAttach, lblNum, DefaultOverlayable.SOUTH_EAST);
+                            overlayableBtn.setOpaque(false);
+                            overlayableBtn.setOverlayVisible(ersterBWInfo != null);
+                            contentLineRight.add(overlayableBtn);
+                        } else {
+                            contentLineRight.add(btnAttach);
+                        }
+
+                        btnAttach.setEnabled(innerBWInfo.getAttachedFiles().size() > 0);
+                    }
 
                     contentLine.add(contentButton);
                     contentLine.add(contentLineRight);
@@ -790,11 +916,17 @@ public class PnlInfo extends NursingRecordsPanel {
             panelForBWInfoTyp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                 @Override
                 public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                    if (ersterBWInfo != null){
+                        bwinfo4html.get(ersterBWInfo).setEnabled(!ersterBWInfo.isAbgesetzt()); // TODO: ?? SINGLE INCIDENT ?
+                    }
                     SYSPropsTools.storeBoolean(internalClassID + ":panelCollapsed:" + typ.getBwinftyp(), false, OPDE.getLogin().getUser());
                 }
 
                 @Override
                 public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                    if (ersterBWInfo != null){
+                        bwinfo4html.get(ersterBWInfo).setEnabled(!ersterBWInfo.isAbgesetzt());
+                    }
                     SYSPropsTools.storeBoolean(internalClassID + ":panelCollapsed:" + typ.getBwinftyp(), true, OPDE.getLogin().getUser());
                 }
             });
@@ -868,10 +1000,13 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        pnlCard = new JPanel();
         splitPane1 = new JSplitPane();
         tabKat = new JideTabbedPane();
         scrollPane1 = new JScrollPane();
         txtHTML = new JTextPane();
+        panel1 = new JPanel();
+        lblWait = new JLabel();
 
         //======== this ========
         addComponentListener(new ComponentAdapter() {
@@ -882,49 +1017,70 @@ public class PnlInfo extends NursingRecordsPanel {
         });
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== splitPane1 ========
+        //======== pnlCard ========
         {
-            splitPane1.setOneTouchExpandable(true);
+            pnlCard.setLayout(new CardLayout());
 
-            //======== tabKat ========
+            //======== splitPane1 ========
             {
-                tabKat.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-                tabKat.setShowIconsOnTab(false);
-                tabKat.setSelectedTabFont(new Font("Arial", Font.BOLD, 14));
-                tabKat.setFont(new Font("Arial", Font.PLAIN, 14));
-                tabKat.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        tabKatStateChanged(e);
-                    }
-                });
-            }
-            splitPane1.setLeftComponent(tabKat);
+                splitPane1.setOneTouchExpandable(true);
 
-            //======== scrollPane1 ========
+                //======== tabKat ========
+                {
+                    tabKat.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+                    tabKat.setShowIconsOnTab(false);
+                    tabKat.setSelectedTabFont(new Font("Arial", Font.BOLD, 14));
+                    tabKat.setFont(new Font("Arial", Font.PLAIN, 14));
+                    tabKat.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            tabKatStateChanged(e);
+                        }
+                    });
+                }
+                splitPane1.setLeftComponent(tabKat);
+
+                //======== scrollPane1 ========
+                {
+
+                    //---- txtHTML ----
+                    txtHTML.setEditable(false);
+                    txtHTML.setContentType("text/html");
+                    txtHTML.addPropertyChangeListener("text", new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent e) {
+                            txtHTMLPropertyChange(e);
+                        }
+                    });
+                    scrollPane1.setViewportView(txtHTML);
+                }
+                splitPane1.setRightComponent(scrollPane1);
+            }
+            pnlCard.add(splitPane1, "cardContent");
+
+            //======== panel1 ========
             {
+                panel1.setLayout(new BorderLayout());
 
-                //---- txtHTML ----
-                txtHTML.setEditable(false);
-                txtHTML.setContentType("text/html");
-                txtHTML.addPropertyChangeListener("text", new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent e) {
-                        txtHTMLPropertyChange(e);
-                    }
-                });
-                scrollPane1.setViewportView(txtHTML);
+                //---- lblWait ----
+                lblWait.setText("text");
+                lblWait.setFont(new Font("Arial", Font.BOLD, 22));
+                lblWait.setHorizontalAlignment(SwingConstants.CENTER);
+                panel1.add(lblWait, BorderLayout.CENTER);
             }
-            splitPane1.setRightComponent(scrollPane1);
+            pnlCard.add(panel1, "cardWait");
         }
-        add(splitPane1);
+        add(pnlCard);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JPanel pnlCard;
     private JSplitPane splitPane1;
     private JideTabbedPane tabKat;
     private JScrollPane scrollPane1;
     private JTextPane txtHTML;
+    private JPanel panel1;
+    private JLabel lblWait;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

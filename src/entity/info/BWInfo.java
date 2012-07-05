@@ -242,6 +242,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
         this.angesetztDurch = angesetztDurch;
     }
 
+
     public Collection<Sysbwi2file> getAttachedFiles() {
         return attachedFiles;
     }

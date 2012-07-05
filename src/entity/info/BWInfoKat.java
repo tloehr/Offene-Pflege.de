@@ -5,28 +5,22 @@
 
 package entity.info;
 
+import javax.persistence.*;
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import java.text.Collator;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "BWInfoKat")
 @NamedQueries({
-    @NamedQuery(name = "BWInfoKat.findAll", query = "SELECT b FROM BWInfoKat b"),
-    @NamedQuery(name = "BWInfoKat.findByBwikid", query = "SELECT b FROM BWInfoKat b WHERE b.bwikid = :bwikid"),
-    @NamedQuery(name = "BWInfoKat.findByBezeichnung", query = "SELECT b FROM BWInfoKat b WHERE b.bezeichnung = :bezeichnung"),
-    @NamedQuery(name = "BWInfoKat.findByKatArt", query = "SELECT b FROM BWInfoKat b WHERE b.katArt = :katArt"),
-    @NamedQuery(name = "BWInfoKat.findBySortierung", query = "SELECT b FROM BWInfoKat b WHERE b.sortierung = :sortierung")})
-public class BWInfoKat implements Serializable {
+        @NamedQuery(name = "BWInfoKat.findAll", query = "SELECT b FROM BWInfoKat b"),
+        @NamedQuery(name = "BWInfoKat.findByBwikid", query = "SELECT b FROM BWInfoKat b WHERE b.bwikid = :bwikid"),
+        @NamedQuery(name = "BWInfoKat.findByBezeichnung", query = "SELECT b FROM BWInfoKat b WHERE b.bezeichnung = :bezeichnung"),
+        @NamedQuery(name = "BWInfoKat.findByKatArt", query = "SELECT b FROM BWInfoKat b WHERE b.katArt = :katArt"),
+        @NamedQuery(name = "BWInfoKat.findBySortierung", query = "SELECT b FROM BWInfoKat b WHERE b.sortierung = :sortierung")})
+public class BWInfoKat implements Serializable, Comparable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -83,6 +77,17 @@ public class BWInfoKat implements Serializable {
         int hash = 0;
         hash += (bwikid != null ? bwikid.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+
+
+        final Collator collator = Collator.getInstance();
+        collator.setStrength(Collator.SECONDARY);// a == A, a < Ä
+        collator.compare("boo", "bär");
+
+        return collator.compare(bezeichnung, ((BWInfoKat) o).getBezeichnung());
     }
 
     @Override

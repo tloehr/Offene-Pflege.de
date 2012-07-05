@@ -48,35 +48,23 @@ import java.util.UUID;
         @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
         @NamedQuery(name = "SYSFiles.findByFilesize", query = "SELECT s FROM SYSFiles s WHERE s.filesize = :filesize"),
         @NamedQuery(name = "SYSFiles.findByPit", query = "SELECT s FROM SYSFiles s WHERE s.pit = :pit"),
-        @NamedQuery(name = "SYSFiles.findByBWKennung2PB", query = ""
-                + " SELECT s"
-                + " FROM SYSFiles s "
-                + " JOIN s.pbAssignCollection sf "
-                + " WHERE sf.pflegebericht = :bericht"),
-        @NamedQuery(name = "SYSFiles.findByBWKennung2BWI", query = ""
-                + " SELECT s"
-                + " FROM SYSFiles s "
-                + " JOIN s.bwiAssignCollection sf "
-                + " JOIN sf.bwinfo t "
-                + " WHERE t.bewohner = :bewohner "),
-        @NamedQuery(name = "SYSFiles.findByBWKennung2VER", query = ""
-                + " SELECT s"
-                + " FROM SYSFiles s "
-                + " JOIN s.verAssignCollection sf "
-                + " JOIN sf.verordnung v "
-                + " WHERE v.bewohner = :bewohner "),
+//        @NamedQuery(name = "SYSFiles.findByBWKennung2VER", query = ""
+//                + " SELECT s"
+//                + " FROM SYSFiles s "
+//                + " JOIN s.verAssignCollection sf "
+//                + " WHERE sf.verordnung = :verordnung"),
         @NamedQuery(name = "SYSFiles.findByPB", query = ""
-                + " SELECT s, sf"
+                + " SELECT s "
                 + " FROM SYSFiles s "
                 + " JOIN s.pbAssignCollection sf "
                 + " WHERE sf.pflegebericht = :pflegebericht "),
         @NamedQuery(name = "SYSFiles.findByBWInfo", query = ""
-                + " SELECT s, sf"
+                + " SELECT s "
                 + " FROM SYSFiles s "
                 + " JOIN s.bwiAssignCollection sf "
                 + " WHERE sf.bwinfo = :bwinfo "),
         @NamedQuery(name = "SYSFiles.findByVerordnung", query = ""
-                + " SELECT s, sf"
+                + " SELECT s "
                 + " FROM SYSFiles s "
                 + " JOIN s.verAssignCollection sf "
                 + " WHERE sf.verordnung = :verordnung ")
@@ -251,6 +239,7 @@ public class SYSFiles implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
+
         return getFilename().compareTo(((SYSFiles) o).getFilename());
     }
 

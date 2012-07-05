@@ -348,28 +348,7 @@ public class SYSFilesTools {
         return itemPopupAttach;
     }
 
-    public static ArrayList<SYSFiles> getAttachedFilesList(Object attachable){
-        ArrayList<SYSFiles> files = null;
-        EntityManager em = OPDE.createEM();
-        if (attachable instanceof Pflegeberichte) {
-            Query query = em.createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
-            query.setParameter("bericht", attachable);
-            files = new ArrayList<SYSFiles>(query.getResultList());
-            Collections.sort(files);
-        } else if (attachable instanceof Verordnung) {
-            Query query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
-            query.setParameter("bewohner", ((Pflegeberichte) attachable).getBewohner());
-            files = new ArrayList<SYSFiles>(query.getResultList());
-            Collections.sort(files);
-        } else if (attachable instanceof BWInfo) {
-            Query query = em.createNamedQuery("SYSFiles.findByBWKennung2BWI", SYSFiles.class);
-            query.setParameter("bewohner", ((BWInfo) attachable).getBewohner());
-            files = new ArrayList<SYSFiles>(query.getResultList());
-            Collections.sort(files);
-        }
-        em.close();
-        return files;
-    }
+
 
 //    public static JMenuItem getFileListPopupMenu(JTable o, Point p, Object a) {
 //        final Object attachable = a;
