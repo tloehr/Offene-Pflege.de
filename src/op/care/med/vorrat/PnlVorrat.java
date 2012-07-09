@@ -37,7 +37,7 @@ import entity.BewohnerTools;
 import entity.system.SYSPropsTools;
 import entity.verordnungen.*;
 import op.OPDE;
-import op.system.DlgYesNo;
+import op.tools.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;

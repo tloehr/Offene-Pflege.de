@@ -185,7 +185,7 @@ public class BWInfo {
 
             String sql = "" +
                     " SELECT bi.BWINFOID, bi.BWINFTYP, bi.Von, bi.Bis, bi.Bemerkung, bi.AnUKennung, bi.AbUKennung, bi.XML XMLC, bt.XML XMLS, " +
-                    " bt.Sortierung, bt.BWInfoKurz, bt.IntervalMode, bk.KatArt, fia.anzahl, bk.Bezeichnung, bk.bwikid " +
+                    " bt.Status, bt.BWInfoKurz, bt.IntervalMode, bk.KatArt, fia.anzahl, bk.Bezeichnung, bk.bwikid " +
                     " FROM BWInfo bi" +
                     " INNER JOIN BWInfoTyp bt ON bi.BWINFTYP = bt.BWINFTYP " +
                     " INNER JOIN BWInfoKat bk ON bt.BWIKID = bk.BWIKID " +
@@ -298,7 +298,7 @@ public class BWInfo {
 
             String sql = "" +
                     " SELECT bi.BWINFOID, bi.BWINFTYP, bi.Von, bi.Bis, bi.Bemerkung, bi.AnUKennung, bi.AbUKennung, bi.XML XMLC, bt.XML XMLS, " +
-                    " bt.Sortierung, bt.BWInfoKurz, bt.IntervalMode, bk.KatArt, bk.Bezeichnung, bk.bwikid " +
+                    " bt.Status, bt.BWInfoKurz, bt.IntervalMode, bk.KatArt, bk.Bezeichnung, bk.bwikid " +
                     " FROM BWInfo bi" +
                     " INNER JOIN BWInfoTyp bt ON bi.BWINFTYP = bt.BWINFTYP " +
                     " INNER JOIN BWInfoKat bk ON bt.BWIKID = bk.BWIKID " +
@@ -352,7 +352,7 @@ public class BWInfo {
 
             String sql = "" +
                     " SELECT bi.BWINFOID, bi.BWINFTYP, bi.Von, bi.Bis, bi.Bemerkung, bi.AnUKennung, bi.AbUKennung, bi.XML XMLC, bt.XML XMLS, " +
-                    " bt.Sortierung, bt.BWInfoKurz, bt.IntervalMode, bk.KatArt, bk.Bezeichnung, bk.bwikid " +
+                    " bt.Status, bt.BWInfoKurz, bt.IntervalMode, bk.KatArt, bk.Bezeichnung, bk.bwikid " +
                     " FROM BWInfo bi" +
                     " INNER JOIN BWInfoTyp bt ON bi.BWINFTYP = bt.BWINFTYP " +
                     " INNER JOIN BWInfoKat bk ON bt.BWIKID = bk.BWIKID " +

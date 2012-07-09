@@ -40,8 +40,7 @@ import java.util.Collection;
         @NamedQuery(name = "BWInfoTyp.findAll", query = "SELECT b FROM BWInfoTyp b"),
         @NamedQuery(name = "BWInfoTyp.findByBwinftyp", query = "SELECT b FROM BWInfoTyp b WHERE b.bwinftyp = :bwinftyp"),
         @NamedQuery(name = "BWInfoTyp.findByBWInfoKurz", query = "SELECT b FROM BWInfoTyp b WHERE b.bWInfoKurz = :bWInfoKurz"),
-        @NamedQuery(name = "BWInfoTyp.findByKat", query = "SELECT b FROM BWInfoTyp b WHERE b.bwInfokat = :kat AND b.sortierung >= 0 ORDER BY b.sortierung, b.bWInfoKurz"),
-        @NamedQuery(name = "BWInfoTyp.findBySortierung", query = "SELECT b FROM BWInfoTyp b WHERE b.sortierung = :sortierung"),
+        @NamedQuery(name = "BWInfoTyp.findByKat", query = "SELECT b FROM BWInfoTyp b WHERE b.bwInfokat = :kat AND b.status >= 0 ORDER BY b.bWInfoKurz"),
         @NamedQuery(name = "BWInfoTyp.findByIntervalMode", query = "SELECT b FROM BWInfoTyp b WHERE b.intervalMode = :intervalMode")})
 public class BWInfoTyp implements Serializable {
 
@@ -60,8 +59,8 @@ public class BWInfoTyp implements Serializable {
     @Lob
     @Column(name = "BWInfoLang")
     private String bWInfoLang;
-    @Column(name = "Sortierung")
-    private Integer sortierung;
+    @Column(name = "Status")
+    private Integer status;
     @Column(name = "IntervalMode")
     private Short intervalMode;
 
@@ -96,6 +95,16 @@ public class BWInfoTyp implements Serializable {
         return xml;
     }
 
+    /***
+ *     __    __       ___       __       __        ______      .______    _______ .___________. _______ .______
+ *    |  |  |  |     /   \     |  |     |  |      /  __  \     |   _  \  |   ____||           ||   ____||   _  \
+ *    |  |__|  |    /  ^  \    |  |     |  |     |  |  |  |    |  |_)  | |  |__   `---|  |----`|  |__   |  |_)  |
+ *    |   __   |   /  /_\  \   |  |     |  |     |  |  |  |    |   ___/  |   __|      |  |     |   __|  |      /
+ *    |  |  |  |  /  _____  \  |  `----.|  `----.|  `--'  |    |  |      |  |____     |  |     |  |____ |  |\  \----.
+ *    |__|  |__| /__/     \__\ |_______||_______| \______/     | _|      |_______|    |__|     |_______|| _| `._____|
+ *
+ */
+
     public void setXml(String xml) {
         this.xml = xml;
     }
@@ -124,12 +133,12 @@ public class BWInfoTyp implements Serializable {
         this.bwInfokat = bwInfokat;
     }
 
-    public Integer getSortierung() {
-        return sortierung;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setSortierung(Integer sortierung) {
-        this.sortierung = sortierung;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public Short getIntervalMode() {

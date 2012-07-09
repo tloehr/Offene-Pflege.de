@@ -58,19 +58,22 @@ public class Arzt implements Serializable {
     private String mobil;
     @Column(name = "EMail")
     private String eMail;
-    @Basic(optional = false)
-    @Column(name = "Fach")
-    private String fach;
 
     public Arzt() {
+//        this.anrede = "";
+//        this.titel = "";
+//        this.name = "";
+//        this.vorname = "";
+//        this.strasse = "";
+//        this.plz = "";
+//        this.ort = "";
+//        this.tel = "";
+//        this.fax = "";
+//        this.eMail = "";
+//        this.mobil = "";
     }
 
-    public Arzt(Long arztID) {
-        this.arztID = arztID;
-    }
-
-    public Arzt(Long arztID, String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax, String fach) {
-        this.arztID = arztID;
+    public Arzt(String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
         this.anrede = anrede;
         this.titel = titel;
         this.name = name;
@@ -80,7 +83,6 @@ public class Arzt implements Serializable {
         this.ort = ort;
         this.tel = tel;
         this.fax = fax;
-        this.fach = fach;
     }
 
     public Long getArztID() {
@@ -177,14 +179,6 @@ public class Arzt implements Serializable {
 
     public void setEMail(String eMail) {
         this.eMail = eMail;
-    }
-
-    public String getFach() {
-        return fach;
-    }
-
-    public void setFach(String fach) {
-        this.fach = fach;
     }
 
     @Override

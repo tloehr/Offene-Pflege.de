@@ -38,6 +38,7 @@ import com.jidesoft.status.TimeStatusBarItem;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
+import com.jidesoft.wizard.WizardDialog;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.Stationen;
@@ -45,8 +46,10 @@ import entity.StationenTools;
 import entity.files.SYSFilesTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
+import op.admin.residents.bwassistant.AddBWWizard;
 import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
+import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.system.DlgLogin;
 import op.threads.DisplayManager;
@@ -68,7 +71,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -77,7 +82,7 @@ import java.util.List;
 public class FrmMain extends JFrame {
 
     public static final String internalClassID = "opde.mainframe";
-
+    public final Icon icon22addbw = new ImageIcon(getClass().getResource("/artwork/22x22/add_bw.png"));
 
     private boolean initPhase;
 
@@ -290,16 +295,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
-                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                        "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
+                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -401,15 +406,40 @@ public class FrmMain extends JFrame {
         }
     }//GEN-LAST:event_btnVerlegungActionPerformed
 
-
-    private void createProgramListe() {
+    private CollapsiblePane addApps() {
         JPanel mypanel = new JPanel(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
-        final CollapsiblePane mypane = new CollapsiblePane("Programme");
-        mypane.setFont(new Font("Arial", Font.BOLD, 14));
+        final CollapsiblePane mypane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".Apps"));
+        mypane.setFont(SYSConst.ARIAL14);
+
+        // Darf neue Bewohner anlegen
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) {
+            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), icon22addbw, null);
+//            final MyJDialog dlg = new MyJDialog();
+            final MyJDialog dlg = new MyJDialog();
+            addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+            addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
+            addbw.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    WizardDialog wizard = new AddBWWizard(new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+
+                            }
+                            dlg.dispose();
+                        }
+                    }).getWizard();
+                    dlg.setContentPane(wizard.getContentPane());
+                    dlg.pack();
+                    dlg.setVisible(true);
+                }
+            });
+            mypanel.add(addbw);
+        }
 
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
-
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassname(), InternalClassACL.EXECUTE)) {
 
@@ -441,11 +471,23 @@ public class FrmMain extends JFrame {
                 mypanel.add(progButton);
             }
         }
-        mypane.setSlidingDirection(SwingConstants.SOUTH);
+//        mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
         mypane.setContentPane(mypanel);
-        panesApps.add(mypane);
-        panesApps.setBackground(mypane.getBackground());
+//        panesApps.add(mypane);
+//        panesApps.setBackground(mypane.getBackground());
+        return mypane;
+    }
+
+    private CollapsiblePane addCommandNewBW() {
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+        return null;
     }
 
     private void prepareSearchArea() {
@@ -456,16 +498,30 @@ public class FrmMain extends JFrame {
 
         panesApps = new CollapsiblePanes();
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
+
+//        panesApps.add(addCommandNewBW());
+        panesApps.add(addApps());
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Stationen.findAllSorted");
+        ArrayList<Stationen> stationen = new ArrayList<Stationen>(query.getResultList());
+        em.close();
+        for (Stationen station : stationen) {
+            panesApps.add(addNursingRecords(station));
+        }
+
+        // Darf auf das Archiv zugreifen
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.ARCHIVE)) {
+            panesApps.add(addNursingRecords(null));
+        }
+
+        panesApps.addExpansion();
         jspApps = new JScrollPane(panesApps);
 
         splitPaneLeft.setOrientation(JideSplitPane.VERTICAL_SPLIT);
         splitPaneLeft.add(jspApps);
         splitPaneLeft.add(jspSearch);
 
-        createProgramListe();
-        createPflegedokumentation();
-
-        panesApps.addExpansion();
     }
 
     private CleanablePanel loadPanel(String classname) {
@@ -481,19 +537,24 @@ public class FrmMain extends JFrame {
         return panel;
     }
 
-    private CollapsiblePane createBewohnerListe(Stationen station) {
+    private CollapsiblePane addNursingRecords(Stationen station) {
         bwButtonMap = new HashMap<Bewohner, JideButton>();
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
-        query.setParameter("station", station);
-        Iterator<Bewohner> it = query.getResultList().iterator();
+        Query query = null;
+        if (station == null) {
+            query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
+        } else {
+            query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
+            query.setParameter("station", station);
+        }
+        ArrayList<Bewohner> bewohnerliste = new ArrayList<Bewohner>(query.getResultList());
         em.close();
 
-        CollapsiblePane mypane = new CollapsiblePane(station.getBezeichnung());
-        mypane.setFont(new Font("Arial", Font.BOLD, 14));
-        mypane.setEmphasized(station.equals(StationenTools.getSpecialStation()));
-        mypane.setSlidingDirection(SwingConstants.SOUTH);
+        CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getBezeichnung());
+        mypane.setFont(SYSConst.ARIAL14);
+        mypane.setEmphasized(station != null && station.equals(StationenTools.getSpecialStation()));
+//        mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
 
         JPanel labelPanel = new JPanel();
@@ -506,8 +567,7 @@ public class FrmMain extends JFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        while (it.hasNext()) {
-            final Bewohner innerbewohner = it.next();
+        for (final Bewohner innerbewohner : bewohnerliste) {
 
             ActionListener actionListener = new ActionListener() {
                 @Override
@@ -633,18 +693,18 @@ public class FrmMain extends JFrame {
      */
     private void createPflegedokumentation() {
 
-        if (!OPDE.getAppInfo().userHasAccessLevelForThisClass("nursingrecords.main", InternalClassACL.EXECUTE)) {
-            return;
-        }
-
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Stationen.findAllSorted");
-        Iterator<Stationen> it = query.getResultList().iterator();
-        em.close();
-
-        while (it.hasNext()) {
-            panesApps.add(createBewohnerListe(it.next()));
-        }
+//        if (!OPDE.getAppInfo().userHasAccessLevelForThisClass("nursingrecords.main", InternalClassACL.EXECUTE)) {
+//            return;
+//        }
+//
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createNamedQuery("Stationen.findAllSorted");
+//        Iterator<Stationen> it = query.getResultList().iterator();
+//        em.close();
+//
+//        while (it.hasNext()) {
+//            panesApps.add(createBewohnerListe(it.next()));
+//        }
 
     }
 

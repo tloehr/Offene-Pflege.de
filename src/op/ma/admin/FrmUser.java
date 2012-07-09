@@ -31,6 +31,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import entity.Groups;
 import entity.Users;
+import entity.UsersTools;
 import entity.files.SYSFilesTools;
 import entity.system.IntClassesTools;
 import op.OPDE;
@@ -1441,7 +1442,7 @@ public class FrmUser extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNameFocusLost
 
     private void btnEnableUserItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_btnEnableUserItemStateChanged
-        selectedUser.setStatus(btnEnableUser.isSelected() ? Users.STATUS_ACTIVE : Users.STATUS_INACTIVE);
+        selectedUser.setStatus(btnEnableUser.isSelected() ? UsersTools.STATUS_ACTIVE : UsersTools.STATUS_INACTIVE);
         saveUser();
     }//GEN-LAST:event_btnEnableUserItemStateChanged
 

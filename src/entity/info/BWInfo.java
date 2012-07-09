@@ -194,6 +194,10 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
         }
     }
 
+    public boolean isHeimaufnahme(){
+        return bwinfotyp.getBwinftyp().equalsIgnoreCase("hauf");
+    }
+
     public String getXml() {
         return xml;
     }

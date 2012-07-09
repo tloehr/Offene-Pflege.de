@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.system;
 
 import java.io.Serializable;
 import javax.persistence.*;

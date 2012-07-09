@@ -44,6 +44,7 @@ import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
 import org.eclipse.persistence.config.QueryHints;
+import org.eclipse.persistence.logging.SessionLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -501,11 +502,14 @@ public class OPDE {
             url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
             jpaProps.put("javax.persistence.jdbc.url", url);
 
-            jpaProps.put(QueryHints.JDBC_TIMEOUT, "3");
+//            jpaProps.put(QueryHints.JDBC_TIMEOUT, "3");
 
             // Cache abschalten
             jpaProps.put("eclipselink.cache.shared.default", "false");
-            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+//            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+            jpaProps.put("eclipselink.logging.level", SessionLog.FINER);
+
+
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 

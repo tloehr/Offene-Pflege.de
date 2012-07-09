@@ -34,7 +34,7 @@ import entity.BewohnerTools;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import op.OPDE;
-import op.system.DlgYesNo;
+import op.tools.DlgYesNo;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;

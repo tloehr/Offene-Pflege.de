@@ -1,4 +1,4 @@
-package entity;
+package entity.system;
 
 import op.tools.SYSTools;
 

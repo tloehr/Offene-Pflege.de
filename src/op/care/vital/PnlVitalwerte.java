@@ -39,7 +39,7 @@ import entity.BewohnerTools;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.system.DlgYesNo;
+import op.tools.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;

@@ -9,11 +9,16 @@ import javax.persistence.Query;
 import op.OPDE;
 import op.tools.SYSTools;
 
+import java.util.List;
+
 /**
  *
  * @author tloehr
  */
 public class UsersTools {
+
+    public static final short STATUS_INACTIVE = 0;
+    public static final short STATUS_ACTIVE = 1;
 
     public static boolean isAdmin(Users user) {
         EntityManager em = OPDE.createEM();

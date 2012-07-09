@@ -25,6 +25,7 @@
  */
 package entity;
 
+import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -47,11 +48,9 @@ import java.util.Date;
         @NamedQuery(name = "Bewohner.findByVorname", query = "SELECT b FROM Bewohner b WHERE b.vorname = :vorname"),
         @NamedQuery(name = "Bewohner.findByGeschlecht", query = "SELECT b FROM Bewohner b WHERE b.geschlecht = :geschlecht"),
         @NamedQuery(name = "Bewohner.findByGebDatum", query = "SELECT b FROM Bewohner b WHERE b.gebDatum = :gebDatum"),
-        @NamedQuery(name = "Bewohner.findByVersion", query = "SELECT b FROM Bewohner b WHERE b.version = :version"),
         @NamedQuery(name = "Bewohner.findByEditor", query = "SELECT b FROM Bewohner b WHERE b.editor = :editor"),
         @NamedQuery(name = "Bewohner.findByAdminonly", query = "SELECT b FROM Bewohner b WHERE b.adminonly = :adminonly")})
 public class Bewohner implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -70,13 +69,9 @@ public class Bewohner implements Serializable {
     @Column(name = "GebDatum")
     @Temporal(TemporalType.DATE)
     private Date gebDatum;
-    @Basic(optional = false)
-    @Column(name = "_version")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date version;
-    @Basic(optional = false)
-    @Column(name = "_editor")
-    private String editor;
+//    @Version
+//    @Column(name = "version")
+//    private Long version;
     @Basic(optional = false)
     @Column(name = "adminonly")
     private short adminonly;
@@ -90,9 +85,9 @@ public class Bewohner implements Serializable {
 //    private Collection<Verordnung> verordnungCollection;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<BWInfo> bwinfoCollection;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
-    private Collection<Pflegeberichte> pflegberichte;
+//
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
+//    private Collection<Pflegeberichte> pflegberichte;
 
     // Bewohner, die keiner Pflegestation zugeordnet sind, gelten als inaktiv.
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
@@ -110,23 +105,21 @@ public class Bewohner implements Serializable {
     @JoinColumn(name = "BetrID1", referencedColumnName = "BetrID")
     @ManyToOne
     private Betreuer betreuer1;
+    @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users editor;
 
     public Bewohner() {
     }
 
-    public Bewohner(String bWKennung) {
-        this.bWKennung = bWKennung;
-    }
-
-    public Bewohner(String bWKennung, String nachname, String vorname, int geschlecht, Date gebDatum, Date version, String editor, short adminonly) {
-        this.bWKennung = bWKennung;
+    public Bewohner(String nachname, String vorname, int geschlecht, Date gebDatum) {
+        this.bWKennung = null;
         this.nachname = nachname;
         this.vorname = vorname;
         this.geschlecht = geschlecht;
         this.gebDatum = gebDatum;
-        this.version = version;
-        this.editor = editor;
-        this.adminonly = adminonly;
+        this.editor = OPDE.getLogin().getUser();
+        this.adminonly = 0;
     }
 
     public String getBWKennung() {
@@ -134,7 +127,9 @@ public class Bewohner implements Serializable {
     }
 
     public void setBWKennung(String bWKennung) {
-        this.bWKennung = bWKennung;
+        if (this.bWKennung == null) {
+            this.bWKennung = bWKennung;
+        }
     }
 
     public String getNachnameNieAnonym() {
@@ -179,6 +174,14 @@ public class Bewohner implements Serializable {
         this.vorname = vorname;
     }
 
+    public Users getEditor() {
+        return editor;
+    }
+
+    public void setEditor(Users editor) {
+        this.editor = editor;
+    }
+
     public int getGeschlecht() {
         return geschlecht;
     }
@@ -193,22 +196,6 @@ public class Bewohner implements Serializable {
 
     public void setGebDatum(Date gebDatum) {
         this.gebDatum = gebDatum;
-    }
-
-    public Date getVersion() {
-        return version;
-    }
-
-    public void setVersion(Date version) {
-        this.version = version;
-    }
-
-    public String getEditor() {
-        return editor;
-    }
-
-    public void setEditor(String editor) {
-        this.editor = editor;
     }
 
     public short getAdminonly() {

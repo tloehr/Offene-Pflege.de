@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Fri May 18 14:51:51 CEST 2012
  */
 
-package op.system;
+package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;

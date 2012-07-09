@@ -9,7 +9,7 @@ import entity.verordnungen.MedBestand;
 import entity.verordnungen.MedBuchungen;
 import entity.verordnungen.MedBuchungenTools;
 import op.OPDE;
-import op.system.DlgYesNo;
+import op.tools.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

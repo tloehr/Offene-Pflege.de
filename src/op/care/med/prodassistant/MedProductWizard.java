@@ -5,6 +5,7 @@ import com.jidesoft.wizard.*;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
@@ -156,13 +157,13 @@ public class MedProductWizard {
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText("<html><font face=\"" + OPDE.arial14.getFamily() + "\">" +
+            txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
                     OPDE.lang.getString(internalClassID + ".welcome.html") +
                     "</font></html>");
 
             addComponent(txt, true);
             addSpace();
-            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", OPDE.arial14);
+            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", SYSConst.ARIAL14);
         }
 
         @Override
@@ -412,14 +413,14 @@ public class MedProductWizard {
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText("<html><font face=\"" + OPDE.arial14.getFamily() + "\">" +
+            txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
                     check() +
                     "</font>" +
                     "</html>");
 
             addComponent(txt, true);
             addSpace();
-            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", OPDE.arial14);
+            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", SYSConst.ARIAL14);
         }
 
         @Override

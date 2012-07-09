@@ -27,6 +27,10 @@
 
 package op.bw.admin;
 
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.event.*;
+import com.toedter.calendar.*;
 import op.OPDE;
 import op.tools.*;
 
@@ -103,141 +107,158 @@ public class DlgBW extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        lblText = new JLabel();
+        jSeparator1 = new JSeparator();
+        jLabel2 = new JLabel();
+        jLabel3 = new JLabel();
+        jLabel4 = new JLabel();
+        jLabel5 = new JLabel();
+        jdcGebDatum = new JDateChooser();
+        txtName = new JTextField();
+        txtVorname = new JTextField();
+        rbMann = new JRadioButton();
+        rbFrau = new JRadioButton();
+        btnDiscard = new JButton();
+        btnSave = new JButton();
+        jSeparator2 = new JSeparator();
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        lblText = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jdcGebDatum = new com.toedter.calendar.JDateChooser();
-        txtName = new javax.swing.JTextField();
-        txtVorname = new javax.swing.JTextField();
-        rbMann = new javax.swing.JRadioButton();
-        rbFrau = new javax.swing.JRadioButton();
-        btnDiscard = new javax.swing.JButton();
-        btnSave = new javax.swing.JButton();
-        jSeparator2 = new javax.swing.JSeparator();
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        Container contentPane = getContentPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-
-        lblText.setFont(new java.awt.Font("Dialog", 1, 18));
+        //---- lblText ----
+        lblText.setFont(new Font("Dialog", Font.BOLD, 18));
         lblText.setText("Neue(n) BewohnerIn anlegen");
 
+        //---- jLabel2 ----
         jLabel2.setText("Name:");
 
+        //---- jLabel3 ----
         jLabel3.setText("Vorname:");
 
+        //---- jLabel4 ----
         jLabel4.setText("Geburtsdatum:");
 
+        //---- jLabel5 ----
         jLabel5.setText("Geschlecht:");
 
+        //---- txtName ----
         txtName.setText("jTextField1");
-        txtName.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtNameCaretUpdate(evt);
+        txtName.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtNameCaretUpdate(e);
             }
         });
 
+        //---- txtVorname ----
         txtVorname.setText("jTextField2");
-        txtVorname.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtVornameCaretUpdate(evt);
+        txtVorname.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                txtVornameCaretUpdate(e);
             }
         });
 
-        buttonGroup1.add(rbMann);
-        rbMann.setText("männlich");
-        rbMann.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbMann.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        //---- rbMann ----
+        rbMann.setText("m\u00e4nnlich");
+        rbMann.setBorder(BorderFactory.createEmptyBorder());
+        rbMann.setMargin(new Insets(0, 0, 0, 0));
 
-        buttonGroup1.add(rbFrau);
+        //---- rbFrau ----
         rbFrau.setText("weiblich");
-        rbFrau.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        rbFrau.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        rbFrau.setBorder(BorderFactory.createEmptyBorder());
+        rbFrau.setMargin(new Insets(0, 0, 0, 0));
 
+        //---- btnDiscard ----
         btnDiscard.setText("Verwerfen");
-        btnDiscard.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDiscardActionPerformed(evt);
+        btnDiscard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnDiscardActionPerformed(e);
             }
         });
 
+        //---- btnSave ----
         btnSave.setText("Speichern");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSaveActionPerformed(e);
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
-                                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
-                                        .add(lblText)
-                                        .add(layout.createSequentialGroup()
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(jLabel2)
-                                                        .add(jLabel3)
-                                                        .add(jLabel4)
-                                                        .add(jLabel5))
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                                        .add(layout.createSequentialGroup()
-                                                                .add(rbMann)
-                                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                                .add(rbFrau))
-                                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                                                .add(txtVorname)
-                                                                .add(jdcGebDatum, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-                                                                .add(txtName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 196, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                                .add(btnSave)
-                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                                .add(btnDiscard)))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jSeparator2, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
+                        .addComponent(jSeparator1, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
+                        .addComponent(lblText)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel5))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(contentPaneLayout.createParallelGroup()
+                                .addGroup(contentPaneLayout.createSequentialGroup()
+                                    .addComponent(rbMann)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(rbFrau))
+                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtVorname)
+                                    .addComponent(jdcGebDatum, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                                    .addComponent(txtName, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnSave)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnDiscard)))
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .add(lblText)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(jLabel2)
-                                        .add(txtName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(jLabel3)
-                                        .add(txtVorname, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jLabel4)
-                                        .add(jdcGebDatum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(14, 14, 14)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(jLabel5)
-                                        .add(rbMann)
-                                        .add(rbFrau))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(btnDiscard)
-                                        .add(btnSave))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblText)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(txtVorname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jLabel4)
+                        .addComponent(jdcGebDatum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addGap(14, 14, 14)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(rbMann)
+                        .addComponent(rbFrau))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnDiscard)
+                        .addComponent(btnSave))
+                    .addContainerGap())
         );
+        setSize(328, 255);
+        setLocationRelativeTo(null);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 328) / 2, (screenSize.height - 255) / 2, 328, 255);
+        //---- buttonGroup1 ----
+        ButtonGroup buttonGroup1 = new ButtonGroup();
+        buttonGroup1.add(rbMann);
+        buttonGroup1.add(rbFrau);
     }// </editor-fold>//GEN-END:initComponents
 
     public String showDialog() {
@@ -331,21 +352,20 @@ public class DlgBW extends javax.swing.JDialog {
     }//GEN-LAST:event_txtNameCaretUpdate
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDiscard;
-    private javax.swing.JButton btnSave;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private com.toedter.calendar.JDateChooser jdcGebDatum;
-    private javax.swing.JLabel lblText;
-    private javax.swing.JRadioButton rbFrau;
-    private javax.swing.JRadioButton rbMann;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JTextField txtVorname;
+    private JLabel lblText;
+    private JSeparator jSeparator1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JLabel jLabel4;
+    private JLabel jLabel5;
+    private JDateChooser jdcGebDatum;
+    private JTextField txtName;
+    private JTextField txtVorname;
+    private JRadioButton rbMann;
+    private JRadioButton rbFrau;
+    private JButton btnDiscard;
+    private JButton btnSave;
+    private JSeparator jSeparator2;
     // End of variables declaration//GEN-END:variables
 
 }

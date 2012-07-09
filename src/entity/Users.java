@@ -53,10 +53,7 @@ import java.util.Collection;
                 + " WHERE :group NOT MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
         @NamedQuery(name = "Users.findByEMail", query = "SELECT o FROM Users o WHERE o.eMail = :eMail")})
 public class Users implements Serializable {
-
     private static final long serialVersionUID = 1L;
-    public static final short STATUS_INACTIVE = 0;
-    public static final short STATUS_ACTIVE = 1;
     @Id
     @Basic(optional = false)
     @Column(name = "UKennung")
@@ -96,7 +93,7 @@ public class Users implements Serializable {
 
     public Users() {
         groups = new ArrayList<Groups>();
-        status = STATUS_ACTIVE;
+        status = UsersTools.STATUS_ACTIVE;
     }
 //
 //    public Users(String uKennung) {
@@ -179,7 +176,7 @@ public class Users implements Serializable {
      * @return true, wenn ja; false, sonst.
      */
     public boolean isActive() {
-        return status == STATUS_ACTIVE;
+        return status == UsersTools.STATUS_ACTIVE;
     }
 
     @Override
