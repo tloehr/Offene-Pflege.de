@@ -4,13 +4,14 @@
 
 package op.admin.residents.bwassistant;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Arzt;
 import entity.ArztTools;
+import entity.Betreuer;
 import op.OPDE;
 import op.tools.PnlEditArzt;
+import op.tools.PnlEditBetreuer;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -19,18 +20,20 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlHausarzt extends JPanel {
-    public static final String internalClassID = "opde.admin.bw.wizard.page4";
+public class PnlBetreuer extends JPanel {
+    public static final String internalClassID = "opde.admin.bw.wizard.page5";
     private double split1Pos;
     private Closure validate;
-    private PnlEditArzt pnlEditArzt;
+    private PnlEditBetreuer pnlEditBetreuer;
 
 
-    public PnlHausarzt(Closure validate) {
+    public PnlBetreuer(Closure validate) {
         this.validate = validate;
         initComponents();
         initPanel();
@@ -38,16 +41,16 @@ public class PnlHausarzt extends JPanel {
 
     private void initPanel() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createNamedQuery("Arzt.findAllActive");
-        java.util.List<Arzt> listAerzte = queryArzt.getResultList();
+        Query query = em.createNamedQuery("Betreuer.findAllActive");
+        java.util.List<Betreuer> listBetreuer = query.getResultList();
         em.close();
-        listAerzte.add(0, null);
+        listBetreuer.add(0, null);
 
-        pnlEditArzt = new PnlEditArzt(new Arzt());
-        pnlRight.add(pnlEditArzt);
+        pnlEditBetreuer = new PnlEditBetreuer(new Betreuer());
+        pnlRight.add(pnlEditBetreuer);
 
-        cmbArzt.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArzt.setRenderer(ArztTools.getArztRenderer());
+        cmbBetreuer.setModel(new DefaultComboBoxModel(listBetreuer.toArray()));
+        cmbBetreuer.setRenderer(ArztTools.getArztRenderer());
 
     }
 
@@ -60,9 +63,9 @@ public class PnlHausarzt extends JPanel {
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
-        Arzt newArzt = pnlEditArzt.getArzt();
-        if (newArzt != null){
-            cmbArzt.setModel(new DefaultComboBoxModel(new Arzt[]{newArzt}));
+        Betreuer newBetreuer = pnlEditBetreuer.getBetreuer();
+        if (newBetreuer != null){
+            cmbBetreuer.setModel(new DefaultComboBoxModel(new Betreuer[]{newBetreuer}));
         }
         split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
     }
@@ -73,7 +76,7 @@ public class PnlHausarzt extends JPanel {
 
     private void cmbArztItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED){
-            validate.execute(cmbArzt.getSelectedItem());
+            validate.execute(cmbBetreuer.getSelectedItem());
         }
     }
 
@@ -81,7 +84,7 @@ public class PnlHausarzt extends JPanel {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         split1 = new JSplitPane();
         panel1 = new JPanel();
-        cmbArzt = new JComboBox();
+        cmbBetreuer = new JComboBox();
         btnAdd = new JButton();
         pnlRight = new JPanel();
         panel2 = new JPanel();
@@ -106,14 +109,14 @@ public class PnlHausarzt extends JPanel {
                     "default:grow, $lcgap, default",
                     "2*(default, $lgap), default"));
 
-                //---- cmbArzt ----
-                cmbArzt.addItemListener(new ItemListener() {
+                //---- cmbBetreuer ----
+                cmbBetreuer.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent e) {
                         cmbArztItemStateChanged(e);
                     }
                 });
-                panel1.add(cmbArzt, CC.xy(1, 3));
+                panel1.add(cmbBetreuer, CC.xy(1, 3));
 
                 //---- btnAdd ----
                 btnAdd.setText(null);
@@ -172,7 +175,7 @@ public class PnlHausarzt extends JPanel {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JSplitPane split1;
     private JPanel panel1;
-    private JComboBox cmbArzt;
+    private JComboBox cmbBetreuer;
     private JButton btnAdd;
     private JPanel pnlRight;
     private JPanel panel2;

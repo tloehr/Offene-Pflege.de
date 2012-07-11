@@ -6,9 +6,12 @@ package entity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.swing.*;
+
 import op.OPDE;
 import op.tools.SYSTools;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -16,9 +19,25 @@ import java.util.List;
  * @author tloehr
  */
 public class UsersTools {
-
     public static final short STATUS_INACTIVE = 0;
     public static final short STATUS_ACTIVE = 1;
+
+    public static ListCellRenderer getUserRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                } else if (o instanceof Users) {
+                    text = o.toString();
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
 
     public static boolean isAdmin(Users user) {
         EntityManager em = OPDE.createEM();

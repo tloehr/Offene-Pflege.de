@@ -6,20 +6,20 @@ import java.io.Serializable;
 @Entity
 @Table(name = "Arzt")
 @NamedQueries({
-    @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Arzt a ORDER BY a.name, a.vorname"),
-    @NamedQuery(name = "Arzt.findByArztID", query = "SELECT a FROM Arzt a WHERE a.arztID = :arztID"),
-    @NamedQuery(name = "Arzt.findByAnrede", query = "SELECT a FROM Arzt a WHERE a.anrede = :anrede"),
-    @NamedQuery(name = "Arzt.findByTitel", query = "SELECT a FROM Arzt a WHERE a.titel = :titel"),
-    @NamedQuery(name = "Arzt.findByName", query = "SELECT a FROM Arzt a WHERE a.name = :name"),
-    @NamedQuery(name = "Arzt.findByVorname", query = "SELECT a FROM Arzt a WHERE a.vorname = :vorname"),
-    @NamedQuery(name = "Arzt.findByStrasse", query = "SELECT a FROM Arzt a WHERE a.strasse = :strasse"),
-    @NamedQuery(name = "Arzt.findByPlz", query = "SELECT a FROM Arzt a WHERE a.plz = :plz"),
-    @NamedQuery(name = "Arzt.findByOrt", query = "SELECT a FROM Arzt a WHERE a.ort = :ort"),
-    @NamedQuery(name = "Arzt.findByTel", query = "SELECT a FROM Arzt a WHERE a.tel = :tel"),
-    @NamedQuery(name = "Arzt.findByFax", query = "SELECT a FROM Arzt a WHERE a.fax = :fax"),
-    @NamedQuery(name = "Arzt.findByMobil", query = "SELECT a FROM Arzt a WHERE a.mobil = :mobil"),
-    @NamedQuery(name = "Arzt.findByEMail", query = "SELECT a FROM Arzt a WHERE a.eMail = :eMail"),
-    @NamedQuery(name = "Arzt.findByFach", query = "SELECT a FROM Arzt a WHERE a.fach = :fach")})
+        @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Arzt a ORDER BY a.name, a.vorname"),
+        @NamedQuery(name = "Arzt.findAllActive", query = "SELECT a FROM Arzt a WHERE a.status >= 0 ORDER BY a.name, a.vorname"),
+        @NamedQuery(name = "Arzt.findByArztID", query = "SELECT a FROM Arzt a WHERE a.arztID = :arztID"),
+        @NamedQuery(name = "Arzt.findByAnrede", query = "SELECT a FROM Arzt a WHERE a.anrede = :anrede"),
+        @NamedQuery(name = "Arzt.findByTitel", query = "SELECT a FROM Arzt a WHERE a.titel = :titel"),
+        @NamedQuery(name = "Arzt.findByName", query = "SELECT a FROM Arzt a WHERE a.name = :name"),
+        @NamedQuery(name = "Arzt.findByVorname", query = "SELECT a FROM Arzt a WHERE a.vorname = :vorname"),
+        @NamedQuery(name = "Arzt.findByStrasse", query = "SELECT a FROM Arzt a WHERE a.strasse = :strasse"),
+        @NamedQuery(name = "Arzt.findByPlz", query = "SELECT a FROM Arzt a WHERE a.plz = :plz"),
+        @NamedQuery(name = "Arzt.findByOrt", query = "SELECT a FROM Arzt a WHERE a.ort = :ort"),
+        @NamedQuery(name = "Arzt.findByTel", query = "SELECT a FROM Arzt a WHERE a.tel = :tel"),
+        @NamedQuery(name = "Arzt.findByFax", query = "SELECT a FROM Arzt a WHERE a.fax = :fax"),
+        @NamedQuery(name = "Arzt.findByMobil", query = "SELECT a FROM Arzt a WHERE a.mobil = :mobil"),
+        @NamedQuery(name = "Arzt.findByEMail", query = "SELECT a FROM Arzt a WHERE a.eMail = :eMail")})
 public class Arzt implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -58,19 +58,22 @@ public class Arzt implements Serializable {
     private String mobil;
     @Column(name = "EMail")
     private String eMail;
+    @Column(name = "Status")
+    private Integer status;
 
     public Arzt() {
-//        this.anrede = "";
-//        this.titel = "";
-//        this.name = "";
-//        this.vorname = "";
-//        this.strasse = "";
-//        this.plz = "";
-//        this.ort = "";
-//        this.tel = "";
-//        this.fax = "";
-//        this.eMail = "";
-//        this.mobil = "";
+        this.anrede = "";
+        this.titel = "";
+        this.name = "";
+        this.vorname = "";
+        this.strasse = "";
+        this.plz = "";
+        this.ort = "";
+        this.tel = "";
+        this.fax = "";
+        this.eMail = "";
+        this.mobil = "";
+        this.status = 0;
     }
 
     public Arzt(String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
@@ -131,6 +134,14 @@ public class Arzt implements Serializable {
 
     public void setStrasse(String strasse) {
         this.strasse = strasse;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getPlz() {

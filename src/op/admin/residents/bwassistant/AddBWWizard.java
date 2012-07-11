@@ -1,16 +1,12 @@
 package op.admin.residents.bwassistant;
 
-import com.jidesoft.dialog.ButtonEvent;
-import com.jidesoft.dialog.ButtonNames;
-import com.jidesoft.dialog.PageList;
-import com.jidesoft.wizard.AbstractWizardPage;
-import com.jidesoft.wizard.DefaultWizardPage;
-import com.jidesoft.wizard.WelcomeWizardPage;
-import com.jidesoft.wizard.WizardDialog;
-import entity.Arzt;
-import entity.Bewohner;
-import entity.Users;
+import com.jidesoft.dialog.*;
+import com.jidesoft.wizard.*;
+import entity.*;
+import entity.info.BWInfo;
+import entity.info.BWInfoTypTools;
 import op.OPDE;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
@@ -18,6 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +30,7 @@ public class AddBWWizard {
     private WizardDialog wizard;
     private Bewohner bewohner;
     private Closure finishAction;
+    private BWInfo bwinfo_hauf;
 
     private final int PAGE_WELCOME = 0;
     private final int PAGE_BASISINFO = 1;
@@ -55,13 +53,16 @@ public class AddBWWizard {
         AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString(internalClassID + ".page1.title"), OPDE.lang.getString(internalClassID + ".page1.description"));
         AbstractWizardPage page2 = new BasisInfoPage(OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".title"), OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".description"));
         AbstractWizardPage page3 = new BVPage(OPDE.lang.getString(PnlBV.internalClassID + ".title"), OPDE.lang.getString(PnlBV.internalClassID + ".description"));
-//        AbstractWizardPage page6 = new CompletionPage("Zusammenfassung", "Bitte prüfen Sie hier Ihre Eingaben.");
+        AbstractWizardPage page4 = new HausarztPage(OPDE.lang.getString(PnlHausarzt.internalClassID + ".title"), OPDE.lang.getString(PnlHausarzt.internalClassID + ".description"));
+        AbstractWizardPage page5 = new BetreuerPage(OPDE.lang.getString(PnlBetreuer.internalClassID + ".title"), OPDE.lang.getString(PnlBetreuer.internalClassID + ".description"));
+        AbstractWizardPage page6 = new HaufPage(OPDE.lang.getString(PnlHAUF.internalClassID + ".title"), OPDE.lang.getString(PnlHAUF.internalClassID + ".description"));
+        AbstractWizardPage page7 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page7.title"), OPDE.lang.getString(internalClassID + ".page7.description"));
 
         model.append(page1);
         model.append(page2);
         model.append(page3);
-//        model.append(page4);
-//        model.append(page5);
+        model.append(page4);
+        model.append(page5);
 //        model.append(page6);
 
         wizard.setPageList(model);
@@ -224,7 +225,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner.getBv1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(bewohner == null || bewohner.getBv1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -235,9 +236,7 @@ public class AddBWWizard {
             addComponent(new PnlBV(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    if (o != null) {
-                        bewohner.setBv1((Users) o);
-                    }
+                    bewohner.setBv1((Users) o);
                     setupWizardButtons();
                 }
             }), true);
@@ -245,9 +244,29 @@ public class AddBWWizard {
     }
 
     private class HausarztPage extends DefaultWizardPage {
+        private PnlHausarzt pnlHausarzt;
+        private boolean alreadyexecute = false;
 
         public HausarztPage(String title, String description) {
             super(title, description);
+            pnlHausarzt = new PnlHausarzt(new Closure() {
+                @Override
+                public void execute(Object o) {
+                    if (o != null) {
+                        bewohner.setHausarzt((Arzt) o);
+                    }
+                    setupWizardButtons();
+                }
+            });
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (!alreadyexecute && pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                        alreadyexecute = true;
+                        pnlHausarzt.initSplitPanel();
+                    }
+                }
+            });
             setupWizardButtons();
         }
 
@@ -256,7 +275,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner.getHausarzt() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(bewohner == null || bewohner.getHausarzt() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -264,12 +283,90 @@ public class AddBWWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(new PnlHausarzt(new Closure() {
+            addComponent(pnlHausarzt, true);
+        }
+    }
+
+
+    private class BetreuerPage extends DefaultWizardPage {
+        private PnlBetreuer pnlBetreuer;
+        private boolean alreadyexecute = false;
+
+        public BetreuerPage(String title, String description) {
+            super(title, description);
+            pnlBetreuer = new PnlBetreuer(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    if (o != null) {
-                        bewohner.setHausarzt((Arzt) o);
+                    bewohner.setBetreuer1((Betreuer) o);
+                    setupWizardButtons();
+                }
+            });
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (!alreadyexecute && pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                        alreadyexecute = true;
+                        pnlBetreuer.initSplitPanel();
                     }
+                }
+            });
+            setupWizardButtons();
+        }
+
+        @Override
+        public void setupWizardButtons() {
+            super.setupWizardButtons();
+
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
+            fireButtonEvent(bewohner == null || bewohner.getBetreuer1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
+        }
+
+        @Override
+        protected void initContentPane() {
+            super.initContentPane();
+            addComponent(pnlBetreuer, true);
+        }
+    }
+
+
+    private class HaufPage extends DefaultWizardPage {
+
+        public HaufPage(String title, String description) {
+            super(title, description);
+        }
+
+        @Override
+        public void setupWizardButtons() {
+            super.setupWizardButtons();
+
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
+            fireButtonEvent(bewohner == null || bwinfo_hauf == null || bewohner.getStation() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
+        }
+
+//        @Override
+//        public Image getGraphic() {
+//            return getLeftGraphic("/artwork/aspecton1.png");
+//        }
+
+        @Override
+        protected void initContentPane() {
+            super.initContentPane();
+            addComponent(new PnlHAUF(new Closure() {
+                @Override
+                public void execute(Object o) {
+                    Date hauf = ((Pair<Date, Stationen>) o).getFirst();
+                    Stationen station = ((Pair<Date, Stationen>) o).getSecond();
+                    if (hauf != null) {
+                        bwinfo_hauf = new BWInfo(BWInfoTypTools.findByBWINFTYP("HAUF"), bewohner);
+                        bwinfo_hauf.setVon(hauf);
+                    } else {
+                        bwinfo_hauf = null;
+                    }
+                    bewohner.setStation(station);
                     setupWizardButtons();
                 }
             }), true);
@@ -277,65 +374,65 @@ public class AddBWWizard {
     }
 
 
-//    private class CompletionPage extends CompletionWizardPage {
-//        public CompletionPage(String title, String description) {
-//            super(title, description);
+    private class CompletionPage extends CompletionWizardPage {
+        public CompletionPage(String title, String description) {
+            super(title, description);
 //            setLeftPaneItems(LEFTPANE_GRAPHIC);
-//            addPageListener(new PageListener() {
-//                @Override
-//                public void pageEventFired(PageEvent pageEvent) {
-//                    if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-//                        OPDE.debug("CompletionPage OPENDED");
-//                    }
-//                }
-//            });
-//        }
-//
-//        @Override
-//        protected void initContentPane() {
-//            super.initContentPane();
-//
-//            JTextPane txt = new JTextPane();
-//            txt.setEditable(false);
-//            txt.setContentType("text/html");
-//            txt.setOpaque(false);
-//            txt.setText("<html><font face=\"" + OPDE.arial14.getFamily() + "\">" +
-//                    check() +
-//                    "</font>" +
-//                    "</html>");
-//
-//            addComponent(txt, true);
-//            addSpace();
-//            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", OPDE.arial14);
-//        }
-//
-//        @Override
-//        public void setupWizardButtons() {
-//            super.setupWizardButtons();
-//            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
-//        }
-//
-//        private String check() {
-//            String result = "<b>" + OPDE.lang.getString(internalClassID + ".summaryline1") + "</b><br/>";
-//            result += OPDE.lang.getString(internalClassID + ".summaryline2") + "<br/>";
-//            result += "<ul>";
-//            result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-//            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + DarreichungTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-//            result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackungTools.toPrettyString(packung) + "</b></li>";
-//
-//            MedHersteller displayHersteller = hersteller == null ? produkt.getHersteller() : hersteller;
-//            result += "<li>Hersteller: <b>" + displayHersteller.getFirma() + ", " + displayHersteller.getOrt() + "</b>" + (displayHersteller.getMphid() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-//
-//            result += "</ul>";
-//
-//            result += "<p>";
-//            result += "Wenn Sie sicher sind, dann bestätigen Sie nun die Eingaben. Ansonsten gehen Sie einfach zurück und korrigieren das Nötige.</p>" +
-//                    "</font>";
-//            return result;
-//        }
-//
-//
-//    }
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                        OPDE.debug("CompletionPage OPENDED");
+                    }
+                }
+            });
+        }
+
+        @Override
+        protected void initContentPane() {
+            super.initContentPane();
+
+            JTextPane txt = new JTextPane();
+            txt.setEditable(false);
+            txt.setContentType("text/html");
+            txt.setOpaque(false);
+            txt.setText("<html><font face=\"" + OPDE.arial14.getFamily() + "\">" +
+                    check() +
+                    "</font>" +
+                    "</html>");
+
+            addComponent(txt, true);
+            addSpace();
+            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", OPDE.arial14);
+        }
+
+        @Override
+        public void setupWizardButtons() {
+            super.setupWizardButtons();
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
+        }
+
+        private String check() {
+            String result = "<b>" + OPDE.lang.getString(internalClassID + ".summaryline1") + "</b><br/>";
+            result += OPDE.lang.getString(internalClassID + ".summaryline2") + "<br/>";
+            result += "<ul>";
+            result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + DarreichungTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackungTools.toPrettyString(packung) + "</b></li>";
+
+            MedHersteller displayHersteller = hersteller == null ? produkt.getHersteller() : hersteller;
+            result += "<li>Hersteller: <b>" + displayHersteller.getFirma() + ", " + displayHersteller.getOrt() + "</b>" + (displayHersteller.getMphid() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+
+            result += "</ul>";
+
+            result += "<p>";
+            result += "Wenn Sie sicher sind, dann bestätigen Sie nun die Eingaben. Ansonsten gehen Sie einfach zurück und korrigieren das Nötige.</p>" +
+                    "</font>";
+            return result;
+        }
+
+
+    }
 
 
 }

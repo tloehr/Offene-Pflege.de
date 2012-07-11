@@ -50,6 +50,9 @@ public class PnlBWBasisInfo extends JPanel {
         lblGebdatum.setText(OPDE.lang.getString("misc.msg.dob"));
         lblGeschlecht.setText(OPDE.lang.getString("misc.msg.gender"));
         cmbGender.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")}));
+        jdcDOB.setMaxSelectableDate(new Date());
+        jdcDOB.setDate(new Date());
+        gebdatum = jdcDOB.getDate();
     }
 
     private void jdcDOBPropertyChange(PropertyChangeEvent e) {

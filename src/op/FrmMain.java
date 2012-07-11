@@ -433,6 +433,7 @@ public class FrmMain extends JFrame {
                     }).getWizard();
                     dlg.setContentPane(wizard.getContentPane());
                     dlg.pack();
+                    dlg.setSize(new Dimension(800, 550));
                     dlg.setVisible(true);
                 }
             });

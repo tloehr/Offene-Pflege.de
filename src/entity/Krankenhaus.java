@@ -7,6 +7,7 @@ import java.io.Serializable;
 @Table(name = "KH")
 @NamedQueries({
     @NamedQuery(name = "Krankenhaus.findAll", query = "SELECT k FROM Krankenhaus k ORDER BY k.name"),
+        @NamedQuery(name = "Krankenhaus.findAllActive", query = "SELECT k FROM Krankenhaus k WHERE k.status >= 0 ORDER BY k.name"),
     @NamedQuery(name = "Krankenhaus.findByKhid", query = "SELECT k FROM Krankenhaus k WHERE k.khid = :khid"),
     @NamedQuery(name = "Krankenhaus.findByName", query = "SELECT k FROM Krankenhaus k WHERE k.name = :name"),
     @NamedQuery(name = "Krankenhaus.findByStrasse", query = "SELECT k FROM Krankenhaus k WHERE k.strasse = :strasse"),
@@ -34,6 +35,8 @@ public class Krankenhaus implements Serializable {
     private String tel;
     @Column(name = "Fax")
     private String fax;
+    @Column(name = "Status")
+    private Integer status;
 
     public Krankenhaus() {
     }
@@ -68,6 +71,14 @@ public class Krankenhaus implements Serializable {
 
     public void setPlz(String plz) {
         this.plz = plz;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getOrt() {

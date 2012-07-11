@@ -1,5 +1,6 @@
 package entity;
 
+import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -20,7 +21,7 @@ public class KrankenhausTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
                 } else if (o instanceof Krankenhaus) {
                     text = ((Krankenhaus) o).getName() + ", " + ((Krankenhaus) o).getOrt();
                 } else {

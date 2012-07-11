@@ -53,7 +53,7 @@ public class MedProductWizard {
     }
 
     private void createWizard(){
-        wizard = new WizardDialog(new JFrame(), false);
+        wizard = new WizardDialog(OPDE.getMainframe(), false);
         PageList model = new PageList();
 
         AbstractWizardPage page1 = new WelcomePage("Assistent zur Eingabe von Medizin-Produkten",
@@ -191,16 +191,16 @@ public class MedProductWizard {
             super(title, description);
             setLeftPaneItems(LEFTPANE_GRAPHIC);
 
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
-                        OPDE.debug(pageEvent.getSource());
-                    } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        OPDE.debug("ProduktPage OPENDED");
-                    }
-                }
-            });
+//            addPageListener(new PageListener() {
+//                @Override
+//                public void pageEventFired(PageEvent pageEvent) {
+//                    if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
+//                        OPDE.debug(pageEvent.getSource());
+//                    } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+//                        OPDE.debug("ProduktPage OPENDED");
+//                    }
+//                }
+//            });
         }
 
         @Override

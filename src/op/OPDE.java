@@ -506,8 +506,8 @@ public class OPDE {
 
             // Cache abschalten
             jpaProps.put("eclipselink.cache.shared.default", "false");
-//            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-            jpaProps.put("eclipselink.logging.level", SessionLog.FINER);
+            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+//            jpaProps.put("eclipselink.logging.level", "FINER");
 
 
 
