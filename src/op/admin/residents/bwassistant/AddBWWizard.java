@@ -5,15 +5,21 @@ import com.jidesoft.wizard.*;
 import entity.*;
 import entity.info.BWInfo;
 import entity.info.BWInfoTypTools;
+import entity.system.Unique;
+import entity.system.UniqueTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -31,14 +37,6 @@ public class AddBWWizard {
     private Bewohner bewohner;
     private Closure finishAction;
     private BWInfo bwinfo_hauf;
-
-    private final int PAGE_WELCOME = 0;
-    private final int PAGE_BASISINFO = 1;
-    private final int PAGE_HAUSARZT = 2;
-    private final int PAGE_BETREUER = 3;
-    private final int PAGE_BV = 4;
-    private final int PAGE_AUFNAHME = 5;
-    private final int PAGE_SUMMARY = 6;
 
     public AddBWWizard(Closure finishAction) {
         this.finishAction = finishAction;
@@ -63,7 +61,8 @@ public class AddBWWizard {
         model.append(page3);
         model.append(page4);
         model.append(page5);
-//        model.append(page6);
+        model.append(page6);
+        model.append(page7);
 
         wizard.setPageList(model);
 
@@ -105,33 +104,31 @@ public class AddBWWizard {
     }
 
     private void save() {
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-//            produkt = em.merge(produkt);
-//            darreichung = em.merge(darreichung);
-//            packung = em.merge(packung);
-//            if (hersteller != null) {
-//                hersteller = em.merge(hersteller);
-//            }
-//
-//            if (!produkt.getDarreichungen().contains(darreichung)) {
-//                produkt.getDarreichungen().add(darreichung);
-//            }
-//
-//            darreichung.getPackungen().add(packung);
-//
-//            em.getTransaction().commit();
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + DarreichungTools.toPrettyString(darreichung) + ", " + MedPackungTools.toPrettyString(packung) + " erfolgreich eingetragen", 6));
-//            finishAction.execute(packung);
-//        } catch (Exception e) {
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+
+
+            String prefix = bewohner.getNachname().substring(0, 1) + bewohner.getVorname().substring(0, 1);
+            prefix = prefix.toUpperCase();
+
+            Unique unique = UniqueTools.getNewUID(em, prefix);
+            String bwkennung = prefix + unique.getUid();
+            bewohner.setBWKennung(bwkennung);
+
+            bewohner = em.merge(bewohner);
+            bwinfo_hauf = em.merge(bwinfo_hauf);
+            em.getTransaction().commit();
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(BewohnerTools.getBWLabelTextKompakt(bewohner) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
+            finishAction.execute(bewohner);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
     }
 
     private class WelcomePage extends WelcomeWizardPage {
@@ -378,14 +375,14 @@ public class AddBWWizard {
         public CompletionPage(String title, String description) {
             super(title, description);
 //            setLeftPaneItems(LEFTPANE_GRAPHIC);
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        OPDE.debug("CompletionPage OPENDED");
-                    }
-                }
-            });
+//            addPageListener(new PageListener() {
+//                @Override
+//                public void pageEventFired(PageEvent pageEvent) {
+//                    if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+//                        OPDE.debug("CompletionPage OPENDED");
+//                    }
+//                }
+//            });
         }
 
         @Override
@@ -396,38 +393,38 @@ public class AddBWWizard {
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText("<html><font face=\"" + OPDE.arial14.getFamily() + "\">" +
-                    check() +
-                    "</font>" +
-                    "</html>");
+            txt.setText(SYSTools.toHTMLForScreen(check()));
 
             addComponent(txt, true);
             addSpace();
-            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", OPDE.arial14);
+//            addText("Drücken Sie auf FERTIG, wenn's los gehen soll.", OPDE.arial14);
         }
 
         @Override
         public void setupWizardButtons() {
             super.setupWizardButtons();
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
+            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
         private String check() {
-            String result = "<b>" + OPDE.lang.getString(internalClassID + ".summaryline1") + "</b><br/>";
-            result += OPDE.lang.getString(internalClassID + ".summaryline2") + "<br/>";
+            String result = "<b>" + OPDE.lang.getString(internalClassID + ".page7.summaryline1") + "</b><br/>";
+            result += OPDE.lang.getString(internalClassID + ".page7.summaryline2") + "<br/>";
             result += "<ul>";
-            result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + DarreichungTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackungTools.toPrettyString(packung) + "</b></li>";
+            result += "<li>" + BewohnerTools.getFullName(bewohner) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.bv") + ": " + bewohner.getBv1().getNameUndVorname() + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + ArztTools.getFullName(bewohner.getHausarzt()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.lg") + ": " + BetreuerTools.getFullName(bewohner.getBetreuer1()) + "</li>";
 
-            MedHersteller displayHersteller = hersteller == null ? produkt.getHersteller() : hersteller;
-            result += "<li>Hersteller: <b>" + displayHersteller.getFirma() + ", " + displayHersteller.getOrt() + "</b>" + (displayHersteller.getMphid() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getVon()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + bewohner.getStation().getBezeichnung() + "</li>";
 
             result += "</ul>";
 
-            result += "<p>";
-            result += "Wenn Sie sicher sind, dann bestätigen Sie nun die Eingaben. Ansonsten gehen Sie einfach zurück und korrigieren das Nötige.</p>" +
-                    "</font>";
+            result += "<p>" + OPDE.lang.getString(internalClassID + ".page7.summaryline3") + "</p>";
             return result;
         }
 

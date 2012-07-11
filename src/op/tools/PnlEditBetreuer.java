@@ -11,6 +11,8 @@ import op.OPDE;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 /**
  * @author Torsten Löhr
@@ -46,14 +48,33 @@ public class PnlEditBetreuer extends JPanel {
         txtPLZ.setText(betreuer.getPlz());
         txtOrt.setText(betreuer.getOrt());
         txtTel.setText(betreuer.getTel());
+        txtPrivate.setText(betreuer.getPrivat());
         txtFax.setText(betreuer.getFax());
         txtMobil.setText(SYSTools.catchNull(betreuer.getOrt()));
-        txtEMAIL.setText(SYSTools.catchNull(betreuer.getOrt()));
+        txtEMAIL.setText(SYSTools.catchNull(betreuer.getEMail()));
 
+        FocusAdapter fa = new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                ((JTextField) focusEvent.getSource()).selectAll();
+            }
+        };
+
+        txtAnrede.addFocusListener(fa);
+        txtNachname.addFocusListener(fa);
+        txtVorname.addFocusListener(fa);
+        txtStrasse.addFocusListener(fa);
+        txtPLZ.addFocusListener(fa);
+        txtOrt.addFocusListener(fa);
+        txtTel.addFocusListener(fa);
+        txtPrivate.addFocusListener(fa);
+        txtFax.addFocusListener(fa);
+        txtMobil.addFocusListener(fa);
+        txtEMAIL.addFocusListener(fa);
     }
 
     public Betreuer getBetreuer(){
-        if (txtNachname.getText().isEmpty() || txtVorname.getText().isEmpty()){
+        if (txtNachname.getText().isEmpty()){
             return null;
         }
 

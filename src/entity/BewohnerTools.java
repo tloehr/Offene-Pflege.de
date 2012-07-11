@@ -27,7 +27,8 @@ public class BewohnerTools {
 
     public static final int GESCHLECHT_MAENNLICH = 1;
     public static final int GESCHLECHT_WEIBLICH = 2;
-    public static final String GESCHLECHT[] = {"", "männlich", "weiblich"};
+    public static final String GESCHLECHT[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
+    public static final String ANREDE[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
 
     public static Bewohner findByBWKennung(String bwkennung) {
         EntityManager em = OPDE.createEM();
@@ -53,7 +54,7 @@ public class BewohnerTools {
     }
 
     public static String getBWLabelTextKompakt(Bewohner bewohner) {
-        return bewohner.getNachname() + ", " + bewohner.getVorname() +" [" + bewohner.getBWKennung() + "]";
+        return bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getBWKennung() + "]";
     }
 
 
@@ -62,6 +63,10 @@ public class BewohnerTools {
         lblBW.setHorizontalAlignment(SwingConstants.LEADING);
         lblBW.setForeground(new java.awt.Color(255, 51, 0));
         lblBW.setText(getBWLabelText(bewohner));
+    }
+
+    public static String getFullName(Bewohner bewohner) {
+        return ANREDE[bewohner.getGeschlecht()] + " " + bewohner.getVorname() + " " + bewohner.getNachname();
     }
 
     public static boolean isWeiblich(Bewohner bewohner) {
@@ -114,9 +119,6 @@ public class BewohnerTools {
             applyClosure.execute(bewohner);
         }
     }
-
-
-
 
 
 }

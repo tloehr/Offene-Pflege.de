@@ -27,16 +27,19 @@
 package op.care;
 
 import entity.*;
+import entity.info.BWInfo;
+import entity.info.BWInfoTools;
+import entity.info.BWInfoTypTools;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
-import op.share.bwinfo.BWInfo;
 import op.share.bwinfo.TMBWInfo;
-import op.tools.*;
-import org.xml.sax.Attributes;
+import op.tools.DlgException;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.persistence.EntityManager;
@@ -47,9 +50,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author root
@@ -60,25 +63,49 @@ public class DBHandling {
                                          boolean mitEinrichtung, boolean medi, boolean bilanz, boolean bericht,
                                          boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean bwi) {
 
+
+        /***
+         *      _   _                _
+         *     | | | | ___  __ _  __| | ___ _ __
+         *     | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     |  _  |  __/ (_| | (_| |  __/ |
+         *     |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
         String result = "<h1 id=\"fonth1\">Pflegeinformationen</h1>";
-        String bwkennung = bewohner.getBWKennung();
+
         DateFormat df = DateFormat.getDateInstance();
         if (print) {
-            result += "<h2 id=\"fonth2\">" + SYSTools.getBWLabel(bwkennung) + "</h2>";
+            result += "<h2 id=\"fonth2\">" + BewohnerTools.getBWLabelText(bewohner) + "</h2>";
         }
         result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
+
         if (print) {
-//            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
-            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(SYSCalendar.nowDB()) + " (" + OPDE.getLogin().getUser().getNameUndVorname() + ")</b></td></tr>";
+            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(new Date()) + " (" + OPDE.getLogin().getUser().getNameUndVorname() + ")</b></td></tr>";
         }
 
+        /***
+         *      _____ _            _      _     _
+         *     | ____(_)_ __  _ __(_) ___| |__ | |_ _   _ _ __   __ _
+         *     |  _| | | '_ \| '__| |/ __| '_ \| __| | | | '_ \ / _` |
+         *     | |___| | | | | |  | | (__| | | | |_| |_| | | | | (_| |
+         *     |_____|_|_| |_|_|  |_|\___|_| |_|\__|\__,_|_| |_|\__, |
+         *                                                      |___/
+         */
         if (mitEinrichtung) {
             if (bewohner.getStation() != null) {
-                Einrichtungen einrichtung = bewohner.getStation().getEinrichtung();
-                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + einrichtung.getBezeichnung() + ", " + einrichtung.getStrasse() + ", " + einrichtung.getPlz() + " " + einrichtung.getOrt() + ", Tel.: " + einrichtung.getTel() + ", Fax.: " + einrichtung.getFax() + "</b></td></tr>";
+                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + EinrichtungenTools.getAsText(bewohner.getStation().getEinrichtung()) + "</b></td></tr>";
             }
         }
 
+        /***
+         *       ____     _   _  ___         ______               _      _     _      ______  __  __ ___
+         *      / ___|_ _(_)_(_)/ _ \ ___   / / ___| _____      _(_) ___| |__ | |_   / / __ )|  \/  |_ _|
+         *     | |  _| '__/ _ \| |/ // _ \ / / |  _ / _ \ \ /\ / / |/ __| '_ \| __| / /|  _ \| |\/| || |
+         *     | |_| | | | (_) | |\ \  __// /| |_| |  __/\ V  V /| | (__| | | | |_ / / | |_) | |  | || |
+         *      \____|_|  \___/| ||_/\___/_/  \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___|
+         *                     |_|
+         */
         BWerte gewicht = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GEWICHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (gewicht == null) {
@@ -102,12 +129,18 @@ public class DBHandling {
             result += "Ein BMI kann noch nicht bestimmt werden.";
         } else {
             BigDecimal bmi = gewicht.getWert().divide(groesse.getWert().pow(2), 2, BigDecimal.ROUND_HALF_UP);
-//            Double abmi = ((Double) gewicht.get(1)).doubleValue() / (((Double) groesse.get(1)).doubleValue() * ((Double) groesse.get(1)).doubleValue());
-//            bmi = Math.round(bmi * 100.) / 100.;
             result += bmi.toPlainString();
         }
         result += "</b></td></tr>";
 
+        /***
+         *      ____ _____
+         *     | __ )__  /
+         *     |  _ \ / /
+         *     | |_) / /_
+         *     |____/____|
+         *
+         */
         BWerte bz = BWerteTools.getLetztenBWert(bewohner, BWerteTools.BZ);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
@@ -117,92 +150,107 @@ public class DBHandling {
         }
         result += "</b></td></tr>";
 
-        boolean bilanzdurchbwinfo = false;
-        int trinkmin = 0;
-        int trinkmax = 0;
-        if (bilanz) {
-            BWInfo bwinfo4 = new BWInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
-            if (bwinfo4.getAttribute().size() > 0) {
-                HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
-                bilanzdurchbwinfo = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
-
-                boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
-                boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
-                if (minkontrolle || maxkontrolle) {
-                    trinkmin = Integer.parseInt(antwort.get("c.einfmenge").toString());
-                    trinkmax = Integer.parseInt(antwort.get("c.uebermenge").toString());
-                    result += "<tr><td valign=\"top\">Trinkmenge</td><td valign=\"top\">";
-                    if (minkontrolle) {
-                        result += "Die Trinkmenge sollte nicht <b><u>unter</u> " + trinkmin + " ml in 24h</b> liegen.<br/>";
-                    }
-                    if (maxkontrolle) {
-                        result += "Die Trinkmenge sollte nicht <b><u>über</u> " + trinkmax + " ml in 24h</b> liegen.";
-                    }
-                    result += "</td></tr>";
-                }
-            }
-            bwinfo4.cleanup();
-        }
-        bilanzdurchbwinfo &= bilanz;
-
-//        boolean zieltrinkmenge = false;
-//        int zieltrink = 0;
-//        BWInfo bwinfo3 = new BWInfo(bwkennung, "ZIELTRINK", SYSCalendar.nowDBDate());
-//        if (bwinfo3.getAttribute().size() > 0) {
-//            TMBWInfo tmbwi3 = new TMBWInfo(bwinfo3.getAttribute(), true, false, false);
-//            HashMap antwort = (HashMap) ((HashMap) bwinfo3.getAttribute().get(0)).get("antwort");
-//            zieltrink = Integer.parseInt(antwort.get("zieltrinkmenge").toString());
-//            zieltrinkmenge = true;
-//            result += "<tr><td valign=\"top\">Zieltrinkmenge</td><td valign=\"top\">";
-//            result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi3.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-//            result += "</td></tr>";
+        /***
+         *      ____  _ _                    _______ ___  ____   _____
+         *     | __ )(_) | __ _ _ __  ____  / /_   _/ _ \|  _ \ / _ \ \
+         *     |  _ \| | |/ _` | '_ \|_  / | |  | || | | | | | | | | | |
+         *     | |_) | | | (_| | | | |/ /  | |  | || |_| | |_| | |_| | |
+         *     |____/|_|_|\__,_|_| |_/___| | |  |_| \___/|____/ \___/| |
+         *                                  \_\                     /_/
+         */
+//        boolean bilanzdurchbwinfo = false;
+//        int trinkmin = 0;
+//        int trinkmax = 0;
+//        if (bilanz) {
+//            BWInfo bwinfo4 = new BWInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
+//            if (bwinfo4.getAttribute().size() > 0) {
+//                HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
+//                bilanzdurchbwinfo = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
+//
+//                boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
+//                boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
+//                if (minkontrolle || maxkontrolle) {
+//                    trinkmin = Integer.parseInt(antwort.get("c.einfmenge").toString());
+//                    trinkmax = Integer.parseInt(antwort.get("c.uebermenge").toString());
+//                    result += "<tr><td valign=\"top\">Trinkmenge</td><td valign=\"top\">";
+//                    if (minkontrolle) {
+//                        result += "Die Trinkmenge sollte nicht <b><u>unter</u> " + trinkmin + " ml in 24h</b> liegen.<br/>";
+//                    }
+//                    if (maxkontrolle) {
+//                        result += "Die Trinkmenge sollte nicht <b><u>über</u> " + trinkmax + " ml in 24h</b> liegen.";
+//                    }
+//                    result += "</td></tr>";
+//                }
+//            }
+//            bwinfo4.cleanup();
 //        }
-//        bwinfo3.cleanup();
-//        zieltrinkmenge &= bilanz;
+//        bilanzdurchbwinfo &= bilanz;
 
-        // Beginn des aktuellen Heimaufenthaltes.
 
-        BWInfo bwinfoHAUF = new BWInfo(bwkennung, "HAUF", SYSCalendar.nowDBDate());
-        if (bwinfoHAUF.getAttribute().size() > 0) {
-            TMBWInfo tmbwihauf = new TMBWInfo(bwinfoHAUF.getAttribute(), true, false, false);
-            result += "<tr><td valign=\"top\">Heimaufnahme</td><td valign=\"top\">";
-//            DateFormat df = DateFormat.getDateInstance();
-            result += "<b>" + df.format(bwinfoHAUF.getVonHauf()) + "</b>";
+        /***
+         *      _   _    _   _   _ _____
+         *     | | | |  / \ | | | |  ___|
+         *     | |_| | / _ \| | | | |_
+         *     |  _  |/ ___ \ |_| |  _|
+         *     |_| |_/_/   \_\___/|_|
+         *
+         */
+        BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
+        if (bwinfo_hauf != null) {
+            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
+            result += "<b>" + df.format(bwinfo_hauf.getVon()) + "</b>";
             result += "</td></tr>";
         }
-        bwinfoHAUF.cleanup();
 
-
-        BWInfo bwinfoPS = new BWInfo(bwkennung, "PSTF", SYSCalendar.nowDBDate());
-        if (bwinfoPS.getAttribute().size() > 0) {
-            TMBWInfo tmbwips = new TMBWInfo(bwinfoPS.getAttribute(), true, false, false);
-            result += "<tr><td valign=\"top\">Pflegestufe</td><td valign=\"top\">";
-            result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwips.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+        /***
+         *      ____  ____
+         *     |  _ \/ ___|
+         *     | |_) \___ \
+         *     |  __/ ___) |
+         *     |_|   |____/
+         *
+         */
+        BWInfo bwinfo_pstf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("PSTF"));
+        if (bwinfo_pstf != null) {
+            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
+            result += bwinfo_pstf.getHtml();
             result += "</td></tr>";
         }
-        bwinfoPS.cleanup();
-
-        BWInfo bwinfo1 = new BWInfo(bwkennung, "BETREUER1", SYSCalendar.nowDBDate());
-        if (bwinfo1.getAttribute().size() > 0) {
-            TMBWInfo tmbwi1 = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
-            result += "<tr><td valign=\"top\">BetreuerIn</td><td valign=\"top\">";
-            result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi1.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+        /***
+         *      ____       _
+         *     | __ )  ___| |_ _ __ ___ _   _  ___ _ __
+         *     |  _ \ / _ \ __| '__/ _ \ | | |/ _ \ '__|
+         *     | |_) |  __/ |_| | |  __/ |_| |  __/ |
+         *     |____/ \___|\__|_|  \___|\__,_|\___|_|
+         *
+         */
+        if (bewohner.getBetreuer1() != null) {
+            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lg") + "</td><td valign=\"top\">";
+            result += BetreuerTools.getFullName(bewohner.getBetreuer1());
             result += "</td></tr>";
         }
-        bwinfo1.cleanup();
 
-        BWInfo bwinfo2 = new BWInfo(bwkennung, "ANGEH", SYSCalendar.nowDBDate());
-        if (bwinfo2.getAttribute().size() > 0) {
-            TMBWInfo tmbwi2 = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
-            result += "<tr><td valign=\"top\">Angehörige</td><td valign=\"top\">";
-            result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi2.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+        /***
+         *         _                     _     _   _      _
+         *        / \   _ __   __ _  ___| |__ (_)_(_)_ __(_) __ _  ___
+         *       / _ \ | '_ \ / _` |/ _ \ '_ \ / _ \| '__| |/ _` |/ _ \
+         *      / ___ \| | | | (_| |  __/ | | | (_) | |  | | (_| |  __/
+         *     /_/   \_\_| |_|\__, |\___|_| |_|\___/|_|  |_|\__, |\___|
+         *                    |___/                         |___/
+         */
+        BWInfo bwinfo_angeh = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("ANGEH"));
+        if (bwinfo_angeh != null) {
+            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
+            result += bwinfo_angeh.getHtml();
             result += "</td></tr>";
         }
-        bwinfo2.cleanup();
 
         result += "</table>";
 
-        result += getAerzte(bwkennung);
+        if (bewohner.getHausarzt() != null) {
+            result += "<h2>" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
+            result += ArztTools.getFullName(bewohner.getHausarzt());
+        }
 
         if (diag) {
             result += getDiagnosen(bwkennung);
@@ -450,18 +498,22 @@ public class DBHandling {
         return result;
     }
 
-    private static String getDiagnosen(String bwkennung) {
-        String result = "";
-        BWInfo bwinfo = new BWInfo(bwkennung, "DIAG", SYSCalendar.nowDBDate());
-        //TMBWInfo tmbwi = new TMBWInfo(bwinfo.getAttribute(), true, false);
+    private static String getDiagnosen(Bewohner bewohner) {
 
-        int numBwi = bwinfo.getAttribute().size();
-        if (numBwi > 0) {
-            result += "<h2>Diagnosen</h2>";
-            result +=
-                    "<table border=\"1\" cellspacing=\"0\">";
-            result +=
-                    "<tr><th>ICD</th><th>Diagnose</th><th>Körperseite</th><th>Diagnose-Sicherheit</th></tr>";
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.bis < :bis ORDER BY b.von DESC");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("bwinfotyp", BWInfoTypTools.findByBWINFTYP("DIAG"));
+        query.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);
+        List<BWInfo> diags = query.getResultList();
+        em.close();
+
+        String result = "";
+
+        if (diags.size() > 0) {
+            result += "<h2>" + OPDE.lang.getString("misc.msg.diags") + "</h2>";
+            result += "<table border=\"1\" cellspacing=\"0\">";
+            result += "<tr><th>ICD</th><th>Diagnose</th><th>Körperseite</th><th>Diagnose-Sicherheit</th></tr>";
             for (int v = 0; v
                     < numBwi; v++) {
                 HashMap hm = (HashMap) bwinfo.getAttribute().get(v);
@@ -487,70 +539,70 @@ public class DBHandling {
         return result;
     }
 
-    private static String getAerzte(String bwkennung) {
-        String result = "";
-        BWInfo bwinfo1 = new BWInfo(bwkennung, "HAUSARZT", SYSCalendar.nowDBDate());
-        BWInfo bwinfo2 = new BWInfo(bwkennung, "FACHARZT", SYSCalendar.nowDBDate());
+//    private static String getAerzte(String bwkennung) {
+//        String result = "";
+//        BWInfo bwinfo1 = new BWInfo(bwkennung, "HAUSARZT", SYSCalendar.nowDBDate());
+//        BWInfo bwinfo2 = new BWInfo(bwkennung, "FACHARZT", SYSCalendar.nowDBDate());
+//
+//        int numBwi1 = bwinfo1.getAttribute().size();
+//        int numBwi2 = bwinfo2.getAttribute().size();
+//
+//        if (numBwi1 + numBwi2 > 0) {
+//            result += "<h2>Ärzte</h2>";
+//            if (numBwi1 > 0) {
+//                TMBWInfo tmbwi = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
+//                result +=
+//                        SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi.getValueAt(0, TMBWInfo.COL_HTML).toString()));
+//            }
+//
+//            if (numBwi2 > 0) {
+//                TMBWInfo tmbwi = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
+//                for (int v = 0; v
+//                        < numBwi2; v++) {
+//                    //HashMap hm = (HashMap) bwinfo2.getAttribute().get(v);
+//                    //String xml = hm.get("xmlc").toString();
+//                    result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi.getValueAt(v, TMBWInfo.COL_HTML).toString()));
+//                }
+////result += "</table>";
+//
+//            }
+//        }
+//        bwinfo1.cleanup();
+//        bwinfo2.cleanup();
+//        return result;
+//    }
 
-        int numBwi1 = bwinfo1.getAttribute().size();
-        int numBwi2 = bwinfo2.getAttribute().size();
-
-        if (numBwi1 + numBwi2 > 0) {
-            result += "<h2>Ärzte</h2>";
-            if (numBwi1 > 0) {
-                TMBWInfo tmbwi = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
-                result +=
-                        SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-            }
-
-            if (numBwi2 > 0) {
-                TMBWInfo tmbwi = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
-                for (int v = 0; v
-                        < numBwi2; v++) {
-                    //HashMap hm = (HashMap) bwinfo2.getAttribute().get(v);
-                    //String xml = hm.get("xmlc").toString();
-                    result += SYSTools.anonymizeString(SYSTools.unHTML2(tmbwi.getValueAt(v, TMBWInfo.COL_HTML).toString()));
-                }
-//result += "</table>";
-
-            }
-        }
-        bwinfo1.cleanup();
-        bwinfo2.cleanup();
-        return result;
-    }
-
-    private static class HandlerDiagnosen extends DefaultHandler {
-
-        private String icd;
-        private String diagnose;
-
-        public String getSeite() {
-            return seite;
-        }
-
-        public String getSicherheit() {
-            return sicherheit;
-        }
-
-        private String sicherheit;
-        private String seite;
-
-        public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
-            if (tagName.equalsIgnoreCase("java")) {
-                icd = attributes.getValue("icd");
-                diagnose = attributes.getValue("text");
-                sicherheit = attributes.getValue("diagnosesicherheit");
-                seite = attributes.getValue("koerperseite");
-            }
-        }
-
-        public String getICD() {
-            return icd;
-        }
-
-        public String getDiagnose() {
-            return diagnose;
-        }
-    }
+//    private static class HandlerDiagnosen extends DefaultHandler {
+//
+//        private String icd;
+//        private String diagnose;
+//
+//        public String getSeite() {
+//            return seite;
+//        }
+//
+//        public String getSicherheit() {
+//            return sicherheit;
+//        }
+//
+//        private String sicherheit;
+//        private String seite;
+//
+//        public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
+//            if (tagName.equalsIgnoreCase("java")) {
+//                icd = attributes.getValue("icd");
+//                diagnose = attributes.getValue("text");
+//                sicherheit = attributes.getValue("diagnosesicherheit");
+//                seite = attributes.getValue("koerperseite");
+//            }
+//        }
+//
+//        public String getICD() {
+//            return icd;
+//        }
+//
+//        public String getDiagnose() {
+//            return diagnose;
+//        }
+//    }
 }

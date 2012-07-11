@@ -32,6 +32,7 @@ import entity.vorgang.SYSBWI2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.OPDE;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -203,7 +204,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
     }
 
     public String getHtml() {
-        return html;
+        return SYSTools.anonymizeString(html);
     }
 
     public void setHtml(String html) {

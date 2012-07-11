@@ -4,7 +4,6 @@
 
 package op.admin.residents.bwassistant;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Arzt;
@@ -19,6 +18,8 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author Torsten Löhr
@@ -44,14 +45,14 @@ public class PnlHausarzt extends JPanel {
         listAerzte.add(0, null);
 
         pnlEditArzt = new PnlEditArzt(new Arzt());
-        pnlRight.add(pnlEditArzt);
+        pnlRight.add(pnlEditArzt, 0);
 
         cmbArzt.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
         cmbArzt.setRenderer(ArztTools.getArztRenderer());
 
     }
 
-    public void initSplitPanel(){
+    public void initSplitPanel() {
         split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
     }
 
@@ -61,8 +62,9 @@ public class PnlHausarzt extends JPanel {
 
     private void btnOKActionPerformed(ActionEvent e) {
         Arzt newArzt = pnlEditArzt.getArzt();
-        if (newArzt != null){
+        if (newArzt != null) {
             cmbArzt.setModel(new DefaultComboBoxModel(new Arzt[]{newArzt}));
+            validate.execute(newArzt);
         }
         split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
     }
@@ -72,9 +74,7 @@ public class PnlHausarzt extends JPanel {
     }
 
     private void cmbArztItemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED){
-            validate.execute(cmbArzt.getSelectedItem());
-        }
+        validate.execute(cmbArzt.getSelectedItem());
     }
 
     private void initComponents() {
@@ -90,8 +90,8 @@ public class PnlHausarzt extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, $lgap, default"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, $lgap, default"));
 
         //======== split1 ========
         {
@@ -103,8 +103,8 @@ public class PnlHausarzt extends JPanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default",
-                    "2*(default, $lgap), default"));
+                        "default:grow, $lcgap, default",
+                        "2*(default, $lgap), default"));
 
                 //---- cmbArzt ----
                 cmbArzt.addItemListener(new ItemListener() {

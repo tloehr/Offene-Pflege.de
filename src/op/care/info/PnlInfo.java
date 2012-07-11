@@ -298,7 +298,7 @@ public class PnlInfo extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) { // => ACL_MATRIX
             JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -502,7 +502,7 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |____/ \__,_|\__|\__\___/|_| |_| /_/   \_\__,_|\__,_|
              *
              */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
                 JButton btnAdd = new JButton(icon22add);
                 btnAdd.setPressedIcon(icon22addPressed);
                 btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -563,7 +563,7 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |____/ \__,_|\__|\__\___/|_| |_| |_____\__,_|_|\__|
              *
              */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {  // => ACL_MATRIX
                 JButton btnEdit = new JButton(icon22edit);
                 btnEdit.setPressedIcon(icon22editPressed);
                 btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -611,7 +611,7 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \__\___/| .__/
              *                                                     |_|
              */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
                 JButton btnStop = new JButton(icon22stop);
                 btnStop.setPressedIcon(icon22stopPressed);
                 btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -657,7 +657,7 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \___|_|\___|\__\___|
              *
              */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
                 JButton btnDelete = new JButton(icon22delete);
                 btnDelete.setPressedIcon(icon22deletePressed);
                 btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -701,7 +701,7 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |____/ \__,_|\__|\__\___/|_| |_| |_|   |_|_|\___/_/   \_\__|\__\__,_|\___|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
              *
              */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
                 JButton btnAttach = new JButton(icon22attach);
                 btnAttach.setPressedIcon(icon22attachPressed);
                 btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -885,7 +885,7 @@ public class PnlInfo extends NursingRecordsPanel {
                      *     |____/ \__,_|\__|\__\___/|_| |_| |_|   |_|_|\___/_/   \_\__|\__\__,_|\___|_| |_|  \____\___/|_| |_|\__\___|_| |_|\__|
                      *
                      */
-                    if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {
+                    if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {    // => ACL_MATRIX
                         JButton btnAttach = new JButton(icon22attach);
                         btnAttach.setPressedIcon(icon22attachPressed);
                         btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);

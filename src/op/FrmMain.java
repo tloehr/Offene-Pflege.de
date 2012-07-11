@@ -193,6 +193,8 @@ public class FrmMain extends JFrame {
         jspApps = null;
         panesSearch.removeAll();
         panesSearch = null;
+        panesApps.removeAll();
+        panesApps = null;
         splitPaneLeft.removeAll();
 
     }
@@ -413,22 +415,29 @@ public class FrmMain extends JFrame {
         mypane.setFont(SYSConst.ARIAL14);
 
         // Darf neue Bewohner anlegen
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
             JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
-            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
             addbw.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    final MyJDialog dlg = new MyJDialog();
                     WizardDialog wizard = new AddBWWizard(new Closure() {
                         @Override
                         public void execute(Object o) {
-                            if (o != null) {
-
-                            }
                             dlg.dispose();
+                            jspSearch.removeAll();
+                            jspSearch = null;
+                            jspApps.removeAll();
+                            jspApps = null;
+                            panesSearch.removeAll();
+                            panesSearch = null;
+                            panesApps.removeAll();
+                            panesApps = null;
+                            splitPaneLeft.removeAll();
+                            prepareSearchArea();
                         }
                     }).getWizard();
                     dlg.setContentPane(wizard.getContentPane());
@@ -448,7 +457,14 @@ public class FrmMain extends JFrame {
                 final String longDescription = ic.getLongDescription();
                 final String javaclass = ic.getJavaClass();
 
-                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, null, new ActionListener() {
+                Icon icon = null;
+                try {
+                    icon = new ImageIcon(getClass().getResource("/artwork/22x22/" + ic.getIconname()));
+                } catch (Exception e) {
+
+                }
+
+                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
 
@@ -480,17 +496,6 @@ public class FrmMain extends JFrame {
         return mypane;
     }
 
-    private CollapsiblePane addCommandNewBW() {
-        JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout());
-        mypanel.setBackground(Color.WHITE);
-
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
-        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
-        searchPane.setCollapsible(false);
-        return null;
-    }
-
     private void prepareSearchArea() {
 
         panesSearch = new CollapsiblePanes();
@@ -512,7 +517,7 @@ public class FrmMain extends JFrame {
         }
 
         // Darf auf das Archiv zugreifen
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.ARCHIVE)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.ARCHIVE)) { // => ACLMATRIX
             panesApps.add(addNursingRecords(null));
         }
 

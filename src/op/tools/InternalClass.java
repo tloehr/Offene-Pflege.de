@@ -32,7 +32,7 @@ public class InternalClass implements Comparable<InternalClass> {
 
     private IntClasses intClass;
 
-    public InternalClass(String internalClassname, String shortDescription, String longDescription, boolean mainClass, String javaClass) {
+    public InternalClass(String internalClassname, String shortDescription, String longDescription, boolean mainClass, String javaClass, String iconname) {
         this.internalClassname = internalClassname;
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
@@ -40,7 +40,7 @@ public class InternalClass implements Comparable<InternalClass> {
         this.javaClass = javaClass;
         acls = new ArrayList();
         this.intClass = null;
-        this.iconname = "";
+        this.iconname = iconname;
     }
 
 

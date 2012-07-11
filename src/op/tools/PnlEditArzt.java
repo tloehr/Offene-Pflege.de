@@ -50,12 +50,31 @@ public class PnlEditArzt extends JPanel {
         txtTel.setText(arzt.getTel());
         txtFax.setText(arzt.getFax());
         txtMobil.setText(SYSTools.catchNull(arzt.getOrt()));
-        txtEMAIL.setText(SYSTools.catchNull(arzt.getOrt()));
+        txtEMAIL.setText(SYSTools.catchNull(arzt.getEMail()));
+
+        FocusAdapter fa = new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                ((JTextField) focusEvent.getSource()).selectAll();
+            }
+        };
+
+        txtAnrede.addFocusListener(fa);
+        txtTitel.addFocusListener(fa);
+        txtNachname.addFocusListener(fa);
+        txtVorname.addFocusListener(fa);
+        txtStrasse.addFocusListener(fa);
+        txtPLZ.addFocusListener(fa);
+        txtOrt.addFocusListener(fa);
+        txtTel.addFocusListener(fa);
+        txtFax.addFocusListener(fa);
+        txtMobil.addFocusListener(fa);
+        txtEMAIL.addFocusListener(fa);
 
     }
 
     public Arzt getArzt(){
-        if (txtNachname.getText().isEmpty() || txtVorname.getText().isEmpty()){
+        if (txtNachname.getText().isEmpty()){
             return null;
         }
 

@@ -41,6 +41,7 @@ public class PnlBWBasisInfo extends JPanel {
         this.validate = validate;
         initComponents();
         initPanel();
+        txtNachname.requestFocus();
     }
 
     private void initPanel() {

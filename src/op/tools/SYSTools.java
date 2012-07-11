@@ -74,7 +74,6 @@ public class SYSTools {
 
     public static final boolean LEFT_UPPER_SIDE = false;
     public static final boolean RIGHT_LOWER_SIDE = true;
-
     public static final boolean MUST_BE_POSITIVE = true;
 
     /**
@@ -406,15 +405,7 @@ public class SYSTools {
     }
 
     public static String anonymizeString(String in) {
-        String out = "[anonymisiert]";
-        if (!OPDE.isAnonym()) {
-            out = in;
-        }
-        return out;
-    }
-
-    public static String anonymizeName(String in) {
-        String out = "[anonymisiert]";
+        String out = "["+OPDE.lang.getString("misc.msg.anon")+"]";
         if (!OPDE.isAnonym()) {
             out = in;
         }
@@ -903,7 +894,7 @@ public class SYSTools {
         String result = neutral;
         if (in != null) {
             result = in.toString();
-            if (result.equals("")) {
+            if (result.isEmpty()) {
                 result = neutral;
             }
         }
@@ -925,7 +916,7 @@ public class SYSTools {
      */
     public static String catchNull(Object in, String prefix, String suffix) {
         String result = "";
-        if (!catchNull(in).equals("")) {
+        if (!catchNull(in).isEmpty()) {
             result = prefix + catchNull(in) + suffix;
         }
         return result;
@@ -935,7 +926,7 @@ public class SYSTools {
      * Gibt eine einheitliche Titelzeile für alle Fenster zurück.
      */
     public static String getWindowTitle(String moduleName) {
-        if (!moduleName.equals("")) {
+        if (!moduleName.isEmpty()) {
             moduleName = ", " + moduleName;
         }
         return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion()
@@ -1127,12 +1118,12 @@ public class SYSTools {
 
 
     public static String getHTMLSubstring(String in, int maximum) {
-        if (in == null || in.isEmpty()){
+        if (in == null || in.isEmpty()) {
             return "";
         }
         String htmlshort = in.replaceAll("\\<.*?\\>", " "); // Alle HTML Tags entfernen.
         int max = Math.min(maximum, htmlshort.length() - 1); // Nur die ersten 40 Zeichen zeigen...
-        return htmlshort.substring(0, max) + (htmlshort.length()-1 <= max ? "" : "...");
+        return htmlshort.substring(0, max) + (htmlshort.length() - 1 <= max ? "" : "...");
     }
 
     /**
@@ -1998,8 +1989,6 @@ public class SYSTools {
 
         return wert;
     }
-
-
 
 
     public static BigDecimal parseCurrency(String test) {

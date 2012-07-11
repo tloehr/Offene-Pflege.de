@@ -33,10 +33,12 @@ import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.files.SYSFilesTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.care.berichte.PnlBerichte;
+import op.care.info.PnlInfo;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
-import op.tools.SYSPrint;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -49,16 +51,15 @@ import java.beans.PropertyVetoException;
  * @author tloehr
  */
 public class PnlBWUebersicht extends NursingRecordsPanel {
+    public static final String internalClassID = "nursingrecords.overview";
 
     private Bewohner bewohner;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
-    private JCheckBox cbMedi;
-    private JCheckBox cbBilanz;
-    private JCheckBox cbBerichte;
-    private JCheckBox cbBWInfo;
+    private JToggleButton tbMedi, tbBilanz, tbBerichte, tbBWInfo;
     private ItemListener itemListener;
     private MouseAdapter mouseAdapter;
+    private boolean initPhase = false;
 
     /**
      * Creates new form PnlBWUebersicht
@@ -83,31 +84,10 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
 
         mouseAdapter = GUITools.getHyperlinkStyleMouseAdapter();
 
-        cbMedi = new JCheckBox("Medikamente", false);
-        cbMedi.addItemListener(itemListener);
-        cbMedi.addMouseListener(mouseAdapter);
-        cbBerichte = new JCheckBox("Pflegeberichte", false);
-        cbBerichte.addItemListener(itemListener);
-        cbBerichte.addMouseListener(mouseAdapter);
-        cbBilanz = new JCheckBox("Bilanz", true);
-        cbBilanz.addItemListener(itemListener);
-        cbBilanz.addMouseListener(mouseAdapter);
-        cbBWInfo = new JCheckBox("Bewohner-Informationen", false);
-        cbBWInfo.addItemListener(itemListener);
-        cbBWInfo.addMouseListener(mouseAdapter);
     }
 
     @Override
     public void cleanup() {
-        cbMedi.removeItemListener(itemListener);
-        cbMedi.removeMouseListener(mouseAdapter);
-        cbBerichte.removeItemListener(itemListener);
-        cbBerichte.removeMouseListener(mouseAdapter);
-        cbBilanz.removeItemListener(itemListener);
-        cbBilanz.removeMouseListener(mouseAdapter);
-        cbBWInfo.removeItemListener(itemListener);
-        cbBWInfo.removeMouseListener(mouseAdapter);
-
         SYSTools.unregisterListeners(this);
     }
 
@@ -149,16 +129,86 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     public void reloadDisplay() {
-        txtUebersicht.setText(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, true, cbBWInfo.isSelected()));
+        txtUebersicht.setText(DBHandling.getUeberleitung(bewohner, false, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, tbBWInfo.isSelected()));
         jspHTML.getViewport().setViewPosition(new Point(0, 0));
     }
 
+    private CollapsiblePane addFilters() {
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.setLayout(new VerticalLayout(5));
+
+        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
+        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+        panelFilter.setCollapsible(false);
+
+        tbMedi = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.medication"));
+        tbMedi.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (initPhase) return;
+                SYSPropsTools.storeState(internalClassID + ":tbMedi", tbMedi);
+                reloadDisplay();
+            }
+        });
+        tbMedi.setHorizontalAlignment(SwingConstants.LEFT);
+        labelPanel.add(tbMedi);
+        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
+
+        tbBerichte = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlBerichte.internalClassID));
+        tbBerichte.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (initPhase) return;
+                SYSPropsTools.storeState(internalClassID + ":tbBerichte", tbBerichte);
+                reloadDisplay();
+            }
+        });
+        tbBerichte.setHorizontalAlignment(SwingConstants.LEFT);
+        labelPanel.add(tbBerichte);
+        SYSPropsTools.restoreState(internalClassID + ":tbBerichte", tbBerichte);
+
+        tbBilanz = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.liquid.result"));
+        tbBilanz.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (initPhase) return;
+                SYSPropsTools.storeState(internalClassID + ":tbBilanz", tbBilanz);
+                reloadDisplay();
+            }
+        });
+        tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
+        labelPanel.add(tbBilanz);
+        SYSPropsTools.restoreState(internalClassID + ":tbBilanz", tbBilanz);
+
+        tbBWInfo = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlInfo.internalClassID));
+        tbBWInfo.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (initPhase) return;
+                SYSPropsTools.storeState(internalClassID + ":tbBWInfo", tbBWInfo);
+                reloadDisplay();
+            }
+        });
+        tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
+        labelPanel.add(tbBWInfo);
+        SYSPropsTools.restoreState(internalClassID + ":tbBWInfo", tbBWInfo);
+
+        panelFilter.setContentPane(labelPanel);
+
+        return panelFilter;
+
+
+    }
+
     private void prepareSearchArea() {
+        initPhase = true;
         searchPanes = new CollapsiblePanes();
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
 
 
-        CollapsiblePane searchPane = new CollapsiblePane("Bewohner-Übersicht");
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
         searchPane.setSlidingDirection(SwingConstants.SOUTH);
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
@@ -169,50 +219,27 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout());
+        mypanel.setLayout(new VerticalLayout(5));
+        mypanel.setBackground(Color.WHITE);
 
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+                SYSFilesTools.print(SYSTools.htmlUmlautConversion(txtUebersicht.getText()), false);
             }
         });
         mypanel.add(printButton);
 
-        mypanel.add(cbMedi);
-        mypanel.add(cbBilanz);
-        mypanel.add(cbBerichte);
-        mypanel.add(cbBWInfo);
-        mypanel.setBackground(Color.WHITE);
 
         searchPane.setContentPane(mypanel);
         searchPanes.add(searchPane);
+        searchPanes.add(addFilters());
         searchPanes.addExpansion();
 
         jspSearch.setViewportView(searchPanes);
 
-
+        initPhase = false;
     }
-
-    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-        SYSFilesTools.print(SYSTools.htmlUmlautConversion(DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
-    }//GEN-LAST:event_btnPrintActionPerformed
-
-    private void cbMediActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbMediActionPerformed
-        reloadDisplay();
-    }//GEN-LAST:event_cbMediActionPerformed
-
-    private void cbBilanzActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBilanzActionPerformed
-        reloadDisplay();
-    }//GEN-LAST:event_cbBilanzActionPerformed
-
-    private void cbBerichteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBerichteActionPerformed
-        reloadDisplay();
-    }//GEN-LAST:event_cbBerichteActionPerformed
-
-    private void cbBWInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBWInfoActionPerformed
-        reloadDisplay();
-    }//GEN-LAST:event_cbBWInfoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspHTML;

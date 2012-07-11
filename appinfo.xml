@@ -65,7 +65,7 @@
         </class>
         <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         </class>
-        <class name="opde.tickets" short="Vorgänge" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true" javaclass="op.vorgang.PnlVorgang" icon="utilities-file-archiver.png">
+        <class name="opde.tickets" short="Vorgänge" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true" javaclass="op.vorgang.PnlVorgang" icon="link-symbol.png">
             <manager  langbundle="appinfo.default.acl.manager"/>
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
@@ -76,6 +76,7 @@
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.insert"/>
             <update langbundle="appinfo.default.acl.update"/>
+            <manager langbundle="appinfo.default.acl.manager"/>
             <user1 langbundle="appinfo.nursingrecords.info.acl.user1"/>
             <user2 langbundle="appinfo.nursingrecords.info.acl.user2"/>
         </class>

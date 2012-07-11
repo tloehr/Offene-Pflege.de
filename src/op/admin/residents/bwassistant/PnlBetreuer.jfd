@@ -75,7 +75,7 @@
              <object class="com.jformdesigner.model.FormEvent"> 
               <string>java.awt.event.ItemListener</string> 
               <string>itemStateChanged</string> 
-              <string>cmbArztItemStateChanged</string> 
+              <string>cmbBetreuerItemStateChanged</string> 
               <boolean>true</boolean> 
              </object> 
             </void> 

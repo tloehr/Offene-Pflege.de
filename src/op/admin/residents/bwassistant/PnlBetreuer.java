@@ -6,11 +6,9 @@ package op.admin.residents.bwassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Arzt;
-import entity.ArztTools;
 import entity.Betreuer;
+import entity.BetreuerTools;
 import op.OPDE;
-import op.tools.PnlEditArzt;
 import op.tools.PnlEditBetreuer;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -47,14 +45,14 @@ public class PnlBetreuer extends JPanel {
         listBetreuer.add(0, null);
 
         pnlEditBetreuer = new PnlEditBetreuer(new Betreuer());
-        pnlRight.add(pnlEditBetreuer);
+        pnlRight.add(pnlEditBetreuer, 0);
 
         cmbBetreuer.setModel(new DefaultComboBoxModel(listBetreuer.toArray()));
-        cmbBetreuer.setRenderer(ArztTools.getArztRenderer());
+        cmbBetreuer.setRenderer(BetreuerTools.getBetreuerRenderer());
 
     }
 
-    public void initSplitPanel(){
+    public void initSplitPanel() {
         split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
     }
 
@@ -64,8 +62,9 @@ public class PnlBetreuer extends JPanel {
 
     private void btnOKActionPerformed(ActionEvent e) {
         Betreuer newBetreuer = pnlEditBetreuer.getBetreuer();
-        if (newBetreuer != null){
+        if (newBetreuer != null) {
             cmbBetreuer.setModel(new DefaultComboBoxModel(new Betreuer[]{newBetreuer}));
+            validate.execute(newBetreuer);
         }
         split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
     }
@@ -74,10 +73,8 @@ public class PnlBetreuer extends JPanel {
         split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, 500);
     }
 
-    private void cmbArztItemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED){
-            validate.execute(cmbBetreuer.getSelectedItem());
-        }
+    private void cmbBetreuerItemStateChanged(ItemEvent e) {
+        validate.execute(cmbBetreuer.getSelectedItem());
     }
 
     private void initComponents() {
@@ -113,7 +110,7 @@ public class PnlBetreuer extends JPanel {
                 cmbBetreuer.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent e) {
-                        cmbArztItemStateChanged(e);
+                        cmbBetreuerItemStateChanged(e);
                     }
                 });
                 panel1.add(cmbBetreuer, CC.xy(1, 3));

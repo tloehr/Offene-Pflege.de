@@ -176,7 +176,7 @@ public class AppInfo {
                 environment = tagName;
             } else if (environment.equalsIgnoreCase("classes")) { // oder wir sind schon in einer Umgebung.
                 if (tagName.equalsIgnoreCase("class")) {
-                    thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"), SYSTools.catchNull(attributes.getValue("main")).equalsIgnoreCase("true"), attributes.getValue("javaclass"));
+                    thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"), SYSTools.catchNull(attributes.getValue("main")).equalsIgnoreCase("true"), attributes.getValue("javaclass"), SYSTools.catchNull(attributes.getValue("icon"), "run.png"));
 //                    OPDE.debug(thisClass.getInternalClassname());
                 } else if (tagName.equalsIgnoreCase("insert")) {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.INSERT));
