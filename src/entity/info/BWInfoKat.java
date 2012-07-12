@@ -29,7 +29,7 @@ public class BWInfoKat implements Serializable, Comparable {
     @Column(name = "Bezeichnung")
     private String bezeichnung;
     @Column(name = "KatArt")
-    private Short katArt;
+    private Integer katArt;
     @Column(name = "Sortierung")
     private Integer sortierung;
 
@@ -56,11 +56,11 @@ public class BWInfoKat implements Serializable, Comparable {
         this.bezeichnung = bezeichnung;
     }
 
-    public Short getKatArt() {
+    public Integer getKatArt() {
         return katArt;
     }
 
-    public void setKatArt(Short katArt) {
+    public void setKatArt(Integer katArt) {
         this.katArt = katArt;
     }
 

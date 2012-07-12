@@ -27,10 +27,10 @@ import java.util.Iterator;
         @NamedQuery(name = "Pflegeberichte.findByPbid", query = "SELECT p FROM Pflegeberichte p WHERE p.pbid = :pbid"),
         @NamedQuery(name = "Pflegeberichte.findFirst", query = "SELECT p FROM Pflegeberichte p WHERE p.pbid = :pbid"),
 
-        @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriod", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
-                + " ORDER BY p.pit DESC "),
+//        @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriod", query = " "
+//                + " SELECT p FROM Pflegeberichte p "
+//                + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
+//                + " ORDER BY p.pit DESC "),
         /**
          * Ermittelt Pflegeberichte eines Bewohner innerhalb eines bestimmten Zeitraums.
          * Nur die als Besonders markiert sind.

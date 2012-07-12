@@ -33,6 +33,7 @@ import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
 import entity.files.SYSFilesTools;
+import entity.info.BWInfoTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.berichte.PnlBerichte;
@@ -56,7 +57,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     private Bewohner bewohner;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
-    private JToggleButton tbMedi, tbBilanz, tbBerichte, tbBWInfo;
+    private JToggleButton tbMedi, tbBilanz, tbBerichte;
     private ItemListener itemListener;
     private MouseAdapter mouseAdapter;
     private boolean initPhase = false;
@@ -129,7 +130,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     public void reloadDisplay() {
-        txtUebersicht.setText(DBHandling.getUeberleitung(bewohner, false, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, tbBWInfo.isSelected()));
+        txtUebersicht.setText(BWInfoTools.getUeberleitung(bewohner, false, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
         jspHTML.getViewport().setViewPosition(new Point(0, 0));
     }
 
@@ -182,18 +183,18 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         labelPanel.add(tbBilanz);
         SYSPropsTools.restoreState(internalClassID + ":tbBilanz", tbBilanz);
 
-        tbBWInfo = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlInfo.internalClassID));
-        tbBWInfo.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbBWInfo", tbBWInfo);
-                reloadDisplay();
-            }
-        });
-        tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
-        labelPanel.add(tbBWInfo);
-        SYSPropsTools.restoreState(internalClassID + ":tbBWInfo", tbBWInfo);
+//        tbBWInfo = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlInfo.internalClassID));
+//        tbBWInfo.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (initPhase) return;
+//                SYSPropsTools.storeState(internalClassID + ":tbBWInfo", tbBWInfo);
+//                reloadDisplay();
+//            }
+//        });
+//        tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
+//        labelPanel.add(tbBWInfo);
+//        SYSPropsTools.restoreState(internalClassID + ":tbBWInfo", tbBWInfo);
 
         panelFilter.setContentPane(labelPanel);
 
@@ -225,7 +226,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(SYSTools.htmlUmlautConversion(txtUebersicht.getText()), false);
+                SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true)), true);
             }
         });
         mypanel.add(printButton);

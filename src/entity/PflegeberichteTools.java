@@ -206,13 +206,14 @@ public class PflegeberichteTools {
         return html;
     }
 
-    public static String getBerichteAsHTML(List<Pflegeberichte> berichte, boolean nurBesonderes) {
+    public static String getBerichteAsHTML(List<Pflegeberichte> berichte, boolean nurBesonderes, boolean withlongheader) {
         String html = "";
 
         int num = berichte.size();
         if (num > 0) {
-            html += "<h1>Pflegeberichte für " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) + "</h1>"; // Die Bewohner in dieser Liste sind alle dieselben.
-            html += "<table border=\"1\" cellspacing=\"0\"><tr>"
+//            html += "<h2 id=\"fonth2\">Pflegeberichte für " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) + "</h2>";
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " für " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) : "") + "</h2>";
+            html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th></tr>";
             Iterator<Pflegeberichte> it = berichte.iterator();
             while (it.hasNext()) {
@@ -231,13 +232,6 @@ public class PflegeberichteTools {
         } else {
             html += "<i>keine Berichte in der Auswahl vorhanden</i>";
         }
-
-        html = "<html><head>"
-                + "<title>" + SYSTools.getWindowTitle("") + "</title>"
-                + "<script type=\"text/javascript\">"
-                + "window.onload = function() {"
-                + "window.print();"
-                + "}</script></head><body>" + html + "</body></html>";
         return html;
     }
 
@@ -252,7 +246,7 @@ public class PflegeberichteTools {
     }
 
     public static String getTagsAsHTML(Pflegeberichte bericht) {
-        String result = "<font " + getHTMLColor(bericht)  + SYSConst.html_arial14 + ">";
+        String result = "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">";
         Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();
         while (itTags.hasNext()) {
             PBerichtTAGS tag = itTags.next();
@@ -286,7 +280,7 @@ public class PflegeberichteTools {
     public static String getAsHTML(Pflegeberichte bericht) {
         String result = "";
 
-        String fonthead = "<font " + getHTMLColor(bericht)  + SYSConst.html_arial14 + ">";
+        String fonthead = "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">";
 
         DateFormat df = DateFormat.getDateTimeInstance();
         //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");

@@ -1,5 +1,8 @@
 package entity;
 
+import op.OPDE;
+import op.tools.SYSTools;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -172,7 +175,7 @@ public class Betreuer implements Serializable {
     }
 
     public String getMobil() {
-        return mobil;
+        return SYSTools.catchNull(mobil).isEmpty() ? OPDE.lang.getString("misc.msg.unknown") : mobil;
     }
 
     public void setMobil(String mobil) {

@@ -238,7 +238,7 @@ public class PnlBerichte extends NursingRecordsPanel {
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
             TMPflegeberichte tm = (TMPflegeberichte) tblTB.getModel();
-            out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false)));
+            out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false, true)));
 
             out.close();
             SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);

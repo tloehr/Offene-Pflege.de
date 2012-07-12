@@ -360,7 +360,7 @@ public class VerordnungTools {
             result += result.isEmpty() ? "" : "<br/>";
             result += "<b><u>Bemerkung:</u> </b>" + verordnung.getBemerkung();
         }
-        return result+"</font>";
+        return result + "</font>";
     }
 
     public static String getAN(Verordnung verordnung) {
@@ -546,19 +546,18 @@ public class VerordnungTools {
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
      */
-    public static String getVerordnungenAsHTML(List<Verordnung> list) {
+    public static String getVerordnungenAsHTML(List<Verordnung> list, boolean withlongheader) {
         String result = "";
 
         if (!list.isEmpty()) {
 
             Verordnung verordnung = list.get(0);
-//                if (SYSTools.catchNull(bwkennung).equals("")) {
-//                    result += "<h2>Ärztliche Verordnungen</h2>";
-//                } else {
-            result += "<h1  id=\"fonth1\" >Ärztliche Verordnungen für " + BewohnerTools.getBWLabelText(verordnung.getBewohner()) + "</h1>";
-            if (verordnung.getBewohner().getStation() != null) {
-                result += EinrichtungenTools.getAsText(verordnung.getBewohner().getStation().getEinrichtung());
-            }
+
+            result += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + BewohnerTools.getBWLabelText(verordnung.getBewohner()) : "") + "</h2>";
+
+//            if (verordnung.getBewohner().getStation() != null) {
+//                result += EinrichtungenTools.getAsText(verordnung.getBewohner().getStation().getEinrichtung());
+//            }
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                     "<th >Medikament/Massnahme</th><th >Dosierung / Hinweise</th><th >Angesetzt</th></tr>";

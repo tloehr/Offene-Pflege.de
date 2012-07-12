@@ -175,7 +175,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             File temp = File.createTempFile("verordnungen", ".html");
             temp.deleteOnExit();
             List<Verordnung> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
-            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getVerordnungenAsHTML(listVerordnung));
+            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getVerordnungenAsHTML(listVerordnung, true));
             SYSFilesTools.print(html, true);
         } catch (IOException e) {
             new DlgException(e);

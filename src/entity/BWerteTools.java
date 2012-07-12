@@ -8,10 +8,12 @@ import op.care.vital.PnlVitalwerte;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -310,5 +312,34 @@ public class BWerteTools {
         return newOne;
     }
 
+    public static boolean hatEinfuhren(Bewohner bewohner) {
+            boolean result = false;
+
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT SUM(b.wert) FROM BWerte b WHERE b.wert > 0 AND b.replacedBy IS NULL AND b.bewohner = :bewohner AND b.type = :type AND b.pit >= :pit ");
+            query.setParameter("bewohner", bewohner);
+            query.setParameter("type", BWerteTools.BILANZ);
+            query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
+
+            BigDecimal sumwert = (BigDecimal) query.getSingleResult();
+            result = sumwert != null && sumwert.abs().compareTo(BigDecimal.ZERO) > 0;
+
+            return result;
+        }
+
+        public static boolean hatAusfuhren(Bewohner bewohner) {
+            boolean result = false;
+
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT SUM(b.wert) FROM BWerte b WHERE b.wert < 0 AND b.replacedBy IS NULL AND b.bewohner = :bewohner AND b.type = :type AND b.pit >= :pit ");
+            query.setParameter("bewohner", bewohner);
+            query.setParameter("type", BWerteTools.BILANZ);
+            query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
+
+            BigDecimal sumwert = (BigDecimal) query.getSingleResult();
+            result = sumwert != null && sumwert.abs().compareTo(BigDecimal.ZERO) > 0;
+
+            return result;
+        }
 
 }

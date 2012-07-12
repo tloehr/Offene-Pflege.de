@@ -86,10 +86,8 @@ import java.util.List;
         @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Verordnung b WHERE b.abDatum = :abDatum"),
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
-        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan"),
-        @NamedQuery(name = "Verordnung.findByBewohnerActiveSorted", query = " " +
-                " SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum = '9999-12-31 23:59:59' " +
-                " ORDER BY b.situation.sitID, b.darreichung.dafID, b.darreichung.medProdukt.bezeichnung, b.massnahme.bezeichnung ")
+        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")
+
 })
 
 @SqlResultSetMappings({

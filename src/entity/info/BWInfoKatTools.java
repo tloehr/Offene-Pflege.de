@@ -3,10 +3,9 @@ package entity.info;
 import op.OPDE;
 import op.care.info.PnlInfo;
 import op.tools.InternalClassACL;
-import org.eclipse.persistence.internal.xr.Result;
 
-import javax.persistence.Query;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,15 +18,26 @@ import java.util.List;
  */
 public class BWInfoKatTools {
 
+    public static final int GRUNDPFLEGE = 100;
+    public static final int HAUT = 110;
+    public static final int VITAL = 120;
+    public static final int VERWALTUNG = 1000;
+    public static final int STAMMDATEN = 2000;
+
+
+    /**
+     * @return
+     */
     public static List<BWInfoKat> getKategorien() {
 
-        String katart = "0 "; // 0 können alle
+        String katart = "0";   // a little trick. 0 is always viable
 
-        katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER1) ? ",2 " : ""; // Stammdaten
-        katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER2) ? ",1 " : ""; // Verwaltung
+        katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER1) ? "," + STAMMDATEN : ""; // Stammdaten
+        katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER2) ? "," + VERWALTUNG : ""; // Verwaltung
 
+        // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE b.katArt IN (" + katart + " ) AND b.sortierung >= 0");
+        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE (b.katArt < 1000 OR b.katArt IN (" + katart + " )) AND b.sortierung >= 0");
         List<BWInfoKat> result = query.getResultList();
         em.close();
         Collections.sort(result);
