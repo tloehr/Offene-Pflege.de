@@ -29,6 +29,7 @@ package op.care.dfn;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.info.BWInfoTools;
 import op.OCSec;
 import op.OPDE;
 import op.care.planung.DlgMassSelect;
@@ -97,7 +98,7 @@ public class PnlDFN extends NursingRecordsPanel {
         this.bwkennung = bewohner.getBWKennung();
         BewohnerTools.setBWLabel(lblBW, bewohner);
 
-        abwesend = DBRetrieve.getAbwesendSeit(bwkennung) != null;
+        abwesend = BWInfoTools.isAbwesend(bewohner);
 
 //        if (myRunningClass != null){
 //            SYSRunningClassesTools.endModule(myRunningClass);

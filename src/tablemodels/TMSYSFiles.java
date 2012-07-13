@@ -88,7 +88,7 @@ public class TMSYSFiles extends AbstractTableModel {
         String result = "";
 
         result += sysfile.getPbAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + " " + sysfile.getPbAssignCollection().size() + ", ";
-        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.information") + " " + sysfile.getBwiAssignCollection().size() + ", ";
+        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.info") + " " + sysfile.getBwiAssignCollection().size() + ", ";
         result += sysfile.getVerAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + " " + sysfile.getVerAssignCollection().size() + ", ";
 
         String html = OPDE.lang.getString(PnlFiles.internalClassID+".Attachments")+": ";

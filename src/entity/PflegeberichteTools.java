@@ -208,29 +208,28 @@ public class PflegeberichteTools {
 
     public static String getBerichteAsHTML(List<Pflegeberichte> berichte, boolean nurBesonderes, boolean withlongheader) {
         String html = "";
+        boolean ihavesomethingtoshow = false;
 
-        int num = berichte.size();
-        if (num > 0) {
+        if (!berichte.isEmpty()) {
 //            html += "<h2 id=\"fonth2\">Pflegeberichte für " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) + "</h2>";
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " für " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) : "") + "</h2>";
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                    + "<th>Info</th><th>Text</th></tr>";
-            Iterator<Pflegeberichte> it = berichte.iterator();
-            while (it.hasNext()) {
-                Pflegeberichte bericht = it.next();
-
+                    + "<th>Info</th><th>Text</th>\n</tr>";
+//            Iterator<Pflegeberichte> it = berichte.iterator();
+            for (Pflegeberichte bericht : berichte) {
                 if (!nurBesonderes || bericht.isBesonders()) {
+                    ihavesomethingtoshow = true;
                     html += "<tr>";
-                    html += "<td>" + getDatumUndUser(bericht, false) + "</td>";
-                    html += "<td>" + getAsHTML(bericht) + "</td>";
-                    html += "</tr>";
-
+                    html += "<td valign=\"top\">" + getDatumUndUser(bericht, false) + "</td>";
+                    html += "<td valign=\"top\">" + getAsHTML(bericht) + "</td>";
+                    html += "</tr>\n";
                 }
-
             }
-            html += "</table>";
-        } else {
-            html += "<i>keine Berichte in der Auswahl vorhanden</i>";
+            html += "</table>\n";
+        }
+
+        if (berichte.isEmpty() || !ihavesomethingtoshow) {
+            html = "";
         }
         return html;
     }
@@ -269,7 +268,7 @@ public class PflegeberichteTools {
         if (showIDs) {
             result += "<br/><i>(" + bericht.getPbid() + ")</i>";
         }
-        return "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">" + result + "</font>";
+        return "<font " + getHTMLColor(bericht) + "><div id=\"fonttext\">" + result + "</div></font>";
     }
 
     /**
@@ -280,7 +279,7 @@ public class PflegeberichteTools {
     public static String getAsHTML(Pflegeberichte bericht) {
         String result = "";
 
-        String fonthead = "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">";
+        String fonthead = "<font " + getHTMLColor(bericht) + "><div id=\"fonttext\">";
 
         DateFormat df = DateFormat.getDateTimeInstance();
         //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
@@ -301,7 +300,7 @@ public class PflegeberichteTools {
             result += "<font color=\"red\">&#9679;</font>";
         }
         result += SYSTools.replace(bericht.getText(), "\n", "<br/>");
-        result = fonthead + result + "</font>";
+        result = fonthead + result + "</div></font>";
         return result;
     }
 

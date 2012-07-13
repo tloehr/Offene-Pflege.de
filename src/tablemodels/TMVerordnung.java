@@ -50,7 +50,6 @@ public class TMVerordnung extends AbstractTableModel {
     protected HashMap cache;
 
     protected List<Object[]> listeVerordnungen;
-    protected Comparator comparator;
 
     public TMVerordnung(Bewohner bewohner, boolean archiv, boolean bestand) {
         super();
@@ -79,28 +78,15 @@ public class TMVerordnung extends AbstractTableModel {
             i++;
         }
 
-        comparator = new Comparator<Object[]>() {
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.sorting"), 50, 100));
+        Collections.sort(listeVerordnungen, new Comparator<Object[]>() {
             @Override
             public int compare(Object[] us, Object[] them) {
                 Verordnung usVerordnung = (Verordnung) us[0];
                 Verordnung themVerordnung = (Verordnung) them[0];
-
-                int result = ((Boolean) usVerordnung.isAbgesetzt()).compareTo(themVerordnung.isAbgesetzt()) * -1;
-                if (result == 0) {
-                    result = ((Boolean) usVerordnung.isBedarf()).compareTo(themVerordnung.isBedarf()) * -1;
-                }
-                if (result == 0) {
-                    result = ((Boolean) usVerordnung.hasMedi()).compareTo(themVerordnung.hasMedi());
-                }
-                if (result == 0) {
-                    result = VerordnungTools.getMassnahme(usVerordnung).compareTo(VerordnungTools.getMassnahme(themVerordnung));
-                }
-                return result;
+                return usVerordnung.compareTo(themVerordnung);
             }
-        };
-
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.sorting"), 50, 100));
-        Collections.sort(listeVerordnungen, comparator);
+        });
 
         // Cache vorbereiten
         for (int row = 0; row < listeVerordnungen.size(); row++) {

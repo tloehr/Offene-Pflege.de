@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * @author tloehr
@@ -57,7 +58,7 @@ import java.util.Date;
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis")})
-public class BWInfo implements Serializable, VorgangElement, Cloneable {
+public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparable<BWInfo> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -118,10 +119,10 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
         this.properties = "";
         Date now = new Date();
 
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.von = now;
             this.bis = now;
-        } else if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
+        } else if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
             this.von = new DateTime().toDateMidnight().toDate();
             this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
         } else {
@@ -136,7 +137,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
         this.attachedVorgaenge = new ArrayList<SYSBWI2VORGANG>();
     }
 
-     public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Bewohner bewohner) {
+    public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Bewohner bewohner) {
         this.von = von;
         this.bis = bis;
         this.xml = xml;
@@ -144,7 +145,8 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
         this.properties = properties;
         this.bemerkung = bemerkung;
         this.bwinfotyp = bwinfotyp;
-        this.angesetztDurch = OPDE.getLogin().getUser();;
+        this.angesetztDurch = OPDE.getLogin().getUser();
+        ;
         this.abgesetztDurch = null;
         this.bewohner = bewohner;
         this.attachedFiles = new ArrayList<Sysbwi2file>();
@@ -172,11 +174,11 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
     }
 
     public void setVon(Date von) {
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
             von = new DateTime(von).toDateMidnight().toDate();
         }
         this.von = von;
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.bis = von;
         }
     }
@@ -186,16 +188,16 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
     }
 
     public void setBis(Date bis) {
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY){
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
             bis = new DateTime(bis).toDateMidnight().plusDays(1).toDateTime().minusMinutes(1).toDate();
         }
         this.bis = bis;
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS){
+        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.von = bis;
         }
     }
 
-    public boolean isHeimaufnahme(){
+    public boolean isHeimaufnahme() {
         return bwinfotyp.getBwinftyp().equalsIgnoreCase("hauf");
     }
 
@@ -263,14 +265,23 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
 
     /**
      * SingleIncidents können nicht abgesetzt sein. Ansonsten, dann, wenn bis vor dem aktuellen Zeitpunkt liegt.
+     *
      * @return
      */
-    public boolean isAbgesetzt(){
+    public boolean isAbgesetzt() {
         return bwinfotyp.getIntervalMode() != BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS && bis.before(new Date());
     }
 
-    public boolean isSingleIncident(){
+    public boolean isSingleIncident() {
         return bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS;
+    }
+
+    public boolean isNoConstraints() {
+        return bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS;
+    }
+
+    public boolean isActiveNoConstraint() {
+        return isNoConstraints() && !isAbgesetzt();
     }
 
     @Override
@@ -298,6 +309,21 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
     }
 
     @Override
+    public int compareTo(BWInfo bwInfo) {
+        if (bwInfo.getBwinfotyp().getStatus() == BWInfoTypTools.STATUS_NORMAL) {
+            return 0;
+        } else if (getBwinfotyp().getBwinftyp().equalsIgnoreCase(BWInfoTypTools.TYP_DIAGNOSE) || bwInfo.getBwinfotyp().getBwinftyp().equalsIgnoreCase(BWInfoTypTools.TYP_DIAGNOSE)) {
+            Properties thisProps = BWInfoTools.getContent(this);
+            Properties thatProps = BWInfoTools.getContent(bwInfo);
+            String thisICD = thisProps.getProperty("icd");
+            String thatICD = thatProps.getProperty("icd");
+            return thisICD.compareTo(thatICD);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof BWInfo)) {
@@ -311,9 +337,8 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable {
     }
 
 
-
     @Override
-    public BWInfo clone()  {
+    public BWInfo clone() {
         return new BWInfo(von, bis, xml, html, properties, bemerkung, bwinfotyp, bewohner);
     }
 

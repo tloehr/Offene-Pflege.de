@@ -37,7 +37,7 @@ import entity.info.BWInfoTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.berichte.PnlBerichte;
-import op.care.info.PnlInfo;
+import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
@@ -130,8 +130,30 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     public void reloadDisplay() {
-        txtUebersicht.setText(BWInfoTools.getUeberleitung(bewohner, false, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
-        jspHTML.getViewport().setViewPosition(new Point(0, 0));
+        initPhase = true;
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+        SwingWorker worker = new SwingWorker() {
+            String html = "";
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                html = SYSTools.toHTML(BWInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                txtUebersicht.setText(html);
+                txtUebersicht.repaint();
+                initPhase = false;
+//                ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+            }
+        };
+        worker.execute();
     }
 
     private CollapsiblePane addFilters() {
@@ -226,7 +248,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true)), true);
+                SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true)), true);
             }
         });
         mypanel.add(printButton);

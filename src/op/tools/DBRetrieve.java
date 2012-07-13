@@ -45,81 +45,81 @@ public class DBRetrieve {
     public static final int MODE_INTERVAL_DISJUNCTIVE = 1;
     public static final int MODE_INTERVAL_NOCONSTRAINTS = 2;
 
-    public static Properties getOCProps(String ip) {
-        Properties p = new Properties();
+//    public static Properties getOCProps(String ip) {
+//        Properties p = new Properties();
+//
+//        PreparedStatement stmt;
+//        ResultSet rs;
+//
+//        try {
+//            String sql = "SELECT K, V FROM OCProps WHERE IP = ?";
+//            stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, ip);
+//            rs = stmt.executeQuery();
+//
+//            while (rs.next()) {
+//                p.put(rs.getString("K"), rs.getString("V"));
+//            }
+//        } // try
+//        catch (SQLException se) {
+//            new DlgException(se);
+//        } // catch
+//
+//        return p;
+//    }
 
-        PreparedStatement stmt;
-        ResultSet rs;
+//    /**
+//     * Ermittelt, seit wann ein Bewohner abwesend war.
+//     *
+//     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
+//     */
+//    public static Date getAbwesendSeit(String bwkennung) {
+//        PreparedStatement stmt;
+//        ResultSet rs;
+//        Date d = null;
+//        try {
+//            String sql = "" +
+//                    " SELECT Von " +
+//                    " FROM BWInfo " +
+//                    " WHERE BWINFTYP = 'abwe' AND BWKennung = ? AND von <= NOW() AND bis >= NOW()";
+//            stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, bwkennung);
+//            rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                d = rs.getDate("von");
+//            } else {
+//                d = null;
+//            }
+//
+//        } // try
+//        catch (SQLException se) {
+//            new DlgException(se);
+//        } // catch
+//        return d;
+//    }
 
-        try {
-            String sql = "SELECT K, V FROM OCProps WHERE IP = ?";
-            stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, ip);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                p.put(rs.getString("K"), rs.getString("V"));
-            }
-        } // try
-        catch (SQLException se) {
-            new DlgException(se);
-        } // catch
-
-        return p;
-    }
-
-    /**
-     * Ermittelt, seit wann ein Bewohner abwesend war.
-     *
-     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
-     */
-    public static Date getAbwesendSeit(String bwkennung) {
-        PreparedStatement stmt;
-        ResultSet rs;
-        Date d = null;
-        try {
-            String sql = "" +
-                    " SELECT Von " +
-                    " FROM BWInfo " +
-                    " WHERE BWINFTYP = 'abwe' AND BWKennung = ? AND von <= NOW() AND bis >= NOW()";
-            stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            rs = stmt.executeQuery();
-            if (rs.first()) {
-                d = rs.getDate("von");
-            } else {
-                d = null;
-            }
-
-        } // try
-        catch (SQLException se) {
-            new DlgException(se);
-        } // catch
-        return d;
-    }
-
-    public static HashMap getBW(String bwkennung) {
-        HashMap hm = new HashMap();
-
-        // Bewohnernamen in den Label schreiben.
-        try {
-            String sql = "SELECT b.nachname, b.vorname, b.GebDatum FROM Bewohner b WHERE BWKennung = ?";
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            ResultSet rs = stmt.executeQuery();
-            rs.first();
-            hm.put("vorname", rs.getString("b.vorname"));
-            hm.put("nachname", rs.getString("b.nachname"));
-            hm.put("bwkennung", bwkennung);
-            hm.put("gebdatum", rs.getDate("b.GebDatum"));
-
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-
-
-        return hm;
-    }
+//    public static HashMap getBW(String bwkennung) {
+//        HashMap hm = new HashMap();
+//
+//        // Bewohnernamen in den Label schreiben.
+//        try {
+//            String sql = "SELECT b.nachname, b.vorname, b.GebDatum FROM Bewohner b WHERE BWKennung = ?";
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, bwkennung);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.first();
+//            hm.put("vorname", rs.getString("b.vorname"));
+//            hm.put("nachname", rs.getString("b.nachname"));
+//            hm.put("bwkennung", bwkennung);
+//            hm.put("gebdatum", rs.getDate("b.GebDatum"));
+//
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//
+//
+//        return hm;
+//    }
 
     /**
      * liest aus einer beliegigen Tabelle, genau einen Wert heraus.
@@ -490,29 +490,29 @@ public class DBRetrieve {
      *              freie Zeitraum <b>immer</b> VAA - BAW.
      * @return ArrayList mit den Lücken in den Zeiträumen. Die Zeiträumen beginnen mit SYSConst.VON_ANFANG_AN und enden mit SYSConst.BIS_AUF_WEITERES. NULL bei Fehler.
      */
-    public static ArrayList getFreeIntervals(String table, String from, String to, String where, int mode) {
-        ArrayList result = null;
-        switch (mode) {
-            case MODE_INTERVAL_DISJUNCTIVE: {
-                result = new ArrayList();
-                result = getFreeIntervalsDisjunctive(table, from, to, where);
-                break;
-            }
-            case MODE_INTERVAL_OVERLAP: {
-                result = new ArrayList();
-                result = getFreeIntervalsOverlap(table, from, to, where);
-                break;
-            }
-            case MODE_INTERVAL_NOCONSTRAINTS: {
-                result = new ArrayList();
-                result = getFreeIntervalsNoConstraints();
-                break;
-            }
-            default: {
-            }
-        }
-        return result;
-    }
+//    public static ArrayList getFreeIntervals(String table, String from, String to, String where, int mode) {
+//        ArrayList result = null;
+//        switch (mode) {
+//            case MODE_INTERVAL_DISJUNCTIVE: {
+//                result = new ArrayList();
+//                result = getFreeIntervalsDisjunctive(table, from, to, where);
+//                break;
+//            }
+//            case MODE_INTERVAL_OVERLAP: {
+//                result = new ArrayList();
+//                result = getFreeIntervalsOverlap(table, from, to, where);
+//                break;
+//            }
+//            case MODE_INTERVAL_NOCONSTRAINTS: {
+//                result = new ArrayList();
+//                result = getFreeIntervalsNoConstraints();
+//                break;
+//            }
+//            default: {
+//            }
+//        }
+//        return result;
+//    }
 
     /**
      * Diese Methode ermittelt die freien Zeiträume aus Tabellen mit historisierten Daten (in der Regel mit "Von","Bis" Spalten).
@@ -902,38 +902,38 @@ public class DBRetrieve {
     /**
      * Gibt direkt eine HTML Beschreibung für eine bestimmte LoginID zurück.
      */
-    public static String identifyUser(long OCLoginID) {
-        String sql = " SELECT l.HOST, l.Login, p.V, l.UKennung " +
-                " FROM OCLogin l " +
-                " LEFT OUTER JOIN OCProps p ON l.IP = p.IP " +
-                " WHERE l.OCLoginID = ?";
-        String result = "Fehler";
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setLong(1, OCLoginID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-                result = "<ul>";
-                result += "<li>Benutzer: <b>" + getUsername(rs.getString("UKennung")) + "</b></li>";
-                result += "<li>Computer: <b>" + rs.getString("HOST") + "</b></li>";
-                result += "<li>Angemeldet am: <b>" + formatter.format(rs.getTimestamp("Login")) + "</b></li>";
-                if (!SYSTools.catchNull(rs.getString("V")).equals("")) {
-                    result += "<li>Station: <b>" + rs.getString("V") + "</b></li>";
-                }
-                result += "</ul>";
-            } else {
-                result = "Keine Information vorhanden.";
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            result = ex.getMessage();
-        }
-
-
-        return result;
-
-    }
+//    public static String identifyUser(long OCLoginID) {
+//        String sql = " SELECT l.HOST, l.Login, p.V, l.UKennung " +
+//                " FROM OCLogin l " +
+//                " LEFT OUTER JOIN OCProps p ON l.IP = p.IP " +
+//                " WHERE l.OCLoginID = ?";
+//        String result = "Fehler";
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setLong(1, OCLoginID);
+//            ResultSet rs = stmt.executeQuery();
+//            if (rs.first()) {
+//                SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+//                result = "<ul>";
+//                result += "<li>Benutzer: <b>" + getUsername(rs.getString("UKennung")) + "</b></li>";
+//                result += "<li>Computer: <b>" + rs.getString("HOST") + "</b></li>";
+//                result += "<li>Angemeldet am: <b>" + formatter.format(rs.getTimestamp("Login")) + "</b></li>";
+//                if (!SYSTools.catchNull(rs.getString("V")).equals("")) {
+//                    result += "<li>Station: <b>" + rs.getString("V") + "</b></li>";
+//                }
+//                result += "</ul>";
+//            } else {
+//                result = "Keine Information vorhanden.";
+//            }
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//            result = ex.getMessage();
+//        }
+//
+//
+//        return result;
+//
+//    }
 
 //    public static String getEinrichtung2Station(String station) {
 //        HashMap hm = new HashMap();

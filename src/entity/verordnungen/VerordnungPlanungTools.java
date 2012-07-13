@@ -45,7 +45,7 @@ public class VerordnungPlanungTools {
      * @return
      */
     public static String getWiederholung(VerordnungPlanung planung, boolean writeTaeglich) {
-        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+        String result = "<div id=\"fonttext\">";
 
         if (planung.isTaeglich()) {
             if (planung.getTaeglich() > 1) {
@@ -118,11 +118,11 @@ public class VerordnungPlanungTools {
             result += df.format(planung.getLDatum());
         }
 
-        return result + "</font>";
+        return result + "</div>";
     }
 
     public static String getDosisAsHTML(VerordnungPlanung planung, VerordnungPlanung vorherigePlanung, boolean singleUsageOnly) {
-        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+        String result = "<div id=\"fonttext\">";
 
         // Wenn die vorherige Planung null ist, dann muss das hier der De erste durchlauf sein
         // gleichzeitig brauchen wir einen Header dann, wenn der Status sich unterscheidet.
@@ -140,7 +140,7 @@ public class VerordnungPlanungTools {
 
         if (getTerminStatus(planung) == ZEIT) {
             if (headerNeeded) {
-                result += "<table border=\"1\" cellspacing=\"0\">" +
+                result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">" +
                         "   <tr>" +
                         "      <th align=\"center\">fm</th>" +
                         "      <th align=\"center\">mo</th>" +
@@ -193,7 +193,7 @@ public class VerordnungPlanungTools {
         } else {
             result = "!!FEHLER!!";
         }
-        return result + "</font>";
+        return result + "</div>";
     }
 
 

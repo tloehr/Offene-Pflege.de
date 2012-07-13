@@ -108,7 +108,7 @@ public class FrmMain extends JFrame {
     private CollapsiblePanes panesSearch, panesApps;
     private Closure bwchange;
     private HashMap<Bewohner, JideButton> bwButtonMap;
-    private MouseListener blockingListener;
+//    private MouseListener blockingListener;
 
 
     public FrmMain() {
@@ -117,6 +117,8 @@ public class FrmMain extends JFrame {
 
         currentVisiblePanel = null;
         currentBewohner = null;
+        lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
+        lblWait.setVisible(false);
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
@@ -141,19 +143,19 @@ public class FrmMain extends JFrame {
             }
         };
 
-        blockingListener = new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                OPDE.debug("PING");
-                mouseEvent.consume();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                OPDE.debug("PING");
-                mouseEvent.consume();
-            }
-        };
+//        blockingListener = new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent mouseEvent) {
+//                OPDE.debug("PING");
+//                mouseEvent.consume();
+//            }
+//
+//            @Override
+//            public void mousePressed(MouseEvent mouseEvent) {
+//                OPDE.debug("PING");
+//                mouseEvent.consume();
+//            }
+//        };
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
@@ -174,8 +176,6 @@ public class FrmMain extends JFrame {
         final MemoryStatusBarItem gc = new MemoryStatusBarItem();
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
-
-//        SYSPropsTools.storeProp(internalClassID + ":splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString());
 
         initPhase = false;
 
@@ -281,6 +281,9 @@ public class FrmMain extends JFrame {
         pbMsg = new JProgressBar();
         btnReload = new JButton();
         splitPaneLeft = new JideSplitPane();
+        pnlCard = new JPanel();
+        pnlWait = new JPanel();
+        lblWait = new JLabel();
         statusBar = new StatusBar();
 
         //======== this ========
@@ -388,6 +391,24 @@ public class FrmMain extends JFrame {
             });
             pnlMain.add(splitPaneLeft, CC.xy(3, 4, CC.FILL, CC.FILL));
 
+            //======== pnlCard ========
+            {
+                pnlCard.setLayout(new CardLayout());
+
+                //======== pnlWait ========
+                {
+                    pnlWait.setLayout(new BorderLayout());
+
+                    //---- lblWait ----
+                    lblWait.setText("text");
+                    lblWait.setFont(new Font("Arial", Font.BOLD, 22));
+                    lblWait.setHorizontalAlignment(SwingConstants.CENTER);
+                    pnlWait.add(lblWait, BorderLayout.CENTER);
+                }
+                pnlCard.add(pnlWait, "cardWait");
+            }
+            pnlMain.add(pnlCard, CC.xy(5, 4, CC.FILL, CC.FILL));
+
             //---- statusBar ----
             statusBar.setBackground(new Color(238, 238, 238));
             pnlMain.add(statusBar, CC.xywh(3, 6, 4, 1, CC.FILL, CC.FILL));
@@ -403,7 +424,7 @@ public class FrmMain extends JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(currentBewohner, true, true, true, false, false, true, true, true, true)), false);
+            SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(currentBewohner, true, true, true, true, true, true, true, true)), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }
@@ -670,58 +691,38 @@ public class FrmMain extends JFrame {
 
     public void setBlocked(boolean blocked) {
         if (blocked) {
+            lblWait.setVisible(true);
             JPanel glass = new JPanel();
-            glass.addMouseListener(new MouseAdapter() {
-            });
-            glass.addMouseMotionListener(new MouseMotionAdapter() {
-            });
-            glass.addKeyListener(new KeyAdapter() {
-            });
+            glass.addMouseListener(new MouseAdapter() {});
+            glass.addMouseMotionListener(new MouseMotionAdapter() {});
+            glass.addKeyListener(new KeyAdapter() {});
             glass.setOpaque(false);
             setGlassPane(glass);
             getGlassPane().setVisible(true);
+            ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardWait");
         } else {
             getGlassPane().setVisible(false);
             setGlassPane(new JPanel());
+            ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
         }
     }
 
     public Point getLocationForDialog(Dimension dimOfDialog) {
-
-
-        //Dimension them = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight() + 10);
         SwingUtilities.convertPointToScreen(point, this);
         return point;
     }
 
-    /**
-     * Das erstellt eine Liste aller Bewohner mit direktem Verweis auf die jeweilige Pflegeakte.
-     */
-    private void createPflegedokumentation() {
-
-//        if (!OPDE.getAppInfo().userHasAccessLevelForThisClass("nursingrecords.main", InternalClassACL.EXECUTE)) {
-//            return;
-//        }
-//
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createNamedQuery("Stationen.findAllSorted");
-//        Iterator<Stationen> it = query.getResultList().iterator();
-//        em.close();
-//
-//        while (it.hasNext()) {
-//            panesApps.add(createBewohnerListe(it.next()));
-//        }
-
-    }
-
     private void setPanelTo(CleanablePanel pnl) {
         if (currentVisiblePanel != null) {
-            pnlMain.remove(currentVisiblePanel);
+            pnlCard.remove(currentVisiblePanel);
         }
 
         currentVisiblePanel = pnl;
-        pnlMain.add(currentVisiblePanel, CC.xywh(5, 4, 2, 2, CC.FILL, CC.FILL));
+//        pnlMain.add(currentVisiblePanel, CC.xywh(5, 4, 2, 2, CC.FILL, CC.FILL));
+        pnlCard.add("cardContent", currentVisiblePanel);
+        ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
+
     }
 
     public void dispose() {
@@ -729,10 +730,6 @@ public class FrmMain extends JFrame {
         cleanup();
         super.dispose();
     }
-
-//    public JideSplitPane getSplitPaneLeft() {
-//        return splitPaneLeft;
-//    }
 
     private void showLogin() {
         dlgLogin = new DlgLogin(new Closure() {
@@ -784,6 +781,9 @@ public class FrmMain extends JFrame {
     private JProgressBar pbMsg;
     private JButton btnReload;
     private JideSplitPane splitPaneLeft;
+    private JPanel pnlCard;
+    private JPanel pnlWait;
+    private JLabel lblWait;
     private StatusBar statusBar;
     // End of variables declaration//GEN-END:variables
 

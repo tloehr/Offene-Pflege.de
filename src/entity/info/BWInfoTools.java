@@ -34,11 +34,6 @@ import java.util.*;
  */
 public class BWInfoTools {
 
-    public static final int ART_PFLEGE = 0;
-    public static final int ART_VERWALTUNG = 1; // BRAUCHT RECHT USER1
-    public static final int ART_STAMMDATEN = 2; // BRAUCHT RECHT USER2
-
-
     /**
      * Eine kompakte HTML Darstellung aus der aktuellen BWInfo
      * Inkl. Bemerkungsfeld.
@@ -46,16 +41,19 @@ public class BWInfoTools {
      * @param bwinfo
      */
     public static String getHTML(BWInfo bwinfo) {
-        String html = "<h2 id=\"fonth2\" >" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</h2><div id=\"fonttext\">" + bwinfo.getHtml() + "</div>";
+        String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</h2>\n<div id=\"fonttext\">";
+        DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
+        html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getBis())));
+        html += bwinfo.getHtml() + "</div>\n";
 
         if (!SYSTools.catchNull(bwinfo.getBemerkung()).isEmpty()) {
             html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b></p>";
             html += "<p id=\"fonttext\" >" + bwinfo.getBemerkung() + "</p>";
         }
 
-        if (bwinfo.isAbgesetzt()) {
-            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.OutdatedSince") + ":</u></b> " + DateFormat.getDateInstance().format(bwinfo.getBis()) + "</p>";
-        }
+//        if (bwinfo.isAbgesetzt()) {
+//            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.OutdatedSince") + ":</u></b> " + DateFormat.getDateInstance().format(bwinfo.getBis()) + "</p>";
+//        }
 
         return html;
     }
@@ -72,6 +70,11 @@ public class BWInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
+    public static boolean isAbwesend(Bewohner bewohner){
+        BWInfo abwesend = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
+        return abwesend != null & abwesend.isAbgesetzt();
+    }
+
     public static List<BWInfo> findByBewohnerUndTyp(Bewohner bewohner, BWInfoTyp typ) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
@@ -82,11 +85,13 @@ public class BWInfoTools {
         return bwInfos;
     }
 
-    public static List<BWInfo> findByBewohnerUndKatArt(Bewohner bewohner, int katart) {
+    public static List<BWInfo> getActiveBWInfosByBewohnerUndKatArt(Bewohner bewohner, int katart) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp.bwInfokat.katArt = :katart ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis AND b.bwinfotyp.bwInfokat.katArt = :katart ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("katart", katart);
+        query.setParameter("von", new Date());
+        query.setParameter("bis", new Date());
         List<BWInfo> bwInfos = query.getResultList();
         em.close();
         return bwInfos;
@@ -271,8 +276,6 @@ public class BWInfoTools {
 
             } // while
             html += "</ul>";
-        } else {
-            html = "<font color=\"red\"><i>bisher unbeantwortet</i></font><br/>";
         }
 
         if (scaleriskmodel != null && scalesum != null) {
@@ -347,68 +350,6 @@ public class BWInfoTools {
         return result;
 
     }
-
-//    private static class HandlerInhalt extends DefaultHandler {
-//
-//        private Properties content = new Properties();
-//        private DefaultMutableTreeNode struktur;
-//        // private String html;
-//
-//        HandlerInhalt(DefaultMutableTreeNode struktur) {
-//            this.struktur = struktur;
-//            //System.out.println("struktur: "+struktur);
-//            //antwort.put("xml", xml);
-//        }
-//
-//
-//        public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
-//            if (!tagName.equalsIgnoreCase("xml")) {
-//                if (tagName.equalsIgnoreCase("java")) { // eine Java Klasse sorgt selbst für ihre Darstellung. Da gibts hier nicht viel zu tun.
-//                    // Bisher gibts nur Diagnosen in dieser Form
-//                    content.put("icd", attributes.getValue("icd"));
-//                    content.put("text", attributes.getValue("text"));
-//                    content.put("arztid", attributes.getValue("arztid"));
-//                    content.put("khid", attributes.getValue("khid"));
-//                    content.put("koerperseite", attributes.getValue("koerperseite"));
-//                    content.put("diagnosesicherheit", attributes.getValue("diagnosesicherheit"));
-//
-//                    String atr = attributes.getValue("html");
-//                    atr = atr.replaceAll("&lt;", "<");
-//                    atr = atr.replaceAll("&gt;", ">");
-//                    content.put(tagName, atr); // Hier steht schon HTML drin.
-//                } else if (tagName.equalsIgnoreCase("unbeantwortet")) {
-//                    content.clear();
-//                } else {
-//                    DefaultMutableTreeNode node = findNameInTree(struktur, tagName);
-//                    if (node != null) {
-//
-//                        InfoTreeNodeBean myNode = (InfoTreeNodeBean) node.getUserObject();
-//
-//                        String value = SYSTools.catchNull(attributes.getValue("value"));
-//
-//                        if (myNode.getTagName().equalsIgnoreCase("option")) {
-//                            content.put(tagName, myNode.getLabel());
-//                        } else {
-//                            content.put(tagName, value);
-//                        }
-//
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        public void endElement(String uri, String localName, String qName) throws SAXException {
-//        }
-//
-//        public void endDocument() {
-//            //html += "</ul>";
-//        }
-//
-//        public Properties getContent() {
-//            return content;
-//        }
-//    } // private class HandlerFragenInhalt
 
     private static class HandlerStruktur extends DefaultHandler {
 
@@ -761,7 +702,9 @@ public class BWInfoTools {
             Query query = em.createQuery("SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum > :now ");
             query.setParameter("bewohner", bewohner);
             query.setParameter("now", new Date());
-            result += VerordnungTools.getVerordnungenAsHTML(query.getResultList(), false);
+            List listeVerordnungen = query.getResultList();
+            Collections.sort(listeVerordnungen);
+            result += VerordnungTools.getVerordnungenAsHTML(listeVerordnungen, false);
             em.close();
         }
 
@@ -797,9 +740,9 @@ public class BWInfoTools {
             BigDecimal trinkmin = BigDecimal.ZERO;
             BigDecimal trinkmax = BigDecimal.ZERO;
 
-            result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.liquid.result") + "</h2>";
             boolean hateinfuhren = BWerteTools.hatEinfuhren(bewohner);
             boolean hatausfuhren = BWerteTools.hatAusfuhren(bewohner);
+            result += hateinfuhren || hatausfuhren ? "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.liquid.result") + "</h2>" : "";
 
             if (hatausfuhren) {
                 EntityManager em = OPDE.createEM();
@@ -910,9 +853,10 @@ public class BWInfoTools {
                 }
                 result += "</table>";
 
-            } else {
-                result += OPDE.lang.getString("misc.msg.insufficientdata");
             }
+//            else {
+//                result += OPDE.lang.getString("misc.msg.insufficientdata");
+//            }
 
 
         }
@@ -926,14 +870,15 @@ public class BWInfoTools {
          *                                  |_|               |___/
          */
         if (grundpflege) {
-            List<BWInfo> bwinfos = BWInfoTools.findByBewohnerUndKatArt(bewohner, BWInfoKatTools.GRUNDPFLEGE);
+            List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2>";
                 for (BWInfo bwinfo : bwinfos) {
+                    result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
             }
-            result += "<br/><br/>";
+//            result += "<br/><br/>";
         }
 
         /***
@@ -945,7 +890,7 @@ public class BWInfoTools {
          *
          */
         if (haut) {
-            List<BWInfo> bwinfos = BWInfoTools.findByBewohnerUndKatArt(bewohner, BWInfoKatTools.HAUT);
+            List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.HAUT);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2>";
                 for (BWInfo bwinfo : bwinfos) {
@@ -953,7 +898,7 @@ public class BWInfoTools {
                     result += bwinfo.getHtml();
                 }
             }
-            result += "<br/><br/>";
+//            result += "<br/><br/>";
         }
 
         /***
@@ -965,7 +910,7 @@ public class BWInfoTools {
          *
          */
         if (vital) {
-            List<BWInfo> bwinfos = BWInfoTools.findByBewohnerUndKatArt(bewohner, BWInfoKatTools.VITAL);
+            List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.VITAL);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2>";
                 for (BWInfo bwinfo : bwinfos) {
@@ -973,11 +918,11 @@ public class BWInfoTools {
                     result += bwinfo.getHtml();
                 }
             }
-            result += "<br/><br/>";
+//            result += "<br/><br/>";
         }
 
 
-        return SYSTools.toHTML(result);
+        return result;
     }
 
     private static String getDiagnosen(Bewohner bewohner) {
@@ -985,10 +930,11 @@ public class BWInfoTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.bis > :now ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("bwinfotyp", BWInfoTypTools.findByBWINFTYP("DIAG"));
+        query.setParameter("bwinfotyp", BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_DIAGNOSE));
         query.setParameter("now", new Date());
         List<BWInfo> diags = query.getResultList();
         em.close();
+        Collections.sort(diags);
 
         String result = "";
 
@@ -997,20 +943,26 @@ public class BWInfoTools {
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">";
             result += "<tr><th>ICD</th><th>" + OPDE.lang.getString("misc.msg.diag") + "</th><th>" + OPDE.lang.getString("misc.msg.diag.side") + "</th><th>" + OPDE.lang.getString("misc.msg.diag.security") + "</th></tr>";
             for (BWInfo diag : diags) {
-                Properties props = new Properties();
-                try {
-                    StringReader reader = new StringReader(diag.getProperties());
-                    props.load(reader);
-                    reader.close();
-                } catch (IOException ex) {
-                    OPDE.fatal(ex);
-                }
+                Properties props = getContent(diag);
                 result += "<tr><td>" + props.getProperty("icd") + "</td><td>" + props.getProperty("text") + "</td><td>" + props.getProperty("koerperseite") + "</td><td>" + props.getProperty("diagnosesicherheit") + "</td></tr>";
             }
             result += "</table>";
         }
 
         return result;
+    }
+
+
+    public static Properties getContent(BWInfo bwinfo) {
+        Properties props = new Properties();
+        try {
+            StringReader reader = new StringReader(bwinfo.getProperties());
+            props.load(reader);
+            reader.close();
+        } catch (IOException ex) {
+            OPDE.fatal(ex);
+        }
+        return props;
     }
 
 }

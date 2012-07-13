@@ -20,6 +20,16 @@ public class BWInfoTypTools {
     public static final int MODE_INTERVAL_NOCONSTRAINTS = 2;
     public static final int MODE_INTERVAL_SINGLE_INCIDENTS = 3; // Das sind Ereignisse, bei denen von == bis gilt. Weitere Einschränkungen werden nicht gemacht.
 
+    public static final int STATUS_INACTIVE_NORMAL = -1;
+    public static final int STATUS_NORMAL = 0;
+    public static final int STATUS_SYSTEM = 10;
+    public static final int STATUS_INACTIVE_SYSTEM = -10;
+
+    public static final String TYP_DIAGNOSE = "DIAG";
+    public static final String TYP_HEIMAUFNAHME = "HAUF";
+    public static final String TYP_ABWESENHEIT = "ABWE";
+    public static final String TYP_KH_AUFENTHALT = "KH";
+
     public static BWInfoTyp findByBWINFTYP(String bwinftyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfoTyp.findByBwinftyp");

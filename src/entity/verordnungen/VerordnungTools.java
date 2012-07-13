@@ -4,7 +4,10 @@
  */
 package entity.verordnungen;
 
-import entity.*;
+import entity.Bewohner;
+import entity.BewohnerTools;
+import entity.Einrichtungen;
+import entity.Stationen;
 import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
@@ -307,7 +310,7 @@ public class VerordnungTools {
     }
 
     public static String getMassnahme(Verordnung verordnung) {
-        String result = SYSConst.html_fontface;
+        String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
         if (verordnung.isAbgesetzt()) {
             result += "<s>"; // Abgesetzte
@@ -347,11 +350,11 @@ public class VerordnungTools {
             result += "</s>"; // Abgesetzte
         }
 
-        return result + "</font>";
+        return result + "</div>";
     }
 
     public static String getHinweis(Verordnung verordnung) {
-        String result = SYSConst.html_fontface;
+        String result = "<div id=\"fonttext\">";
 
         if (verordnung.isBedarf()) {
             result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
@@ -360,11 +363,11 @@ public class VerordnungTools {
             result += result.isEmpty() ? "" : "<br/>";
             result += "<b><u>Bemerkung:</u> </b>" + verordnung.getBemerkung();
         }
-        return result + "</font>";
+        return result + "</div>";
     }
 
     public static String getAN(Verordnung verordnung) {
-        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+        String result = "<div id=\"fonttext\">";
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
         String datum = sdf.format(verordnung.getAnDatum());
 
@@ -381,12 +384,11 @@ public class VerordnungTools {
         }
         result += "; " + verordnung.getAngesetztDurch().getNameUndVorname() + "</font>";
 
-
-        return result + "</font>";
+        return result + "</div>";
     }
 
     public static String getAB(Verordnung verordnung) {
-        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+        String result = "<div id=\"fonttext\">";
 
         if (verordnung.isBegrenzt()) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
@@ -406,7 +408,7 @@ public class VerordnungTools {
             result += "; " + verordnung.getAbgesetztDurch().getNameUndVorname() + "</font>";
 
         }
-        return result + "</font>";
+        return result + "</div>";
     }
 
     public static String getDosis(Verordnung verordnung) {
@@ -415,7 +417,7 @@ public class VerordnungTools {
 
     public static String getDosis(Verordnung verordnung, boolean mitBestandsAnzeige, MedVorrat vorrat, MedBestand bestandImAnbruch) {
 //        long timestart = System.currentTimeMillis();
-        String result = "<font face=\"" + OPDE.arial14.getFamily() + "\">";
+        String result = "";
         if (verordnung.getPlanungen().size() > 1) {
             Collections.sort(verordnung.getPlanungen());
         }
@@ -513,7 +515,7 @@ public class VerordnungTools {
 
 //        OPDE.debug("time end: " + (timeend - timestart) + " millis");
 
-        return result + "</font>";
+        return result;
     }
 
     /**
@@ -577,7 +579,7 @@ public class VerordnungTools {
 
             result += "</table>";
         } else {
-            result += "<h2  id=\"fonth2\" >Ärztliche Verordnungen</h2><i>zur Zeit gibt es keine Verordnungen</i>";
+            result += "<h2  id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + "</h2><i>" + OPDE.lang.getString("misc.msg.currentlynoentry") + "</i>";
         }
         return result;
     }

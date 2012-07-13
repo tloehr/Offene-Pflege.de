@@ -157,7 +157,7 @@ import java.util.List;
 
 })
 
-public class Verordnung implements Serializable, VorgangElement, Cloneable {
+public class Verordnung implements Serializable, VorgangElement, Cloneable, Comparable<Verordnung> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -491,6 +491,21 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable {
             }
         });
         return copy;
+    }
+
+    @Override
+    public int compareTo(Verordnung them) {
+        int result = ((Boolean) isAbgesetzt()).compareTo(them.isAbgesetzt()) * -1;
+        if (result == 0) {
+            result = ((Boolean) isBedarf()).compareTo(them.isBedarf()) * -1;
+        }
+        if (result == 0) {
+            result = ((Boolean) hasMedi()).compareTo(them.hasMedi());
+        }
+        if (result == 0) {
+            result = VerordnungTools.getMassnahme(this).compareTo(VerordnungTools.getMassnahme(them));
+        }
+        return result;
     }
 
     @Override
