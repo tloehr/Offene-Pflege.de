@@ -27,8 +27,12 @@ public class BWInfoTypTools {
 
     public static final String TYP_DIAGNOSE = "DIAG";
     public static final String TYP_HEIMAUFNAHME = "HAUF";
-    public static final String TYP_ABWESENHEIT = "ABWE";
+    public static final String TYP_ABWESENHEIT = "ABWE1";
     public static final String TYP_KH_AUFENTHALT = "KH";
+
+    public static final String ABWE_TYP_KH = "HOSPITAL";
+    public static final String ABWE_TYP_HOLLIDAY = "HOLLIDAY";
+    public static final String ABWE_TYP_OTHER = "OTHER";
 
     public static BWInfoTyp findByBWINFTYP(String bwinftyp) {
         EntityManager em = OPDE.createEM();

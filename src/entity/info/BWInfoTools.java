@@ -13,7 +13,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
@@ -70,10 +69,10 @@ public class BWInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static boolean isAbwesend(Bewohner bewohner){
-        BWInfo abwesend = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
-        return abwesend != null & abwesend.isAbgesetzt();
-    }
+//    public static boolean isAbwesend(Bewohner bewohner){
+//        BWInfo abwesend = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
+//        return abwesend != null & abwesend.isAbgesetzt();
+//    }
 
     public static List<BWInfo> findByBewohnerUndTyp(Bewohner bewohner, BWInfoTyp typ) {
         EntityManager em = OPDE.createEM();
@@ -155,31 +154,17 @@ public class BWInfoTools {
 
 
     /**
-     * Ermittelt, seit wann ein Bewohner abwesend war.
+     * Tells since when a resident was away.
      *
-     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
+     * @return Date of the departure. null if not away.
      */
     public static Date getAbwesendSeit(Bewohner bewohner) {
+        BWInfo lastabsence = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
+        return lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
+    }
 
-        Date d = null;
-        EntityManager em = OPDE.createEM();
-        try {
-
-            String jpql = "" +
-                    " SELECT b FROM BWInfo b WHERE b.bwinfotyp.bwinftyp = 'abwe' AND b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis";
-            Query query = em.createQuery(jpql);
-            query.setParameter("bewohner", bewohner);
-            query.setParameter("von", new Date());
-            query.setParameter("bis", new Date());
-            d = (Date) query.getSingleResult();
-        } catch (NoResultException nre) {
-            d = null;
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-        return d;
+    public static boolean isAbwesend(Bewohner bewohner) {
+        return getAbwesendSeit(bewohner) != null;
     }
 
 //    /**

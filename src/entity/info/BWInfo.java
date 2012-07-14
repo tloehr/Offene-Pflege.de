@@ -146,7 +146,6 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
         this.bemerkung = bemerkung;
         this.bwinfotyp = bwinfotyp;
         this.angesetztDurch = OPDE.getLogin().getUser();
-        ;
         this.abgesetztDurch = null;
         this.bewohner = bewohner;
         this.attachedFiles = new ArrayList<Sysbwi2file>();

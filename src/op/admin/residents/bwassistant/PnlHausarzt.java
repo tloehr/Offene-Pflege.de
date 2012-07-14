@@ -10,6 +10,7 @@ import entity.Arzt;
 import entity.ArztTools;
 import op.OPDE;
 import op.tools.PnlEditArzt;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -57,7 +58,7 @@ public class PnlHausarzt extends JPanel {
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
-        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
+        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
@@ -66,11 +67,11 @@ public class PnlHausarzt extends JPanel {
             cmbArzt.setModel(new DefaultComboBoxModel(new Arzt[]{newArzt}));
             validate.execute(newArzt);
         }
-        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
+        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
-        split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, 500);
+        split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void cmbArztItemStateChanged(ItemEvent e) {
@@ -90,12 +91,12 @@ public class PnlHausarzt extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, $lgap, default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, $lgap, default"));
 
         //======== split1 ========
         {
-            split1.setDividerLocation(400);
+            split1.setDividerLocation(100);
             split1.setDividerSize(1);
             split1.setDoubleBuffered(true);
             split1.setEnabled(false);
@@ -103,8 +104,8 @@ public class PnlHausarzt extends JPanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                        "default:grow, $lcgap, default",
-                        "2*(default, $lgap), default"));
+                    "default:grow, $lcgap, default",
+                    "2*(default, $lgap), default"));
 
                 //---- cmbArzt ----
                 cmbArzt.addItemListener(new ItemListener() {

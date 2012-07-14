@@ -131,10 +131,7 @@ public class SYSConst {
     public static final byte NM = 4; // Nachmittags
     public static final byte AB = 5; // Abends
     public static final byte NA = 6; // Nacht Abends
-    //    public static final int SCHICHT_FRUEH = 0;
-//    public static final int SCHICHT_SPAET = 1;
-//    public static final int SCHICHT_NACHT = 2;
-//    public static final int SCHICHT_SONST = 3;
+
     public static final int ZEIT_ALLES = -1;
     public static final int ZEIT_NACHT_MO = 0;
     public static final int ZEIT_FRUEH = 1;
@@ -142,10 +139,6 @@ public class SYSConst {
     public static final int ZEIT_NACHT_AB = 3;
     public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
 
-
-    public static final int BMI_UNTERGEWICHT = 0;
-    public static final int BMI_NORMAL = 1;
-    public static final int BMI_ÜBERGEWICHT = 2;
     public static final String html_arial14 = "face=\"" + ARIAL14.getFamily() + "\"";
     public static final String html_fontface = "<font " + html_arial14 + " >";
 
@@ -155,6 +148,7 @@ public class SYSConst {
             + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
             + "<br/>http://www.offene-pflege.de</font>\n";
 
+    public static final int SCROLL_TIME_FAST = 500; // for the sliding splitpanes
 
     public static HashMap getNachnamenAnonym() {
         HashMap hm = new HashMap();

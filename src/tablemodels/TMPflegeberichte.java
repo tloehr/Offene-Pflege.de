@@ -29,6 +29,7 @@ package tablemodels;
 import entity.Bewohner;
 import entity.Pflegeberichte;
 import entity.PflegeberichteTools;
+import op.tools.SYSTools;
 
 import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
@@ -86,19 +87,15 @@ public class TMPflegeberichte
 
         switch (col) {
             case COL_PIT: {
-                result = PflegeberichteTools.getDatumUndUser(bericht, showIDs);
+                result = SYSTools.toHTML(PflegeberichteTools.getDatumUndUser(bericht, showIDs, true));
                 break;
             }
             case COL_Flags: {
-                result = PflegeberichteTools.getTagsAsHTML(bericht);
+                result = SYSTools.toHTML(PflegeberichteTools.getTagsAsHTML(bericht));
                 break;
             }
-//            case COL_Text: {
-//                result = PflegeberichteTools.getAsText(bericht);
-//                break;
-//            }
             case COL_HTML: {
-                result = PflegeberichteTools.getAsHTML(bericht);
+                result = SYSTools.toHTML(PflegeberichteTools.getAsHTML(bericht));
                 break;
             }
             default: {
@@ -109,5 +106,5 @@ public class TMPflegeberichte
 
         return result;
     }
-} // TBTableModel
+}
 

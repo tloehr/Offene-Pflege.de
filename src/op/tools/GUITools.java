@@ -75,7 +75,7 @@ public class GUITools {
      * Shows a JidePopup in relation to its owner. Calculates the new position that it leaves the owner
      * visible. The popup is placed according to the <code>location</code> setting. The size of the content
      * pane is taken into the calculation in order to find the necessary <code>x, y</code> coordinates on the screen.
-     *
+     * <p/>
      * <ul>
      * <li>SwingConstants.CENTER <i>You can use this, but I fail to see the sense in it.</i></li>
      * <li>SwingConstants.SOUTH</li>
@@ -88,8 +88,8 @@ public class GUITools {
      * <li>SwingConstants.SOUTH_WEST</li>
      * </ul>
      *
-     * @param popup     the JidePopup to show
-     * @param location  where to show the popup in relation to the <code>reference</code>. Use the SwingConstants above.
+     * @param popup    the JidePopup to show
+     * @param location where to show the popup in relation to the <code>reference</code>. Use the SwingConstants above.
      */
     public static void showPopup(JidePopup popup, int location) {
 
@@ -105,6 +105,21 @@ public class GUITools {
             case SwingConstants.SOUTH_WEST: {
                 x = screenposition.x - content.getPreferredSize().width - popup.getOwner().getPreferredSize().width;
                 y = screenposition.y + popup.getOwner().getPreferredSize().height;
+                break;
+            }
+            case SwingConstants.SOUTH_EAST: {
+                x = screenposition.x + popup.getOwner().getPreferredSize().width;
+                y = screenposition.y + popup.getOwner().getPreferredSize().height;
+                break;
+            }
+            case SwingConstants.NORTH_EAST: {
+                x = screenposition.x + popup.getOwner().getPreferredSize().width;
+                y = screenposition.y - popup.getOwner().getPreferredSize().height - content.getPreferredSize().height;
+                break;
+            }
+            case SwingConstants.EAST: {
+                x = screenposition.x + popup.getOwner().getPreferredSize().width;
+                y = screenposition.y;
                 break;
             }
             default: {

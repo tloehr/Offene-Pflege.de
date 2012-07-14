@@ -220,7 +220,6 @@ public class PnlInfo extends NursingRecordsPanel {
                     tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
                     refreshDisplay();
                     initPhase = false;
-//                    ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
                 }
@@ -288,7 +287,7 @@ public class PnlInfo extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(); //OPDE.lang.getString(internalClassID)
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -299,13 +298,71 @@ public class PnlInfo extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
+            JideButton btnBWDied = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.died"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
                 }
             });
-            mypanel.add(printButton);
+            mypanel.add(btnBWDied);
+            JideButton btnBWMovedOut = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.movedout"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                }
+            });
+            mypanel.add(btnBWMovedOut);
+            /***
+             *      _          _
+             *     (_)___     / \__      ____ _ _   _
+             *     | / __|   / _ \ \ /\ / / _` | | | |
+             *     | \__ \  / ___ \ V  V / (_| | |_| |
+             *     |_|___/ /_/   \_\_/\_/ \__,_|\__, |
+             *                                  |___/
+             */
+            final JideButton btnBWisAway = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isaway"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), null);
+            btnBWisAway.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+                    final BWInfo abwesenheit = new BWInfo(BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT), bewohner);
+                    PnlAbwesend pnlAbwesend = new PnlAbwesend(abwesenheit, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            popup.hidePopup();
+                            if (o != null) {
+                                EntityTools.merge(o);
+                                refreshTabKat(abwesenheit.getBwinfotyp().getBwInfokat());
+                            }
+                        }
+                    });
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                    popup.setOwner(btnBWisAway);
+                    popup.removeExcludedComponent(btnBWisAway);
+                    popup.getContentPane().add(pnlAbwesend);
+                    popup.setDefaultFocusComponent(pnlAbwesend);
+                    GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
+                }
+            });
+            mypanel.add(btnBWisAway);
+            /***
+             *      _       ____             _
+             *     (_)___  | __ )  __ _  ___| | __
+             *     | / __| |  _ \ / _` |/ __| |/ /
+             *     | \__ \ | |_) | (_| | (__|   <
+             *     |_|___/ |____/ \__,_|\___|_|\_\
+             *
+             */
+            JideButton btnBWisBack = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isback"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                }
+            });
+            mypanel.add(btnBWisBack);
         }
 
 //        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) { // => ACL_MATRIX
@@ -331,7 +388,7 @@ public class PnlInfo extends NursingRecordsPanel {
         labelPanel.setBackground(Color.WHITE);
         labelPanel.setLayout(new VerticalLayout(5));
 
-        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
+        CollapsiblePane panelFilter = new CollapsiblePane(); // OPDE.lang.getString("misc.msg.Filter")
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
@@ -989,10 +1046,10 @@ public class PnlInfo extends NursingRecordsPanel {
     }
 
     private void refreshTabKat(BWInfoKat kat) {
-        int i = tabKat.getSelectedIndex();
-        tabKat.removeTabAt(i);
-        tabKat.insertTab(kat.getBezeichnung(), null, new JScrollPane(createCollapsiblePanesFor(kat)), null, i);
-        tabKat.setSelectedIndex(i);
+        int katindex = kategorien.indexOf(kat);
+        tabKat.removeTabAt(katindex);
+        tabKat.insertTab(kat.getBezeichnung(), null, new JScrollPane(createCollapsiblePanesFor(kat)), null, katindex);
+        tabKat.setSelectedIndex(katindex);
         tabKat.repaint();
     }
 

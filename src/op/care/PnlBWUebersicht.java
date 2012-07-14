@@ -147,8 +147,13 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             protected void done() {
                 txtUebersicht.setText(html);
                 txtUebersicht.repaint();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jspHTML.getViewport().setViewPosition(new Point(0, 0));
+                    }
+                });
                 initPhase = false;
-//                ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
             }

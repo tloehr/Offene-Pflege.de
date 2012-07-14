@@ -10,6 +10,7 @@ import entity.Betreuer;
 import entity.BetreuerTools;
 import op.OPDE;
 import op.tools.PnlEditBetreuer;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -57,7 +58,7 @@ public class PnlBetreuer extends JPanel {
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
-        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
+        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
@@ -66,11 +67,11 @@ public class PnlBetreuer extends JPanel {
             cmbBetreuer.setModel(new DefaultComboBoxModel(new Betreuer[]{newBetreuer}));
             validate.execute(newBetreuer);
         }
-        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, 500);
+        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
-        split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, 500);
+        split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void cmbBetreuerItemStateChanged(ItemEvent e) {

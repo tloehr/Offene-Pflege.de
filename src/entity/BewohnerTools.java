@@ -121,4 +121,16 @@ public class BewohnerTools {
     }
 
 
+    /**
+     * This method must be called if a resident finally leaves the home. It will then seize all running processes and
+     * end all open periods of any kind. Plans, Medication etc.
+     *
+     * @param em       as it is quite a complex operation, it runs within a surrounding EM to trigger rollbacks if necessary
+     * @param bewohner the resident in question
+     */
+    public static void endOfStay(EntityManager em, Bewohner bewohner) throws Exception {
+
+    }
+
+
 }

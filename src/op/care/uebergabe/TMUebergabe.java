@@ -144,7 +144,7 @@ public class TMUebergabe
         } else {
             switch (col) {
                 case COL_PIT: {
-                    result = PflegeberichteTools.getDatumUndUser((Pflegeberichte) bericht[LIST_BERICHT], false);
+                    result = PflegeberichteTools.getDatumUndUser((Pflegeberichte) bericht[LIST_BERICHT], false, false);
                     break;
                 }
                 case COL_INFO: {

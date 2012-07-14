@@ -1094,11 +1094,11 @@ public class DlgVerordnung extends MyJDialog {
 
     private void fillAerzteUndKHs() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createNamedQuery("Arzt.findAll");
+        Query queryArzt = em.createNamedQuery("Arzt.findAllActive");
         List<Arzt> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
-        Query queryKH = em.createNamedQuery("Krankenhaus.findAll");
+        Query queryKH = em.createNamedQuery("Krankenhaus.findAllActive");
         List<Krankenhaus> listKH = queryKH.getResultList();
         listKH.add(0, null);
         em.close();

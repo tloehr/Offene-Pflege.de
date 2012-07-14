@@ -220,7 +220,7 @@ public class PflegeberichteTools {
                 if (!nurBesonderes || bericht.isBesonders()) {
                     ihavesomethingtoshow = true;
                     html += "<tr>";
-                    html += "<td valign=\"top\">" + getDatumUndUser(bericht, false) + "</td>";
+                    html += "<td valign=\"top\">" + getDatumUndUser(bericht, false, false) + "</td>";
                     html += "<td valign=\"top\">" + getAsHTML(bericht) + "</td>";
                     html += "</tr>\n";
                 }
@@ -245,7 +245,7 @@ public class PflegeberichteTools {
     }
 
     public static String getTagsAsHTML(Pflegeberichte bericht) {
-        String result = "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">";
+        String result = "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">";
         Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();
         while (itTags.hasNext()) {
             PBerichtTAGS tag = itTags.next();
@@ -254,21 +254,21 @@ public class PflegeberichteTools {
             result += (tag.isBesonders() ? "</b>" : "");
             result += (itTags.hasNext() ? " " : "");
         }
-        result += "</font>";
-        return SYSTools.toHTML(result);
+        result += "</font></div>";
+        return result;
     }
 
-    public static String getDatumUndUser(Pflegeberichte bericht, boolean showIDs) {
+    public static String getDatumUndUser(Pflegeberichte bericht, boolean showIDs, boolean showMinutes) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
-        if (!bericht.isDeleted() && !bericht.isReplaced()) {
+        if (showMinutes && !bericht.isDeleted() && !bericht.isReplaced()) {
             result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + bericht.getDauer() + " " + OPDE.lang.getString("misc.msg.Minutes");
         }
         if (showIDs) {
             result += "<br/><i>(" + bericht.getPbid() + ")</i>";
         }
-        return "<font " + getHTMLColor(bericht) + "><div id=\"fonttext\">" + result + "</div></font>";
+        return "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">" + result + "</font></div>";
     }
 
     /**
@@ -279,7 +279,7 @@ public class PflegeberichteTools {
     public static String getAsHTML(Pflegeberichte bericht) {
         String result = "";
 
-        String fonthead = "<font " + getHTMLColor(bericht) + "><div id=\"fonttext\">";
+        String fonthead = "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">";
 
         DateFormat df = DateFormat.getDateTimeInstance();
         //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
@@ -300,7 +300,7 @@ public class PflegeberichteTools {
             result += "<font color=\"red\">&#9679;</font>";
         }
         result += SYSTools.replace(bericht.getText(), "\n", "<br/>");
-        result = fonthead + result + "</div></font>";
+        result = fonthead + result + "</font></div>";
         return result;
     }
 

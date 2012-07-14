@@ -39,6 +39,13 @@ public class Krankenhaus implements Serializable {
     private Integer status;
 
     public Krankenhaus() {
+        this.name = "";
+        this.strasse = "";
+        this.plz = "";
+        this.ort = "";
+        this.tel = "";
+        this.fax = "";
+        this.status = 0;
     }
 
     public Long getKhid() {

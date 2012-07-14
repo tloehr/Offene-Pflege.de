@@ -31,7 +31,7 @@
         </object> 
         <void method="setProperty"> 
          <string>dividerLocation</string> 
-         <int>400</int> 
+         <int>100</int> 
         </void> 
         <void method="setProperty"> 
          <string>dividerSize</string> 
