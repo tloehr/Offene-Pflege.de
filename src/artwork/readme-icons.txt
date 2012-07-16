@@ -13,4 +13,4 @@ Die obigen Icons stehen unter der GNU LGPL.
 	- cb-off.png
 	- cb-on.png
 
-- Number Icons von April Russo. CC-BY. http://russograffix.blogspot.de/2012/02/number-icons-cc-by.html
+- Lots of different Icons and Symbols from www.wpclipart.com. This material is PD.

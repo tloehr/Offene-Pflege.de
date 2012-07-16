@@ -495,7 +495,7 @@ public class DBHandling {
 
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
-                html += "<h1>Pflegeplanungen für " + SYSTools.getBWLabel(bwkennung) + "</h1>";
+                html += "<h1>Pflegeplanungen für  </h1>";
                 rs.beforeFirst();
                 while (rs.next()) {
                     html += getPlanungAsHTML(rs.getLong("PlanID"));

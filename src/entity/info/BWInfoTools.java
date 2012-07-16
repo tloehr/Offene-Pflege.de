@@ -17,6 +17,7 @@ import javax.persistence.Query;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -144,12 +145,14 @@ public class BWInfoTools {
     }
 
 
-    public static boolean isAusgezogen(BWInfo bwinfo) {
-        return !(bwinfo == null || bwinfo.getXml().indexOf("ausgezogen") == -1);
+    public static boolean isAusgezogen(Bewohner bewohner) {
+        BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
+        return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
     }
 
-    public static boolean isVerstorben(BWInfo bwinfo) {
-        return !(bwinfo == null || bwinfo.getXml().indexOf("verstorben") == -1);
+    public static boolean isVerstorben(Bewohner bewohner) {
+        BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
+        return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
     }
 
 
@@ -160,7 +163,7 @@ public class BWInfoTools {
      */
     public static Date getAbwesendSeit(Bewohner bewohner) {
         BWInfo lastabsence = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
-        return lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
+        return lastabsence == null || lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
     }
 
     public static boolean isAbwesend(Bewohner bewohner) {
@@ -639,7 +642,7 @@ public class BWInfoTools {
          */
         BWInfo bwinfo_angeh = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("ANGEH"));
         if (bwinfo_angeh != null) {
-            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
             result += bwinfo_angeh.getHtml();
             result += "</td></tr>";
         }
@@ -857,11 +860,12 @@ public class BWInfoTools {
         if (grundpflege) {
             List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2>";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (BWInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
+                result += "</div>";
             }
 //            result += "<br/><br/>";
         }
@@ -877,11 +881,12 @@ public class BWInfoTools {
         if (haut) {
             List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.HAUT);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2>";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (BWInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
+                result += "</div>";
             }
 //            result += "<br/><br/>";
         }
@@ -897,11 +902,12 @@ public class BWInfoTools {
         if (vital) {
             List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.VITAL);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2>";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (BWInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
+                result += "</div>";
             }
 //            result += "<br/><br/>";
         }
@@ -937,6 +943,17 @@ public class BWInfoTools {
         return result;
     }
 
+
+    public static void setContent(BWInfo bwinfo, Properties props) {
+        try {
+            StringWriter writer = new StringWriter();
+            props.store(writer, "[" + bwinfo.getBwinfotyp().getBwinftyp() + "] " + bwinfo.getBwinfotyp().getBWInfoKurz());
+            bwinfo.setProperties(writer.toString());
+            writer.close();
+        } catch (IOException ex) {
+            OPDE.fatal(ex);
+        }
+    }
 
     public static Properties getContent(BWInfo bwinfo) {
         Properties props = new Properties();

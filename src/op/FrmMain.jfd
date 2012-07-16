@@ -113,6 +113,14 @@
              <string>horizontalAlignment</string> 
              <int>0</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>horizontalTextPosition</string> 
+             <int>10</int> 
+            </void> 
             <void property="name"> 
              <string>lblMainMsg</string> 
             </void> 
@@ -136,7 +144,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/infored.png</string> 
+              <string>/artwork/22x22/ambulance1.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -153,10 +161,7 @@
             </void> 
             <void method="setProperty"> 
              <string>selectedIcon</string> 
-             <object class="com.jformdesigner.model.SwingIcon"> 
-              <int>0</int> 
-              <string>/artwork/22x22/infoyellow.png</string> 
-             </object> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
             </void> 
             <void method="setProperty"> 
              <string>toolTipText</string> 

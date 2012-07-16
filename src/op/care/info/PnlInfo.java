@@ -39,9 +39,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -86,6 +84,7 @@ public class PnlInfo extends NursingRecordsPanel {
     private List<BWInfoKat> kategorien;
 
     private JToggleButton tbEmpty, tbInactive;
+    private JideButton btnBWDied, btnBWMovedOut, btnBWisAway, btnBWisBack;
 
 
     private boolean initPhase;
@@ -113,24 +112,24 @@ public class PnlInfo extends NursingRecordsPanel {
 
         btnPrint.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)); // => ACL_MATRIX
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                double pos;
-                try {
-                    pos = Double.parseDouble(OPDE.getProps().getProperty(internalClassID + ":splitPane1DividerLocation"));
-                } catch (Exception e) {
-                    pos = 0.75d;
-                }
-                splitPane1.setDividerLocation(SYSTools.getDividerInAbsolutePosition(splitPane1, pos));
-                splitPane1.addPropertyChangeListener("dividerLocation", new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                        SYSPropsTools.storeProp(internalClassID + ":splitPane1DividerLocation", SYSTools.getDividerInRelativePosition(splitPane1).toString(), OPDE.getLogin().getUser());
-                    }
-                });
-            }
-        });
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                double pos;
+//                try {
+//                    pos = Double.parseDouble(OPDE.getProps().getProperty(internalClassID + ":splitPane1DividerLocation"));
+//                } catch (Exception e) {
+//                    pos = 0.75d;
+//                }
+//                splitPane1.setDividerLocation(SYSTools.getDividerInAbsolutePosition(splitPane1, pos));
+//                splitPane1.addPropertyChangeListener("dividerLocation", new PropertyChangeListener() {
+//                    @Override
+//                    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+//                        SYSPropsTools.storeProp(internalClassID + ":splitPane1DividerLocation", SYSTools.getDividerInRelativePosition(splitPane1).toString(), OPDE.getLogin().getUser());
+//                    }
+//                });
+//            }
+//        });
 
         change2Bewohner(bewohner);
     }
@@ -138,7 +137,7 @@ public class PnlInfo extends NursingRecordsPanel {
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        GUITools.setBWDisplay(bewohner);
         reloadDisplay();
     }
 
@@ -219,6 +218,10 @@ public class PnlInfo extends NursingRecordsPanel {
                     txtHTML.setText(null);
                     tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
                     refreshDisplay();
+                    btnBWDied.setEnabled(bewohner.isAktiv());
+                    btnBWMovedOut.setEnabled(bewohner.isAktiv());
+                    btnBWisAway.setEnabled(bewohner.isAktiv() && !BWInfoTools.isAbwesend(bewohner));
+                    btnBWisBack.setEnabled(bewohner.isAktiv() && BWInfoTools.isAbwesend(bewohner));
                     initPhase = false;
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
@@ -298,20 +301,114 @@ public class PnlInfo extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-            // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
-            JideButton btnBWDied = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.died"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+
+            /***
+             *      _       ____                 _
+             *     (_)___  |  _ \  ___  __ _  __| |
+             *     | / __| | | | |/ _ \/ _` |/ _` |
+             *     | \__ \ | |_| |  __/ (_| | (_| |
+             *     |_|___/ |____/ \___|\__,_|\__,_|
+             *
+             */
+            btnBWMovedOut = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.movedout"), new ImageIcon(getClass().getResource("/artwork/22x22/delete_user.png")), null);
+            btnBWDied = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.died"), new ImageIcon(getClass().getResource("/artwork/22x22/cross1.png")), null);
+            btnBWisAway = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isaway"), new ImageIcon(getClass().getResource("/artwork/22x22/person-away.png")), null);
+            btnBWisBack = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isback"), new ImageIcon(getClass().getResource("/artwork/22x22/person.png")), null);
+            btnBWDied.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgUhrzeitDatum(OPDE.lang.getString(internalClassID + ".dlg.dateofdeath"), new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                Date dod = (Date) o;
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    bewohner.setStation(null);
+                                    BWInfo hauf = em.merge(BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME)));
+                                    hauf.setBis(dod);
+                                    hauf.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
 
+                                    Properties props = BWInfoTools.getContent(hauf);
+                                    props.setProperty("hauf", "verstorben");
+                                    BWInfoTools.setContent(hauf, props);
+
+                                    BewohnerTools.endOfStay(em, em.merge(bewohner), dod);
+                                    em.getTransaction().commit();
+                                    btnBWDied.setEnabled(false);
+                                    btnBWMovedOut.setEnabled(false);
+                                    btnBWisAway.setEnabled(false);
+                                    btnBWisBack.setEnabled(false);
+                                    reloadDisplay();
+                                    GUITools.setBWDisplay(bewohner);
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isdeadnow")));
+                            }
+                        }
+                    });
                 }
             });
+            btnBWDied.setEnabled(bewohner.isAktiv());
             mypanel.add(btnBWDied);
-            JideButton btnBWMovedOut = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.movedout"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+            /***
+             *                                   _               _
+             *      _ __ ___   _____   _____  __| |   ___  _   _| |_
+             *     | '_ ` _ \ / _ \ \ / / _ \/ _` |  / _ \| | | | __|
+             *     | | | | | | (_) \ V /  __/ (_| | | (_) | |_| | |_
+             *     |_| |_| |_|\___/ \_/ \___|\__,_|  \___/ \__,_|\__|
+             *
+             */
+            btnBWMovedOut.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgUhrzeitDatum(OPDE.lang.getString(internalClassID + ".dlg.dateofmoveout"), new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                Date dod = (Date) o;
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    bewohner.setStation(null);
+                                    BWInfo hauf = em.merge(BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME)));
+                                    hauf.setBis(dod);
+                                    hauf.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
 
+                                    Properties props = BWInfoTools.getContent(hauf);
+                                    props.setProperty("hauf", "verstorben");
+                                    BWInfoTools.setContent(hauf, props);
+
+                                    BewohnerTools.endOfStay(em, em.merge(bewohner), dod);
+                                    em.getTransaction().commit();
+                                    btnBWDied.setEnabled(false);
+                                    btnBWMovedOut.setEnabled(false);
+                                    btnBWisAway.setEnabled(false);
+                                    btnBWisBack.setEnabled(false);
+                                    reloadDisplay();
+                                    GUITools.setBWDisplay(bewohner);
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.hasgonenow")));
+                            }
+                        }
+                    });
                 }
             });
+            btnBWMovedOut.setEnabled(bewohner.isAktiv());
             mypanel.add(btnBWMovedOut);
             /***
              *      _          _
@@ -321,7 +418,6 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |_|___/ /_/   \_\_/\_/ \__,_|\__, |
              *                                  |___/
              */
-            final JideButton btnBWisAway = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isaway"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), null);
             btnBWisAway.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -333,7 +429,11 @@ public class PnlInfo extends NursingRecordsPanel {
                             popup.hidePopup();
                             if (o != null) {
                                 EntityTools.merge(o);
+                                btnBWisAway.setEnabled(false);
+                                btnBWisBack.setEnabled(true);
                                 refreshTabKat(abwesenheit.getBwinfotyp().getBwInfokat());
+                                GUITools.setBWDisplay(bewohner);
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isawaynow")));
                             }
                         }
                     });
@@ -347,6 +447,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
                 }
             });
+            btnBWisAway.setEnabled(bewohner.isAktiv() && !BWInfoTools.isAbwesend(bewohner));
             mypanel.add(btnBWisAway);
             /***
              *      _       ____             _
@@ -356,12 +457,33 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |_|___/ |____/ \__,_|\___|_|\_\
              *
              */
-            JideButton btnBWisBack = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isback"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+
+            btnBWisBack.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        BWInfo lastabsence = em.merge(BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT)));
+                        lastabsence.setBis(new Date());
+                        lastabsence.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+                        em.getTransaction().commit();
+                        btnBWisAway.setEnabled(true);
+                        btnBWisBack.setEnabled(false);
+                        refreshTabKat(lastabsence.getBwinfotyp().getBwInfokat());
+                        GUITools.setBWDisplay(bewohner);
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isbacknow")));
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
                 }
             });
+            btnBWisBack.setEnabled(bewohner.isAktiv() && BWInfoTools.isAbwesend(bewohner));
             mypanel.add(btnBWisBack);
         }
 

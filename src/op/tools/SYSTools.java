@@ -505,28 +505,28 @@ public class SYSTools {
 //    }
 
 
-    public static String getBWLabel(String currentBW) {
-        HashMap bw = DBHandling.getBW(currentBW);
-        String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
-
-        Object[] obj = op.share.bwinfo.DBHandling.miniBWInfo(currentBW);
-//        boolean aufenthalt = (Boolean) obj[0];
-//        Date vonHauf = (Date) obj[1];;
-        Date bisHauf = (Date) obj[2];
-        boolean ausgezogen = (Boolean) obj[3];
-        boolean verstorben = (Boolean) obj[4];
-        if (verstorben) {
-            // In dem Fall, wird das Alter bis zum Sterbedatum gerechnet.
-            result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum")), SYSCalendar.toGC(bisHauf)) + " Jahre) [" + currentBW + "]";
-            result += "  verstorben: " + SYSCalendar.printGermanStyle(bisHauf) + ", ";
-        } else {
-            if (ausgezogen) {
-                result += "  ausgezogen: " + SYSCalendar.printGermanStyle(bisHauf) + ", ";
-            }
-            result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
-        }
-        return result;
-    }
+//    public static String getBWLabel(String currentBW) {
+//        HashMap bw = DBHandling.getBW(currentBW);
+//        String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
+//
+//        Object[] obj = op.share.bwinfo.DBHandling.miniBWInfo(currentBW);
+////        boolean aufenthalt = (Boolean) obj[0];
+////        Date vonHauf = (Date) obj[1];;
+//        Date bisHauf = (Date) obj[2];
+//        boolean ausgezogen = (Boolean) obj[3];
+//        boolean verstorben = (Boolean) obj[4];
+//        if (verstorben) {
+//            // In dem Fall, wird das Alter bis zum Sterbedatum gerechnet.
+//            result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum")), SYSCalendar.toGC(bisHauf)) + " Jahre) [" + currentBW + "]";
+//            result += "  verstorben: " + SYSCalendar.printGermanStyle(bisHauf) + ", ";
+//        } else {
+//            if (ausgezogen) {
+//                result += "  ausgezogen: " + SYSCalendar.printGermanStyle(bisHauf) + ", ";
+//            }
+//            result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
+//        }
+//        return result;
+//    }
 
     /**
      * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.

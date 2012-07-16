@@ -184,7 +184,8 @@ public class FrmMain extends JFrame {
 
     private void emptyFrame() {
         if (currentVisiblePanel != null) {
-            pnlMain.remove(currentVisiblePanel);
+            pnlCard.remove(currentVisiblePanel);
+            lblWait.setVisible(false);
         }
         currentVisiblePanel = null;
         displayManager.clearAllMessages();
@@ -301,30 +302,32 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
-                        "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
+                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
                 lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
                 lblMainMsg.setForeground(new Color(105, 80, 69));
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
+                lblMainMsg.setIcon(null);
+                lblMainMsg.setHorizontalTextPosition(SwingConstants.LEADING);
                 pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
 
                 //---- btnVerlegung ----
-                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infored.png")));
+                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance1.png")));
                 btnVerlegung.setBorder(null);
                 btnVerlegung.setBorderPainted(false);
                 btnVerlegung.setContentAreaFilled(false);
-                btnVerlegung.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/infoyellow.png")));
+                btnVerlegung.setSelectedIcon(null);
                 btnVerlegung.setToolTipText("Verlegungsbericht drucken");
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override

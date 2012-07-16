@@ -208,7 +208,7 @@ public class TMVorgang extends AbstractTableModel {
                             if (currbw.equals("")) {
                                 html += "<br/>Allgemeiner Vorgang<br/>";
                             } else {
-                                html += "<br/>Vorgang gehört zu BewohnerIn: <b>" + SYSTools.getBWLabel(currbw) + "</b><br/>";
+                                html += "<br/>Vorgang gehört zu BewohnerIn: <b> </b><br/>"; // SYSTools.getBWLabel(currbw)
                             }
                         }
                         html += "<b>Von:</b> " + df.format(rs.getDate("v.Von"));

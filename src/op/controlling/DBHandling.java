@@ -157,7 +157,7 @@ public class DBHandling {
                         }
 
                         bwkennung = rs.getString("bwi.BWKennung");
-                        String bwlabel = SYSTools.getBWLabel(bwkennung);
+                        String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
                         if (lbl != null) {
                             lbl.setText("Sturzstatistik: " + bwlabel);
                         }
@@ -429,7 +429,7 @@ public class DBHandling {
                                 s += "</table>";
                             }
 
-                            String bwlabel = SYSTools.getBWLabel(bwkennung);
+                            String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
 
                             if (lbl != null) {
                                 lbl.setText("Gewichtstatistik: " + bwlabel);
@@ -848,7 +848,7 @@ public class DBHandling {
                         }
 
                         prev = bwkennung;
-                        String bwlabel = SYSTools.getBWLabel(bwkennung);
+                        String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
 
                         zieltrink = 0;
                         BWInfo bwinfo3 = new BWInfo(bwkennung, "ZIELTRINK", SYSCalendar.nowDBDate());
@@ -1158,7 +1158,7 @@ public class DBHandling {
                         }
 
                         bwkennung = rs.getString("c.BWKennung");
-                        String bwlabel = SYSTools.getBWLabel(bwkennung);
+                        String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
                         if (lbl != null) {
                             lbl.setText("Wund-Doku: " + bwlabel);
                         }

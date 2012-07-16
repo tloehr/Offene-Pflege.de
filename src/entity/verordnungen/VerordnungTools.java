@@ -9,11 +9,14 @@ import entity.BewohnerTools;
 import entity.Einrichtungen;
 import entity.Stationen;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -612,6 +615,29 @@ public class VerordnungTools {
         myPretty += verordnung.isBedarf() ? " (Nur bei Bedarf: " + verordnung.getSituation().getText() + ")" : "";
 
         return myPretty;
+    }
+
+    public static void alleAbsetzen(Bewohner bewohner){
+        EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Verordnung verordnung = (Verordnung) em.merge(o);
+                                    em.lock(verordnung, LockModeType.OPTIMISTIC);
+                                    verordnung.setAbDatum(new Date());
+                                    verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+                                    BHPTools.aufräumen(em, verordnung);
+                                    em.getTransaction().commit();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
+                                    em.getTransaction().rollback();
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
     }
 
 }

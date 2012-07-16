@@ -27,7 +27,7 @@ public class DisplayManager extends Thread {
     private long zyklen = 0, pbIntermediateZyklen = 0;
     private final Color defaultColor = new Color(105, 80, 69);
     private long dbZyklenRest = 0;
-    private Icon icon1, icon2;
+    private Icon icon1, icon2, icondead, iconaway, icongone;
     private SwingWorker worker;
 
 //    private DateFormat df;
@@ -47,8 +47,9 @@ public class DisplayManager extends Thread {
         jp.setMaximum(100);
         lblMain = lblM;
         lblSub = lblS;
-        icon1 = new ImageIcon(getClass().getResource("/artwork/22x22/db.png"));
-        icon2 = new ImageIcon(getClass().getResource("/artwork/22x22/db_update.png"));
+        icondead = new ImageIcon(getClass().getResource("/artwork/22x22/cross1.png"));
+        iconaway = new ImageIcon(getClass().getResource("/artwork/22x22/person-away.png"));
+        icongone = new ImageIcon(getClass().getResource("/artwork/22x22/delete_user.png"));
 //        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
         lblSub.setText(" ");
@@ -59,6 +60,7 @@ public class DisplayManager extends Thread {
     public void setMainMessage(String message) {
         lblMain.setToolTipText(message);
         lblMain.setText(message);
+        lblMain.setIcon(null);
     }
 
     public void clearAllMessages() {
@@ -66,6 +68,18 @@ public class DisplayManager extends Thread {
         messageQ.clear();
         oldMessages.clear();
         processSubMessage();
+    }
+
+    public void setIconDead(){
+        lblMain.setIcon(icondead);
+    }
+
+    public void setIconGone(){
+        lblMain.setIcon(icongone);
+    }
+
+    public void setIconAway(){
+        lblMain.setIcon(iconaway);
     }
 
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {

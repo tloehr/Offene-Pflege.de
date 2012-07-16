@@ -7,11 +7,14 @@ package entity;
 import entity.info.BWInfo;
 import entity.info.BWInfoTools;
 import entity.info.BWInfoTypTools;
+import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.tools.DlgListSelector;
-import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.Years;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -69,25 +72,28 @@ public class BewohnerTools {
         return ANREDE[bewohner.getGeschlecht()] + " " + bewohner.getVorname() + " " + bewohner.getNachname();
     }
 
-    public static boolean isWeiblich(Bewohner bewohner) {
-        return bewohner.getGeschlecht() == GESCHLECHT_WEIBLICH;
-    }
+//    public static boolean isWeiblich(Bewohner bewohner) {
+//        return bewohner.getGeschlecht() == GESCHLECHT_WEIBLICH;
+//    }
 
     public static String getBWLabelText(Bewohner bewohner) {
-        DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT);
-        String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + ", ";
+        boolean verstorben = BWInfoTools.isVerstorben(bewohner);
+        boolean ausgezogen = BWInfoTools.isVerstorben(bewohner);
         BWInfo hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("hauf"));
 
-        if (BWInfoTools.isVerstorben(hauf)) {
-            // In dem Fall, wird das Alter bis zum Sterbedatum gerechnet.
-            result += SYSCalendar.calculateAge(SYSCalendar.toGC(bewohner.getGebDatum()), SYSCalendar.toGC(hauf.getBis())) + " Jahre) [" + bewohner.getBWKennung() + "]";
-            result += "  verstorben: " + df.format(hauf.getBis()) + ", ";
-        } else {
-            if (BWInfoTools.isAusgezogen(hauf)) {
-                result += "  ausgezogen: " + df.format(hauf.getBis()) + ", ";
-            }
-            result += SYSCalendar.calculateAge(SYSCalendar.toGC(bewohner.getGebDatum()), SYSCalendar.toGC(new Date())) + " Jahre) [" + bewohner.getBWKennung() + "]";
+        DateFormat df = DateFormat.getDateInstance();
+        String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + ", ";
+
+        DateMidnight birthdate = new DateTime(bewohner.getGebDatum()).toDateMidnight();
+        DateTime refdate = verstorben ? new DateTime(hauf.getBis()) : new DateTime();
+        Years age = Years.yearsBetween(birthdate, refdate);
+
+        result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getBWKennung() + "]";
+
+        if (verstorben || ausgezogen) {
+            result += "  " + (verstorben ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(hauf.getBis()) + ", ";
         }
+
         return result;
     }
 
@@ -128,8 +134,15 @@ public class BewohnerTools {
      * @param em       as it is quite a complex operation, it runs within a surrounding EM to trigger rollbacks if necessary
      * @param bewohner the resident in question
      */
-    public static void endOfStay(EntityManager em, Bewohner bewohner) throws Exception {
+    public static void endOfStay(EntityManager em, Bewohner bewohner, Date enddate) throws Exception {
+        // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
+        // Alle Verordnungen absetzen
 
+        // Alle Planungen absetzen
+        // Alle BWINFOS absetzen
+        // Alle Bestände schließen
+        // Alle nicht abgehkaten BHPs und DFNs löschen
+        // Alle Vorgänge schließen
     }
 
 

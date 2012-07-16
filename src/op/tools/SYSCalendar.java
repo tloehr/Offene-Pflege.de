@@ -855,13 +855,13 @@ public class SYSCalendar {
         return sameDay(toGC(a), toGC(b));
     }
 
-    public static int calculateAge(GregorianCalendar a, GregorianCalendar b) {
-        return getDaysBetween(a, b) / 365;
-    }
-
-    public static int calculateAge(GregorianCalendar a) {
-        return getDaysBetween(a, new GregorianCalendar()) / 365;
-    }
+//    public static int calculateAge(GregorianCalendar a, GregorianCalendar b) {
+//        return getDaysBetween(a, b) / 365;
+//    }
+//
+//    public static int calculateAge(GregorianCalendar a) {
+//        return getDaysBetween(a, new GregorianCalendar()) / 365;
+//    }
 
     public static void checkJDC(JDateChooser jdc) {
         if (jdc.getDate() == null) {
