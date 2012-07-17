@@ -69,9 +69,9 @@ public class Bewohner implements Serializable {
     @Column(name = "GebDatum")
     @Temporal(TemporalType.DATE)
     private Date gebDatum;
-//    @Version
-//    @Column(name = "version")
-//    private Long version;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "adminonly")
     private short adminonly;

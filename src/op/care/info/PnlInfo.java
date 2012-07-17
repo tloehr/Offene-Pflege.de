@@ -15,13 +15,13 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.care.sysfiles.PnlFiles;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -29,6 +29,8 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -205,7 +207,10 @@ public class PnlInfo extends NursingRecordsPanel {
                         for (final BWInfoKat kat : kategorien) {
                             progress++;
                             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, kategorien.size()));
-                            tabKat.addTab(kat.getBezeichnung(), new JScrollPane(createCollapsiblePanesFor(kat)));
+
+//                            if (!BWInfoTypTools.findByKategorie(kat).isEmpty()) {
+                                tabKat.addTab(kat.getBezeichnung(), new JScrollPane(createCollapsiblePanesFor(kat)));
+//                            }
                         }
                     } catch (Exception e) {
                         OPDE.fatal(e);
@@ -251,14 +256,13 @@ public class PnlInfo extends NursingRecordsPanel {
         try {
             cpane.setLayout(new JideBoxLayout(cpane, JideBoxLayout.Y_AXIS));
 
-//            if (!bwinfotypen.containsKey(kat)) {
             bwinfotypen.put(kat, BWInfoTypTools.findByKategorie(kat));
-//            }
 
             for (BWInfoTyp typ : bwinfotypen.get(kat)) {
                 bwinfos.put(typ, BWInfoTools.findByBewohnerUndTyp(bewohner, typ));
                 CollapsiblePane panel = createPanelFor(typ);
                 cpane.add(panel);
+                panel.setVisible((tbEmpty.isSelected() || !bwinfos.get(typ).isEmpty()) && (tbInactive.isSelected() || bwinfos.get(typ).isEmpty() || !bwinfos.get(typ).get(0).isAbgesetzt()));
                 panelmap.put(typ, panel);
             }
             cpane.addExpansion();
@@ -325,8 +329,11 @@ public class PnlInfo extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                     bewohner.setStation(null);
                                     BWInfo hauf = em.merge(BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME)));
+                                    em.lock(hauf, LockModeType.OPTIMISTIC);
+
                                     hauf.setBis(dod);
                                     hauf.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
 
@@ -340,8 +347,16 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnBWMovedOut.setEnabled(false);
                                     btnBWisAway.setEnabled(false);
                                     btnBWisBack.setEnabled(false);
-                                    reloadDisplay();
-                                    GUITools.setBWDisplay(bewohner);
+//                                    reloadDisplay();
+//                                    GUITools.setBWDisplay(bewohner);
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTMLForScreen(OPDE.lang.getString(internalClassID + ".msg.isdeadnow")), 5));
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -350,7 +365,6 @@ public class PnlInfo extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isdeadnow")));
                             }
                         }
                     });
@@ -377,8 +391,10 @@ public class PnlInfo extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                     bewohner.setStation(null);
                                     BWInfo hauf = em.merge(BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME)));
+                                    em.lock(hauf, LockModeType.OPTIMISTIC);
                                     hauf.setBis(dod);
                                     hauf.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
 
@@ -392,8 +408,16 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnBWMovedOut.setEnabled(false);
                                     btnBWisAway.setEnabled(false);
                                     btnBWisBack.setEnabled(false);
-                                    reloadDisplay();
-                                    GUITools.setBWDisplay(bewohner);
+//                                    reloadDisplay();
+//                                    GUITools.setBWDisplay(bewohner);
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTMLForScreen(OPDE.lang.getString(internalClassID + ".msg.hasgonenow")), 5));
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -402,7 +426,6 @@ public class PnlInfo extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.hasgonenow")));
                             }
                         }
                     });
@@ -428,12 +451,31 @@ public class PnlInfo extends NursingRecordsPanel {
                         public void execute(Object o) {
                             popup.hidePopup();
                             if (o != null) {
-                                EntityTools.merge(o);
-                                btnBWisAway.setEnabled(false);
-                                btnBWisBack.setEnabled(true);
-                                refreshTabKat(abwesenheit.getBwinfotyp().getBwInfokat());
-                                GUITools.setBWDisplay(bewohner);
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isawaynow")));
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.merge(o);
+                                    em.getTransaction().commit();
+                                    btnBWisAway.setEnabled(false);
+                                    btnBWisBack.setEnabled(true);
+                                    refreshTabKat(abwesenheit.getBwinfotyp().getBwInfokat());
+                                    GUITools.setBWDisplay(bewohner);
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isawaynow")));
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
                             }
                         }
                     });
@@ -464,7 +506,9 @@ public class PnlInfo extends NursingRecordsPanel {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
+                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                         BWInfo lastabsence = em.merge(BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT)));
+                        em.lock(lastabsence, LockModeType.OPTIMISTIC);
                         lastabsence.setBis(new Date());
                         lastabsence.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                         em.getTransaction().commit();
@@ -473,6 +517,11 @@ public class PnlInfo extends NursingRecordsPanel {
                         refreshTabKat(lastabsence.getBwinfotyp().getBwInfokat());
                         GUITools.setBWDisplay(bewohner);
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isbacknow")));
+                    } catch (OptimisticLockException ole) {
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
                     } catch (Exception e) {
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -717,17 +766,25 @@ public class PnlInfo extends NursingRecordsPanel {
                                     EntityManager em = OPDE.createEM();
                                     try {
                                         em.getTransaction().begin();
+                                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
                                         BWInfo newinfo = em.merge((BWInfo) o);
+                                        em.lock(newinfo, LockModeType.OPTIMISTIC);
                                         if (typ.getIntervalMode() != BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS && ersterBWInfo != null) {
-                                            ersterBWInfo.setBis(new DateTime(newinfo.getVon()).minusSeconds(1).toDate());
-                                            ersterBWInfo.setAbgesetztDurch(newinfo.getAngesetztDurch());
-                                            em.merge(ersterBWInfo);
+                                            BWInfo myersterbwinfo = em.merge(ersterBWInfo);
+                                            em.lock(myersterbwinfo, LockModeType.OPTIMISTIC);
+                                            myersterbwinfo.setBis(new DateTime(newinfo.getVon()).minusSeconds(1).toDate());
+                                            myersterbwinfo.setAbgesetztDurch(newinfo.getAngesetztDurch());
                                         }
-
                                         newinfo.setHtml(BWInfoTools.getContentAsHTML(newinfo));
                                         newinfo = em.merge(newinfo);
                                         em.getTransaction().commit();
                                         refreshTabKat(newinfo.getBwinfotyp().getBwInfokat());
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.anewentryhasbeenadded")));
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
                                     } catch (Exception e) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -736,6 +793,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                     } finally {
                                         em.close();
                                     }
+                                } else {
+                                    OPDE.getDisplayManager().clearSubMessages();
                                 }
                             }
                         });
@@ -769,12 +828,19 @@ public class PnlInfo extends NursingRecordsPanel {
                                     EntityManager em = OPDE.createEM();
                                     try {
                                         em.getTransaction().begin();
-                                        BWInfo newinfo = em.merge(ersterBWInfo);
+                                        BWInfo newinfo = em.merge((BWInfo) o);
+                                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                        em.lock(newinfo, LockModeType.OPTIMISTIC);
                                         newinfo.setHtml(BWInfoTools.getContentAsHTML(newinfo));
                                         newinfo.setAngesetztDurch(em.merge(OPDE.getLogin().getUser()));
-                                        em.merge(newinfo);
                                         em.getTransaction().commit();
                                         refreshTabKat(typ.getBwInfokat());
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.thisentryhasbeenedited")));
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
                                     } catch (Exception e) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -818,10 +884,18 @@ public class PnlInfo extends NursingRecordsPanel {
                                     try {
                                         em.getTransaction().begin();
                                         BWInfo newinfo = em.merge(ersterBWInfo);
+                                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                        em.lock(newinfo, LockModeType.OPTIMISTIC);
                                         newinfo.setBis(new Date());
                                         newinfo.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                                         em.getTransaction().commit();
                                         refreshTabKat(typ.getBwInfokat());
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.thisentryhasbeencancelled")));
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
                                     } catch (Exception e) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -863,9 +937,18 @@ public class PnlInfo extends NursingRecordsPanel {
                                     EntityManager em = OPDE.createEM();
                                     try {
                                         em.getTransaction().begin();
-                                        em.remove(em.merge(ersterBWInfo));
+                                        em.merge(ersterBWInfo);
+                                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                        em.lock(ersterBWInfo, LockModeType.OPTIMISTIC);
+                                        em.remove(ersterBWInfo);
                                         em.getTransaction().commit();
                                         refreshTabKat(typ.getBwInfokat());
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.thisentryhasbeendeleted")));
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
                                     } catch (Exception e) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -1024,11 +1107,32 @@ public class PnlInfo extends NursingRecordsPanel {
                                     public void execute(Object o) {
                                         popup.hidePopup();
                                         if (o != null) {
-                                            Date date = (Date) o;
-                                            innerBWInfo.setVon(date);
-                                            innerBWInfo.setBis(date);
-                                            EntityTools.merge(innerBWInfo);
-                                            refreshTabKat(typ.getBwInfokat());
+
+                                            EntityManager em = OPDE.createEM();
+                                            try {
+                                                em.getTransaction().begin();
+                                                BWInfo mybwinfo = em.merge(innerBWInfo);
+                                                em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                                em.lock(mybwinfo, LockModeType.OPTIMISTIC);
+                                                Date date = (Date) o;
+                                                mybwinfo.setVon(date);
+                                                mybwinfo.setBis(date);
+                                                em.getTransaction().commit();
+                                                refreshTabKat(typ.getBwInfokat());
+                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.pitchanged")));
+                                            } catch (OptimisticLockException ole) {
+                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                if (em.getTransaction().isActive()) {
+                                                    em.getTransaction().rollback();
+                                                }
+                                            } catch (Exception e) {
+                                                if (em.getTransaction().isActive()) {
+                                                    em.getTransaction().rollback();
+                                                }
+                                                OPDE.fatal(e);
+                                            } finally {
+                                                em.close();
+                                            }
                                         }
                                     }
                                 });
@@ -1053,11 +1157,31 @@ public class PnlInfo extends NursingRecordsPanel {
                                     public void execute(Object o) {
                                         popup.hidePopup();
                                         if (o != null) {
-                                            Pair<Date, Date> period = (Pair<Date, Date>) o;
-                                            innerBWInfo.setVon(period.getFirst());
-                                            innerBWInfo.setBis(period.getSecond());
-                                            EntityTools.merge(innerBWInfo);
-                                            refreshTabKat(typ.getBwInfokat());
+                                            EntityManager em = OPDE.createEM();
+                                            try {
+                                                em.getTransaction().begin();
+                                                BWInfo mybwinfo = em.merge(innerBWInfo);
+                                                em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                                em.lock(mybwinfo, LockModeType.OPTIMISTIC);
+                                                Pair<Date, Date> period = (Pair<Date, Date>) o;
+                                                mybwinfo.setVon(period.getFirst());
+                                                mybwinfo.setBis(period.getSecond());
+                                                em.getTransaction().commit();
+                                                refreshTabKat(typ.getBwInfokat());
+                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.periodchanged")));
+                                            } catch (OptimisticLockException ole) {
+                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                if (em.getTransaction().isActive()) {
+                                                    em.getTransaction().rollback();
+                                                }
+                                            } catch (Exception e) {
+                                                if (em.getTransaction().isActive()) {
+                                                    em.getTransaction().rollback();
+                                                }
+                                                OPDE.fatal(e);
+                                            } finally {
+                                                em.close();
+                                            }
                                         }
 
                                     }

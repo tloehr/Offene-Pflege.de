@@ -6,6 +6,8 @@ import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -147,9 +149,12 @@ public class BHPTools {
         int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
         Query query = em.createQuery("SELECT b FROM BHP b WHERE b.verordnung = :verordnung AND b.soll >= :bofday AND b.soll <= :eofday");
 
+        DateMidnight bofday = new DateMidnight();
+        DateTime eofday = new DateMidnight().toDateTime().plusDays(1).minusSeconds(1).toDateTime();
+
         query.setParameter("verordnung", verordnung);
-        query.setParameter("bofday", new Date(SYSCalendar.startOfDay()));
-        query.setParameter("eofday", new Date(SYSCalendar.endOfDay()));
+        query.setParameter("bofday", bofday.toDate());
+        query.setParameter("eofday", eofday.toDate());
 
         List<BHP> bhps = query.getResultList();
 

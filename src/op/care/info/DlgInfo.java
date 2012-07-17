@@ -96,7 +96,7 @@ public class DlgInfo extends MyJDialog {
             contentPanel.add(new JScrollPane(txtBemerkung), CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
         }
 
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(bwInfo.getBwinfotyp().getBWInfoKurz(), 10));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + bwInfo.getBwinfotyp().getBWInfoKurz(), 10));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {

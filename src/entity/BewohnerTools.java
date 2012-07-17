@@ -17,6 +17,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Years;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.text.DateFormat;
@@ -135,13 +136,13 @@ public class BewohnerTools {
      * @param bewohner the resident in question
      */
     public static void endOfStay(EntityManager em, Bewohner bewohner, Date enddate) throws Exception {
+        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
         // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
-        // Alle Verordnungen absetzen
-
+        VerordnungTools.alleAbsetzen(em, bewohner);
         // Alle Planungen absetzen
-        // Alle BWINFOS absetzen
+        BWInfoTools.alleAbsetzen(em, bewohner);
         // Alle Bestände schließen
-        // Alle nicht abgehkaten BHPs und DFNs löschen
+        // Alle nicht abgehakten BHPs und DFNs löschen
         // Alle Vorgänge schließen
     }
 

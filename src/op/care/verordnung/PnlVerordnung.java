@@ -34,15 +34,15 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.system.UniqueTools;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
+import entity.system.UniqueTools;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgBestandAbschliessen;
 import op.care.med.vorrat.DlgBestandAnbrechen;
-import op.tools.DlgYesNo;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -271,8 +271,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Korrigiert: " + VerordnungTools.toPrettyString(verordnung), 2));
                                 } catch (javax.persistence.OptimisticLockException ole) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem korrigiert.", DisplayMessage.IMMEDIATELY, 2));
-                                    em.getTransaction().rollback();
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -333,8 +339,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Geändert: " + VerordnungTools.toPrettyString(oldVerordnung), 2));
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem korrigiert.", DisplayMessage.IMMEDIATELY, 2));
-                                    em.getTransaction().rollback();
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -369,10 +381,16 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     BHPTools.aufräumen(em, verordnung);
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
-                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
+//                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
-                                    em.getTransaction().rollback();
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -410,8 +428,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gelöscht: " + VerordnungTools.toPrettyString(selectedVerordnung), 2));
                                 } catch (OptimisticLockException ole) {
-                                    em.getTransaction().rollback();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Diese Verordnung wurde zwischenzeitlich schon gelöscht.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -656,6 +680,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
                                     verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
                                     verordnung = em.merge(verordnung);
                                     if (!verordnung.isBedarf()) {
@@ -663,8 +688,19 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     }
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
-                                    em.getTransaction().rollback();
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
                                     OPDE.fatal(e);
                                 } finally {
                                     em.close();

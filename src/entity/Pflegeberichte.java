@@ -181,6 +181,9 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     @Basic(optional = false)
     @Column(name = "PBID")
     private Long pbid;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)

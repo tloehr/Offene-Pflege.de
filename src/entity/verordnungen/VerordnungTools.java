@@ -9,14 +9,12 @@ import entity.BewohnerTools;
 import entity.Einrichtungen;
 import entity.Stationen;
 import op.OPDE;
-import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -617,27 +615,23 @@ public class VerordnungTools {
         return myPretty;
     }
 
-    public static void alleAbsetzen(Bewohner bewohner){
-        EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Verordnung verordnung = (Verordnung) em.merge(o);
-                                    em.lock(verordnung, LockModeType.OPTIMISTIC);
-                                    verordnung.setAbDatum(new Date());
-                                    verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
-                                    BHPTools.aufräumen(em, verordnung);
-                                    em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
-                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder eine BHP wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 2));
-                                    em.getTransaction().rollback();
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
+    public static void absetzen(EntityManager em, Verordnung verordnung) throws Exception {
+        verordnung = em.merge(verordnung);
+        em.lock(verordnung, LockModeType.OPTIMISTIC);
+        verordnung.setAbDatum(new Date());
+        verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+        BHPTools.aufräumen(em, verordnung);
+    }
+
+    public static void alleAbsetzen(EntityManager em, Bewohner bewohner) throws Exception {
+        Query query = em.createQuery("SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum >= :now");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("now", new Date());
+        List<Verordnung> verordnungen = query.getResultList();
+
+        for (Verordnung verordnung : verordnungen) {
+            absetzen(em, verordnung);
+        }
     }
 
 }

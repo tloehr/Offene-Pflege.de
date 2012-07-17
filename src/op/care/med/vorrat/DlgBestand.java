@@ -39,6 +39,7 @@ import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.Form;
 import op.system.PrinterType;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.PrintListElement;
@@ -46,9 +47,7 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
+import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -263,8 +262,8 @@ public class DlgBestand extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -308,7 +307,7 @@ public class DlgBestand extends MyJDialog {
             mainPane.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -351,7 +350,7 @@ public class DlgBestand extends MyJDialog {
             mainPane.add(jLabel6, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -479,6 +478,8 @@ public class DlgBestand extends MyJDialog {
         try {
             em.getTransaction().begin();
 
+            em.lock(bewohner, LockModeType.OPTIMISTIC);
+
             // Wenn die packung null ist, dann ist eine Sonderpackung
             if (packung != null) {
                 packung = em.merge(packung);
@@ -509,8 +510,19 @@ public class DlgBestand extends MyJDialog {
             }
 
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr." + bestand.getBestID() + " wurde eingebucht", 2));
+        } catch (OptimisticLockException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
         } catch (Exception ex) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             OPDE.fatal(ex);
         } finally {
             em.close();

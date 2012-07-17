@@ -1096,7 +1096,7 @@ public class SYSTools {
                     + "</head>"
                     + "<body>" + in + "</body></html>";
         }
-        return out;
+        return htmlUmlautConversion(out);
     }
 
     /**
@@ -1187,6 +1187,9 @@ public class SYSTools {
      * @return geänderter String
      */
     public static String htmlUmlautConversion(String in) {
+        if (in == null){
+            return null;
+        }
         String result = in;
         result = SYSTools.replace(result, "Ä", "&Auml;");
         result = SYSTools.replace(result, "ä", "&auml;");

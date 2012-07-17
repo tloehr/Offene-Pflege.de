@@ -1,6 +1,8 @@
 package entity.info;
 
 import entity.*;
+import entity.verordnungen.BHPTools;
+import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.tools.*;
@@ -13,6 +15,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
@@ -51,10 +54,6 @@ public class BWInfoTools {
             html += "<p id=\"fonttext\" >" + bwinfo.getBemerkung() + "</p>";
         }
 
-//        if (bwinfo.isAbgesetzt()) {
-//            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.OutdatedSince") + ":</u></b> " + DateFormat.getDateInstance().format(bwinfo.getBis()) + "</p>";
-//        }
-
         return html;
     }
 
@@ -69,11 +68,6 @@ public class BWInfoTools {
         em.close();
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
-
-//    public static boolean isAbwesend(Bewohner bewohner){
-//        BWInfo abwesend = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
-//        return abwesend != null & abwesend.isAbgesetzt();
-//    }
 
     public static List<BWInfo> findByBewohnerUndTyp(Bewohner bewohner, BWInfoTyp typ) {
         EntityManager em = OPDE.createEM();
@@ -95,17 +89,6 @@ public class BWInfoTools {
         List<BWInfo> bwInfos = query.getResultList();
         em.close();
         return bwInfos;
-    }
-
-
-    public static Zeitraum getZeitraum(BWInfo bwinfo) {
-        Zeitraum zeitraum = null;
-        try {
-            zeitraum = new Zeitraum(bwinfo.getVon(), bwinfo.getBis());
-        } catch (Exception ex) {
-            new DlgException(ex);
-        }
-        return zeitraum;
     }
 
     public static Pair<Date, Date> getMinMaxAusdehnung(BWInfo info, ArrayList<BWInfo> sortedInfoList) {
@@ -965,6 +948,19 @@ public class BWInfoTools {
             OPDE.fatal(ex);
         }
         return props;
+    }
+
+    public static void alleAbsetzen(EntityManager em, Bewohner bewohner) throws Exception {
+        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bis >= :now");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("now", new Date());
+        List<BWInfo> bwinfos = query.getResultList();
+
+        for (BWInfo info : bwinfos) {
+            em.lock(info, LockModeType.OPTIMISTIC);
+            info.setBis(new Date());
+            info.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+        }
     }
 
 }

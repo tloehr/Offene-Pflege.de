@@ -40,7 +40,7 @@ import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
-import op.tools.DlgYesNo;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -51,6 +51,8 @@ import tablemodels.TMPflegeberichte;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -61,10 +63,6 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -227,23 +225,8 @@ public class PnlBerichte extends NursingRecordsPanel {
     }
 
     private void printBericht(int[] sel) {
-        try {
-            // Create temp file.
-            File temp = File.createTempFile("pflegebericht", ".html");
-
-            // Delete temp file when program exits.
-            temp.deleteOnExit();
-
-            // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-
-            TMPflegeberichte tm = (TMPflegeberichte) tblTB.getModel();
-            out.write(SYSTools.htmlUmlautConversion(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false, true)));
-
-            out.close();
-            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
-        } catch (IOException e) {
-        }
+        TMPflegeberichte tm = (TMPflegeberichte) tblTB.getModel();
+        SYSFilesTools.print(SYSTools.toHTML(PflegeberichteTools.getBerichteAsHTML(SYSTools.getSelectionAsList(tm.getPflegeberichte(), sel), false, true)), true);
     }
 
     private void tblTBMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTBMousePressed
@@ -255,7 +238,6 @@ public class PnlBerichte extends NursingRecordsPanel {
 
         final int row = tblTB.rowAtPoint(p);
         final int col = tblTB.columnAtPoint(p);
-//        OPDE.debug("COLUMN: " + col);
 
         ListSelectionModel lsm = tblTB.getSelectionModel();
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
@@ -284,6 +266,14 @@ public class PnlBerichte extends NursingRecordsPanel {
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
 
+                /***
+                 *      _____    _ _ _     ____            _      _     _
+                 *     | ____|__| (_) |_  | __ )  ___ _ __(_) ___| |__ | |_
+                 *     |  _| / _` | | __| |  _ \ / _ \ '__| |/ __| '_ \| __|
+                 *     | |__| (_| | | |_  | |_) |  __/ |  | | (__| | | | |_
+                 *     |_____\__,_|_|\__| |____/ \___|_|  |_|\___|_| |_|\__|
+                 *
+                 */
                 final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
                 itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -340,34 +330,36 @@ public class PnlBerichte extends NursingRecordsPanel {
                             saveButton.addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent actionEvent) {
+                                    popup.hidePopup();
                                     EntityManager em = OPDE.createEM();
                                     try {
+                                        em.getTransaction().begin();
 
-                                        Pflegeberichte newBericht = PflegeberichteTools.copyBericht(bericht);
-                                        popup.hidePopup();
+                                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                        bericht = em.merge(bericht);
+                                        Pflegeberichte newBericht = em.merge(PflegeberichteTools.copyBericht(bericht));
 
                                         switch (col) {
                                             case TMPflegeberichte.COL_PIT: {
                                                 newBericht.setPit(((PnlUhrzeitDatum) editor).getPIT());
-                                                PflegeberichteTools.changeBericht(bericht, newBericht);
-                                                reloadTable();
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+                                                PflegeberichteTools.changeBericht(em, bericht, newBericht);
+//                                                reloadTable();
+//                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
                                                 break;
                                             }
                                             case TMPflegeberichte.COL_Flags: {
                                                 bericht.getTags().clear();
                                                 bericht.getTags().addAll(mytags);
-                                                bericht = EntityTools.merge(bericht);
-                                                ((TMPflegeberichte) tblTB.getModel()).setPflegebericht(row, bericht);
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+//                                                ((TMPflegeberichte) tblTB.getModel()).setPflegebericht(row, bericht);
+//                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
                                                 break;
                                             }
                                             case TMPflegeberichte.COL_HTML: {
                                                 if (!((JTextArea) editor).getText().trim().isEmpty()) {
                                                     newBericht.setText(((JTextArea) editor).getText().trim());
-                                                    PflegeberichteTools.changeBericht(bericht, newBericht);
-                                                    reloadTable();
-                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+                                                    PflegeberichteTools.changeBericht(em, bericht, newBericht);
+//                                                    reloadTable();
+//                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
                                                 } else {
                                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
                                                 }
@@ -377,8 +369,27 @@ public class PnlBerichte extends NursingRecordsPanel {
 
                                             }
                                         }
+                                        em.getTransaction().commit();
+                                        reloadTable();
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+                                    } catch (OptimisticLockException ole) {
+
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+
+                                        //Class> entity.Bewohner
+                                        // if (((org.eclipse.persistence.exceptions.OptimisticLockException) ole.getCause()).getObject() instanceof Bewohner) {
+                                        if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                     } catch (Exception e) {
-                                        em.getTransaction().rollback();
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
                                     } finally {
                                         em.close();
                                     }
@@ -431,7 +442,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                             bericht.setDauer(minutes);
                             bericht = EntityTools.merge(bericht);
                             ((TMPflegeberichte) tblTB.getModel()).setPflegebericht(row, bericht);
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.edited")));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.thisentryhasbeenedited")));
                         }
                     });
                     timemenu.add(item);
@@ -441,8 +452,15 @@ public class PnlBerichte extends NursingRecordsPanel {
                 timemenu.setEnabled(OPDE.isAdmin() || (!alreadyEdited && singleRowSelected && sameUser)); // Sonderfall, egal ob schon bestätigt.
             }
 
+            /***
+             *      ____       _      _
+             *     |  _ \  ___| | ___| |_ ___
+             *     | | | |/ _ \ |/ _ \ __/ _ \
+             *     | |_| |  __/ |  __/ ||  __/
+             *     |____/ \___|_|\___|\__\___|
+             *
+             */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
-
                 JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
                 itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
                     @Override
@@ -451,12 +469,37 @@ public class PnlBerichte extends NursingRecordsPanel {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    Pflegeberichte mybericht = PflegeberichteTools.deleteBericht(bericht);
-                                    ((TMPflegeberichte) tblTB.getModel()).setPflegebericht(row, mybericht);
 
-                                    if (!tbShowReplaced.isSelected()) {
-                                        reloadTable();
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                        Pflegeberichte mybericht = PflegeberichteTools.deleteBericht(em, bericht);
+                                        em.getTransaction().commit();
+
+                                        ((TMPflegeberichte) tblTB.getModel()).setPflegebericht(row, mybericht);
+                                        if (!tbShowReplaced.isSelected()) {
+                                            reloadTable();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.thisentryhasbeendeleted")));
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
                                     }
+
                                 }
                             }
                         });
@@ -470,8 +513,8 @@ public class PnlBerichte extends NursingRecordsPanel {
                 JMenuItem itemPopupPrint = new JMenuItem(OPDE.lang.getString("misc.commands.printselected"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
                 itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        int[] sel = tblTB.getSelectedRows();
-                        printBericht(sel);
+//                        int[] sel = tblTB.getSelectedRows();
+                        printBericht(tblTB.getSelectedRows());
                     }
                 });
                 menu.add(itemPopupPrint);
@@ -676,7 +719,14 @@ public class PnlBerichte extends NursingRecordsPanel {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-
+        /***
+         *      _   _
+         *     | \ | | _____      __
+         *     |  \| |/ _ \ \ /\ / /
+         *     | |\  |  __/\ V  V /
+         *     |_| \_|\___| \_/\_/
+         *
+         */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
@@ -688,9 +738,22 @@ public class PnlBerichte extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
                                     em.merge(bericht);
                                     em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
                                     OPDE.fatal(e);
                                 } finally {
                                     em.close();
@@ -708,8 +771,8 @@ public class PnlBerichte extends NursingRecordsPanel {
             JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
-//                    SYSPrint.print(new JFrame(), SYSTools.htmlUmlautConversion(op.care.DBHandling.getUeberleitung(bewohner, false, false, cbMedi.isSelected(), cbBilanz.isSelected(), cbBerichte.isSelected(), true, false, false, false, cbBWInfo.isSelected())), false);
+                    TMPflegeberichte tm = (TMPflegeberichte) tblTB.getModel();
+                    SYSFilesTools.print(SYSTools.toHTML(PflegeberichteTools.getBerichteAsHTML(tm.getPflegeberichte(), false, true)), true);
                 }
             });
             mypanel.add(printButton);

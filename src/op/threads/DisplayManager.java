@@ -1,6 +1,7 @@
 package op.threads;
 
 import entity.system.SyslogTools;
+import op.OPDE;
 import op.tools.FadingLabel;
 import op.tools.SYSConst;
 
@@ -211,6 +212,10 @@ public class DisplayManager extends Thread {
 //        }
 //    }
 
+
+    public static DisplayMessage getLockMessage(){
+        return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, 5);
+    }
 
     public void run() {
         while (!interrupted) {

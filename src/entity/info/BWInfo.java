@@ -65,6 +65,9 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
     @Basic(optional = false)
     @Column(name = "BWINFOID")
     private Long bwinfoid;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)

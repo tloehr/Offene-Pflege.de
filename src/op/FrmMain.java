@@ -182,7 +182,7 @@ public class FrmMain extends JFrame {
     }
 
 
-    private void emptyFrame() {
+    public void emptyFrame() {
         if (currentVisiblePanel != null) {
             pnlCard.remove(currentVisiblePanel);
             lblWait.setVisible(false);
@@ -238,7 +238,7 @@ public class FrmMain extends JFrame {
         splitPaneLeft.setDividerLocation(0, 15);
     }
 
-    private void afterLogin() {
+    public void afterLogin() {
 
         prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getNameUndVorname());
@@ -261,7 +261,7 @@ public class FrmMain extends JFrame {
         SwingUtilities.invokeLater(runnable);
 
         displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
-        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
+//        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
 
     }
 
