@@ -28,7 +28,6 @@ package op.controlling;
 
 import entity.*;
 import op.OPDE;
-import op.share.bwinfo.BWInfo;
 import op.tools.*;
 
 import javax.persistence.EntityManager;
@@ -171,12 +170,12 @@ public class DBHandling {
 
                     html.append("<tr>");
                     String datum = sdf.format(rs.getDate("bwi.Von"));
-                    BWInfo bwinfo = new BWInfo(rs.getLong("bwi.BWINFOID"));
-                    ArrayList content = bwinfo.getAttribute();
-                    HashMap attrib = (HashMap) content.get(0); // Diese BWInfo hat nur eine Zeile
+//                    BWInfo bwinfo = new BWInfo(rs.getLong("bwi.BWINFOID"));
+//                    ArrayList content = bwinfo.getAttribute();
+//                    HashMap attrib = (HashMap) content.get(0); // Diese BWInfo hat nur eine Zeile
                     //String bemerkung = SYSTools.catchNull(rs.getString("bwi.Bemerkung"), "<i>keine Bemerkung</i>");
                     html.append("<td>" + datum + "</td>");
-                    html.append("<td>" + attrib.get("html").toString() + "</td>");
+//                    html.append("<td>" + attrib.get("html").toString() + "</td>");
                     html.append("</tr>");
                     stuerze++;
                     isCancelled = (Boolean) o[2];
@@ -851,20 +850,20 @@ public class DBHandling {
                         String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
 
                         zieltrink = 0;
-                        BWInfo bwinfo3 = new BWInfo(bwkennung, "ZIELTRINK", SYSCalendar.nowDBDate());
-                        if (bwinfo3.getAttribute().size() > 0) {
-                            HashMap antwort = (HashMap) ((HashMap) bwinfo3.getAttribute().get(0)).get("antwort");
-                            zieltrink = Integer.parseInt(antwort.get("zieltrinkmenge").toString());
-                        }
-                        bwinfo3.cleanup();
-
-                        bilanz = false;
-                        BWInfo bwinfo4 = new BWInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
-                        if (bwinfo4.getAttribute().size() > 0) {
-                            HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
-                            bilanz = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
-                        }
-                        bwinfo4.cleanup();
+//                        BWInfo bwinfo3 = new BWInfo(bwkennung, "ZIELTRINK", SYSCalendar.nowDBDate());
+//                        if (bwinfo3.getAttribute().size() > 0) {
+//                            HashMap antwort = (HashMap) ((HashMap) bwinfo3.getAttribute().get(0)).get("antwort");
+//                            zieltrink = Integer.parseInt(antwort.get("zieltrinkmenge").toString());
+//                        }
+//                        bwinfo3.cleanup();
+//
+//                        bilanz = false;
+//                        BWInfo bwinfo4 = new BWInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
+//                        if (bwinfo4.getAttribute().size() > 0) {
+//                            HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
+//                            bilanz = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
+//                        }
+//                        bwinfo4.cleanup();
 
 
                         if (lbl != null) {
@@ -1184,10 +1183,10 @@ public class DBHandling {
                         Pflegeberichte bericht = EntityTools.find(Pflegeberichte.class, rs.getLong("c.pk"));
                         html.append("<td>" + PflegeberichteTools.getBerichtAsHTML(bericht, false) + "</td>");
                     } else {
-                        BWInfo bwinfo = new BWInfo(rs.getLong("c.pk"));
-                        ArrayList content = bwinfo.getAttribute();
-                        HashMap attrib = (HashMap) content.get(0); // Diese BWInfo hat nur eine Zeile
-                        html.append("<td>" + "<b>" + attrib.get("bwinfokurz") + "</b><br/>" + attrib.get("html").toString() + "</td>");
+//                        BWInfo bwinfo = new BWInfo(rs.getLong("c.pk"));
+//                        ArrayList content = bwinfo.getAttribute();
+//                        HashMap attrib = (HashMap) content.get(0); // Diese BWInfo hat nur eine Zeile
+//                        html.append("<td>" + "<b>" + attrib.get("bwinfokurz") + "</b><br/>" + attrib.get("html").toString() + "</td>");
                     }
                     html.append("</tr>");
                     isCancelled = (Boolean) o[2];
@@ -1356,29 +1355,29 @@ public class DBHandling {
                 rs.beforeFirst();
                 while (rs.next()) {
                     Date last = new Date();//op.care.vital.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
-                    BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
-                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
-                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
+//                    BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
+//                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
+//                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
 
-                    Date grenze = SYSCalendar.addDate(new Date(), tage * -1);
+//                    Date grenze = SYSCalendar.addDate(new Date(), tage * -1);
 
-                    if (last.before(grenze)) {
-
-                        if (html.length() == 0) {
-                            html.append("<h" + headertiefe + ">");
-                            html.append("Bewohner ohne Stuhlgang");
-                            html.append("</h" + headertiefe + ">");
-                            html.append("<table border=\"1\"><tr>" +
-                                    "<th>BewohnerIn</th><th>Letzter Stuhlgang</th><th>Tage bis Alarm</th></tr>");
-                        }
-
-                        html.append("<tr>");
-                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-                        html.append("<td>" + name + "</td>");
-                        html.append("<td>" + df.format(last) + "</td>");
-                        html.append("<td>" + tage + "</td>");
-                        html.append("</tr>");
-                    }
+//                    if (last.before(grenze)) {
+//
+//                        if (html.length() == 0) {
+//                            html.append("<h" + headertiefe + ">");
+//                            html.append("Bewohner ohne Stuhlgang");
+//                            html.append("</h" + headertiefe + ">");
+//                            html.append("<table border=\"1\"><tr>" +
+//                                    "<th>BewohnerIn</th><th>Letzter Stuhlgang</th><th>Tage bis Alarm</th></tr>");
+//                        }
+//
+//                        html.append("<tr>");
+//                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+//                        html.append("<td>" + name + "</td>");
+//                        html.append("<td>" + df.format(last) + "</td>");
+//                        html.append("<td>" + tage + "</td>");
+//                        html.append("</tr>");
+//                    }
 
                 }
 
@@ -1417,55 +1416,55 @@ public class DBHandling {
                 while (rs.next()) {
 
                     //Date last = op.care.vital.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
-                    BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
-                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
-                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
-                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
-                    int tage = Integer.parseInt(antwort.get("c.einftage").toString());
-                    int minmenge = Integer.parseInt(antwort.get("c.einfmenge").toString());
-                    int maxmenge = Integer.parseInt(antwort.get("c.uebermenge").toString());
-                    if (!minkontrolle) {
-                        minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
-                    }
-                    if (!maxkontrolle) {
-                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
-                    }
-
-                    String s = " SELECT * FROM (" +
-                            "       SELECT PIT, SUM(Wert) EINFUHR FROM BWerte " +
-                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<BILANZ/>' " +
-                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
-                            "       Group By DATE(PIT) " +
-                            "       ORDER BY PIT desc " +
-                            " ) a" +
-                            " WHERE a.EINFUHR < ? OR a.Einfuhr > ? ";
-                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
-                    stmt1.setString(1, rs.getString("b.BWKennung"));
-                    stmt1.setInt(2, tage * -1);
-                    stmt1.setInt(3, minmenge);
-                    stmt1.setInt(4, maxmenge);
-
-                    ResultSet rs1 = stmt1.executeQuery();
-                    if (rs1.first()) {
-                        rs1.beforeFirst();
-                        while (rs1.next()) {
-
-                            if (html.length() == 0) {
-                                html.append("<h" + headertiefe + ">");
-                                html.append("Bewohner mit zu geringer / zu hoher Einfuhr");
-                                html.append("</h" + headertiefe + ">");
-                                html.append("<table border=\"1\"><tr>" +
-                                        "<th>BewohnerIn</th><th>Datum</th><th>Einfuhr (ml)</th><th>Bemerkung</th></tr>");
-                            }
-                            html.append("<tr>");
-                            String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-                            html.append("<td>" + name + "</td>");
-                            html.append("<td>" + df.format(rs1.getDate("PIT")) + "</td>");
-                            html.append("<td>" + rs1.getString("Einfuhr") + "</td>");
-                            html.append("<td>" + (rs1.getDouble("Einfuhr") < minmenge ? "Einfuhr zu niedrig" : "Einfuhr zu hoch") + "</td>");
-                            html.append("</tr>");
-                        }
-                    }
+//                    BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
+//                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
+//                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
+//                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
+//                    int tage = Integer.parseInt(antwort.get("c.einftage").toString());
+//                    int minmenge = Integer.parseInt(antwort.get("c.einfmenge").toString());
+//                    int maxmenge = Integer.parseInt(antwort.get("c.uebermenge").toString());
+//                    if (!minkontrolle) {
+//                        minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
+//                    }
+//                    if (!maxkontrolle) {
+//                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
+//                    }
+//
+//                    String s = " SELECT * FROM (" +
+//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM BWerte " +
+//                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<BILANZ/>' " +
+//                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
+//                            "       Group By DATE(PIT) " +
+//                            "       ORDER BY PIT desc " +
+//                            " ) a" +
+//                            " WHERE a.EINFUHR < ? OR a.Einfuhr > ? ";
+//                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
+//                    stmt1.setString(1, rs.getString("b.BWKennung"));
+//                    stmt1.setInt(2, tage * -1);
+//                    stmt1.setInt(3, minmenge);
+//                    stmt1.setInt(4, maxmenge);
+//
+//                    ResultSet rs1 = stmt1.executeQuery();
+//                    if (rs1.first()) {
+//                        rs1.beforeFirst();
+//                        while (rs1.next()) {
+//
+//                            if (html.length() == 0) {
+//                                html.append("<h" + headertiefe + ">");
+//                                html.append("Bewohner mit zu geringer / zu hoher Einfuhr");
+//                                html.append("</h" + headertiefe + ">");
+//                                html.append("<table border=\"1\"><tr>" +
+//                                        "<th>BewohnerIn</th><th>Datum</th><th>Einfuhr (ml)</th><th>Bemerkung</th></tr>");
+//                            }
+//                            html.append("<tr>");
+//                            String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+//                            html.append("<td>" + name + "</td>");
+//                            html.append("<td>" + df.format(rs1.getDate("PIT")) + "</td>");
+//                            html.append("<td>" + rs1.getString("Einfuhr") + "</td>");
+//                            html.append("<td>" + (rs1.getDouble("Einfuhr") < minmenge ? "Einfuhr zu niedrig" : "Einfuhr zu hoch") + "</td>");
+//                            html.append("</tr>");
+//                        }
+//                    }
                 }
                 if (html.length() > 0) {
                     html.append("</table>");

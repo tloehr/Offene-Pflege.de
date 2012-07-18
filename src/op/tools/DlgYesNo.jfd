@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -81,7 +81,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JTextArea</string> 
+              <string>javax.swing.JTextPane</string> 
               <void method="setProperty"> 
                <string>font</string> 
                <object class="java.awt.Font"> 
@@ -95,12 +95,8 @@
                <boolean>false</boolean> 
               </void> 
               <void method="setProperty"> 
-               <string>wrapStyleWord</string> 
-               <boolean>true</boolean> 
-              </void> 
-              <void method="setProperty"> 
-               <string>lineWrap</string> 
-               <boolean>true</boolean> 
+               <string>contentType</string> 
+               <string>text/html</string> 
               </void> 
               <void property="name"> 
                <string>txtMessage</string> 

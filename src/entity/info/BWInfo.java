@@ -57,6 +57,7 @@ import java.util.Properties;
                 + " WHERE v = :vorgang "),
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
+        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_ASC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von ASC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis")})
 public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparable<BWInfo> {
     private static final long serialVersionUID = 1L;
@@ -288,8 +289,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
 
     @Override
     public String getContentAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        return html;
     }
 
     @Override

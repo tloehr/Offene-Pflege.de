@@ -26,7 +26,7 @@ public class DlgYesNo extends MyJDialog {
         super();
         initComponents();
         this.actionBlock = actionBlock;
-        txtMessage.setText(message);
+        txtMessage.setText(SYSTools.toHTMLForScreen(message));
         result = JOptionPane.CANCEL_OPTION;
         lblIcon.setIcon(icon);
         pack();
@@ -49,7 +49,7 @@ public class DlgYesNo extends MyJDialog {
         contentPanel = new JPanel();
         lblIcon = new JLabel();
         scrollPane1 = new JScrollPane();
-        txtMessage = new JTextArea();
+        txtMessage = new JTextPane();
         buttonBar = new JPanel();
         cancelButton = new JButton();
         okButton = new JButton();
@@ -76,8 +76,7 @@ public class DlgYesNo extends MyJDialog {
                     //---- txtMessage ----
                     txtMessage.setFont(new Font("Arial", Font.PLAIN, 18));
                     txtMessage.setEditable(false);
-                    txtMessage.setWrapStyleWord(true);
-                    txtMessage.setLineWrap(true);
+                    txtMessage.setContentType("text/html");
                     scrollPane1.setViewportView(txtMessage);
                 }
                 contentPanel.add(scrollPane1, CC.xy(3, 1, CC.FILL, CC.FILL));
@@ -122,7 +121,7 @@ public class DlgYesNo extends MyJDialog {
     private JPanel contentPanel;
     private JLabel lblIcon;
     private JScrollPane scrollPane1;
-    private JTextArea txtMessage;
+    private JTextPane txtMessage;
     private JPanel buttonBar;
     private JButton cancelButton;
     private JButton okButton;

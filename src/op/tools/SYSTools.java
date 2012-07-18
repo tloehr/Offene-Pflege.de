@@ -1099,13 +1099,13 @@ public class SYSTools {
         return htmlUmlautConversion(out);
     }
 
-    /**
-     * Fügt html Tags vor und hinter den Eingangsstring ein.
-     *
-     * @param in Eingangsstring
-     * @return String mit HTML Erweiterungen.
-     */
-    public static String toHTMLForScreen(String in) {
+//    /**
+//     * Fügt html Tags vor und hinter den Eingangsstring ein.
+//     *
+//     * @param in Eingangsstring
+//     * @return String mit HTML Erweiterungen.
+//     */
+   public static String toHTMLForScreen(String in) {
         String out = null;
 
         if (!catchNull(in).isEmpty()) {
@@ -1113,7 +1113,7 @@ public class SYSTools {
                     + SYSConst.html_fontface
                     + in + "</font></html>";
         }
-        return out;
+        return htmlUmlautConversion(out);
     }
 
 

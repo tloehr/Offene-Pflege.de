@@ -64,13 +64,13 @@ public class DlgInfo extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
-//        pack();
         setVisible(true);
     }
 
     @Override
     public void dispose() {
         super.dispose();
+        OPDE.getDisplayManager().clearSubMessages();
         actionBlock.execute(bwInfo);
     }
 

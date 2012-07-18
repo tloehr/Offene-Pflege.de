@@ -13,7 +13,7 @@
         <class>entity.DFN</class>
         <class>entity.Einrichtungen</class>
         <class>entity.Groups</class>
-        <class>entity.ICD</class>
+        <class>entity.info.ICD</class>
         <class>entity.KKasse</class>
         <class>entity.Krankenhaus</class>
         <class>entity.MassTermin</class>

@@ -43,10 +43,7 @@ public class MyJDialog extends JDialog {
 
     @Override
     public void dispose() {
-//        OPDE.debug("DISPOSE");
         setVisible(false);
-
-//        super.dispose();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     protected void initAnimator() {

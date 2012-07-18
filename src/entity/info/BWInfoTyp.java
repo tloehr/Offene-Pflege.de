@@ -139,6 +139,10 @@ public class BWInfoTyp implements Serializable {
         this.intervalMode = intervalMode;
     }
 
+    public boolean isObsolete(){
+        return status < 0;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

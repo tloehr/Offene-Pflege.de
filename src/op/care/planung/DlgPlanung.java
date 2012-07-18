@@ -30,7 +30,7 @@ import entity.Bewohner;
 import entity.BewohnerTools;
 import op.OPDE;
 import op.care.DFNImport;
-import op.share.bwinfo.BWInfo;
+
 import op.tools.*;
 
 import javax.swing.*;
@@ -93,7 +93,7 @@ public class DlgPlanung extends javax.swing.JDialog {
     private void initDialog() {
         doDeleteTmp = true;
         this.setTitle(SYSTools.getWindowTitle("Bearbeitung einer Pflegeplanung"));
-        cmbKategorie.setModel(op.share.bwinfo.DBHandling.ladeKategorien(BWInfo.ART_PFLEGE, false, false));
+//        cmbKategorie.setModel(op.share.bwinfo.DBHandling.ladeKategorien(BWInfo.ART_PFLEGE, false, false));
         BewohnerTools.setBWLabel(lblBW, bewohner);
 
         myPropertyChangeListener = new java.beans.PropertyChangeListener() {

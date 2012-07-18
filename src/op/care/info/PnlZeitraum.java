@@ -35,11 +35,11 @@ public class PnlZeitraum extends JPanel {
     public PnlZeitraum(Date min, Date max, Date from, Date to, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.min = min;
-        this.max = max;
+        this.max = max;//new Date(Math.min(new Date().getTime(), max.getTime())); // max date is always today
         this.from = from;
         this.to = to;
-        dtmin = new DateTime(min);
-        dtmax = new DateTime(max);
+        dtmin = new DateTime(this.min);
+        dtmax = new DateTime(this.max);
         initComponents();
         initPanel();
     }
@@ -308,9 +308,9 @@ public class PnlZeitraum extends JPanel {
         if (e.getPropertyName().equals("highValue")) {
             int val = (Integer) e.getNewValue();
             if (val < slider.getMaximum()) {
-                jdcVon.setDate(dtmin.plusDays(val+1).toDateMidnight().toDateTime().minusSeconds(1).toDate()); // Innerhalb der Grenzen enden alle Tage immer um 23:59:59.
+                jdcBis.setDate(dtmin.plusDays(val+1).toDateMidnight().toDateTime().minusSeconds(1).toDate()); // Innerhalb der Grenzen enden alle Tage immer um 23:59:59.
             } else {
-                jdcVon.setDate(max); // Ansonsten genau an der Grenze
+                jdcBis.setDate(max); // Ansonsten genau an der Grenze
             }
         }
         ignore = false;

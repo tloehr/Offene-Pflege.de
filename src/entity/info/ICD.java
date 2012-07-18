@@ -3,7 +3,9 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.info;
+
+import op.tools.SYSTools;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -63,11 +65,11 @@ public class ICD implements Serializable {
         this.icdid = icdid;
     }
 
-    public String getIcd10() {
+    public String getICD10() {
         return icd10;
     }
 
-    public void setIcd10(String icd10) {
+    public void setICD10(String icd10) {
         this.icd10 = icd10;
     }
 
@@ -101,7 +103,7 @@ public class ICD implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Icd[icdid=" + icdid + "]";
+        return icd10 + " " + text;
     }
 
 }

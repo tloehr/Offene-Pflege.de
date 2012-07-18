@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -69,6 +70,18 @@ public class BWInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
+    public static BWInfo getFirstBWInfo(Bewohner bewohner, BWInfoTyp bwinfotyp) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("bwinfotyp", bwinfotyp);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<BWInfo> bwinfos = query.getResultList();
+        em.close();
+        return bwinfos.isEmpty() ? null : bwinfos.get(0);
+    }
+
     public static List<BWInfo> findByBewohnerUndTyp(Bewohner bewohner, BWInfoTyp typ) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
@@ -94,13 +107,16 @@ public class BWInfoTools {
     public static Pair<Date, Date> getMinMaxAusdehnung(BWInfo info, ArrayList<BWInfo> sortedInfoList) {
         Date min = null, max = null;
 
+        BWInfo firstHauf = getFirstBWInfo(info.getBewohner(), BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME));
+//        min = firstHauf.getVon();
+
         if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             return new Pair<Date, Date>(null, null);
         }
 
         if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS) {
-            min = SYSConst.DATE_VON_ANFANG_AN;
-            max = SYSConst.DATE_BIS_AUF_WEITERES;
+            min = firstHauf.getVon();
+            max = new Date();
             return new Pair<Date, Date>(min, max);
         }
 
@@ -112,7 +128,7 @@ public class BWInfoTools {
                 DateTime dtVon = new DateTime(leftElement.getVon());
                 max = dtVon.minusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
-                max = SYSConst.DATE_BIS_AUF_WEITERES;
+                max = new Date();
             }
 
             try {
@@ -120,7 +136,7 @@ public class BWInfoTools {
                 DateTime dtBis = new DateTime(rightElement.getBis());
                 min = dtBis.plusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
-                min = SYSConst.DATE_VON_ANFANG_AN;
+                min = firstHauf.getVon();
             }
         }
 

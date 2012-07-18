@@ -27,7 +27,6 @@
 package op.care.planung.massnahmen;
 
 import op.OPDE;
-import op.share.bwinfo.BWInfo;
 import op.tools.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -75,7 +74,7 @@ public class FrmMassnahmen extends javax.swing.JFrame {
         initComponents();
         ignoreEvent = true;
         setTitle(SYSTools.getWindowTitle("Massnahmen Datenbank"));
-        cmbKategorie.setModel(op.share.bwinfo.DBHandling.ladeKategorien(BWInfo.ART_PFLEGE, false, false));
+//        cmbKategorie.setModel(op.share.bwinfo.DBHandling.ladeKategorien(BWInfo.ART_PFLEGE, false, false));
         cmbKategorie.setSelectedIndex(-1);
 
         Object[] arten = new Object[]{new ListElement("Pflege", ART_PFLEGE), new ListElement("BHP", ART_BHP), new ListElement("Sozial", ART_SOZIAL)};
