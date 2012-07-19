@@ -25,6 +25,7 @@
  */
 package entity.files;
 
+import entity.Pflegeberichte;
 import entity.Users;
 import entity.verordnungen.Verordnung;
 
@@ -65,8 +66,11 @@ public class Sysver2file implements Serializable {
     public Sysver2file() {
     }
 
-    public Sysver2file(Long id) {
-        this.id = id;
+    public Sysver2file(SYSFiles sysfile, Verordnung verordnung, Users user, Date pit) {
+        this.sysfile = sysfile;
+        this.verordnung = verordnung;
+        this.user = user;
+        this.pit = pit;
     }
 
     public Users getUser() {

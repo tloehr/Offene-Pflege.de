@@ -1,6 +1,6 @@
 package entity.vorgang;
 
-import entity.Planung;
+import entity.planung.Planung;
 
 import javax.persistence.*;
 

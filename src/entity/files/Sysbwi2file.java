@@ -98,8 +98,11 @@ public class Sysbwi2file implements Serializable {
     public Sysbwi2file() {
     }
 
-    public Sysbwi2file(Long id) {
-        this.id = id;
+    public Sysbwi2file(SYSFiles sysfile, BWInfo bwinfo, Users user, Date pit) {
+        this.sysfile = sysfile;
+        this.bwinfo = bwinfo;
+        this.user = user;
+        this.pit = pit;
     }
 
     public Long getId() {

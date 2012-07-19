@@ -1,8 +1,6 @@
 package entity.info;
 
 import entity.*;
-import entity.verordnungen.BHPTools;
-import entity.verordnungen.Verordnung;
 import entity.verordnungen.VerordnungTools;
 import op.OPDE;
 import op.tools.*;
@@ -21,7 +19,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -628,6 +625,20 @@ public class BWInfoTools {
             result += ", " + bewohner.getBetreuer1().getPlz() + " " + bewohner.getBetreuer1().getOrt();
             result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getBetreuer1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getBetreuer1().getMobil();
 
+            result += "</td></tr>";
+        }
+
+        /***
+         *      ______     __
+         *     | __ ) \   / /
+         *     |  _ \\ \ / /
+         *     | |_) |\ V /
+         *     |____/  \_/
+         *
+         */
+        if (bewohner.getBv1() != null) {
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.bv") + "</td><td valign=\"top\">";
+            result += bewohner.getBv1().getNameUndVorname();
             result += "</td></tr>";
         }
 

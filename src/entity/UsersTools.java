@@ -22,7 +22,8 @@ public class UsersTools {
     public static final short STATUS_INACTIVE = 0;
     public static final short STATUS_ACTIVE = 1;
 
-    public static ListCellRenderer getUserRenderer() {
+    public static ListCellRenderer
+    getUserRenderer() {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {

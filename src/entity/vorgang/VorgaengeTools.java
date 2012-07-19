@@ -6,6 +6,7 @@ package entity.vorgang;
 
 import entity.*;
 import entity.info.BWInfo;
+import entity.planung.Planung;
 import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.tools.DlgException;

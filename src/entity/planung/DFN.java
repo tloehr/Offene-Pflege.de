@@ -1,4 +1,4 @@
-package entity;
+package entity.planung;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -3,24 +3,15 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.planung;
+
+import entity.Massnahmen;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 /**
  *
@@ -31,8 +22,6 @@ import javax.persistence.TemporalType;
 @NamedQueries({
     @NamedQuery(name = "MassTermin.findAll", query = "SELECT m FROM MassTermin m"),
     @NamedQuery(name = "MassTermin.findByTermID", query = "SELECT m FROM MassTermin m WHERE m.termID = :termID"),
-    @NamedQuery(name = "MassTermin.findByMassID", query = "SELECT m FROM MassTermin m WHERE m.massID = :massID"),
-    @NamedQuery(name = "MassTermin.findByPlanID", query = "SELECT m FROM MassTermin m WHERE m.planID = :planID"),
     @NamedQuery(name = "MassTermin.findByNachtMo", query = "SELECT m FROM MassTermin m WHERE m.nachtMo = :nachtMo"),
     @NamedQuery(name = "MassTermin.findByMorgens", query = "SELECT m FROM MassTermin m WHERE m.morgens = :morgens"),
     @NamedQuery(name = "MassTermin.findByMittags", query = "SELECT m FROM MassTermin m WHERE m.mittags = :mittags"),
@@ -54,8 +43,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "MassTermin.findBySon", query = "SELECT m FROM MassTermin m WHERE m.son = :son"),
     @NamedQuery(name = "MassTermin.findByErforderlich", query = "SELECT m FROM MassTermin m WHERE m.erforderlich = :erforderlich"),
     @NamedQuery(name = "MassTermin.findByLDatum", query = "SELECT m FROM MassTermin m WHERE m.lDatum = :lDatum"),
-    @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer"),
-    @NamedQuery(name = "MassTermin.findByTmp", query = "SELECT m FROM MassTermin m WHERE m.tmp = :tmp")})
+    @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer")})
 public class MassTermin implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -63,12 +51,6 @@ public class MassTermin implements Serializable {
     @Basic(optional = false)
     @Column(name = "TermID")
     private Long termID;
-    @Basic(optional = false)
-    @Column(name = "MassID")
-    private long massID;
-    @Basic(optional = false)
-    @Column(name = "PlanID")
-    private long planID;
     @Column(name = "NachtMo")
     private Short nachtMo;
     @Column(name = "Morgens")
@@ -123,8 +105,16 @@ public class MassTermin implements Serializable {
     @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
-    @Column(name = "tmp")
-    private BigInteger tmp;
+    @Version
+    @Column(name = "version")
+    private Long version;
+
+    @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
+    @ManyToOne
+    private Planung planung;
+    @JoinColumn(name = "MassID", referencedColumnName = "MassID")
+    @ManyToOne
+    private Massnahmen massnahme;
 
     public MassTermin() {
     }
@@ -133,36 +123,12 @@ public class MassTermin implements Serializable {
         this.termID = termID;
     }
 
-    public MassTermin(Long termID, long massID, long planID, Date lDatum, BigDecimal dauer) {
-        this.termID = termID;
-        this.massID = massID;
-        this.planID = planID;
-        this.lDatum = lDatum;
-        this.dauer = dauer;
-    }
-
     public Long getTermID() {
         return termID;
     }
 
     public void setTermID(Long termID) {
         this.termID = termID;
-    }
-
-    public long getMassID() {
-        return massID;
-    }
-
-    public void setMassID(long massID) {
-        this.massID = massID;
-    }
-
-    public long getPlanID() {
-        return planID;
-    }
-
-    public void setPlanID(long planID) {
-        this.planID = planID;
     }
 
     public Short getNachtMo() {
@@ -317,7 +283,7 @@ public class MassTermin implements Serializable {
         this.son = son;
     }
 
-    public Boolean getErforderlich() {
+    public Boolean isErforderlich() {
         return erforderlich;
     }
 
@@ -357,12 +323,44 @@ public class MassTermin implements Serializable {
         this.bemerkung = bemerkung;
     }
 
-    public BigInteger getTmp() {
-        return tmp;
+    public Massnahmen getMassnahme() {
+        return massnahme;
     }
 
-    public void setTmp(BigInteger tmp) {
-        this.tmp = tmp;
+    public void setMassnahme(Massnahmen massnahme) {
+        this.massnahme = massnahme;
+    }
+
+    public Date getlDatum() {
+        return lDatum;
+    }
+
+    public void setlDatum(Date lDatum) {
+        this.lDatum = lDatum;
+    }
+
+    public Planung getPlanung() {
+        return planung;
+    }
+
+    public void setPlanung(Planung planung) {
+        this.planung = planung;
+    }
+
+    public boolean verwendetUhrzeit() {
+        return uhrzeit != null;
+    }
+
+    public boolean isTaeglich() {
+        return taeglich > 0;
+    }
+
+    public boolean isWoechentlich() {
+        return woechentlich > 0;
+    }
+
+    public boolean isMonatlich() {
+        return monatlich > 0;
     }
 
     @Override

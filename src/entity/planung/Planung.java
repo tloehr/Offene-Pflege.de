@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.planung;
 
+import entity.Bewohner;
+import entity.Users;
 import entity.info.BWInfoKat;
 import entity.vorgang.SYSPLAN2VORGANG;
 import entity.vorgang.VorgangElement;
@@ -67,6 +69,10 @@ public class Planung implements Serializable, VorgangElement {
     @Column(name = "NKontrolle")
     @Temporal(TemporalType.DATE)
     private Date nKontrolle;
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     // ==
     // N:1 Relationen
     // ==
@@ -88,6 +94,10 @@ public class Planung implements Serializable, VorgangElement {
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
     private Collection<SYSPLAN2VORGANG> attachedVorgaenge;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
+    private Collection<PlanKontrolle> kontrollen;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
+    private Collection<MassTermin> massnahmen;
 
     public Planung() {
     }
@@ -198,6 +208,16 @@ public class Planung implements Serializable, VorgangElement {
         return bis.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
+
+
+    public Collection<PlanKontrolle> getKontrollen() {
+        return kontrollen;
+    }
+
+    public Collection<MassTermin> getMassnahmen() {
+        return massnahmen;
+    }
+
     @Override
     public long getPITInMillis() {
         return von.getTime();
@@ -242,6 +262,6 @@ public class Planung implements Serializable, VorgangElement {
 
     @Override
     public String toString() {
-        return "entity.Planung[planID=" + planID + "]";
+        return "entity.planung.Planung[planID=" + planID + "]";
     }
 }

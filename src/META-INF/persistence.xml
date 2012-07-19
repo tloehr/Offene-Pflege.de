@@ -10,20 +10,20 @@
         <class>entity.Barbetrag</class>
         <class>entity.Betreuer</class>
         <class>entity.Bewohner</class>
-        <class>entity.DFN</class>
+        <class>entity.planung.DFN</class>
         <class>entity.Einrichtungen</class>
         <class>entity.Groups</class>
         <class>entity.info.ICD</class>
         <class>entity.KKasse</class>
         <class>entity.Krankenhaus</class>
-        <class>entity.MassTermin</class>
+        <class>entity.planung.MassTermin</class>
         <class>entity.Massnahmen</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PB2User</class>
         <class>entity.PBerichtTAGS</class>
         <class>entity.Pflegeberichte</class>
-        <class>entity.PlanKontrolle</class>
-        <class>entity.Planung</class>
+        <class>entity.planung.PlanKontrolle</class>
+        <class>entity.planung.Planung</class>
         <class>entity.QSQuery</class>
         <class>entity.Raeume</class>
         <class>entity.Stationen</class>

@@ -160,7 +160,7 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_PPLANUNG: {
-                previousPanel = new PnlPlanung(new JFrame(), currentBewohner);
+                previousPanel = new PnlPlanung(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_PPLANUNG, previousPanel);
 
                 break;

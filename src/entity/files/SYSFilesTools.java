@@ -125,6 +125,8 @@ public class SYSFilesTools {
             bw = ((Pflegeberichte) attachable).getBewohner();
         } else if (attachable instanceof Verordnung) {
             bw = ((Verordnung) attachable).getBewohner();
+        } else if (attachable instanceof BWInfo) {
+            bw = ((BWInfo) attachable).getBewohner();
         }
         return putFiles(files, bw, attachable);
     }
@@ -145,6 +147,14 @@ public class SYSFilesTools {
                             Syspb2file link = em.merge(new Syspb2file(sysfile, (Pflegeberichte) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getPbAssignCollection().add(link);
                             ((Pflegeberichte) attachable).getAttachedFiles().add(link);
+                        } else if (attachable instanceof Verordnung) {
+                            Sysver2file link = em.merge(new Sysver2file(sysfile, (Verordnung) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getVerAssignCollection().add(link);
+                            ((Verordnung) attachable).getAttachedFiles().add(link);
+                        } else if (attachable instanceof BWInfo) {
+                            Sysbwi2file link = em.merge(new Sysbwi2file(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getBwiAssignCollection().add(link);
+                            ((BWInfo) attachable).getAttachedFiles().add(link);
                         }
                     }
                     successful.add(sysfile);

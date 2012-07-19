@@ -31,7 +31,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -45,7 +44,8 @@ public class DlgFiles extends MyJDialog {
 
     /**
      * Creates a generic file attachment dialog to show existing files and add new ones.
-     * @param attachable object to add the files to
+     *
+     * @param attachable        object to add the files to
      * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
      */
     public DlgFiles(Object attachable, Closure afterAttachAction) {
@@ -58,17 +58,13 @@ public class DlgFiles extends MyJDialog {
     }
 
     private void initDialog() {
-
         if (afterAttachAction == null) {
             contentPanel.add(getFileListPanel(), CC.xywh(1, 1, 3, 1));
         } else {
             contentPanel.add(getFileDropPanel(), CC.xy(1, 1));
             contentPanel.add(getFileListPanel(), CC.xy(3, 1));
         }
-
-
     }
-
 
     private JPanel getFileDropPanel() {
         JPanel dropPanel = new JPanel();
@@ -130,11 +126,10 @@ public class DlgFiles extends MyJDialog {
         pnlFilesList.setBorder(new EmptyBorder(10, 10, 10, 10));
         pnlFilesList.add(new JScrollPane(list));
 
-
         return pnlFilesList;
     }
 
-    private ArrayList<SYSFiles> getAttachedFilesList(Object attachable){
+    private ArrayList<SYSFiles> getAttachedFilesList(Object attachable) {
         ArrayList<SYSFiles> files = null;
         EntityManager em = OPDE.createEM();
         if (attachable instanceof Pflegeberichte) {

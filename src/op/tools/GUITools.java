@@ -43,6 +43,11 @@ public class GUITools {
         return button;
     }
 
+    public static void addAllComponents(JPanel panel, java.util.List<Component> componentList){
+        for (Component component : componentList){
+            panel.add(component);
+        }
+    }
 
     public static MouseAdapter getHyperlinkStyleMouseAdapter() {
         return new MouseAdapter() {

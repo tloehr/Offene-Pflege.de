@@ -272,22 +272,22 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private CollapsiblePanes createCollapsiblePanesFor(BWInfoKat kat) {
         CollapsiblePanes cpane = new CollapsiblePanes();
-        try {
-            cpane.setLayout(new JideBoxLayout(cpane, JideBoxLayout.Y_AXIS));
+//        try {
+        cpane.setLayout(new JideBoxLayout(cpane, JideBoxLayout.Y_AXIS));
 
-            bwinfotypen.put(kat, BWInfoTypTools.findByKategorie(kat));
+        bwinfotypen.put(kat, BWInfoTypTools.findByKategorie(kat));
 
-            for (BWInfoTyp typ : bwinfotypen.get(kat)) {
-                bwinfos.put(typ, BWInfoTools.findByBewohnerUndTyp(bewohner, typ));
-                CollapsiblePane panel = createPanelFor(typ);
-                cpane.add(panel);
-                panel.setVisible((tbEmpty.isSelected() || !bwinfos.get(typ).isEmpty()) && (tbInactive.isSelected() || bwinfos.get(typ).isEmpty() || !bwinfos.get(typ).get(0).isAbgesetzt()));
-                panelmap.put(typ, panel);
-            }
-            cpane.addExpansion();
-        } catch (Exception e) {
-            OPDE.fatal(e);
+        for (BWInfoTyp typ : bwinfotypen.get(kat)) {
+            bwinfos.put(typ, BWInfoTools.findByBewohnerUndTyp(bewohner, typ));
+            CollapsiblePane panel = createPanelFor(typ);
+            cpane.add(panel);
+            panel.setVisible((tbEmpty.isSelected() || !bwinfos.get(typ).isEmpty()) && (tbInactive.isSelected() || bwinfos.get(typ).isEmpty() || !bwinfos.get(typ).get(0).isAbgesetzt()));
+            panelmap.put(typ, panel);
         }
+        cpane.addExpansion();
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        }
         return cpane;
     }
 
@@ -302,18 +302,12 @@ public class PnlInfo extends NursingRecordsPanel {
         searchPanes = new CollapsiblePanes();
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
-        searchPanes.add(addCommands());
-        searchPanes.add(addFilters());
-        searchPanes.addExpansion();
-    }
-
-    private CollapsiblePane addCommands() {
 
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout());
+        mypanel.setLayout(new VerticalLayout(5));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(); //OPDE.lang.getString(internalClassID)
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -322,6 +316,33 @@ public class PnlInfo extends NursingRecordsPanel {
         } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
+
+        GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addFilters());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+    }
+
+    private List<Component> addCommands() {
+
+        List<Component> list = new ArrayList<Component>();
+
+//        JPanel mypanel = new JPanel();
+//        mypanel.setLayout(new VerticalLayout());
+//        mypanel.setBackground(Color.WHITE);
+//
+//        CollapsiblePane searchPane = new CollapsiblePane(); //OPDE.lang.getString(internalClassID)
+//        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        searchPane.setCollapsible(false);
+//
+//        try {
+//            searchPane.setCollapsed(false);
+//        } catch (PropertyVetoException e) {
+//            OPDE.error(e);
+//        }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
 
@@ -390,7 +411,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             });
             btnBWDied.setEnabled(bewohner.isAktiv());
-            mypanel.add(btnBWDied);
+            list.add(btnBWDied);
             /***
              *                                   _               _
              *      _ __ ___   _____   _____  __| |   ___  _   _| |_
@@ -452,7 +473,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             });
             btnBWMovedOut.setEnabled(bewohner.isAktiv());
-            mypanel.add(btnBWMovedOut);
+            list.add(btnBWMovedOut);
             /***
              *      _          _
              *     (_)___     / \__      ____ _ _   _
@@ -511,7 +532,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             });
             btnBWisAway.setEnabled(bewohner.isAktiv() && !BWInfoTools.isAbwesend(bewohner));
-            mypanel.add(btnBWisAway);
+            list.add(btnBWisAway);
             /***
              *      _       ____             _
              *     (_)___  | __ )  __ _  ___| | __
@@ -555,7 +576,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             });
             btnBWisBack.setEnabled(bewohner.isAktiv() && BWInfoTools.isAbwesend(bewohner));
-            mypanel.add(btnBWisBack);
+            list.add(btnBWisBack);
         }
 
 //        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) { // => ACL_MATRIX
@@ -568,22 +589,19 @@ public class PnlInfo extends NursingRecordsPanel {
 //            mypanel.add(printButton);
 //        }
 
-        searchPane.setContentPane(mypanel);
-        searchPanes.add(searchPane);
 
-
-        searchPane.setContentPane(mypanel);
-        return searchPane;
+        return list;
     }
 
-    private CollapsiblePane addFilters() {
-        JPanel labelPanel = new JPanel();
-        labelPanel.setBackground(Color.WHITE);
-        labelPanel.setLayout(new VerticalLayout(5));
-
-        CollapsiblePane panelFilter = new CollapsiblePane(); // OPDE.lang.getString("misc.msg.Filter")
-        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
-        panelFilter.setCollapsible(false);
+    private List<Component> addFilters() {
+        List<Component> list = new ArrayList<Component>();
+//        JPanel labelPanel = new JPanel();
+//        labelPanel.setBackground(Color.WHITE);
+//        labelPanel.setLayout(new VerticalLayout(5));
+//
+//        CollapsiblePane panelFilter = new CollapsiblePane(); // OPDE.lang.getString("misc.msg.Filter")
+//        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        panelFilter.setCollapsible(false);
 
         tbEmpty = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".empty"));
         tbEmpty.addItemListener(new ItemListener() {
@@ -595,7 +613,7 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
         tbEmpty.setHorizontalAlignment(SwingConstants.LEFT);
-        labelPanel.add(tbEmpty);
+        list.add(tbEmpty);
         SYSPropsTools.restoreState(internalClassID + ":tbEmpty", tbEmpty);
 
 
@@ -609,12 +627,12 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
         tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
-        labelPanel.add(tbInactive);
+        list.add(tbInactive);
         SYSPropsTools.restoreState(internalClassID + ":tbInactive", tbInactive);
 
-        panelFilter.setContentPane(labelPanel);
+//        panelFilter.setContentPane(labelPanel);
 
-        return panelFilter;
+        return list;
     }
 
     private String getHyperlinkButtonTextForPanelHead(BWInfoTyp typ) {
@@ -705,11 +723,16 @@ public class PnlInfo extends NursingRecordsPanel {
             title.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isNoConstraints()) {
+                    if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isSingleIncident()) {
                         setAllViewButtonsOff(typ.getBwInfokat());
                         txtHTML.setText(SYSTools.toHTML(BWInfoTools.getHTML(ersterBWInfo)));
                     } else {
                         txtHTML.setText("<html>&nbsp;</html>");
+                        try {
+                            panelForBWInfoTyp.setCollapsed(false);
+                        } catch (PropertyVetoException e) {
+                            OPDE.error(e);
+                        }
                     }
                 }
             });
@@ -907,7 +930,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 btnStop.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + ersterBWInfo.getHtml(), icon48stop, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + ersterBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + ersterBWInfo.getHtml(), icon48stop, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -941,7 +964,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         });
                     }
                 });
-                btnStop.setEnabled(ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme() && typ.getIntervalMode() != BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS);
+                btnStop.setEnabled(ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isSingleIncident());
                 titlePanelright.add(btnStop);
             }
 
@@ -962,7 +985,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 btnDelete.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete") + "<br/>" + ersterBWInfo.getHtml(), icon48delete, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete") + "<br/>" + ersterBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + ersterBWInfo.getHtml(), icon48delete, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -995,7 +1018,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         });
                     }
                 });
-                btnDelete.setEnabled(ersterBWInfo != null && !ersterBWInfo.isHeimaufnahme());
+                btnDelete.setEnabled(ersterBWInfo != null && !ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints());
                 titlePanelright.add(btnDelete);
             }
 
@@ -1024,9 +1047,9 @@ public class PnlInfo extends NursingRecordsPanel {
                         });
                     }
                 });
-                btnAttach.setEnabled(ersterBWInfo != null && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme());
+                btnAttach.setEnabled(ersterBWInfo != null && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme());
 
-                if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && ersterBWInfo.getAttachedFiles().size() > 0) {
+                if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && ersterBWInfo.getAttachedFiles().size() > 0) {
                     JLabel lblNum = new JLabel(Integer.toString(ersterBWInfo.getAttachedFiles().size()), icon16redStar, SwingConstants.CENTER);
                     lblNum.setFont(SYSConst.ARIAL10BOLD);
                     lblNum.setForeground(Color.YELLOW);
@@ -1132,7 +1155,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         btnStop.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent actionEvent) {
-                                new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + innerBWInfo.getHtml(), icon48stop, new Closure() {
+                                new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + innerBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + innerBWInfo.getHtml(), icon48stop, new Closure() {
                                     @Override
                                     public void execute(Object answer) {
                                         if (answer.equals(JOptionPane.YES_OPTION)) {
