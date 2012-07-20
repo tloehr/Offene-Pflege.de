@@ -167,6 +167,12 @@
              <string>toolTipText</string> 
              <string>Verlegungsbericht drucken</string> 
             </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object id="Cursor0" class="java.awt.Cursor"> 
+              <int>12</int> 
+             </object> 
+            </void> 
             <void property="name"> 
              <string>btnVerlegung</string> 
             </void> 
@@ -224,6 +230,10 @@
             <void method="setProperty"> 
              <string>toolTipText</string> 
              <string>Abmelden</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object idref="Cursor0"/> 
             </void> 
             <void property="name"> 
              <string>btnExit</string> 
@@ -369,6 +379,10 @@
             <void method="setProperty"> 
              <string>toolTipText</string> 
              <string>Ansicht aktualisieren</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object idref="Cursor0"/> 
             </void> 
             <void property="name"> 
              <string>btnReload</string> 

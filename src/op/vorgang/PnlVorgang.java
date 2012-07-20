@@ -837,7 +837,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 
 
     private void cmbKatFocusGained(FocusEvent e) {
-        // TODO add your code here
+
     }
 
     private void tblElementsMousePressed(MouseEvent e) {

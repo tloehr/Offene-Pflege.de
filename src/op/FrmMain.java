@@ -329,6 +329,7 @@ public class FrmMain extends JFrame {
                 btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.setSelectedIcon(null);
                 btnVerlegung.setToolTipText("Verlegungsbericht drucken");
+                btnVerlegung.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -344,6 +345,7 @@ public class FrmMain extends JFrame {
                 btnExit.setOpaque(false);
                 btnExit.setContentAreaFilled(false);
                 btnExit.setToolTipText("Abmelden");
+                btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnExit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -372,6 +374,7 @@ public class FrmMain extends JFrame {
                 btnReload.setOpaque(false);
                 btnReload.setContentAreaFilled(false);
                 btnReload.setToolTipText("Ansicht aktualisieren");
+                btnReload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnReload.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

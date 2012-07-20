@@ -35,17 +35,23 @@ import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
 import entity.planung.Planung;
 import entity.planung.PlanungTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -99,6 +105,7 @@ public class PnlPlanung extends NursingRecordsPanel {
      */
     public PnlPlanung(Bewohner bewohner, JScrollPane jspSearch) {
         initPhase = true;
+        this.jspSearch = jspSearch;
 //        standardActionListener = new ActionListener() {
 //
 //            public void actionPerformed(ActionEvent e) {
@@ -116,7 +123,7 @@ public class PnlPlanung extends NursingRecordsPanel {
     private void initPanel() {
         planungCollapsiblePaneMap = new HashMap<Planung, CollapsiblePane>();
         planungen = new HashMap<BWInfoKat, java.util.List<Planung>>();
-
+        prepareSearchArea();
     }
 
     @Override
@@ -471,21 +478,23 @@ public class PnlPlanung extends NursingRecordsPanel {
 
         } else {
 
-
+            cpPlan.removeAll();
             planungCollapsiblePaneMap.clear();
             planungen.clear();
 
             // Elmininate empty categories
             kategorien = new ArrayList<BWInfoKat>();
             for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
-                if (!PlanungTools.findByKategorie(kat).isEmpty()) {
+                if (!PlanungTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
                     kategorien.add(kat);
                 }
             }
 
+            cpPlan.setLayout(new JideBoxLayout(cpPlan, JideBoxLayout.Y_AXIS));
             for (BWInfoKat kat : kategorien) {
                 cpPlan.add(createCollapsiblePanesFor(kat));
             }
+            cpPlan.addExpansion();
 //            refreshDisplay();
         }
         initPhase = false;
@@ -509,23 +518,42 @@ public class PnlPlanung extends NursingRecordsPanel {
 //    }
 
 
-    private CollapsiblePanes createCollapsiblePanesFor(BWInfoKat kat) {
-        CollapsiblePanes katpane = new CollapsiblePanes();
+    private CollapsiblePane createCollapsiblePanesFor(BWInfoKat kat) {
+        CollapsiblePane katpane = new CollapsiblePane(kat.getBezeichnung());
+        katpane.setSlidingDirection(SwingConstants.SOUTH);
+//        katpane.setStyle(CollapsiblePane.TREE_STYLE);
+        katpane.setHorizontalAlignment(SwingConstants.LEADING);
+        katpane.setBackground(kat.getBackgroundHeader());
+        katpane.setForeground(kat.getForegroundHeader());
+        katpane.setOpaque(false);
+        JPanel katPanel = new JPanel();
+        katPanel.setLayout(new VerticalLayout());
 
-        katpane.setLayout(new JideBoxLayout(katpane, JideBoxLayout.Y_AXIS));
-
-        planungen.put(kat, PlanungTools.findByKategorie(kat));
+        planungen.put(kat, PlanungTools.findByKategorieAndBewohner(bewohner, kat));
 
         for (Planung planung : planungen.get(kat)) {
-            CollapsiblePane panel = createPanelFor(planung);
-            katpane.add(panel);
+            CollapsiblePane panel = new CollapsiblePane(planung.getStichwort());
+            panel.setSlidingDirection(SwingConstants.SOUTH);
+            try {
+                panel.setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+//            panel.setStyle(CollapsiblePane.PLAIN_STYLE);
+            panel.setHorizontalAlignment(SwingConstants.LEADING);
+            panel.setBackground(kat.getBackgroundContent());
+            panel.setForeground(kat.getForegroundContent());
+            panel.setOpaque(false);
+            katPanel.add(panel);
             panel.setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
             planungCollapsiblePaneMap.put(planung, panel);
         }
-        katpane.addExpansion();
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        }
+        katpane.setContentPane(katPanel);
+        try {
+            katpane.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         return katpane;
     }
 
@@ -540,7 +568,7 @@ public class PnlPlanung extends NursingRecordsPanel {
          *     |_| |_|_____/_/   \_\____/|_____|_| \_\
          *
          */
-        final CollapsiblePane panelForBWInfoTyp = new CollapsiblePane();
+        final CollapsiblePane panelForPlanung = new CollapsiblePane();
         try {
 
 
@@ -676,10 +704,10 @@ public class PnlPlanung extends NursingRecordsPanel {
             titlePanel.add(titlePanelleft);
             titlePanel.add(titlePanelright);
 
-            panelForBWInfoTyp.setTitleLabelComponent(titlePanel);
-            panelForBWInfoTyp.setSlidingDirection(SwingConstants.SOUTH);
-            panelForBWInfoTyp.setStyle(CollapsiblePane.TREE_STYLE);
-            panelForBWInfoTyp.setHorizontalAlignment(SwingConstants.LEADING);
+            panelForPlanung.setTitleLabelComponent(titlePanel);
+            panelForPlanung.setSlidingDirection(SwingConstants.SOUTH);
+            panelForPlanung.setStyle(CollapsiblePane.TREE_STYLE);
+            panelForPlanung.setHorizontalAlignment(SwingConstants.LEADING);
 
 //            panelForBWInfoTyp.setEmphasized(bwinfos.get(typ).isEmpty());
 
@@ -697,8 +725,8 @@ public class PnlPlanung extends NursingRecordsPanel {
             JTextPane contentPane = new JTextPane();
             contentPane.setContentType("text/html");
             contentPane.setText(PlanungTools.getAsHTML(planung));
-            panelForBWInfoTyp.setContentPane(contentPane);
-            panelForBWInfoTyp.setCollapsed(true);
+            panelForPlanung.setContentPane(contentPane);
+            panelForPlanung.setCollapsed(true);
 
 //            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
 
@@ -709,7 +737,68 @@ public class PnlPlanung extends NursingRecordsPanel {
         }
 
 
-        return panelForBWInfoTyp;
+        return panelForPlanung;
+    }
+
+    public void refreshDisplay() {
+
+    }
+
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout(5));
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+//           GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addFilters());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+    }
+
+
+    private List<Component> addFilters() {
+        List<Component> list = new ArrayList<Component>();
+//        JPanel labelPanel = new JPanel();
+//        labelPanel.setBackground(Color.WHITE);
+//        labelPanel.setLayout(new VerticalLayout(5));
+//
+//        CollapsiblePane panelFilter = new CollapsiblePane(); // OPDE.lang.getString("misc.msg.Filter")
+//        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        panelFilter.setCollapsible(false);
+
+        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
+        tbInactive.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (initPhase) return;
+                SYSPropsTools.storeState(internalClassID + ":tbInactive", tbInactive);
+                refreshDisplay();
+            }
+        });
+        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbInactive);
+        SYSPropsTools.restoreState(internalClassID + ":tbInactive", tbInactive);
+
+//        panelFilter.setContentPane(labelPanel);
+
+        return list;
     }
 
 

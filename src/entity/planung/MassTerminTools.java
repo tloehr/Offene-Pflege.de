@@ -29,9 +29,9 @@ public class MassTerminTools {
         int currentState;
         // Zeit verwendet ?
         if (termin.verwendetUhrzeit()) {
-            currentState = ZEIT;
-        } else {
             currentState = UHRZEIT;
+        } else {
+            currentState = ZEIT;
         }
         boolean headerNeeded = previousState == -1 || currentState != previousState;
 
@@ -77,7 +77,6 @@ public class MassTerminTools {
             }
 
             String wdh = getWiederholung(termin);
-            // TODO: NULL POINTER
             result += "    <tr>" +
                     "      <td align=\"center\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(termin.getUhrzeit()) + " Uhr</td>" +
                     "      <td align=\"center\">" + termin.getUhrzeitAnzahl() + "</td>" +

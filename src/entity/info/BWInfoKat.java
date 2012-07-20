@@ -6,6 +6,7 @@
 package entity.info;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.io.Serializable;
 import java.text.Collator;
 
@@ -32,6 +33,15 @@ public class BWInfoKat implements Serializable, Comparable {
     private Integer katArt;
     @Column(name = "Sortierung")
     private Integer sortierung;
+    @Column(name = "BGHEADER")
+    private String bgheader;
+    @Column(name = "BGCONTENT")
+    private String bgcontent;
+    @Column(name = "FGHEADER")
+    private String fgheader;
+    @Column(name = "FGCONTENT")
+    private String fgcontent;
+
 
     public BWInfoKat() {
     }
@@ -62,6 +72,38 @@ public class BWInfoKat implements Serializable, Comparable {
 
     public void setKatArt(Integer katArt) {
         this.katArt = katArt;
+    }
+
+    public Color getForegroundHeader() {
+        int red = Integer.parseInt(fgheader.substring(0, 2), 16);
+        int green = Integer.parseInt(fgheader.substring(2, 4), 16);
+        int blue = Integer.parseInt(fgheader.substring(4), 16);
+
+        return new Color(red, green, blue);
+    }
+
+    public Color getForegroundContent() {
+        int red = Integer.parseInt(fgcontent.substring(0, 2), 16);
+        int green = Integer.parseInt(fgcontent.substring(2, 4), 16);
+        int blue = Integer.parseInt(fgcontent.substring(4), 16);
+
+        return new Color(red, green, blue);
+    }
+
+    public Color getBackgroundHeader() {
+        int red = Integer.parseInt(bgheader.substring(0, 2), 16);
+        int green = Integer.parseInt(bgheader.substring(2, 4), 16);
+        int blue = Integer.parseInt(bgheader.substring(4), 16);
+
+        return new Color(red, green, blue);
+    }
+
+    public Color getBackgroundContent() {
+        int red = Integer.parseInt(bgcontent.substring(0, 2), 16);
+        int green = Integer.parseInt(bgcontent.substring(2, 4), 16);
+        int blue = Integer.parseInt(bgcontent.substring(4), 16);
+
+        return new Color(red, green, blue);
     }
 
     public Integer getSortierung() {

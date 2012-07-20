@@ -1,5 +1,6 @@
 package entity.planung;
 
+import entity.Bewohner;
 import entity.info.BWInfoKat;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -22,10 +23,11 @@ import java.util.List;
 public class PlanungTools {
 
 
-    public static List<Planung> findByKategorie(BWInfoKat kat) {
+    public static List<Planung> findByKategorieAndBewohner(Bewohner bewohner, BWInfoKat kat) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM Planung p WHERE p.kategorie = :kat ORDER BY p.stichwort, p.von");
+        Query query = em.createQuery("SELECT p FROM Planung p WHERE p.bewohner = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
         query.setParameter("kat", kat);
+        query.setParameter("bewohner", bewohner);
         List<Planung> planungen = query.getResultList();
         em.close();
         return planungen;
