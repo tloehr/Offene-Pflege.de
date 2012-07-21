@@ -9,10 +9,12 @@ import entity.Users;
 import entity.info.BWInfoKat;
 import entity.vorgang.SYSPLAN2VORGANG;
 import entity.vorgang.VorgangElement;
+import op.OPDE;
 import op.tools.SYSConst;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -100,6 +102,14 @@ public class Planung implements Serializable, VorgangElement {
     private Collection<MassTermin> massnahmen;
 
     public Planung() {
+    }
+
+    public Planung(Bewohner bewohner) {
+        this.bewohner = bewohner;
+        this.angesetztDurch = OPDE.getLogin().getUser();
+        massnahmen = new ArrayList<MassTermin>();
+        kontrollen = new ArrayList<PlanKontrolle>();
+        attachedVorgaenge = new ArrayList<SYSPLAN2VORGANG>();
     }
 
     public Long getPlanID() {

@@ -1,13 +1,13 @@
 package entity.planung;
 
+import op.OPDE;
+import op.care.planung.PnlPlanung;
+import op.care.verordnung.PnlVerordnung;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
-import java.sql.Time;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,15 +44,15 @@ public class MassTerminTools {
         previousState = currentState;
         if (currentState == ZEIT) {
             if (headerNeeded) {
-                result += "<table border=\"1\">" +
+                result += "<table id=\"fonttext\" border=\"1\">" +
                         "   <tr>" +
-                        "      <th align=\"center\">fm</th>" +
-                        "      <th align=\"center\">mo</th>" +
-                        "      <th align=\"center\">mi</th>" +
-                        "      <th align=\"center\">nm</th>" +
-                        "      <th align=\"center\">ab</th>" +
-                        "      <th align=\"center\">sa</th>" +
-                        "      <th align=\"center\">Wdh.</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".early.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".morning.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".noon.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".afternoon.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".evening.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".late.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".repeat.short") + "</th>" +
                         "   </tr>";
             }
             String wdh = getWiederholung(termin);
@@ -68,11 +68,11 @@ public class MassTerminTools {
                     "    </tr>";
         } else if (currentState == UHRZEIT) {
             if (headerNeeded) {
-                result += "<table border=\"1\" >" +
+                result += "<table id=\"fonttext\" border=\"1\" >" +
                         "   <tr>" +
-                        "      <th align=\"center\">Uhrzeit</th>" +
-                        "      <th align=\"center\">Anzahl</th>" +
-                        "      <th align=\"center\">Wdh.</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Number") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".repeat.short") + "</th>" +
                         "   </tr>";
             }
 
@@ -88,10 +88,10 @@ public class MassTerminTools {
 
         result += "</table>";
 
-        result += SYSTools.catchNull(termin.getBemerkung(), "<br/><b>Kommentar: </b>", "");
+        result += SYSTools.catchNull(termin.getBemerkung(), "<br/><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "");
 
         if (termin.isErforderlich()) {
-            result += "<br/><font color=\"red\">Bearbeitung erforderlich !</font>";
+            result += "<div id=\"fonttext\"><font color=\"blue\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".floatinginterventions") + "</font></div>";
         }
 
         return result;

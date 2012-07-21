@@ -37,17 +37,20 @@ import entity.planung.Planung;
 import entity.planung.PlanungTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.threads.DisplayManager;
 import op.tools.GUITools;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
+import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +60,7 @@ import java.util.List;
  * @author tloehr
  */
 public class PnlPlanung extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.planning";
+    public static final String internalClassID = "nursingrecords.nursingprocess";
     private JPopupMenu menu;
     private boolean initPhase;
 
@@ -518,11 +521,29 @@ public class PnlPlanung extends NursingRecordsPanel {
 //    }
 
 
-    private CollapsiblePane createCollapsiblePanesFor(BWInfoKat kat) {
-        CollapsiblePane katpane = new CollapsiblePane(kat.getBezeichnung());
+    private CollapsiblePane createCollapsiblePanesFor(final BWInfoKat kat) {
+        final CollapsiblePane katpane = new CollapsiblePane(kat.getBezeichnung());
+        katpane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                try {
+                    if (katpane.isCollapsed()) {
+                        katpane.setCollapsed(false);
+                    } else {
+                        // collapse all children
+                        for (Planung planung : planungen.get(kat)) {
+                            planungCollapsiblePaneMap.get(planung).setCollapsed(true);
+                        }
+                        katpane.setCollapsed(true);
+                    }
+                } catch (PropertyVetoException e) {
+                    OPDE.error(e);
+                }
+            }
+        });
         katpane.setSlidingDirection(SwingConstants.SOUTH);
 //        katpane.setStyle(CollapsiblePane.TREE_STYLE);
-        katpane.setHorizontalAlignment(SwingConstants.LEADING);
+//        katpane.setHorizontalAlignment(SwingConstants.LEADING);
         katpane.setBackground(kat.getBackgroundHeader());
         katpane.setForeground(kat.getForegroundHeader());
         katpane.setOpaque(false);
@@ -532,7 +553,7 @@ public class PnlPlanung extends NursingRecordsPanel {
         planungen.put(kat, PlanungTools.findByKategorieAndBewohner(bewohner, kat));
 
         for (Planung planung : planungen.get(kat)) {
-            CollapsiblePane panel = new CollapsiblePane(planung.getStichwort());
+            CollapsiblePane panel = createPanelFor(planung);
             panel.setSlidingDirection(SwingConstants.SOUTH);
             try {
                 panel.setCollapsed(true);
@@ -552,13 +573,14 @@ public class PnlPlanung extends NursingRecordsPanel {
         try {
             katpane.setCollapsed(true);
         } catch (PropertyVetoException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            OPDE.error(e);
         }
         return katpane;
     }
 
 
     private CollapsiblePane createPanelFor(final Planung planung) {
+        final CollapsiblePane panelForPlanung = new CollapsiblePane();
 
         /***
          *      _   _ _____    _    ____  _____ ____
@@ -568,173 +590,217 @@ public class PnlPlanung extends NursingRecordsPanel {
          *     |_| |_|_____/_/   \_\____/|_____|_| \_\
          *
          */
-        final CollapsiblePane panelForPlanung = new CollapsiblePane();
-        try {
+
+        JPanel titlePanelleft = new JPanel();
+        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
+
+        /***
+         *      _     _       _    _           _   _                _   _                _
+         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
+         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
+         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
+        JideButton title = GUITools.createHyperlinkButton(planung.getStichwort(), null, null);
+//        title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        title.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    panelForPlanung.setCollapsed(!panelForPlanung.isCollapsed());
+                } catch (PropertyVetoException e) {
+                    OPDE.error(e);
+                }
+            }
+        });
+        titlePanelleft.add(title);
 
 
-            JPanel titlePanel = new JPanel();
-            titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.LINE_AXIS));
+        JPanel titlePanelright = new JPanel();
+        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
-            JPanel titlePanelleft = new JPanel();
-            titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
-            /***
-             *      _     _       _    _           _   _                _   _                _
-             *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-             *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-             *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-             *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-             *
-             */
-            JideButton title = GUITools.createHyperlinkButton(planung.getStichwort(), null, null);
-            title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-            title.setAlignmentX(Component.LEFT_ALIGNMENT);
-            title.addActionListener(new ActionListener() {
+        /***
+         *      ____        _   _                   _       _     _
+         *     | __ ) _   _| |_| |_ ___  _ __      / \   __| | __| |
+         *     |  _ \| | | | __| __/ _ \| '_ \    / _ \ / _` |/ _` |
+         *     | |_) | |_| | |_| || (_) | | | |  / ___ \ (_| | (_| |
+         *     |____/ \__,_|\__|\__\___/|_| |_| /_/   \_\__,_|\__,_|
+         *
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
+            JButton btnAdd = new JButton(icon22add);
+            btnAdd.setPressedIcon(icon22addPressed);
+            btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnAdd.setContentAreaFilled(false);
+            btnAdd.setBorder(null);
+            btnAdd.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                    new DlgPlanung(planung, new Closure() {
+                        @Override
+                        public void execute(Object planung) {
+                            if (planung != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                    em.merge(planung);
+                                    em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+//                                reloadTable();
+                            }
+                        }
+                    });
+
+                }
+            });
+            titlePanelright.add(btnAdd);
+//                btnAdd.setEnabled(ersterBWInfo == null || (!ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.getBwinfotyp().isObsolete()));
+        }
+
+        /***
+         *      ____        _   _                _____    _ _ _
+         *     | __ ) _   _| |_| |_ ___  _ __   | ____|__| (_) |_
+         *     |  _ \| | | | __| __/ _ \| '_ \  |  _| / _` | | __|
+         *     | |_) | |_| | |_| || (_) | | | | | |__| (_| | | |_
+         *     |____/ \__,_|\__|\__\___/|_| |_| |_____\__,_|_|\__|
+         *
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {  // => ACL_MATRIX
+            JButton btnEdit = new JButton(icon22edit);
+            btnEdit.setPressedIcon(icon22editPressed);
+            btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnEdit.setContentAreaFilled(false);
+            btnEdit.setBorder(null);
+            btnEdit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
                 }
             });
-            titlePanelleft.add(title);
+            titlePanelright.add(btnEdit);
+        }
 
+        /***
+         *      ____        _   _                ____  _
+         *     | __ ) _   _| |_| |_ ___  _ __   / ___|| |_ ___  _ __
+         *     |  _ \| | | | __| __/ _ \| '_ \  \___ \| __/ _ \| '_ \
+         *     | |_) | |_| | |_| || (_) | | | |  ___) | || (_) | |_) |
+         *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \__\___/| .__/
+         *                                                     |_|
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
+            JButton btnStop = new JButton(icon22stop);
+            btnStop.setPressedIcon(icon22stopPressed);
+            btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnStop.setContentAreaFilled(false);
+            btnStop.setBorder(null);
+            btnStop.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
 
-            JPanel titlePanelright = new JPanel();
-            titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
-
-
-            /***
-             *      ____        _   _                   _       _     _
-             *     | __ ) _   _| |_| |_ ___  _ __      / \   __| | __| |
-             *     |  _ \| | | | __| __/ _ \| '_ \    / _ \ / _` |/ _` |
-             *     | |_) | |_| | |_| || (_) | | | |  / ___ \ (_| | (_| |
-             *     |____/ \__,_|\__|\__\___/|_| |_| /_/   \_\__,_|\__,_|
-             *
-             */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
-                JButton btnAdd = new JButton(icon22add);
-                btnAdd.setPressedIcon(icon22addPressed);
-                btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnAdd.setContentAreaFilled(false);
-                btnAdd.setBorder(null);
-                btnAdd.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                    }
-                });
-                titlePanelright.add(btnAdd);
-//                btnAdd.setEnabled(ersterBWInfo == null || (!ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.getBwinfotyp().isObsolete()));
-            }
-
-            /***
-             *      ____        _   _                _____    _ _ _
-             *     | __ ) _   _| |_| |_ ___  _ __   | ____|__| (_) |_
-             *     |  _ \| | | | __| __/ _ \| '_ \  |  _| / _` | | __|
-             *     | |_) | |_| | |_| || (_) | | | | | |__| (_| | | |_
-             *     |____/ \__,_|\__|\__\___/|_| |_| |_____\__,_|_|\__|
-             *
-             */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {  // => ACL_MATRIX
-                JButton btnEdit = new JButton(icon22edit);
-                btnEdit.setPressedIcon(icon22editPressed);
-                btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnEdit.setContentAreaFilled(false);
-                btnEdit.setBorder(null);
-                btnEdit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-
-                    }
-                });
-                titlePanelright.add(btnEdit);
-            }
-
-            /***
-             *      ____        _   _                ____  _
-             *     | __ ) _   _| |_| |_ ___  _ __   / ___|| |_ ___  _ __
-             *     |  _ \| | | | __| __/ _ \| '_ \  \___ \| __/ _ \| '_ \
-             *     | |_) | |_| | |_| || (_) | | | |  ___) | || (_) | |_) |
-             *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \__\___/| .__/
-             *                                                     |_|
-             */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
-                JButton btnStop = new JButton(icon22stop);
-                btnStop.setPressedIcon(icon22stopPressed);
-                btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnStop.setContentAreaFilled(false);
-                btnStop.setBorder(null);
-                btnStop.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-
-                    }
-                });
+                }
+            });
 //                btnStop.setEnabled(ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isSingleIncident());
-                titlePanelright.add(btnStop);
-            }
+            titlePanelright.add(btnStop);
+        }
 
-            /***
-             *      ____        _   _                ____       _      _
-             *     | __ ) _   _| |_| |_ ___  _ __   |  _ \  ___| | ___| |_ ___
-             *     |  _ \| | | | __| __/ _ \| '_ \  | | | |/ _ \ |/ _ \ __/ _ \
-             *     | |_) | |_| | |_| || (_) | | | | | |_| |  __/ |  __/ ||  __/
-             *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \___|_|\___|\__\___|
-             *
-             */
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
-                JButton btnDelete = new JButton(icon22delete);
-                btnDelete.setPressedIcon(icon22deletePressed);
-                btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnDelete.setContentAreaFilled(false);
-                btnDelete.setBorder(null);
-                btnDelete.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
+        /***
+         *      ____        _   _                ____       _      _
+         *     | __ ) _   _| |_| |_ ___  _ __   |  _ \  ___| | ___| |_ ___
+         *     |  _ \| | | | __| __/ _ \| '_ \  | | | |/ _ \ |/ _ \ __/ _ \
+         *     | |_) | |_| | |_| || (_) | | | | | |_| |  __/ |  __/ ||  __/
+         *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \___|_|\___|\__\___|
+         *
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
+            JButton btnDelete = new JButton(icon22delete);
+            btnDelete.setPressedIcon(icon22deletePressed);
+            btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnDelete.setContentAreaFilled(false);
+            btnDelete.setBorder(null);
+            btnDelete.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
 
-                    }
-                });
+                }
+            });
 //                btnDelete.setEnabled(ersterBWInfo != null && !ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints());
-                titlePanelright.add(btnDelete);
-            }
+            titlePanelright.add(btnDelete);
+        }
 
 
-            titlePanelleft.setOpaque(false);
-            titlePanelright.setOpaque(false);
-            titlePanel.setOpaque(false);
+        titlePanelleft.setOpaque(false);
+        titlePanelright.setOpaque(false);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setOpaque(false);
 
-            titlePanel.add(titlePanelleft);
-            titlePanel.add(titlePanelright);
 
-            panelForPlanung.setTitleLabelComponent(titlePanel);
-            panelForPlanung.setSlidingDirection(SwingConstants.SOUTH);
-            panelForPlanung.setStyle(CollapsiblePane.TREE_STYLE);
-            panelForPlanung.setHorizontalAlignment(SwingConstants.LEADING);
+        titlePanel.setLayout(new GridBagLayout());
+        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+
+        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 5), 0, 0));
+
+        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+//        titlePanel.add(titlePanelleft);
+//        titlePanel.add(titlePanelright);
+
+
+        panelForPlanung.setTitleLabelComponent(titlePanel);
+        panelForPlanung.setSlidingDirection(SwingConstants.SOUTH);
+//            panelForPlanung.setStyle(CollapsiblePane.TREE_STYLE);
+//            panelForPlanung.setHorizontalAlignment(SwingConstants.LEADING);
 
 //            panelForBWInfoTyp.setEmphasized(bwinfos.get(typ).isEmpty());
 
 //            JPanel contentPanel = new JPanel();
 //            contentPanel.setLayout(new VerticalLayout());
 
-            /***
-             *       ___ ___  _  _ _____ ___ _  _ _____
-             *      / __/ _ \| \| |_   _| __| \| |_   _|
-             *     | (_| (_) | .` | | | | _|| .` | | |
-             *      \___\___/|_|\_| |_| |___|_|\_| |_|
-             *
-             */
+        /***
+         *       ___ ___  _  _ _____ ___ _  _ _____
+         *      / __/ _ \| \| |_   _| __| \| |_   _|
+         *     | (_| (_) | .` | | | | _|| .` | | |
+         *      \___\___/|_|\_| |_| |___|_|\_| |_|
+         *
+         */
 
-            JTextPane contentPane = new JTextPane();
-            contentPane.setContentType("text/html");
-            contentPane.setText(PlanungTools.getAsHTML(planung));
-            panelForPlanung.setContentPane(contentPane);
+        JTextPane contentPane = new JTextPane();
+        contentPane.setContentType("text/html");
+        contentPane.setText(SYSTools.toHTML(PlanungTools.getAsHTML(planung, false)));
+        panelForPlanung.setContentPane(contentPane);
+        try {
             panelForPlanung.setCollapsed(true);
-
-//            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
-
         } catch (PropertyVetoException e) {
             OPDE.error(e);
-        } catch (Exception e) {
-            OPDE.fatal(e);
         }
+
+//            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
 
 
         return panelForPlanung;
@@ -763,7 +829,7 @@ public class PnlPlanung extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-//           GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
@@ -775,14 +841,6 @@ public class PnlPlanung extends NursingRecordsPanel {
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
-//        JPanel labelPanel = new JPanel();
-//        labelPanel.setBackground(Color.WHITE);
-//        labelPanel.setLayout(new VerticalLayout(5));
-//
-//        CollapsiblePane panelFilter = new CollapsiblePane(); // OPDE.lang.getString("misc.msg.Filter")
-//        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
-//        panelFilter.setCollapsible(false);
-
         tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
         tbInactive.addItemListener(new ItemListener() {
             @Override
@@ -795,8 +853,61 @@ public class PnlPlanung extends NursingRecordsPanel {
         tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbInactive);
         SYSPropsTools.restoreState(internalClassID + ":tbInactive", tbInactive);
+        return list;
+    }
 
-//        panelFilter.setContentPane(labelPanel);
+    private List<Component> addCommands() {
+
+        List<Component> list = new ArrayList<Component>();
+
+        /***
+         *      _   _
+         *     | \ | | _____      __
+         *     |  \| |/ _ \ \ /\ / /
+         *     | |\  |  __/\ V  V /
+         *     |_| \_|\___| \_/\_/
+         *
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgPlanung(new Planung(bewohner), new Closure() {
+                        @Override
+                        public void execute(Object planung) {
+                            if (planung != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                    em.merge(planung);
+                                    em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+//                                reloadTable();
+                            }
+                        }
+                    });
+                }
+            });
+            list.add(addButton);
+        }
+
 
         return list;
     }

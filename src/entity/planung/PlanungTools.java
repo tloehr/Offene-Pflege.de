@@ -3,14 +3,12 @@ package entity.planung;
 import entity.Bewohner;
 import entity.info.BWInfoKat;
 import op.OPDE;
-import op.tools.SYSCalendar;
+import op.care.planung.PnlPlanung;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,12 +38,16 @@ public class PlanungTools {
      * @param planung
      * @return
      */
-    public static String getAsHTML(Planung planung) {
+    public static String getAsHTML(Planung planung, boolean withHeader) {
 
-        String html = "<h2><font color=\"green\">";
-        html += "Pflegeplanung &raquo;" + planung.getStichwort() + "&laquo;";
-        html += "</font></h2>";
-        html += "<b>Kategorie:</b> " + planung.getKategorie().getBezeichnung() + "<br/>";
+        String html = "";
+        html += "<h2 id=\"fonth2\" >";
+        html += withHeader ? "Pflegeplanung &raquo;" + planung.getStichwort() + "&laquo;" : "";
+        html += "</h2>";
+
+        html += "<div id=\"fonttext\">";
+
+        html += withHeader ? "<b>Kategorie:</b> " + planung.getKategorie().getBezeichnung() + "<br/>" : "";
 
         DateFormat df = DateFormat.getDateInstance();
         html += "<b>Prüfungstermin:</b> " + df.format(planung.getNKontrolle()) + "<br/>";
@@ -56,136 +58,38 @@ public class PlanungTools {
             html += "<b>Am:</b> " + df.format(planung.getBis()) + "<br/>";
         }
 
-        html += "<h3>Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>");
-        html += "<h3>Ziel(e):</h3>" + SYSTools.replace(planung.getZiel(), "\n", "<br/>");
+        html += "<h3 id=\"fonth3\">Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>");
+        html += "<h3 id=\"fonth3\">Ziel(e):</h3>" + SYSTools.replace(planung.getZiel(), "\n", "<br/>");
 
-        html += "<h3>Informationen und Massnahmen</h3>";
+        html += "<h3 id=\"fonth3\">"+OPDE.lang.getString(PnlPlanung.internalClassID+".interventions")+"</h3>";
 
         if (planung.getMassnahmen().isEmpty()) {
-            html += "<ul><li><i>bisher nichts zugeordnet</i></li></ul>";
+            html += "<ul><li><b>Massnahmen fehlen !!!</b></li></ul>";
         } else {
             html += "<ul>";
-            html += "<li><b>Einzelmassnahmen</b></li><ul>";
+            html += "<li><b>" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</b></li><ul>";
             for (MassTermin massTermin : planung.getMassnahmen()) {
-                html += "<li>" + MassTerminTools.getTerminAsHTML(massTermin) + "</li>";
-
-//                        case ART_KONTROLLEN: {
-//                            html += "<li><b>Kontrolltermine</b></li><ul>";
-//                            break;
-//                        }
-//                        default: {
-//                        }
-//                    } // switch
-                //html += "<ul>";
-                // Gruppenwechsel
-
+                html += "<li>";
+                html += "";
+                html = "<div id=\"fonttext\"><b>" + massTermin.getMassnahme().getBezeichnung() + "</b> (" + massTermin.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div><br/>";
+                html += MassTerminTools.getTerminAsHTML(massTermin);
+                html += "";
+                html += "</li>";
             }
             html += "</ul>";
-            if (!planung.getKontrollen().isEmpty()) {
-                html += "<li><b>Kontrolltermine</b></li><ul>";
-                for (PlanKontrolle kontrolle : planung.getKontrollen()) {
-                    html += "<li>" + DateFormat.getDateInstance().format(kontrolle.getDatum()) + "</li>";
-                }
-                html += "</ul>";
-            }
         }
-        html += "</ul></ul>";
+
+
+        if (!planung.getKontrollen().isEmpty()) {
+            html += "<h3 id=\"fonth3\">Kontrolltermine</h3>";
+            html += "<ul>";
+            for (PlanKontrolle kontrolle : planung.getKontrollen()) {
+                html += "<li><div id=\"fonttext\">" + PlanKontrolleTools.getAsHTML(kontrolle) + "</div></li>";
+            }
+            html += "</ul>";
+        }
+
+        html += "</ul></ul></div>";
         return html;
     }
-
-    public static String getWiederholung(int Mon, int Die, int Mit, int Don, int Fre,
-                                         int Sam, int Son, int Taeglich, int Woechentlich, int Monatlich, int TagNum, Date LDatum) {
-        String result = "";
-
-        if (Taeglich > 0) {
-            if (Taeglich > 1) {
-                result += "alle " + Taeglich + " Tage";
-            } else {
-                result += "jeden Tag";
-            }
-        } else if (Woechentlich > 0) {
-            if (Woechentlich == 1) {
-                result += "jede Woche ";
-            } else {
-                result += "alle " + Woechentlich + " Wochen ";
-            }
-
-            if (Mon > 0) {
-                result += "Mon ";
-            }
-            if (Die > 0) {
-                result += "Die ";
-            }
-            if (Mit > 0) {
-                result += "Mit ";
-            }
-            if (Don > 0) {
-                result += "Don ";
-            }
-            if (Fre > 0) {
-                result += "Fre ";
-            }
-            if (Sam > 0) {
-                result += "Sam ";
-            }
-            if (Son > 0) {
-                result += "Son ";
-            }
-
-        } else if (Monatlich > 0) {
-            if (Monatlich == 1) {
-                result += "jeden Monat ";
-            } else {
-                result += "alle " + Monatlich + " Monate ";
-            }
-
-            if (TagNum > 0) {
-                result += "jeweils am " + TagNum + ". des Monats";
-            } else {
-
-                int wtag = 0;
-                String tag = "";
-                if (Mon > 0) {
-                    tag += "Montag ";
-                    wtag = Mon;
-                }
-                if (Die > 0) {
-                    tag += "Dienstag ";
-                    wtag = Die;
-                }
-                if (Mit > 0) {
-                    tag += "Mittwoch ";
-                    wtag = Mit;
-                }
-                if (Don > 0) {
-                    tag += "Donnerstag ";
-                    wtag = Don;
-                }
-                if (Fre > 0) {
-                    tag += "Freitag ";
-                    wtag = Fre;
-                }
-                if (Sam > 0) {
-                    tag += "Samstag ";
-                    wtag = Sam;
-                }
-                if (Son > 0) {
-                    tag += "Sonntag ";
-                    wtag = Son;
-                }
-                result += "jeweils am " + wtag + ". " + tag + " des Monats";
-            }
-        } else {
-            result = "";
-        }
-
-        if (SYSCalendar.sameDay(LDatum, new Date()) > 0) { // Die erste Ausführung liegt in der Zukunft
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-            result += "<br/>erst ab: " + sdf.format(LDatum);
-        }
-
-        return result;
-    }
-
-
 }

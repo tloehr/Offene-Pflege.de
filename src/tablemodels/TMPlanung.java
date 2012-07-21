@@ -24,12 +24,18 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.planung;
+package tablemodels;
 
 /**
  *
  * @author tloehr
  */
+
+import entity.planung.MassTermin;
+import entity.planung.MassTerminTools;
+import entity.planung.Planung;
+import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -39,19 +45,17 @@ import java.util.ArrayList;
  */
 public class TMPlanung extends AbstractTableModel {
 
-    private ArrayList content;
-    public static final int COL_ID = 1;
+    private ArrayList<MassTermin> planungsliste;
     public static final int COL_TXT = 0;
-    public static final int COL_ART = 2;
-    public static final int COL_PKID = 3;
 
-    TMPlanung(ArrayList c) {
+
+    public TMPlanung(Planung planung) {
         super();
-        this.content = c;
+        this.planungsliste = new ArrayList<MassTermin>(planung.getMassnahmen());
     }
 
     public int getRowCount() {
-        return content.size();
+        return planungsliste.size();
     }
 
     public int getColumnCount() {
@@ -63,35 +67,15 @@ public class TMPlanung extends AbstractTableModel {
         return String.class;
     }
 
-    public Object getValueAt(int r, int c) {
+    public Object getValueAt(int row, int col) {
         Object result;
-        Object[] o = (Object[]) content.get(r);
-        int art = ((Integer) o[0]).intValue();
-        //long relid = ((Long) o[1]).longValue();
-        //Object obj = o[1];
-        String txt = o[1].toString();
-        Object pkid = o[2];
 
-        switch (c) {
+        switch (col) {
             case COL_TXT: {
-                result = txt;
-                break;
-            }
-            case COL_ART: {
-                result = art;
-                break;
-            }
-            case COL_PKID: {
-                result = pkid;
-                break;
-            }
-            case COL_ID: {
-//                if (OPDE.ocprops.getProperty("debug").equalsIgnoreCase("true")) {
-//                    result = pkid.toString() + " " + DBHandling.ARTEN[art];
-//                } else {
-//                    
-//                }
-                result = DBHandling.ARTEN[art];
+                String html = "";
+                html += "<b>" + planungsliste.get(row).getMassnahme().getBezeichnung() + "</b> (" + planungsliste.get(row).getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")<br/>";
+                html += MassTerminTools.getTerminAsHTML(planungsliste.get(row));
+                result = SYSTools.toHTML(html);
                 break;
             }
             default: {
@@ -99,9 +83,5 @@ public class TMPlanung extends AbstractTableModel {
             }
         }
         return result;
-    }
-
-    public void cleanup() {
-        content.clear();
     }
 }

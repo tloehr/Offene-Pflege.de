@@ -26,6 +26,9 @@
  */
 package op.care.planung;
 
+import java.awt.event.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 import op.tools.SYSTools;
 import tablerenderer.RNDStandard;
 
@@ -92,139 +95,159 @@ public class DlgVorlage extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        lblTitel = new JLabel();
+        jPanel1 = new JPanel();
+        txtSuche = new JTextField();
+        jspVorlagen = new JScrollPane();
+        tblVorlagen = new JTable();
+        cbAbgesetzte = new JCheckBox();
+        jLabel1 = new JLabel();
+        btnOK = new JButton();
+        btnCancel = new JButton();
 
-        lblTitel = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        txtSuche = new javax.swing.JTextField();
-        jspVorlagen = new javax.swing.JScrollPane();
-        tblVorlagen = new javax.swing.JTable();
-        cbAbgesetzte = new javax.swing.JCheckBox();
-        jLabel1 = new javax.swing.JLabel();
-        btnOK = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        Container contentPane = getContentPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        lblTitel.setFont(new java.awt.Font("Dialog", 1, 18));
+        //---- lblTitel ----
+        lblTitel.setFont(new Font("Dialog", Font.BOLD, 18));
         lblTitel.setText("Pflegeplanung aus Vorlage erstellen");
 
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
 
-        txtSuche.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtSucheCaretUpdate(evt);
-            }
-        });
-
-        jspVorlagen.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                jspVorlagenComponentResized(evt);
-            }
-        });
-
-        tblVorlagen.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
+            //---- txtSuche ----
+            txtSuche.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtSucheCaretUpdate(e);
                 }
-        ));
-        tblVorlagen.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblVorlagenMouseClicked(evt);
+            });
+
+            //======== jspVorlagen ========
+            {
+                jspVorlagen.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        jspVorlagenComponentResized(e);
+                    }
+                });
+
+                //---- tblVorlagen ----
+                tblVorlagen.setModel(new DefaultTableModel(
+                    new Object[][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                    },
+                    new String[] {
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
+                ));
+                tblVorlagen.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        tblVorlagenMouseClicked(e);
+                    }
+                });
+                jspVorlagen.setViewportView(tblVorlagen);
             }
-        });
-        jspVorlagen.setViewportView(tblVorlagen);
 
-        cbAbgesetzte.setText("auch abgesetzte anzeigen");
-        cbAbgesetzte.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbAbgesetzteActionPerformed(evt);
-            }
-        });
+            //---- cbAbgesetzte ----
+            cbAbgesetzte.setText("auch abgesetzte anzeigen");
+            cbAbgesetzte.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cbAbgesetzteActionPerformed(e);
+                }
+            });
 
-        jLabel1.setText("Stichwort-Suche:");
+            //---- jLabel1 ----
+            jLabel1.setText("Stichwort-Suche:");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jspVorlagen, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(jLabel1)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtSuche, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE))
-                                        .addComponent(cbAbgesetzte))
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1)
-                                        .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspVorlagen, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbAbgesetzte)
-                                .addContainerGap())
-        );
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jspVorlagen, GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSuche, GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE))
+                            .addComponent(cbAbgesetzte))
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jspVorlagen, GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbAbgesetzte)
+                        .addContainerGap())
+            );
+        }
 
-        btnOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
+        //---- btnOK ----
+        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
         btnOK.setText("Erstellen");
         btnOK.setEnabled(false);
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOKActionPerformed(e);
             }
         });
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
+        //---- btnCancel ----
+        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
         btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCancelActionPerformed(e);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(lblTitel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(btnOK)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnCancel)))
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblTitel, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
+                        .addGroup(contentPaneLayout.createSequentialGroup()
+                            .addComponent(btnOK)
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancel)))
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOK))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblTitel)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnCancel)
+                        .addComponent(btnOK))
+                    .addContainerGap())
         );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
@@ -294,16 +317,15 @@ public class DlgVorlage extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JCheckBox cbAbgesetzte;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jspVorlagen;
-    private javax.swing.JLabel lblTitel;
-    private javax.swing.JTable tblVorlagen;
-    private javax.swing.JTextField txtSuche;
-
+    private JLabel lblTitel;
+    private JPanel jPanel1;
+    private JTextField txtSuche;
+    private JScrollPane jspVorlagen;
+    private JTable tblVorlagen;
+    private JCheckBox cbAbgesetzte;
+    private JLabel jLabel1;
+    private JButton btnOK;
+    private JButton btnCancel;
     // End of variables declaration//GEN-END:variables
     public long getPlanid() {
         return planid;

@@ -1,11 +1,15 @@
 package entity.info;
 
+import entity.verordnungen.Darreichung;
 import op.OPDE;
 import op.care.info.PnlInfo;
 import op.tools.InternalClassACL;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +28,23 @@ public class BWInfoKatTools {
     public static final int VERWALTUNG = 1000;
     public static final int STAMMDATEN = 2000;
 
+
+    public static ListCellRenderer getRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                } else if (o instanceof BWInfoKat) {
+                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((BWInfoKat) o).getFgheader()+"\">"+((BWInfoKat) o).getBezeichnung()+"</font></div>");
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
 
     /**
      * @return

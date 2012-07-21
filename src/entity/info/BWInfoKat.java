@@ -106,6 +106,22 @@ public class BWInfoKat implements Serializable, Comparable {
         return new Color(red, green, blue);
     }
 
+    public String getBgheader() {
+        return bgheader;
+    }
+
+    public String getBgcontent() {
+        return bgcontent;
+    }
+
+    public String getFgheader() {
+        return fgheader;
+    }
+
+    public String getFgcontent() {
+        return fgcontent;
+    }
+
     public Integer getSortierung() {
         return sortierung;
     }
@@ -123,12 +139,8 @@ public class BWInfoKat implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
-
-
         final Collator collator = Collator.getInstance();
         collator.setStrength(Collator.SECONDARY);// a == A, a < Ä
-        collator.compare("boo", "bär");
-
         return collator.compare(bezeichnung, ((BWInfoKat) o).getBezeichnung());
     }
 
@@ -147,7 +159,7 @@ public class BWInfoKat implements Serializable, Comparable {
 
     @Override
     public String toString() {
-        return "entity.info.BWInfoKat[bwikid=" + bwikid + "]";
+        return bezeichnung;
     }
 
 }
