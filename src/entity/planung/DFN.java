@@ -1,8 +1,17 @@
 package entity.planung;
 
+import entity.Bewohner;
+import entity.Massnahmen;
+import entity.Users;
+import entity.verordnungen.BHPTools;
+import entity.verordnungen.MedBuchungen;
+import entity.verordnungen.Verordnung;
+import entity.verordnungen.VerordnungPlanung;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 
 @Entity
@@ -10,9 +19,6 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "Dfn.findAll", query = "SELECT d FROM DFN d"),
     @NamedQuery(name = "Dfn.findByDfnid", query = "SELECT d FROM DFN d WHERE d.dfnid = :dfnid"),
-    @NamedQuery(name = "Dfn.findByBWKennung", query = "SELECT d FROM DFN d WHERE d.bWKennung = :bWKennung"),
-    @NamedQuery(name = "Dfn.findByTermID", query = "SELECT d FROM DFN d WHERE d.termID = :termID"),
-    @NamedQuery(name = "Dfn.findByUKennung", query = "SELECT d FROM DFN d WHERE d.uKennung = :uKennung"),
     @NamedQuery(name = "Dfn.findByMassID", query = "SELECT d FROM DFN d WHERE d.massID = :massID"),
     @NamedQuery(name = "Dfn.findBySoll", query = "SELECT d FROM DFN d WHERE d.soll = :soll"),
     @NamedQuery(name = "Dfn.findByIst", query = "SELECT d FROM DFN d WHERE d.ist = :ist"),
@@ -31,17 +37,6 @@ public class DFN implements Serializable {
     @Column(name = "DFNID")
     private Long dfnid;
     @Basic(optional = false)
-    @Column(name = "BWKennung")
-    private String bWKennung;
-    @Basic(optional = false)
-    @Column(name = "TermID")
-    private long termID;
-    @Column(name = "UKennung")
-    private String uKennung;
-    @Basic(optional = false)
-    @Column(name = "MassID")
-    private long massID;
-    @Basic(optional = false)
     @Column(name = "Soll")
     @Temporal(TemporalType.TIMESTAMP)
     private Date soll;
@@ -53,12 +48,12 @@ public class DFN implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date stDatum;
     @Column(name = "SZeit")
-    private Boolean sZeit;
+    private Byte sZeit;
     @Column(name = "IZeit")
-    private Boolean iZeit;
+    private Byte iZeit;
     @Basic(optional = false)
     @Column(name = "Status")
-    private boolean status;
+    private Byte status;
     @Basic(optional = false)
     @Column(name = "Erforderlich")
     private boolean erforderlich;
@@ -66,28 +61,58 @@ public class DFN implements Serializable {
     @Column(name = "Dauer")
     private BigDecimal dauer;
     @Basic(optional = false)
-    @Column(name = "_mdate")
+    @Column(name = "MDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
+    @Version
+    @Column(name="version")
+    private Long version;
+
+
+    @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
+    @ManyToOne
+    private Planung planung;
+
+    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @ManyToOne
+    private Bewohner bewohner;
+
+    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
+
+    @JoinColumn(name = "MassID", referencedColumnName = "MassID")
+    @ManyToOne
+    private Massnahmen massnahme;
+
+    @JoinColumn(name = "TermID", referencedColumnName = "TermID")
+    @ManyToOne
+    private MassTermin massTermin;
+
+    public Massnahmen getMassnahme() {
+        return massnahme;
+    }
+
+    public void setMassnahme(Massnahmen massnahme) {
+        this.massnahme = massnahme;
+    }
 
     public DFN() {
     }
 
-    public DFN(Long dfnid) {
-        this.dfnid = dfnid;
-    }
 
-    public DFN(Long dfnid, String bWKennung, long termID, long massID, Date soll, Date stDatum, boolean status, boolean erforderlich, BigDecimal dauer, Date mdate) {
-        this.dfnid = dfnid;
-        this.bWKennung = bWKennung;
-        this.termID = termID;
-        this.massID = massID;
+    public DFN(MassTermin massTermin, Date soll, Byte sZeit) {
+        // Das sieht redundant aus, dient aber der Vereinfachung
+        this.massTermin = massTermin;
+        this.massnahme = massTermin.getMassnahme();
+        this.planung = massTermin.getPlanung();
+        this.dauer = massTermin.getDauer();
+        this.bewohner = massTermin.getPlanung().getBewohner();
         this.soll = soll;
-        this.stDatum = stDatum;
-        this.status = status;
-        this.erforderlich = erforderlich;
-        this.dauer = dauer;
-        this.mdate = mdate;
+        this.version = 0l;
+        this.sZeit = sZeit;
+        this.status = DFNTools.STATUS_OFFEN;
+        this.mdate = new Date();
     }
 
     public Long getDfnid() {
@@ -98,36 +123,28 @@ public class DFN implements Serializable {
         this.dfnid = dfnid;
     }
 
-    public String getBWKennung() {
-        return bWKennung;
+    public Byte getsZeit() {
+        return sZeit;
     }
 
-    public void setBWKennung(String bWKennung) {
-        this.bWKennung = bWKennung;
+    public void setsZeit(Byte sZeit) {
+        this.sZeit = sZeit;
     }
 
-    public long getTermID() {
-        return termID;
+    public Byte getiZeit() {
+        return iZeit;
     }
 
-    public void setTermID(long termID) {
-        this.termID = termID;
+    public void setiZeit(Byte iZeit) {
+        this.iZeit = iZeit;
     }
 
-    public String getUKennung() {
-        return uKennung;
+    public MassTermin getMassTermin() {
+        return massTermin;
     }
 
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
-    }
-
-    public long getMassID() {
-        return massID;
-    }
-
-    public void setMassID(long massID) {
-        this.massID = massID;
+    public void setMassTermin(MassTermin massTermin) {
+        this.massTermin = massTermin;
     }
 
     public Date getSoll() {
@@ -154,31 +171,7 @@ public class DFN implements Serializable {
         this.stDatum = stDatum;
     }
 
-    public Boolean getSZeit() {
-        return sZeit;
-    }
-
-    public void setSZeit(Boolean sZeit) {
-        this.sZeit = sZeit;
-    }
-
-    public Boolean getIZeit() {
-        return iZeit;
-    }
-
-    public void setIZeit(Boolean iZeit) {
-        this.iZeit = iZeit;
-    }
-
-    public boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public boolean getErforderlich() {
+    public boolean isErforderlich() {
         return erforderlich;
     }
 
@@ -200,6 +193,30 @@ public class DFN implements Serializable {
 
     public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    public Planung getPlanung() {
+        return planung;
+    }
+
+    public void setPlanung(Planung planung) {
+        this.planung = planung;
+    }
+
+    public Bewohner getBewohner() {
+        return bewohner;
+    }
+
+    public void setBewohner(Bewohner bewohner) {
+        this.bewohner = bewohner;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     @Override

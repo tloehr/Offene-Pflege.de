@@ -438,7 +438,11 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         return woechentlich > 0;
     }
 
-    /**
+    public boolean isMonatlich() {
+        return monatlich > 0;
+    }
+
+     /**
      * @param date, zu prüfendes Datum.
      * @return Ist <code>true</code>, wenn diese Planung wöchentlich gilt und das Attribut mit dem aktuellen Wochentagsnamen größer null ist.
      */
@@ -535,10 +539,6 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
             }
         }
         return passend;
-    }
-
-    public boolean isMonatlich() {
-        return monatlich > 0;
     }
 
     @Override

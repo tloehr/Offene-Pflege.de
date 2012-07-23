@@ -6,11 +6,13 @@
 package entity.planung;
 
 import entity.Massnahmen;
+import op.tools.SYSCalendar;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import javax.persistence.*;
 
 /**
@@ -357,6 +359,105 @@ public class MassTermin implements Serializable {
 
     public boolean isWoechentlich() {
         return woechentlich > 0;
+    }
+
+    /**
+     * @param date, zu prüfendes Datum.
+     * @return Ist <code>true</code>, wenn diese Planung wöchentlich gilt und das Attribut mit dem aktuellen Wochentagsnamen größer null ist.
+     */
+    public boolean isPassenderWochentag(Date date) {
+        boolean passend = false;
+
+        if (isWoechentlich()) { // wenn nicht wöchentlich, dann passt gar nix
+            GregorianCalendar gcDate = SYSCalendar.toGC(date);
+            switch (gcDate.get(GregorianCalendar.DAY_OF_WEEK)) {
+                case GregorianCalendar.MONDAY: {
+                    passend = mon > 0;
+                    break;
+                }
+                case GregorianCalendar.TUESDAY: {
+                    passend = die > 0;
+                    break;
+                }
+                case GregorianCalendar.WEDNESDAY: {
+                    passend = mit > 0;
+                    break;
+                }
+                case GregorianCalendar.THURSDAY: {
+                    passend = don > 0;
+                    break;
+                }
+                case GregorianCalendar.FRIDAY: {
+                    passend = fre > 0;
+                    break;
+                }
+                case GregorianCalendar.SATURDAY: {
+                    passend = sam > 0;
+                    break;
+                }
+                case GregorianCalendar.SUNDAY: {
+                    passend = son > 0;
+                    break;
+                }
+                default: {
+                    passend = false;
+                    break;
+                }
+            }
+        }
+        return passend;
+    }
+
+    /**
+     * @param date, zu prüfendes Datum.
+     * @return Ist <code>true</code>, wenn diese Planung monatlich gilt und das Attribut <code>tagnum</code> dem aktuellen Tag im Monat entspricht
+     *         <b>oder</b> das Attribut mit dem aktuellen Wochentagsnamen gleich dem Wochentag im Monat entpricht (der erste Mitwwoch im Monat hat 1, der zweite 2 usw...).
+     */
+    public boolean isPassenderTagImMonat(Date date) {
+        boolean passend = false;
+        if (isMonatlich()) { // wenn nicht monatlich, dann passt gar nix
+            GregorianCalendar gcDate = SYSCalendar.toGC(date);
+
+            passend = tagNum == gcDate.get(GregorianCalendar.DAY_OF_MONTH);
+
+            if (!passend) {
+                switch (gcDate.get(GregorianCalendar.DAY_OF_WEEK)) {
+                    case GregorianCalendar.MONDAY: {
+                        passend = mon == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.TUESDAY: {
+                        passend = die == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.WEDNESDAY: {
+                        passend = mit == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.THURSDAY: {
+                        passend = don == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.FRIDAY: {
+                        passend = fre == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.SATURDAY: {
+                        passend = sam == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    case GregorianCalendar.SUNDAY: {
+                        passend = son == gcDate.get(GregorianCalendar.DAY_OF_WEEK_IN_MONTH);
+                        break;
+                    }
+                    default: {
+                        passend = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return passend;
     }
 
     public boolean isMonatlich() {

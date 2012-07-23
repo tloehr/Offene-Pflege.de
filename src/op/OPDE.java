@@ -31,11 +31,11 @@ import entity.EntityTools;
 import entity.Users;
 import entity.UsersTools;
 import entity.files.SYSFilesTools;
+import entity.planung.DFNTools;
 import entity.system.SYSLogin;
 import entity.system.SYSPropsTools;
 import entity.system.SyslogTools;
 import entity.verordnungen.BHPTools;
-import op.care.DFNImport;
 import op.system.FrmInit;
 import op.system.PrinterTypes;
 import op.threads.DisplayManager;
@@ -43,8 +43,7 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
-import org.eclipse.persistence.config.QueryHints;
-import org.eclipse.persistence.logging.SessionLog;
+import org.joda.time.DateMidnight;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -510,7 +509,6 @@ public class OPDE {
 //            jpaProps.put("eclipselink.logging.level", "FINER");
 
 
-
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
             String header = SYSTools.getWindowTitle("");
@@ -524,10 +522,36 @@ public class OPDE {
             if (cl.hasOption("d")) {
                 // initProps();
                 String d = cl.getOptionValue("d");
+                EntityManager em = OPDE.createEM();
+                int offset = 0;
+                if (isDebug()) {
+                    String sOffset = cl.getOptionValue("d");
+                    OPDE.debug(cl.getOptionValue("d"));
+                    try {
+                        offset = Integer.parseInt(sOffset);
+                    } catch (NumberFormatException ex) {
+                        offset = 0;
+                    }
+                }
+
                 try {
-                    DFNImport.importDFN();
+                    em.getTransaction().begin();
+                    Users rootUser = em.find(Users.class, "root");
+
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
+                    OPDE.setLogin(rootLogin);
+                    initProps();
+
+                    DateMidnight stichtag = new DateMidnight().plusDays(offset);
+                    DFNTools.erzeugen(em, stichtag.toDate());
+                    em.getTransaction().commit();
                 } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
                     fatal(ex);
+                } finally {
+                    em.close();
                 }
                 System.exit(0);
             }
@@ -551,23 +575,21 @@ public class OPDE {
                     em.getTransaction().begin();
                     Users rootUser = em.find(Users.class, "root");
 
-                    SYSLogin rootLogin = new SYSLogin(rootUser);
-                    EntityTools.persist(rootLogin);
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
                     OPDE.setLogin(rootLogin);
                     initProps();
 
-                    Date stichtag = SYSCalendar.addDate(new Date(), offset);
-                    BHPTools.erzeugen(em, stichtag);
+                    DateMidnight stichtag = new DateMidnight().plusDays(offset);
+                    BHPTools.erzeugen(em, stichtag.toDate());
                     em.getTransaction().commit();
                 } catch (Exception ex) {
-                    em.getTransaction().rollback();
-
-
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
                     fatal(ex);
                 } finally {
                     em.close();
                 }
-
                 System.exit(0);
             }
 

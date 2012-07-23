@@ -216,7 +216,7 @@ public class BHPTools {
 
                 OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
                 OPDE.debug("==========================================");
-                System.out.println("Planung: " + planung.getBhppid());
+                OPDE.debug("Planung: " + planung.getBhppid());
                 OPDE.debug("BWKennung: " + planung.getVerordnung().getBewohner().getBWKennung());
                 OPDE.debug("VerID: " + planung.getVerordnung().getVerid());
 
