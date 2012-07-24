@@ -251,6 +251,11 @@ public class OPDE {
         SyslogTools.info(message.toString());
     }
 
+    public static void important(EntityManager em, Object message) throws Exception {
+        logger.info(message);
+        SyslogTools.addLog(em, message.toString(), SyslogTools.INFO);
+    }
+
     public static void fatal(Throwable e) {
         logger.fatal(e.getMessage(), e);
         SyslogTools.fatal(e.getMessage());
@@ -543,7 +548,7 @@ public class OPDE {
                     initProps();
 
                     DateMidnight stichtag = new DateMidnight().plusDays(offset);
-                    DFNTools.erzeugen(em, stichtag.toDate());
+                    DFNTools.generate(em, stichtag.toDate());
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     if (em.getTransaction().isActive()) {
@@ -575,12 +580,13 @@ public class OPDE {
                     em.getTransaction().begin();
                     Users rootUser = em.find(Users.class, "root");
 
-                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
+                    SYSLogin rootLogin = new SYSLogin(rootUser);
+                    em.persist(rootLogin);
                     OPDE.setLogin(rootLogin);
                     initProps();
 
                     DateMidnight stichtag = new DateMidnight().plusDays(offset);
-                    BHPTools.erzeugen(em, stichtag.toDate());
+                    BHPTools.generate(em, stichtag.toDate());
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     if (em.getTransaction().isActive()) {

@@ -33,7 +33,7 @@ public class DFNTools {
      * @param datum, das Datum für den die DFN erzeugt werden sollen. <code>null</code>, wenn das heutige Datum gewünscht ist.
      * @return Anzahl der erzeugten BHPs
      */
-    public static int erzeugen(EntityManager em, Date datum) throws Exception {
+    public static int generate(EntityManager em, Date datum) throws Exception {
 
         String internalClassID = "nursingrecords.dfnimport";
         int numdfn = 0;
@@ -71,11 +71,19 @@ public class DFNTools {
                 " AND mt.lDatum <= :ldatum AND p.bewohner.adminonly <> 2 " +
                 " ORDER BY mt.termID ");
 
+
+//        SELECT * FROM MassTermin mt
+//INNER JOIN Planung plan ON plan.PlanID = mt.PlanID
+//INNER JOIN Bewohner bw ON bw.BWKennung = plan.BWKennung
+//WHERE plan.von <= now() AND plan.bis >= now()
+//AND mt.ldatum <= now() AND bw.adminonly <> 2
+//ORDER BY mt.termid
+
         // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
         // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
         // die wirklichen Treffer nachher genauer ermittelt werden.
 
-        OPDE.debug("[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
+        OPDE.important(em, "[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
 
         select.setParameter("von", stichtag.toDate());
         select.setParameter("bis", stichtag.plusDays(1).toDateTime().minusMinutes(1).toDate());
@@ -83,17 +91,36 @@ public class DFNTools {
 
         List<MassTermin> list = select.getResultList();
 
-        numdfn = erzeugen(em, list, stichtag, true);
+        numdfn = generate(em, list, stichtag, true);
 
-        OPDE.important("[DFNImport] Durchgeführt. Stichtag: " + DateFormat.getDateInstance().format(stichtag) + " Anzaghl erzeugter DFNs: " + numdfn);
+        Query forceQuery = em.createQuery(" UPDATE DFN d "
+                + " SET d.soll = :now "
+                + " WHERE d.erforderlich = TRUE AND d.status = :status AND d.soll < :now1 "
+                + " AND d.planung.von < :now2 AND d.planung.bis > :now3 ");
+        forceQuery.setParameter("now", stichtag.toDate());
+        forceQuery.setParameter("now1", stichtag.toDate());
+        forceQuery.setParameter("now2", stichtag.toDate());
+        forceQuery.setParameter("now3", stichtag.toDate());
+        forceQuery.setParameter("status", DFNTools.STATUS_OFFEN);
 
-//            SYSRunningClassesTools.endModule(me);
+//        String forcedSQL = " UPDATE DFN d "
+//                + " INNER JOIN MassTermin t ON d.TermID = t.TermID "
+//                + " INNER JOIN Planung p ON p.PlanID = t.PlanID "
+//                + " SET d.Soll=now() "
+//                + " WHERE d.Erforderlich > 0 AND d.Status = 0 AND DATE(d.Soll) < Date(now()) "
+//                + " AND p.von < now() AND p.bis > now()";
+        // Die nicht beachteten zu erzwingenden müssen noch auf das heutige Datum umgetragen werden.
+        // Das erfolgt unabhängig von dem eingegebenen Stichtag.
+        // Nur bei uneingeschränkten Imports.
+        int affectedOldDFNs = forceQuery.executeUpdate();
+        OPDE.debug("Notwendige Massnahmen werden übertragen...");
 
-        SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateFormat.getDateInstance().format(stichtag));
 
-//        } else {
-//            OPDE.warn("BHPImport nicht abgeschlossen. Zugriffskonflikt.");
-//        }
+        OPDE.important(em, "[DFNImport] Durchgeführt. Stichtag: " + DateFormat.getDateInstance().format(stichtag.toDate()) + " Anzaghl erzeugter DFNs: " + numdfn);
+        OPDE.important(em, affectedOldDFNs + " notwendige Massnahmen wurden übertragen.");
+
+        SYSPropsTools.storeProp(em, "LASTDFNIMPORT", DateFormat.getDateInstance().format(stichtag.toDate()));
+
         return numdfn;
     }
 
@@ -122,7 +149,7 @@ public class DFNTools {
      * @param wholeday true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
-    public static int erzeugen(EntityManager em, List<MassTermin> list, DateMidnight stichtag, boolean wholeday) {
+    public static int generate(EntityManager em, List<MassTermin> list, DateMidnight stichtag, boolean wholeday) {
 //        GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
         int maxrows = list.size();
         int numdfn = 0;
@@ -155,8 +182,8 @@ public class DFNTools {
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(termin.getLDatum());
 
-                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(ldatum));
-                OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(stichtag));
+                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
+                OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(stichtag.toDate()));
 
                 // Genaue Ermittlung der Treffer
                 // =============================
@@ -164,7 +191,7 @@ public class DFNTools {
                     OPDE.debug("Eine tägliche Planung");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der stichtag getroffen wurde oder überschritten ist.
-                    while (Days.daysBetween(ldatum, stichtag).getDays() < 0) {
+                    while (Days.daysBetween(ldatum, stichtag).getDays() > 0) {
                         OPDE.debug("ldatum liegt vor dem stichtag. Addiere tage: " + termin.getTaeglich());
                         ldatum = ldatum.plusDays(termin.getTaeglich());
                     }
@@ -172,7 +199,7 @@ public class DFNTools {
                     treffer = Days.daysBetween(ldatum, stichtag).getDays() == 0;
                 } else if (termin.isWoechentlich()) {
                     OPDE.debug("Eine wöchentliche Planung");
-                    while (Weeks.weeksBetween(ldatum, stichtag).getWeeks() < 0) {
+                    while (Weeks.weeksBetween(ldatum, stichtag).getWeeks() > 0) {
                         OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + termin.getWoechentlich());
                         ldatum = ldatum.plusWeeks(termin.getWoechentlich());
                     }
@@ -181,7 +208,7 @@ public class DFNTools {
                     treffer = Weeks.weeksBetween(ldatum, stichtag).getWeeks() == 0;
                 } else if (termin.isMonatlich()) {
                     OPDE.debug("Eine monatliche Planung");
-                    while (Months.monthsBetween(ldatum, stichtag).getMonths() < 0) {
+                    while (Months.monthsBetween(ldatum, stichtag).getMonths() > 0) {
                         OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + termin.getMonatlich());
                         ldatum = ldatum.plusMonths(termin.getMonatlich());
                     }
@@ -190,7 +217,7 @@ public class DFNTools {
                     treffer = Months.monthsBetween(ldatum, stichtag).getMonths() == 0;
                 }
 
-                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum));
+                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
                 OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
 
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
@@ -208,39 +235,53 @@ public class DFNTools {
                 if (treffer) {
                     if (erstAbFM && termin.getNachtMo() > 0) {
                         OPDE.debug("SYSConst.FM, " + termin.getNachtMo());
-                        em.merge(new DFN(termin, stichtag.toDate(), SYSConst.FM));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getNachtMo(); dfncount++) {
+                            em.merge(new DFN(termin, stichtag.toDate(), SYSConst.FM));
+                            numdfn++;
+                        }
                     }
                     if (erstAbMO && termin.getMorgens() > 0) {
                         OPDE.debug("SYSConst.MO, " + termin.getMorgens());
-                        em.merge(new DFN(termin, stichtag.toDate(), SYSConst.MO));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getMorgens(); dfncount++) {
+                            em.merge(new DFN(termin, stichtag.toDate(), SYSConst.MO));
+                            numdfn++;
+                        }
                     }
                     if (erstAbMI && termin.getMittags() > 0) {
                         OPDE.debug("SYSConst.MI, " + termin.getMittags());
-                        em.merge(new DFN(termin, stichtag.toDate(), SYSConst.MI));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getMittags(); dfncount++) {
+                            em.merge(new DFN(termin, stichtag.toDate(), SYSConst.MI));
+                            numdfn++;
+                        }
                     }
                     if (erstAbNM && termin.getNachmittags() > 0) {
                         OPDE.debug("SYSConst.NM, " + termin.getNachmittags());
-                        em.merge(new DFN(termin, stichtag.toDate(), SYSConst.NM));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getNachmittags(); dfncount++) {
+                            em.merge(new DFN(termin, stichtag.toDate(), SYSConst.NM));
+                            numdfn++;
+                        }
                     }
                     if (erstAbAB && termin.getAbends() > 0) {
                         OPDE.debug("SYSConst.AB, " + termin.getAbends());
-                        em.merge(new DFN(termin, stichtag.toDate(), SYSConst.AB));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getAbends(); dfncount++) {
+                            em.merge(new DFN(termin, stichtag.toDate(), SYSConst.AB));
+                            numdfn++;
+                        }
                     }
                     if (erstAbNA && termin.getNachtAb() > 0) {
                         OPDE.debug("SYSConst.NA, " + termin.getNachtAb());
-                        em.merge(new DFN(termin, stichtag.toDate(), SYSConst.NA));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getNachtAb(); dfncount++) {
+                            em.merge(new DFN(termin, stichtag.toDate(), SYSConst.NA));
+                            numdfn++;
+                        }
                     }
                     if (uhrzeitOK && termin.getUhrzeit() != null) {
                         Date neuerStichtag = SYSCalendar.addTime2Date(stichtag.toDate(), termin.getUhrzeit());
                         OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(neuerStichtag));
-                        em.merge(new DFN(termin, neuerStichtag, SYSConst.UZ));
-                        numdfn++;
+                        for (int dfncount = 1; dfncount <= termin.getUhrzeitAnzahl(); dfncount++) {
+                            em.merge(new DFN(termin, neuerStichtag, SYSConst.UZ));
+                            numdfn++;
+                        }
                     }
 
                     // Nun noch das LDatum in der Tabelle MassTermin neu setzen.

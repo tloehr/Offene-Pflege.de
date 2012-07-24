@@ -47,6 +47,8 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 import tablemodels.TMVerordnung;
 import tablerenderer.RNDHTML;
 
@@ -265,7 +267,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     queryDELBHP.executeUpdate();
 
                                     if (!verordnung.isBedarf()) {
-                                        BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), true);
+                                        BHPTools.generate(em, verordnung.getPlanungen(), new DateMidnight(), true);
                                     }
 
                                     em.getTransaction().commit();
@@ -328,12 +330,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     newVerordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
 
                                     // Dann werden die nicht mehr benötigten BHPs der alten Verordnung entfernt.
-                                    BHPTools.aufräumen(em, oldVerordnung);
+                                    BHPTools.cleanup(em, oldVerordnung);
 
                                     // Die neuen BHPs werden erzeugt.
                                     if (!newVerordnung.isBedarf()) {
                                         // ab der aktuellen Uhrzeit
-                                        BHPTools.erzeugen(em, newVerordnung.getPlanungen(), new Date(), false);
+                                        BHPTools.generate(em, newVerordnung.getPlanungen(), new DateMidnight(), false);
                                     }
 
                                     em.getTransaction().commit();
@@ -378,7 +380,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.lock(verordnung, LockModeType.OPTIMISTIC);
                                     verordnung.setAbDatum(new Date());
                                     verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
-                                    BHPTools.aufräumen(em, verordnung);
+                                    BHPTools.cleanup(em, verordnung);
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
 //                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
@@ -684,7 +686,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
                                     verordnung = em.merge(verordnung);
                                     if (!verordnung.isBedarf()) {
-                                        BHPTools.erzeugen(em, verordnung.getPlanungen(), new Date(), true);
+                                        BHPTools.generate(em, verordnung.getPlanungen(), new DateMidnight(), true);
                                     }
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + VerordnungTools.toPrettyString(verordnung), 2));

@@ -19,7 +19,6 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "Dfn.findAll", query = "SELECT d FROM DFN d"),
     @NamedQuery(name = "Dfn.findByDfnid", query = "SELECT d FROM DFN d WHERE d.dfnid = :dfnid"),
-    @NamedQuery(name = "Dfn.findByMassID", query = "SELECT d FROM DFN d WHERE d.massID = :massID"),
     @NamedQuery(name = "Dfn.findBySoll", query = "SELECT d FROM DFN d WHERE d.soll = :soll"),
     @NamedQuery(name = "Dfn.findByIst", query = "SELECT d FROM DFN d WHERE d.ist = :ist"),
     @NamedQuery(name = "Dfn.findByStDatum", query = "SELECT d FROM DFN d WHERE d.stDatum = :stDatum"),
@@ -113,6 +112,7 @@ public class DFN implements Serializable {
         this.sZeit = sZeit;
         this.status = DFNTools.STATUS_OFFEN;
         this.mdate = new Date();
+        this.stDatum = new Date();
     }
 
     public Long getDfnid() {
