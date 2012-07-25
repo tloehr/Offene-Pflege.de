@@ -43,8 +43,8 @@ public class GUITools {
         return button;
     }
 
-    public static void addAllComponents(JPanel panel, java.util.List<Component> componentList){
-        for (Component component : componentList){
+    public static void addAllComponents(JPanel panel, java.util.List<Component> componentList) {
+        for (Component component : componentList) {
             panel.add(component);
         }
     }
@@ -125,6 +125,11 @@ public class GUITools {
                 y = screenposition.y - popup.getOwner().getPreferredSize().height - content.getPreferredSize().height;
                 break;
             }
+            case SwingConstants.NORTH_WEST: {
+                x = screenposition.x - content.getPreferredSize().width - popup.getOwner().getPreferredSize().width;
+                y = screenposition.y - popup.getOwner().getPreferredSize().height - content.getPreferredSize().height;
+                break;
+            }
             case SwingConstants.EAST: {
                 x = screenposition.x + popup.getOwner().getPreferredSize().width;
                 y = screenposition.y;
@@ -154,13 +159,13 @@ public class GUITools {
         return dropPanel;
     }
 
-    public static void setBWDisplay(Bewohner bewohner){
+    public static void setBWDisplay(Bewohner bewohner) {
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
-        if (BWInfoTools.isAbwesend(bewohner)){
+        if (BWInfoTools.isAbwesend(bewohner)) {
             OPDE.getDisplayManager().setIconAway();
-        } else if (BWInfoTools.isVerstorben(bewohner)){
+        } else if (BWInfoTools.isVerstorben(bewohner)) {
             OPDE.getDisplayManager().setIconDead();
-        } else if (BWInfoTools.isAusgezogen(bewohner)){
+        } else if (BWInfoTools.isAusgezogen(bewohner)) {
             OPDE.getDisplayManager().setIconGone();
         }
     }

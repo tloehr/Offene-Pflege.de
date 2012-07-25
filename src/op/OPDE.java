@@ -27,7 +27,6 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
-import entity.EntityTools;
 import entity.Users;
 import entity.UsersTools;
 import entity.files.SYSFilesTools;
@@ -106,7 +105,7 @@ public class OPDE {
     protected static boolean debug;
     protected static String opwd = "";
     protected static String css = "";
-    public static Font arial14, arial28;
+//    public static Font arial14, arial28;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -258,7 +257,17 @@ public class OPDE {
 
     public static void fatal(Throwable e) {
         logger.fatal(e.getMessage(), e);
-        SyslogTools.fatal(e.getMessage());
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
+            em.getTransaction().commit();
+        } catch (Exception ee) {
+            em.getTransaction().rollback();
+            ee.printStackTrace();
+        } finally {
+            em.close();
+        }
         e.printStackTrace();
 
         String html = SYSTools.getThrowableAsHTML(e);
@@ -380,13 +389,46 @@ public class OPDE {
      * @param args Hier stehen die Kommandozeilen Parameter. Diese werden mit
      */
     public static void main(String[] args) throws Exception {
-        // throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+        /***
+         *
+         *              ____
+         *            ,'  , `.
+         *         ,-+-,.' _ |              ,--,
+         *      ,-+-. ;   , ||            ,--.'|         ,---,
+         *     ,--.'|'   |  ;|            |  |,      ,-+-. /  |
+         *    |   |  ,', |  ':  ,--.--.   `--'_     ,--.'|'   |
+         *    |   | /  | |  || /       \  ,' ,'|   |   |  ,"' |
+         *    '   | :  | :  |,.--.  .-. | '  | |   |   | /  | |
+         *    ;   . |  ; |--'  \__\/: . . |  | :   |   | |  | |
+         *    |   : |  | ,     ," .--.; | '  : |__ |   | |  |/
+         *    |   : '  |/     /  /  ,.  | |  | '.'||   | |--'
+         *    ;   | |`-'     ;  :   .'   \;  :    ;|   |/
+         *    |   ;/         |  ,     .-./|  ,   / '---'
+         *    '---'           `--`---'     ---`-'
+         *
+         */
         uptime = SYSCalendar.now();
-        arial14 = new Font("Arial", Font.PLAIN, 14);
-        arial28 = new Font("Arial", Font.PLAIN, 28);
+//        arial14 = new Font("Arial", Font.PLAIN, 14);
+//        arial28 = new Font("Arial", Font.PLAIN, 28);
+
+        /***
+         *      _                                               ____                  _ _
+         *     | |    __ _ _ __   __ _ _   _  __ _  __ _  ___  | __ ) _   _ _ __   __| | | ___
+         *     | |   / _` | '_ \ / _` | | | |/ _` |/ _` |/ _ \ |  _ \| | | | '_ \ / _` | |/ _ \
+         *     | |__| (_| | | | | (_| | |_| | (_| | (_| |  __/ | |_) | |_| | | | | (_| | |  __/
+         *     |_____\__,_|_| |_|\__, |\__,_|\__,_|\__, |\___| |____/ \__,_|_| |_|\__,_|_|\___|
+         *                       |___/             |___/
+         */
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
 
-        // Das hier fängt alle ungefangenen Exceptions auf.
+        /***
+         *       ____      _       _             _ _                                                        _   _
+         *      / ___|__ _| |_ ___| |__     __ _| | |  _ __ ___   __ _ _   _  ___    _____  _____ ___ _ __ | |_(_) ___  _ __  ___
+         *     | |   / _` | __/ __| '_ \   / _` | | | | '__/ _ \ / _` | | | |/ _ \  / _ \ \/ / __/ _ \ '_ \| __| |/ _ \| '_ \/ __|
+         *     | |__| (_| | || (__| | | | | (_| | | | | | | (_) | (_| | |_| |  __/ |  __/>  < (_|  __/ |_) | |_| | (_) | | | \__ \
+         *      \____\__,_|\__\___|_| |_|  \__,_|_|_| |_|  \___/ \__, |\__,_|\___|  \___/_/\_\___\___| .__/ \__|_|\___/|_| |_|___/
+         *                                                       |___/                               |_|
+         */
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -397,16 +439,37 @@ public class OPDE {
         localProps = new SortedProperties();
         props = new Properties();
 
-        // LogSystem initialisieren.
+        /***
+         *      _       _ _     _                   _                             _
+         *     (_)_ __ (_) |_  | | ___   __ _  __ _(_)_ __   __ _   ___ _   _ ___| |_ ___ _ __ ___
+         *     | | '_ \| | __| | |/ _ \ / _` |/ _` | | '_ \ / _` | / __| | | / __| __/ _ \ '_ ` _ \
+         *     | | | | | | |_  | | (_) | (_| | (_| | | | | | (_| | \__ \ |_| \__ \ ||  __/ | | | | |
+         *     |_|_| |_|_|\__| |_|\___/ \__, |\__, |_|_| |_|\__, | |___/\__, |___/\__\___|_| |_| |_|
+         *                              |___/ |___/         |___/       |___/
+         */
         logger = Logger.getRootLogger();
         PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
         ConsoleAppender consoleAppender = new ConsoleAppender(layout);
         logger.addAppender(consoleAppender);
 
+        /***
+         *                         _      _               ___        __
+         *      _ __ ___  __ _  __| |    / \   _ __  _ __|_ _|_ __  / _| ___
+         *     | '__/ _ \/ _` |/ _` |   / _ \ | '_ \| '_ \| || '_ \| |_ / _ \
+         *     | | |  __/ (_| | (_| |  / ___ \| |_) | |_) | || | | |  _| (_) |
+         *     |_|  \___|\__,_|\__,_| /_/   \_\ .__/| .__/___|_| |_|_|  \___/
+         *                                    |_|   |_|
+         */
         appInfo = new AppInfo();
 
-        // AUSWERTUNG KOMMANDOZEILE-----------------------------------------------------------------------------
-        // Hier erfolgt die Unterscheidung, in welchem Modus OPDE gestartet wurde.
+        /***
+         *       ____                                          _   _     _               ___        _   _
+         *      / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| | | |   (_)_ __   ___   / _ \ _ __ | |_(_) ___  _ __  ___
+         *     | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` | | |   | | '_ \ / _ \ | | | | '_ \| __| |/ _ \| '_ \/ __|
+         *     | |__| (_) | | | | | | | | | | | (_| | | | | (_| | | |___| | | | |  __/ | |_| | |_) | |_| | (_) | | | \__ \
+         *      \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_| |_____|_|_| |_|\___|  \___/| .__/ \__|_|\___/|_| |_|___/
+         *                                                                                   |_|
+         */
         Options opts = new Options();
         opts.addOption("h", "hilfe", false, "Gibt die Hilfeseite für OPDE aus.");
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
@@ -416,25 +479,31 @@ public class OPDE {
         Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
         opts.addOption(konfigdir);
 
-
         opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription("Setzt eine alternative URL zur Datenbank fest. Ersetzt die Angaben in der local.properties.").create("j"));
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
-                .withLongOpt("dfnimport") //.hasOptionalArg()
+                .withLongOpt("dfnimport").hasOptionalArg()
                 .withDescription("Startet OPDE im DFNImport Modus für den aktuellen Tag.").create("d");
-
+        dfnimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
         opts.addOption(dfnimport);
 
         Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-        bhpimport.setOptionalArg(true);
+//        bhpimport.setOptionalArg(true);
         bhpimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
-
         opts.addOption(bhpimport);
 
         BasicParser parser = new BasicParser();
         CommandLine cl = null;
         String footer = "http://www.Offene-Pflege.de";
 
+        /***
+         *      _          _
+         *     | |__   ___| |_ __    ___  ___ _ __ ___  ___ _ __
+         *     | '_ \ / _ \ | '_ \  / __|/ __| '__/ _ \/ _ \ '_ \
+         *     | | | |  __/ | |_) | \__ \ (__| | |  __/  __/ | | |
+         *     |_| |_|\___|_| .__/  |___/\___|_|  \___|\___|_| |_|
+         *                  |_|
+         */
         try {
             cl = parser.parse(opts, args);
         } catch (ParseException ex) {
@@ -444,6 +513,7 @@ public class OPDE {
             System.exit(0);
         }
 
+
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
             f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
@@ -451,7 +521,14 @@ public class OPDE {
             System.exit(0);
         }
 
-        // Alternatives Arbeitsverzeichnis setzen
+        /***
+         *            _ _                        _   _                                _    _                   _ _        ___
+         *       __ _| | |_ ___ _ __ _ __   __ _| |_(_)_   _____  __      _____  _ __| | _(_)_ __   __ _    __| (_)_ __  |__ \
+         *      / _` | | __/ _ \ '__| '_ \ / _` | __| \ \ / / _ \ \ \ /\ / / _ \| '__| |/ / | '_ \ / _` |  / _` | | '__|   / /
+         *     | (_| | | ||  __/ |  | | | | (_| | |_| |\ V /  __/  \ V  V / (_) | |  |   <| | | | | (_| | | (_| | | |     |_|
+         *      \__,_|_|\__\___|_|  |_| |_|\__,_|\__|_| \_/ \___|   \_/\_/ \___/|_|  |_|\_\_|_| |_|\__, |  \__,_|_|_|     (_)
+         *                                                                                         |___/
+         */
         if (cl.hasOption("k")) {
             String homedir = cl.getOptionValue("k");
             opwd = homedir + System.getProperty("file.separator") + ".opde";
@@ -459,6 +536,14 @@ public class OPDE {
             opwd = System.getProperty("user.home") + System.getProperty("file.separator") + ".opde";
         }
 
+        /***
+         *                                                                ___
+         *       __ _ _ __   ___  _ __  _   _ _ __ ___   ___  _   _ ___  |__ \
+         *      / _` | '_ \ / _ \| '_ \| | | | '_ ` _ \ / _ \| | | / __|   / /
+         *     | (_| | | | | (_) | | | | |_| | | | | | | (_) | |_| \__ \  |_|
+         *      \__,_|_| |_|\___/|_| |_|\__, |_| |_| |_|\___/ \__,_|___/  (_)
+         *                              |___/
+         */
         if (cl.hasOption("a")) { // anonym Modus
             //localProps.put("anonym", "true");
             anonym = true;
@@ -467,8 +552,24 @@ public class OPDE {
             anonym = false;
         }
 
+        /***
+         *      _       _ _                _       _
+         *     (_)_ __ (_) |_   _ __  _ __(_)_ __ | |_ ___ _ __ ___
+         *     | | '_ \| | __| | '_ \| '__| | '_ \| __/ _ \ '__/ __|
+         *     | | | | | | |_  | |_) | |  | | | | | ||  __/ |  \__ \
+         *     |_|_| |_|_|\__| | .__/|_|  |_|_| |_|\__\___|_|  |___/
+         *                     |_|
+         */
         printers = new PrinterTypes();
 
+        /***
+         *      _                 _   _                 _                                   _   _
+         *     | | ___   __ _  __| | | | ___   ___ __ _| |  _ __  _ __ ___  _ __   ___ _ __| |_(_) ___  ___
+         *     | |/ _ \ / _` |/ _` | | |/ _ \ / __/ _` | | | '_ \| '__/ _ \| '_ \ / _ \ '__| __| |/ _ \/ __|
+         *     | | (_) | (_| | (_| | | | (_) | (_| (_| | | | |_) | | | (_) | |_) |  __/ |  | |_| |  __/\__ \
+         *     |_|\___/ \__,_|\__,_| |_|\___/ \___\__,_|_| | .__/|_|  \___/| .__/ \___|_|   \__|_|\___||___/
+         *                                                 |_|             |_|
+         */
         if (loadLocalProperties()) {
 
             String sep = System.getProperty("file.separator");
@@ -479,12 +580,19 @@ public class OPDE {
                 fatal(ex);
             }
 
-
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
             logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
             logger.info(System.getProperty("os.name").toLowerCase());
 
+            /***
+             *      _     ____       _                   ___ ___
+             *     (_)___|  _ \  ___| |__  _   _  __ _  |__ \__ \
+             *     | / __| | | |/ _ \ '_ \| | | |/ _` |   / / / /
+             *     | \__ \ |_| |  __/ |_) | |_| | (_| |  |_| |_|
+             *     |_|___/____/ \___|_.__/ \__,_|\__, |  (_) (_)
+             *                                   |___/
+             */
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
                 debug = true;
                 logger.setLevel(Level.ALL);
@@ -493,12 +601,17 @@ public class OPDE {
                 logger.setLevel(Level.INFO);
             }
 
+            /***
+             *          _ ____   _      ____        _        _
+             *         | |  _ \ / \    |  _ \  __ _| |_ __ _| |__   __ _ ___  ___
+             *      _  | | |_) / _ \   | | | |/ _` | __/ _` | '_ \ / _` / __|/ _ \
+             *     | |_| |  __/ ___ \  | |_| | (_| | || (_| | |_) | (_| \__ \  __/
+             *      \___/|_| /_/   \_\ |____/ \__,_|\__\__,_|_.__/ \__,_|___/\___|
+             *
+             */
             String hostkey = OPDE.getLocalProps().getProperty("hostkey");
             String cryptpassword = localProps.getProperty("javax.persistence.jdbc.password");
-
-            // Passwort entschlüsseln
             DesEncrypter desEncrypter = new DesEncrypter(hostkey);
-
             Properties jpaProps = new Properties();
             jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
             jpaProps.put("javax.persistence.jdbc.password", desEncrypter.decrypt(cryptpassword));
@@ -506,38 +619,49 @@ public class OPDE {
             url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
             jpaProps.put("javax.persistence.jdbc.url", url);
 
-//            jpaProps.put(QueryHints.JDBC_TIMEOUT, "3");
-
-            // Cache abschalten
+            // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
 //            jpaProps.put("eclipselink.logging.level", "FINER");
-
-
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
-            String header = SYSTools.getWindowTitle("");
 
+            /***
+             *     __     __            _
+             *     \ \   / /__ _ __ ___(_) ___  _ __
+             *      \ \ / / _ \ '__/ __| |/ _ \| '_ \
+             *       \ V /  __/ |  \__ \ | (_) | | | |
+             *        \_/ \___|_|  |___/_|\___/|_| |_|
+             *
+             */
+            String header = SYSTools.getWindowTitle("");
             if (cl.hasOption("v")) {
                 System.out.println(header);
                 System.out.println(footer);
                 System.exit(0);
             }
 
+
+            /***
+             *       ____                           _         ____  _____ _   _
+             *      / ___| ___ _ __   ___ _ __ __ _| |_ ___  |  _ \|  ___| \ | |___
+             *     | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \ | | | | |_  |  \| / __|
+             *     | |_| |  __/ | | |  __/ | | (_| | ||  __/ | |_| |  _| | |\  \__ \
+             *      \____|\___|_| |_|\___|_|  \__,_|\__\___| |____/|_|   |_| \_|___/
+             *
+             */
             if (cl.hasOption("d")) {
-                // initProps();
-                String d = cl.getOptionValue("d");
                 EntityManager em = OPDE.createEM();
-                int offset = 0;
-                if (isDebug()) {
-                    String sOffset = cl.getOptionValue("d");
-                    OPDE.debug(cl.getOptionValue("d"));
-                    try {
-                        offset = Integer.parseInt(sOffset);
-                    } catch (NumberFormatException ex) {
-                        offset = 0;
-                    }
+
+                int offset;
+                String sOffset = cl.getOptionValue("d");
+                OPDE.debug(cl.getOptionValue("d"));
+                try {
+                    offset = Integer.parseInt(sOffset);
+                } catch (NumberFormatException ex) {
+                    offset = 0;
                 }
+
 
                 try {
                     em.getTransaction().begin();
@@ -561,19 +685,24 @@ public class OPDE {
                 System.exit(0);
             }
 
+            /***
+             *       ____                           _         ____  _   _ ____
+             *      / ___| ___ _ __   ___ _ __ __ _| |_ ___  | __ )| | | |  _ \ ___
+             *     | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \ |  _ \| |_| | |_) / __|
+             *     | |_| |  __/ | | |  __/ | | (_| | ||  __/ | |_) |  _  |  __/\__ \
+             *      \____|\___|_| |_|\___|_|  \__,_|\__\___| |____/|_| |_|_|   |___/
+             *
+             */
             if (cl.hasOption("b")) {
 
                 EntityManager em = OPDE.createEM();
-                int offset = 0;
-
-                if (isDebug()) {
-                    String sOffset = cl.getOptionValue("b");
-                    OPDE.debug(cl.getOptionValue("b"));
-                    try {
-                        offset = Integer.parseInt(sOffset);
-                    } catch (NumberFormatException ex) {
-                        offset = 0;
-                    }
+                int offset;
+                String sOffset = cl.getOptionValue("b");
+                OPDE.debug(cl.getOptionValue("b"));
+                try {
+                    offset = Integer.parseInt(sOffset);
+                } catch (NumberFormatException ex) {
+                    offset = 0;
                 }
 
                 try {
@@ -613,7 +742,15 @@ public class OPDE {
             WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
             // JideSoft
 
-            // !!!!!!!!!!!!!!!!!!!!!!!! HAUPTPROGRAMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            /***
+             *      _____               __  __       _        ____
+             *     |  ___| __ _ __ ___ |  \/  | __ _(_)_ __  / /\ \
+             *     | |_ | '__| '_ ` _ \| |\/| |/ _` | | '_ \| |  | |
+             *     |  _|| |  | | | | | | |  | | (_| | | | | | |  | |
+             *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
+             *                                               \_\/_/
+             */
             mainframe = new FrmMain();
             mainframe.setVisible(true);
         }
@@ -674,37 +811,37 @@ public class OPDE {
     }
 
     public static void setStandardFont() {
-        UIManager.put("Button.font", arial14);
-        UIManager.put("ToggleButton.font", arial14);
-        UIManager.put("RadioButton.font", arial14);
-        UIManager.put("CheckBox.font", arial14);
-        UIManager.put("ColorChooser.font", arial14);
-        UIManager.put("ComboBox.font", arial14);
-        UIManager.put("Label.font", arial14);
-        UIManager.put("List.font", arial14);
-        UIManager.put("MenuBar.font", arial14);
-        UIManager.put("MenuItem.font", arial14);
-        UIManager.put("RadioButtonMenuItem.font", arial14);
-        UIManager.put("CheckBoxMenuItem.font", arial14);
-        UIManager.put("Menu.font", arial14);
-        UIManager.put("PopupMenu.font", arial14);
-        UIManager.put("OptionPane.font", arial14);
-        UIManager.put("Panel.font", arial14);
-        UIManager.put("ProgressBar.font", arial14);
-        UIManager.put("ScrollPane.font", arial14);
-        UIManager.put("Viewport.font", arial14);
-        UIManager.put("TabbedPane.font", arial14);
-        UIManager.put("Table.font", arial14);
-        UIManager.put("TableHeader.font", arial14);
-        UIManager.put("TextField.font", arial14);
-        UIManager.put("PasswordField.font", arial14);
-        UIManager.put("TextArea.font", arial14);
-        UIManager.put("TextPane.font", arial14);
-        UIManager.put("EditorPane.font", arial14);
-        UIManager.put("TitledBorder.font", arial14);
-        UIManager.put("ToolBar.font", arial14);
-        UIManager.put("ToolTip.font", arial14);
-        UIManager.put("Tree.font", arial14);
+        UIManager.put("Button.font", SYSConst.ARIAL14);
+        UIManager.put("ToggleButton.font", SYSConst.ARIAL14);
+        UIManager.put("RadioButton.font", SYSConst.ARIAL14);
+        UIManager.put("CheckBox.font", SYSConst.ARIAL14);
+        UIManager.put("ColorChooser.font", SYSConst.ARIAL14);
+        UIManager.put("ComboBox.font", SYSConst.ARIAL14);
+        UIManager.put("Label.font", SYSConst.ARIAL14);
+        UIManager.put("List.font", SYSConst.ARIAL14);
+        UIManager.put("MenuBar.font", SYSConst.ARIAL14);
+        UIManager.put("MenuItem.font", SYSConst.ARIAL14);
+        UIManager.put("RadioButtonMenuItem.font", SYSConst.ARIAL14);
+        UIManager.put("CheckBoxMenuItem.font", SYSConst.ARIAL14);
+        UIManager.put("Menu.font", SYSConst.ARIAL14);
+        UIManager.put("PopupMenu.font", SYSConst.ARIAL14);
+        UIManager.put("OptionPane.font", SYSConst.ARIAL14);
+        UIManager.put("Panel.font", SYSConst.ARIAL14);
+        UIManager.put("ProgressBar.font", SYSConst.ARIAL14);
+        UIManager.put("ScrollPane.font", SYSConst.ARIAL14);
+        UIManager.put("Viewport.font", SYSConst.ARIAL14);
+        UIManager.put("TabbedPane.font", SYSConst.ARIAL14);
+        UIManager.put("Table.font", SYSConst.ARIAL14);
+        UIManager.put("TableHeader.font", SYSConst.ARIAL14);
+        UIManager.put("TextField.font", SYSConst.ARIAL14);
+        UIManager.put("PasswordField.font", SYSConst.ARIAL14);
+        UIManager.put("TextArea.font", SYSConst.ARIAL14);
+        UIManager.put("TextPane.font", SYSConst.ARIAL14);
+        UIManager.put("EditorPane.font", SYSConst.ARIAL14);
+        UIManager.put("TitledBorder.font", SYSConst.ARIAL14);
+        UIManager.put("ToolBar.font", SYSConst.ARIAL14);
+        UIManager.put("ToolTip.font", SYSConst.ARIAL14);
+        UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
 
     public static void newOCSec() {

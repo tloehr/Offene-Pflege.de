@@ -16,17 +16,10 @@ import java.util.List;
  * Time: 14:26
  * To change this template use File | Settings | File Templates.
  */
-public class MassnahmenTools {
-    //    public static final int ART_PROBLEM = 0;
-//    public static final int ART_RESSOURCE = 1;
-//    public static final int ART_ZIEL = 2;
-//    public static final int ART_INFO = 3;
-    public static final int ART_MASSNAHME = 4;
-    public static final int ART_KONTROLLEN = 5;
-    public static final String[] ARTEN = new String[]{"", "", "", "", "Massnahme", "Kontrolle"}; // die ersten vier leeren stammen noch aus alten Zeiten.
-    public static final int MODE_ALLE = 0;
-    public static final int MODE_NUR_BHP = 1;
-    public static final int MODE_NUR_PFLEGE = 2;
+public class InterventionTools {
+
+    public static final int MASSART_PFLEGE = 1;
+    public static final int MASSART_BHP = 2;
 
     public static ListCellRenderer getMassnahmenRenderer() {
         return new ListCellRenderer() {
@@ -36,8 +29,8 @@ public class MassnahmenTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof Massnahmen) {
-                    text = ((Massnahmen) o).getBezeichnung();
+                } else if (o instanceof Intervention) {
+                    text = ((Intervention) o).getBezeichnung();
                 } else {
                     text = o.toString();
                 }
@@ -46,34 +39,26 @@ public class MassnahmenTools {
         };
     }
 
-    public static List<Massnahmen> findMassnahmenBy(int mode) {
+    public static List<Intervention> findMassnahmenBy(int mode) {
         return findMassnahmenBy(mode, "");
     }
 
-    public static List<Massnahmen> findMassnahmenBy(int mode, String suche) {
+    public static List<Intervention> findMassnahmenBy(int massArt, String suche) {
 
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Massnahmen m WHERE m.aktiv = TRUE AND m.massArt = :art " +
+                " SELECT m FROM Intervention m WHERE m.aktiv = TRUE AND m.massArt = :art " +
                 (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
                 " ORDER BY m.bezeichnung "
         );
 
-        int art = 0;
-        if (mode == MODE_NUR_BHP) {
-            art = 2;
-        } else if (mode == MODE_NUR_PFLEGE) {
-            art = 1;
-        }
-
-        query.setParameter("art", art);
+        query.setParameter("art", massArt);
         if (!SYSTools.catchNull(suche).isEmpty()) {
-            suche = "%" + suche + "%";
-            query.setParameter("suche", suche);
+            query.setParameter("suche", EntityTools.getMySQLsearchPattern(suche));
         }
 
-        List<Massnahmen> list = query.getResultList();
+        List<Intervention> list = query.getResultList();
 
         em.close();
 

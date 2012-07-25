@@ -13,6 +13,7 @@ import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
 import entity.verordnungen.MedHersteller;
 import op.OPDE;
+import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -42,7 +43,7 @@ public class DlgHersteller extends JPanel {
     private void initDialog() {
         attentionIconFirma = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         txtFirma = new OverlayTextField(25);
-        txtFirma.setFont(OPDE.arial14);
+        txtFirma.setFont(SYSConst.ARIAL14);
         ovrFirma = new DefaultOverlayable(txtFirma, attentionIconFirma, DefaultOverlayable.SOUTH_EAST);
         ovrFirma.setOverlayVisible(true);
         contentPanel.add(ovrFirma, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
@@ -56,7 +57,7 @@ public class DlgHersteller extends JPanel {
 
         attentionIconOrt = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         txtOrt = new OverlayTextField(25);
-        txtOrt.setFont(OPDE.arial14);
+        txtOrt.setFont(SYSConst.ARIAL14);
         ovrOrt = new DefaultOverlayable(txtOrt, attentionIconOrt, DefaultOverlayable.SOUTH_EAST);
         ovrOrt.setOverlayVisible(true);
         contentPanel.add(ovrOrt, CC.xy(3, 7));

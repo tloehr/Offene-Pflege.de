@@ -273,7 +273,7 @@ public class DlgVerordnung extends MyJDialog {
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
-        cmbMass.setModel(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_BHP, txtMass.getText()).toArray()));
+        cmbMass.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP, txtMass.getText()).toArray()));
     }
 
     /**
@@ -751,8 +751,8 @@ public class DlgVerordnung extends MyJDialog {
         ignoreEvent = true;
         txtSit.setText("");
         txtMed.setText("");
-        cmbMass.setModel(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_BHP).toArray()));
-        cmbMass.setRenderer(MassnahmenTools.getMassnahmenRenderer());
+        cmbMass.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
+        cmbMass.setRenderer(InterventionTools.getMassnahmenRenderer());
         jdcAN.setMinSelectableDate(new Date());
         jdcAB.setMinSelectableDate(new Date());
         cmbMed.setRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
@@ -850,7 +850,7 @@ public class DlgVerordnung extends MyJDialog {
 
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
-        cmbMass.setModel(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_BHP).toArray()));
+        cmbMass.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
         cmbMass.setSelectedItem(((Darreichung) cmbMed.getSelectedItem()).getMedForm().getMassnahme());
         cmbMass.setEnabled(false);
         txtMass.setText(null);
@@ -968,7 +968,7 @@ public class DlgVerordnung extends MyJDialog {
         verordnung.setStellplan(cbStellplan.isSelected());
         verordnung.setBisPackEnde(cbPackEnde.isSelected());
         verordnung.setBemerkung(txtBemerkung.getText());
-        verordnung.setMassnahme((Massnahmen) cmbMass.getSelectedItem());
+        verordnung.setMassnahme((Intervention) cmbMass.getSelectedItem());
         verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
         verordnung.setStellplan(cbStellplan.isSelected());
 

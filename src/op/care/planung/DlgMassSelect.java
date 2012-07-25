@@ -31,7 +31,7 @@ import java.awt.event.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
-import entity.MassnahmenTools;
+import entity.InterventionTools;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -243,7 +243,7 @@ public class DlgMassSelect extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void reloadMassnahmen() {
-        lstMass.setModel(SYSTools.cmb2lst(new DefaultComboBoxModel(MassnahmenTools.findMassnahmenBy(MassnahmenTools.MODE_NUR_PFLEGE, txtSuche.getText()).toArray())));
+//        lstMass.setModel(SYSTools.cmb2lst(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MODE_NUR_PFLEGE, txtSuche.getText()).toArray())));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

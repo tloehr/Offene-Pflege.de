@@ -83,7 +83,7 @@ public class BHPTools {
             lastbhp = lastbhp.minusDays(1);
         }
 
-        if (Days.daysBetween(lastbhp, new DateMidnight()).getDays() != 1) {
+        if (Days.daysBetween(lastbhp, stichtag).getDays() != 1) {
             throw new IndexOutOfBoundsException(OPDE.lang.getString(internalClassID + ".exception.import"));
         }
 

@@ -43,6 +43,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.PrintListElement;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
@@ -175,7 +176,7 @@ public class DlgBestand extends MyJDialog {
                 vorrat = (MedVorrat) itemEvent.getItem();
             }
         });
-        cmbVorrat.setFont(OPDE.arial14);
+        cmbVorrat.setFont(SYSConst.ARIAL14);
         ovrVorrat = new DefaultOverlayable(cmbVorrat);
         mainPane.add(ovrVorrat, CC.xywh(5, 11, 4, 1));
 
@@ -187,7 +188,7 @@ public class DlgBestand extends MyJDialog {
                 cmbBWItemStateChanged(itemEvent);
             }
         });
-        cmbBW.setFont(OPDE.arial14);
+        cmbBW.setFont(SYSConst.ARIAL14);
         ovrBW = new DefaultOverlayable(cmbBW);
         mainPane.add(ovrBW, CC.xywh(7, 15, 2, 1));
 
@@ -214,7 +215,7 @@ public class DlgBestand extends MyJDialog {
                 txtMengeFocusGained(focusEvent);
             }
         });
-        txtMenge.setFont(OPDE.arial14);
+        txtMenge.setFont(SYSConst.ARIAL14);
         ovrMenge = new DefaultOverlayable(txtMenge);
         mainPane.add(ovrMenge, CC.xywh(5, 9, 4, 1));
 

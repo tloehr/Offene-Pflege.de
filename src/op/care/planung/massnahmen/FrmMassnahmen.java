@@ -26,6 +26,10 @@
  */
 package op.care.planung.massnahmen;
 
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 import op.OPDE;
 import op.tools.*;
 import org.xml.sax.InputSource;
@@ -216,280 +220,341 @@ public class FrmMassnahmen extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnNeu = new JButton();
+        btnSave = new JButton();
+        btnCancel = new JButton();
+        jPanel2 = new JPanel();
+        txtSuche = new JTextField();
+        jScrollPane2 = new JScrollPane();
+        lstMass = new JList();
+        jPanel1 = new JPanel();
+        jScrollPane1 = new JScrollPane();
+        treeMass = new JTree();
+        jPanel3 = new JPanel();
+        jLabel1 = new JLabel();
+        jLabel2 = new JLabel();
+        jLabel3 = new JLabel();
+        txtBezeichnung = new JTextField();
+        txtDauer = new JTextField();
+        cmbKategorie = new JComboBox();
+        jLabel4 = new JLabel();
+        cmbArt = new JComboBox();
+        cbAktiv = new JCheckBox();
+        lblMassnahme = new JLabel();
 
-        jToolBar1 = new javax.swing.JToolBar();
-        btnNeu = new javax.swing.JButton();
-        btnSave = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        txtSuche = new javax.swing.JTextField();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        lstMass = new javax.swing.JList();
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        treeMass = new javax.swing.JTree();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        txtBezeichnung = new javax.swing.JTextField();
-        txtDauer = new javax.swing.JTextField();
-        cmbKategorie = new javax.swing.JComboBox();
-        jLabel4 = new javax.swing.JLabel();
-        cmbArt = new javax.swing.JComboBox();
-        cbAktiv = new javax.swing.JCheckBox();
-        lblMassnahme = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
+        //======== this ========
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                formWindowClosing(e);
             }
         });
+        Container contentPane = getContentPane();
 
-        jToolBar1.setFloatable(false);
-        jToolBar1.setRollover(true);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
+            jToolBar1.setRollover(true);
 
-        btnNeu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/filenew.png"))); // NOI18N
-        btnNeu.setText("Neu");
-        btnNeu.setFocusable(false);
-        btnNeu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNeuActionPerformed(evt);
+            //---- btnNeu ----
+            btnNeu.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
+            btnNeu.setText("Neu");
+            btnNeu.setFocusable(false);
+            btnNeu.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnNeuActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnNeu);
+
+            //---- btnSave ----
+            btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnSave.setText("Speichern");
+            btnSave.setEnabled(false);
+            btnSave.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSaveActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnSave);
+
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.setText("Abbrechen");
+            btnCancel.setEnabled(false);
+            btnCancel.setFocusable(false);
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnCancel);
+        }
+
+        //======== jPanel2 ========
+        {
+            jPanel2.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+
+            //---- txtSuche ----
+            txtSuche.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    txtSucheCaretUpdate(e);
+                }
+            });
+
+            //======== jScrollPane2 ========
+            {
+
+                //---- lstMass ----
+                lstMass.setModel(new AbstractListModel() {
+                    String[] values = {
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4",
+                        "Item 5"
+                    };
+                    @Override
+                    public int getSize() { return values.length; }
+                    @Override
+                    public Object getElementAt(int i) { return values[i]; }
+                });
+                lstMass.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                lstMass.addListSelectionListener(new ListSelectionListener() {
+                    @Override
+                    public void valueChanged(ListSelectionEvent e) {
+                        lstMassValueChanged(e);
+                    }
+                });
+                jScrollPane2.setViewportView(lstMass);
             }
-        });
-        jToolBar1.add(btnNeu);
 
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/apply.png"))); // NOI18N
-        btnSave.setText("Speichern");
-        btnSave.setEnabled(false);
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
+            GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+            jPanel2.setLayout(jPanel2Layout);
+            jPanel2Layout.setHorizontalGroup(
+                jPanel2Layout.createParallelGroup()
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtSuche, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
+                        .addContainerGap())
+            );
+            jPanel2Layout.setVerticalGroup(
+                jPanel2Layout.createParallelGroup()
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(txtSuche, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+        }
+
+        //======== jPanel1 ========
+        {
+            jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+
+            //======== jScrollPane1 ========
+            {
+
+                //---- treeMass ----
+                treeMass.setEnabled(false);
+                treeMass.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        treeMassMousePressed(e);
+                    }
+                });
+                jScrollPane1.setViewportView(treeMass);
             }
-        });
-        jToolBar1.add(btnSave);
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/cancel.png"))); // NOI18N
-        btnCancel.setText("Abbrechen");
-        btnCancel.setEnabled(false);
-        btnCancel.setFocusable(false);
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnCancel);
+            //======== jPanel3 ========
+            {
+                jPanel3.setBorder(new TitledBorder("Details"));
 
-        jPanel2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+                //---- jLabel1 ----
+                jLabel1.setText("Bezeichnung");
 
-        txtSuche.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtSucheCaretUpdate(evt);
-            }
-        });
+                //---- jLabel2 ----
+                jLabel2.setText("Dauer");
 
-        lstMass.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+                //---- jLabel3 ----
+                jLabel3.setText("Kategorie");
 
-            public int getSize() {
-                return strings.length;
-            }
+                //---- txtBezeichnung ----
+                txtBezeichnung.setText("jTextField1");
+                txtBezeichnung.setEnabled(false);
+                txtBezeichnung.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtBezeichnungCaretUpdate(e);
+                    }
+                });
 
-            public Object getElementAt(int i) {
-                return strings[i];
-            }
-        });
-        lstMass.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        lstMass.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                lstMassValueChanged(evt);
-            }
-        });
-        jScrollPane2.setViewportView(lstMass);
+                //---- txtDauer ----
+                txtDauer.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtDauer.setText("10");
+                txtDauer.setToolTipText("Dauer in Minuten");
+                txtDauer.setEnabled(false);
+                txtDauer.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtDauerCaretUpdate(e);
+                    }
+                });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(txtSuche, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(txtSuche, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+                //---- cmbKategorie ----
+                cmbKategorie.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbKategorie.setEnabled(false);
+                cmbKategorie.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbKategorieItemStateChanged(e);
+                    }
+                });
 
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+                //---- jLabel4 ----
+                jLabel4.setText("Art");
 
-        treeMass.setEnabled(false);
-        treeMass.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                treeMassMousePressed(evt);
-            }
-        });
-        jScrollPane1.setViewportView(treeMass);
+                //---- cmbArt ----
+                cmbArt.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
+                }));
+                cmbArt.setEnabled(false);
+                cmbArt.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbArtItemStateChanged(e);
+                    }
+                });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Details"));
+                //---- cbAktiv ----
+                cbAktiv.setText("Aktiv");
+                cbAktiv.setToolTipText("Soll diese Massnahmen f\u00fcr neue Pflegeplanungen angeboten werden ?");
+                cbAktiv.setEnabled(false);
+                cbAktiv.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cbAktivItemStateChanged(e);
+                    }
+                });
 
-        jLabel1.setText("Bezeichnung");
-
-        jLabel2.setText("Dauer");
-
-        jLabel3.setText("Kategorie");
-
-        txtBezeichnung.setText("jTextField1");
-        txtBezeichnung.setEnabled(false);
-        txtBezeichnung.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtBezeichnungCaretUpdate(evt);
-            }
-        });
-
-        txtDauer.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtDauer.setText("10");
-        txtDauer.setToolTipText("Dauer in Minuten");
-        txtDauer.setEnabled(false);
-        txtDauer.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtDauerCaretUpdate(evt);
-            }
-        });
-
-        cmbKategorie.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbKategorie.setEnabled(false);
-        cmbKategorie.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbKategorieItemStateChanged(evt);
-            }
-        });
-
-        jLabel4.setText("Art");
-
-        cmbArt.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbArt.setEnabled(false);
-        cmbArt.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbArtItemStateChanged(evt);
-            }
-        });
-
-        cbAktiv.setText("Aktiv");
-        cbAktiv.setToolTipText("Soll diese Massnahmen für neue Pflegeplanungen angeboten werden ?");
-        cbAktiv.setEnabled(false);
-        cbAktiv.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cbAktivItemStateChanged(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
+                jPanel3.setLayout(jPanel3Layout);
+                jPanel3Layout.setHorizontalGroup(
+                    jPanel3Layout.createParallelGroup()
                         .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jLabel2)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(txtBezeichnung, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+                            .addContainerGap()
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel4))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                .addComponent(txtBezeichnung, GroupLayout.DEFAULT_SIZE, 911, Short.MAX_VALUE)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addGroup(jPanel3Layout.createParallelGroup()
                                         .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                                                .addComponent(txtDauer, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(jLabel3))
-                                                        .addComponent(cmbArt, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cbAktiv)
-                                                        .addComponent(cmbKategorie, 0, 296, Short.MAX_VALUE))))
-                                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtDauer, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(jLabel3))
+                                        .addComponent(cmbArt, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(jPanel3Layout.createParallelGroup()
+                                        .addComponent(cbAktiv)
+                                        .addComponent(cmbKategorie, 0, 789, Short.MAX_VALUE))))
+                            .addContainerGap())
+                );
+                jPanel3Layout.setVerticalGroup(
+                    jPanel3Layout.createParallelGroup()
                         .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1)
-                                        .addComponent(txtBezeichnung, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(txtDauer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel3)
-                                        .addComponent(cmbKategorie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cmbArt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel4)
-                                        .addComponent(cbAktiv))
-                                .addContainerGap(21, Short.MAX_VALUE))
-        );
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel1)
+                                .addComponent(txtBezeichnung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtDauer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel3)
+                                .addComponent(cmbKategorie, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel2))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(cmbArt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel4)
+                                .addComponent(cbAktiv))
+                            .addContainerGap(20, Short.MAX_VALUE))
+                );
+            }
 
-        lblMassnahme.setFont(new java.awt.Font("Dialog", 1, 14));
-        lblMassnahme.setForeground(new java.awt.Color(51, 51, 255));
-        lblMassnahme.setText("jLabel5");
+            //---- lblMassnahme ----
+            lblMassnahme.setFont(new Font("Dialog", Font.BOLD, 14));
+            lblMassnahme.setForeground(new Color(51, 51, 255));
+            lblMassnahme.setText("jLabel5");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
-                                        .addComponent(lblMassnahme, javax.swing.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
-                                        .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblMassnahme)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup()
+                            .addComponent(jScrollPane1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1030, Short.MAX_VALUE)
+                            .addComponent(lblMassnahme, GroupLayout.DEFAULT_SIZE, 1030, Short.MAX_VALUE)
+                            .addComponent(jPanel3, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblMassnahme)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+                        .addContainerGap())
+            );
+        }
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
+        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
+        contentPane.setLayout(contentPaneLayout);
+        contentPaneLayout.setHorizontalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 1293, Short.MAX_VALUE)
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addGap(12, 12, 12)
+                    .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap())
         );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+        contentPaneLayout.setVerticalGroup(
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup()
+                        .addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addContainerGap())
         );
-
         pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -519,364 +584,364 @@ public class FrmMassnahmen extends javax.swing.JFrame {
 
     private void treeMassMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMassMousePressed
 
-        if (evt.isPopupTrigger()) {
-            SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
-
-            if (treeMass.getRowForLocation(evt.getX(), evt.getY()) != -1) {
-//            JMenuItem itemedit = null;
-//            JMenuItem itemdelete = null;
-
-                final TreePath curPath = treeMass.getPathForLocation(evt.getX(), evt.getY());
-                DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
-                treeMass.setSelectionPath(curPath);
-                final ListElement le = (ListElement) dmtn.getUserObject();
-                Object[] o = (Object[]) le.getObject();
-                //Object[] o = new Object[]{beschreibung, zeit, new Vector(), new Vector(), typ, 0d};
-                //Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(selected)};
-                Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
-//            String label = le.getValue();
-//            Double zeit = (Double) o[ParserMassnahmen.O_ZEIT];
-//            Double sum = (Double) o[ParserMassnahmen.O_SUMME];
-                final int typ = (Integer) o[ParserMassnahmen.O_TYP];
-
-
-                // Aufbau Kontextmenü
-                // ==================
-                // (1) Erschwernis / Erleichterung ->  Nummer 1
-                //                                     Nummer 2
-                // ------------------------------------------------------------
-                // Neu  ->  (2) Teilschritt (Nur Unterhalb Vorber... Nachber.. Durchf...)
-                //          (3) Durchführung (nur Unterhalb Root)
-                //          (4) Erschwernis / Erleichterung
-                // Bearbeiten -> (5) (je nachdem, was markiert ist, nicht bei ROOT)
-                //               (6)   Erschwernis / Erleichterung Nummer 1 (NUR WENN VORHANDEN)
-                //                                                 Nummer 2
-                // Löschen  ->  (7)(je nachdem, was markiert ist)
-                //              (8)    Erschwernis / Erleichterung ->  Nummer 1
-                //                                                     Nummer 2
-                // --------------------------------------------------------------
-                // Ausschneiden (+ Unterknoten und Modfaktoren)
-                // Kopieren (+ Unterknoten und Modfaktoren)
-                // Einfügen (an markierte Stelle)
-
-
-                // ===
-                // (1)
-                // ===
-                if (mdfs.size() > 0) { // Es gibt also mindestens eine Erleichterung.
-                    // Dann müssen wir ein Untermenü erstellen, die eine Aufstellung aller
-                    // MODFAKTOREN enthält.
-                    JMenu menumod = new JMenu("Erschwernis/Erleichterung");
-
-                    Enumeration e = mdfs.elements();
-                    int num = 0;
-                    while (e.hasMoreElements()) {
-                        Object[] thisobj = (Object[]) e.nextElement();
-                        boolean selected = (Boolean) thisobj[4];
-                        String lbl = thisobj[0].toString();
-                        String beschreibung = thisobj[1].toString();
-                        JMenuItem item = new JMenuItem(lbl);
-                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
-                        if (selected) {
-                            item.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/darkcheck.png")));
-                        }
-                        final int t = num;
-                        item.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                Tools.selectModfaktor(t, curPath);
-                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                                lstMass.setEnabled(false);
-                                txtSuche.setEnabled(false);
-                                saveOK();
-                                reloadTree();
-                            }
-                        });
-                        num++;
-                        menumod.add(item);
-                    }
-                    menu.add(menumod);
-                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
-                }
-
-                JMenu menunew = new JMenu("Neu");
-                // ===
-                // (3)
-                // ===
-                if (typ == ParserMassnahmen.TYPE_ROOT) {
-                    JMenuItem item = new JMenuItem("Durchführung");
-
-                    final DefaultMutableTreeNode mynode = dmtn;
-                    item.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_DF, null, null, null, null});
-                            Object[] data = dlg.showDialog();
-                            if (data != null) {
-                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
-                                ListElement le = new ListElement(data[1].toString(), o);
-                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
-                                // Jetzt soll der neue Knoten hinten an den Baum angefügt werden. Jedoch immer VOR der Nachbereitung.
-                                // Somit:
-                                ((DefaultMutableTreeNode) mynode.getRoot()).insert(node, mynode.getRoot().getChildCount() - 1);
-                                ((DefaultTreeModel) treeMass.getModel()).reload();
-                                lstMass.setEnabled(false);
-                                txtSuche.setEnabled(false);
-                                saveOK();
-                            }
-                            dlg.dispose();
-                        }
-                    });
-                    menunew.add(item);
-                }
-                // ===
-                // (2)
-                // ===
-                if (typ == ParserMassnahmen.TYPE_Vorbereitung
-                        || typ == ParserMassnahmen.TYPE_Nachbereitung
-                        || typ == ParserMassnahmen.TYPE_DF
-                        || typ == ParserMassnahmen.TYPE_Teilschritt) {
-                    JMenuItem item = new JMenuItem("Teilschritt");
-                    final DefaultMutableTreeNode mynode = dmtn;
-                    item.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_Teilschritt, null, null, null, null});
-                            Object[] data = dlg.showDialog();
-                            if (data != null) {
-                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
-                                ListElement le = new ListElement(data[1].toString(), o);
-                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
-                                mynode.add(node);
-                                Enumeration expansion = treeMass.getExpandedDescendants(new TreePath(treeMass.getModel().getRoot()));
-                                ((DefaultTreeModel) treeMass.getModel()).reload();
-                                while (expansion.hasMoreElements()) {
-                                    treeMass.expandPath((TreePath) expansion.nextElement());
-                                }
-                            }
-                            lstMass.setEnabled(false);
-                            txtSuche.setEnabled(false);
-                            saveOK();
-                            dlg.dispose();
-                        }
-                    });
-                    menunew.add(item);
-                }
-                // ===
-                // (4)
-                // ===
-                JMenuItem item1 = new JMenuItem("Erschwernis/Erleichterung");
-                final DefaultMutableTreeNode mynode1 = dmtn;
-                item1.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, null, null, null, null});
-                        Object[] data = dlg.showDialog();
-                        if (data != null) {
-                            String label = data[1].toString();
-                            String beschreibung = data[2].toString();
-                            double zeit = (Double) data[3];
-                            double prozent = (Double) data[4];
-                            Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(false)};
-                            ListElement le = (ListElement) mynode1.getUserObject();
-                            Object[] o = (Object[]) le.getObject();
-                            Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
-                            mdfs.add(modfaktor);
-                            reloadTree();
-                            lstMass.setEnabled(false);
-                            txtSuche.setEnabled(false);
-                            saveOK();
-                        }
-                        dlg.dispose();
-                    }
-                });
-                menunew.add(item1);
-
-                menu.add(menunew);
-
-                JMenu menuedit = null;
-                if (typ != ParserMassnahmen.TYPE_ROOT) {
-                    menuedit = new JMenu("Bearbeiten");
-                    // ===
-                    // (5)
-                    // ===
-                    ListElement le4label = (ListElement) dmtn.getUserObject();
-                    JMenuItem itemNode = new JMenuItem(le4label.getValue());
-                    final DefaultMutableTreeNode mynode = dmtn;
-                    itemNode.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            ListElement le = (ListElement) mynode.getUserObject();
-                            Object[] o = (Object[]) le.getObject();
-                            DlgNode dlg = new DlgNode(parent, new Object[]{typ, le.getValue(), o[0], o[1], null});
-                            Object[] data = dlg.showDialog();
-                            if (data != null) {
-                                //Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
-                                o[0] = data[2].toString();
-                                o[1] = data[3];
-                                ListElement newle = new ListElement(data[1].toString(), o);
-                                mynode.setUserObject(newle);
-                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                                lstMass.setEnabled(false);
-                                txtSuche.setEnabled(false);
-                                saveOK();
-                            }
-                            dlg.dispose();
-                        }
-                    });
-                    menuedit.add(itemNode);
-                }
-
-
-                // ===
-                // (6)
-                // ===
-                if (mdfs.size() > 0) {
-                    if (menuedit == null) {
-                        menuedit = new JMenu("Bearbeiten");
-                    }
-                    final Vector mymdfs = mdfs;
-                    Enumeration e = mdfs.elements();
-                    int num = 0;
-                    while (e.hasMoreElements()) {
-                        Object[] thisobj = (Object[]) e.nextElement();
-                        final boolean selected = (Boolean) thisobj[ParserMassnahmen.O_MF_SELECTED];
-                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
-                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
-                        final double zeit1 = (Double) thisobj[ParserMassnahmen.O_MF_ZEIT];
-                        final double prozent1 = (Double) thisobj[ParserMassnahmen.O_MF_PROZENT];
-                        JMenuItem item = new JMenuItem(lbl);
-                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
-                        final int t = num;
-                        item.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                //{typ, le.getValue(), o[0], o[1], null}
-                                DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, lbl, beschreibung, zeit1, prozent1});
-                                Object[] data = dlg.showDialog();
-                                if (data != null) {
-                                    String newlabel = data[1].toString();
-                                    String newbeschreibung = data[2].toString();
-                                    double newzeit = (Double) data[3];
-                                    double newprozent = (Double) data[4];
-                                    Object[] modfaktor = new Object[]{newlabel, newbeschreibung, newzeit, newprozent, new Boolean(selected)};
-                                    mymdfs.set(t, modfaktor);
-                                    txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                                    lstMass.setEnabled(false);
-                                    txtSuche.setEnabled(false);
-                                    saveOK();
-                                }
-                                dlg.dispose();
-                            }
-                        });
-                        num++;
-                        menuedit.add(item);
-                    }
-                }
-                if (menuedit != null) {
-                    menu.add(menuedit);
-                }
-
-
-                // ===
-                // (7)
-                // ===
-                JMenu menudel = new JMenu("Löschen");
-
-                final ListElement le4label = (ListElement) dmtn.getUserObject();
-                JMenuItem itemNode = new JMenuItem(le4label.getValue());
-                final DefaultMutableTreeNode mynode = dmtn;
-                itemNode.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (mynode.isLeaf()
-                                || JOptionPane.showConfirmDialog(parent, "Damit wird der ganze Teilbaum gelöscht.\n\nSind Sie sicher ?", le4label.getValue() + " entfernen ??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            // Drei Fälle
-                            if (typ == ParserMassnahmen.TYPE_Teilschritt
-                                    || typ == ParserMassnahmen.TYPE_DF) {
-                                mynode.removeFromParent();
-                            } else if (typ == ParserMassnahmen.TYPE_Vorbereitung
-                                    || typ == ParserMassnahmen.TYPE_Nachbereitung) {
-                                mynode.removeAllChildren();
-                            } else { // ROOT
-                                treeMass.setModel(new DefaultTreeModel(null));
-                                txtDauer.setEnabled(true);
-                                //--
-//                            Object[] ov = new Object[]{"", 0d, new Vector(), new Vector(), ParserMassnahmen.TYPE_Vorbereitung, 0d};
-//                            ListElement lev = new ListElement("Vorbereitung", ov);
-//                            DefaultMutableTreeNode nodev = new DefaultMutableTreeNode(lev);
-//                            //--
-//                            Object[] on = new Object[]{"", 0d, new Vector(), new Vector(), ParserMassnahmen.TYPE_Nachbereitung, 0d};
-//                            ListElement len = new ListElement("Nachbereitung", ov);
-//                            DefaultMutableTreeNode noden = new DefaultMutableTreeNode(len);
-//                            //--
-//                            mynode.add(nodev);
-//                            mynode.add(noden);
-                            }
-                            ((DefaultTreeModel) treeMass.getModel()).reload();
-                            txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                            lstMass.setEnabled(false);
-                            txtSuche.setEnabled(false);
-                            saveOK();
-                            SYSTools.expandAll(treeMass);
-                        }
-                    }
-                });
-                menudel.add(itemNode);
-
-                // ===
-                // (8)
-                // ===
-                if (mdfs.size() > 0) {
-                    menudel.add(new JSeparator());
-                    final Vector mymdfs = mdfs;
-                    Enumeration e = mdfs.elements();
-                    int num = 0;
-                    //final DefaultMutableTreeNode mynode = dmtn;
-                    while (e.hasMoreElements()) {
-                        Object[] thisobj = (Object[]) e.nextElement();
-                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
-                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
-                        JMenuItem item = new JMenuItem(lbl);
-                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
-                        final int t = num;
-                        item.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                mymdfs.remove(t);
-                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                            }
-                        });
-                        num++;
-                        menudel.add(item);
-                    }
-                    lstMass.setEnabled(false);
-                    txtSuche.setEnabled(false);
-                    saveOK();
-                }
-                menu.add(menudel);
-            } else {
-                JMenuItem item = new JMenuItem("Neuen Baum erstellen");
-
-                item.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        createNewTree();
-                        lstMass.setEnabled(false);
-                        txtSuche.setEnabled(false);
-                        saveOK();
-                    }
-                });
-                menu.add(item);
-                item.setEnabled(treeMass.getModel().getRoot() == null && massid > -1);
-            }
-            menu.show(evt.getComponent(), evt.getX(), evt.getY());
-        }
+//        if (evt.isPopupTrigger()) {
+//            SYSTools.unregisterListeners(menu);
+//            menu = new JPopupMenu();
+//
+//            if (treeMass.getRowForLocation(evt.getX(), evt.getY()) != -1) {
+////            JMenuItem itemedit = null;
+////            JMenuItem itemdelete = null;
+//
+//                final TreePath curPath = treeMass.getPathForLocation(evt.getX(), evt.getY());
+//                DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
+//                treeMass.setSelectionPath(curPath);
+//                final ListElement le = (ListElement) dmtn.getUserObject();
+//                Object[] o = (Object[]) le.getObject();
+//                //Object[] o = new Object[]{beschreibung, zeit, new Vector(), new Vector(), typ, 0d};
+//                //Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(selected)};
+//                Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
+////            String label = le.getValue();
+////            Double zeit = (Double) o[ParserMassnahmen.O_ZEIT];
+////            Double sum = (Double) o[ParserMassnahmen.O_SUMME];
+//                final int typ = (Integer) o[ParserMassnahmen.O_TYP];
+//
+//
+//                // Aufbau Kontextmenü
+//                // ==================
+//                // (1) Erschwernis / Erleichterung ->  Nummer 1
+//                //                                     Nummer 2
+//                // ------------------------------------------------------------
+//                // Neu  ->  (2) Teilschritt (Nur Unterhalb Vorber... Nachber.. Durchf...)
+//                //          (3) Durchführung (nur Unterhalb Root)
+//                //          (4) Erschwernis / Erleichterung
+//                // Bearbeiten -> (5) (je nachdem, was markiert ist, nicht bei ROOT)
+//                //               (6)   Erschwernis / Erleichterung Nummer 1 (NUR WENN VORHANDEN)
+//                //                                                 Nummer 2
+//                // Löschen  ->  (7)(je nachdem, was markiert ist)
+//                //              (8)    Erschwernis / Erleichterung ->  Nummer 1
+//                //                                                     Nummer 2
+//                // --------------------------------------------------------------
+//                // Ausschneiden (+ Unterknoten und Modfaktoren)
+//                // Kopieren (+ Unterknoten und Modfaktoren)
+//                // Einfügen (an markierte Stelle)
+//
+//
+//                // ===
+//                // (1)
+//                // ===
+//                if (mdfs.size() > 0) { // Es gibt also mindestens eine Erleichterung.
+//                    // Dann müssen wir ein Untermenü erstellen, die eine Aufstellung aller
+//                    // MODFAKTOREN enthält.
+//                    JMenu menumod = new JMenu("Erschwernis/Erleichterung");
+//
+//                    Enumeration e = mdfs.elements();
+//                    int num = 0;
+//                    while (e.hasMoreElements()) {
+//                        Object[] thisobj = (Object[]) e.nextElement();
+//                        boolean selected = (Boolean) thisobj[4];
+//                        String lbl = thisobj[0].toString();
+//                        String beschreibung = thisobj[1].toString();
+//                        JMenuItem item = new JMenuItem(lbl);
+//                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
+//                        if (selected) {
+//                            item.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/darkcheck.png")));
+//                        }
+//                        final int t = num;
+//                        item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                Tools.selectModfaktor(t, curPath);
+//                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                                lstMass.setEnabled(false);
+//                                txtSuche.setEnabled(false);
+//                                saveOK();
+//                                reloadTree();
+//                            }
+//                        });
+//                        num++;
+//                        menumod.add(item);
+//                    }
+//                    menu.add(menumod);
+//                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
+//                }
+//
+//                JMenu menunew = new JMenu("Neu");
+//                // ===
+//                // (3)
+//                // ===
+//                if (typ == ParserMassnahmen.TYPE_ROOT) {
+//                    JMenuItem item = new JMenuItem("Durchführung");
+//
+//                    final DefaultMutableTreeNode mynode = dmtn;
+//                    item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_DF, null, null, null, null});
+//                            Object[] data = dlg.showDialog();
+//                            if (data != null) {
+//                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
+//                                ListElement le = new ListElement(data[1].toString(), o);
+//                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
+//                                // Jetzt soll der neue Knoten hinten an den Baum angefügt werden. Jedoch immer VOR der Nachbereitung.
+//                                // Somit:
+//                                ((DefaultMutableTreeNode) mynode.getRoot()).insert(node, mynode.getRoot().getChildCount() - 1);
+//                                ((DefaultTreeModel) treeMass.getModel()).reload();
+//                                lstMass.setEnabled(false);
+//                                txtSuche.setEnabled(false);
+//                                saveOK();
+//                            }
+//                            dlg.dispose();
+//                        }
+//                    });
+//                    menunew.add(item);
+//                }
+//                // ===
+//                // (2)
+//                // ===
+//                if (typ == ParserMassnahmen.TYPE_Vorbereitung
+//                        || typ == ParserMassnahmen.TYPE_Nachbereitung
+//                        || typ == ParserMassnahmen.TYPE_DF
+//                        || typ == ParserMassnahmen.TYPE_Teilschritt) {
+//                    JMenuItem item = new JMenuItem("Teilschritt");
+//                    final DefaultMutableTreeNode mynode = dmtn;
+//                    item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_Teilschritt, null, null, null, null});
+//                            Object[] data = dlg.showDialog();
+//                            if (data != null) {
+//                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
+//                                ListElement le = new ListElement(data[1].toString(), o);
+//                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
+//                                mynode.add(node);
+//                                Enumeration expansion = treeMass.getExpandedDescendants(new TreePath(treeMass.getModel().getRoot()));
+//                                ((DefaultTreeModel) treeMass.getModel()).reload();
+//                                while (expansion.hasMoreElements()) {
+//                                    treeMass.expandPath((TreePath) expansion.nextElement());
+//                                }
+//                            }
+//                            lstMass.setEnabled(false);
+//                            txtSuche.setEnabled(false);
+//                            saveOK();
+//                            dlg.dispose();
+//                        }
+//                    });
+//                    menunew.add(item);
+//                }
+//                // ===
+//                // (4)
+//                // ===
+//                JMenuItem item1 = new JMenuItem("Erschwernis/Erleichterung");
+//                final DefaultMutableTreeNode mynode1 = dmtn;
+//                item1.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, null, null, null, null});
+//                        Object[] data = dlg.showDialog();
+//                        if (data != null) {
+//                            String label = data[1].toString();
+//                            String beschreibung = data[2].toString();
+//                            double zeit = (Double) data[3];
+//                            double prozent = (Double) data[4];
+//                            Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(false)};
+//                            ListElement le = (ListElement) mynode1.getUserObject();
+//                            Object[] o = (Object[]) le.getObject();
+//                            Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
+//                            mdfs.add(modfaktor);
+//                            reloadTree();
+//                            lstMass.setEnabled(false);
+//                            txtSuche.setEnabled(false);
+//                            saveOK();
+//                        }
+//                        dlg.dispose();
+//                    }
+//                });
+//                menunew.add(item1);
+//
+//                menu.add(menunew);
+//
+//                JMenu menuedit = null;
+//                if (typ != ParserMassnahmen.TYPE_ROOT) {
+//                    menuedit = new JMenu("Bearbeiten");
+//                    // ===
+//                    // (5)
+//                    // ===
+//                    ListElement le4label = (ListElement) dmtn.getUserObject();
+//                    JMenuItem itemNode = new JMenuItem(le4label.getValue());
+//                    final DefaultMutableTreeNode mynode = dmtn;
+//                    itemNode.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            ListElement le = (ListElement) mynode.getUserObject();
+//                            Object[] o = (Object[]) le.getObject();
+//                            DlgNode dlg = new DlgNode(parent, new Object[]{typ, le.getValue(), o[0], o[1], null});
+//                            Object[] data = dlg.showDialog();
+//                            if (data != null) {
+//                                //Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
+//                                o[0] = data[2].toString();
+//                                o[1] = data[3];
+//                                ListElement newle = new ListElement(data[1].toString(), o);
+//                                mynode.setUserObject(newle);
+//                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                                lstMass.setEnabled(false);
+//                                txtSuche.setEnabled(false);
+//                                saveOK();
+//                            }
+//                            dlg.dispose();
+//                        }
+//                    });
+//                    menuedit.add(itemNode);
+//                }
+//
+//
+//                // ===
+//                // (6)
+//                // ===
+//                if (mdfs.size() > 0) {
+//                    if (menuedit == null) {
+//                        menuedit = new JMenu("Bearbeiten");
+//                    }
+//                    final Vector mymdfs = mdfs;
+//                    Enumeration e = mdfs.elements();
+//                    int num = 0;
+//                    while (e.hasMoreElements()) {
+//                        Object[] thisobj = (Object[]) e.nextElement();
+//                        final boolean selected = (Boolean) thisobj[ParserMassnahmen.O_MF_SELECTED];
+//                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
+//                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
+//                        final double zeit1 = (Double) thisobj[ParserMassnahmen.O_MF_ZEIT];
+//                        final double prozent1 = (Double) thisobj[ParserMassnahmen.O_MF_PROZENT];
+//                        JMenuItem item = new JMenuItem(lbl);
+//                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
+//                        final int t = num;
+//                        item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                //{typ, le.getValue(), o[0], o[1], null}
+//                                DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, lbl, beschreibung, zeit1, prozent1});
+//                                Object[] data = dlg.showDialog();
+//                                if (data != null) {
+//                                    String newlabel = data[1].toString();
+//                                    String newbeschreibung = data[2].toString();
+//                                    double newzeit = (Double) data[3];
+//                                    double newprozent = (Double) data[4];
+//                                    Object[] modfaktor = new Object[]{newlabel, newbeschreibung, newzeit, newprozent, new Boolean(selected)};
+//                                    mymdfs.set(t, modfaktor);
+//                                    txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                                    lstMass.setEnabled(false);
+//                                    txtSuche.setEnabled(false);
+//                                    saveOK();
+//                                }
+//                                dlg.dispose();
+//                            }
+//                        });
+//                        num++;
+//                        menuedit.add(item);
+//                    }
+//                }
+//                if (menuedit != null) {
+//                    menu.add(menuedit);
+//                }
+//
+//
+//                // ===
+//                // (7)
+//                // ===
+//                JMenu menudel = new JMenu("Löschen");
+//
+//                final ListElement le4label = (ListElement) dmtn.getUserObject();
+//                JMenuItem itemNode = new JMenuItem(le4label.getValue());
+//                final DefaultMutableTreeNode mynode = dmtn;
+//                itemNode.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        if (mynode.isLeaf()
+//                                || JOptionPane.showConfirmDialog(parent, "Damit wird der ganze Teilbaum gelöscht.\n\nSind Sie sicher ?", le4label.getValue() + " entfernen ??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//                            // Drei Fälle
+//                            if (typ == ParserMassnahmen.TYPE_Teilschritt
+//                                    || typ == ParserMassnahmen.TYPE_DF) {
+//                                mynode.removeFromParent();
+//                            } else if (typ == ParserMassnahmen.TYPE_Vorbereitung
+//                                    || typ == ParserMassnahmen.TYPE_Nachbereitung) {
+//                                mynode.removeAllChildren();
+//                            } else { // ROOT
+//                                treeMass.setModel(new DefaultTreeModel(null));
+//                                txtDauer.setEnabled(true);
+//                                //--
+////                            Object[] ov = new Object[]{"", 0d, new Vector(), new Vector(), ParserMassnahmen.TYPE_Vorbereitung, 0d};
+////                            ListElement lev = new ListElement("Vorbereitung", ov);
+////                            DefaultMutableTreeNode nodev = new DefaultMutableTreeNode(lev);
+////                            //--
+////                            Object[] on = new Object[]{"", 0d, new Vector(), new Vector(), ParserMassnahmen.TYPE_Nachbereitung, 0d};
+////                            ListElement len = new ListElement("Nachbereitung", ov);
+////                            DefaultMutableTreeNode noden = new DefaultMutableTreeNode(len);
+////                            //--
+////                            mynode.add(nodev);
+////                            mynode.add(noden);
+//                            }
+//                            ((DefaultTreeModel) treeMass.getModel()).reload();
+//                            txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                            lstMass.setEnabled(false);
+//                            txtSuche.setEnabled(false);
+//                            saveOK();
+//                            SYSTools.expandAll(treeMass);
+//                        }
+//                    }
+//                });
+//                menudel.add(itemNode);
+//
+//                // ===
+//                // (8)
+//                // ===
+//                if (mdfs.size() > 0) {
+//                    menudel.add(new JSeparator());
+//                    final Vector mymdfs = mdfs;
+//                    Enumeration e = mdfs.elements();
+//                    int num = 0;
+//                    //final DefaultMutableTreeNode mynode = dmtn;
+//                    while (e.hasMoreElements()) {
+//                        Object[] thisobj = (Object[]) e.nextElement();
+//                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
+//                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
+//                        JMenuItem item = new JMenuItem(lbl);
+//                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
+//                        final int t = num;
+//                        item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                mymdfs.remove(t);
+//                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                            }
+//                        });
+//                        num++;
+//                        menudel.add(item);
+//                    }
+//                    lstMass.setEnabled(false);
+//                    txtSuche.setEnabled(false);
+//                    saveOK();
+//                }
+//                menu.add(menudel);
+//            } else {
+//                JMenuItem item = new JMenuItem("Neuen Baum erstellen");
+//
+//                item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        createNewTree();
+//                        lstMass.setEnabled(false);
+//                        txtSuche.setEnabled(false);
+//                        saveOK();
+//                    }
+//                });
+//                menu.add(item);
+//                item.setEnabled(treeMass.getModel().getRoot() == null && massid > -1);
+//            }
+//            menu.show(evt.getComponent(), evt.getX(), evt.getY());
+//        }
     }//GEN-LAST:event_treeMassMousePressed
 
     private void txtSucheCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtSucheCaretUpdate
-        lstMass.setModel(SYSTools.rs2lst(DBRetrieve.getResultSet("Massnahmen", new String[]{"MassID", "Bezeichnung"}, "Bezeichnung", DBHandling.createSearchPattern(txtSuche.getText()), "like", new String[]{"Bezeichnung"})));
+//        lstMass.setModel(SYSTools.rs2lst(DBRetrieve.getResultSet("Massnahmen", new String[]{"MassID", "Bezeichnung"}, "Bezeichnung", DBHandling.createSearchPattern(txtSuche.getText()), "like", new String[]{"Bezeichnung"})));
         // Detailanzeige zurück setzen
         cmbKategorie.setSelectedIndex(-1);
         cmbArt.setSelectedIndex(-1);
@@ -1048,27 +1113,27 @@ public class FrmMassnahmen extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnNeu;
-    private javax.swing.JButton btnSave;
-    private javax.swing.JCheckBox cbAktiv;
-    private javax.swing.JComboBox cmbArt;
-    private javax.swing.JComboBox cmbKategorie;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JLabel lblMassnahme;
-    private javax.swing.JList lstMass;
-    private javax.swing.JTree treeMass;
-    private javax.swing.JTextField txtBezeichnung;
-    private javax.swing.JTextField txtDauer;
-    private javax.swing.JTextField txtSuche;
+    private JToolBar jToolBar1;
+    private JButton btnNeu;
+    private JButton btnSave;
+    private JButton btnCancel;
+    private JPanel jPanel2;
+    private JTextField txtSuche;
+    private JScrollPane jScrollPane2;
+    private JList lstMass;
+    private JPanel jPanel1;
+    private JScrollPane jScrollPane1;
+    private JTree treeMass;
+    private JPanel jPanel3;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JTextField txtBezeichnung;
+    private JTextField txtDauer;
+    private JComboBox cmbKategorie;
+    private JLabel jLabel4;
+    private JComboBox cmbArt;
+    private JCheckBox cbAktiv;
+    private JLabel lblMassnahme;
     // End of variables declaration//GEN-END:variables
 }

@@ -634,7 +634,7 @@ public class DBHandling {
      * @param pattern
      * @return
      */
-    public static String createSearchPattern(String pattern) {
+    public static String getMySQLsearchPattern(String pattern) {
         pattern = pattern.replaceAll("%", "");
         pattern = "%" + pattern + "%";
         return pattern;

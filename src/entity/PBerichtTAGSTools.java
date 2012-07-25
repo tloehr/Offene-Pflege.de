@@ -7,6 +7,7 @@ package entity;
 import entity.files.SYSFiles;
 import op.OPDE;
 import op.tools.GUITools;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -129,7 +130,7 @@ public class PBerichtTAGSTools {
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
             cb.setForeground(tag.getColor());
             if (tag.isBesonders()) {
-                cb.setFont(OPDE.arial14);
+                cb.setFont(SYSConst.ARIAL14);
             }
             cb.putClientProperty("UserObject", tag);
 

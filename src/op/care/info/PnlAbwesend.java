@@ -42,7 +42,6 @@ public class PnlAbwesend extends JPanel {
     public static final String internalClassID = "nursingrecords.info.pnlabwesend";
     private BWInfo abwesenheit;
     private Closure actionBlock;
-    private double split1Pos;
     private PnlEditKH pnlEditKH;
     private Properties props;
 
@@ -97,14 +96,14 @@ public class PnlAbwesend extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
+                SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
             }
         });
 
     }
 
     private void btnAddKHActionPerformed(ActionEvent e) {
-        split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
+        SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
     private void btnToLeftActionPerformed(ActionEvent e) {
@@ -112,7 +111,7 @@ public class PnlAbwesend extends JPanel {
         if (newKH != null) {
             cmbKH.setModel(new DefaultComboBoxModel(new Krankenhaus[]{newKH}));
         }
-        split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
+        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
 
     }
 

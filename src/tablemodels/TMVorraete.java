@@ -6,6 +6,7 @@ import entity.verordnungen.MedVorrat;
 import entity.verordnungen.MedVorratTools;
 import op.OPDE;
 import op.tools.Pair;
+import op.tools.SYSConst;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
@@ -75,7 +76,7 @@ public class TMVorraete extends AbstractTableModel {
                 break;
             }
             case COL_MENGE: {
-                result = "<font face=\"" + OPDE.arial14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + MedFormenTools.EINHEIT[MedVorratTools.getForm(getVorrat(row)).getPackEinheit()] + "</font>";
+                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + MedFormenTools.EINHEIT[MedVorratTools.getForm(getVorrat(row)).getPackEinheit()] + "</font>";
                 break;
             }
             default: {

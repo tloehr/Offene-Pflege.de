@@ -134,4 +134,10 @@ public class EntityTools {
         em.close();
         return list;
     }
+
+    public static String getMySQLsearchPattern(String pattern) {
+        pattern = pattern.replaceAll("%", "");
+        pattern = "%" + pattern + "%";
+        return pattern;
+    }
 }

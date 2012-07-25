@@ -55,7 +55,7 @@ public class DFNTools {
             lastdfn = lastdfn.minusDays(1);
         }
 
-        if (Days.daysBetween(lastdfn, new DateMidnight()).getDays() != 1) {
+        if (Days.daysBetween(lastdfn, stichtag).getDays() != 1) {
             throw new IndexOutOfBoundsException(OPDE.lang.getString(internalClassID + ".exception.import"));
         }
 

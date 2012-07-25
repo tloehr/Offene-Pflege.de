@@ -397,7 +397,7 @@ public class AddBWWizard {
 
             addComponent(txt, true);
             addSpace();
-//            addText("Drücken Sie auf FERTIG, wenn's los gehen soll.", OPDE.arial14);
+//            addText("Drücken Sie auf FERTIG, wenn's los gehen soll.", SYSConst.ARIAL14);
         }
 
         @Override

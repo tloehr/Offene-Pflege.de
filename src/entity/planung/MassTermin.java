@@ -5,47 +5,46 @@
 
 package entity.planung;
 
-import entity.Massnahmen;
+import entity.Intervention;
 import op.tools.SYSCalendar;
+import org.joda.time.DateMidnight;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.persistence.*;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "MassTermin")
 @NamedQueries({
-    @NamedQuery(name = "MassTermin.findAll", query = "SELECT m FROM MassTermin m"),
-    @NamedQuery(name = "MassTermin.findByTermID", query = "SELECT m FROM MassTermin m WHERE m.termID = :termID"),
-    @NamedQuery(name = "MassTermin.findByNachtMo", query = "SELECT m FROM MassTermin m WHERE m.nachtMo = :nachtMo"),
-    @NamedQuery(name = "MassTermin.findByMorgens", query = "SELECT m FROM MassTermin m WHERE m.morgens = :morgens"),
-    @NamedQuery(name = "MassTermin.findByMittags", query = "SELECT m FROM MassTermin m WHERE m.mittags = :mittags"),
-    @NamedQuery(name = "MassTermin.findByNachmittags", query = "SELECT m FROM MassTermin m WHERE m.nachmittags = :nachmittags"),
-    @NamedQuery(name = "MassTermin.findByAbends", query = "SELECT m FROM MassTermin m WHERE m.abends = :abends"),
-    @NamedQuery(name = "MassTermin.findByNachtAb", query = "SELECT m FROM MassTermin m WHERE m.nachtAb = :nachtAb"),
-    @NamedQuery(name = "MassTermin.findByUhrzeitAnzahl", query = "SELECT m FROM MassTermin m WHERE m.uhrzeitAnzahl = :uhrzeitAnzahl"),
-    @NamedQuery(name = "MassTermin.findByUhrzeit", query = "SELECT m FROM MassTermin m WHERE m.uhrzeit = :uhrzeit"),
-    @NamedQuery(name = "MassTermin.findByTaeglich", query = "SELECT m FROM MassTermin m WHERE m.taeglich = :taeglich"),
-    @NamedQuery(name = "MassTermin.findByWoechentlich", query = "SELECT m FROM MassTermin m WHERE m.woechentlich = :woechentlich"),
-    @NamedQuery(name = "MassTermin.findByMonatlich", query = "SELECT m FROM MassTermin m WHERE m.monatlich = :monatlich"),
-    @NamedQuery(name = "MassTermin.findByTagNum", query = "SELECT m FROM MassTermin m WHERE m.tagNum = :tagNum"),
-    @NamedQuery(name = "MassTermin.findByMon", query = "SELECT m FROM MassTermin m WHERE m.mon = :mon"),
-    @NamedQuery(name = "MassTermin.findByDie", query = "SELECT m FROM MassTermin m WHERE m.die = :die"),
-    @NamedQuery(name = "MassTermin.findByMit", query = "SELECT m FROM MassTermin m WHERE m.mit = :mit"),
-    @NamedQuery(name = "MassTermin.findByDon", query = "SELECT m FROM MassTermin m WHERE m.don = :don"),
-    @NamedQuery(name = "MassTermin.findByFre", query = "SELECT m FROM MassTermin m WHERE m.fre = :fre"),
-    @NamedQuery(name = "MassTermin.findBySam", query = "SELECT m FROM MassTermin m WHERE m.sam = :sam"),
-    @NamedQuery(name = "MassTermin.findBySon", query = "SELECT m FROM MassTermin m WHERE m.son = :son"),
-    @NamedQuery(name = "MassTermin.findByErforderlich", query = "SELECT m FROM MassTermin m WHERE m.erforderlich = :erforderlich"),
-    @NamedQuery(name = "MassTermin.findByLDatum", query = "SELECT m FROM MassTermin m WHERE m.lDatum = :lDatum"),
-    @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer")})
+        @NamedQuery(name = "MassTermin.findAll", query = "SELECT m FROM MassTermin m"),
+        @NamedQuery(name = "MassTermin.findByTermID", query = "SELECT m FROM MassTermin m WHERE m.termID = :termID"),
+        @NamedQuery(name = "MassTermin.findByNachtMo", query = "SELECT m FROM MassTermin m WHERE m.nachtMo = :nachtMo"),
+        @NamedQuery(name = "MassTermin.findByMorgens", query = "SELECT m FROM MassTermin m WHERE m.morgens = :morgens"),
+        @NamedQuery(name = "MassTermin.findByMittags", query = "SELECT m FROM MassTermin m WHERE m.mittags = :mittags"),
+        @NamedQuery(name = "MassTermin.findByNachmittags", query = "SELECT m FROM MassTermin m WHERE m.nachmittags = :nachmittags"),
+        @NamedQuery(name = "MassTermin.findByAbends", query = "SELECT m FROM MassTermin m WHERE m.abends = :abends"),
+        @NamedQuery(name = "MassTermin.findByNachtAb", query = "SELECT m FROM MassTermin m WHERE m.nachtAb = :nachtAb"),
+        @NamedQuery(name = "MassTermin.findByUhrzeitAnzahl", query = "SELECT m FROM MassTermin m WHERE m.uhrzeitAnzahl = :uhrzeitAnzahl"),
+        @NamedQuery(name = "MassTermin.findByUhrzeit", query = "SELECT m FROM MassTermin m WHERE m.uhrzeit = :uhrzeit"),
+        @NamedQuery(name = "MassTermin.findByTaeglich", query = "SELECT m FROM MassTermin m WHERE m.taeglich = :taeglich"),
+        @NamedQuery(name = "MassTermin.findByWoechentlich", query = "SELECT m FROM MassTermin m WHERE m.woechentlich = :woechentlich"),
+        @NamedQuery(name = "MassTermin.findByMonatlich", query = "SELECT m FROM MassTermin m WHERE m.monatlich = :monatlich"),
+        @NamedQuery(name = "MassTermin.findByTagNum", query = "SELECT m FROM MassTermin m WHERE m.tagNum = :tagNum"),
+        @NamedQuery(name = "MassTermin.findByMon", query = "SELECT m FROM MassTermin m WHERE m.mon = :mon"),
+        @NamedQuery(name = "MassTermin.findByDie", query = "SELECT m FROM MassTermin m WHERE m.die = :die"),
+        @NamedQuery(name = "MassTermin.findByMit", query = "SELECT m FROM MassTermin m WHERE m.mit = :mit"),
+        @NamedQuery(name = "MassTermin.findByDon", query = "SELECT m FROM MassTermin m WHERE m.don = :don"),
+        @NamedQuery(name = "MassTermin.findByFre", query = "SELECT m FROM MassTermin m WHERE m.fre = :fre"),
+        @NamedQuery(name = "MassTermin.findBySam", query = "SELECT m FROM MassTermin m WHERE m.sam = :sam"),
+        @NamedQuery(name = "MassTermin.findBySon", query = "SELECT m FROM MassTermin m WHERE m.son = :son"),
+        @NamedQuery(name = "MassTermin.findByErforderlich", query = "SELECT m FROM MassTermin m WHERE m.erforderlich = :erforderlich"),
+        @NamedQuery(name = "MassTermin.findByLDatum", query = "SELECT m FROM MassTermin m WHERE m.lDatum = :lDatum"),
+        @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer")})
 public class MassTermin implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -116,13 +115,18 @@ public class MassTermin implements Serializable {
     private Planung planung;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Massnahmen massnahme;
+    private Intervention massnahme;
 
     public MassTermin() {
     }
 
-    public MassTermin(Long termID) {
-        this.termID = termID;
+    public MassTermin(Planung planung, Intervention massnahme) {
+        this.morgens = 1;
+        this.taeglich = 1;
+        this.lDatum = new DateMidnight().toDate();
+        this.dauer = massnahme.getDauer();
+        this.planung = planung;
+        this.massnahme = massnahme;
     }
 
     public Long getTermID() {
@@ -325,11 +329,11 @@ public class MassTermin implements Serializable {
         this.bemerkung = bemerkung;
     }
 
-    public Massnahmen getMassnahme() {
+    public Intervention getMassnahme() {
         return massnahme;
     }
 
-    public void setMassnahme(Massnahmen massnahme) {
+    public void setMassnahme(Intervention massnahme) {
         this.massnahme = massnahme;
     }
 

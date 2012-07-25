@@ -1,17 +1,12 @@
 package entity.planung;
 
 import entity.Bewohner;
-import entity.Massnahmen;
+import entity.Intervention;
 import entity.Users;
-import entity.verordnungen.BHPTools;
-import entity.verordnungen.MedBuchungen;
-import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungPlanung;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 
 @Entity
@@ -82,17 +77,17 @@ public class DFN implements Serializable {
 
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Massnahmen massnahme;
+    private Intervention massnahme;
 
     @JoinColumn(name = "TermID", referencedColumnName = "TermID")
     @ManyToOne
     private MassTermin massTermin;
 
-    public Massnahmen getMassnahme() {
+    public Intervention getMassnahme() {
         return massnahme;
     }
 
-    public void setMassnahme(Massnahmen massnahme) {
+    public void setMassnahme(Intervention massnahme) {
         this.massnahme = massnahme;
     }
 
@@ -107,6 +102,7 @@ public class DFN implements Serializable {
         this.planung = massTermin.getPlanung();
         this.dauer = massTermin.getDauer();
         this.bewohner = massTermin.getPlanung().getBewohner();
+        this.erforderlich = massTermin.isErforderlich();
         this.soll = soll;
         this.version = 0l;
         this.sZeit = sZeit;

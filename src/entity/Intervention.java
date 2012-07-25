@@ -13,7 +13,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -25,15 +24,14 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Massnahmen")
 @NamedQueries({
-    @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Massnahmen m"),
-    @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Massnahmen m WHERE m.massID = :massID"),
-    @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Massnahmen m WHERE m.bezeichnung = :bezeichnung"),
-    @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Massnahmen m WHERE m.dauer = :dauer"),
-    @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Massnahmen m WHERE m.massArt = :massArt"),
-    @NamedQuery(name = "Massnahmen.findByBwikid", query = "SELECT m FROM Massnahmen m WHERE m.bwikid = :bwikid"),
-    @NamedQuery(name = "Massnahmen.findByPsid", query = "SELECT m FROM Massnahmen m WHERE m.psid = :psid"),
-    @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Massnahmen m WHERE m.aktiv = :aktiv")})
-public class Massnahmen implements Serializable {
+    @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Intervention m"),
+    @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Intervention m WHERE m.massID = :massID"),
+    @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Intervention m WHERE m.bezeichnung = :bezeichnung"),
+    @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Intervention m WHERE m.dauer = :dauer"),
+    @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Intervention m WHERE m.massArt = :massArt"),
+    @NamedQuery(name = "Massnahmen.findByBwikid", query = "SELECT m FROM Intervention m WHERE m.bwikid = :bwikid"),
+    @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Intervention m WHERE m.aktiv = :aktiv")})
+public class Intervention implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,22 +50,17 @@ public class Massnahmen implements Serializable {
     @Basic(optional = false)
     @Column(name = "BWIKID")
     private long bwikid;
-    @Lob
-    @Column(name = "XMLT")
-    private String xmlt;
-    @Column(name = "PSID")
-    private Short psid;
     @Column(name = "Aktiv")
     private Boolean aktiv;
 
-    public Massnahmen() {
+    public Intervention() {
     }
 
-    public Massnahmen(Long massID) {
+    public Intervention(Long massID) {
         this.massID = massID;
     }
 
-    public Massnahmen(Long massID, String bezeichnung, BigDecimal dauer, int massArt, long bwikid) {
+    public Intervention(Long massID, String bezeichnung, BigDecimal dauer, int massArt, long bwikid) {
         this.massID = massID;
         this.bezeichnung = bezeichnung;
         this.dauer = dauer;
@@ -115,22 +108,6 @@ public class Massnahmen implements Serializable {
         this.bwikid = bwikid;
     }
 
-    public String getXmlt() {
-        return xmlt;
-    }
-
-    public void setXmlt(String xmlt) {
-        this.xmlt = xmlt;
-    }
-
-    public Short getPsid() {
-        return psid;
-    }
-
-    public void setPsid(Short psid) {
-        this.psid = psid;
-    }
-
     public Boolean getAktiv() {
         return aktiv;
     }
@@ -148,11 +125,10 @@ public class Massnahmen implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Massnahmen)) {
+        if (!(object instanceof Intervention)) {
             return false;
         }
-        Massnahmen other = (Massnahmen) object;
+        Intervention other = (Intervention) object;
         if ((this.massID == null && other.massID != null) || (this.massID != null && !this.massID.equals(other.massID))) {
             return false;
         }
@@ -161,7 +137,7 @@ public class Massnahmen implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Massnahmen[massID=" + massID + "]";
+        return bezeichnung;
     }
 
 }

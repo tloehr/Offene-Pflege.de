@@ -32,7 +32,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import com.toedter.calendar.*;
 import op.OPDE;
-import op.care.planung.massnahmen.DlgNode;
+
 import op.care.planung.massnahmen.ParserMassnahmen;
 import op.care.planung.massnahmen.RNDMassTree;
 import op.care.planung.massnahmen.Tools;
@@ -1785,361 +1785,361 @@ public class DlgTermin extends javax.swing.JDialog {
     }//GEN-LAST:event_spinMorgensStateChanged
 
     private void treeMassMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMassMousePressed
-        if (evt.isPopupTrigger()) {
-            SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
-
-            if (treeMass.getRowForLocation(evt.getX(), evt.getY()) != -1) {
-//            JMenuItem itemedit = null;
-//            JMenuItem itemdelete = null;
-
-                final TreePath curPath = treeMass.getPathForLocation(evt.getX(), evt.getY());
-                DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
-                treeMass.setSelectionPath(curPath);
-                final ListElement le = (ListElement) dmtn.getUserObject();
-                Object[] o = (Object[]) le.getObject();
-                //Object[] o = new Object[]{beschreibung, zeit, new Vector(), new Vector(), typ, 0d};
-                //Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(selected)};
-                Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
-//            String label = le.getValue();
-//            Double zeit = (Double) o[ParserMassnahmen.O_ZEIT];
-//            Double sum = (Double) o[ParserMassnahmen.O_SUMME];
-                final int typ = (Integer) o[ParserMassnahmen.O_TYP];
-
-
-                // Aufbau Kontextmenü
-                // ==================
-                // (1) Erschwernis / Erleichterung ->  Nummer 1
-                //                                     Nummer 2
-                // ------------------------------------------------------------
-                // Neu  ->  (2) Teilschritt (Nur Unterhalb Vorber... Nachber.. Durchf...)
-                //          (3) Durchführung (nur Unterhalb Root)
-                //          (4) Erschwernis / Erleichterung
-                // Bearbeiten -> (5) (je nachdem, was markiert ist, nicht bei ROOT)
-                //               (6)   Erschwernis / Erleichterung Nummer 1 (NUR WENN VORHANDEN)
-                //                                                 Nummer 2
-                // Löschen  ->  (7)(je nachdem, was markiert ist)
-                //              (8)    Erschwernis / Erleichterung ->  Nummer 1
-                //                                                     Nummer 2
-                // --------------------------------------------------------------
-                // Baum aus Vorlage zurück setzen (9)
-                // Ausschneiden (+ Unterknoten und Modfaktoren)
-                // Kopieren (+ Unterknoten und Modfaktoren)
-                // Einfügen (an markierte Stelle)
-
-
-                // ===
-                // (1)
-                // ===
-                if (mdfs.size() > 0) { // Es gibt also mindestens eine Erleichterung.
-                    // Dann müssen wir ein Untermenü erstellen, die eine Aufstellung aller
-                    // MODFAKTOREN enthält.
-                    JMenu menumod = new JMenu("Erschwernis/Erleichterung");
-
-                    Enumeration e = mdfs.elements();
-                    int num = 0;
-                    while (e.hasMoreElements()) {
-                        Object[] thisobj = (Object[]) e.nextElement();
-                        boolean selected = (Boolean) thisobj[4];
-                        String lbl = thisobj[0].toString();
-                        String beschreibung = thisobj[1].toString();
-                        JMenuItem item = new JMenuItem(lbl);
-                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
-                        if (selected) {
-                            item.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/darkcheck.png")));
-                        }
-                        final int t = num;
-                        item.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                Tools.selectModfaktor(t, curPath);
-                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                                saveOK();
-                                reloadTree();
-                            }
-                        });
-                        num++;
-                        menumod.add(item);
-                    }
-                    menu.add(menumod);
-                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
-                }
-
-                JMenu menunew = new JMenu("Neu");
-                // ===
-                // (3)
-                // ===
-                if (typ == ParserMassnahmen.TYPE_ROOT) {
-                    JMenuItem item = new JMenuItem("Durchführung");
-
-                    final DefaultMutableTreeNode mynode = dmtn;
-                    item.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_DF, null, null, null, null});
-                            Object[] data = dlg.showDialog();
-                            if (data != null) {
-                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
-                                ListElement le = new ListElement(data[1].toString(), o);
-                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
-                                // Jetzt soll der neue Knoten hinten an den Baum angefügt werden. Jedoch immer VOR der Nachbereitung.
-                                // Somit:
-                                ((DefaultMutableTreeNode) mynode.getRoot()).insert(node, mynode.getRoot().getChildCount() - 1);
-                                ((DefaultTreeModel) treeMass.getModel()).reload();
-                                saveOK();
-                            }
-                            dlg.dispose();
-                        }
-                    });
-                    menunew.add(item);
-                }
-                // ===
-                // (2)
-                // ===
-                if (typ == ParserMassnahmen.TYPE_Vorbereitung ||
-                        typ == ParserMassnahmen.TYPE_Nachbereitung ||
-                        typ == ParserMassnahmen.TYPE_DF ||
-                        typ == ParserMassnahmen.TYPE_Teilschritt) {
-                    JMenuItem item = new JMenuItem("Teilschritt");
-                    final DefaultMutableTreeNode mynode = dmtn;
-                    item.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_Teilschritt, null, null, null, null});
-                            Object[] data = dlg.showDialog();
-                            if (data != null) {
-                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
-                                ListElement le = new ListElement(data[1].toString(), o);
-                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
-                                mynode.add(node);
-                                Enumeration expansion = treeMass.getExpandedDescendants(new TreePath(treeMass.getModel().getRoot()));
-                                ((DefaultTreeModel) treeMass.getModel()).reload();
-                                while (expansion.hasMoreElements()) {
-                                    treeMass.expandPath((TreePath) expansion.nextElement());
-                                }
-                            }
-                            saveOK();
-                            dlg.dispose();
-                        }
-                    });
-                    menunew.add(item);
-                }
-                // ===
-                // (4)
-                // ===
-                JMenuItem item1 = new JMenuItem("Erschwernis/Erleichterung");
-                final DefaultMutableTreeNode mynode1 = dmtn;
-                item1.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, null, null, null, null});
-                        Object[] data = dlg.showDialog();
-                        if (data != null) {
-                            String label = data[1].toString();
-                            String beschreibung = data[2].toString();
-                            double zeit = (Double) data[3];
-                            double prozent = (Double) data[4];
-                            Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(false)};
-                            ListElement le = (ListElement) mynode1.getUserObject();
-                            Object[] o = (Object[]) le.getObject();
-                            Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
-                            mdfs.add(modfaktor);
-                            reloadTree();
-                            saveOK();
-                        }
-                        dlg.dispose();
-                    }
-                });
-                menunew.add(item1);
-
-                menu.add(menunew);
-
-                JMenu menuedit = null;
-                if (typ != ParserMassnahmen.TYPE_ROOT) {
-                    menuedit = new JMenu("Bearbeiten");
-                    // ===
-                    // (5)
-                    // ===
-                    ListElement le4label = (ListElement) dmtn.getUserObject();
-                    JMenuItem itemNode = new JMenuItem(le4label.getValue());
-                    final DefaultMutableTreeNode mynode = dmtn;
-                    itemNode.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            ListElement le = (ListElement) mynode.getUserObject();
-                            Object[] o = (Object[]) le.getObject();
-                            DlgNode dlg = new DlgNode(parent, new Object[]{typ, le.getValue(), o[0], o[1], null});
-                            Object[] data = dlg.showDialog();
-                            if (data != null) {
-                                //Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
-                                o[0] = data[2].toString();
-                                o[1] = data[3];
-                                ListElement newle = new ListElement(data[1].toString(), o);
-                                mynode.setUserObject(newle);
-                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                                saveOK();
-                            }
-                            dlg.dispose();
-                        }
-                    });
-                    menuedit.add(itemNode);
-                }
-
-
-                // ===
-                // (6)
-                // ===
-                if (mdfs.size() > 0) {
-                    if (menuedit == null) {
-                        menuedit = new JMenu("Bearbeiten");
-                    }
-                    final Vector mymdfs = mdfs;
-                    Enumeration e = mdfs.elements();
-                    int num = 0;
-                    while (e.hasMoreElements()) {
-                        Object[] thisobj = (Object[]) e.nextElement();
-                        final boolean selected = (Boolean) thisobj[ParserMassnahmen.O_MF_SELECTED];
-                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
-                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
-                        final double zeit1 = (Double) thisobj[ParserMassnahmen.O_MF_ZEIT];
-                        final double prozent1 = (Double) thisobj[ParserMassnahmen.O_MF_PROZENT];
-                        JMenuItem item = new JMenuItem(lbl);
-                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
-                        final int t = num;
-                        item.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                //{typ, le.getValue(), o[0], o[1], null}
-                                DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, lbl, beschreibung, zeit1, prozent1});
-                                Object[] data = dlg.showDialog();
-                                if (data != null) {
-                                    String newlabel = data[1].toString();
-                                    String newbeschreibung = data[2].toString();
-                                    double newzeit = (Double) data[3];
-                                    double newprozent = (Double) data[4];
-                                    Object[] modfaktor = new Object[]{newlabel, newbeschreibung, newzeit, newprozent, new Boolean(selected)};
-                                    mymdfs.set(t, modfaktor);
-                                    txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                                    saveOK();
-                                }
-                                dlg.dispose();
-                            }
-                        });
-                        num++;
-                        menuedit.add(item);
-                    }
-                }
-                if (menuedit != null) {
-                    menu.add(menuedit);
-                }
-
-
-                // ===
-                // (7)
-                // ===
-                JMenu menudel = new JMenu("Löschen");
-
-                final ListElement le4label = (ListElement) dmtn.getUserObject();
-                JMenuItem itemNode = new JMenuItem(le4label.getValue());
-                final DefaultMutableTreeNode mynode = dmtn;
-                itemNode.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (mynode.isLeaf() ||
-                                JOptionPane.showConfirmDialog(parent, "Damit wird der ganze Teilbaum gelöscht.\n\nSind Sie sicher ?", le4label.getValue() + " entfernen ??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            // Drei Fälle
-                            if (typ == ParserMassnahmen.TYPE_Teilschritt ||
-                                    typ == ParserMassnahmen.TYPE_DF) {
-                                mynode.removeFromParent();
-                            } else if (typ == ParserMassnahmen.TYPE_Vorbereitung ||
-                                    typ == ParserMassnahmen.TYPE_Nachbereitung) {
-                                mynode.removeAllChildren();
-                            } else { // ROOT
-                                treeMass.setModel(new DefaultTreeModel(null));
-                            }
-                            ((DefaultTreeModel) treeMass.getModel()).reload();
-                            txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                            saveOK();
-                            SYSTools.expandAll(treeMass);
-                        }
-                    }
-                });
-                menudel.add(itemNode);
-
-                // ===
-                // (8)
-                // ===
-                if (mdfs.size() > 0) {
-                    menudel.add(new JSeparator());
-                    final Vector mymdfs = mdfs;
-                    Enumeration e = mdfs.elements();
-                    int num = 0;
-                    //final DefaultMutableTreeNode mynode = dmtn;
-                    while (e.hasMoreElements()) {
-                        Object[] thisobj = (Object[]) e.nextElement();
-                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
-                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
-                        JMenuItem item = new JMenuItem(lbl);
-                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
-                        final int t = num;
-                        item.addActionListener(new java.awt.event.ActionListener() {
-
-                            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                mymdfs.remove(t);
-                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
-                            }
-                        });
-                        num++;
-                        menudel.add(item);
-                    }
-                    saveOK();
-                }
-                menu.add(menudel);
-
-                // ===
-                // (9)
-                // ===
-                menu.add(new JSeparator());
-                JMenuItem menurestore = new JMenuItem("Baum auf Ausgangszustand zurücksetzen");
-                menurestore.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Ausgangszustand zurücksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            createTree(SYSTools.catchNull(template.get("XML")));
-                        }
-                    }
-                });
-                menu.add(menurestore);
-
-                // ===
-                // (10)
-                // ===
-                JMenuItem menutemplate = new JMenuItem("Baum auf Vorlage zurücksetzen");
-                menutemplate.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Vorlage zurücksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            createTree(SYSTools.catchNull(DBRetrieve.getSingleValue("Massnahmen", "XMLT", "MassID", template.get("MassID"))));
-                        }
-                    }
-                });
-                menu.add(menutemplate);
-            } else {
-                JMenuItem item = new JMenuItem("Neuen Baum erstellen");
-
-                item.addActionListener(new java.awt.event.ActionListener() {
-
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        createNewTree();
-                        saveOK();
-                    }
-                });
-                menu.add(item);
-                item.setEnabled(treeMass.getModel().getRoot() == null);
-            }
-            menu.show(evt.getComponent(), evt.getX(), evt.getY());
-            // Weiter gehts. Bring den Baum bei den Planungen zum laufen
-        }
+//        if (evt.isPopupTrigger()) {
+//            SYSTools.unregisterListeners(menu);
+//            menu = new JPopupMenu();
+//
+//            if (treeMass.getRowForLocation(evt.getX(), evt.getY()) != -1) {
+////            JMenuItem itemedit = null;
+////            JMenuItem itemdelete = null;
+//
+//                final TreePath curPath = treeMass.getPathForLocation(evt.getX(), evt.getY());
+//                DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
+//                treeMass.setSelectionPath(curPath);
+//                final ListElement le = (ListElement) dmtn.getUserObject();
+//                Object[] o = (Object[]) le.getObject();
+//                //Object[] o = new Object[]{beschreibung, zeit, new Vector(), new Vector(), typ, 0d};
+//                //Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(selected)};
+//                Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
+////            String label = le.getValue();
+////            Double zeit = (Double) o[ParserMassnahmen.O_ZEIT];
+////            Double sum = (Double) o[ParserMassnahmen.O_SUMME];
+//                final int typ = (Integer) o[ParserMassnahmen.O_TYP];
+//
+//
+//                // Aufbau Kontextmenü
+//                // ==================
+//                // (1) Erschwernis / Erleichterung ->  Nummer 1
+//                //                                     Nummer 2
+//                // ------------------------------------------------------------
+//                // Neu  ->  (2) Teilschritt (Nur Unterhalb Vorber... Nachber.. Durchf...)
+//                //          (3) Durchführung (nur Unterhalb Root)
+//                //          (4) Erschwernis / Erleichterung
+//                // Bearbeiten -> (5) (je nachdem, was markiert ist, nicht bei ROOT)
+//                //               (6)   Erschwernis / Erleichterung Nummer 1 (NUR WENN VORHANDEN)
+//                //                                                 Nummer 2
+//                // Löschen  ->  (7)(je nachdem, was markiert ist)
+//                //              (8)    Erschwernis / Erleichterung ->  Nummer 1
+//                //                                                     Nummer 2
+//                // --------------------------------------------------------------
+//                // Baum aus Vorlage zurück setzen (9)
+//                // Ausschneiden (+ Unterknoten und Modfaktoren)
+//                // Kopieren (+ Unterknoten und Modfaktoren)
+//                // Einfügen (an markierte Stelle)
+//
+//
+//                // ===
+//                // (1)
+//                // ===
+//                if (mdfs.size() > 0) { // Es gibt also mindestens eine Erleichterung.
+//                    // Dann müssen wir ein Untermenü erstellen, die eine Aufstellung aller
+//                    // MODFAKTOREN enthält.
+//                    JMenu menumod = new JMenu("Erschwernis/Erleichterung");
+//
+//                    Enumeration e = mdfs.elements();
+//                    int num = 0;
+//                    while (e.hasMoreElements()) {
+//                        Object[] thisobj = (Object[]) e.nextElement();
+//                        boolean selected = (Boolean) thisobj[4];
+//                        String lbl = thisobj[0].toString();
+//                        String beschreibung = thisobj[1].toString();
+//                        JMenuItem item = new JMenuItem(lbl);
+//                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
+//                        if (selected) {
+//                            item.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/darkcheck.png")));
+//                        }
+//                        final int t = num;
+//                        item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                Tools.selectModfaktor(t, curPath);
+//                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                                saveOK();
+//                                reloadTree();
+//                            }
+//                        });
+//                        num++;
+//                        menumod.add(item);
+//                    }
+//                    menu.add(menumod);
+//                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
+//                }
+//
+//                JMenu menunew = new JMenu("Neu");
+//                // ===
+//                // (3)
+//                // ===
+//                if (typ == ParserMassnahmen.TYPE_ROOT) {
+//                    JMenuItem item = new JMenuItem("Durchführung");
+//
+//                    final DefaultMutableTreeNode mynode = dmtn;
+//                    item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_DF, null, null, null, null});
+//                            Object[] data = dlg.showDialog();
+//                            if (data != null) {
+//                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
+//                                ListElement le = new ListElement(data[1].toString(), o);
+//                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
+//                                // Jetzt soll der neue Knoten hinten an den Baum angefügt werden. Jedoch immer VOR der Nachbereitung.
+//                                // Somit:
+//                                ((DefaultMutableTreeNode) mynode.getRoot()).insert(node, mynode.getRoot().getChildCount() - 1);
+//                                ((DefaultTreeModel) treeMass.getModel()).reload();
+//                                saveOK();
+//                            }
+//                            dlg.dispose();
+//                        }
+//                    });
+//                    menunew.add(item);
+//                }
+//                // ===
+//                // (2)
+//                // ===
+//                if (typ == ParserMassnahmen.TYPE_Vorbereitung ||
+//                        typ == ParserMassnahmen.TYPE_Nachbereitung ||
+//                        typ == ParserMassnahmen.TYPE_DF ||
+//                        typ == ParserMassnahmen.TYPE_Teilschritt) {
+//                    JMenuItem item = new JMenuItem("Teilschritt");
+//                    final DefaultMutableTreeNode mynode = dmtn;
+//                    item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_Teilschritt, null, null, null, null});
+//                            Object[] data = dlg.showDialog();
+//                            if (data != null) {
+//                                Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
+//                                ListElement le = new ListElement(data[1].toString(), o);
+//                                DefaultMutableTreeNode node = new DefaultMutableTreeNode(le);
+//                                mynode.add(node);
+//                                Enumeration expansion = treeMass.getExpandedDescendants(new TreePath(treeMass.getModel().getRoot()));
+//                                ((DefaultTreeModel) treeMass.getModel()).reload();
+//                                while (expansion.hasMoreElements()) {
+//                                    treeMass.expandPath((TreePath) expansion.nextElement());
+//                                }
+//                            }
+//                            saveOK();
+//                            dlg.dispose();
+//                        }
+//                    });
+//                    menunew.add(item);
+//                }
+//                // ===
+//                // (4)
+//                // ===
+//                JMenuItem item1 = new JMenuItem("Erschwernis/Erleichterung");
+//                final DefaultMutableTreeNode mynode1 = dmtn;
+//                item1.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, null, null, null, null});
+//                        Object[] data = dlg.showDialog();
+//                        if (data != null) {
+//                            String label = data[1].toString();
+//                            String beschreibung = data[2].toString();
+//                            double zeit = (Double) data[3];
+//                            double prozent = (Double) data[4];
+//                            Object[] modfaktor = new Object[]{label, beschreibung, zeit, prozent, new Boolean(false)};
+//                            ListElement le = (ListElement) mynode1.getUserObject();
+//                            Object[] o = (Object[]) le.getObject();
+//                            Vector mdfs = (Vector) o[ParserMassnahmen.O_MODFAKTOR];
+//                            mdfs.add(modfaktor);
+//                            reloadTree();
+//                            saveOK();
+//                        }
+//                        dlg.dispose();
+//                    }
+//                });
+//                menunew.add(item1);
+//
+//                menu.add(menunew);
+//
+//                JMenu menuedit = null;
+//                if (typ != ParserMassnahmen.TYPE_ROOT) {
+//                    menuedit = new JMenu("Bearbeiten");
+//                    // ===
+//                    // (5)
+//                    // ===
+//                    ListElement le4label = (ListElement) dmtn.getUserObject();
+//                    JMenuItem itemNode = new JMenuItem(le4label.getValue());
+//                    final DefaultMutableTreeNode mynode = dmtn;
+//                    itemNode.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            ListElement le = (ListElement) mynode.getUserObject();
+//                            Object[] o = (Object[]) le.getObject();
+//                            DlgNode dlg = new DlgNode(parent, new Object[]{typ, le.getValue(), o[0], o[1], null});
+//                            Object[] data = dlg.showDialog();
+//                            if (data != null) {
+//                                //Object[] o = new Object[]{data[2].toString(), data[3], new Vector(), new Vector(), ParserMassnahmen.TYPE_DF, 0d};
+//                                o[0] = data[2].toString();
+//                                o[1] = data[3];
+//                                ListElement newle = new ListElement(data[1].toString(), o);
+//                                mynode.setUserObject(newle);
+//                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                                saveOK();
+//                            }
+//                            dlg.dispose();
+//                        }
+//                    });
+//                    menuedit.add(itemNode);
+//                }
+//
+//
+//                // ===
+//                // (6)
+//                // ===
+//                if (mdfs.size() > 0) {
+//                    if (menuedit == null) {
+//                        menuedit = new JMenu("Bearbeiten");
+//                    }
+//                    final Vector mymdfs = mdfs;
+//                    Enumeration e = mdfs.elements();
+//                    int num = 0;
+//                    while (e.hasMoreElements()) {
+//                        Object[] thisobj = (Object[]) e.nextElement();
+//                        final boolean selected = (Boolean) thisobj[ParserMassnahmen.O_MF_SELECTED];
+//                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
+//                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
+//                        final double zeit1 = (Double) thisobj[ParserMassnahmen.O_MF_ZEIT];
+//                        final double prozent1 = (Double) thisobj[ParserMassnahmen.O_MF_PROZENT];
+//                        JMenuItem item = new JMenuItem(lbl);
+//                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
+//                        final int t = num;
+//                        item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                //{typ, le.getValue(), o[0], o[1], null}
+//                                DlgNode dlg = new DlgNode(parent, new Object[]{ParserMassnahmen.TYPE_MODFAKTOR, lbl, beschreibung, zeit1, prozent1});
+//                                Object[] data = dlg.showDialog();
+//                                if (data != null) {
+//                                    String newlabel = data[1].toString();
+//                                    String newbeschreibung = data[2].toString();
+//                                    double newzeit = (Double) data[3];
+//                                    double newprozent = (Double) data[4];
+//                                    Object[] modfaktor = new Object[]{newlabel, newbeschreibung, newzeit, newprozent, new Boolean(selected)};
+//                                    mymdfs.set(t, modfaktor);
+//                                    txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                                    saveOK();
+//                                }
+//                                dlg.dispose();
+//                            }
+//                        });
+//                        num++;
+//                        menuedit.add(item);
+//                    }
+//                }
+//                if (menuedit != null) {
+//                    menu.add(menuedit);
+//                }
+//
+//
+//                // ===
+//                // (7)
+//                // ===
+//                JMenu menudel = new JMenu("Löschen");
+//
+//                final ListElement le4label = (ListElement) dmtn.getUserObject();
+//                JMenuItem itemNode = new JMenuItem(le4label.getValue());
+//                final DefaultMutableTreeNode mynode = dmtn;
+//                itemNode.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        if (mynode.isLeaf() ||
+//                                JOptionPane.showConfirmDialog(parent, "Damit wird der ganze Teilbaum gelöscht.\n\nSind Sie sicher ?", le4label.getValue() + " entfernen ??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//                            // Drei Fälle
+//                            if (typ == ParserMassnahmen.TYPE_Teilschritt ||
+//                                    typ == ParserMassnahmen.TYPE_DF) {
+//                                mynode.removeFromParent();
+//                            } else if (typ == ParserMassnahmen.TYPE_Vorbereitung ||
+//                                    typ == ParserMassnahmen.TYPE_Nachbereitung) {
+//                                mynode.removeAllChildren();
+//                            } else { // ROOT
+//                                treeMass.setModel(new DefaultTreeModel(null));
+//                            }
+//                            ((DefaultTreeModel) treeMass.getModel()).reload();
+//                            txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                            saveOK();
+//                            SYSTools.expandAll(treeMass);
+//                        }
+//                    }
+//                });
+//                menudel.add(itemNode);
+//
+//                // ===
+//                // (8)
+//                // ===
+//                if (mdfs.size() > 0) {
+//                    menudel.add(new JSeparator());
+//                    final Vector mymdfs = mdfs;
+//                    Enumeration e = mdfs.elements();
+//                    int num = 0;
+//                    //final DefaultMutableTreeNode mynode = dmtn;
+//                    while (e.hasMoreElements()) {
+//                        Object[] thisobj = (Object[]) e.nextElement();
+//                        final String lbl = thisobj[ParserMassnahmen.O_MF_LABEL].toString();
+//                        final String beschreibung = thisobj[ParserMassnahmen.O_MF_BESCHREIBUNG].toString();
+//                        JMenuItem item = new JMenuItem(lbl);
+//                        item.setToolTipText(beschreibung.equals("") ? null : beschreibung);
+//                        final int t = num;
+//                        item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                                mymdfs.remove(t);
+//                                txtDauer.setText(Double.toString(Tools.calculateTree(treeMass.getModel(), sm)));
+//                            }
+//                        });
+//                        num++;
+//                        menudel.add(item);
+//                    }
+//                    saveOK();
+//                }
+//                menu.add(menudel);
+//
+//                // ===
+//                // (9)
+//                // ===
+//                menu.add(new JSeparator());
+//                JMenuItem menurestore = new JMenuItem("Baum auf Ausgangszustand zurücksetzen");
+//                menurestore.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Ausgangszustand zurücksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//                            createTree(SYSTools.catchNull(template.get("XML")));
+//                        }
+//                    }
+//                });
+//                menu.add(menurestore);
+//
+//                // ===
+//                // (10)
+//                // ===
+//                JMenuItem menutemplate = new JMenuItem("Baum auf Vorlage zurücksetzen");
+//                menutemplate.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        if (JOptionPane.showConfirmDialog(parent, "Wirklich ?", "Auf Vorlage zurücksetzen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//                            createTree(SYSTools.catchNull(DBRetrieve.getSingleValue("Massnahmen", "XMLT", "MassID", template.get("MassID"))));
+//                        }
+//                    }
+//                });
+//                menu.add(menutemplate);
+//            } else {
+//                JMenuItem item = new JMenuItem("Neuen Baum erstellen");
+//
+//                item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                        createNewTree();
+//                        saveOK();
+//                    }
+//                });
+//                menu.add(item);
+//                item.setEnabled(treeMass.getModel().getRoot() == null);
+//            }
+//            menu.show(evt.getComponent(), evt.getX(), evt.getY());
+//            // Weiter gehts. Bring den Baum bei den Planungen zum laufen
+//        }
     }//GEN-LAST:event_treeMassMousePressed
 
     private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged

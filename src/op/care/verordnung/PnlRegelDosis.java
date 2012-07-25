@@ -80,7 +80,7 @@ public class PnlRegelDosis extends CleanablePanel {
     }
 
     private void btnToTimeActionPerformed(ActionEvent e) {
-        splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.RIGHT_LOWER_SIDE, 500);
+        splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
         if (Double.parseDouble(txtUhrzeit.getText()) == 0) {
             txtUhrzeit.setText("1.0");
         }
@@ -88,7 +88,7 @@ public class PnlRegelDosis extends CleanablePanel {
     }
 
     private void btnToTimeOfDayActionPerformed(ActionEvent e) {
-        splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.LEFT_UPPER_SIDE, 500);
+        splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
         if (!isAtLeastOneTxtFieldNotZero()) {
             txtUhrzeit.setText("1.0");
         }

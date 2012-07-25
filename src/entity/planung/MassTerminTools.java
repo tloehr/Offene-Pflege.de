@@ -88,7 +88,7 @@ public class MassTerminTools {
 
         result += "</table>";
 
-        result += SYSTools.catchNull(termin.getBemerkung(), "<br/><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "");
+        result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
         if (termin.isErforderlich()) {
             result += "<div id=\"fonttext\"><font color=\"blue\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".floatinginterventions") + "</font></div>";

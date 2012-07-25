@@ -76,6 +76,9 @@ public class SYSTools {
     public static final boolean RIGHT_LOWER_SIDE = true;
     public static final boolean MUST_BE_POSITIVE = true;
 
+    public static final int SPEED_NORMAL = 500;
+    public static final int SPEED_SLOW = 700;
+
     /**
      *
      */

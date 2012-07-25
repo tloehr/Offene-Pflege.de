@@ -27,7 +27,6 @@
 package op.care.planung;
 
 import op.OPDE;
-import op.care.DFNImport;
 import op.tools.*;
 
 import javax.swing.*;
@@ -177,7 +176,7 @@ public class DBHandling {
                     stmt.close();
 
                     // DFN abgleichen.
-                    DFNImport.importDFN(neuPlanid, SYSCalendar.nowDB(), 0);
+//                    DFNImport.importDFN(neuPlanid, SYSCalendar.nowDB(), 0);
 
                 } // WHILE
                 if (doCommit) {
@@ -332,45 +331,45 @@ public class DBHandling {
         return detail;
     }
 
-    public static ArrayList loadBibliothek(String suche, String bwkennung) {
-        String sql;
-        ArrayList detail = new ArrayList();
-
-        if (!SYSTools.catchNull(suche).equals("")) {
-            suche = op.tools.DBHandling.createSearchPattern(suche);
-            // Zusammenstellen der Bibliothek
-
-            // Einzel-Massnahmen
-            PreparedStatement stmt;
-            ResultSet rs;
-
-            // Fehler: Nur aktive und Pflege- und Sozial maßnahmen anzeigen.
-            sql = "" +
-                    " SELECT m.MassID, m.Bezeichnung, m.Bezeichnung " +
-                    " FROM Massnahmen m " +
-                    " WHERE m.Aktiv = 1 AND (m.MassArt = 4 OR m.MassArt = 1) AND m.Bezeichnung LIKE ? " +
-                    " ORDER BY m.Bezeichnung";
-
-            try {
-                stmt = OPDE.getDb().db.prepareStatement(sql);
-                stmt.setString(1, suche);
-
-                rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    Object[] s = {ART_MASSNAHME, rs.getString("Bezeichnung"), rs.getLong("MassID")};
-                    detail.add(s);
-                }
-                rs.close();
-                stmt.close();
-            } // try
-            catch (SQLException se) {
-                new DlgException(se);
-            } // catch
-
-        }
-        return detail;
-    }
+//    public static ArrayList loadBibliothek(String suche, String bwkennung) {
+//        String sql;
+//        ArrayList detail = new ArrayList();
+//
+//        if (!SYSTools.catchNull(suche).equals("")) {
+//            suche = op.tools.DBHandling.createSearchPattern(suche);
+//            // Zusammenstellen der Bibliothek
+//
+//            // Einzel-Massnahmen
+//            PreparedStatement stmt;
+//            ResultSet rs;
+//
+//            // Fehler: Nur aktive und Pflege- und Sozial maßnahmen anzeigen.
+//            sql = "" +
+//                    " SELECT m.MassID, m.Bezeichnung, m.Bezeichnung " +
+//                    " FROM Massnahmen m " +
+//                    " WHERE m.Aktiv = 1 AND (m.MassArt = 4 OR m.MassArt = 1) AND m.Bezeichnung LIKE ? " +
+//                    " ORDER BY m.Bezeichnung";
+//
+//            try {
+//                stmt = OPDE.getDb().db.prepareStatement(sql);
+//                stmt.setString(1, suche);
+//
+//                rs = stmt.executeQuery();
+//
+//                while (rs.next()) {
+//                    Object[] s = {ART_MASSNAHME, rs.getString("Bezeichnung"), rs.getLong("MassID")};
+//                    detail.add(s);
+//                }
+//                rs.close();
+//                stmt.close();
+//            } // try
+//            catch (SQLException se) {
+//                new DlgException(se);
+//            } // catch
+//
+//        }
+//        return detail;
+//    }
 
     public static String getKontrolleAsHTML(Date date, String ukennung, String bemerkung, boolean abschluss) {
         String result = "";

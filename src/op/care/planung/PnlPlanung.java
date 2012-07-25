@@ -38,11 +38,9 @@ import entity.planung.PlanungTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.threads.DisplayManager;
-import op.tools.GUITools;
-import op.tools.InternalClassACL;
-import op.tools.NursingRecordsPanel;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -52,6 +50,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +75,9 @@ public class PnlPlanung extends NursingRecordsPanel {
     //    private HashMap<BWInfo, JToggleButton> bwinfo4html;
 //    private HashMap<BWInfoTyp, java.util.List<BWInfo>> bwinfos;
     private java.util.List<BWInfoKat> kategorien;
+
     private JToggleButton tbInactive;
+    private JXSearchField txtSearch;
 
     public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
     public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
@@ -562,8 +563,8 @@ public class PnlPlanung extends NursingRecordsPanel {
             }
 //            panel.setStyle(CollapsiblePane.PLAIN_STYLE);
             panel.setHorizontalAlignment(SwingConstants.LEADING);
-            panel.setBackground(kat.getBackgroundContent());
-            panel.setForeground(kat.getForegroundContent());
+            panel.setBackground(planung.isAbgesetzt() ? Color.lightGray : kat.getBackgroundContent());
+            panel.setForeground(planung.isAbgesetzt() ? SYSConst.grey80 : kat.getForegroundContent());
             panel.setOpaque(false);
             katPanel.add(panel);
             panel.setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
@@ -602,7 +603,7 @@ public class PnlPlanung extends NursingRecordsPanel {
          *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
          *
          */
-        JideButton title = GUITools.createHyperlinkButton(planung.getStichwort(), null, null);
+        JideButton title = GUITools.createHyperlinkButton(getHyperlinkButtonTextFor(planung), null, null);
 //        title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
         title.addActionListener(new ActionListener() {
@@ -675,7 +676,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                 }
             });
             titlePanelright.add(btnAdd);
-//                btnAdd.setEnabled(ersterBWInfo == null || (!ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.getBwinfotyp().isObsolete()));
+            btnAdd.setEnabled(!planung.isAbgesetzt());
         }
 
         /***
@@ -699,7 +700,9 @@ public class PnlPlanung extends NursingRecordsPanel {
                 }
             });
             titlePanelright.add(btnEdit);
+            btnEdit.setEnabled(!planung.isAbgesetzt());
         }
+
 
         /***
          *      ____        _   _                ____  _
@@ -721,7 +724,7 @@ public class PnlPlanung extends NursingRecordsPanel {
 
                 }
             });
-//                btnStop.setEnabled(ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isSingleIncident());
+            btnStop.setEnabled(!planung.isAbgesetzt());
             titlePanelright.add(btnStop);
         }
 
@@ -745,7 +748,7 @@ public class PnlPlanung extends NursingRecordsPanel {
 
                 }
             });
-//                btnDelete.setEnabled(ersterBWInfo != null && !ersterBWInfo.isHeimaufnahme() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints());
+            btnDelete.setEnabled(!planung.isAbgesetzt());
             titlePanelright.add(btnDelete);
         }
 
@@ -789,7 +792,6 @@ public class PnlPlanung extends NursingRecordsPanel {
          *      \___\___/|_|\_| |_| |___|_|\_| |_|
          *
          */
-
         JTextPane contentPane = new JTextPane();
         contentPane.setContentType("text/html");
         contentPane.setText(SYSTools.toHTML(PlanungTools.getAsHTML(planung, false)));
@@ -799,15 +801,17 @@ public class PnlPlanung extends NursingRecordsPanel {
         } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
-
-//            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
-
+        panelForPlanung.setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
 
         return panelForPlanung;
     }
 
     public void refreshDisplay() {
-
+        for (BWInfoKat kat : kategorien) {
+            for (Planung planung : planungen.get(kat)) {
+                planungCollapsiblePaneMap.get(planung).setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
+            }
+        }
     }
 
     private void prepareSearchArea() {
@@ -838,9 +842,32 @@ public class PnlPlanung extends NursingRecordsPanel {
         searchPanes.addExpansion();
     }
 
+    private String getHyperlinkButtonTextFor(Planung planung) {
+        String result = planung.getStichwort() + " ";
+
+        if (planung.isAbgesetzt()) {
+            result += DateFormat.getDateInstance().format(planung.getVon()) + " &rarr; " + DateFormat.getDateInstance().format(planung.getBis());
+        } else {
+            result += DateFormat.getDateInstance().format(planung.getVon()) + " &rarr;| ";
+        }
+
+        return SYSTools.toHTMLForScreen(result);
+    }
+
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
+
+        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setInstantSearchDelay(750);
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        list.add(txtSearch);
+
         tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
         tbInactive.addItemListener(new ItemListener() {
             @Override

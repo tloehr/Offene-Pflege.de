@@ -28,13 +28,17 @@ package op.care.planung;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
+import entity.Intervention;
 import entity.info.BWInfoKat;
-import entity.info.BWInfoKatTools;
+import entity.planung.MassTermin;
 import entity.planung.Planung;
 import op.OPDE;
-import op.care.DFNImport;
-import op.tools.*;
+import op.care.planung.massnahmen.PnlSelectIntervention;
+import op.tools.GUITools;
+import op.tools.MyJDialog;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import tablemodels.TMPlanung;
@@ -43,15 +47,12 @@ import tablerenderer.RNDHTML;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * @author root
@@ -107,6 +108,33 @@ public class DlgPlanung extends MyJDialog {
 
         jspPlanung.dispatchEvent(new ComponentEvent(jspPlanung, ComponentEvent.COMPONENT_RESIZED));
         tblPlanung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+    }
+
+    private void btnAddInterventionActionPerformed(ActionEvent e) {
+        final JidePopup popup = new JidePopup();
+
+        PnlSelectIntervention pnlSelectIntervention = new PnlSelectIntervention(new Closure() {
+            @Override
+            public void execute(Object o) {
+                popup.hidePopup();
+                if (o != null) {
+                    for (Object obj : (Object[]) o) {
+                        Intervention intervention = (Intervention) obj;
+                        planung.getMassnahmen().add(new MassTermin(planung, intervention));
+                    }
+                    reloadInterventions();
+                }
+            }
+        });
+
+        popup.setMovable(false);
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+        popup.setOwner(btnAddIntervention);
+        popup.removeExcludedComponent(btnAddIntervention);
+        popup.getContentPane().add(pnlSelectIntervention);
+        popup.setDefaultFocusComponent(pnlSelectIntervention);
+        GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
     }
 
 //    private void reloadBibliothek() {
@@ -185,14 +213,14 @@ public class DlgPlanung extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, default",
-            "fill:default, $lgap, default, $rgap, pref, $lgap, default"));
+                "default, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, default",
+                "fill:default, $lgap, default, $rgap, pref, $lgap, default"));
 
         //======== jPanel5 ========
         {
             jPanel5.setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
+                    "default, $lcgap, default:grow",
+                    "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
 
             //---- jLabel4 ----
             jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -209,11 +237,11 @@ public class DlgPlanung extends MyJDialog {
             jPanel5.add(jLabel5, CC.xy(1, 3));
 
             //---- cmbKategorie ----
-            cmbKategorie.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbKategorie.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbKategorie.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel5.add(cmbKategorie, CC.xy(3, 3));
@@ -268,8 +296,8 @@ public class DlgPlanung extends MyJDialog {
         //======== panel2 ========
         {
             panel2.setLayout(new FormLayout(
-                "default:grow",
-                "default, $lgap, default"));
+                    "default:grow",
+                    "default, $lgap, default"));
 
             //======== jspPlanung ========
             {
@@ -282,15 +310,15 @@ public class DlgPlanung extends MyJDialog {
 
                 //---- tblPlanung ----
                 tblPlanung.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblPlanung.addMouseListener(new MouseAdapter() {
                     @Override
@@ -313,6 +341,12 @@ public class DlgPlanung extends MyJDialog {
                 btnAddIntervention.setBorderPainted(false);
                 btnAddIntervention.setBorder(null);
                 btnAddIntervention.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+                btnAddIntervention.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAddInterventionActionPerformed(e);
+                    }
+                });
                 panel3.add(btnAddIntervention);
             }
             panel2.add(panel3, CC.xy(1, 3));
@@ -365,7 +399,7 @@ public class DlgPlanung extends MyJDialog {
         int textWidth = dim.width - 25;
         TableColumnModel tcm1 = tblPlanung.getColumnModel();
         tcm1.getColumn(0).setPreferredWidth(textWidth);
-        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString(PnlPlanung.internalClassID+".interventions"));
+        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions"));
     }//GEN-LAST:event_jspPlanungComponentResized
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -373,7 +407,7 @@ public class DlgPlanung extends MyJDialog {
         dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void save(){
+    private void save() {
 
     }
 
@@ -451,7 +485,6 @@ public class DlgPlanung extends MyJDialog {
 //
 //        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
 //    }//GEN-LAST:event_tblBibMousePressed
-
 
 
 //    private void saveEDIT() {

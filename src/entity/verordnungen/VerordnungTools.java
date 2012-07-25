@@ -553,9 +553,7 @@ public class VerordnungTools {
         String result = "";
 
         if (!list.isEmpty()) {
-
             Verordnung verordnung = list.get(0);
-
             result += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + BewohnerTools.getBWLabelText(verordnung.getBewohner()) : "") + "</h2>";
 
 //            if (verordnung.getBewohner().getStation() != null) {
@@ -620,7 +618,7 @@ public class VerordnungTools {
         em.lock(verordnung, LockModeType.OPTIMISTIC);
         verordnung.setAbDatum(new Date());
         verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
-        BHPTools.aufräumen(em, verordnung);
+        BHPTools.cleanup(em, verordnung);
     }
 
     public static void alleAbsetzen(EntityManager em, Bewohner bewohner) throws Exception {

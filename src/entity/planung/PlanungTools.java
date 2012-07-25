@@ -41,10 +41,11 @@ public class PlanungTools {
     public static String getAsHTML(Planung planung, boolean withHeader) {
 
         String html = "";
-        html += "<h2 id=\"fonth2\" >";
-        html += withHeader ? "Pflegeplanung &raquo;" + planung.getStichwort() + "&laquo;" : "";
-        html += "</h2>";
-
+        if (withHeader) {
+            html += "<h2 id=\"fonth2\" >";
+            html += "Pflegeplanung &raquo;" + planung.getStichwort() + "&laquo;";
+            html += "</h2>";
+        }
         html += "<div id=\"fonttext\">";
 
         html += withHeader ? "<b>Kategorie:</b> " + planung.getKategorie().getBezeichnung() + "<br/>" : "";
@@ -61,19 +62,17 @@ public class PlanungTools {
         html += "<h3 id=\"fonth3\">Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>");
         html += "<h3 id=\"fonth3\">Ziel(e):</h3>" + SYSTools.replace(planung.getZiel(), "\n", "<br/>");
 
-        html += "<h3 id=\"fonth3\">"+OPDE.lang.getString(PnlPlanung.internalClassID+".interventions")+"</h3>";
+        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</h3>";
 
         if (planung.getMassnahmen().isEmpty()) {
             html += "<ul><li><b>Massnahmen fehlen !!!</b></li></ul>";
         } else {
             html += "<ul>";
-            html += "<li><b>" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</b></li><ul>";
+//            html += "<li><b>" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</b></li><ul>";
             for (MassTermin massTermin : planung.getMassnahmen()) {
                 html += "<li>";
-                html += "";
-                html = "<div id=\"fonttext\"><b>" + massTermin.getMassnahme().getBezeichnung() + "</b> (" + massTermin.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div><br/>";
+                html += "<div id=\"fonttext\"><b>" + massTermin.getMassnahme().getBezeichnung() + "</b> (" + massTermin.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div><br/>";
                 html += MassTerminTools.getTerminAsHTML(massTermin);
-                html += "";
                 html += "</li>";
             }
             html += "</ul>";
@@ -89,7 +88,7 @@ public class PlanungTools {
             html += "</ul>";
         }
 
-        html += "</ul></ul></div>";
+        html += "</div>";
         return html;
     }
 }

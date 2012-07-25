@@ -1,7 +1,6 @@
 package entity.verordnungen;
 
-import entity.Massnahmen;
-import op.tools.SYSTools;
+import entity.Intervention;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -131,14 +130,14 @@ public class MedFormen implements Serializable {
         return anwEinheit == packEinheit;
     }
 
-    public Massnahmen getMassnahme() {
+    public Intervention getMassnahme() {
         return massnahme;
     }
 
     // N:1 Relationen
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Massnahmen massnahme;
+    private Intervention massnahme;
 
 
     @Override

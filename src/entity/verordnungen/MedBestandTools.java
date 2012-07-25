@@ -246,7 +246,7 @@ public class MedBestandTools {
                         verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                         verordnung.setAbArzt(verordnung.getAnArzt());
                         verordnung.setAbKH(verordnung.getAnKH());
-                        BHPTools.aufräumen(em, verordnung);
+                        BHPTools.cleanup(em, verordnung);
                     }
                 }
             }
@@ -379,7 +379,7 @@ public class MedBestandTools {
 
         String htmlcolor = bestand.isAbgeschlossen() ? "gray" : "red";
 
-        result += "<font face =\"" + OPDE.arial14.getFamily() + "\">";
+        result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
         result += DarreichungTools.toPrettyString(bestand.getDarreichung());
 

@@ -38,10 +38,7 @@ import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.care.med.vorrat.DlgBestand;
-import op.tools.CleanablePanel;
-import op.tools.GUITools;
-import op.tools.InternalClassACL;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -323,7 +320,7 @@ public class PnlMed extends CleanablePanel {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
                 component.setText(null);
             }
-            component.setFont(OPDE.arial14);
+            component.setFont(SYSConst.ARIAL14);
 //            setBackground(selected ? SYSConst.lightblue : Color.WHITE);
 
             return component;
@@ -361,7 +358,7 @@ public class PnlMed extends CleanablePanel {
         }
 
         txtSuche = new JXSearchField("Suchen");
-        txtSuche.setFont(OPDE.arial14);
+        txtSuche.setFont(SYSConst.ARIAL14);
         txtSuche.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -378,7 +375,7 @@ public class PnlMed extends CleanablePanel {
 
         lstPraep = new JList(new DefaultListModel());
         lstPraep.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
-        lstPraep.setFont(OPDE.arial14);
+        lstPraep.setFont(SYSConst.ARIAL14);
         lstPraep.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {

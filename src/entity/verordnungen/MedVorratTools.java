@@ -48,7 +48,7 @@ public class MedVorratTools {
 
         String htmlcolor = vorrat.isAbgeschlossen() ? "gray" : "blue";
 
-        result += "<font face =\"" + OPDE.arial14.getFamily() + "\">";
+        result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + vorrat.getVorID() + "</u></b></font>&nbsp; ";
         result += vorrat.getText();
 

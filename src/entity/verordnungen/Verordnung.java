@@ -212,7 +212,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
     private Bewohner bewohner;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Massnahmen massnahme;
+    private Intervention massnahme;
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
     private Darreichung darreichung;
@@ -246,7 +246,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Verordnung(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Massnahmen massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Verordnung(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Intervention massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.anDatum = anDatum;
         this.abDatum = abDatum;
         this.bisPackEnde = bisPackEnde;
@@ -384,11 +384,11 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
         this.darreichung = darreichung;
     }
 
-    public Massnahmen getMassnahme() {
+    public Intervention getMassnahme() {
         return massnahme;
     }
 
-    public void setMassnahme(Massnahmen massnahme) {
+    public void setMassnahme(Intervention massnahme) {
         this.massnahme = massnahme;
     }
 
