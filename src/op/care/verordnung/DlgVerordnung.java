@@ -32,6 +32,8 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import entity.planung.Intervention;
+import entity.planung.InterventionTools;
 import entity.verordnungen.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;

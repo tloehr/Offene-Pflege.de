@@ -90,7 +90,7 @@ public class MassTerminTools {
 
         result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
-        if (termin.isErforderlich()) {
+        if (termin.isFloating()) {
             result += "<div id=\"fonttext\"><font color=\"blue\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".floatinginterventions") + "</font></div>";
         }
 

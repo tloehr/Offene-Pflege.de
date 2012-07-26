@@ -1,5 +1,6 @@
-package entity;
+package entity.planung;
 
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSTools;
 

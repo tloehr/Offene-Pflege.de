@@ -49,6 +49,19 @@ public class BWInfoKatTools {
     /**
      * @return
      */
+    public static List<BWInfoKat> getCategoriesForNursingProcess() {
+        // katart below 1000 is accessible for everyone
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE b.katArt < 1000 AND b.sortierung >= 0");
+        List<BWInfoKat> result = query.getResultList();
+        em.close();
+        Collections.sort(result);
+        return result;
+    }
+
+    /**
+     * @return
+     */
     public static List<BWInfoKat> getKategorien() {
 
         String katart = "0";   // a little trick. 0 is always viable

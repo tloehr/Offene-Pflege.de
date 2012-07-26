@@ -226,7 +226,7 @@ public class SYSFiles implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof SYSFiles)) {
             return false;
         }

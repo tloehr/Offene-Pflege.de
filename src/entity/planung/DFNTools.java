@@ -1,6 +1,7 @@
 package entity.planung;
 
 import entity.system.SYSPropsTools;
+import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -294,5 +295,16 @@ public class DFNTools {
         }
         OPDE.debug("Erzeugte DFNs: " + numdfn);
         return numdfn;
+    }
+
+
+    public static long getNumDFNs(Planung planung) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.planung = :planung AND dfn.status <> :status");
+        query.setParameter("planung", planung);
+        query.setParameter("status", STATUS_OFFEN);
+        long num = (Long) query.getSingleResult();
+        em.close();
+        return num;
     }
 }

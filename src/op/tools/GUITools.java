@@ -139,7 +139,6 @@ public class GUITools {
                 // nop
             }
         }
-
         popup.showPopup(x, y);
     }
 

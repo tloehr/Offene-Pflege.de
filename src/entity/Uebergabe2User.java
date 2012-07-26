@@ -83,7 +83,7 @@ public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> 
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof Uebergabe2User)) {
             return false;
         }

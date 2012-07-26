@@ -17,7 +17,7 @@
         <class>entity.KKasse</class>
         <class>entity.Krankenhaus</class>
         <class>entity.planung.MassTermin</class>
-        <class>entity.Intervention</class>
+        <class>entity.planung.Intervention</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PB2User</class>
         <class>entity.PBerichtTAGS</class>

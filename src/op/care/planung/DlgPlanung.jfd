@@ -562,6 +562,10 @@
               </object> 
              </object> 
             </void> 
+            <void method="setProperty"> 
+             <string>autoResizeMode</string> 
+             <int>4</int> 
+            </void> 
             <void property="name"> 
              <string>tblPlanung</string> 
             </void> 

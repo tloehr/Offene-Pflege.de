@@ -11,6 +11,7 @@ import entity.vorgang.SYSPLAN2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.OPDE;
 import op.tools.SYSConst;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -110,6 +111,9 @@ public class Planung implements Serializable, VorgangElement {
         massnahmen = new ArrayList<MassTermin>();
         kontrollen = new ArrayList<PlanKontrolle>();
         attachedVorgaenge = new ArrayList<SYSPLAN2VORGANG>();
+        nKontrolle = new DateTime().plusWeeks(4).toDate();
+        von = new Date();
+        bis = SYSConst.DATE_BIS_AUF_WEITERES;
     }
 
     public Long getPlanID() {
@@ -259,7 +263,7 @@ public class Planung implements Serializable, VorgangElement {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof Planung)) {
             return false;
         }

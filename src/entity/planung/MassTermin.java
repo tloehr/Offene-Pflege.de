@@ -5,7 +5,6 @@
 
 package entity.planung;
 
-import entity.Intervention;
 import op.tools.SYSCalendar;
 import org.joda.time.DateMidnight;
 
@@ -45,7 +44,7 @@ import java.util.GregorianCalendar;
         @NamedQuery(name = "MassTermin.findByErforderlich", query = "SELECT m FROM MassTermin m WHERE m.erforderlich = :erforderlich"),
         @NamedQuery(name = "MassTermin.findByLDatum", query = "SELECT m FROM MassTermin m WHERE m.lDatum = :lDatum"),
         @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer")})
-public class MassTermin implements Serializable {
+public class MassTermin implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -101,9 +100,6 @@ public class MassTermin implements Serializable {
     @Column(name = "Dauer")
     private BigDecimal dauer;
     @Lob
-    @Column(name = "XML")
-    private String xml;
-    @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
     @Version
@@ -125,6 +121,54 @@ public class MassTermin implements Serializable {
         this.taeglich = 1;
         this.lDatum = new DateMidnight().toDate();
         this.dauer = massnahme.getDauer();
+        this.planung = planung;
+        this.massnahme = massnahme;
+
+        this.nachtMo = 0;
+        this.mittags = 0;
+        this.nachmittags = 0;
+        this.abends = 0;
+        this.nachtAb = 0;
+        this.uhrzeitAnzahl = 0;
+        this.uhrzeit = null;
+        this.woechentlich = 0;
+        this.monatlich = 0;
+        this.tagNum = 0;
+        this.mon = 0;
+        this.die = 0;
+        this.mit = 0;
+        this.don = 0;
+        this.fre = 0;
+        this.sam = 0;
+        this.son = 0;
+        this.erforderlich = false;
+        this.bemerkung = null;
+    }
+
+    public MassTermin(Short nachtMo, Short morgens, Short mittags, Short nachmittags, Short abends, Short nachtAb, Short uhrzeitAnzahl, Date uhrzeit, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Boolean erforderlich, Date lDatum, BigDecimal dauer, String bemerkung, Planung planung, Intervention massnahme) {
+        this.nachtMo = nachtMo;
+        this.morgens = morgens;
+        this.mittags = mittags;
+        this.nachmittags = nachmittags;
+        this.abends = abends;
+        this.nachtAb = nachtAb;
+        this.uhrzeitAnzahl = uhrzeitAnzahl;
+        this.uhrzeit = uhrzeit;
+        this.taeglich = taeglich;
+        this.woechentlich = woechentlich;
+        this.monatlich = monatlich;
+        this.tagNum = tagNum;
+        this.mon = mon;
+        this.die = die;
+        this.mit = mit;
+        this.don = don;
+        this.fre = fre;
+        this.sam = sam;
+        this.son = son;
+        this.erforderlich = erforderlich;
+        this.lDatum = lDatum;
+        this.dauer = dauer;
+        this.bemerkung = bemerkung;
         this.planung = planung;
         this.massnahme = massnahme;
     }
@@ -289,12 +333,12 @@ public class MassTermin implements Serializable {
         this.son = son;
     }
 
-    public Boolean isErforderlich() {
+    public Boolean isFloating() {
         return erforderlich;
     }
 
-    public void setErforderlich(Boolean erforderlich) {
-        this.erforderlich = erforderlich;
+    public void setFloating(Boolean floating) {
+        this.erforderlich = floating;
     }
 
     public Date getLDatum() {
@@ -311,14 +355,6 @@ public class MassTermin implements Serializable {
 
     public void setDauer(BigDecimal dauer) {
         this.dauer = dauer;
-    }
-
-    public String getXml() {
-        return xml;
-    }
-
-    public void setXml(String xml) {
-        this.xml = xml;
     }
 
     public String getBemerkung() {
@@ -477,7 +513,7 @@ public class MassTermin implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof MassTermin)) {
             return false;
         }
@@ -493,4 +529,10 @@ public class MassTermin implements Serializable {
         return "entity.rest.MassTermin[termID=" + termID + "]";
     }
 
+
+
+    @Override
+    public MassTermin clone() {
+        return new MassTermin(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitAnzahl, uhrzeit, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, erforderlich, lDatum, dauer, bemerkung, planung, massnahme);
+    }
 }

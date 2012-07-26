@@ -19,7 +19,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class PlanungTools {
-
+    public static final String UNIQUEID = "__plankenn";
 
     public static List<Planung> findByKategorieAndBewohner(Bewohner bewohner, BWInfoKat kat) {
         EntityManager em = OPDE.createEM();

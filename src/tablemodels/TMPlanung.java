@@ -35,8 +35,10 @@ import entity.planung.MassTermin;
 import entity.planung.MassTerminTools;
 import entity.planung.Planung;
 import op.OPDE;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 
@@ -45,21 +47,26 @@ import java.util.ArrayList;
  */
 public class TMPlanung extends AbstractTableModel {
 
-    private ArrayList<MassTermin> planungsliste;
+//    private ArrayList<MassTermin> planungsliste;
     public static final int COL_TXT = 0;
-
+    public static final int COL_DEL = 1;
+    private Planung planung;
 
     public TMPlanung(Planung planung) {
         super();
-        this.planungsliste = new ArrayList<MassTermin>(planung.getMassnahmen());
+        this.planung = planung;
     }
 
     public int getRowCount() {
-        return planungsliste.size();
+        return planung.getMassnahmen().size();
     }
 
     public int getColumnCount() {
         return 1;
+    }
+
+    public MassTermin getMassTermin(int row){
+        return ((ArrayList<MassTermin>) planung.getMassnahmen()).get(row);
     }
 
     @Override
@@ -72,10 +79,15 @@ public class TMPlanung extends AbstractTableModel {
 
         switch (col) {
             case COL_TXT: {
-                String html = "";
-                html += "<b>" + planungsliste.get(row).getMassnahme().getBezeichnung() + "</b> (" + planungsliste.get(row).getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")<br/>";
-                html += MassTerminTools.getTerminAsHTML(planungsliste.get(row));
+                String html = SYSConst.html_div_open;
+                html += "<b>" + ((ArrayList<MassTermin>) planung.getMassnahmen()).get(row).getMassnahme().getBezeichnung() + "</b> (" + ((ArrayList<MassTermin>) planung.getMassnahmen()).get(row).getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")<br/>";
+                html += MassTerminTools.getTerminAsHTML(((ArrayList<MassTermin>) planung.getMassnahmen()).get(row));
+                html += SYSConst.html_div_close;
                 result = SYSTools.toHTML(html);
+                break;
+            }
+            case COL_DEL: {
+                result = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png"));
                 break;
             }
             default: {

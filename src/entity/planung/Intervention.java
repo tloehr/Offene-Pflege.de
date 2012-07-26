@@ -3,34 +3,26 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.planung;
 
+import entity.info.BWInfoKat;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "Massnahmen")
 @NamedQueries({
-    @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Intervention m"),
-    @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Intervention m WHERE m.massID = :massID"),
-    @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Intervention m WHERE m.bezeichnung = :bezeichnung"),
-    @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Intervention m WHERE m.dauer = :dauer"),
-    @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Intervention m WHERE m.massArt = :massArt"),
-    @NamedQuery(name = "Massnahmen.findByBwikid", query = "SELECT m FROM Intervention m WHERE m.bwikid = :bwikid"),
-    @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Intervention m WHERE m.aktiv = :aktiv")})
+        @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Intervention m"),
+        @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Intervention m WHERE m.massID = :massID"),
+        @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Intervention m WHERE m.bezeichnung = :bezeichnung"),
+        @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Intervention m WHERE m.dauer = :dauer"),
+        @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Intervention m WHERE m.massArt = :massArt"),
+        @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Intervention m WHERE m.aktiv = :aktiv")})
 public class Intervention implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,11 +39,12 @@ public class Intervention implements Serializable {
     @Basic(optional = false)
     @Column(name = "MassArt")
     private int massArt;
-    @Basic(optional = false)
-    @Column(name = "BWIKID")
-    private long bwikid;
     @Column(name = "Aktiv")
     private Boolean aktiv;
+
+    @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
+    @ManyToOne
+    private BWInfoKat kategorie;
 
     public Intervention() {
     }
@@ -60,12 +53,12 @@ public class Intervention implements Serializable {
         this.massID = massID;
     }
 
-    public Intervention(Long massID, String bezeichnung, BigDecimal dauer, int massArt, long bwikid) {
-        this.massID = massID;
+    public Intervention(String bezeichnung, BigDecimal dauer, int massArt, BWInfoKat kategorie) {
         this.bezeichnung = bezeichnung;
         this.dauer = dauer;
         this.massArt = massArt;
-        this.bwikid = bwikid;
+        this.kategorie = kategorie;
+        this.aktiv = true;
     }
 
     public Long getMassID() {
@@ -100,12 +93,12 @@ public class Intervention implements Serializable {
         this.massArt = massArt;
     }
 
-    public long getBwikid() {
-        return bwikid;
+    public BWInfoKat getKategorie() {
+        return kategorie;
     }
 
-    public void setBwikid(long bwikid) {
-        this.bwikid = bwikid;
+    public void setKategorie(BWInfoKat kategorie) {
+        this.kategorie = kategorie;
     }
 
     public Boolean getAktiv() {

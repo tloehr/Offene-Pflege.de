@@ -1,7 +1,6 @@
 package entity.planung;
 
 import entity.Bewohner;
-import entity.Intervention;
 import entity.Users;
 
 import javax.persistence.*;
@@ -102,7 +101,7 @@ public class DFN implements Serializable {
         this.planung = massTermin.getPlanung();
         this.dauer = massTermin.getDauer();
         this.bewohner = massTermin.getPlanung().getBewohner();
-        this.erforderlich = massTermin.isErforderlich();
+        this.erforderlich = massTermin.isFloating();
         this.soll = soll;
         this.version = 0l;
         this.sZeit = sZeit;
@@ -224,7 +223,7 @@ public class DFN implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof DFN)) {
             return false;
         }

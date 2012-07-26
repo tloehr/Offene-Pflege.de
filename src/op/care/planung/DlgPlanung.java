@@ -30,38 +30,37 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
-import entity.Intervention;
-import entity.info.BWInfoKat;
+import entity.info.BWInfoKatTools;
+import entity.planung.Intervention;
 import entity.planung.MassTermin;
 import entity.planung.Planung;
 import op.OPDE;
 import op.care.planung.massnahmen.PnlSelectIntervention;
+import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.MyJDialog;
-import op.tools.SYSTools;
+import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import tablemodels.TMPlanung;
 import tablerenderer.RNDHTML;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Collections;
 import java.util.Date;
 
 /**
  * @author root
  */
 public class DlgPlanung extends MyJDialog {
-
+    public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung";
     private Closure actionBlock;
     private Planung planung;
     private JPopupMenu menu;
+    Action delete;
 
     /**
      * Creates new form DlgPlanung
@@ -77,13 +76,7 @@ public class DlgPlanung extends MyJDialog {
     }
 
     private void initDialog() {
-
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE b.katArt < 1000 AND b.sortierung >= 0");
-        java.util.List<BWInfoKat> result = query.getResultList();
-        em.close();
-        Collections.sort(result);
-        cmbKategorie.setModel(SYSTools.list2cmb(result));
+        cmbKategorie.setModel(new DefaultComboBoxModel(BWInfoKatTools.getCategoriesForNursingProcess().toArray()));
 
         txtStichwort.setText(planung.getStichwort());
         txtSituation.setText(planung.getSituation());
@@ -92,6 +85,11 @@ public class DlgPlanung extends MyJDialog {
         jdcKontrolle.setMinSelectableDate(new Date());
         cmbKategorie.setSelectedItem(planung.getKategorie());
         reloadInterventions();
+
+        String mode = "new";
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + "." + mode), 5));
+
+
     }
 
     @Override
@@ -102,17 +100,26 @@ public class DlgPlanung extends MyJDialog {
     }
 
     private void reloadInterventions() {
-
         tblPlanung.setModel(new TMPlanung(planung));
         tblPlanung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_TXT).setCellRenderer(new RNDHTML());
+        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_TXT).setHeaderValue(OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions"));
 
-        jspPlanung.dispatchEvent(new ComponentEvent(jspPlanung, ComponentEvent.COMPONENT_RESIZED));
-        tblPlanung.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+//        new RNDButton(tblPlanung, delete, TMPlanung.COL_DEL);
+//        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_DEL).setCellRenderer(delbutton);
+//        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_DEL).setCellEditor(delbutton);
     }
 
     private void btnAddInterventionActionPerformed(ActionEvent e) {
+        /***
+         *      _     _            _       _     _
+         *     | |__ | |_ _ __    / \   __| | __| |
+         *     | '_ \| __| '_ \  / _ \ / _` |/ _` |
+         *     | |_) | |_| | | |/ ___ \ (_| | (_| |
+         *     |_.__/ \__|_| |_/_/   \_\__,_|\__,_|
+         *
+         */
         final JidePopup popup = new JidePopup();
-
         PnlSelectIntervention pnlSelectIntervention = new PnlSelectIntervention(new Closure() {
             @Override
             public void execute(Object o) {
@@ -151,31 +158,51 @@ public class DlgPlanung extends MyJDialog {
 //
 //    }
 
-    private void saveOK() {
-        // Gründe, warum man nicht speichern kann.
-        boolean stichwortXX = txtStichwort.getText().trim().equals("");
-        boolean datumXX = jdcKontrolle.getDate() == null;
-        boolean kategorieXX = cmbKategorie.getSelectedIndex() < 0;
+    /**
+     * Reasons why you couldn't save it
+     *
+     * @return
+     */
+    private boolean saveOK() {
+//        boolean datumXX = jdcKontrolle.getDate() == null;
+//        boolean kategorieXX = cmbKategorie.getSelectedIndex() < 0;
 //        boolean situationXX1 = (editMode == CHANGE_MODE && txtSituation.getText().equals(""));
 //        boolean situationXX2 = (editMode == CHANGE_MODE && txtSituation.getText().equalsIgnoreCase(oldSituation));
 //        boolean zieleXX1 = (editMode == CHANGE_MODE && txtZiele.getText().equals(""));
 //        boolean zieleXX2 = (editMode == CHANGE_MODE && txtZiele.getText().equalsIgnoreCase(oldZiele));
-        btnSave.setEnabled(!(stichwortXX || datumXX || kategorieXX)); //|| situationXX1 || situationXX2 || zieleXX1 || zieleXX2));
+//        btnSave.setEnabled(!(stichwortXX || datumXX || kategorieXX)); //|| situationXX1 || situationXX2 || zieleXX1 || zieleXX2));
 
-        if (!btnSave.isEnabled()) {
-            String ursache = "<html><body>Sie können auf dem / den folgenden Grund/Gründen nicht speichern:<ul>";
-            ursache += (stichwortXX ? "<li>Sie <b>müssen</b> ein Stichwort angeben.</li>" : "");
-            ursache += (datumXX ? "<li>Sie haben ein falsches datum für die nächste Kontrolle angegeben.</li>" : "");
-            ursache += (kategorieXX ? "<li>Sie haben keine Kategorie für die Planung ausgewählt.</li>" : "");
-//            ursache += (situationXX1 ? "<li>Sie haben keinen Text zur Situationsbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += (situationXX2 ? "<li>Sie haben den Text zur Situationsbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += (zieleXX1 ? "<li>Sie haben keinen Text zur Zielbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += (zieleXX2 ? "<li>Sie haben den Text zur Zielbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-            ursache += "</ul></body></html>";
-            btnSave.setToolTipText(ursache);
-        } else {
-            btnSave.setToolTipText(null);
+
+        if (txtStichwort.getText().trim().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".stichwortxx"), DisplayMessage.WARNING));
+            return false;
         }
+
+        if (jdcKontrolle.getDate() == null) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".datumxx"), DisplayMessage.WARNING));
+            return false;
+        }
+
+        if (cmbKategorie.getSelectedItem() == null) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".kategoriexx"), DisplayMessage.WARNING));
+            return false;
+        }
+
+        return true;
+//        if (!btnSave.isEnabled()) {
+//            String ursache = "<html><body>Sie können auf dem / den folgenden Grund/Gründen nicht speichern:<ul>";
+//            ursache += (stichwortXX ? "<li>Sie <b>müssen</b> ein Stichwort angeben.</li>" : "");
+//            ursache += (datumXX ? "<li>Sie haben ein falsches datum für die nächste Kontrolle angegeben.</li>" : "");
+//            ursache += (kategorieXX ? "<li>Sie haben keine Kategorie für die Planung ausgewählt.</li>" : "");
+////            ursache += (situationXX1 ? "<li>Sie haben keinen Text zur Situationsbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
+////            ursache += (situationXX2 ? "<li>Sie haben den Text zur Situationsbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
+////            ursache += (zieleXX1 ? "<li>Sie haben keinen Text zur Zielbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
+////            ursache += (zieleXX2 ? "<li>Sie haben den Text zur Zielbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
+//            ursache += "</ul></body></html>";
+//            btnSave.setToolTipText(ursache);
+//        } else {
+//            btnSave.setToolTipText(null);
+//        }
 
     }
 
@@ -320,6 +347,7 @@ public class DlgPlanung extends MyJDialog {
                                 "Title 1", "Title 2", "Title 3", "Title 4"
                         }
                 ));
+                tblPlanung.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
                 tblPlanung.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
@@ -403,89 +431,94 @@ public class DlgPlanung extends MyJDialog {
     }//GEN-LAST:event_jspPlanungComponentResized
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        save();
-        dispose();
+        if (saveOK()) {
+            dispose();
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
-
-    private void save() {
-
-    }
 
     private void tblPlanungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
         if (!evt.isPopupTrigger()) {
             return;
         }
-//        Point p = evt.getPoint();
+//
 //        ListSelectionModel lsm = tblPlanung.getSelectionModel();
 //        int row = tblPlanung.rowAtPoint(p);
 //        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
 //            lsm.setSelectionInterval(row, row);
 //        }
-//        SYSTools.unregisterListeners(menu);
-//        menu = new JPopupMenu();
-//
-//        // -------------------------------------------------
-//        JMenuItem itemPopupDelete = new JMenuItem("Entfernen");
-//        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                if (JOptionPane.showConfirmDialog(parent, "Sollen die markierten Einträge wirklich entfernt werden ?",
-//                        "Einträge entfernen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-//                    removeFromPlan();
-//                    reloadMeinePlanung();
-//                    reloadBibliothek();
-//                }
-//            }
-//        });
-//        menu.add(itemPopupDelete);
+
+        menu = new JPopupMenu();
+
+        /***
+         *      _ _                 ____                         ____       _      _
+         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __ |  _ \  ___| | ___| |_ ___
+         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \| | | |/ _ \ |/ _ \ __/ _ \
+         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) | |_| |  __/ |  __/ ||  __/
+         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/|____/ \___|_|\___|\__\___|
+         *                                    |_|         |_|
+         */
+        JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
+        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                for (int row : tblPlanung.getSelectedRows()) {
+                    planung.getMassnahmen().remove(((TMPlanung) tblPlanung.getModel()).getMassTermin(row));
+                }
+                ((TMPlanung) tblPlanung.getModel()).fireTableDataChanged();
+            }
+        });
+        menu.add(itemPopupDelete);
 //        itemPopupDelete.setEnabled(!kontrollenMarkiert());
-//
-//        // -------------------------------------------------
-//        JMenuItem itemPopupTermin = new JMenuItem("Termine der Massnahmen bearbeiten");
-//        itemPopupTermin.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                editMassnahmen();
-//                reloadMeinePlanung();
-//            }
-//        });
-//        menu.add(itemPopupTermin);
-//        itemPopupTermin.setEnabled(nurMassnahmenMarkiert());
-//
-//        // -------------------------------------------------
-//
-//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+
+        /***
+         *      _ _                 ____                        ____       _              _       _
+         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __/ ___|  ___| |__   ___  __| |_   _| | ___
+         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \___ \ / __| '_ \ / _ \/ _` | | | | |/ _ \
+         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) |__) | (__| | | |  __/ (_| | |_| | |  __/
+         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/____/ \___|_| |_|\___|\__,_|\__,_|_|\___|
+         *                                    |_|         |_|
+         */
+        final JMenuItem itemPopupSchedule = new JMenuItem(OPDE.lang.getString("misc.commands.editsheduling"), SYSConst.icon22clock);
+        itemPopupSchedule.addActionListener(new java.awt.event.ActionListener() {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                final JidePopup popup = new JidePopup();
+                // TODO: java.lang.ArrayIndexOutOfBoundsException: 0
+                int row = tblPlanung.getSelectedRows()[0];
+                MassTermin firstMassTerminWillBeTemplate = ((TMPlanung) tblPlanung.getModel()).getMassTermin(row);
+                JPanel dlg = new PnlSchedule(firstMassTerminWillBeTemplate, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            MassTermin template = (MassTermin) o;
+                            for (int row : tblPlanung.getSelectedRows()) {
+                                planung.getMassnahmen().remove(((TMPlanung) tblPlanung.getModel()).getMassTermin(row));
+                            }
+                            for (int row : tblPlanung.getSelectedRows()) {
+                                planung.getMassnahmen().add(template.clone());
+                            }
+                            popup.hidePopup();
+                            ((TMPlanung) tblPlanung.getModel()).fireTableDataChanged();
+                        }
+                    }
+                });
+
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.getContentPane().add(dlg);
+                popup.setOwner(itemPopupSchedule);
+                popup.removeExcludedComponent(itemPopupSchedule);
+                popup.setDefaultFocusComponent(dlg);
+
+                GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
+            }
+        });
+        menu.add(itemPopupSchedule);
+
+
+        Point p = evt.getPoint();
+        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_tblPlanungMousePressed
-
-//    private void tblBibMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBibMousePressed
-//        if (!evt.isPopupTrigger()) {
-//            return;
-//        }
-//        Point p = evt.getPoint();
-//        ListSelectionModel lsm = tblBib.getSelectionModel();
-//        int col = tblBib.columnAtPoint(p);
-//        int row = tblBib.rowAtPoint(p);
-//        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
-//            lsm.setSelectionInterval(row, row);
-//        }
-//        SYSTools.unregisterListeners(menu);
-//        menu = new JPopupMenu();
-//
-//        // -------------------------------------------------
-//        JMenuItem itemPopupAdd = new JMenuItem("Zur Planung hinzufügen");
-//        itemPopupAdd.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                bib2plan();
-//                reloadMeinePlanung();
-//                reloadBibliothek();
-//            }
-//        });
-//        menu.add(itemPopupAdd);
-//
-//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//    }//GEN-LAST:event_tblBibMousePressed
-
 
 //    private void saveEDIT() {
 //        HashMap hm = new HashMap();
@@ -663,129 +696,6 @@ public class DlgPlanung extends MyJDialog {
 //        }
 //    }
 
-//    private void editMassnahmen() {
-//        int[] sel = tblPlanung.getSelectedRows();
-//        //ArrayList relids = new ArrayList();
-//        ArrayList termids = new ArrayList();
-//
-//        if (sel.length > 0) {
-//            for (int r = 0; r < sel.length; r++) {
-//                int row = sel[r];
-//                //long relid = ((Long) tblPlanung.getModel().getValueAt(row, TMPlanung.COL_RELID)).longValue();
-//                long termid = ((Long) tblPlanung.getModel().getValueAt(row, TMPlanung.COL_PKID)).longValue();
-//                //relids.add(relid);
-//                termids.add(termid);
-//            }
-//
-//            DlgTermin dlg = new DlgTermin(this, termids, OPDE.getLogin().getLoginID(), false);
-//            dlg.showDialog();
-//
-//        }
-//    }
-//
-//    private boolean nurMassnahmenMarkiert() {
-//        int[] sel = tblPlanung.getSelectedRows();
-//        boolean result;
-//        if (sel.length > 0) {
-//            result = true;
-//            for (int r = 0; r < sel.length; r++) {
-//                int row = sel[r];
-//                int art = ((Integer) tblPlanung.getModel().getValueAt(row, TMPlanung.COL_ART)).intValue();
-//                if (art != DBHandling.ART_MASSNAHME) {
-//                    result = false;
-//                    r = sel.length;
-//                }
-//            }
-//        } else {
-//            result = false;
-//        }
-//        return result;
-//    }
-//
-//    private boolean kontrollenMarkiert() {
-//        int[] sel = tblPlanung.getSelectedRows();
-//        boolean result;
-//        if (sel.length > 0) {
-//            result = false;
-//            for (int r = 0; r < sel.length; r++) {
-//                int row = sel[r];
-//                int art = ((Integer) tblPlanung.getModel().getValueAt(row, TMPlanung.COL_ART)).intValue();
-//                if (art == DBHandling.ART_KONTROLLEN) {
-//                    result = true;
-//                    r = sel.length;
-//                }
-//            }
-//        } else {
-//            result = false;
-//        }
-//        return result;
-//    }
-//
-//    /**
-//     * Kopiert die markierten Zeilen der Bibliothek in den Plan.
-//     */
-//    private void bib2plan() {
-//        if (!tblBib.getSelectionModel().isSelectionEmpty()) {
-//            Connection db = OPDE.getDb().db;
-//            try {
-//                // Hier beginnt eine Transaktion
-//                db.setAutoCommit(false);
-//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//                db.commit();
-//                int[] sel = tblBib.getSelectedRows();
-//                //HashMap hm = new HashMap();
-//                for (int r = 0; r < sel.length; r++) {
-//                    int row = sel[r];
-//                    //int art = ((Integer) tblBib.getModel().getValueAt(row, TMPlanung.COL_ART)).intValue();
-//                    //String t = tblBib.getModel().getValueAt(row, TMPlanung.COL_PKID).toString();
-//                    long pkid = ((Long) tblBib.getModel().getValueAt(row, TMPlanung.COL_PKID)).longValue();
-//                    DBHandling.addMassnahme2Planung(pkid, planid);
-//                }
-//                db.commit();
-//                db.setAutoCommit(true);
-//            } catch (SQLException ex) {
-//                try {
-//                    db.rollback();
-//                    new DlgException(ex);
-//                } catch (SQLException ex1) {
-//                    System.exit(1);
-//                }
-//            }
-//        }
-//    }
-//
-//    void removeFromPlan() {
-//        if (!tblPlanung.getSelectionModel().isSelectionEmpty()) {
-//            Connection db = OPDE.getDb().db;
-//            try {
-//                // Hier beginnt eine Transaktion
-//                db.setAutoCommit(false);
-//                db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//                db.commit();
-//                int[] sel = tblPlanung.getSelectedRows();
-//                HashMap hm = new HashMap();
-//                for (int r = 0; r < sel.length; r++) {
-//                    int row = sel[r];
-//                    long termid = ((Long) tblPlanung.getModel().getValueAt(row, TMPlanung.COL_PKID)).longValue();
-//
-//                    if (op.tools.DBHandling.deleteRecords("MassTermin", "TermID", termid) < 0) {
-//                        throw new SQLException("FEHLER bei MassTermin");
-//                    }
-//
-//                    hm.clear();
-//                }
-//                db.commit();
-//                db.setAutoCommit(true);
-//            } catch (SQLException ex) {
-//                try {
-//                    db.rollback();
-//                    new DlgException(ex);
-//                } catch (SQLException ex1) {
-//                    System.exit(1);
-//                }
-//            }
-//        }
-//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel5;

@@ -33,9 +33,12 @@ import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
+import entity.planung.DFNTools;
 import entity.planung.Planung;
 import entity.planung.PlanungTools;
 import entity.system.SYSPropsTools;
+import entity.system.Unique;
+import entity.system.UniqueTools;
 import op.OPDE;
 import op.threads.DisplayManager;
 import op.tools.*;
@@ -81,7 +84,6 @@ public class PnlPlanung extends NursingRecordsPanel {
 
     public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
     public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
-
     public final Icon icon22addPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png"));
     public final Icon icon22attach = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach.png"));
     public final Icon icon22attachPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach_pressed.png"));
@@ -582,6 +584,7 @@ public class PnlPlanung extends NursingRecordsPanel {
 
     private CollapsiblePane createPanelFor(final Planung planung) {
         final CollapsiblePane panelForPlanung = new CollapsiblePane();
+        long numDFNs = DFNTools.getNumDFNs(planung);
 
         /***
          *      _   _ _____    _    ____  _____ ____
@@ -696,11 +699,43 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnEdit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
+                    new DlgPlanung(planung, new Closure() {
+                        @Override
+                        public void execute(Object planung) {
+                            if (planung != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                    Unique unique = UniqueTools.getNewUID(em, PlanungTools.UNIQUEID);
+                                    Planung myplan = em.merge((Planung) planung);
+                                    myplan.setPlanKennung(unique.getUid());
+                                    em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+//                                reloadTable();
+                            }
+                        }
+                    });
                 }
             });
             titlePanelright.add(btnEdit);
-            btnEdit.setEnabled(!planung.isAbgesetzt());
+            btnEdit.setEnabled(!planung.isAbgesetzt() && numDFNs == 0);
         }
 
 
@@ -748,7 +783,7 @@ public class PnlPlanung extends NursingRecordsPanel {
 
                 }
             });
-            btnDelete.setEnabled(!planung.isAbgesetzt());
+            btnDelete.setEnabled(!planung.isAbgesetzt() && numDFNs == 0);
             titlePanelright.add(btnDelete);
         }
 
@@ -907,7 +942,9 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
-                                    em.merge(planung);
+                                    Unique unique = UniqueTools.getNewUID(em, PlanungTools.UNIQUEID);
+                                    Planung myplan = em.merge((Planung) planung);
+                                    myplan.setPlanKennung(unique.getUid());
                                     em.getTransaction().commit();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {

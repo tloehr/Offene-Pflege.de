@@ -7,6 +7,7 @@ package entity.verordnungen;
 
 import entity.*;
 import entity.files.Sysver2file;
+import entity.planung.Intervention;
 import entity.vorgang.SYSVER2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.OPDE;
@@ -468,7 +469,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof Verordnung)) {
             return false;
         }
