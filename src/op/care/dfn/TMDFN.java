@@ -97,7 +97,7 @@ public class TMDFN
                     " dfn.Dauer, k.Sortierung " +
                     " FROM DFN dfn " +
                     " INNER JOIN Massnahmen m ON dfn.MassID = m.MassID " +
-                    " LEFT OUTER JOIN MassTermin t ON t.TermID = dfn.TermID " +
+                    " LEFT OUTER JOIN InterventionSchedule t ON t.TermID = dfn.TermID " +
                     " LEFT OUTER JOIN Planung p ON t.PlanID = p.PlanID " +
                     " LEFT OUTER JOIN BWInfoKat k ON k.BWIKID = p.BWIKID " +
                     " WHERE dfn.BWKennung = ? AND Date(dfn.Soll) = Date(?) " +

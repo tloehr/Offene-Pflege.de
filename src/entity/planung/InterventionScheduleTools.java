@@ -16,9 +16,9 @@ import java.text.DateFormat;
  * Time: 16:23
  * To change this template use File | Settings | File Templates.
  */
-public class MassTerminTools {
+public class InterventionScheduleTools {
 
-    public static String getTerminAsHTML(MassTermin termin) {
+    public static String getTerminAsHTML(InterventionSchedule termin) {
         String result = "";
 
 
@@ -97,7 +97,7 @@ public class MassTerminTools {
         return result;
     }
 
-    public static String getWiederholung(MassTermin termin) {
+    public static String getWiederholung(InterventionSchedule termin) {
         String result = "";
 
         if (termin.isTaeglich()) {

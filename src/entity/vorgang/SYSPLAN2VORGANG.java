@@ -1,6 +1,6 @@
 package entity.vorgang;
 
-import entity.planung.Planung;
+import entity.planung.NursingProcess;
 
 import javax.persistence.*;
 
@@ -17,9 +17,9 @@ import javax.persistence.*;
 @Table(name = "SYSPLAN2VORGANG")
 @NamedQueries({
         @NamedQuery(name = "SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSPLAN2VORGANG s WHERE s.planung = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
+                " SELECT s.vorgang FROM SYSPLAN2VORGANG s WHERE s.nursingProcess = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
         @NamedQuery(name = "SYSPLAN2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSPLAN2VORGANG s WHERE s.planung = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
+                " SELECT s FROM SYSPLAN2VORGANG s WHERE s.nursingProcess = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
 })
 public class SYSPLAN2VORGANG {
     @Id
@@ -38,16 +38,16 @@ public class SYSPLAN2VORGANG {
 
     @ManyToOne
     @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
-    private Planung planung;
+    private NursingProcess nursingProcess;
 
     protected SYSPLAN2VORGANG() {
     }
 
-    public SYSPLAN2VORGANG(Vorgaenge vorgang, Planung planung) {
+    public SYSPLAN2VORGANG(Vorgaenge vorgang, NursingProcess nursingProcess) {
         this.id = 0;
         this.pdca = VorgaengeTools.PDCA_OFF;
         this.vorgang = vorgang;
-        this.planung = planung;
+        this.nursingProcess = nursingProcess;
     }
 
     public short getPdca() {
@@ -66,11 +66,11 @@ public class SYSPLAN2VORGANG {
         this.vorgang = vorgang;
     }
 
-    public Planung getPlanung() {
-        return planung;
+    public NursingProcess getNursingProcess() {
+        return nursingProcess;
     }
 
-    public void setPlanung(Planung planung) {
-        this.planung = planung;
+    public void setNursingProcess(NursingProcess nursingProcess) {
+        this.nursingProcess = nursingProcess;
     }
 }

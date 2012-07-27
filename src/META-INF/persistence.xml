@@ -16,14 +16,14 @@
         <class>entity.info.ICD</class>
         <class>entity.KKasse</class>
         <class>entity.Krankenhaus</class>
-        <class>entity.planung.MassTermin</class>
+        <class>entity.planung.InterventionSchedule</class>
         <class>entity.planung.Intervention</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PB2User</class>
         <class>entity.PBerichtTAGS</class>
         <class>entity.Pflegeberichte</class>
-        <class>entity.planung.PlanKontrolle</class>
-        <class>entity.planung.Planung</class>
+        <class>entity.planung.NPControl</class>
+        <class>entity.planung.NursingProcess</class>
         <class>entity.QSQuery</class>
         <class>entity.Raeume</class>
         <class>entity.Stationen</class>

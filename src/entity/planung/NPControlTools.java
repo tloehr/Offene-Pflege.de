@@ -1,7 +1,6 @@
 package entity.planung;
 
 import java.text.DateFormat;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,9 +9,9 @@ import java.util.Date;
  * Time: 16:23
  * To change this template use File | Settings | File Templates.
  */
-public class PlanKontrolleTools {
+public class NPControlTools {
 
-    public static String getAsHTML(PlanKontrolle kontrolle) {
+    public static String getAsHTML(NPControl kontrolle) {
         String result = "";
         DateFormat df = DateFormat.getDateInstance();
         result += "<b>" + df.format(kontrolle.getDatum()) + "</b>; <u>"+kontrolle.getUser().getNameUndVorname()+"</u>; "+kontrolle.getBemerkung() ;

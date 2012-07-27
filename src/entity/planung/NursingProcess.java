@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -25,19 +26,19 @@ import java.util.Date;
 @Entity
 @Table(name = "Planung")
 @NamedQueries({
-        @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM Planung p"),
-        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM Planung p WHERE p.planID = :planID"),
+        @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM NursingProcess p"),
+        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.planID = :planID"),
         @NamedQuery(name = "Planung.findByVorgang", query = " "
-                + " SELECT p, av.pdca FROM Planung p "
+                + " SELECT p, av.pdca FROM NursingProcess p "
                 + " JOIN p.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM Planung p WHERE p.stichwort = :stichwort"),
-        @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM Planung p WHERE p.von = :von"),
-        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM Planung p WHERE p.bis = :bis"),
-        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM Planung p WHERE p.planKennung = :planKennung"),
-        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM Planung p WHERE p.nKontrolle = :nKontrolle")})
-public class Planung implements Serializable, VorgangElement {
+        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM NursingProcess p WHERE p.stichwort = :stichwort"),
+        @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM NursingProcess p WHERE p.von = :von"),
+        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.bis = :bis"),
+        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.planKennung = :planKennung"),
+        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nKontrolle = :nKontrolle")})
+public class NursingProcess implements Serializable, VorgangElement, Comparable<NursingProcess>, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -95,25 +96,26 @@ public class Planung implements Serializable, VorgangElement {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<SYSPLAN2VORGANG> attachedVorgaenge;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
-    private Collection<PlanKontrolle> kontrollen;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planung")
-    private Collection<MassTermin> massnahmen;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    private Collection<NPControl> kontrollen;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    private List<InterventionSchedule> interventionSchedules;
 
-    public Planung() {
+    public NursingProcess() {
     }
 
-    public Planung(Bewohner bewohner) {
+    public NursingProcess(Bewohner bewohner) {
         this.bewohner = bewohner;
         this.angesetztDurch = OPDE.getLogin().getUser();
-        massnahmen = new ArrayList<MassTermin>();
-        kontrollen = new ArrayList<PlanKontrolle>();
+        interventionSchedules = new ArrayList<InterventionSchedule>();
+        kontrollen = new ArrayList<NPControl>();
         attachedVorgaenge = new ArrayList<SYSPLAN2VORGANG>();
         nKontrolle = new DateTime().plusWeeks(4).toDate();
         von = new Date();
         bis = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.planKennung = -1l;
     }
 
     public Long getPlanID() {
@@ -222,14 +224,12 @@ public class Planung implements Serializable, VorgangElement {
         return bis.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
-
-
-    public Collection<PlanKontrolle> getKontrollen() {
+    public Collection<NPControl> getKontrollen() {
         return kontrollen;
     }
 
-    public Collection<MassTermin> getMassnahmen() {
-        return massnahmen;
+    public List<InterventionSchedule> getInterventionSchedule() {
+        return interventionSchedules;
     }
 
     @Override
@@ -264,14 +264,52 @@ public class Planung implements Serializable, VorgangElement {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Planung)) {
+        if (!(object instanceof NursingProcess)) {
             return false;
         }
-        Planung other = (Planung) object;
+        NursingProcess other = (NursingProcess) object;
         if ((this.planID == null && other.planID != null) || (this.planID != null && !this.planID.equals(other.planID))) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(NursingProcess nursingProcess) {
+        if (stichwort.compareTo(nursingProcess.getStichwort()) == 0){
+            return stichwort.compareTo(nursingProcess.getStichwort());
+        }
+
+        return von.compareTo(nursingProcess.getVon());
+    }
+
+    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, BWInfoKat kategorie, Collection<SYSPLAN2VORGANG> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
+        this.stichwort = stichwort;
+        this.situation = situation;
+        this.ziel = ziel;
+        this.von = von;
+        this.bis = bis;
+        this.planKennung = planKennung;
+        this.nKontrolle = nKontrolle;
+        this.version = version;
+        this.angesetztDurch = angesetztDurch;
+        this.abgesetztDurch = abgesetztDurch;
+        this.bewohner = bewohner;
+        this.kategorie = kategorie;
+        this.attachedVorgaenge = attachedVorgaenge;
+        this.kontrollen = kontrollen;
+        this.interventionSchedules = interventionSchedules;
+    }
+
+    @Override
+    public NursingProcess clone() {
+        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, bewohner,  kategorie, new ArrayList<SYSPLAN2VORGANG>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
+        for (InterventionSchedule is : interventionSchedules){
+            InterventionSchedule myIS = is.clone();
+            myIS.setNursingProcess(myNewNP);
+            myNewNP.getInterventionSchedule().add(myIS);
+        }
+        return myNewNP;
     }
 
     @Override

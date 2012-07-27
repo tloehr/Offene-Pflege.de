@@ -6,7 +6,7 @@ package entity.vorgang;
 
 import entity.*;
 import entity.info.BWInfo;
-import entity.planung.Planung;
+import entity.planung.NursingProcess;
 import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.tools.DlgException;
@@ -406,7 +406,7 @@ public class VorgaengeTools {
             complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWInfo) {
             complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (element instanceof Planung) {
+        } else if (element instanceof NursingProcess) {
             complement = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             complement = null;
@@ -452,7 +452,7 @@ public class VorgaengeTools {
             query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWInfo) {
             query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (element instanceof Planung) {
+        } else if (element instanceof NursingProcess) {
             query = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
         } else {
             query = null;

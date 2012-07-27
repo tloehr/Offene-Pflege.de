@@ -31,7 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
-import entity.planung.MassTermin;
+import entity.planung.InterventionSchedule;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -57,7 +57,7 @@ public class PnlSchedule extends JPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung.pnlschedule";
 
     private boolean ignoreEvent = false;
-    private MassTermin termin;
+    private InterventionSchedule termin;
     private Closure actionBlock;
 
     private double splitRegularPos;
@@ -68,7 +68,7 @@ public class PnlSchedule extends JPanel {
 
     private JToggleButton tbFloating;
 
-    public PnlSchedule(MassTermin termin, Closure actionBlock) {
+    public PnlSchedule(InterventionSchedule termin, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.termin = termin;
         initComponents();
@@ -301,8 +301,8 @@ public class PnlSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                    "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
-                    "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu, 2*($lgap, default)"));
+                "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
+                "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu, 2*($lgap, default)"));
 
             //======== splitRegular ========
             {
@@ -316,8 +316,8 @@ public class PnlSchedule extends JPanel {
                     pnlTageszeit.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlTageszeit.setBorder(new EtchedBorder());
                     pnlTageszeit.setLayout(new FormLayout(
-                            "6*(28dlu, $lcgap), default",
-                            "fill:default, $lgap, fill:default"));
+                        "6*(28dlu, $lcgap), default",
+                        "fill:default, $lgap, fill:default"));
 
                     //---- jLabel6 ----
                     jLabel6.setText("Nachts, fr\u00fch morgens");
@@ -495,8 +495,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                            "default, $ugap, 28dlu, $ugap, pref",
-                            "default:grow, $rgap, default"));
+                        "default, $ugap, 28dlu, $ugap, pref",
+                        "default:grow, $rgap, default"));
 
                     //---- lblUhrzeit ----
                     lblUhrzeit.setText("Dosis zur Uhrzeit");
@@ -554,8 +554,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                            "default, $lgap, pref, $lgap, default"));
+                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                        "default, $lgap, pref, $lgap, default"));
 
                     //---- label3 ----
                     label3.setText("alle");
@@ -589,14 +589,14 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                            "default, 7*(13dlu), $lcgap, default:grow",
-                            "$ugap, $lgap, default, $lgap, pref, default:grow, $lgap, $rgap"));
+                        "default, 7*(13dlu), $lcgap, default:grow",
+                        "$ugap, $lgap, default, $lgap, pref, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
-                                "default:grow, $lgap, default"));
+                            "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
+                            "default:grow, $lgap, default"));
 
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
@@ -762,8 +762,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
-                            "3*(default, $lgap), default"));
+                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
+                        "3*(default, $lgap), default"));
 
                     //---- label4 ----
                     label4.setText("jeden");
@@ -808,15 +808,15 @@ public class PnlSchedule extends JPanel {
                     pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel(new String[]{
-                            "Tag des Monats",
-                            "Montag",
-                            "Dienstag",
-                            "Mittwoch",
-                            "Donnerstag",
-                            "Freitag",
-                            "Samstag",
-                            "Sonntag"
+                    cmbTag.setModel(new DefaultComboBoxModel(new String[] {
+                        "Tag des Monats",
+                        "Montag",
+                        "Dienstag",
+                        "Mittwoch",
+                        "Donnerstag",
+                        "Freitag",
+                        "Samstag",
+                        "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
@@ -844,7 +844,7 @@ public class PnlSchedule extends JPanel {
             //======== pnlBemerkung ========
             {
                 pnlBemerkung.setBorder(new TitledBorder(null, "Kommentar zur Anwendung (Erscheint im DFN)", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                        new Font("Arial", Font.PLAIN, 14)));
+                    new Font("Arial", Font.PLAIN, 14)));
                 pnlBemerkung.setLayout(new BoxLayout(pnlBemerkung, BoxLayout.X_AXIS));
 
                 //======== jScrollPane1 ========

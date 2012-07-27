@@ -34,8 +34,9 @@ import entity.Bewohner;
 import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
 import entity.planung.DFNTools;
-import entity.planung.Planung;
-import entity.planung.PlanungTools;
+import entity.planung.InterventionSchedule;
+import entity.planung.NursingProcess;
+import entity.planung.NursingProcessTools;
 import entity.system.SYSPropsTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
@@ -45,16 +46,19 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -73,38 +77,15 @@ public class PnlPlanung extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
 
 
-    private HashMap<Planung, CollapsiblePane> planungCollapsiblePaneMap;
-    private HashMap<BWInfoKat, java.util.List<Planung>> planungen;
+    private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
+    //    private HashMap<BWInfoKat, CollapsiblePane> categoryCPMap;
+    private HashMap<BWInfoKat, java.util.List<NursingProcess>> planungen;
     //    private HashMap<BWInfo, JToggleButton> bwinfo4html;
 //    private HashMap<BWInfoTyp, java.util.List<BWInfo>> bwinfos;
     private java.util.List<BWInfoKat> kategorien;
 
     private JToggleButton tbInactive;
     private JXSearchField txtSearch;
-
-    public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
-    public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
-    public final Icon icon22addPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png"));
-    public final Icon icon22attach = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach.png"));
-    public final Icon icon22attachPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach_pressed.png"));
-    public final Icon icon22edit = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread.png"));
-    public final Icon icon22editPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread_pressed.png"));
-    public final Icon icon22gotoEnd = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png"));
-    public final Icon icon22gotoEndPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end_pressed.png"));
-    public final Icon icon22stop = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop.png"));
-    public final Icon icon22stopPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop_pressed.png"));
-    public final Icon icon48stop = new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_stop.png"));
-    public final Icon icon22delete = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png"));
-    public final Icon icon22deletePressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete_pressed.png"));
-    public final Icon icon48delete = new ImageIcon(getClass().getResource("/artwork/48x48/bw/editdelete.png"));
-    public final Icon icon22view = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag.png"));
-    public final Icon icon22viewPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag-selected.png"));
-    public final Icon icon22changePeriod = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page.png"));
-    public final Icon icon22changePeriodPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page_pressed.png"));
-    public final Icon icon16bysecond = new ImageIcon(getClass().getResource("/artwork/16x16/bw/bysecond.png"));
-    public final Icon icon16byday = new ImageIcon(getClass().getResource("/artwork/16x16/bw/byday.png"));
-    public final Icon icon16pit = new ImageIcon(getClass().getResource("/artwork/16x16/bw/pointintime.png"));
-
 
     /**
      * Creates new form PnlPlanung
@@ -127,8 +108,10 @@ public class PnlPlanung extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        planungCollapsiblePaneMap = new HashMap<Planung, CollapsiblePane>();
-        planungen = new HashMap<BWInfoKat, java.util.List<Planung>>();
+        planungCollapsiblePaneMap = new HashMap<NursingProcess, CollapsiblePane>();
+//        categoryCPMap = new HashMap<BWInfoKat, CollapsiblePane>();
+        planungen = new HashMap<BWInfoKat, java.util.List<NursingProcess>>();
+        kategorien = new ArrayList<BWInfoKat>();
         prepareSearchArea();
     }
 
@@ -146,6 +129,10 @@ public class PnlPlanung extends NursingRecordsPanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         GUITools.setBWDisplay(bewohner);
+//        categoryCPMap.clear();
+        planungCollapsiblePaneMap.clear();
+        planungen.clear();
+        kategorien.clear();
         reloadDisplay();
     }
 
@@ -485,14 +472,13 @@ public class PnlPlanung extends NursingRecordsPanel {
         } else {
 
             cpPlan.removeAll();
-            planungCollapsiblePaneMap.clear();
-            planungen.clear();
 
-            // Elmininate empty categories
-            kategorien = new ArrayList<BWInfoKat>();
-            for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
-                if (!PlanungTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
-                    kategorien.add(kat);
+            if (kategorien.isEmpty()) {
+                // Elmininate empty categories
+                for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
+                    if (!NursingProcessTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
+                        kategorien.add(kat);
+                    }
                 }
             }
 
@@ -526,6 +512,8 @@ public class PnlPlanung extends NursingRecordsPanel {
 
     private CollapsiblePane createCollapsiblePanesFor(final BWInfoKat kat) {
         final CollapsiblePane katpane = new CollapsiblePane(kat.getBezeichnung());
+//        categoryCPMap.put(kat, katpane);
+
         katpane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
@@ -534,7 +522,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                         katpane.setCollapsed(false);
                     } else {
                         // collapse all children
-                        for (Planung planung : planungen.get(kat)) {
+                        for (NursingProcess planung : planungen.get(kat)) {
                             planungCollapsiblePaneMap.get(planung).setCollapsed(true);
                         }
                         katpane.setCollapsed(true);
@@ -545,34 +533,23 @@ public class PnlPlanung extends NursingRecordsPanel {
             }
         });
         katpane.setSlidingDirection(SwingConstants.SOUTH);
-//        katpane.setStyle(CollapsiblePane.TREE_STYLE);
-//        katpane.setHorizontalAlignment(SwingConstants.LEADING);
         katpane.setBackground(kat.getBackgroundHeader());
         katpane.setForeground(kat.getForegroundHeader());
         katpane.setOpaque(false);
         JPanel katPanel = new JPanel();
+
+        if (!planungen.containsKey(kat)) {
+            planungen.put(kat, NursingProcessTools.findByKategorieAndBewohner(bewohner, kat));
+        }
+
         katPanel.setLayout(new VerticalLayout());
-
-        planungen.put(kat, PlanungTools.findByKategorieAndBewohner(bewohner, kat));
-
-        for (Planung planung : planungen.get(kat)) {
+        for (NursingProcess planung : planungen.get(kat)) {
             CollapsiblePane panel = createPanelFor(planung);
-            panel.setSlidingDirection(SwingConstants.SOUTH);
-            try {
-                panel.setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-//            panel.setStyle(CollapsiblePane.PLAIN_STYLE);
-            panel.setHorizontalAlignment(SwingConstants.LEADING);
-            panel.setBackground(planung.isAbgesetzt() ? Color.lightGray : kat.getBackgroundContent());
-            panel.setForeground(planung.isAbgesetzt() ? SYSConst.grey80 : kat.getForegroundContent());
-            panel.setOpaque(false);
             katPanel.add(panel);
-            panel.setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
             planungCollapsiblePaneMap.put(planung, panel);
         }
         katpane.setContentPane(katPanel);
+
         try {
             katpane.setCollapsed(true);
         } catch (PropertyVetoException e) {
@@ -582,7 +559,7 @@ public class PnlPlanung extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createPanelFor(final Planung planung) {
+    private CollapsiblePane createPanelFor(final NursingProcess planung) {
         final CollapsiblePane panelForPlanung = new CollapsiblePane();
         long numDFNs = DFNTools.getNumDFNs(planung);
 
@@ -635,8 +612,8 @@ public class PnlPlanung extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
-            JButton btnAdd = new JButton(icon22add);
-            btnAdd.setPressedIcon(icon22addPressed);
+            JButton btnAdd = new JButton(SYSConst.icon22add);
+            btnAdd.setPressedIcon(SYSConst.icon22addPressed);
             btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnAdd.setContentAreaFilled(false);
             btnAdd.setBorder(null);
@@ -644,16 +621,25 @@ public class PnlPlanung extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
-                    new DlgPlanung(planung, new Closure() {
+                    new DlgPlanung(planung.clone(), new Closure() {
                         @Override
-                        public void execute(Object planung) {
-                            if (planung != null) {
+                        public void execute(Object o) {
+                            if (o != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
-                                    em.merge(planung);
+                                    em.lock(em.merge(planung), LockModeType.OPTIMISTIC);
+                                    // Fetch the new Plan from the PAIR
+                                    NursingProcess myNewNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
+                                    // Close old NP
+                                    NursingProcessTools.close(planung, myNewNP.getSituation());
+                                    // Create new DFNs according to plan
+                                    DFNTools.generate(em, myNewNP.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
+                                    // Refresh Display
+                                    addNursingProcessToDisplay(myNewNP);
+                                    reloadDisplay();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -691,8 +677,8 @@ public class PnlPlanung extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {  // => ACL_MATRIX
-            JButton btnEdit = new JButton(icon22edit);
-            btnEdit.setPressedIcon(icon22editPressed);
+            JButton btnEdit = new JButton(SYSConst.icon22edit);
+            btnEdit.setPressedIcon(SYSConst.icon22editPressed);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.setContentAreaFilled(false);
             btnEdit.setBorder(null);
@@ -707,10 +693,21 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
-                                    Unique unique = UniqueTools.getNewUID(em, PlanungTools.UNIQUEID);
-                                    Planung myplan = em.merge((Planung) planung);
-                                    myplan.setPlanKennung(unique.getUid());
+                                    NursingProcess mynp = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) planung).getFirst());
+                                    em.lock(mynp, LockModeType.OPTIMISTIC);
+                                    // Schedules to delete
+                                    for (InterventionSchedule is : ((Pair<NursingProcess, ArrayList<InterventionSchedule>>) planung).getSecond()) {
+                                        em.remove(em.merge(is));
+                                    }
+                                    // No unused DFNs to delete
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess ");
+                                    delQuery.setParameter("nursingprocess", mynp);
+                                    delQuery.executeUpdate();
+                                    // Create new DFNs according to plan
+                                    DFNTools.generate(em, mynp.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
+                                    Collections.sort(planungen.get(mynp.getKategorie()));
+                                    reloadDisplay();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -748,8 +745,8 @@ public class PnlPlanung extends NursingRecordsPanel {
          *                                                     |_|
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
-            JButton btnStop = new JButton(icon22stop);
-            btnStop.setPressedIcon(icon22stopPressed);
+            JButton btnStop = new JButton(SYSConst.icon22stop);
+            btnStop.setPressedIcon(SYSConst.icon22stopPressed);
             btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnStop.setContentAreaFilled(false);
             btnStop.setBorder(null);
@@ -772,8 +769,8 @@ public class PnlPlanung extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
-            JButton btnDelete = new JButton(icon22delete);
-            btnDelete.setPressedIcon(icon22deletePressed);
+            JButton btnDelete = new JButton(SYSConst.icon22delete);
+            btnDelete.setPressedIcon(SYSConst.icon22deletePressed);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.setContentAreaFilled(false);
             btnDelete.setBorder(null);
@@ -829,13 +826,20 @@ public class PnlPlanung extends NursingRecordsPanel {
          */
         JTextPane contentPane = new JTextPane();
         contentPane.setContentType("text/html");
-        contentPane.setText(SYSTools.toHTML(PlanungTools.getAsHTML(planung, false)));
+        contentPane.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML(planung, false)));
         panelForPlanung.setContentPane(contentPane);
         try {
             panelForPlanung.setCollapsed(true);
         } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
+
+        panelForPlanung.setSlidingDirection(SwingConstants.SOUTH);
+        panelForPlanung.setHorizontalAlignment(SwingConstants.LEADING);
+        panelForPlanung.setBackground(planung.isAbgesetzt() ? Color.lightGray : planung.getKategorie().getBackgroundContent());
+        panelForPlanung.setForeground(planung.isAbgesetzt() ? SYSConst.grey80 : planung.getKategorie().getForegroundContent());
+        panelForPlanung.setOpaque(false);
+
         panelForPlanung.setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
 
         return panelForPlanung;
@@ -843,7 +847,7 @@ public class PnlPlanung extends NursingRecordsPanel {
 
     public void refreshDisplay() {
         for (BWInfoKat kat : kategorien) {
-            for (Planung planung : planungen.get(kat)) {
+            for (NursingProcess planung : planungen.get(kat)) {
                 planungCollapsiblePaneMap.get(planung).setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
             }
         }
@@ -877,8 +881,8 @@ public class PnlPlanung extends NursingRecordsPanel {
         searchPanes.addExpansion();
     }
 
-    private String getHyperlinkButtonTextFor(Planung planung) {
-        String result = planung.getStichwort() + " ";
+    private String getHyperlinkButtonTextFor(NursingProcess planung) {
+        String result = "<b>" + planung.getStichwort() + "</b> ";
 
         if (planung.isAbgesetzt()) {
             result += DateFormat.getDateInstance().format(planung.getVon()) + " &rarr; " + DateFormat.getDateInstance().format(planung.getBis());
@@ -918,6 +922,22 @@ public class PnlPlanung extends NursingRecordsPanel {
         return list;
     }
 
+    private void addNursingProcessToDisplay(NursingProcess np) {
+//        private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
+//    private HashMap<BWInfoKat, java.util.List<NursingProcess>> planungen;
+
+        if (!planungen.containsKey(np.getKategorie())) {
+            planungen.put(np.getKategorie(), new ArrayList<NursingProcess>());
+        }
+        planungen.get(np.getKategorie()).add(np);
+        Collections.sort(planungen.get(np.getKategorie()));
+
+        if (!kategorien.contains(np.getKategorie())) {
+            kategorien.add(np.getKategorie());
+        }
+        Collections.sort(kategorien);
+    }
+
     private List<Component> addCommands() {
 
         List<Component> list = new ArrayList<Component>();
@@ -934,7 +954,7 @@ public class PnlPlanung extends NursingRecordsPanel {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgPlanung(new Planung(bewohner), new Closure() {
+                    new DlgPlanung(new NursingProcess(bewohner), new Closure() {
                         @Override
                         public void execute(Object planung) {
                             if (planung != null) {
@@ -942,10 +962,13 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
-                                    Unique unique = UniqueTools.getNewUID(em, PlanungTools.UNIQUEID);
-                                    Planung myplan = em.merge((Planung) planung);
+                                    Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
+                                    NursingProcess myplan = em.merge((NursingProcess) planung);
                                     myplan.setPlanKennung(unique.getUid());
+                                    DFNTools.generate(em, myplan.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
+                                    addNursingProcessToDisplay(myplan);
+                                    reloadDisplay();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -963,7 +986,6 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
-//                                reloadTable();
                             }
                         }
                     });

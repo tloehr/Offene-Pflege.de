@@ -391,7 +391,7 @@ public class PnlInfo extends NursingRecordsPanel {
 //                                    GUITools.setBWDisplay(bewohner);
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTMLForScreen(OPDE.lang.getString(internalClassID + ".msg.isdeadnow")), 5));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isdeadnow"),5));
                                 } catch (OptimisticLockException ole) {
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                     if (em.getTransaction().isActive()) {
@@ -450,7 +450,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnBWisBack.setEnabled(false);
 //                                    reloadDisplay();
 //                                    GUITools.setBWDisplay(bewohner);
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTMLForScreen(OPDE.lang.getString(internalClassID + ".msg.hasgonenow")), 5));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.hasgonenow"), 5));
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 } catch (OptimisticLockException ole) {

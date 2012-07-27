@@ -73,6 +73,7 @@ public class OPDE {
     public static final int INFO_TIME = 2;
     public static final int WARNING_TIME = 4;
     public static final int ERROR_TIME = 4;
+    public static final int START_OF_MODULE_TIME = 6;
 
     public static final boolean CALC_MEDI = true;
 

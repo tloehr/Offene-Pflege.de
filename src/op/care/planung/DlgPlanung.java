@@ -30,15 +30,17 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
+import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
 import entity.planung.Intervention;
-import entity.planung.MassTermin;
-import entity.planung.Planung;
+import entity.planung.InterventionSchedule;
+import entity.planung.NursingProcess;
 import op.OPDE;
 import op.care.planung.massnahmen.PnlSelectIntervention;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.MyJDialog;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -48,8 +50,10 @@ import tablerenderer.RNDHTML;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -58,14 +62,14 @@ import java.util.Date;
 public class DlgPlanung extends MyJDialog {
     public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung";
     private Closure actionBlock;
-    private Planung planung;
+    private NursingProcess planung;
     private JPopupMenu menu;
-    Action delete;
+    private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
 
     /**
      * Creates new form DlgPlanung
      */
-    public DlgPlanung(Planung planung, Closure actionBlock) {
+    public DlgPlanung(NursingProcess planung, Closure actionBlock) {
         super();
         this.planung = planung;
         this.actionBlock = actionBlock;
@@ -87,16 +91,24 @@ public class DlgPlanung extends MyJDialog {
         reloadInterventions();
 
         String mode = "new";
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + "." + mode), 5));
-
-
+        if (planung.getPlanID() != null) {
+            mode = "edit";
+        } else if (planung.getPlanID() == null && planung.getPlanKennung() > -1) {
+            mode = "change";
+        }
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + "." + mode), OPDE.START_OF_MODULE_TIME));
     }
 
     @Override
     public void dispose() {
         jdcKontrolle.cleanup();
         super.dispose();
-        actionBlock.execute(planung);
+
+        if (planung == null) {
+            actionBlock.execute(null);
+        } else {
+            actionBlock.execute(new Pair<NursingProcess, ArrayList<InterventionSchedule>>(planung, listInterventionSchedule2Remove));
+        }
     }
 
     private void reloadInterventions() {
@@ -104,10 +116,6 @@ public class DlgPlanung extends MyJDialog {
         tblPlanung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblPlanung.getColumnModel().getColumn(TMPlanung.COL_TXT).setCellRenderer(new RNDHTML());
         tblPlanung.getColumnModel().getColumn(TMPlanung.COL_TXT).setHeaderValue(OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions"));
-
-//        new RNDButton(tblPlanung, delete, TMPlanung.COL_DEL);
-//        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_DEL).setCellRenderer(delbutton);
-//        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_DEL).setCellEditor(delbutton);
     }
 
     private void btnAddInterventionActionPerformed(ActionEvent e) {
@@ -127,7 +135,7 @@ public class DlgPlanung extends MyJDialog {
                 if (o != null) {
                     for (Object obj : (Object[]) o) {
                         Intervention intervention = (Intervention) obj;
-                        planung.getMassnahmen().add(new MassTermin(planung, intervention));
+                        planung.getInterventionSchedule().add(new InterventionSchedule(planung, intervention));
                     }
                     reloadInterventions();
                 }
@@ -144,19 +152,17 @@ public class DlgPlanung extends MyJDialog {
         GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
     }
 
-//    private void reloadBibliothek() {
-//        ArrayList bib = DBHandling.loadBibliothek(txtSuche.getText(), bewohner.getBWKennung());
-//
-//        tblBib.setModel(new TMPlanung(bib));
-//        tblBib.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//
-//        jspBib.dispatchEvent(new ComponentEvent(jspBib, ComponentEvent.COMPONENT_RESIZED));
-//        //tblBib.getColumnModel().getColumn(0).setCellRenderer(new RNDPlanung());
-//        tblBib.getColumnModel().getColumn(0).setCellRenderer(new RNDPlanung());
-//
-//        //btnAdd.setEnabled(!txtSuche.equals("") && tblBib.getModel().getRowCount() == 0);
-//
-//    }
+    private void txtStichwortFocusGained(FocusEvent e) {
+        ((JTextComponent) e.getSource()).selectAll();
+    }
+
+    private void txtSituationFocusGained(FocusEvent e) {
+        ((JTextComponent) e.getSource()).selectAll();
+    }
+
+    private void txtZieleFocusGained(FocusEvent e) {
+        ((JTextComponent) e.getSource()).selectAll();
+    }
 
     /**
      * Reasons why you couldn't save it
@@ -164,14 +170,6 @@ public class DlgPlanung extends MyJDialog {
      * @return
      */
     private boolean saveOK() {
-//        boolean datumXX = jdcKontrolle.getDate() == null;
-//        boolean kategorieXX = cmbKategorie.getSelectedIndex() < 0;
-//        boolean situationXX1 = (editMode == CHANGE_MODE && txtSituation.getText().equals(""));
-//        boolean situationXX2 = (editMode == CHANGE_MODE && txtSituation.getText().equalsIgnoreCase(oldSituation));
-//        boolean zieleXX1 = (editMode == CHANGE_MODE && txtZiele.getText().equals(""));
-//        boolean zieleXX2 = (editMode == CHANGE_MODE && txtZiele.getText().equalsIgnoreCase(oldZiele));
-//        btnSave.setEnabled(!(stichwortXX || datumXX || kategorieXX)); //|| situationXX1 || situationXX2 || zieleXX1 || zieleXX2));
-
 
         if (txtStichwort.getText().trim().isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".stichwortxx"), DisplayMessage.WARNING));
@@ -188,21 +186,22 @@ public class DlgPlanung extends MyJDialog {
             return false;
         }
 
+        if (planung.getInterventionSchedule().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".schedulexx"), DisplayMessage.WARNING));
+            return false;
+        }
+
+        if (txtSituation.getText().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".situationxx"), DisplayMessage.WARNING));
+            return false;
+        }
+
+        if (txtZiele.getText().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".goalxx"), DisplayMessage.WARNING));
+            return false;
+        }
+
         return true;
-//        if (!btnSave.isEnabled()) {
-//            String ursache = "<html><body>Sie können auf dem / den folgenden Grund/Gründen nicht speichern:<ul>";
-//            ursache += (stichwortXX ? "<li>Sie <b>müssen</b> ein Stichwort angeben.</li>" : "");
-//            ursache += (datumXX ? "<li>Sie haben ein falsches datum für die nächste Kontrolle angegeben.</li>" : "");
-//            ursache += (kategorieXX ? "<li>Sie haben keine Kategorie für die Planung ausgewählt.</li>" : "");
-////            ursache += (situationXX1 ? "<li>Sie haben keinen Text zur Situationsbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-////            ursache += (situationXX2 ? "<li>Sie haben den Text zur Situationsbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-////            ursache += (zieleXX1 ? "<li>Sie haben keinen Text zur Zielbeschreibung eingegeben. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-////            ursache += (zieleXX2 ? "<li>Sie haben den Text zur Zielbeschreibung nicht verändert. Bei einer Planungsänderung ist das Pflicht.</li>" : "");
-//            ursache += "</ul></body></html>";
-//            btnSave.setToolTipText(ursache);
-//        } else {
-//            btnSave.setToolTipText(null);
-//        }
 
     }
 
@@ -256,6 +255,12 @@ public class DlgPlanung extends MyJDialog {
 
             //---- txtStichwort ----
             txtStichwort.setFont(new Font("Arial", Font.BOLD, 20));
+            txtStichwort.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtStichwortFocusGained(e);
+                }
+            });
             jPanel5.add(txtStichwort, CC.xy(3, 1));
 
             //---- jLabel5 ----
@@ -282,6 +287,12 @@ public class DlgPlanung extends MyJDialog {
                 txtSituation.setRows(5);
                 txtSituation.setWrapStyleWord(true);
                 txtSituation.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtSituation.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtSituationFocusGained(e);
+                    }
+                });
                 jScrollPane3.setViewportView(txtSituation);
             }
             jPanel5.add(jScrollPane3, CC.xy(3, 5));
@@ -305,6 +316,12 @@ public class DlgPlanung extends MyJDialog {
                 txtZiele.setRows(5);
                 txtZiele.setWrapStyleWord(true);
                 txtZiele.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtZiele.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtZieleFocusGained(e);
+                    }
+                });
                 jScrollPane1.setViewportView(txtZiele);
             }
             jPanel5.add(jScrollPane1, CC.xy(3, 7));
@@ -432,6 +449,7 @@ public class DlgPlanung extends MyJDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (saveOK()) {
+            save();
             dispose();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -440,12 +458,13 @@ public class DlgPlanung extends MyJDialog {
         if (!evt.isPopupTrigger()) {
             return;
         }
-//
-//        ListSelectionModel lsm = tblPlanung.getSelectionModel();
-//        int row = tblPlanung.rowAtPoint(p);
-//        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
-//            lsm.setSelectionInterval(row, row);
-//        }
+
+        Point p = evt.getPoint();
+        ListSelectionModel lsm = tblPlanung.getSelectionModel();
+        int row = tblPlanung.rowAtPoint(p);
+        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
+            lsm.setSelectionInterval(row, row);
+        }
 
         menu = new JPopupMenu();
 
@@ -461,7 +480,8 @@ public class DlgPlanung extends MyJDialog {
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 for (int row : tblPlanung.getSelectedRows()) {
-                    planung.getMassnahmen().remove(((TMPlanung) tblPlanung.getModel()).getMassTermin(row));
+                    listInterventionSchedule2Remove.add(((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row));
+                    planung.getInterventionSchedule().remove(((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row));
                 }
                 ((TMPlanung) tblPlanung.getModel()).fireTableDataChanged();
             }
@@ -482,83 +502,54 @@ public class DlgPlanung extends MyJDialog {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 final JidePopup popup = new JidePopup();
-                // TODO: java.lang.ArrayIndexOutOfBoundsException: 0
+
+                /**
+                 * This routine uses the <b>first</b> element of the selection as the template for editing
+                 * the schedule. After the edit it clones this "template", removes the original
+                 * InterventionSchedules (copying the apropriate Intervention of every single
+                 * Schedule first) and finally creates new schedules and adds them to
+                 * the CareProcess in question.
+                 */
                 int row = tblPlanung.getSelectedRows()[0];
-                MassTermin firstMassTerminWillBeTemplate = ((TMPlanung) tblPlanung.getModel()).getMassTermin(row);
-                JPanel dlg = new PnlSchedule(firstMassTerminWillBeTemplate, new Closure() {
+                InterventionSchedule firstInterventionScheduleWillBeTemplate = ((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row);
+                JPanel dlg = new PnlSchedule(firstInterventionScheduleWillBeTemplate, new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o != null) {
-                            MassTermin template = (MassTermin) o;
+                            InterventionSchedule template = (InterventionSchedule) o;
+                            ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
                             for (int row : tblPlanung.getSelectedRows()) {
-                                planung.getMassnahmen().remove(((TMPlanung) tblPlanung.getModel()).getMassTermin(row));
+                                InterventionSchedule oldTermin = ((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row);
+                                InterventionSchedule newTermin = template.clone();
+                                newTermin.setIntervention(oldTermin.getIntervention());
+                                listInterventionSchedule2Remove.add(oldTermin);
+                                listInterventionSchedule2Add.add(newTermin);
                             }
-                            for (int row : tblPlanung.getSelectedRows()) {
-                                planung.getMassnahmen().add(template.clone());
-                            }
+                            planung.getInterventionSchedule().removeAll(listInterventionSchedule2Remove);
+                            planung.getInterventionSchedule().addAll(listInterventionSchedule2Add);
                             popup.hidePopup();
                             ((TMPlanung) tblPlanung.getModel()).fireTableDataChanged();
                         }
                     }
                 });
 
-
                 popup.setMovable(false);
                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                 popup.getContentPane().add(dlg);
-                popup.setOwner(itemPopupSchedule);
-                popup.removeExcludedComponent(itemPopupSchedule);
+                popup.setOwner(tblPlanung);
+                popup.removeExcludedComponent(tblPlanung);
                 popup.setDefaultFocusComponent(dlg);
 
-                GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
+                GUITools.showPopup(popup, SwingConstants.CENTER);
             }
         });
         menu.add(itemPopupSchedule);
 
 
-        Point p = evt.getPoint();
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_tblPlanungMousePressed
 
-//    private void saveEDIT() {
-//        HashMap hm = new HashMap();
-//        hm.put("Stichwort", txtStichwort.getText());
-//        hm.put("Situation", txtSituation.getText());
-//        hm.put("Ziel", txtZiele.getText());
-//        ListElement lel = (ListElement) cmbKategorie.getSelectedItem();
-//        hm.put("BWIKID", lel.getPk());
-//        hm.put("NKontrolle", jdcKontrolle.getDate());
-//
-//        Connection db = OPDE.getDb().db;
-//        try {
-//            // Hier beginnt eine Transaktion
-//            db.setAutoCommit(false);
-//            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//            db.commit();
-//
-//            if (!op.tools.DBHandling.updateRecord("Planung", hm, "PlanID", planid)) {
-//                throw new SQLException("Fehler bei Insert into Planung");
-//            }
-//            hm.clear();
-//            DBHandling.cleanDFN(planid);
-//            DBHandling.tmp2real(planid);
-//            DFNImport.importDFN(planid);
-//
-//            db.commit();
-//            db.setAutoCommit(true);
-//
-//        } catch (SQLException ex) {
-//            try {
-//                db.rollback();
-//            } catch (SQLException ex1) {
-//                new DlgException(ex1);
-//                ex1.printStackTrace();
-//                System.exit(1);
-//            }
-//            new DlgException(ex);
-//        }
-//    }
-//
+
 //    private void saveTEMPLATE() {
 //        HashMap hm = new HashMap();
 //        hm.put("BWKennung", bewohner.getBWKennung());
@@ -652,49 +643,13 @@ public class DlgPlanung extends MyJDialog {
 //        }
 //    }
 //
-//    private void saveNEW() {
-//        HashMap hm = new HashMap();
-//        hm.put("BWKennung", bewohner.getBWKennung());
-//        hm.put("Stichwort", txtStichwort.getText());
-//        hm.put("Situation", txtSituation.getText());
-//        hm.put("Ziel", txtZiele.getText());
-//        ListElement lel = (ListElement) cmbKategorie.getSelectedItem();
-//        hm.put("BWIKID", lel.getPk());
-//        hm.put("Von", "!NOW!");
-//        hm.put("Bis", "!BAW!");
-//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUKennung());
-//        hm.put("AbUKennung", null);
-//        hm.put("PlanKennung", OPDE.getDb().getUID("__plankenn"));
-//        hm.put("NKontrolle", jdcKontrolle.getDate());
-//
-//        Connection db = OPDE.getDb().db;
-//        try {
-//            // Hier beginnt eine Transaktion
-//            db.setAutoCommit(false);
-//            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//            db.commit();
-//            planid = op.tools.DBHandling.insertRecord("Planung", hm);
-//            if (planid < 0) {
-//                throw new SQLException("Fehler bei Insert into Planung");
-//            }
-//            hm.clear();
-//            DBHandling.tmp2real(planid);
-//            DFNImport.importDFN(planid);
-//
-//            db.commit();
-//            db.setAutoCommit(true);
-//
-//        } catch (SQLException ex) {
-//            try {
-//                db.rollback();
-//            } catch (SQLException ex1) {
-//                new DlgException(ex1);
-//                ex1.printStackTrace();
-//                System.exit(1);
-//            }
-//            new DlgException(ex);
-//        }
-//    }
+    private void save() {
+        planung.setStichwort(txtStichwort.getText().trim());
+        planung.setSituation(txtSituation.getText().trim());
+        planung.setZiel(txtZiele.getText().trim());
+        planung.setNKontrolle(jdcKontrolle.getDate());
+        planung.setKategorie((BWInfoKat) cmbKategorie.getSelectedItem());
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

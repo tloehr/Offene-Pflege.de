@@ -2,8 +2,9 @@ package op.threads;
 
 
 import op.OPDE;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
-import javax.swing.plaf.OptionPaneUI;
 import java.util.UUID;
 
 /**
@@ -31,7 +32,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
 
 
     public DisplayMessage(String message) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -42,7 +43,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, int secondsToShow) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -53,7 +54,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, int progress, int max) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -65,7 +66,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, short priority, int secondsToShow) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = priority;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -76,7 +77,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, short priority) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = priority;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -97,7 +98,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
                           long timestamp,
                           long processed,
                           int secondsToShow) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = priority;
         this.timestamp = timestamp;
         this.processed = processed;
@@ -108,7 +109,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, String classname) {
-        this.message = message;
+        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
         this.priority = IMMEDIATELY;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;

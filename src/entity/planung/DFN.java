@@ -64,7 +64,7 @@ public class DFN implements Serializable {
 
     @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
     @ManyToOne
-    private Planung planung;
+    private NursingProcess nursingProcess;
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
@@ -76,32 +76,32 @@ public class DFN implements Serializable {
 
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Intervention massnahme;
+    private Intervention intervention;
 
     @JoinColumn(name = "TermID", referencedColumnName = "TermID")
     @ManyToOne
-    private MassTermin massTermin;
+    private InterventionSchedule interventionSchedule;
 
-    public Intervention getMassnahme() {
-        return massnahme;
+    public Intervention getIntervention() {
+        return intervention;
     }
 
-    public void setMassnahme(Intervention massnahme) {
-        this.massnahme = massnahme;
+    public void setIntervention(Intervention intervention) {
+        this.intervention = intervention;
     }
 
     public DFN() {
     }
 
 
-    public DFN(MassTermin massTermin, Date soll, Byte sZeit) {
+    public DFN(InterventionSchedule interventionSchedule, Date soll, Byte sZeit) {
         // Das sieht redundant aus, dient aber der Vereinfachung
-        this.massTermin = massTermin;
-        this.massnahme = massTermin.getMassnahme();
-        this.planung = massTermin.getPlanung();
-        this.dauer = massTermin.getDauer();
-        this.bewohner = massTermin.getPlanung().getBewohner();
-        this.erforderlich = massTermin.isFloating();
+        this.interventionSchedule = interventionSchedule;
+        this.intervention = interventionSchedule.getIntervention();
+        this.nursingProcess = interventionSchedule.getNursingProcess();
+        this.dauer = interventionSchedule.getDauer();
+        this.bewohner = interventionSchedule.getNursingProcess().getBewohner();
+        this.erforderlich = interventionSchedule.isFloating();
         this.soll = soll;
         this.version = 0l;
         this.sZeit = sZeit;
@@ -134,12 +134,12 @@ public class DFN implements Serializable {
         this.iZeit = iZeit;
     }
 
-    public MassTermin getMassTermin() {
-        return massTermin;
+    public InterventionSchedule getInterventionSchedule() {
+        return interventionSchedule;
     }
 
-    public void setMassTermin(MassTermin massTermin) {
-        this.massTermin = massTermin;
+    public void setInterventionSchedule(InterventionSchedule interventionSchedule) {
+        this.interventionSchedule = interventionSchedule;
     }
 
     public Date getSoll() {
@@ -190,12 +190,12 @@ public class DFN implements Serializable {
         this.mdate = mdate;
     }
 
-    public Planung getPlanung() {
-        return planung;
+    public NursingProcess getNursingProcess() {
+        return nursingProcess;
     }
 
-    public void setPlanung(Planung planung) {
-        this.planung = planung;
+    public void setNursingProcess(NursingProcess nursingProcess) {
+        this.nursingProcess = nursingProcess;
     }
 
     public Bewohner getBewohner() {

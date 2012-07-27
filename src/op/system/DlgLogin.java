@@ -411,10 +411,10 @@ public class DlgLogin extends MyJDialog {
 ////            PreparedStatement stmtBHPCleanupSession = OPDE.getDb().db.prepareStatement(sqlBHPCleanupSession);
 ////            stmtBHPCleanupSession.executeUpdate();
 ////
-////            // Dann MassTermine löschen, die aus alten Trümmersitzungen stammen löschen.
-////            String sqlMassTerminCleanupSession = "DELETE FROM MassTermin WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
-////            PreparedStatement stmtMassTerminCleanupSession = OPDE.getDb().db.prepareStatement(sqlMassTerminCleanupSession);
-////            stmtMassTerminCleanupSession.executeUpdate();
+////            // Dann InterventionSchedulee löschen, die aus alten Trümmersitzungen stammen löschen.
+////            String sqlInterventionScheduleCleanupSession = "DELETE FROM InterventionSchedule WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
+////            PreparedStatement stmtInterventionScheduleCleanupSession = OPDE.getDb().db.prepareStatement(sqlInterventionScheduleCleanupSession);
+////            stmtInterventionScheduleCleanupSession.executeUpdate();
 //
 //            // Dann OCLogin bereinigen.
 ////            String sqlCleanupSession = "UPDATE SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID SET l.Logout=LPOL WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now()";

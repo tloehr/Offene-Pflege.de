@@ -1,7 +1,6 @@
 package entity.planung;
 
 import entity.system.SYSPropsTools;
-import entity.verordnungen.Verordnung;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -61,8 +60,8 @@ public class DFNTools {
         }
 
         Query select = em.createQuery(" " +
-                " SELECT mt FROM MassTermin mt " +
-                " JOIN mt.planung p " +
+                " SELECT mt FROM InterventionSchedule mt " +
+                " JOIN mt.nursingProcess p " +
                 // nur die Planungen, die überhaupt gültig sind
                 // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
                 // Das heisst, wenn eine Planungen heute endet, dann wird sie dennoch eingetragen.
@@ -90,14 +89,14 @@ public class DFNTools {
         select.setParameter("bis", stichtag.plusDays(1).toDateTime().minusMinutes(1).toDate());
         select.setParameter("ldatum", stichtag.toDate());
 
-        List<MassTermin> list = select.getResultList();
+        List<InterventionSchedule> list = select.getResultList();
 
         numdfn = generate(em, list, stichtag, true);
 
         Query forceQuery = em.createQuery(" UPDATE DFN d "
                 + " SET d.soll = :now "
                 + " WHERE d.erforderlich = TRUE AND d.status = :status AND d.soll < :now1 "
-                + " AND d.planung.von < :now2 AND d.planung.bis > :now3 ");
+                + " AND d.nursingProcess.von < :now2 AND d.nursingProcess.bis > :now3 ");
         forceQuery.setParameter("now", stichtag.toDate());
         forceQuery.setParameter("now1", stichtag.toDate());
         forceQuery.setParameter("now2", stichtag.toDate());
@@ -150,7 +149,7 @@ public class DFNTools {
      * @param wholeday true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
-    public static int generate(EntityManager em, List<MassTermin> list, DateMidnight stichtag, boolean wholeday) {
+    public static int generate(EntityManager em, List<InterventionSchedule> list, DateMidnight stichtag, boolean wholeday) {
 //        GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
         int maxrows = list.size();
         int numdfn = 0;
@@ -162,12 +161,12 @@ public class DFNTools {
 
         OPDE.debug("MaxRows: " + maxrows);
 
-        for (MassTermin termin : list) {
+        for (InterventionSchedule termin : list) {
 
             termin = em.merge(termin);
             em.lock(termin, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            em.lock(em.merge(termin.getPlanung()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            em.lock(termin.getPlanung().getBewohner(), LockModeType.OPTIMISTIC);
+            em.lock(em.merge(termin.getNursingProcess()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+            em.lock(termin.getNursingProcess().getBewohner(), LockModeType.OPTIMISTIC);
 
             if (!SYSCalendar.isInFuture(termin.getLDatum()) && (termin.isTaeglich() || termin.isPassenderWochentag(stichtag.toDate()) || termin.isPassenderTagImMonat(stichtag.toDate()))) {
 
@@ -176,8 +175,8 @@ public class DFNTools {
                 OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
                 OPDE.debug("==========================================");
                 OPDE.debug("MassTermin: " + termin.getTermID());
-                OPDE.debug("BWKennung: " + termin.getPlanung().getBewohner().getBWKennung());
-                OPDE.debug("PlanID: " + termin.getPlanung().getPlanID());
+                OPDE.debug("BWKennung: " + termin.getNursingProcess().getBewohner().getBWKennung());
+                OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
 
 
                 boolean treffer = false;
@@ -298,9 +297,9 @@ public class DFNTools {
     }
 
 
-    public static long getNumDFNs(Planung planung) {
+    public static long getNumDFNs(NursingProcess planung) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.planung = :planung AND dfn.status <> :status");
+        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.nursingProcess = :planung AND dfn.status <> :status");
         query.setParameter("planung", planung);
         query.setParameter("status", STATUS_OFFEN);
         long num = (Long) query.getSingleResult();

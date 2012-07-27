@@ -73,15 +73,15 @@ public class DBHandling {
             db.setAutoCommit(false);
             db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             db.commit();
-            // MassTermin --------------------------
+            // InterventionSchedule --------------------------
             String sql = "" +
-                    " INSERT INTO MassTermin (MassID, PlanID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitAnzahl," +
+                    " INSERT INTO InterventionSchedule (MassID, PlanID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitAnzahl," +
                     " Uhrzeit, Taeglich, Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, " +
                     " tmp, LDatum, Bemerkung, Erforderlich, Dauer, XML)" +
                     " SELECT m.MassID, PlanID, NachtMo, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitAnzahl, " +
                     " Uhrzeit, Taeglich, Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, " +
                     " ?, LDatum, Bemerkung, Erforderlich, Dauer, XML " +
-                    " FROM MassTermin m " +
+                    " FROM InterventionSchedule m " +
                     //" INNER JOIN Massnahmen mass ON mass.MassID = m.MassID " +
                     " WHERE m.PlanID = ? AND m.tmp = 0 ";
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
@@ -158,15 +158,15 @@ public class DBHandling {
                     }
                     hm.clear();
 
-                    // MassTermin kopieren
+                    // InterventionSchedule kopieren
                     String sql = "" +
-                            " INSERT INTO MassTermin (MassID, PlanID, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitAnzahl," +
+                            " INSERT INTO InterventionSchedule (MassID, PlanID, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitAnzahl," +
                             " Uhrzeit, Taeglich, Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, " +
                             " tmp, LDatum, Bemerkung, Erforderlich) " +
                             " SELECT MassID, ?, Morgens, Mittags, Nachmittags, Abends, NachtAb, UhrzeitAnzahl, " +
                             " Uhrzeit, Taeglich, Woechentlich, Monatlich, TagNum, Mon, Die, Mit, Don, Fre, Sam, Son, " +
                             " 0, LDatum, Bemerkung, Erforderlich " +
-                            " FROM MassTermin m " +
+                            " FROM InterventionSchedule m " +
                             " WHERE m.PlanID = ? AND m.tmp = 0 ";
                     PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
                     stmt.setLong(1, neuPlanid);
@@ -205,9 +205,9 @@ public class DBHandling {
             throws SQLException {
 
         // DEEEEEEEEELLLLEEEEEEEEEEEEEEETTTTTEEEEEEEEEEEEEEEEEEEE
-        // MassTermin
+        // InterventionSchedule
         String delete = "" +
-                " DELETE m.* FROM MassTermin m " +
+                " DELETE m.* FROM InterventionSchedule m " +
                 " WHERE m.PlanID = ? AND m.tmp = 0 ";
         PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(delete);
         stmtDel.setLong(1, planid);
@@ -218,7 +218,7 @@ public class DBHandling {
         PreparedStatement stmt;
 
         // UUUUUUUUPPPPPPPPDDDDDAAAAAAAAATTTTTTTTTTTEEEEEEEEEEEEEEEE
-        update = "UPDATE MassTermin SET PlanID=?, tmp=0 WHERE tmp = ?";
+        update = "UPDATE InterventionSchedule SET PlanID=?, tmp=0 WHERE tmp = ?";
         stmt = OPDE.getDb().db.prepareStatement(update);
         stmt.setLong(1, planid);
         stmt.setLong(2, OPDE.getLogin().getLoginID());
@@ -235,8 +235,8 @@ public class DBHandling {
             db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             db.commit();
 
-            // MassTermin
-            String delete = "DELETE FROM MassTermin WHERE tmp = ?";
+            // InterventionSchedule
+            String delete = "DELETE FROM InterventionSchedule WHERE tmp = ?";
             PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(delete);
             stmtDel.setLong(1, OPDE.getLogin().getLoginID());
             stmtDel.executeUpdate();
@@ -268,7 +268,7 @@ public class DBHandling {
                 " t.Don, t.Fre, t.Sam, t.Son, t.Taeglich, t.Woechentlich, t.Monatlich, " +
                 " t.TagNum, t.TermID, m.Bezeichnung, " +
                 " t.Erforderlich, t.LDatum, t.Bemerkung, t.Dauer" +
-                " FROM MassTermin t " +
+                " FROM InterventionSchedule t " +
                 " INNER JOIN Massnahmen m ON m.MassID = t.MassID " +
                 " WHERE t.PlanID = ? AND t.tmp = ? " +
                 " ORDER BY m.Bezeichnung ";
@@ -693,7 +693,7 @@ public class DBHandling {
     public static void addMassnahme2Planung(long massid, long planid) throws SQLException {
 
         String sql = "" +
-                " INSERT INTO MassTermin (MassID, PlanID, Morgens, Taeglich, LDatum, tmp, Dauer, XML) " +
+                " INSERT INTO InterventionSchedule (MassID, PlanID, Morgens, Taeglich, LDatum, tmp, Dauer, XML) " +
                 " VALUES (?, ?, 1, 1, now(), ?, " +
                 "   (SELECT Dauer From Massnahmen WHERE MassID = ?)," +
                 "   (SELECT XMLT From Massnahmen WHERE MassID = ?)" +
@@ -716,7 +716,7 @@ public class DBHandling {
     public static void deletePlanung(long planid) {
         try {
             String bhp = " DELETE d.*, t.*, p.* FROM Planung p " +
-                    " LEFT OUTER JOIN MassTermin t ON t.PlanID = p.PlanID " +
+                    " LEFT OUTER JOIN InterventionSchedule t ON t.PlanID = p.PlanID " +
                     " LEFT OUTER JOIN DFN d ON d.TermID = t.TermID " +
                     " WHERE p.PlanID = ? ";
             PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
@@ -736,7 +736,7 @@ public class DBHandling {
     public static void cleanDFN(long planid)
             throws SQLException {
         String bhp = " DELETE d.* FROM DFN d " +
-                " INNER JOIN MassTermin t ON t.TermID = d.TermID " +
+                " INNER JOIN InterventionSchedule t ON t.TermID = d.TermID " +
                 " INNER JOIN Planung p ON t.PlanID = p.PlanID " +
                 " WHERE p.PlanID = ? ";
         PreparedStatement stmtDel = OPDE.getDb().db.prepareStatement(bhp);
@@ -757,7 +757,7 @@ public class DBHandling {
             throws SQLException {
         int zeit = SYSCalendar.ermittleZeit(ts);
         String bhp = " DELETE d.* FROM DFN d " +
-                " INNER JOIN MassTermin t ON t.TermID = d.TermID " +
+                " INNER JOIN InterventionSchedule t ON t.TermID = d.TermID " +
                 " INNER JOIN Planung p ON t.PlanID = p.PlanID " +
                 " WHERE p.PlanID = ? AND Status = 0 AND Date(Soll)=Date(now()) AND " +
                 " (" +
@@ -848,7 +848,7 @@ public class DBHandling {
         long result = 0;
         String sql = " SELECT count(*) " +
                 " FROM DFN dfn " +
-                " INNER JOIN MassTermin t ON t.TermID = dfn.TermID " +
+                " INNER JOIN InterventionSchedule t ON t.TermID = dfn.TermID " +
                 " WHERE t.PlanID = ? AND dfn.Status > 0 ";
         try {
             PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);

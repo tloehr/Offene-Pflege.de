@@ -1197,7 +1197,7 @@ public class DlgTermin extends javax.swing.JDialog {
 
     private void initData() {
         if (termid != null && termid.size() > 0) {
-            template = DBRetrieve.getSingleRecord("MassTermin", "TermID", termid.get(0));
+            template = DBRetrieve.getSingleRecord("InterventionSchedule", "TermID", termid.get(0));
         } else {
             // Dieser Fall kann so eigentlich nicht eintreten. Keine Ahnung, warum das hier drin steht.
             template = new HashMap();
@@ -1754,8 +1754,8 @@ public class DlgTermin extends javax.swing.JDialog {
             db.commit();
 
             for (int i = 0; i < termid.size(); i++) {
-                if (!DBHandling.updateRecord("MassTermin", hm, "TermID", termid.get(i))) {
-                    throw new SQLException("Fehler bei UPDATE MassTermin");
+                if (!DBHandling.updateRecord("InterventionSchedule", hm, "TermID", termid.get(i))) {
+                    throw new SQLException("Fehler bei UPDATE InterventionSchedule");
                 }
             }
 

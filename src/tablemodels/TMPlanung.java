@@ -31,9 +31,9 @@ package tablemodels;
  * @author tloehr
  */
 
-import entity.planung.MassTermin;
-import entity.planung.MassTerminTools;
-import entity.planung.Planung;
+import entity.planung.InterventionSchedule;
+import entity.planung.InterventionScheduleTools;
+import entity.planung.NursingProcess;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -46,27 +46,24 @@ import java.util.ArrayList;
  * @author tloehr
  */
 public class TMPlanung extends AbstractTableModel {
-
-//    private ArrayList<MassTermin> planungsliste;
     public static final int COL_TXT = 0;
-    public static final int COL_DEL = 1;
-    private Planung planung;
+    private NursingProcess planung;
 
-    public TMPlanung(Planung planung) {
+    public TMPlanung(NursingProcess planung) {
         super();
         this.planung = planung;
     }
 
     public int getRowCount() {
-        return planung.getMassnahmen().size();
+        return planung.getInterventionSchedule().size();
     }
 
     public int getColumnCount() {
         return 1;
     }
 
-    public MassTermin getMassTermin(int row){
-        return ((ArrayList<MassTermin>) planung.getMassnahmen()).get(row);
+    public InterventionSchedule getInterventionSchedule(int row){
+        return planung.getInterventionSchedule().get(row);
     }
 
     @Override
@@ -80,14 +77,10 @@ public class TMPlanung extends AbstractTableModel {
         switch (col) {
             case COL_TXT: {
                 String html = SYSConst.html_div_open;
-                html += "<b>" + ((ArrayList<MassTermin>) planung.getMassnahmen()).get(row).getMassnahme().getBezeichnung() + "</b> (" + ((ArrayList<MassTermin>) planung.getMassnahmen()).get(row).getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")<br/>";
-                html += MassTerminTools.getTerminAsHTML(((ArrayList<MassTermin>) planung.getMassnahmen()).get(row));
+                html += "<b>" + planung.getInterventionSchedule().get(row).getIntervention().getBezeichnung() + "</b> (" + planung.getInterventionSchedule().get(row).getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")";
+                html += InterventionScheduleTools.getTerminAsHTML(planung.getInterventionSchedule().get(row));
                 html += SYSConst.html_div_close;
                 result = SYSTools.toHTML(html);
-                break;
-            }
-            case COL_DEL: {
-                result = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png"));
                 break;
             }
             default: {

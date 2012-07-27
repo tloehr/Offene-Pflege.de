@@ -98,7 +98,7 @@ public class DlgVerordnung extends MyJDialog {
 
     private void btnAddDosisActionPerformed(ActionEvent e) {
         if (isBedarf() && verordnung.getPlanungen().size() > 0) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.toHTML("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden."), 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden.", 2));
             return;
         }
 
@@ -889,7 +889,7 @@ public class DlgVerordnung extends MyJDialog {
 
 
         if (!ursache.isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>" + ursache + "</html>", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ursache, DisplayMessage.WARNING));
         }
         return ansetzungOK & absetzungOK & medOK & massOK & dosisVorhanden;
 

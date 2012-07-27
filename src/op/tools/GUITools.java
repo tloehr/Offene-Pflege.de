@@ -135,6 +135,11 @@ public class GUITools {
                 y = screenposition.y;
                 break;
             }
+            case SwingConstants.CENTER: {
+                x = screenposition.x + popup.getOwner().getPreferredSize().width / 2 - content.getPreferredSize().width / 2;
+                y = screenposition.y + popup.getOwner().getPreferredSize().height / 2 - content.getPreferredSize().height / 2;
+                break;
+            }
             default: {
                 // nop
             }

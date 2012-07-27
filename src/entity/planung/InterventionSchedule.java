@@ -20,31 +20,31 @@ import java.util.GregorianCalendar;
 @Entity
 @Table(name = "MassTermin")
 @NamedQueries({
-        @NamedQuery(name = "MassTermin.findAll", query = "SELECT m FROM MassTermin m"),
-        @NamedQuery(name = "MassTermin.findByTermID", query = "SELECT m FROM MassTermin m WHERE m.termID = :termID"),
-        @NamedQuery(name = "MassTermin.findByNachtMo", query = "SELECT m FROM MassTermin m WHERE m.nachtMo = :nachtMo"),
-        @NamedQuery(name = "MassTermin.findByMorgens", query = "SELECT m FROM MassTermin m WHERE m.morgens = :morgens"),
-        @NamedQuery(name = "MassTermin.findByMittags", query = "SELECT m FROM MassTermin m WHERE m.mittags = :mittags"),
-        @NamedQuery(name = "MassTermin.findByNachmittags", query = "SELECT m FROM MassTermin m WHERE m.nachmittags = :nachmittags"),
-        @NamedQuery(name = "MassTermin.findByAbends", query = "SELECT m FROM MassTermin m WHERE m.abends = :abends"),
-        @NamedQuery(name = "MassTermin.findByNachtAb", query = "SELECT m FROM MassTermin m WHERE m.nachtAb = :nachtAb"),
-        @NamedQuery(name = "MassTermin.findByUhrzeitAnzahl", query = "SELECT m FROM MassTermin m WHERE m.uhrzeitAnzahl = :uhrzeitAnzahl"),
-        @NamedQuery(name = "MassTermin.findByUhrzeit", query = "SELECT m FROM MassTermin m WHERE m.uhrzeit = :uhrzeit"),
-        @NamedQuery(name = "MassTermin.findByTaeglich", query = "SELECT m FROM MassTermin m WHERE m.taeglich = :taeglich"),
-        @NamedQuery(name = "MassTermin.findByWoechentlich", query = "SELECT m FROM MassTermin m WHERE m.woechentlich = :woechentlich"),
-        @NamedQuery(name = "MassTermin.findByMonatlich", query = "SELECT m FROM MassTermin m WHERE m.monatlich = :monatlich"),
-        @NamedQuery(name = "MassTermin.findByTagNum", query = "SELECT m FROM MassTermin m WHERE m.tagNum = :tagNum"),
-        @NamedQuery(name = "MassTermin.findByMon", query = "SELECT m FROM MassTermin m WHERE m.mon = :mon"),
-        @NamedQuery(name = "MassTermin.findByDie", query = "SELECT m FROM MassTermin m WHERE m.die = :die"),
-        @NamedQuery(name = "MassTermin.findByMit", query = "SELECT m FROM MassTermin m WHERE m.mit = :mit"),
-        @NamedQuery(name = "MassTermin.findByDon", query = "SELECT m FROM MassTermin m WHERE m.don = :don"),
-        @NamedQuery(name = "MassTermin.findByFre", query = "SELECT m FROM MassTermin m WHERE m.fre = :fre"),
-        @NamedQuery(name = "MassTermin.findBySam", query = "SELECT m FROM MassTermin m WHERE m.sam = :sam"),
-        @NamedQuery(name = "MassTermin.findBySon", query = "SELECT m FROM MassTermin m WHERE m.son = :son"),
-        @NamedQuery(name = "MassTermin.findByErforderlich", query = "SELECT m FROM MassTermin m WHERE m.erforderlich = :erforderlich"),
-        @NamedQuery(name = "MassTermin.findByLDatum", query = "SELECT m FROM MassTermin m WHERE m.lDatum = :lDatum"),
-        @NamedQuery(name = "MassTermin.findByDauer", query = "SELECT m FROM MassTermin m WHERE m.dauer = :dauer")})
-public class MassTermin implements Serializable, Cloneable {
+        @NamedQuery(name = "InterventionSchedule.findAll", query = "SELECT m FROM InterventionSchedule m"),
+        @NamedQuery(name = "InterventionSchedule.findByTermID", query = "SELECT m FROM InterventionSchedule m WHERE m.termID = :termID"),
+        @NamedQuery(name = "InterventionSchedule.findByNachtMo", query = "SELECT m FROM InterventionSchedule m WHERE m.nachtMo = :nachtMo"),
+        @NamedQuery(name = "InterventionSchedule.findByMorgens", query = "SELECT m FROM InterventionSchedule m WHERE m.morgens = :morgens"),
+        @NamedQuery(name = "InterventionSchedule.findByMittags", query = "SELECT m FROM InterventionSchedule m WHERE m.mittags = :mittags"),
+        @NamedQuery(name = "InterventionSchedule.findByNachmittags", query = "SELECT m FROM InterventionSchedule m WHERE m.nachmittags = :nachmittags"),
+        @NamedQuery(name = "InterventionSchedule.findByAbends", query = "SELECT m FROM InterventionSchedule m WHERE m.abends = :abends"),
+        @NamedQuery(name = "InterventionSchedule.findByNachtAb", query = "SELECT m FROM InterventionSchedule m WHERE m.nachtAb = :nachtAb"),
+        @NamedQuery(name = "InterventionSchedule.findByUhrzeitAnzahl", query = "SELECT m FROM InterventionSchedule m WHERE m.uhrzeitAnzahl = :uhrzeitAnzahl"),
+        @NamedQuery(name = "InterventionSchedule.findByUhrzeit", query = "SELECT m FROM InterventionSchedule m WHERE m.uhrzeit = :uhrzeit"),
+        @NamedQuery(name = "InterventionSchedule.findByTaeglich", query = "SELECT m FROM InterventionSchedule m WHERE m.taeglich = :taeglich"),
+        @NamedQuery(name = "InterventionSchedule.findByWoechentlich", query = "SELECT m FROM InterventionSchedule m WHERE m.woechentlich = :woechentlich"),
+        @NamedQuery(name = "InterventionSchedule.findByMonatlich", query = "SELECT m FROM InterventionSchedule m WHERE m.monatlich = :monatlich"),
+        @NamedQuery(name = "InterventionSchedule.findByTagNum", query = "SELECT m FROM InterventionSchedule m WHERE m.tagNum = :tagNum"),
+        @NamedQuery(name = "InterventionSchedule.findByMon", query = "SELECT m FROM InterventionSchedule m WHERE m.mon = :mon"),
+        @NamedQuery(name = "InterventionSchedule.findByDie", query = "SELECT m FROM InterventionSchedule m WHERE m.die = :die"),
+        @NamedQuery(name = "InterventionSchedule.findByMit", query = "SELECT m FROM InterventionSchedule m WHERE m.mit = :mit"),
+        @NamedQuery(name = "InterventionSchedule.findByDon", query = "SELECT m FROM InterventionSchedule m WHERE m.don = :don"),
+        @NamedQuery(name = "InterventionSchedule.findByFre", query = "SELECT m FROM InterventionSchedule m WHERE m.fre = :fre"),
+        @NamedQuery(name = "InterventionSchedule.findBySam", query = "SELECT m FROM InterventionSchedule m WHERE m.sam = :sam"),
+        @NamedQuery(name = "InterventionSchedule.findBySon", query = "SELECT m FROM InterventionSchedule m WHERE m.son = :son"),
+        @NamedQuery(name = "InterventionSchedule.findByErforderlich", query = "SELECT m FROM InterventionSchedule m WHERE m.erforderlich = :erforderlich"),
+        @NamedQuery(name = "InterventionSchedule.findByLDatum", query = "SELECT m FROM InterventionSchedule m WHERE m.lDatum = :lDatum"),
+        @NamedQuery(name = "InterventionSchedule.findByDauer", query = "SELECT m FROM InterventionSchedule m WHERE m.dauer = :dauer")})
+public class InterventionSchedule implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -108,21 +108,21 @@ public class MassTermin implements Serializable, Cloneable {
 
     @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
     @ManyToOne
-    private Planung planung;
+    private NursingProcess nursingProcess;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Intervention massnahme;
+    private Intervention intervention;
 
-    public MassTermin() {
+    public InterventionSchedule() {
     }
 
-    public MassTermin(Planung planung, Intervention massnahme) {
+    public InterventionSchedule(NursingProcess planung, Intervention intervention) {
         this.morgens = 1;
         this.taeglich = 1;
         this.lDatum = new DateMidnight().toDate();
-        this.dauer = massnahme.getDauer();
-        this.planung = planung;
-        this.massnahme = massnahme;
+        this.dauer = intervention.getDauer();
+        this.nursingProcess = planung;
+        this.intervention = intervention;
 
         this.nachtMo = 0;
         this.mittags = 0;
@@ -145,7 +145,7 @@ public class MassTermin implements Serializable, Cloneable {
         this.bemerkung = null;
     }
 
-    public MassTermin(Short nachtMo, Short morgens, Short mittags, Short nachmittags, Short abends, Short nachtAb, Short uhrzeitAnzahl, Date uhrzeit, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Boolean erforderlich, Date lDatum, BigDecimal dauer, String bemerkung, Planung planung, Intervention massnahme) {
+    public InterventionSchedule(Short nachtMo, Short morgens, Short mittags, Short nachmittags, Short abends, Short nachtAb, Short uhrzeitAnzahl, Date uhrzeit, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Boolean erforderlich, Date lDatum, BigDecimal dauer, String bemerkung, NursingProcess nursingProcess, Intervention intervention) {
         this.nachtMo = nachtMo;
         this.morgens = morgens;
         this.mittags = mittags;
@@ -169,8 +169,8 @@ public class MassTermin implements Serializable, Cloneable {
         this.lDatum = lDatum;
         this.dauer = dauer;
         this.bemerkung = bemerkung;
-        this.planung = planung;
-        this.massnahme = massnahme;
+        this.nursingProcess = nursingProcess;
+        this.intervention = intervention;
     }
 
     public Long getTermID() {
@@ -365,12 +365,12 @@ public class MassTermin implements Serializable, Cloneable {
         this.bemerkung = bemerkung;
     }
 
-    public Intervention getMassnahme() {
-        return massnahme;
+    public Intervention getIntervention() {
+        return intervention;
     }
 
-    public void setMassnahme(Intervention massnahme) {
-        this.massnahme = massnahme;
+    public void setIntervention(Intervention intervention) {
+        this.intervention = intervention;
     }
 
     public Date getlDatum() {
@@ -381,12 +381,12 @@ public class MassTermin implements Serializable, Cloneable {
         this.lDatum = lDatum;
     }
 
-    public Planung getPlanung() {
-        return planung;
+    public NursingProcess getNursingProcess() {
+        return nursingProcess;
     }
 
-    public void setPlanung(Planung planung) {
-        this.planung = planung;
+    public void setNursingProcess(NursingProcess nursingProcess) {
+        this.nursingProcess = nursingProcess;
     }
 
     public boolean verwendetUhrzeit() {
@@ -514,10 +514,10 @@ public class MassTermin implements Serializable, Cloneable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MassTermin)) {
+        if (!(object instanceof InterventionSchedule)) {
             return false;
         }
-        MassTermin other = (MassTermin) object;
+        InterventionSchedule other = (InterventionSchedule) object;
         if ((this.termID == null && other.termID != null) || (this.termID != null && !this.termID.equals(other.termID))) {
             return false;
         }
@@ -526,13 +526,11 @@ public class MassTermin implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "entity.rest.MassTermin[termID=" + termID + "]";
+        return "entity.rest.InterventionSchedule[termID=" + termID + "]";
     }
 
-
-
     @Override
-    public MassTermin clone() {
-        return new MassTermin(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitAnzahl, uhrzeit, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, erforderlich, lDatum, dauer, bemerkung, planung, massnahme);
+    public InterventionSchedule clone() {
+        return new InterventionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitAnzahl, uhrzeit, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, erforderlich, lDatum, dauer, bemerkung, nursingProcess, intervention);
     }
 }

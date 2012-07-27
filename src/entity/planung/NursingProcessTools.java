@@ -8,7 +8,10 @@ import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.sql.SQLException;
 import java.text.DateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,15 +21,15 @@ import java.util.List;
  * Time: 15:50
  * To change this template use File | Settings | File Templates.
  */
-public class PlanungTools {
+public class NursingProcessTools {
     public static final String UNIQUEID = "__plankenn";
 
-    public static List<Planung> findByKategorieAndBewohner(Bewohner bewohner, BWInfoKat kat) {
+    public static List<NursingProcess> findByKategorieAndBewohner(Bewohner bewohner, BWInfoKat kat) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM Planung p WHERE p.bewohner = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.bewohner = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
         query.setParameter("kat", kat);
         query.setParameter("bewohner", bewohner);
-        List<Planung> planungen = query.getResultList();
+        List<NursingProcess> planungen = query.getResultList();
         em.close();
         return planungen;
     }
@@ -38,14 +41,13 @@ public class PlanungTools {
      * @param planung
      * @return
      */
-    public static String getAsHTML(Planung planung, boolean withHeader) {
+    public static String getAsHTML(NursingProcess planung, boolean withHeader) {
 
         String html = "";
-        if (withHeader) {
-            html += "<h2 id=\"fonth2\" >";
-            html += "Pflegeplanung &raquo;" + planung.getStichwort() + "&laquo;";
-            html += "</h2>";
-        }
+        html += "<h2 id=\"fonth2\" >";
+        html += (withHeader ? OPDE.lang.getString(PnlPlanung.internalClassID) : "") + "&raquo;" + planung.getStichwort() + "&laquo;";
+        html += "</h2>";
+
         html += "<div id=\"fonttext\">";
 
         html += withHeader ? "<b>Kategorie:</b> " + planung.getKategorie().getBezeichnung() + "<br/>" : "";
@@ -64,15 +66,15 @@ public class PlanungTools {
 
         html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</h3>";
 
-        if (planung.getMassnahmen().isEmpty()) {
+        if (planung.getInterventionSchedule().isEmpty()) {
             html += "<ul><li><b>Massnahmen fehlen !!!</b></li></ul>";
         } else {
             html += "<ul>";
 //            html += "<li><b>" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</b></li><ul>";
-            for (MassTermin massTermin : planung.getMassnahmen()) {
+            for (InterventionSchedule interventionSchedule : planung.getInterventionSchedule()) {
                 html += "<li>";
-                html += "<div id=\"fonttext\"><b>" + massTermin.getMassnahme().getBezeichnung() + "</b> (" + massTermin.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div><br/>";
-                html += MassTerminTools.getTerminAsHTML(massTermin);
+                html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div>";
+                html += InterventionScheduleTools.getTerminAsHTML(interventionSchedule);
                 html += "</li>";
             }
             html += "</ul>";
@@ -82,13 +84,23 @@ public class PlanungTools {
         if (!planung.getKontrollen().isEmpty()) {
             html += "<h3 id=\"fonth3\">Kontrolltermine</h3>";
             html += "<ul>";
-            for (PlanKontrolle kontrolle : planung.getKontrollen()) {
-                html += "<li><div id=\"fonttext\">" + PlanKontrolleTools.getAsHTML(kontrolle) + "</div></li>";
+            for (NPControl kontrolle : planung.getKontrollen()) {
+                html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(kontrolle) + "</div></li>";
             }
             html += "</ul>";
         }
 
         html += "</div>";
         return html;
+    }
+
+    public static void close(NursingProcess np, String closingText) {
+
+        np.setAbgesetztDurch(OPDE.getLogin().getUser());
+        np.setBis(new Date());
+
+        NPControl lastValidation = new NPControl(closingText, np);
+        np.getKontrollen().add(lastValidation);
+
     }
 }
