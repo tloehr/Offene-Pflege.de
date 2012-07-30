@@ -28,15 +28,13 @@ package op.care.planung;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.Bewohner;
 import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
-import entity.planung.DFNTools;
-import entity.planung.InterventionSchedule;
-import entity.planung.NursingProcess;
-import entity.planung.NursingProcessTools;
+import entity.planung.*;
 import entity.system.SYSPropsTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
@@ -47,6 +45,7 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -57,9 +56,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -629,16 +626,35 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
-                                    em.lock(em.merge(planung), LockModeType.OPTIMISTIC);
+
                                     // Fetch the new Plan from the PAIR
                                     NursingProcess myNewNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
+                                    NursingProcess myOldNP = em.merge(planung);
+                                    em.lock(myOldNP, LockModeType.OPTIMISTIC);
+
                                     // Close old NP
-                                    NursingProcessTools.close(planung, myNewNP.getSituation());
+                                    myOldNP.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+                                    myOldNP.setBis(new DateTime().minusSeconds(1).toDate());
+                                    NPControl lastValidation = em.merge(new NPControl(myNewNP.getSituation(), myOldNP));
+                                    myOldNP.getKontrollen().add(lastValidation);
+
+                                    // Starts 1 second after the old one stopped
+                                    myNewNP.setVon(new DateTime(myOldNP.getBis()).plusSeconds(1).toDate());
+
+                                    // DFNs to delete
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                    delQuery.setParameter("nursingprocess", myOldNP);
+                                    delQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+                                    delQuery.executeUpdate();
+
                                     // Create new DFNs according to plan
                                     DFNTools.generate(em, myNewNP.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
                                     // Refresh Display
+                                    planungen.get(planung.getKategorie()).remove(planung);
+                                    planungen.get(planung.getKategorie()).add(myOldNP);
                                     addNursingProcessToDisplay(myNewNP);
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(planung.getStichwort(), "changed"));
                                     reloadDisplay();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -707,6 +723,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     DFNTools.generate(em, mynp.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
                                     Collections.sort(planungen.get(mynp.getKategorie()));
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(mynp.getStichwort(), "edited"));
                                     reloadDisplay();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -745,7 +762,7 @@ public class PnlPlanung extends NursingRecordsPanel {
          *                                                     |_|
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
-            JButton btnStop = new JButton(SYSConst.icon22stop);
+            final JButton btnStop = new JButton(SYSConst.icon22stop);
             btnStop.setPressedIcon(SYSConst.icon22stopPressed);
             btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnStop.setContentAreaFilled(false);
@@ -753,7 +770,68 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnStop.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
 
+                    JPanel dlg = new PnlClose(planung, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                popup.hidePopup();
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    NursingProcess myOldNP = em.merge(planung);
+                                    myOldNP.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+                                    myOldNP.setBis(new Date());
+                                    NPControl lastValidation = em.merge(new NPControl(o.toString(), myOldNP));
+                                    myOldNP.getKontrollen().add(lastValidation);
+
+                                    // DFNs to delete
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                    delQuery.setParameter("nursingprocess", myOldNP);
+                                    delQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+                                    delQuery.executeUpdate();
+
+                                    // Refresh Display
+                                    planungen.get(planung.getKategorie()).remove(planung);
+                                    planungen.get(planung.getKategorie()).add(myOldNP);
+                                    Collections.sort(planungen.get(myOldNP.getKategorie()));
+
+                                    em.lock(myOldNP, LockModeType.OPTIMISTIC);
+                                    em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(planung.getStichwort(), "closed"));
+                                reloadDisplay();
+                            }
+                        }
+                    });
+
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.getContentPane().add(dlg);
+                    popup.setOwner(btnStop);
+                    popup.removeExcludedComponent(btnStop);
+                    popup.setDefaultFocusComponent(dlg);
+
+                    GUITools.showPopup(popup, SwingConstants.WEST);
                 }
             });
             btnStop.setEnabled(!planung.isAbgesetzt());
@@ -777,10 +855,48 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<b>" + planung.getStichwort() + "</b>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                NursingProcess myOldNP = em.merge(planung);
 
+                                // DFNs to delete
+                                Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                delQuery.setParameter("nursingprocess", myOldNP);
+                                delQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+                                delQuery.executeUpdate();
+
+                                em.remove(myOldNP);
+                                em.getTransaction().commit();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(planung.getStichwort(), "deleted"));
+                            reloadDisplay();
+                        }
+                    });
                 }
             });
             btnDelete.setEnabled(!planung.isAbgesetzt() && numDFNs == 0);
+            btnDelete.setToolTipText(btnDelete.isEnabled() ? null : SYSTools.toHTML(OPDE.lang.getString(internalClassID + ".btndelete.disabled.reason")));
             titlePanelright.add(btnDelete);
         }
 
@@ -968,6 +1084,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     DFNTools.generate(em, myplan.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
                                     addNursingProcessToDisplay(myplan);
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(myplan.getStichwort(), "entered"));
                                     reloadDisplay();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {

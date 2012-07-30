@@ -235,7 +235,7 @@ public class FrmMain extends JFrame {
     }
 
     private void button1ActionPerformed(ActionEvent e) {
-        splitPaneLeft.setDividerLocation(0, 15);
+        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
     }
 
     public void afterLogin() {
@@ -279,6 +279,7 @@ public class FrmMain extends JFrame {
         btnVerlegung = new JButton();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
+        button1 = new JButton();
         pbMsg = new JProgressBar();
         btnReload = new JButton();
         splitPaneLeft = new JideSplitPane();
@@ -360,6 +361,16 @@ public class FrmMain extends JFrame {
                 lblSubMsg.setForeground(new Color(105, 80, 69));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
+
+                //---- button1 ----
+                button1.setText("text");
+                button1.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        button1ActionPerformed(e);
+                    }
+                });
+                pnlMainMessage.add(button1, CC.xy(3, 7));
 
                 //---- pbMsg ----
                 pbMsg.setValue(50);
@@ -784,6 +795,7 @@ public class FrmMain extends JFrame {
     private JButton btnVerlegung;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
+    private JButton button1;
     private JProgressBar pbMsg;
     private JButton btnReload;
     private JideSplitPane splitPaneLeft;

@@ -61,14 +61,6 @@
             <void property="name"> 
              <string>txtBemerkung</string> 
             </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>javax.swing.event.CaretListener</string> 
-              <string>caretUpdate</string> 
-              <string>txtBemerkungCaretUpdate</string> 
-              <boolean>true</boolean> 
-             </object> 
-            </void> 
            </object> 
           </void> 
          </object> 
@@ -106,33 +98,6 @@
         </object> 
         <void property="name"> 
          <string>panel1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/22x22/cancel.png</string> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-          </void> 
-          <void property="name"> 
-           <string>btnCancel</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>btnCancelActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 

@@ -30,11 +30,11 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>relgap, labelcompgap, 223dlu, labelcompgap, relgap</string> 
+          <string>relgap, labelcompgap, 223dlu:grow, labelcompgap, relgap</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>relgap, linegap, pref, linegap, default, linegap, pref, linegap, default, linegap, 72dlu, linegap, default, linegap, default</string> 
+          <string>relgap, linegap, pref, linegap, default, linegap, pref, linegap, default, linegap, 72dlu:grow, linegap, default, linegap, default</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -72,7 +72,7 @@
           </void> 
           <void method="setProperty"> 
            <string>dividerLocation</string> 
-           <int>300</int> 
+           <int>150</int> 
           </void> 
           <void method="setProperty"> 
            <string>doubleBuffered</string> 
@@ -649,7 +649,7 @@
                <string>icon</string> 
                <object class="com.jformdesigner.model.SwingIcon"> 
                 <int>0</int> 
-                <string>/artwork/22x22/clock.png</string> 
+                <string>/artwork/22x22/bw/1rightarrow.png</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -692,7 +692,7 @@
              <class>com.jgoodies.forms.layout.FormLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>default, unrelgap, 28dlu, unrelgap, pref</string> 
+              <string>default, unrelgap, 75dlu, unrelgap, pref</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
@@ -715,11 +715,11 @@
               <string>com.jidesoft.swing.JideLabel</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Dosis zur Uhrzeit</string> 
+               <string>Anzahl Massnahmen</string> 
               </void> 
               <void method="setProperty"> 
                <string>orientation</string> 
-               <int>1</int> 
+               <int>2</int> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 
@@ -732,6 +732,10 @@
               <void method="setProperty"> 
                <string>horizontalTextPosition</string> 
                <int>2</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>verticalAlignment</string> 
+               <int>3</int> 
               </void> 
               <void property="name"> 
                <string>lblUhrzeit</string> 
@@ -756,7 +760,7 @@
                <string>icon</string> 
                <object class="com.jformdesigner.model.SwingIcon"> 
                 <int>0</int> 
-                <string>/artwork/22x22/bw/1rightarrow.png</string> 
+                <string>/artwork/22x22/bw/1leftarrow.png</string> 
                </object> 
               </void> 
               <void property="name"> 

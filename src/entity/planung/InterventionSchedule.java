@@ -5,6 +5,7 @@
 
 package entity.planung;
 
+import op.OPDE;
 import op.tools.SYSCalendar;
 import org.joda.time.DateMidnight;
 
@@ -13,6 +14,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.UUID;
 
 /**
  * @author tloehr
@@ -44,7 +46,7 @@ import java.util.GregorianCalendar;
         @NamedQuery(name = "InterventionSchedule.findByErforderlich", query = "SELECT m FROM InterventionSchedule m WHERE m.erforderlich = :erforderlich"),
         @NamedQuery(name = "InterventionSchedule.findByLDatum", query = "SELECT m FROM InterventionSchedule m WHERE m.lDatum = :lDatum"),
         @NamedQuery(name = "InterventionSchedule.findByDauer", query = "SELECT m FROM InterventionSchedule m WHERE m.dauer = :dauer")})
-public class InterventionSchedule implements Serializable, Cloneable {
+public class InterventionSchedule implements Serializable, Cloneable, Comparable<InterventionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -106,6 +108,9 @@ public class InterventionSchedule implements Serializable, Cloneable {
     @Column(name = "version")
     private Long version;
 
+    @Transient
+    private String uuid; // only for comparison between un-persisted entities
+
     @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
     @ManyToOne
     private NursingProcess nursingProcess;
@@ -143,6 +148,7 @@ public class InterventionSchedule implements Serializable, Cloneable {
         this.son = 0;
         this.erforderlich = false;
         this.bemerkung = null;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public InterventionSchedule(Short nachtMo, Short morgens, Short mittags, Short nachmittags, Short abends, Short nachtAb, Short uhrzeitAnzahl, Date uhrzeit, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Boolean erforderlich, Date lDatum, BigDecimal dauer, String bemerkung, NursingProcess nursingProcess, Intervention intervention) {
@@ -171,6 +177,7 @@ public class InterventionSchedule implements Serializable, Cloneable {
         this.bemerkung = bemerkung;
         this.nursingProcess = nursingProcess;
         this.intervention = intervention;
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public Long getTermID() {
@@ -401,6 +408,10 @@ public class InterventionSchedule implements Serializable, Cloneable {
         return woechentlich > 0;
     }
 
+    public boolean isValid() {
+        return (uhrzeit == null && nachtMo + morgens + mittags + nachmittags + abends + nachtAb > 0) || (uhrzeit != null && uhrzeitAnzahl > 0);
+    }
+
     /**
      * @param date, zu prüfendes Datum.
      * @return Ist <code>true</code>, wenn diese Planung wöchentlich gilt und das Attribut mit dem aktuellen Wochentagsnamen größer null ist.
@@ -505,23 +516,109 @@ public class InterventionSchedule implements Serializable, Cloneable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (termID != null ? termID.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        InterventionSchedule that = (InterventionSchedule) o;
+        if (termID != null ? !termID.equals(that.termID) : that.termID != null) return false;
+        if (abends != null ? !abends.equals(that.abends) : that.abends != null) return false;
+        if (bemerkung != null ? !bemerkung.equals(that.bemerkung) : that.bemerkung != null) return false;
+        if (dauer != null ? !dauer.equals(that.dauer) : that.dauer != null) return false;
+        if (die != null ? !die.equals(that.die) : that.die != null) return false;
+        if (don != null ? !don.equals(that.don) : that.don != null) return false;
+        if (erforderlich != null ? !erforderlich.equals(that.erforderlich) : that.erforderlich != null) return false;
+        if (fre != null ? !fre.equals(that.fre) : that.fre != null) return false;
+        if (intervention != null ? !intervention.equals(that.intervention) : that.intervention != null) return false;
+        if (lDatum != null ? !lDatum.equals(that.lDatum) : that.lDatum != null) return false;
+        if (mit != null ? !mit.equals(that.mit) : that.mit != null) return false;
+        if (mittags != null ? !mittags.equals(that.mittags) : that.mittags != null) return false;
+        if (mon != null ? !mon.equals(that.mon) : that.mon != null) return false;
+        if (monatlich != null ? !monatlich.equals(that.monatlich) : that.monatlich != null) return false;
+        if (morgens != null ? !morgens.equals(that.morgens) : that.morgens != null) return false;
+        if (nachmittags != null ? !nachmittags.equals(that.nachmittags) : that.nachmittags != null) return false;
+        if (nachtAb != null ? !nachtAb.equals(that.nachtAb) : that.nachtAb != null) return false;
+        if (nachtMo != null ? !nachtMo.equals(that.nachtMo) : that.nachtMo != null) return false;
+        if (nursingProcess != null ? !nursingProcess.equals(that.nursingProcess) : that.nursingProcess != null)
+            return false;
+        if (sam != null ? !sam.equals(that.sam) : that.sam != null) return false;
+        if (son != null ? !son.equals(that.son) : that.son != null) return false;
+        if (taeglich != null ? !taeglich.equals(that.taeglich) : that.taeglich != null) return false;
+        if (tagNum != null ? !tagNum.equals(that.tagNum) : that.tagNum != null) return false;
+        if (uhrzeit != null ? !uhrzeit.equals(that.uhrzeit) : that.uhrzeit != null) return false;
+        if (uhrzeitAnzahl != null ? !uhrzeitAnzahl.equals(that.uhrzeitAnzahl) : that.uhrzeitAnzahl != null)
+            return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        if (woechentlich != null ? !woechentlich.equals(that.woechentlich) : that.woechentlich != null) return false;
+        if (uuid != null ? !uuid.equals(that.uuid) : that.uuid != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
+    public int hashCode() {
+        int result = termID != null ? termID.hashCode() : 0;
+        result = 31 * result + (nachtMo != null ? nachtMo.hashCode() : 0);
+        result = 31 * result + (morgens != null ? morgens.hashCode() : 0);
+        result = 31 * result + (mittags != null ? mittags.hashCode() : 0);
+        result = 31 * result + (nachmittags != null ? nachmittags.hashCode() : 0);
+        result = 31 * result + (abends != null ? abends.hashCode() : 0);
+        result = 31 * result + (nachtAb != null ? nachtAb.hashCode() : 0);
+        result = 31 * result + (uhrzeitAnzahl != null ? uhrzeitAnzahl.hashCode() : 0);
+        result = 31 * result + (uhrzeit != null ? uhrzeit.hashCode() : 0);
+        result = 31 * result + (taeglich != null ? taeglich.hashCode() : 0);
+        result = 31 * result + (woechentlich != null ? woechentlich.hashCode() : 0);
+        result = 31 * result + (monatlich != null ? monatlich.hashCode() : 0);
+        result = 31 * result + (tagNum != null ? tagNum.hashCode() : 0);
+        result = 31 * result + (mon != null ? mon.hashCode() : 0);
+        result = 31 * result + (die != null ? die.hashCode() : 0);
+        result = 31 * result + (mit != null ? mit.hashCode() : 0);
+        result = 31 * result + (don != null ? don.hashCode() : 0);
+        result = 31 * result + (fre != null ? fre.hashCode() : 0);
+        result = 31 * result + (sam != null ? sam.hashCode() : 0);
+        result = 31 * result + (son != null ? son.hashCode() : 0);
+        result = 31 * result + (erforderlich != null ? erforderlich.hashCode() : 0);
+        result = 31 * result + (lDatum != null ? lDatum.hashCode() : 0);
+        result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
+        result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (nursingProcess != null ? nursingProcess.hashCode() : 0);
+        result = 31 * result + (intervention != null ? intervention.hashCode() : 0);
+        return result;
+    }
 
-        if (!(object instanceof InterventionSchedule)) {
-            return false;
-        }
-        InterventionSchedule other = (InterventionSchedule) object;
-        if ((this.termID == null && other.termID != null) || (this.termID != null && !this.termID.equals(other.termID))) {
-            return false;
-        }
-        return true;
+    @Override
+    public int compareTo(InterventionSchedule interventionSchedule) {
+        return intervention.getBezeichnung().compareTo(interventionSchedule.getIntervention().getBezeichnung());
+//        if (uhrzeit != null && interventionSchedule.getUhrzeit() == null){
+//            return -1;
+//        }
+//        if (uhrzeit == null && interventionSchedule.getUhrzeit() != null){
+//            return 1;
+//        }
+//        if (uhrzeit != null){
+//            return uhrzeit.compareTo(interventionSchedule.getUhrzeit());
+//        }
+//        if (isTaeglich() && !interventionSchedule.isTaeglich()){
+//            return 1;
+//        }
+//        if (!isTaeglich() && interventionSchedule.isTaeglich()){
+//            return -1;
+//        }
+//        if (isTaeglich()){
+//            return new Short(getTaeglich()).compareTo(interventionSchedule.getTaeglich());
+//        }
+//        if (isWoechentlich() && !interventionSchedule.isWoechentlich()){
+//            return 1;
+//        }
+//        if (!isWoechentlich() && interventionSchedule.isWoechentlich()){
+//            return -1;
+//        }
+//        if (isWoechentlich()){
+//            return new Short(getWoechentlich()).compareTo(interventionSchedule.getWoechentlich());
+//        }
+//
+
     }
 
     @Override

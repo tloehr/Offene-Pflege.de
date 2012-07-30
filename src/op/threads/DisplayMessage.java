@@ -54,13 +54,12 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, int progress, int max) {
-        this.message = SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
+        this.message = message;
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
         this.secondsToShow = 0;
         this.percentage = new Double(new Double(progress) / new Double(max) * 100d).intValue();
-//        OPDE.debug("DisplayMessage: "+percentage+" %");
         uid = UUID.randomUUID().toString();
         this.classname = "";
     }

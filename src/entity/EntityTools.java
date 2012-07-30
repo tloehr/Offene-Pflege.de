@@ -1,8 +1,11 @@
 package entity;
 
 import op.OPDE;
+import op.threads.DisplayManager;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -50,7 +53,17 @@ public class EntityTools {
         try {
             em.getTransaction().begin();
             mergedEntity = em.merge(entity);
+            em.lock(mergedEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
+        } catch (OptimisticLockException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

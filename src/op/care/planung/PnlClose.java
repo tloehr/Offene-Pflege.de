@@ -26,40 +26,42 @@
  */
 package op.care.planung;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import entity.planung.NursingProcess;
+import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author tloehr
  */
 public class PnlClose extends JPanel {
-
-    private long planid;
-    private String stichwort;
+    public static final String internalClassID = "nursingrecords.nursingprocess.pnlclose";
+    private NursingProcess nursingProcess;
+    private Closure actionBlock;
 
     /**
      * Creates new form DlgAbsetzen
      */
-    public PnlClose(java.awt.Frame parent, long planid, String stichwort) {
-        super(parent, true);
-        this.planid = planid;
-        this.stichwort = stichwort;
+    public PnlClose(NursingProcess nursingProcess, Closure actionBlock) {
+        this.nursingProcess = nursingProcess;
+        this.actionBlock = actionBlock;
         initComponents();
-        initDialog();
+        initPanel();
     }
 
-    private void initDialog() {
-        lblStichwort.setText(stichwort);
-        SYSTools.centerOnParent(this.getParent(), this);
-        setVisible(true);
+    private void initPanel() {
+        pnlReason.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID+".reason")));
     }
 
     /**
@@ -74,13 +76,12 @@ public class PnlClose extends JPanel {
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
         panel1 = new JPanel();
-        btnCancel = new JButton();
         btnOK = new JButton();
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, default:grow, $lcgap, default",
-                "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+            "default, default:grow, $lcgap, default",
+            "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
         //======== pnlReason ========
         {
@@ -93,12 +94,6 @@ public class PnlClose extends JPanel {
                 //---- txtBemerkung ----
                 txtBemerkung.setColumns(20);
                 txtBemerkung.setRows(5);
-                txtBemerkung.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtBemerkungCaretUpdate(e);
-                    }
-                });
                 jScrollPane1.setViewportView(txtBemerkung);
             }
             pnlReason.add(jScrollPane1);
@@ -108,17 +103,6 @@ public class PnlClose extends JPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-
-            //---- btnCancel ----
-            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
-            panel1.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
@@ -135,24 +119,18 @@ public class PnlClose extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        DBHandling.absetzen(planid, txtBemerkung.getText());
-        dispose();
+        if (txtBemerkung.getText().trim().isEmpty()){
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".reasonxx"), DisplayMessage.WARNING));
+        } else {
+            actionBlock.execute(txtBemerkung.getText());
+        }
     }//GEN-LAST:event_btnOKActionPerformed
-
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        dispose();
-    }//GEN-LAST:event_btnCancelActionPerformed
-
-    private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
-        btnOK.setEnabled(!txtBemerkung.getText().equals(""));
-    }//GEN-LAST:event_txtBemerkungCaretUpdate
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlReason;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
     private JPanel panel1;
-    private JButton btnCancel;
     private JButton btnOK;
     // End of variables declaration//GEN-END:variables
 }

@@ -41,6 +41,7 @@ import op.tools.SYSTools;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author tloehr
@@ -52,6 +53,7 @@ public class TMPlanung extends AbstractTableModel {
     public TMPlanung(NursingProcess planung) {
         super();
         this.planung = planung;
+        Collections.sort(planung.getInterventionSchedule());
     }
 
     public int getRowCount() {

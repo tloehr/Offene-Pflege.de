@@ -5,6 +5,7 @@ import entity.info.BWInfoKat;
 import op.OPDE;
 import op.care.planung.PnlPlanung;
 import op.tools.SYSTools;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -94,13 +95,9 @@ public class NursingProcessTools {
         return html;
     }
 
-    public static void close(NursingProcess np, String closingText) {
-
-        np.setAbgesetztDurch(OPDE.getLogin().getUser());
-        np.setBis(new Date());
-
-        NPControl lastValidation = new NPControl(closingText, np);
-        np.getKontrollen().add(lastValidation);
-
-    }
+//    public static void close(EntityManager em, NursingProcess np, String closingText) {
+//
+//
+//
+//    }
 }

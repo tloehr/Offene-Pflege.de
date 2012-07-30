@@ -34,7 +34,10 @@ import com.toedter.calendar.JDateChooser;
 import entity.planung.InterventionSchedule;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.GUITools;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 
@@ -46,7 +49,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -77,26 +79,25 @@ public class PnlSchedule extends JPanel {
 
     private void btnToTimeActionPerformed(ActionEvent e) {
         splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
-        if (Double.parseDouble(txtUhrzeit.getText()) == 0) {
-            txtUhrzeit.setText("1.0");
-        }
+//        if (Double.parseDouble(txtUhrzeit.getText()) == 0) {
+//            txtUhrzeit.setText("1");
+//        }
     }
 
     private void btnToTimeOfDayActionPerformed(ActionEvent e) {
         splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
-        if (!isAtLeastOneTxtFieldNotZero()) {
-            txtUhrzeit.setText("1.0");
-        }
+//        if (!isAtLeastOneTxtFieldNotZero()) {
+//            txtMorgens.setText("1");
+//        }
     }
 
-
     private void panelMainComponentResized(ComponentEvent e) {
-        SYSTools.showSide(splitRegular, splitRegularPos);
+//        SYSTools.showSide(splitRegular, splitRegularPos);
     }
 
     private void cmbUhrzeitItemStateChanged(ItemEvent e) {
 //        currentSelectedTime = (Date) e.getItem();
-        lblUhrzeit.setText("Dosis um " + DateFormat.getTimeInstance(DateFormat.SHORT).format(e.getItem()) + " Uhr");
+//        lblUhrzeit.setText("Dosis um " + DateFormat.getTimeInstance(DateFormat.SHORT).format(e.getItem()) + " Uhr");
     }
 
     private void btnJedenTagActionPerformed(ActionEvent e) {
@@ -113,6 +114,8 @@ public class PnlSchedule extends JPanel {
 
 
     private void initPanel() {
+
+        pnlBemerkung.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID + ".bordertitle4textfield")));
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         cmbUhrzeit.setModel(new DefaultComboBoxModel(timelist.toArray()));
@@ -193,11 +196,9 @@ public class PnlSchedule extends JPanel {
 
         Date now = null;
         if (termin.getUhrzeitAnzahl() > 0) {
-            splitRegularPos = 0.0d;
             now = termin.getUhrzeit();
         } else {
             now = new Date();
-            splitRegularPos = 1.0d;
         }
 
         for (Date zeit : timelist) {
@@ -207,14 +208,15 @@ public class PnlSchedule extends JPanel {
             }
         }
         cmbUhrzeit.setSelectedItem(now);
-        lblUhrzeit.setText("Anzahl Massnahmen " + DateFormat.getTimeInstance(DateFormat.SHORT).format(now) + " Uhr");
+        lblUhrzeit.setText("Anzahl Massnahmen");
 
         txtBemerkung.setText(termin.getBemerkung());
 
         tbFloating = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".floatinginterventions"));
         tbFloating.setSelected(termin.isFloating());
+        panelMain.add(tbFloating, CC.xy(3, 5));
 
-        panelMainComponentResized(null);
+        splitRegularPos = SYSTools.showSide(splitRegular, termin.getUhrzeit() != null ? SYSTools.RIGHT_LOWER_SIDE : SYSTools.LEFT_UPPER_SIDE);
     }
 
     /**
@@ -301,14 +303,14 @@ public class PnlSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
-                "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu, 2*($lgap, default)"));
+                "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
+                "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu:grow, 2*($lgap, default)"));
 
             //======== splitRegular ========
             {
                 splitRegular.setDividerSize(0);
                 splitRegular.setEnabled(false);
-                splitRegular.setDividerLocation(300);
+                splitRegular.setDividerLocation(150);
                 splitRegular.setDoubleBuffered(true);
 
                 //======== pnlTageszeit ========
@@ -480,7 +482,7 @@ public class PnlSchedule extends JPanel {
                     pnlTageszeit.add(txtNachtAb, CC.xy(11, 3));
 
                     //---- btnToTime ----
-                    btnToTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/clock.png")));
+                    btnToTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
                     btnToTime.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -495,19 +497,20 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                        "default, $ugap, 28dlu, $ugap, pref",
+                        "default, $ugap, 75dlu, $ugap, pref",
                         "default:grow, $rgap, default"));
 
                     //---- lblUhrzeit ----
-                    lblUhrzeit.setText("Dosis zur Uhrzeit");
-                    lblUhrzeit.setOrientation(1);
+                    lblUhrzeit.setText("Anzahl Massnahmen");
+                    lblUhrzeit.setOrientation(2);
                     lblUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
                     lblUhrzeit.setClockwise(false);
                     lblUhrzeit.setHorizontalTextPosition(SwingConstants.LEFT);
+                    lblUhrzeit.setVerticalAlignment(SwingConstants.BOTTOM);
                     pnlUhrzeit.add(lblUhrzeit, CC.xy(3, 1, CC.DEFAULT, CC.BOTTOM));
 
                     //---- btnToTimeOfDay ----
-                    btnToTimeOfDay.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
+                    btnToTimeOfDay.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1leftarrow.png")));
                     btnToTimeOfDay.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -957,7 +960,7 @@ public class PnlSchedule extends JPanel {
             save();
             actionBlock.execute(termin);
         } catch (NumberFormatException nfe) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Eingabefehler bei der Dosierung. Bitte prüfen. " + nfe.getLocalizedMessage(), 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".parseerror") + nfe.getLocalizedMessage(), 2));
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
@@ -975,8 +978,8 @@ public class PnlSchedule extends JPanel {
         termin.setNachmittags(splitSetToTime ? (short) 0 : Short.parseShort(txtNachmittags.getText()));
         termin.setAbends(splitSetToTime ? (short) 0 : Short.parseShort(txtAbends.getText()));
         termin.setNachtAb(splitSetToTime ? (short) 0 : Short.parseShort(txtNachtAb.getText()));
-        termin.setUhrzeitAnzahl(splitSetToTime ? (short) 0 : Short.parseShort(txtUhrzeit.getText()));
-        termin.setUhrzeit(splitSetToTime ? (Date) cmbUhrzeit.getSelectedItem() : null);
+        termin.setUhrzeitAnzahl(!splitSetToTime ? (short) 0 : Short.parseShort(txtUhrzeit.getText()));
+        termin.setUhrzeit(!splitSetToTime ? null : (Date) cmbUhrzeit.getSelectedItem());
 
         termin.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
         termin.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
@@ -1014,6 +1017,10 @@ public class PnlSchedule extends JPanel {
 
         termin.setFloating(tbFloating.isSelected());
         termin.setBemerkung(txtBemerkung.getText());
+
+        if (!termin.isValid()) {
+            throw new NumberFormatException("Anzahl muss min. 1 sein");
+        }
 
     }
 

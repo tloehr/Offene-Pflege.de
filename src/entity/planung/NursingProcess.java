@@ -101,6 +101,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<NPControl> kontrollen;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+//    @OrderBy("intervention.bezeichnung ASC")
     private List<InterventionSchedule> interventionSchedules;
 
     public NursingProcess() {
@@ -276,7 +277,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
 
     @Override
     public int compareTo(NursingProcess nursingProcess) {
-        if (stichwort.compareTo(nursingProcess.getStichwort()) == 0){
+        if (stichwort.compareTo(nursingProcess.getStichwort()) != 0){
             return stichwort.compareTo(nursingProcess.getStichwort());
         }
 

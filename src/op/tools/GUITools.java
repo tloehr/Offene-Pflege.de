@@ -111,7 +111,7 @@ public class GUITools {
 
         switch (location) {
             case SwingConstants.SOUTH_WEST: {
-                x = screenposition.x - content.getPreferredSize().width - popup.getOwner().getPreferredSize().width;
+                x = screenposition.x - content.getPreferredSize().width;
                 y = screenposition.y + popup.getOwner().getPreferredSize().height;
                 break;
             }
@@ -133,6 +133,16 @@ public class GUITools {
             case SwingConstants.EAST: {
                 x = screenposition.x + popup.getOwner().getPreferredSize().width;
                 y = screenposition.y;
+                break;
+            }
+            case SwingConstants.WEST: {
+                x = screenposition.x - content.getPreferredSize().width;
+                y = screenposition.y;
+                break;
+            }
+            case SwingConstants.NORTH: {
+                x = screenposition.x;
+                y = screenposition.y - content.getPreferredSize().height;
                 break;
             }
             case SwingConstants.CENTER: {

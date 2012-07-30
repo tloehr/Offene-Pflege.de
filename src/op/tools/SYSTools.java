@@ -1589,7 +1589,12 @@ public class SYSTools {
             animator.start();
 
         } else {
-            split.setDividerLocation(stop);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    split.setDividerLocation(stop);
+                }
+            });
         }
         return stop;
     }

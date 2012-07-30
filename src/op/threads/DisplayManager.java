@@ -71,15 +71,15 @@ public class DisplayManager extends Thread {
         processSubMessage();
     }
 
-    public void setIconDead(){
+    public void setIconDead() {
         lblMain.setIcon(icondead);
     }
 
-    public void setIconGone(){
+    public void setIconGone() {
         lblMain.setIcon(icongone);
     }
 
-    public void setIconAway(){
+    public void setIconAway() {
         lblMain.setIcon(iconaway);
     }
 
@@ -141,7 +141,7 @@ public class DisplayManager extends Thread {
 
         if (nextMessage != null) {
             pbIntermediateZyklen = 0;
-            messageQ.remove(0);
+            messageQ.remove(0); // remove head
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
             lblSub.setText(currentSubMessage.getMessage());
@@ -190,31 +190,19 @@ public class DisplayManager extends Thread {
                 jp.setString(null);
             }
         }
-//        } else {
-//            if ((progressBarMessage != null && zyklen/5%2 == 1 && zyklen % 5 == 0) || zyklen % 10 == 0 || zyklen == 0) {
-//                long heapSize = Runtime.getRuntime().totalMemory();
-//                long heapFreeSize = Runtime.getRuntime().freeMemory();
-//                long heapUsedSize = heapSize - heapFreeSize;
-//                BigDecimal mbSize = new BigDecimal(heapSize).setScale(4).divide(new BigDecimal(1048576), BigDecimal.ROUND_HALF_UP);
-//                BigDecimal mbUsedSize = new BigDecimal(heapUsedSize).setScale(4).divide(new BigDecimal(1048576), BigDecimal.ROUND_HALF_UP);
-//                BigDecimal percentUsed = mbUsedSize.divide(mbSize, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
-//                String stat = mbUsedSize.setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "M/" + mbSize.setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "M";
-//                System.out.println("Memory percent " + percentUsed.toPlainString() + " %");
-//                jp.setValue(percentUsed.intValue());
-//                jp.setString(stat);
-//            }
-//        }
     }
 
-//    private void processDBMessage() {
-//        if (dbAction) {
-//            lblDB.setVisible(zyklen % 2 == dbZyklenRest);
-//        }
-//    }
+    public static DisplayMessage getLockMessage() {
+        return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
+    }
 
-
-    public static DisplayMessage getLockMessage(){
-        return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, 5);
+    /**
+     * @param text
+     * @param operation can be one of deleted, closed, entered, changed, edited
+     * @return
+     */
+    public static DisplayMessage getSuccessMessage(String text, String operation) {
+        return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + OPDE.lang.getString("misc.msg.successfully") + " " + OPDE.lang.getString("misc.msg." + operation), DisplayMessage.NORMAL);
     }
 
     public void run() {
