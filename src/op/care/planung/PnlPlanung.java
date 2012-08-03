@@ -1109,6 +1109,49 @@ public class PnlPlanung extends NursingRecordsPanel {
                 }
             });
             list.add(addButton);
+
+            JideButton addTemplate = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgPlanung(new NursingProcess(bewohner), new Closure() {
+                        @Override
+                        public void execute(Object planung) {
+                            if (planung != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                    Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
+                                    NursingProcess myplan = em.merge((NursingProcess) planung);
+                                    myplan.setPlanKennung(unique.getUid());
+                                    DFNTools.generate(em, myplan.getInterventionSchedule(), new DateMidnight(), true);
+                                    em.getTransaction().commit();
+                                    addNursingProcessToDisplay(myplan);
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(myplan.getStichwort(), "entered"));
+                                    reloadDisplay();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            list.add(addTemplate);
         }
 
 
