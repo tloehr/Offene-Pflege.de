@@ -96,6 +96,8 @@ public class DlgPlanung extends MyJDialog {
             mode = "edit";
         } else if (planung.getPlanID() == null && planung.getPlanKennung() > -1) {
             mode = "change";
+        } else if (planung.getPlanID() == null && planung.getPlanKennung() == -1) {
+            mode = "template";
         }
         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + "." + mode), OPDE.START_OF_MODULE_TIME));
     }

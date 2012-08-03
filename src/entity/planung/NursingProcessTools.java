@@ -1,18 +1,16 @@
 package entity.planung;
 
 import entity.Bewohner;
+import entity.EntityTools;
 import entity.info.BWInfoKat;
 import op.OPDE;
 import op.care.planung.PnlPlanung;
 import op.tools.SYSTools;
-import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,6 +28,18 @@ public class NursingProcessTools {
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.bewohner = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
         query.setParameter("kat", kat);
         query.setParameter("bewohner", bewohner);
+        List<NursingProcess> planungen = query.getResultList();
+        em.close();
+        return planungen;
+    }
+
+    public static List<NursingProcess> getTemplates(String topic, boolean includeInactives) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.stichwort like :topic " + (includeInactives ? "" : " AND p.bis > :now ") + " ORDER BY p.stichwort, p.bewohner.bWKennung, p.von");
+        query.setParameter("topic", EntityTools.getMySQLsearchPattern(topic));
+        if (!includeInactives) {
+            query.setParameter("now", new Date());
+        }
         List<NursingProcess> planungen = query.getResultList();
         em.close();
         return planungen;
