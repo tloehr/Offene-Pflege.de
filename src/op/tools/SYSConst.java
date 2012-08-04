@@ -267,6 +267,10 @@ public class SYSConst {
     public static final Icon icon22gotoEndPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_end_pressed.png"));
     public static final Icon icon22stop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22stopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
+    public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
+    public static final Icon icon22redoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo_pressed.png"));
+    public static final Icon icon22ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2.png"));
+    public static final Icon icon22ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2_pressed.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon22delete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete.png"));
     public static final Icon icon22deletePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete_pressed.png"));
@@ -279,4 +283,5 @@ public class SYSConst {
     public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
     public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
     public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/history.png"));
+    public static final Icon icon22addbw = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_bw.png"));
 }

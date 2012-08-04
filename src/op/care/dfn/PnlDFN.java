@@ -26,26 +26,32 @@
  */
 package op.care.dfn;
 
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.info.BWInfoTools;
-import op.OCSec;
+import entity.verordnungen.BHPTools;
 import op.OPDE;
-import op.care.planung.DlgMassSelect;
 import op.tools.*;
+import org.jdesktop.swingx.HorizontalLayout;
+import org.jdesktop.swingx.VerticalLayout;
+import tablemodels.TMDFN;
+import tablerenderer.RNDDFN;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.math.BigDecimal;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * @author root
@@ -57,21 +63,20 @@ public class PnlDFN extends NursingRecordsPanel {
     String bwkennung;
     Bewohner bewohner;
     JPopupMenu menu;
-    private JFrame parent;
-    //private String classname;
-    private OCSec ocs;
-    private boolean ignoreJDCEvent;
-    private boolean readOnly;
-    private boolean abwesend;
-//    private SYSRunningClasses myRunningClass, blockingClass;
 
-    /**
-     * Creates new form PnlDFN
-     */
-    public PnlDFN(JFrame parent, Bewohner bewohner) {
-        this.parent = parent;
-        ocs = OPDE.getOCSec();
+    private boolean initPhase;
+
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
+    private JDateChooser jdcDatum;
+    private JComboBox cmbSchicht;
+    private int DFN_MAX_MINUTES_TO_WITHDRAW;
+    private JideButton addButton;
+
+    public PnlDFN(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
+        DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
+        this.jspSearch = jspSearch;
         change2Bewohner(bewohner);
     }
 
@@ -79,7 +84,6 @@ public class PnlDFN extends NursingRecordsPanel {
     public void cleanup() {
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);
-//        SYSRunningClassesTools.endModule(myRunningClass);
     }
 
     private void btnLockActionPerformed(ActionEvent e) {
@@ -87,50 +91,246 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     @Override
-   public void reload() {
+    public void reload() {
         reloadTable();
-   }
+    }
 
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
-        this.bwkennung = bewohner.getBWKennung();
-        BewohnerTools.setBWLabel(lblBW, bewohner);
 
-        abwesend = BWInfoTools.isAbwesend(bewohner);
+        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        initPhase = true;
 
-//        if (myRunningClass != null){
-//            SYSRunningClassesTools.endModule(myRunningClass);
-//        }
+
+        prepareSearchArea();
+
+        initPhase = false;
+        reloadTable();
+
+
+//        btnLock.setEnabled(readOnly);
 //
-//        Pair<SYSRunningClasses, SYSRunningClasses> pair = SYSRunningClassesTools.startModule(internalClassID, bewohner, new String[]{"nursingrecords.planung", "nursingrecords.dfn", "nursingrecords.dfnimport"});
-//        myRunningClass = pair.getFirst();
-//        readOnly = myRunningClass.isRW();
+//        ignoreJDCEvent = true;
+//        jdcDatum.setDate(SYSCalendar.nowDBDate());
+//        btnForward.setEnabled(false); // In die Zukunft kann man nicht gucken.
+//
+//        ArrayList hauf = DBRetrieve.getHauf(bwkennung);
+//        Date[] d = (Date[]) hauf.get(0);
+//        jdcDatum.setMinSelectableDate(d[0]);
+//
+//
+//        ignoreJDCEvent = false;
+//        cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
 
-//        if (readOnly) {
-//            blockingClass = pair.getSecond();
-//            btnLock.setToolTipText("<html><body><h3>Dieser Datensatz ist belegt durch:</h3>"
-//                    + blockingClass.getLogin().getUser().getNameUndVorname()
-//                    + "</body></html>");
-//        } else {
-//            btnLock.setToolTipText(null);
-//        }
-
-        btnLock.setEnabled(readOnly);
-
-        ignoreJDCEvent = true;
-        jdcDatum.setDate(SYSCalendar.nowDBDate());
-        btnForward.setEnabled(false); // In die Zukunft kann man nicht gucken.
-
-        ArrayList hauf = DBRetrieve.getHauf(bwkennung);
-        Date[] d = (Date[]) hauf.get(0);
-        jdcDatum.setMinSelectableDate(d[0]);
+    }
 
 
-        ignoreJDCEvent = false;
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+        GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addFilters());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+
+    }
+
+    private java.util.List<Component> addFilters() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        cmbSchicht = new JComboBox(new DefaultComboBoxModel(GUITools.getLocalizedMessages(new String[]{"misc.msg.everything", internalClassID + ".shift.veryearly", internalClassID + ".shift.early", internalClassID + ".shift.late", internalClassID + ".shift.verylate"})));
+        cmbSchicht.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
+        cmbSchicht.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (!initPhase) {
+                    reloadTable();
+                }
+            }
+        });
+        list.add(cmbSchicht);
 
+        jdcDatum = new JDateChooser(new Date());
+        jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
+        jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(bewohner));
+
+        jdcDatum.setBackground(Color.WHITE);
+        jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (initPhase) {
+                    return;
+                }
+                if (evt.getPropertyName().equals("date")) {
+                    reloadTable();
+                }
+            }
+        });
+        list.add(jdcDatum);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new HorizontalLayout(5));
+        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(jdcDatum.getMinSelectableDate());
+            }
+        });
+        homeButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start_pressed.png")));
+        homeButton.setBorder(null);
+        homeButton.setBorderPainted(false);
+        homeButton.setOpaque(false);
+        homeButton.setContentAreaFilled(false);
+        homeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back.png")));
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
+            }
+        });
+        backButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back_pressed.png")));
+        backButton.setBorder(null);
+        backButton.setBorderPainted(false);
+        backButton.setOpaque(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
+        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play.png")));
+        fwdButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
+            }
+        });
+        fwdButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play_pressed.png")));
+        fwdButton.setBorder(null);
+        fwdButton.setBorderPainted(false);
+        fwdButton.setOpaque(false);
+        fwdButton.setContentAreaFilled(false);
+        fwdButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
+        endButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jdcDatum.setDate(new Date());
+            }
+        });
+        endButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end_pressed.png")));
+        endButton.setBorder(null);
+        endButton.setBorderPainted(false);
+        endButton.setOpaque(false);
+        endButton.setContentAreaFilled(false);
+        endButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
+        buttonPanel.add(homeButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(fwdButton);
+        buttonPanel.add(endButton);
+
+        list.add(buttonPanel);
+
+        return list;
+    }
+
+    private void jspDFNComponentResized(ComponentEvent evt) {
+        JScrollPane jsp = (JScrollPane) evt.getComponent();
+        Dimension dim = jsp.getSize();
+        // Größe der Text Spalten im DFN ändern.
+        // Summe der fixen Spalten  = 175 + ein bisschen
+        int textWidth = dim.width - (50 + 80 + 55 + 80 + 25);
+        TableColumnModel tcm1 = tblDFN.getColumnModel();
+        if (tcm1.getColumnCount() < 4) {
+            return;
+        }
+
+        //tcm1.getColumn(TMDFN.COL_MassID).setPreferredWidth(50);
+        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
+        tcm1.getColumn(TMDFN.COL_ZEIT).setPreferredWidth(80);
+        tcm1.getColumn(TMDFN.COL_STATUS).setPreferredWidth(55);
+        tcm1.getColumn(TMDFN.COL_UKENNUNG).setPreferredWidth(80);
+        tcm1.getColumn(TMDFN.COL_BEMDFN).setPreferredWidth(textWidth / 2);
+
+        //tcm1.getColumn(0).setHeaderValue("ID");
+        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
+        tcm1.getColumn(TMDFN.COL_ZEIT).setHeaderValue("Zeit");
+        tcm1.getColumn(TMDFN.COL_STATUS).setHeaderValue("Status");
+        tcm1.getColumn(TMDFN.COL_UKENNUNG).setHeaderValue("PflegerIn");
+        tcm1.getColumn(TMDFN.COL_BEMDFN).setHeaderValue("Hinweis");
+    }
+
+    private java.util.List<Component> addCommands() {
+
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), null);
+//            addButton.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//
+//                    if (VerordnungTools.hasBedarf(bewohner)) {
+//
+//                        final JidePopup popup = new JidePopup();
+//
+//                        DlgBedarf dlg = new DlgBedarf(bewohner, new Closure() {
+//                            @Override
+//                            public void execute(Object o) {
+//                                popup.hidePopup();
+//                                if (o != null) {
+//                                    reloadTable();
+//                                }
+//                            }
+//                        });
+//
+//                        popup.setMovable(false);
+//                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+//                        popup.getContentPane().add(dlg);
+//                        popup.setOwner(addButton);
+//                        popup.removeExcludedComponent(addButton);
+//                        popup.setDefaultFocusComponent(dlg);
+//                        Point p = new Point(addButton.getX(), addButton.getY());
+//                        SwingUtilities.convertPointToScreen(p, addButton);
+//                        popup.showPopup(p.x, p.y - (int) dlg.getPreferredSize().getHeight()); // - (int) addButton.getPreferredSize().getHeight()
+//                    } else {
+//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine Bedarfsverordnungen vorhanden"));
+//                    }
+//                }
+//            });
+            list.add(addButton);
+        }
+
+        return list;
     }
 
     /**
@@ -141,165 +341,11 @@ public class PnlDFN extends NursingRecordsPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jToolBar1 = new JToolBar();
-        btnNew = new JButton();
-        lblBW = new JLabel();
-        btnLock = new JButton();
-        jPanel1 = new JPanel();
-        btnNow = new JButton();
-        btnForward = new JButton();
-        btnBack = new JButton();
-        btnTop = new JButton();
-        jdcDatum = new JDateChooser();
-        cmbSchicht = new JComboBox();
         jspDFN = new JScrollPane();
         tblDFN = new JTable();
 
         //======== this ========
-
-        //======== jToolBar1 ========
-        {
-            jToolBar1.setFloatable(false);
-
-            //---- btnNew ----
-            btnNew.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/filenew.png")));
-            btnNew.setText("Neu");
-            btnNew.setFocusable(false);
-            btnNew.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnNewActionPerformed(e);
-                }
-            });
-            jToolBar1.add(btnNew);
-        }
-
-        //---- lblBW ----
-        lblBW.setFont(new Font("Dialog", Font.BOLD, 18));
-        lblBW.setForeground(new Color(255, 51, 0));
-        lblBW.setText("Nachname, Vorname (*GebDatum, 00 Jahre) [??1]");
-
-        //---- btnLock ----
-        btnLock.setBackground(Color.white);
-        btnLock.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png")));
-        btnLock.setBorder(null);
-        btnLock.setBorderPainted(false);
-        btnLock.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnLockActionPerformed(e);
-            }
-        });
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-            //---- btnNow ----
-            btnNow.setBackground(Color.white);
-            btnNow.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/history.png")));
-            btnNow.setBorder(null);
-            btnNow.setBorderPainted(false);
-            btnNow.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnNowActionPerformed(e);
-                }
-            });
-
-            //---- btnForward ----
-            btnForward.setBackground(Color.white);
-            btnForward.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
-            btnForward.setBorder(null);
-            btnForward.setBorderPainted(false);
-            btnForward.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnForwardActionPerformed(e);
-                }
-            });
-
-            //---- btnBack ----
-            btnBack.setBackground(Color.white);
-            btnBack.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1leftarrow.png")));
-            btnBack.setBorder(null);
-            btnBack.setBorderPainted(false);
-            btnBack.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBackActionPerformed(e);
-                }
-            });
-
-            //---- btnTop ----
-            btnTop.setBackground(Color.white);
-            btnTop.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2leftarrow.png")));
-            btnTop.setBorder(null);
-            btnTop.setBorderPainted(false);
-            btnTop.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnTopActionPerformed(e);
-                }
-            });
-
-            //---- jdcDatum ----
-            jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    jdcDatumPropertyChange(e);
-                }
-            });
-
-            //---- cmbSchicht ----
-            cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{
-                    "Alles",
-                    "Nacht, morgens",
-                    "Fr\u00fch",
-                    "Sp\u00e4t",
-                    "Nacht, abends"
-            }));
-            cmbSchicht.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbSchichtItemStateChanged(e);
-                }
-            });
-
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(btnTop, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(btnBack)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(btnForward)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(btnNow, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
-                                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                    jPanel1Layout.createParallelGroup()
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(jPanel1Layout.createParallelGroup()
-                                            .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                                    .addComponent(btnNow, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(btnForward, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(btnBack, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(btnTop, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(jdcDatum, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addContainerGap(20, Short.MAX_VALUE))
-            );
-        }
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         //======== jspDFN ========
         {
@@ -320,72 +366,38 @@ public class PnlDFN extends NursingRecordsPanel {
             });
             jspDFN.setViewportView(tblDFN);
         }
-
-        GroupLayout layout = new GroupLayout(this);
-        setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup()
-                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblBW, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnLock)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspDFN, GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup()
-                                        .addComponent(btnLock)
-                                        .addComponent(lblBW))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspDFN, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+        add(jspDFN);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNowActionPerformed
-        jdcDatum.setDate(SYSCalendar.today_date());
-        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
-    }//GEN-LAST:event_btnNowActionPerformed
-
-    private void btnForwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForwardActionPerformed
-        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
-        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
-    }//GEN-LAST:event_btnForwardActionPerformed
-
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
-        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
-    }//GEN-LAST:event_btnBackActionPerformed
-
-    private void btnTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTopActionPerformed
-        jdcDatum.setDate(jdcDatum.getMinSelectableDate());
-        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
-    }//GEN-LAST:event_btnTopActionPerformed
-
-    private void jdcDatumPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jdcDatumPropertyChange
-        if (!evt.getPropertyName().equals("date") || ignoreJDCEvent) {
-            return;
-        }
-        ignoreJDCEvent = true;
-        SYSCalendar.checkJDC((JDateChooser) evt.getSource());
-        ignoreJDCEvent = false;
-        reloadTable();
-    }//GEN-LAST:event_jdcDatumPropertyChange
+//    private void btnNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNowActionPerformed
+//        jdcDatum.setDate(SYSCalendar.today_date());
+//        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
+//    }//GEN-LAST:event_btnNowActionPerformed
+//
+//    private void btnForwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForwardActionPerformed
+//        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
+//        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
+//    }//GEN-LAST:event_btnForwardActionPerformed
+//
+//    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+//        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
+//        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
+//    }//GEN-LAST:event_btnBackActionPerformed
+//
+//    private void btnTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTopActionPerformed
+//        jdcDatum.setDate(jdcDatum.getMinSelectableDate());
+//        btnForward.setEnabled(SYSCalendar.sameDay(jdcDatum.getDate(), SYSCalendar.nowDBDate()) < 0);
+//    }//GEN-LAST:event_btnTopActionPerformed
+//
+//    private void jdcDatumPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jdcDatumPropertyChange
+//        if (!evt.getPropertyName().equals("date") || ignoreJDCEvent) {
+//            return;
+//        }
+//        ignoreJDCEvent = true;
+//        SYSCalendar.checkJDC((JDateChooser) evt.getSource());
+//        ignoreJDCEvent = false;
+//        reloadTable();
+//    }//GEN-LAST:event_jdcDatumPropertyChange
 
     private void cmbSchichtItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSchichtItemStateChanged
         if (evt.getStateChange() != ItemEvent.SELECTED) {
@@ -395,203 +407,192 @@ public class PnlDFN extends NursingRecordsPanel {
     }//GEN-LAST:event_cmbSchichtItemStateChanged
 
     private void reloadTable() {
-        tblDFN.setModel(new TMDFN(bwkennung, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
+        tblDFN.setModel(new TMDFN(bewohner, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
         tblDFN.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspDFN.dispatchEvent(new ComponentEvent(jspDFN, ComponentEvent.COMPONENT_RESIZED));
         tblDFN.getColumnModel().getColumn(TMDFN.COL_BEZEICHNUNG).setCellRenderer(new RNDDFN());
         tblDFN.getColumnModel().getColumn(TMDFN.COL_ZEIT).setCellRenderer(new RNDDFN());
         tblDFN.getColumnModel().getColumn(TMDFN.COL_STATUS).setCellRenderer(new RNDDFN());
         tblDFN.getColumnModel().getColumn(TMDFN.COL_UKENNUNG).setCellRenderer(new RNDDFN());
-        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEMPLAN).setCellRenderer(new RNDDFN());
+        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEMDFN).setCellRenderer(new RNDDFN());
 
     }
 
     private void tblDFNMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDFNMousePressed
-        if (readOnly) {
-            return;
-        }
-        final TMDFN tm = (TMDFN) tblDFN.getModel();
-        if (tm.getRowCount() == 0) {
-            return;
-        }
-        Point p = evt.getPoint();
-        final int col = tblDFN.columnAtPoint(p);
-        final int row = tblDFN.rowAtPoint(p);
-        ListSelectionModel lsm = tblDFN.getSelectionModel();
-        lsm.setSelectionInterval(row, row);
-        final long dfnid = ((Long) tm.getValueAt(row, TMDFN.COL_DFNID)).longValue();
-        //final long termid = ((Long) tm.getValueAt(row, TMDFN.COL_TERMID)).longValue();
-        int status = ((Integer) tm.getValueAt(row, TMDFN.COL_STATUS)).intValue();
-        String ukennung = ((String) tm.getValueAt(row, TMDFN.COL_UKENNUNG)).toString();
-        long abdatum = ((Long) tm.getValueAt(row, TMDFN.COL_BIS)).longValue();
-        //final long soll = ((Long) tm.getValueAt(row, TMDFN.COL_SOLL)).longValue();
-        //final int szeit = ((Integer) tm.getValueAt(row, TMDFN.COL_SZEIT)).intValue();
-        //final long relid = ((Long) tm.getValueAt(row, TMDFN.COL_RELID)).longValue();
-        long mdate = ((Long) tm.getValueAt(row, TMDFN.COL_MDATE)).longValue();
-
-        boolean changeable =
-                // Diese Kontrolle stellt sicher, dass ein User nur seine eigenen Einträge und das auch nur
-                // eine halbe Stunde lang bearbeiten kann.
-                !abwesend &&
-                        SYSCalendar.isInFuture(abdatum) &&
-                        (ukennung.equals("") ||
-                                (ukennung.equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung()) &&
-                                        SYSCalendar.earlyEnough(mdate, 30)));
-        OPDE.debug(changeable ? "changeable" : "NOT changeable");
-        if (changeable) {
-            // Drückt der Anwender auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
-            if (!evt.isPopupTrigger() && col == TMDFN.COL_STATUS) {
-                boolean fullReloadNecessary = false;
-                status++;
-                if (status > 1) {
-                    status = 0;
-                }
-                HashMap hm = new HashMap();
-                hm.put("Status", status);
-                if (status == 0) {
-                    hm.put("UKennung", null);
-                    hm.put("Ist", null);
-                    hm.put("IZeit", null);
-                    hm.put("Dauer", 0);
-                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
-
-                } else {
-                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-                    hm.put("Ist", "!NOW!");
-                    hm.put("IZeit", SYSCalendar.ermittleZeit());
-                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
-                }
-
-                hm.clear();
-                tm.setUpdate(row, status);
-                if (fullReloadNecessary) {
-                    reloadTable();
-                }
-            }
-
-        }
-        // Nun noch Menüeinträge
-        if (evt.isPopupTrigger()) {
-            SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
-
-            JMenuItem itemPopupRefuse = new JMenuItem("Verweigert / nicht durchgeführt");
-            itemPopupRefuse.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    HashMap hm = new HashMap();
-                    hm.put("Status", TMDFN.STATUS_VERWEIGERT);
-                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-                    hm.put("Ist", "!NOW!");
-                    hm.put("IZeit", SYSCalendar.ermittleZeit());
-                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
-                    hm.clear();
-                    tm.setUpdate(row, TMDFN.STATUS_VERWEIGERT);
-                    //tm.reload(row, col);
-                }
-            });
-            menu.add(itemPopupRefuse);
-            ocs.setEnabled(this, "itemPopupRefuse", itemPopupRefuse, changeable && status == TMDFN.STATUS_OFFEN);
-
-            if (changeable) {
-                menu.add(new JSeparator());
-                int[] mins = new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360};
-                HashMap text = new HashMap();
-                text.put(60, "1 Stunde");
-                text.put(120, "2 Stunden");
-                text.put(240, "3 Stunden");
-                text.put(360, "4 Stunden");
-                for (int i = 0; i < mins.length; i++) {
-                    String einheit = mins[i] + " Minuten";
-                    if (text.containsKey(mins[i])) {
-                        einheit = mins[i] + " " + text.get(mins[i]).toString();
-                    }
-                    JMenuItem item = new JMenuItem(einheit);
-                    final int minutes = mins[i];
-                    item.addActionListener(new java.awt.event.ActionListener() {
-
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            HashMap hm = new HashMap();
-                            hm.put("Dauer", minutes);
-                            DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
-                            hm.clear();
-                            tm.reload(row, TMDFN.COL_BEZEICHNUNG);
-                        }
-                    });
-                    menu.add(item);
-                    item.setEnabled(status == TMDFN.STATUS_ERLEDIGT);
-                }
-                text.clear();
-            }
-
-            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-        }
-    }//GEN-LAST:event_tblDFNMousePressed
-
-    private void jspDFNComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspDFNComponentResized
-        JScrollPane jsp = (JScrollPane) evt.getComponent();
-        Dimension dim = jsp.getSize();
-        // Größe der Text Spalten im DFN ändern.
-        // Summe der fixen Spalten  = 175 + ein bisschen
-        int textWidth = dim.width - (50 + 80 + 55 + 80 + 25);
-        TableColumnModel tcm1 = tblDFN.getColumnModel();
-        if (tcm1.getColumnCount() < 4) {
-            return;
-        }
-
-        //tcm1.getColumn(TMDFN.COL_MassID).setPreferredWidth(50);
-        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
-        tcm1.getColumn(TMDFN.COL_ZEIT).setPreferredWidth(80);
-        tcm1.getColumn(TMDFN.COL_STATUS).setPreferredWidth(55);
-        tcm1.getColumn(TMDFN.COL_UKENNUNG).setPreferredWidth(80);
-        tcm1.getColumn(TMDFN.COL_BEMPLAN).setPreferredWidth(textWidth / 2);
-
-        //tcm1.getColumn(0).setHeaderValue("ID");
-        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
-        tcm1.getColumn(TMDFN.COL_ZEIT).setHeaderValue("Zeit");
-        tcm1.getColumn(TMDFN.COL_STATUS).setHeaderValue("Status");
-        tcm1.getColumn(TMDFN.COL_UKENNUNG).setHeaderValue("PflegerIn");
-        tcm1.getColumn(TMDFN.COL_BEMPLAN).setHeaderValue("Hinweis");
+//        if (readOnly) {
+//            return;
+//        }
+//        final TMDFN tm = (TMDFN) tblDFN.getModel();
+//        if (tm.getRowCount() == 0) {
+//            return;
+//        }
+//        Point p = evt.getPoint();
+//        final int col = tblDFN.columnAtPoint(p);
+//        final int row = tblDFN.rowAtPoint(p);
+//        ListSelectionModel lsm = tblDFN.getSelectionModel();
+//        lsm.setSelectionInterval(row, row);
+//        final long dfnid = ((Long) tm.getValueAt(row, TMDFN.COL_DFNID)).longValue();
+//        //final long termid = ((Long) tm.getValueAt(row, TMDFN.COL_TERMID)).longValue();
+//        int status = ((Integer) tm.getValueAt(row, TMDFN.COL_STATUS)).intValue();
+//        String ukennung = ((String) tm.getValueAt(row, TMDFN.COL_UKENNUNG)).toString();
+//        long abdatum = ((Long) tm.getValueAt(row, TMDFN.COL_BIS)).longValue();
+//        //final long soll = ((Long) tm.getValueAt(row, TMDFN.COL_SOLL)).longValue();
+//        //final int szeit = ((Integer) tm.getValueAt(row, TMDFN.COL_SZEIT)).intValue();
+//        //final long relid = ((Long) tm.getValueAt(row, TMDFN.COL_RELID)).longValue();
+//        long mdate = ((Long) tm.getValueAt(row, TMDFN.COL_MDATE)).longValue();
+//
+//        boolean changeable =
+//                // Diese Kontrolle stellt sicher, dass ein User nur seine eigenen Einträge und das auch nur
+//                // eine halbe Stunde lang bearbeiten kann.
+//                !abwesend &&
+//                        SYSCalendar.isInFuture(abdatum) &&
+//                        (ukennung.equals("") ||
+//                                (ukennung.equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung()) &&
+//                                        SYSCalendar.earlyEnough(mdate, 30)));
+//        OPDE.debug(changeable ? "changeable" : "NOT changeable");
+//        if (changeable) {
+//            // Drückt der Anwender auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
+//            if (!evt.isPopupTrigger() && col == TMDFN.COL_STATUS) {
+//                boolean fullReloadNecessary = false;
+//                status++;
+//                if (status > 1) {
+//                    status = 0;
+//                }
+//                HashMap hm = new HashMap();
+//                hm.put("Status", status);
+//                if (status == 0) {
+//                    hm.put("UKennung", null);
+//                    hm.put("Ist", null);
+//                    hm.put("IZeit", null);
+//                    hm.put("Dauer", 0);
+//                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
+//
+//                } else {
+//                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//                    hm.put("Ist", "!NOW!");
+//                    hm.put("IZeit", SYSCalendar.ermittleZeit());
+//                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
+//                }
+//
+//                hm.clear();
+//                tm.setUpdate(row, status);
+//                if (fullReloadNecessary) {
+//                    reloadTable();
+//                }
+//            }
+//
+//        }
+//        // Nun noch Menüeinträge
+//        if (evt.isPopupTrigger()) {
+//            SYSTools.unregisterListeners(menu);
+//            menu = new JPopupMenu();
+//
+//            JMenuItem itemPopupRefuse = new JMenuItem("Verweigert / nicht durchgeführt");
+//            itemPopupRefuse.addActionListener(new java.awt.event.ActionListener() {
+//
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    HashMap hm = new HashMap();
+//                    hm.put("Status", TMDFN.STATUS_VERWEIGERT);
+//                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//                    hm.put("Ist", "!NOW!");
+//                    hm.put("IZeit", SYSCalendar.ermittleZeit());
+//                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
+//                    hm.clear();
+//                    tm.setUpdate(row, TMDFN.STATUS_VERWEIGERT);
+//                    //tm.reload(row, col);
+//                }
+//            });
+//            menu.add(itemPopupRefuse);
+//            ocs.setEnabled(this, "itemPopupRefuse", itemPopupRefuse, changeable && status == TMDFN.STATUS_OFFEN);
+//
+//            if (changeable) {
+//                menu.add(new JSeparator());
+//                int[] mins = new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360};
+//                HashMap text = new HashMap();
+//                text.put(60, "1 Stunde");
+//                text.put(120, "2 Stunden");
+//                text.put(240, "3 Stunden");
+//                text.put(360, "4 Stunden");
+//                for (int i = 0; i < mins.length; i++) {
+//                    String einheit = mins[i] + " Minuten";
+//                    if (text.containsKey(mins[i])) {
+//                        einheit = mins[i] + " " + text.get(mins[i]).toString();
+//                    }
+//                    JMenuItem item = new JMenuItem(einheit);
+//                    final int minutes = mins[i];
+//                    item.addActionListener(new java.awt.event.ActionListener() {
+//
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            HashMap hm = new HashMap();
+//                            hm.put("Dauer", minutes);
+//                            DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
+//                            hm.clear();
+//                            tm.reload(row, TMDFN.COL_BEZEICHNUNG);
+//                        }
+//                    });
+//                    menu.add(item);
+//                    item.setEnabled(status == TMDFN.STATUS_ERLEDIGT);
+//                }
+//                text.clear();
+//            }
+//
+//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//        }
+//    }//GEN-LAST:event_tblDFNMousePressed
+//
+//    private void jspDFNComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspDFNComponentResized
+//        JScrollPane jsp = (JScrollPane) evt.getComponent();
+//        Dimension dim = jsp.getSize();
+//        // Größe der Text Spalten im DFN ändern.
+//        // Summe der fixen Spalten  = 175 + ein bisschen
+//        int textWidth = dim.width - (50 + 80 + 55 + 80 + 25);
+//        TableColumnModel tcm1 = tblDFN.getColumnModel();
+//        if (tcm1.getColumnCount() < 4) {
+//            return;
+//        }
+//
+//        //tcm1.getColumn(TMDFN.COL_MassID).setPreferredWidth(50);
+//        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
+//        tcm1.getColumn(TMDFN.COL_ZEIT).setPreferredWidth(80);
+//        tcm1.getColumn(TMDFN.COL_STATUS).setPreferredWidth(55);
+//        tcm1.getColumn(TMDFN.COL_UKENNUNG).setPreferredWidth(80);
+//        tcm1.getColumn(TMDFN.COL_BEMPLAN).setPreferredWidth(textWidth / 2);
+//
+//        //tcm1.getColumn(0).setHeaderValue("ID");
+//        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
+//        tcm1.getColumn(TMDFN.COL_ZEIT).setHeaderValue("Zeit");
+//        tcm1.getColumn(TMDFN.COL_STATUS).setHeaderValue("Status");
+//        tcm1.getColumn(TMDFN.COL_UKENNUNG).setHeaderValue("PflegerIn");
+//        tcm1.getColumn(TMDFN.COL_BEMPLAN).setHeaderValue("Hinweis");
     }//GEN-LAST:event_jspDFNComponentResized
 
-    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        Object[] sel = DlgMassSelect.showDialog(parent, true);
-        if (sel.length > 0) {
-            HashMap hmnew = new HashMap();
-            hmnew.put("Status", TMDFN.STATUS_ERLEDIGT);
-            hmnew.put("UKennung", OPDE.getLogin().getUser().getUKennung());
-            hmnew.put("BWKennung", bwkennung);
-            hmnew.put("TermID", 0);
-            hmnew.put("Soll", "!NOW!");
-            hmnew.put("StDatum", "!NOW!");
-            hmnew.put("SZeit", SYSCalendar.ermittleZeit());
-            hmnew.put("Ist", "!NOW!");
-            hmnew.put("IZeit", SYSCalendar.ermittleZeit());
-            for (int i = 0; i < sel.length; i++) {
-                // Zuerst neuen DFN einfügen.
-                ListElement elmass = (ListElement) sel[i];
-                long massID = elmass.getPk();
-                hmnew.put("MassID", massID);
-                double dauer = ((BigDecimal) DBRetrieve.getSingleValue("Massnahmen", "Dauer", "MassID", massID)).doubleValue();
-                hmnew.put("Dauer", dauer);
-                DBHandling.insertRecord("DFN", hmnew);
-            }
-            reloadTable();
-        }
-    }//GEN-LAST:event_btnNewActionPerformed
+//    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
+//        Object[] sel = DlgMassSelect.showDialog(parent, true);
+//        if (sel.length > 0) {
+//            HashMap hmnew = new HashMap();
+//            hmnew.put("Status", TMDFN.STATUS_ERLEDIGT);
+//            hmnew.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//            hmnew.put("BWKennung", bwkennung);
+//            hmnew.put("TermID", 0);
+//            hmnew.put("Soll", "!NOW!");
+//            hmnew.put("StDatum", "!NOW!");
+//            hmnew.put("SZeit", SYSCalendar.ermittleZeit());
+//            hmnew.put("Ist", "!NOW!");
+//            hmnew.put("IZeit", SYSCalendar.ermittleZeit());
+//            for (int i = 0; i < sel.length; i++) {
+//                // Zuerst neuen DFN einfügen.
+//                ListElement elmass = (ListElement) sel[i];
+//                long massID = elmass.getPk();
+//                hmnew.put("MassID", massID);
+//                double dauer = ((BigDecimal) DBRetrieve.getSingleValue("Massnahmen", "Dauer", "MassID", massID)).doubleValue();
+//                hmnew.put("Dauer", dauer);
+//                DBHandling.insertRecord("DFN", hmnew);
+//            }
+//            reloadTable();
+//        }
+//    }//GEN-LAST:event_btnNewActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JToolBar jToolBar1;
-    private JButton btnNew;
-    private JLabel lblBW;
-    private JButton btnLock;
-    private JPanel jPanel1;
-    private JButton btnNow;
-    private JButton btnForward;
-    private JButton btnBack;
-    private JButton btnTop;
-    private JDateChooser jdcDatum;
-    private JComboBox cmbSchicht;
     private JScrollPane jspDFN;
     private JTable tblDFN;
     // End of variables declaration//GEN-END:variables

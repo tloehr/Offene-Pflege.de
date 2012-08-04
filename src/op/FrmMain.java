@@ -83,7 +83,6 @@ import java.util.List;
 public class FrmMain extends JFrame {
 
     public static final String internalClassID = "opde.mainframe";
-    public final Icon icon22addbw = new ImageIcon(getClass().getResource("/artwork/22x22/add_bw.png"));
 
     private boolean initPhase;
 
@@ -324,13 +323,14 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
 
                 //---- btnVerlegung ----
-                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance1.png")));
+                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
                 btnVerlegung.setBorder(null);
                 btnVerlegung.setBorderPainted(false);
                 btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.setSelectedIcon(null);
                 btnVerlegung.setToolTipText("Verlegungsbericht drucken");
                 btnVerlegung.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2_pressed.png")));
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -347,6 +347,7 @@ public class FrmMain extends JFrame {
                 btnExit.setContentAreaFilled(false);
                 btnExit.setToolTipText("Abmelden");
                 btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock_pressed.png")));
                 btnExit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -386,6 +387,7 @@ public class FrmMain extends JFrame {
                 btnReload.setContentAreaFilled(false);
                 btnReload.setToolTipText("Ansicht aktualisieren");
                 btnReload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnReload.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_pressed.png")));
                 btnReload.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -455,7 +457,7 @@ public class FrmMain extends JFrame {
 
         // Darf neue Bewohner anlegen
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
-            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), icon22addbw, null);
+            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);

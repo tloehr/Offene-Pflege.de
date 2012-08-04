@@ -2,6 +2,7 @@ package entity.planung;
 
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.care.dfn.PnlDFN;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import org.joda.time.*;
@@ -24,6 +25,8 @@ public class DFNTools {
     public static final byte STATUS_OFFEN = 0;
     public static final byte STATUS_ERLEDIGT = 1;
     public static final byte STATUS_VERWEIGERT = 2;
+
+    public static final String[] SOLLZEITTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
 
     /**
      * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft, ermittelt ob sie am betreffenden Stichtag auch "dran" sind und dann
@@ -305,5 +308,34 @@ public class DFNTools {
         long num = (Long) query.getSingleResult();
         em.close();
         return num;
+    }
+
+
+    public static String getInterventionAsHTML(DFN dfn) {
+        String result = SYSConst.html_div_open;
+//          " CASE dfn.SZeit WHEN 0 THEN 'Uhrzeit' WHEN 1 THEN 'NachtMo' WHEN 2 THEN 'Morgens' WHEN 3 THEN 'Mittags' " +
+//                    " WHEN 4 THEN 'Nachmittags' WHEN 5 THEN 'Abends' WHEN 6 THEN 'NachtAb' ELSE '!FEHLER!'
+
+        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isAbgesetzt()) {
+            result += "<s>";
+        }
+        result += "<b>" + dfn.getIntervention().getBezeichnung() + "</b>";
+        result += "<font size=\"-1\">";
+        result += "<br/>Dauer: <b>" + dfn.getDauer() + "</b> " + OPDE.lang.getString("misc.msg.Minutes");
+
+        if (dfn.getNursingProcess() == null) { // on demand
+            result += " " + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand");
+        } else {
+            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getKategorie().getBezeichnung() + "</font>)";
+        }
+
+        result += "</font>";
+
+        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isAbgesetzt()) {
+            result += "</s>";
+        }
+
+        result += SYSConst.html_div_close;
+        return result;
     }
 }

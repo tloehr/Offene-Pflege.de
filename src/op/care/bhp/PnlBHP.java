@@ -510,7 +510,7 @@ public class PnlBHP extends NursingRecordsPanel {
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
-        cmbSchicht = new JComboBox(new DefaultComboBoxModel(new String[]{"Alles", "Nacht, früh morgens", "Früh", "Spät", "Nacht, spät abends"}));
+        cmbSchicht = new JComboBox(new DefaultComboBoxModel(GUITools.getLocalizedMessages(new String[]{"misc.msg.everything",internalClassID+".shift.veryearly",internalClassID+".shift.early",internalClassID+".shift.late",internalClassID+".shift.verylate"})));
         cmbSchicht.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
         cmbSchicht.addItemListener(new ItemListener() {
@@ -632,7 +632,7 @@ public class PnlBHP extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            addButton = GUITools.createHyperlinkButton("Bei Bedarf", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID+".btnadd"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 

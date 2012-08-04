@@ -223,10 +223,7 @@ public class TMBHP extends AbstractTableModel {
                 break;
             }
             case COL_UKENNUNG: {
-                result = "";
-                if (bhp.getUser() != null) {
-                    result = bhp.getUser().getUKennung();
-                }
+                result = SYSTools.catchNull(bhp.getUser().getUKennung());
                 break;
             }
             case COL_BEMPLAN: {

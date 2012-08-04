@@ -183,4 +183,13 @@ public class GUITools {
             OPDE.getDisplayManager().setIconGone();
         }
     }
+
+    public static String[] getLocalizedMessages(String[] languagekeys) {
+        String[] result = new String[languagekeys.length];
+        int index = 0;
+        for (String key : languagekeys) {
+            result[index] = OPDE.lang.getString(key);
+        }
+        return result;
+    }
 }

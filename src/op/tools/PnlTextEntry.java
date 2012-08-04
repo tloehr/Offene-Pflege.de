@@ -46,20 +46,16 @@ import java.awt.event.ActionListener;
  * @author tloehr
  */
 public class PnlTextEntry extends JPanel {
-    public static final String internalClassID = "nursingrecords.nursingprocess.pnlclose";
+
     private Closure actionBlock;
 
     /**
      * Creates new form DlgAbsetzen
      */
-    public PnlTextEntry(NursingProcess nursingProcess, Closure actionBlock) {
+    public PnlTextEntry(String title, Closure actionBlock) {
         this.actionBlock = actionBlock;
         initComponents();
-        initPanel();
-    }
-
-    private void initPanel() {
-        pnlReason.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID+".reason")));
+        pnlReason.setBorder(new TitledBorder(title));
     }
 
     /**
@@ -118,7 +114,7 @@ public class PnlTextEntry extends JPanel {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         if (txtBemerkung.getText().trim().isEmpty()){
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".reasonxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry"), DisplayMessage.WARNING));
         } else {
             actionBlock.execute(txtBemerkung.getText());
         }

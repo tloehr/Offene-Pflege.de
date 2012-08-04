@@ -1,16 +1,15 @@
-Icons
-
-Die Icons stammen alle aus dem KDE Projekt. Folgende Sets wurden
-verwendet:
-
+Most of the icons in OPDE have been taken from several iconsets of the KDE project:
 - CrystalClear (Icon Theme by Everaldo.com Design Studio)
 - CrystalSVG (Icon Theme by Everaldo.com Design Studio)
 - KDE Crystal Diamond 2 (www.paolinoland.it)
+- Black and White (carpelinx, Lothar Grimme, http://www.carpicon.com/index.php?option=com_content&task=view&id=6&Itemid=26)
+- nuoveXT 2.2 (Name: Alexandre Moore, Nickname: Saki, Location: Quebec City, Canada, E-mail: alexandre.moore(at)gmail.com)
+You will find an overview here: http://kde-look.org
 
-Die obigen Icons stehen unter der GNU LGPL.
+On/Off Icons by Jelle Elferink (www.jt11.nl). Used with his kind permission.
+- cb-off.png
+- cb-on.png
 
-- On/Off Icons von Jelle Elferink (www.jt11.nl). Verwendung mit freundlicher Genehmigung.
-	- cb-off.png
-	- cb-on.png
-
-- Lots of different Icons and Symbols from www.wpclipart.com. This material is PD.
+Lots of different icons and symbols taken from www.wpclipart.com. This material is PD.
+-- ambulance1.png (http://www.wpclipart.com/transportation/ambulance/ambulance_sketch..png.html)
+-- ambulance2.png (http://www.wpclipart.com/medical/medical_clip_art/ambulance.png.html)

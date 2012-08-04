@@ -40,6 +40,7 @@ import entity.system.Unique;
 import entity.system.UniqueTools;
 import op.OPDE;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
@@ -64,10 +65,7 @@ import java.util.List;
  */
 public class PnlPlanung extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess";
-    private JPopupMenu menu;
     private boolean initPhase;
-
-    private ActionListener standardActionListener;
 
     private Bewohner bewohner;
     private JScrollPane jspSearch;
@@ -75,10 +73,7 @@ public class PnlPlanung extends NursingRecordsPanel {
 
 
     private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
-    //    private HashMap<BWInfoKat, CollapsiblePane> categoryCPMap;
     private HashMap<BWInfoKat, java.util.List<NursingProcess>> planungen;
-    //    private HashMap<BWInfo, JToggleButton> bwinfo4html;
-//    private HashMap<BWInfoTyp, java.util.List<BWInfo>> bwinfos;
     private java.util.List<BWInfoKat> kategorien;
 
     private JToggleButton tbInactive;
@@ -159,239 +154,6 @@ public class PnlPlanung extends NursingRecordsPanel {
         add(jspPlanung);
     }// </editor-fold>//GEN-END:initComponents
 
-//    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-//        new DlgPlanung(parent, bewohner);
-//        reloadTable();
-//    }//GEN-LAST:event_btnNewActionPerformed
-//
-//    private void cbPastActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPastActionPerformed
-//        reloadTable();
-//    }//GEN-LAST:event_cbPastActionPerformed
-//
-//    private void tblPlanungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
-//        if (!evt.isPopupTrigger()) {
-//            return;
-//        }
-//        Point p = evt.getPoint();
-//        ListSelectionModel lsm = tblPlanung.getSelectionModel();
-//        //int col = tblPlanung.columnAtPoint(p);
-//        int row = tblPlanung.rowAtPoint(p);
-//        lsm.setSelectionInterval(row, row);
-//        final long planid = ((Long) tblPlanung.getModel().getValueAt(row, TMPlanungen.COL_PLANID)).longValue();
-//        boolean abgesetzt = ((Boolean) tblPlanung.getModel().getValueAt(row, TMPlanungen.COL_ABGESETZT)).booleanValue();
-//        final String stichwort = tblPlanung.getModel().getValueAt(row, TMPlanungen.COL_STICHWORT).toString();
-//        long numAffectedDFNs = DBHandling.numAffectedDFNs(planid);
-//        boolean sameUser = tblPlanung.getModel().getValueAt(row, TMPlanungen.COL_ANUKENNUNG).toString().equalsIgnoreCase(OPDE.getLogin().getUser().getUKennung());
-//        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-//
-//        /**
-//         * BEARBEITEN
-//         * Eine Planung kann GEändert werden (Korrektur)
-//         * - Wenn es KEINE abgehakten, zugehörigen DFNs gibt.
-//         * - Wenn sie nicht bereits abgesetzt wurde.
-//         * - Wenn sie von mir ist.
-//         *
-//         */
-//        boolean bearbeitenMöglich = OPDE.isAdmin() || (!abgesetzt && sameUser && numAffectedDFNs == 0);
-//
-//        // if (evt.isPopupTrigger()) {
-//
-//        //final HashMap entry = (HashMap) bwinfo.getAttribute().get(tblPlanung.getSelectedRow());
-//        SYSTools.unregisterListeners(menu);
-//        menu = new JPopupMenu();
-//
-//        // BEARBEITEN
-//        JMenuItem itemPopupEdit = new JMenuItem("Bearbeiten");
-//        itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                new DlgPlanung(parent, bewohner, planid, DlgPlanung.EDIT_MODE);
-//                reloadTable();
-//            }
-//        });
-//        menu.add(itemPopupEdit);
-//
-//        JMenuItem itemPopupChange = new JMenuItem("Verändern");
-//        itemPopupChange.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                try {
-//                    new DlgPlanung(parent, bewohner, planid, DlgPlanung.CHANGE_MODE);
-//                    Thread.sleep(1000);// Sonst, falsche Darstellung in Tabelle
-//                    reloadTable();
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(PnlPlanung.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//        });
-//        menu.add(itemPopupChange);
-//
-//        JMenuItem itemPopupQuit = new JMenuItem("Absetzen");
-//        itemPopupQuit.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                try {
-//                    new DlgAbsetzen(parent, planid, stichwort);
-//                    Thread.sleep(1000); // Sonst, falsche Darstellung in Tabelle
-//                    reloadTable();
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(PnlPlanung.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//        });
-//        menu.add(itemPopupQuit);
-//
-//        JMenuItem itemPopupDelete = new JMenuItem("Löschen");
-//        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                if (JOptionPane.showConfirmDialog(parent, "Möchten Sie diese Planung und die zugehörigen DFNs wirklich löschen ?",
-//                        stichwort + " löschen ?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-//                    DBHandling.deletePlanung(planid);
-//                    reloadTable();
-//                }
-//            }
-//        });
-//        menu.add(itemPopupDelete);
-//
-//        JMenuItem itemPopupControl = new JMenuItem("Überprüfung eintragen");
-//        itemPopupControl.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                new DlgPKontrolle(parent, planid);
-//                reloadTable();
-//            }
-//        });
-//        menu.add(itemPopupControl);
-//
-//        menu.add(new JSeparator());
-//        JMenuItem itemPopupInfo = new JMenuItem("Infos anzeigen");
-//        itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                JOptionPane.showMessageDialog(parent, "PlanID: " + planid + "\n", "Software-Infos", JOptionPane.INFORMATION_MESSAGE);
-//            }
-//        });
-//        menu.add(itemPopupInfo);
-//        ocs.setEnabled(this, "itemPopupInfo", itemPopupInfo, true);
-//
-//
-//        /**
-//         * Löschen
-//         * Eine Planung kann gelöscht werden
-//         * - Wenn es KEINE abgehakten, zugehörigen DFNs gibt. Sonst nicht.
-//         * - man Eigentümer, mindestens PDL oder ADMIN ist
-//         *
-//         */
-//        boolean löschenMöglich = OPDE.isAdmin() || (!abgesetzt && sameUser && numAffectedDFNs == 0);
-//
-//        /**
-//         * Verändern
-//         * Eine Planung kann VERändert werden
-//         * - Wenn es abgehakte, zugehörige DFNs gibt. Sonst nicht.
-//         * - ab Examen aufwärts.
-//         *
-//         */
-//        boolean verändernMöglich = !abgesetzt && numAffectedDFNs > 0;
-//        /**
-//         * Absetzen
-//         * Eine Planung kann abgesetzt werden.
-//         * - immer
-//         * - ab Examen aufwärts.
-//         *
-//         */
-//        boolean absetzenMöglich = !abgesetzt && numAffectedDFNs > 0;
-//
-//
-//        ocs.setEnabled(this, "itemPopupEdit", itemPopupEdit, bearbeitenMöglich);
-//        ocs.setEnabled(this, "itemPopupChange", itemPopupChange, verändernMöglich);
-//        ocs.setEnabled(this, "itemPopupDelete", itemPopupDelete, löschenMöglich);
-//        ocs.setEnabled(this, "itemPopupQuit", itemPopupQuit, absetzenMöglich);
-//        ocs.setEnabled(this, "itemPopupControl", itemPopupQuit, absetzenMöglich);
-//
-//        if (singleRowSelected) {
-////            menu.add(new JSeparator());
-////            menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "Planung", planid, bwkennung, fileActionListener));
-//
-//            EntityManager em = OPDE.createEM();
-//            Planung planung = em.find(Planung.class, planid);
-//            if (!planung.isAbgesetzt()) {
-//                menu.add(new JSeparator());
-//                menu.add(VorgaengeTools.getVorgangContextMenu(parent, planung, bewohner, standardActionListener));
-//            }
-//            em.close();
-//        }
-//
-//
-//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-////        } else if (bearbeitenMöglich && evt.getClickCount() == 2) { // Bearbeiten, wenn möglich
-////            new DlgPlanung(parent, bwkennung, planid, DlgPlanung.EDIT_MODE);
-////            reloadTable();
-////        }
-//    }//GEN-LAST:event_tblPlanungMousePressed
-//
-//    private void jspPlanungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspPlanungComponentResized
-//        JScrollPane jsp = (JScrollPane) evt.getComponent();
-//        Dimension dim = jsp.getSize();
-//        // Größe der Text Spalten im DFN ändern.
-//        // Summe der fixen Spalten  = 175 + ein bisschen
-//        int textWidth = dim.width - (150 + 65 + 65 + 25);
-//        TableColumnModel tcm1 = tblPlanung.getColumnModel();
-//        if (tcm1.getColumnCount() < 4) {
-//            return;
-//        }
-//
-//        tcm1.getColumn(TMPlanungen.COL_KATEGORIE).setPreferredWidth(150);
-//        tcm1.getColumn(TMPlanungen.COL_BEMERKUNG).setPreferredWidth(textWidth);
-//        tcm1.getColumn(TMPlanungen.COL_AN).setPreferredWidth(65);
-//        tcm1.getColumn(TMPlanungen.COL_AB).setPreferredWidth(65);
-//        tcm1.getColumn(TMPlanungen.COL_KATEGORIE).setHeaderValue("Kategorie");
-//        tcm1.getColumn(TMPlanungen.COL_BEMERKUNG).setHeaderValue("Bemerkung");
-//        tcm1.getColumn(TMPlanungen.COL_AN).setHeaderValue("Angesetzt");
-//        tcm1.getColumn(TMPlanungen.COL_AB).setHeaderValue("Abgesetzt");
-//    }//GEN-LAST:event_jspPlanungComponentResized
-
-//    private void btnVorlageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVorlageActionPerformed
-//        long template = DlgVorlage.showDialog(parent);
-//        if (template > 0) {
-//            new DlgPlanung(parent, bewohner, template, DlgPlanung.TEMPLATE_MODE);
-//            reloadTable();
-//        }
-//    }//GEN-LAST:event_btnVorlageActionPerformed
-//
-//    private void cbDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbDetailsActionPerformed
-//        reloadTable();
-//    }//GEN-LAST:event_cbDetailsActionPerformed
-//
-//    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-//        try {
-//            // Create temp file.
-//            File temp = File.createTempFile("planung", ".html");
-//
-//            // Delete temp file when program exits.
-//            temp.deleteOnExit();
-//
-//            // Write to temp file
-//            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-//            if (cbPast.isSelected()) {
-//                out.write(DBHandling.getPlanungenAsHTML(bwkennung, SYSConst.DATE_VON_ANFANG_AN, SYSConst.DATE_BIS_AUF_WEITERES));
-//            } else {
-//                Date now = SYSCalendar.nowDBDate();
-//                Date von = new Date(SYSCalendar.erkenneDatum("03.01.2011").getTimeInMillis());
-//
-//                out.write(DBHandling.getPlanungenAsHTML(bwkennung, von, von));
-//            }
-//            out.close();
-//            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
-//        } catch (IOException e) {
-//        }
-//    }//GEN-LAST:event_btnPrintActionPerformed
-//
-//    private void btnCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyActionPerformed
-//        new DlgCopy(parent, bwkennung);
-//        reloadTable();
-//    }//GEN-LAST:event_btnCopyActionPerformed
-
 
     private void reloadDisplay() {
         /***
@@ -404,67 +166,53 @@ public class PnlPlanung extends NursingRecordsPanel {
          */
         initPhase = true;
 
-        final boolean withworker = false;
+        final boolean withworker = true;
         if (withworker) {
 
-//            OPDE.getMainframe().setBlocked(true);
-//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//
-////            lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
-////            ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardWait");
-//
-//            tabKat.removeAll();
-//            bwinfos.clear();
-//            panelmap.clear();
-//
-//            SwingWorker worker = new SwingWorker() {
-//                TableModel model;
-//
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//                    try {
-//                        int progress = 0;
-//
-//                        // Eliminate empty categories
-//                        kategorien = new ArrayList<BWInfoKat>();
-//                        for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
-//                            if (!BWInfoTypTools.findByKategorie(kat).isEmpty()) {
-//                                kategorien.add(kat);
-//                            }
-//                        }
-//
-//                        // create tabs
-//                        for (final BWInfoKat kat : kategorien) {
-//                            progress++;
-//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, kategorien.size()));
-//
-//                            if (!BWInfoTypTools.findByKategorie(kat).isEmpty()) {
-//                                tabKat.addTab(kat.getBezeichnung(), new JScrollPane(createCollapsiblePanesFor(kat)));
-//                            } else {
-//                                kategorien.remove(kat);
-//                            }
-//                        }
-//                    } catch (Exception e) {
-//                        OPDE.fatal(e);
-//                    }
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    txtHTML.setText(null);
-//                    tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
-//                    refreshDisplay();
-//                    btnBWDied.setEnabled(bewohner.isAktiv());
-//                    btnBWMovedOut.setEnabled(bewohner.isAktiv());
-//                    btnBWisAway.setEnabled(bewohner.isAktiv() && !BWInfoTools.isAbwesend(bewohner));
-//                    btnBWisBack.setEnabled(bewohner.isAktiv() && BWInfoTools.isAbwesend(bewohner));
-//                    initPhase = false;
-//                    OPDE.getDisplayManager().setProgressBarMessage(null);
-//                    OPDE.getMainframe().setBlocked(false);
-//                }
-//            };
-//            worker.execute();
+            OPDE.getMainframe().setBlocked(true);
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+            cpPlan.removeAll();
+
+            SwingWorker worker = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        int progress = 0;
+
+                        if (kategorien.isEmpty()) {
+                            // Elmininate empty categories
+                            for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
+                                if (!NursingProcessTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
+                                    kategorien.add(kat);
+                                }
+                            }
+                        }
+
+                        cpPlan.setLayout(new JideBoxLayout(cpPlan, JideBoxLayout.Y_AXIS));
+                        for (BWInfoKat kat : kategorien) {
+                            progress++;
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, kategorien.size()));
+                            cpPlan.add(createCollapsiblePanesFor(kat));
+                        }
+
+
+                    } catch (Exception e) {
+                        OPDE.fatal(e);
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    cpPlan.addExpansion();
+                    initPhase = false;
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
 
         } else {
 
@@ -599,20 +347,23 @@ public class PnlPlanung extends NursingRecordsPanel {
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
 
-        /***
-         *      ____        _   _                   _       _     _
-         *     | __ ) _   _| |_| |_ ___  _ __      / \   __| | __| |
-         *     |  _ \| | | | __| __/ _ \| '_ \    / _ \ / _` |/ _` |
-         *     | |_) | |_| | |_| || (_) | | | |  / ___ \ (_| | (_| |
-         *     |____/ \__,_|\__|\__\___/|_| |_| /_/   \_\__,_|\__,_|
-         *
-         */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
+
+            /***
+             *      ____        _   _                   _       _     _
+             *     | __ ) _   _| |_| |_ ___  _ __      / \   __| | __| |
+             *     |  _ \| | | | __| __/ _ \| '_ \    / _ \ / _` |/ _` |
+             *     | |_) | |_| | |_| || (_) | | | |  / ___ \ (_| | (_| |
+             *     |____/ \__,_|\__|\__\___/|_| |_| /_/   \_\__,_|\__,_|
+             *
+             */
+
             JButton btnAdd = new JButton(SYSConst.icon22add);
             btnAdd.setPressedIcon(SYSConst.icon22addPressed);
             btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnAdd.setContentAreaFilled(false);
             btnAdd.setBorder(null);
+            btnAdd.setToolTipText(OPDE.lang.getString(internalClassID + ".btnadd.tooltip"));
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -685,6 +436,87 @@ public class PnlPlanung extends NursingRecordsPanel {
             });
             titlePanelright.add(btnAdd);
             btnAdd.setEnabled(!planung.isAbgesetzt());
+
+            /***
+             *      ____  _         _____            _
+             *     | __ )| |_ _ __ | ____|_   ____ _| |
+             *     |  _ \| __| '_ \|  _| \ \ / / _` | |
+             *     | |_) | |_| | | | |___ \ V / (_| | |
+             *     |____/ \__|_| |_|_____| \_/ \__,_|_|
+             *
+             */
+            final JButton btnEval = new JButton(SYSConst.icon22redo);
+            btnEval.setPressedIcon(SYSConst.icon22redoPressed);
+            btnEval.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnEval.setContentAreaFilled(false);
+            btnEval.setBorder(null);
+            btnEval.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+            btnEval.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+
+                    JPanel dlg = new PnlEval(planung, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                popup.hidePopup();
+
+                                Pair<NursingProcess, String> result = (Pair<NursingProcess, String>) o;
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+
+                                    NursingProcess evaluatedNP = em.merge(result.getFirst());
+                                    em.lock(evaluatedNP, LockModeType.OPTIMISTIC);
+
+                                    NPControl newEvaluation = em.merge(new NPControl(result.getSecond(), evaluatedNP));
+                                    evaluatedNP.getKontrollen().add(newEvaluation);
+
+                                    // Refresh Display
+                                    planungen.get(planung.getKategorie()).remove(planung);
+                                    planungen.get(planung.getKategorie()).add(evaluatedNP);
+                                    Collections.sort(planungen.get(planung.getKategorie()));
+
+                                    em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".success.neweval")));
+                                reloadDisplay();
+                            }
+                        }
+                    });
+
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.getContentPane().add(dlg);
+                    popup.setOwner(btnEval);
+                    popup.removeExcludedComponent(btnEval);
+                    popup.setDefaultFocusComponent(dlg);
+
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                }
+            });
+            btnEval.setEnabled(!planung.isAbgesetzt());
+            titlePanelright.add(btnEval);
         }
 
         /***
@@ -701,6 +533,7 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.setContentAreaFilled(false);
             btnEdit.setBorder(null);
+            btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnedit.tooltip"));
             btnEdit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -770,6 +603,7 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnStop.setContentAreaFilled(false);
             btnStop.setBorder(null);
+            btnStop.setToolTipText(OPDE.lang.getString(internalClassID + ".btnstop.tooltip"));
             btnStop.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -855,6 +689,7 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.setContentAreaFilled(false);
             btnDelete.setBorder(null);
+            btnDelete.setToolTipText(SYSTools.toHTML(OPDE.lang.getString(internalClassID + ".btndelete.tooltip" + (btnDelete.isEnabled() ? ".disabled.reason" : ""))));
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -899,7 +734,6 @@ public class PnlPlanung extends NursingRecordsPanel {
                 }
             });
             btnDelete.setEnabled(!planung.isAbgesetzt() && numDFNs == 0);
-            btnDelete.setToolTipText(btnDelete.isEnabled() ? null : SYSTools.toHTML(OPDE.lang.getString(internalClassID + ".btndelete.disabled.reason")));
             titlePanelright.add(btnDelete);
         }
 

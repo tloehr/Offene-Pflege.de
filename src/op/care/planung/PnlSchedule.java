@@ -75,6 +75,7 @@ public class PnlSchedule extends JPanel {
         this.termin = termin;
         initComponents();
         initPanel();
+        //TODO: Hier fehlt noch eine Möglichkeit eine Dauer festzulegen
     }
 
     private void btnToTimeActionPerformed(ActionEvent e) {

@@ -4,11 +4,14 @@ import entity.system.SyslogTools;
 import op.OPDE;
 import op.tools.FadingLabel;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +22,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DisplayManager extends Thread {
-
+    public static final String internalClassID = "opde.displaymanager";
     private boolean interrupted, dbAction;
     private JProgressBar jp;
     private FadingLabel lblMain, lblSub;
@@ -58,10 +61,14 @@ public class DisplayManager extends Thread {
         oldMessages = new ArrayList<DisplayMessage>();
     }
 
-    public void setMainMessage(String message) {
-        lblMain.setToolTipText(message);
-        lblMain.setText(message);
-        lblMain.setIcon(null);
+    public void setMainMessage(final String message) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblMain.setText(message);
+                lblMain.setIcon(null);
+            }
+        });
     }
 
     public void clearAllMessages() {
@@ -145,9 +152,11 @@ public class DisplayManager extends Thread {
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
             lblSub.setText(currentSubMessage.getMessage());
+            lblMain.setToolTipText(SYSTools.toHTML(SYSConst.html_div_open + "<b>" + OPDE.lang.getString(internalClassID + ".lastmessage") + ":&nbsp;</b><p>" + DateFormat.getDateTimeInstance().format(new Date()) + "</p><p>" + currentSubMessage.getRawMessage() + "</p>" + SYSConst.html_div_close));
             if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
                 SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
             }
+
         } else {
             pbIntermediateZyklen++;
             if (currentSubMessage == null || currentSubMessage.isObsolete()) {
@@ -183,7 +192,7 @@ public class DisplayManager extends Thread {
                 jp.setValue(progressBarMessage.getPercentage());
             }
 
-            jp.setString(progressBarMessage.getMessage());
+            jp.setString(progressBarMessage.getRawMessage());
         } else {
             if (jp.getValue() > 0) {
                 jp.setValue(0);

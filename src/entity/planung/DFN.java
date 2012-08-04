@@ -118,11 +118,11 @@ public class DFN implements Serializable {
         this.dfnid = dfnid;
     }
 
-    public Byte getsZeit() {
+    public Byte getSollZeit() {
         return sZeit;
     }
 
-    public void setsZeit(Byte sZeit) {
+    public void setSollZeit(Byte sZeit) {
         this.sZeit = sZeit;
     }
 
@@ -144,6 +144,22 @@ public class DFN implements Serializable {
 
     public Date getSoll() {
         return soll;
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    public Byte getsZeit() {
+        return sZeit;
+    }
+
+    public void setsZeit(Byte sZeit) {
+        this.sZeit = sZeit;
     }
 
     public void setSoll(Date soll) {

@@ -25,21 +25,21 @@
  * 
  */
 
-package op.care.dfn;
+package tablerenderer;
 
-import op.tools.DBRetrieve;
-import op.tools.SYSCalendar;
+import entity.planung.DFN;
+import entity.planung.DFNTools;
+import op.OPDE;
+import op.care.dfn.PnlDFN;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import tablerenderer.RNDHTML;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import tablemodels.TMDFN;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import java.awt.*;
-import java.math.BigInteger;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * @author tloehr
@@ -48,7 +48,6 @@ public class RNDDFN
         extends RNDHTML {
 
     Color color;
-    Font font;
 
     public RNDDFN() {
         super();
@@ -56,22 +55,19 @@ public class RNDDFN
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component result = null;
+//        Component result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-//        Color bermuda_sand = new Color(246, 201, 204);
-//        Color melonrindgreen = new Color(223, 255, 165);
-        TableModel tm = table.getModel();
-        int status = ((Integer) tm.getValueAt(row, TMDFN.COL_STATUS)).intValue();
-        long dfnid = ((Long) tm.getValueAt(row, TMDFN.COL_DFNID)).longValue();
-        boolean erforderlich = ((Boolean) tm.getValueAt(row, TMDFN.COL_ERFORDERLICH)).booleanValue();
-        //boolean zebra = (Boolean) tm.getValueAt(row, TMDFN.COL_ZEBRA);
-        Date stdatum = (Date) tm.getValueAt(row, TMDFN.COL_STDATUM);
-        if (status == TMDFN.STATUS_OFFEN) {
+        TMDFN tmdfn = (TMDFN) table.getModel();
+        DFN dfn = tmdfn.getListeDFN().get(row);
+
+        color = panel.getBackground();
+        if (dfn.getStatus() == DFNTools.STATUS_OFFEN) {
             if (isSelected) {
-                this.color = SYSConst.grey80;
+                color = SYSConst.grey80;
             } else {
-                this.color = Color.white;
+                color = Color.white;
             }
-        } else if (status == TMDFN.STATUS_ERLEDIGT) {
+        } else if (dfn.getStatus() == DFNTools.STATUS_ERLEDIGT) {
             if (isSelected) {
                 color = SYSConst.darkolivegreen3;
             } else {
@@ -84,23 +80,18 @@ public class RNDDFN
                 color = SYSConst.salmon1;
             }
         }
-
+        panel.setBackground(color);
 
         if (column == TMDFN.COL_STATUS) {
             JPanel p = new JPanel();
             JLabel j = new JLabel();
-//            if (dafid > 0){
-//                double saldo = ((Double) tm.getValueAt(row, TMDFN.COL_SALDO)).doubleValue();
-//                int packeinheit = ((Integer) tm.getValueAt(row, TMDFN.COL_PACKEINHEIT)).intValue();
-//                j.setToolTipText("Vorrat: "+saldo+" "+SYSConst.EINHEIT[packeinheit]);
-//            }
             ImageIcon icon;
             ImageIcon icon2 = null;
             ImageIcon icon4 = null;
-            if (status == TMDFN.STATUS_OFFEN) {
+            if (dfn.getStatus() == DFNTools.STATUS_OFFEN) {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
-                if (erforderlich) {
-                    int daysBetween = SYSCalendar.getDaysBetween(SYSCalendar.toGC(stdatum), new GregorianCalendar());
+                if (dfn.isErforderlich()) {
+                    int daysBetween = Days.daysBetween(new DateTime(dfn.getStDatum()), new DateTime()).getDays();
                     if (daysBetween < 4) {
                         icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/reload-green.png"));
                     } else if (daysBetween < 7) {
@@ -109,13 +100,13 @@ public class RNDDFN
                         icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/reload-red.png"));
                     }
                 }
-            } else if (status == TMDFN.STATUS_ERLEDIGT) {
-                if (erforderlich) {
+            } else if (dfn.getStatus() == DFNTools.STATUS_ERLEDIGT) {
+                if (dfn.isErforderlich()) {
                     icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infogreen.png"));
                 }
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
             } else {
-                if (erforderlich) {
+                if (dfn.isErforderlich()) {
                     icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infogreen.png"));
                 }
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"));
@@ -139,49 +130,32 @@ public class RNDDFN
                 j2.setOpaque(true);
                 j2.setBackground(color);
                 String tiptext = "Diese Massnahme muss bearbeitet werden.";
-                if (SYSCalendar.sameDay(stdatum, SYSCalendar.today_date()) != 0) {
-                    DateFormat df = DateFormat.getDateInstance(DateFormat.DEFAULT);
-                    tiptext += " Sie wurde ursprünglich für den <b>" + df.format(stdatum) + "</b> eingeplant.";
+
+                if (Days.daysBetween(new DateTime(dfn.getStDatum()), new DateTime()).getDays() != 0) {
+                    tiptext += " Sie wurde ursprünglich für den <b>" + DateFormat.getDateInstance().format(dfn.getStDatum()) + "</b> eingeplant.";
                 }
                 p.setToolTipText(SYSTools.toHTML(tiptext));
                 p.add(j2);
             }
             result = p;
-        } else if (column == TMDFN.COL_BEMPLAN) {
-            long termid = (Long) tm.getValueAt(row, TMDFN.COL_TERMID);
-            result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            String text = "";
-            if (termid == 0) {
-                text = SYSTools.toHTML("<i>spontane Einzelmassnahme</i>");
-            } else {
-                //result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String stichwort = tm.getValueAt(row, TMDFN.COL_STICHWORT).toString();
-                String situation = SYSTools.catchNull(tm.getValueAt(row, TMDFN.COL_SITUATION));
-                text = "<html><body><b><font color=\"green\">" +
-                        stichwort + "</font></b><table border=\"0\">";
-                text += "    <tr><td align=\"left\" width=\"600\">" + situation + "</td></tr>";
-                text += "   </table></body></html>";
-            }
-            ((JTextPane) result.getComponentAt(row, column)).setToolTipText(text);
+        } else if (column == TMDFN.COL_BEMDFN) {
+//            result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//            String text = "";
+//            if (dfn.getNursingProcess() == null) {
+//                text = SYSTools.toHTML("<i>" + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand") + "</i>");
+//            } else {
+//                text = "<b><font color=\"green\">" +
+//                        dfn.getNursingProcess().getStichwort() + "</font></b><table border=\"0\">";
+//                text += "    <tr><td align=\"left\" width=\"600\">" + dfn.getNursingProcess().getSituation() + "</td></tr>";
+//                text += "   </table>";
+//            }
+//            ((JTextPane) result.getComponentAt(row, column)).setToolTipText(text);
         } else {
             result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
         return result;
     }
 
-    private String getMassnahmenText(
-            long dfnid) {
-        long massid = ((BigInteger) DBRetrieve.getSingleValue("DFN", "MassID", "DFNID", dfnid)).longValue();
-        return (String) DBRetrieve.getSingleValue("Massnahmen", "Bezeichnung", "MassID", massid);
-    }
 
-    private String getMassnahmenErsatzText(long dfnid) {
-        long massid = ((BigInteger) DBRetrieve.getSingleValue("DFN", "MassID", "AltDFNID", dfnid)).longValue();
-        return (String) DBRetrieve.getSingleValue("Massnahmen", "Bezeichnung", "MassID", massid);
-    }
-
-    public Color getBackground() {
-        return color;
-    }
 } // RNDDFN
 

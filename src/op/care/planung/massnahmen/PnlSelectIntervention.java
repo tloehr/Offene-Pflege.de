@@ -41,9 +41,14 @@ public class PnlSelectIntervention extends JPanel {
     Number dauer = BigDecimal.TEN;
 
     public PnlSelectIntervention(Closure actionBlock) {
+        this(actionBlock, false);
+    }
+
+    public PnlSelectIntervention(Closure actionBlock, boolean withEditFunction) {
         this.actionBlock = actionBlock;
         initComponents();
         initPanel();
+        btnAdd.setEnabled(withEditFunction);
     }
 
     private void initPanel() {
