@@ -304,7 +304,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
 
     @Override
     public NursingProcess clone() {
-        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, bewohner,  kategorie, new ArrayList<SYSPLAN2VORGANG>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
+        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, bewohner, kategorie, new ArrayList<SYSPLAN2VORGANG>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
         for (InterventionSchedule is : interventionSchedules){
             InterventionSchedule myIS = is.clone();
             myIS.setNursingProcess(myNewNP);

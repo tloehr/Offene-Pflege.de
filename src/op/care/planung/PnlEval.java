@@ -31,30 +31,24 @@ import com.jgoodies.forms.layout.FormLayout;
 import entity.planung.NursingProcess;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
  * @author tloehr
  */
-public class PnlClose extends JPanel {
+public class PnlEval extends JPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess.pnlclose";
-    private NursingProcess nursingProcess;
     private Closure actionBlock;
 
     /**
      * Creates new form DlgAbsetzen
      */
-    public PnlClose(NursingProcess nursingProcess, Closure actionBlock) {
-        this.nursingProcess = nursingProcess;
+    public PnlEval(NursingProcess nursingProcess, Closure actionBlock) {
         this.actionBlock = actionBlock;
         initComponents();
         initPanel();
@@ -118,7 +112,7 @@ public class PnlClose extends JPanel {
         add(panel1, CC.xy(2, 5, CC.RIGHT, CC.DEFAULT));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
+    private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         if (txtBemerkung.getText().trim().isEmpty()){
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".reasonxx"), DisplayMessage.WARNING));
         } else {

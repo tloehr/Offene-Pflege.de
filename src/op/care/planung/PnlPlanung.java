@@ -484,7 +484,6 @@ public class PnlPlanung extends NursingRecordsPanel {
                 cpPlan.add(createCollapsiblePanesFor(kat));
             }
             cpPlan.addExpansion();
-//            refreshDisplay();
         }
         initPhase = false;
 
@@ -617,8 +616,12 @@ public class PnlPlanung extends NursingRecordsPanel {
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
-                    new DlgPlanung(planung.clone(), new Closure() {
+                    NursingProcess template = planung.clone();
+                    template.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
+                    template.setAbgesetztDurch(null);
+                    template.setAngesetztDurch(OPDE.getLogin().getUser());
+                    template.setNKontrolle(new DateTime().plusWeeks(4).toDate());
+                    new DlgPlanung(template, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
@@ -772,7 +775,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent actionEvent) {
                     final JidePopup popup = new JidePopup();
 
-                    JPanel dlg = new PnlClose(planung, new Closure() {
+                    JPanel dlg = new PnlEval(planung, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
@@ -975,7 +978,7 @@ public class PnlPlanung extends NursingRecordsPanel {
         jspSearch.setViewportView(searchPanes);
 
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout(5));
+        mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
         CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
@@ -1134,7 +1137,13 @@ public class PnlPlanung extends NursingRecordsPanel {
 
                                 // that selected template is cloned and handed over to the DlgPlanung for further editing
                                 NursingProcess template = ((NursingProcess) o).clone();
-                                template.setPlanKennung(-1); // so the next dialog knows thats a template
+                                template.setPlanKennung(-2); // so the next dialog knows thats a template
+                                template.setBewohner(bewohner);
+                                template.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
+                                template.setAbgesetztDurch(null);
+                                template.setAngesetztDurch(OPDE.getLogin().getUser());
+                                template.setNKontrolle(new DateTime().plusWeeks(4).toDate());
+
                                 new DlgPlanung(template, new Closure() {
                                     @Override
                                     public void execute(Object planung) {
@@ -1171,6 +1180,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                         }
                                     }
                                 });
+
                             }
                         }
                     });
