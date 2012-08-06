@@ -654,15 +654,15 @@ public class OPDE {
             if (cl.hasOption("d")) {
                 EntityManager em = OPDE.createEM();
 
-                int offset;
-                String sOffset = cl.getOptionValue("d");
-                OPDE.debug(cl.getOptionValue("d"));
-                try {
-                    offset = Integer.parseInt(sOffset);
-                } catch (NumberFormatException ex) {
-                    offset = 0;
-                }
-
+//                int offset;
+//                String sOffset = cl.getOptionValue("d");
+//                OPDE.debug(cl.getOptionValue("d"));
+//                try {
+//                    offset = Integer.parseInt(sOffset);
+//                } catch (NumberFormatException ex) {
+//                    offset = 0;
+//                }
+//
 
                 try {
                     em.getTransaction().begin();
@@ -672,8 +672,8 @@ public class OPDE {
                     OPDE.setLogin(rootLogin);
                     initProps();
 
-                    DateMidnight stichtag = new DateMidnight().plusDays(offset);
-                    DFNTools.generate(em, stichtag.toDate());
+//                    DateMidnight stichtag = new DateMidnight().plusDays(offset);
+                    DFNTools.generate(em);
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     if (em.getTransaction().isActive()) {

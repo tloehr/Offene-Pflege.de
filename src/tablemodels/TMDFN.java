@@ -116,7 +116,7 @@ public class TMDFN
                 if (dfn.getSollZeit() == 0) { // Uhrzeit
                     result = DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
                 } else {
-                    result = DFNTools.SOLLZEITTEXT[dfn.getSollZeit()];
+//                    result = DFNTools.SOLLZEITTEXT[dfn.getSollZeit()];
                 }
                 break;
             }

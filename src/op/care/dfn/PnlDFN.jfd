@@ -43,18 +43,13 @@
          <string>jspDFN</string> 
         </void> 
         <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTable</string> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>com.jidesoft.pane.CollapsiblePanes</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.BoxLayout</class> 
+          </object> 
           <void property="name"> 
-           <string>tblDFN</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.MouseListener</string> 
-            <string>mousePressed</string> 
-            <string>tblDFNMousePressed</string> 
-            <boolean>true</boolean> 
-           </object> 
+           <string>cpDFN</string> 
           </void> 
          </object> 
         </void> 

@@ -189,6 +189,7 @@ public class GUITools {
         int index = 0;
         for (String key : languagekeys) {
             result[index] = OPDE.lang.getString(key);
+            index++;
         }
         return result;
     }

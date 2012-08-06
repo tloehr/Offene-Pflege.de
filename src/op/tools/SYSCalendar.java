@@ -27,8 +27,13 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
-import entity.verordnungen.Darreichung;
+import entity.planung.DFNTools;
 import op.OPDE;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,6 +115,7 @@ public class SYSCalendar {
     public static ListCellRenderer getTimeRenderer() {
         return new ListCellRenderer() {
             DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
@@ -350,7 +356,7 @@ public class SYSCalendar {
             } while (d1.get(java.util.Calendar.YEAR) != y2);
         }
 
-        if (swapped){
+        if (swapped) {
             days = days * -1;
         }
 
@@ -427,7 +433,6 @@ public class SYSCalendar {
 
         return new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0);
     }
-
 
 
     public static Date parseDate(String input) throws NumberFormatException {
@@ -766,6 +771,68 @@ public class SYSCalendar {
             result.add("");
         }
         return result;
+    }
+
+    public static Pair<Byte, Byte> getTimeIDs4Shift(byte shiftid) {
+        byte id1 = -1, id2 = -1;
+        switch (shiftid) {
+            case DFNTools.SHIFT_VERY_EARLY: {
+                id1 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
+                id2 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
+                break;
+            }
+            case DFNTools.SHIFT_EARLY: {
+                id1 = DFNTools.BYTE_MORNING;
+                id2 = DFNTools.BYTE_NOON;
+                break;
+            }
+            case DFNTools.SHIFT_LATE: {
+                id1 = DFNTools.BYTE_AFTERNOON;
+                id2 = DFNTools.BYTE_EVENING;
+                break;
+            }
+            case DFNTools.SHIFT_VERY_LATE: {
+                id1 = DFNTools.BYTE_LATE_AT_NIGHT;
+                id2 = Byte.MAX_VALUE;
+                break;
+            }
+        }
+
+        return new Pair<Byte, Byte>(id1, id2);
+    }
+
+    public static Pair<Date, Date> getTimeOfDay4Shift(byte shiftid) {
+        String id1 = "", id2 = "";
+        switch (shiftid) {
+            case DFNTools.SHIFT_VERY_EARLY: {
+                id1 = DFNTools.STRING_EARLY_IN_THE_MORNING;
+                id2 = DFNTools.STRING_MORNING;
+                break;
+            }
+            case DFNTools.SHIFT_EARLY: {
+                id1 = DFNTools.STRING_MORNING;
+                id2 = DFNTools.STRING_AFTERNOON;
+                break;
+            }
+            case DFNTools.SHIFT_LATE: {
+                id1 = DFNTools.STRING_AFTERNOON;
+                id2 = DFNTools.STRING_EVENING;
+                break;
+            }
+            case DFNTools.SHIFT_VERY_LATE: {
+                id1 = DFNTools.STRING_LATE_AT_NIGHT;
+                id2 = DFNTools.STRING_EARLY_IN_THE_MORNING;
+                break;
+            }
+        }
+
+        DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");
+        DateTime time1 = parser.parseDateTime(OPDE.getProps().getProperty(id1));
+        DateTime time2 = parser.parseDateTime(OPDE.getProps().getProperty(id2)).minusSeconds(1);
+        Period period1 = new Period(time1.getHourOfDay(), time1.getMinuteOfHour(), time1.getSecondOfMinute(), time1.getMillisOfSecond());
+        Period period2 = new Period(time2.getHourOfDay(), time2.getMinuteOfHour(), time2.getSecondOfMinute(), time2.getMillisOfSecond());
+
+        return new Pair<Date, Date>(new DateMidnight().toDateTime().plus(period1).toDate(), new DateMidnight().toDateTime().plus(period2).toDate());
     }
 
     /**

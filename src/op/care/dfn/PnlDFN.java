@@ -33,18 +33,18 @@ import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.planung.DFN;
+import entity.planung.DFNTools;
+import entity.planung.NursingProcess;
 import entity.verordnungen.BHPTools;
 import op.OPDE;
 import op.tools.*;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
-import tablemodels.TMDFN;
-import tablerenderer.RNDDFN;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -72,12 +72,24 @@ public class PnlDFN extends NursingRecordsPanel {
     private JComboBox cmbSchicht;
     private int DFN_MAX_MINUTES_TO_WITHDRAW;
     private JideButton addButton;
+    private ArrayList<NursingProcess> involvedNPs;
 
     public PnlDFN(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
-        DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
         this.jspSearch = jspSearch;
+        initPanel();
         change2Bewohner(bewohner);
+    }
+
+
+    private void initPanel() {
+        DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
+//        planungCollapsiblePaneMap = new HashMap<NursingProcess, CollapsiblePane>();
+//        categoryCPMap = new HashMap<BWInfoKat, CollapsiblePane>();
+//        planungen = new HashMap<BWInfoKat, java.util.List<NursingProcess>>();
+        involvedNPs = new ArrayList<NursingProcess>();
+        prepareSearchArea();
+
     }
 
     @Override
@@ -107,7 +119,7 @@ public class PnlDFN extends NursingRecordsPanel {
         prepareSearchArea();
 
         initPhase = false;
-        reloadTable();
+        reloadDisplay();
 
 
 //        btnLock.setEnabled(readOnly);
@@ -126,6 +138,135 @@ public class PnlDFN extends NursingRecordsPanel {
 
     }
 
+
+    private void reloadDisplay() {
+        /***
+         *               _                 _ ____  _           _
+         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
+         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
+         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
+         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
+         *                                              |_|            |___/
+         */
+        initPhase = true;
+
+        final boolean withworker = false;
+        if (withworker) {
+
+//            OPDE.getMainframe().setBlocked(true);
+//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+//
+//            cpDFN.removeAll();
+//
+//            SwingWorker worker = new SwingWorker() {
+//
+//                @Override
+//                protected Object doInBackground() throws Exception {
+//                    try {
+//                        int progress = 0;
+//
+//                        if (kategorien.isEmpty()) {
+//                            // Elmininate empty categories
+//                            for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
+//                                if (!NursingProcessTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
+//                                    kategorien.add(kat);
+//                                }
+//                            }
+//                        }
+//
+//                        cpPlan.setLayout(new JideBoxLayout(cpPlan, JideBoxLayout.Y_AXIS));
+//                        for (BWInfoKat kat : kategorien) {
+//                            progress++;
+//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, kategorien.size()));
+//                            cpPlan.add(createCollapsiblePanesFor(kat));
+//                        }
+//
+//
+//                    } catch (Exception e) {
+//                        OPDE.fatal(e);
+//                    }
+//                    return null;
+//                }
+//
+//                @Override
+//                protected void done() {
+//                    cpPlan.addExpansion();
+//                    initPhase = false;
+//                    OPDE.getDisplayManager().setProgressBarMessage(null);
+//                    OPDE.getMainframe().setBlocked(false);
+//                }
+//            };
+//            worker.execute();
+
+        } else {
+
+            cpDFN.removeAll();
+            involvedNPs = DFNTools.getInvolvedNPs(DFNTools.SHIFT_EARLY, bewohner, jdcDatum.getDate());
+
+            cpDFN.setLayout(new JideBoxLayout(cpDFN, JideBoxLayout.Y_AXIS));
+            for (NursingProcess np : involvedNPs) {
+                cpDFN.add(createCollapsiblePanesFor(np));
+            }
+            cpDFN.addExpansion();
+        }
+        initPhase = false;
+    }
+
+
+    private CollapsiblePane createCollapsiblePanesFor(final NursingProcess np) {
+        final CollapsiblePane npPane = new CollapsiblePane(np.getStichwort() + " ("+np.getKategorie().getBezeichnung()+")");
+
+//        katpane.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent mouseEvent) {
+//                try {
+//                    if (katpane.isCollapsed()) {
+//                        katpane.setCollapsed(false);
+//                    } else {
+//                        // collapse all children
+//                        for (NursingProcess planung : planungen.get(kat)) {
+//                            planungCollapsiblePaneMap.get(planung).setCollapsed(true);
+//                        }
+//                        katpane.setCollapsed(true);
+//                    }
+//                } catch (PropertyVetoException e) {
+//                    OPDE.error(e);
+//                }
+//            }
+//        });
+        npPane.setSlidingDirection(SwingConstants.SOUTH);
+        npPane.setBackground(np.getKategorie().getBackgroundHeader());
+        npPane.setForeground(np.getKategorie().getForegroundHeader());
+        npPane.setOpaque(false);
+
+        JPanel npPanel = new JPanel();
+        npPanel.setLayout(new VerticalLayout());
+        npPanel.setBackground(np.getKategorie().getBackgroundContent());
+
+
+        for (DFN dfn : DFNTools.getDFNs(DFNTools.SHIFT_EARLY, np, jdcDatum.getDate())) {
+
+
+
+            final JideButton btnDFN = GUITools.createHyperlinkButton(dfn.getIntervention().getBezeichnung(), SYSConst.icon22redo, null);
+            btnDFN.setForeground(np.getKategorie().getForegroundContent());
+            btnDFN.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnDFN.setIcon(SYSConst.icon22apply);
+                }
+            });
+            npPanel.add(btnDFN);
+        }
+        npPane.setContentPane(npPanel);
+        npPane.setCollapsible(false);
+        try {
+            npPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+        return npPane;
+    }
 
     private void prepareSearchArea() {
         searchPanes = new CollapsiblePanes();
@@ -159,7 +300,9 @@ public class PnlDFN extends NursingRecordsPanel {
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        cmbSchicht = new JComboBox(new DefaultComboBoxModel(GUITools.getLocalizedMessages(new String[]{"misc.msg.everything", internalClassID + ".shift.veryearly", internalClassID + ".shift.early", internalClassID + ".shift.late", internalClassID + ".shift.verylate"})));
+        String[] strs = GUITools.getLocalizedMessages(new String[]{"misc.msg.everything", internalClassID + ".shift.veryearly", internalClassID + ".shift.early", internalClassID + ".shift.late", internalClassID + ".shift.verylate"});
+
+        cmbSchicht = new JComboBox(new DefaultComboBoxModel(strs));
         cmbSchicht.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
         cmbSchicht.addItemListener(new ItemListener() {
@@ -264,29 +407,29 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     private void jspDFNComponentResized(ComponentEvent evt) {
-        JScrollPane jsp = (JScrollPane) evt.getComponent();
-        Dimension dim = jsp.getSize();
-        // Größe der Text Spalten im DFN ändern.
-        // Summe der fixen Spalten  = 175 + ein bisschen
-        int textWidth = dim.width - (50 + 80 + 55 + 80 + 25);
-        TableColumnModel tcm1 = tblDFN.getColumnModel();
-        if (tcm1.getColumnCount() < 4) {
-            return;
-        }
-
-        //tcm1.getColumn(TMDFN.COL_MassID).setPreferredWidth(50);
-        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
-        tcm1.getColumn(TMDFN.COL_ZEIT).setPreferredWidth(80);
-        tcm1.getColumn(TMDFN.COL_STATUS).setPreferredWidth(55);
-        tcm1.getColumn(TMDFN.COL_UKENNUNG).setPreferredWidth(80);
-        tcm1.getColumn(TMDFN.COL_BEMDFN).setPreferredWidth(textWidth / 2);
-
-        //tcm1.getColumn(0).setHeaderValue("ID");
-        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
-        tcm1.getColumn(TMDFN.COL_ZEIT).setHeaderValue("Zeit");
-        tcm1.getColumn(TMDFN.COL_STATUS).setHeaderValue("Status");
-        tcm1.getColumn(TMDFN.COL_UKENNUNG).setHeaderValue("PflegerIn");
-        tcm1.getColumn(TMDFN.COL_BEMDFN).setHeaderValue("Hinweis");
+//        JScrollPane jsp = (JScrollPane) evt.getComponent();
+//        Dimension dim = jsp.getSize();
+//        // Größe der Text Spalten im DFN ändern.
+//        // Summe der fixen Spalten  = 175 + ein bisschen
+//        int textWidth = dim.width - (50 + 80 + 55 + 80 + 25);
+//        TableColumnModel tcm1 = tblDFN.getColumnModel();
+//        if (tcm1.getColumnCount() < 4) {
+//            return;
+//        }
+//
+//        //tcm1.getColumn(TMDFN.COL_MassID).setPreferredWidth(50);
+//        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
+//        tcm1.getColumn(TMDFN.COL_ZEIT).setPreferredWidth(80);
+//        tcm1.getColumn(TMDFN.COL_STATUS).setPreferredWidth(55);
+//        tcm1.getColumn(TMDFN.COL_UKENNUNG).setPreferredWidth(80);
+//        tcm1.getColumn(TMDFN.COL_BEMDFN).setPreferredWidth(textWidth / 2);
+//
+//        //tcm1.getColumn(0).setHeaderValue("ID");
+//        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
+//        tcm1.getColumn(TMDFN.COL_ZEIT).setHeaderValue("Zeit");
+//        tcm1.getColumn(TMDFN.COL_STATUS).setHeaderValue("Status");
+//        tcm1.getColumn(TMDFN.COL_UKENNUNG).setHeaderValue("PflegerIn");
+//        tcm1.getColumn(TMDFN.COL_BEMDFN).setHeaderValue("Hinweis");
     }
 
     private java.util.List<Component> addCommands() {
@@ -342,7 +485,7 @@ public class PnlDFN extends NursingRecordsPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jspDFN = new JScrollPane();
-        tblDFN = new JTable();
+        cpDFN = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -357,14 +500,11 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
             });
 
-            //---- tblDFN ----
-            tblDFN.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    tblDFNMousePressed(e);
-                }
-            });
-            jspDFN.setViewportView(tblDFN);
+            //======== cpDFN ========
+            {
+                cpDFN.setLayout(new BoxLayout(cpDFN, BoxLayout.X_AXIS));
+            }
+            jspDFN.setViewportView(cpDFN);
         }
         add(jspDFN);
     }// </editor-fold>//GEN-END:initComponents
@@ -407,14 +547,14 @@ public class PnlDFN extends NursingRecordsPanel {
     }//GEN-LAST:event_cmbSchichtItemStateChanged
 
     private void reloadTable() {
-        tblDFN.setModel(new TMDFN(bewohner, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
-        tblDFN.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jspDFN.dispatchEvent(new ComponentEvent(jspDFN, ComponentEvent.COMPONENT_RESIZED));
-        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEZEICHNUNG).setCellRenderer(new RNDDFN());
-        tblDFN.getColumnModel().getColumn(TMDFN.COL_ZEIT).setCellRenderer(new RNDDFN());
-        tblDFN.getColumnModel().getColumn(TMDFN.COL_STATUS).setCellRenderer(new RNDDFN());
-        tblDFN.getColumnModel().getColumn(TMDFN.COL_UKENNUNG).setCellRenderer(new RNDDFN());
-        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEMDFN).setCellRenderer(new RNDDFN());
+//        tblDFN.setModel(new TMDFN(bewohner, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
+//        tblDFN.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+//        jspDFN.dispatchEvent(new ComponentEvent(jspDFN, ComponentEvent.COMPONENT_RESIZED));
+//        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEZEICHNUNG).setCellRenderer(new RNDDFN());
+//        tblDFN.getColumnModel().getColumn(TMDFN.COL_ZEIT).setCellRenderer(new RNDDFN());
+//        tblDFN.getColumnModel().getColumn(TMDFN.COL_STATUS).setCellRenderer(new RNDDFN());
+//        tblDFN.getColumnModel().getColumn(TMDFN.COL_UKENNUNG).setCellRenderer(new RNDDFN());
+//        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEMDFN).setCellRenderer(new RNDDFN());
 
     }
 
@@ -594,6 +734,6 @@ public class PnlDFN extends NursingRecordsPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspDFN;
-    private JTable tblDFN;
+    private CollapsiblePanes cpDFN;
     // End of variables declaration//GEN-END:variables
 }
