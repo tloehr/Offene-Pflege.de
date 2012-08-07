@@ -33,25 +33,38 @@ import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
+import entity.info.BWInfoTools;
 import entity.planung.DFN;
 import entity.planung.DFNTools;
 import entity.planung.NursingProcess;
+import entity.planung.NursingProcessTools;
 import entity.verordnungen.BHPTools;
 import op.OPDE;
+import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author root
@@ -73,6 +86,11 @@ public class PnlDFN extends NursingRecordsPanel {
     private int DFN_MAX_MINUTES_TO_WITHDRAW;
     private JideButton addButton;
     private ArrayList<NursingProcess> involvedNPs;
+    private HashMap<DFN, CollapsiblePane> dfnCollapsiblePaneHashMap;
+    private HashMap<NursingProcess, ArrayList<DFN>> nursingProcessArrayListHashMap;
+    private ArrayList<DFN> unassignedDFNArrayList;
+    private CollapsiblePane unassignedPane;
+    private boolean residentAbsent;
 
     public PnlDFN(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
@@ -87,39 +105,35 @@ public class PnlDFN extends NursingRecordsPanel {
 //        planungCollapsiblePaneMap = new HashMap<NursingProcess, CollapsiblePane>();
 //        categoryCPMap = new HashMap<BWInfoKat, CollapsiblePane>();
 //        planungen = new HashMap<BWInfoKat, java.util.List<NursingProcess>>();
-        involvedNPs = new ArrayList<NursingProcess>();
+        nursingProcessArrayListHashMap = new HashMap<NursingProcess, ArrayList<DFN>>();
+        dfnCollapsiblePaneHashMap = new HashMap<DFN, CollapsiblePane>();
         prepareSearchArea();
-
     }
 
     @Override
     public void cleanup() {
         jdcDatum.cleanup();
+        involvedNPs.clear();
+        cpDFN.removeAll();
+        dfnCollapsiblePaneHashMap.clear();
+        nursingProcessArrayListHashMap.clear();
         SYSTools.unregisterListeners(this);
-    }
-
-    private void btnLockActionPerformed(ActionEvent e) {
-        change2Bewohner(bewohner);
     }
 
     @Override
     public void reload() {
-        reloadTable();
+        reloadDisplay();
     }
 
 
     @Override
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
-
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
-        initPhase = true;
-
-
-        prepareSearchArea();
-
-        initPhase = false;
         reloadDisplay();
+
+
+        residentAbsent = bewohner.isActive() && BWInfoTools.absentSince(bewohner) != null;
 
 
 //        btnLock.setEnabled(readOnly);
@@ -201,20 +215,109 @@ public class PnlDFN extends NursingRecordsPanel {
         } else {
 
             cpDFN.removeAll();
-            involvedNPs = DFNTools.getInvolvedNPs(DFNTools.SHIFT_EARLY, bewohner, jdcDatum.getDate());
+            involvedNPs.clear();
+            dfnCollapsiblePaneHashMap.clear();
+            nursingProcessArrayListHashMap.clear();
+            involvedNPs = DFNTools.getInvolvedNPs((byte) (cmbSchicht.getSelectedIndex() - 1), bewohner, jdcDatum.getDate());
 
             cpDFN.setLayout(new JideBoxLayout(cpDFN, JideBoxLayout.Y_AXIS));
             for (NursingProcess np : involvedNPs) {
                 cpDFN.add(createCollapsiblePanesFor(np));
             }
+
+            // this adds unassigned DFNs to the panel
+            CollapsiblePane unassignedPane = createCollapsiblePanesFor((NursingProcess) null);
+            if (unassignedPane != null) {
+                cpDFN.add(unassignedPane);
+            }
+
             cpDFN.addExpansion();
         }
         initPhase = false;
     }
 
 
+    private void refreshDisplay() {
+        cpDFN.removeAll();
+
+        for (NursingProcess np : involvedNPs) {
+            cpDFN.add(refreshCollapsiblePanesFor(np));
+        }
+
+        // this adds unassigned DFNs to the panel
+        unassignedPane = createCollapsiblePanesFor((NursingProcess) null);
+        if (unassignedPane != null) {
+            cpDFN.add(unassignedPane);
+        }
+
+        cpDFN.addExpansion();
+    }
+
+    private CollapsiblePane refreshCollapsiblePanesFor(final NursingProcess np) {
+        String title = "";
+        Color fore, back, backcontent;
+
+        if (np == null) {
+            title = OPDE.lang.getString(internalClassID + ".ondemand");
+            back = Color.LIGHT_GRAY;
+            fore = Color.BLACK;
+            backcontent = Color.LIGHT_GRAY;
+        } else {
+            title = np.getStichwort() + " (" + np.getKategorie().getBezeichnung() + ")";
+            back = np.getKategorie().getBackgroundHeader();
+            fore = np.getKategorie().getForegroundHeader();
+            backcontent = np.getKategorie().getBackgroundContent();
+        }
+
+        final CollapsiblePane npPane = new CollapsiblePane(title);
+
+        npPane.setSlidingDirection(SwingConstants.SOUTH);
+        npPane.setBackground(back);
+        npPane.setForeground(fore);
+        npPane.setOpaque(false);
+
+        JPanel npPanel = new JPanel();
+        npPanel.setLayout(new VerticalLayout());
+        npPanel.setBackground(backcontent);
+
+        if (np == null) {
+            if (unassignedDFNArrayList.isEmpty()) {
+                return null;
+            }
+        }
+
+        for (DFN dfn : (np == null ? unassignedDFNArrayList : nursingProcessArrayListHashMap.get(np))) {
+
+            npPanel.add(dfnCollapsiblePaneHashMap.get(dfn));
+        }
+
+        npPane.setContentPane(npPanel);
+        npPane.setCollapsible(false);
+        try {
+            npPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+        return npPane;
+    }
+
     private CollapsiblePane createCollapsiblePanesFor(final NursingProcess np) {
-        final CollapsiblePane npPane = new CollapsiblePane(np.getStichwort() + " ("+np.getKategorie().getBezeichnung()+")");
+        String title = "";
+        Color fore, back, backcontent;
+
+        if (np == null) {
+            title = OPDE.lang.getString(internalClassID + ".ondemand");
+            back = Color.LIGHT_GRAY;
+            fore = Color.BLACK;
+            backcontent = Color.LIGHT_GRAY;
+        } else {
+            title = np.getStichwort() + " (" + np.getKategorie().getBezeichnung() + ")";
+            back = np.getKategorie().getBackgroundHeader();
+            fore = np.getKategorie().getForegroundHeader();
+            backcontent = np.getKategorie().getBackgroundContent();
+        }
+
+        final CollapsiblePane npPane = new CollapsiblePane(title);
 
 //        katpane.addMouseListener(new MouseAdapter() {
 //            @Override
@@ -235,29 +338,40 @@ public class PnlDFN extends NursingRecordsPanel {
 //            }
 //        });
         npPane.setSlidingDirection(SwingConstants.SOUTH);
-        npPane.setBackground(np.getKategorie().getBackgroundHeader());
-        npPane.setForeground(np.getKategorie().getForegroundHeader());
+        npPane.setBackground(back);
+        npPane.setForeground(fore);
         npPane.setOpaque(false);
 
         JPanel npPanel = new JPanel();
         npPanel.setLayout(new VerticalLayout());
-        npPanel.setBackground(np.getKategorie().getBackgroundContent());
+        npPanel.setBackground(backcontent);
 
-
-        for (DFN dfn : DFNTools.getDFNs(DFNTools.SHIFT_EARLY, np, jdcDatum.getDate())) {
-
-
-
-            final JideButton btnDFN = GUITools.createHyperlinkButton(dfn.getIntervention().getBezeichnung(), SYSConst.icon22redo, null);
-            btnDFN.setForeground(np.getKategorie().getForegroundContent());
-            btnDFN.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnDFN.setIcon(SYSConst.icon22apply);
-                }
-            });
-            npPanel.add(btnDFN);
+        if (np == null) {
+            unassignedDFNArrayList = DFNTools.getDFNs((byte) (cmbSchicht.getSelectedIndex() - 1), bewohner, jdcDatum.getDate());
+            if (unassignedDFNArrayList.isEmpty()) {
+                return null;
+            }
+        } else {
+            nursingProcessArrayListHashMap.put(np, DFNTools.getDFNs((byte) (cmbSchicht.getSelectedIndex() - 1), np, jdcDatum.getDate()));
         }
+
+        for (DFN dfn : (np == null ? unassignedDFNArrayList : nursingProcessArrayListHashMap.get(np))) {
+
+//            final JideButton btnDFN = GUITools.createHyperlinkButton(dfn.getIntervention().getBezeichnung(), SYSConst.icon22redo, null);
+//            btnDFN.setForeground(np.getKategorie().getForegroundContent());
+//            btnDFN.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//
+//                }
+//            });
+//            npPanel.add(btnDFN);
+
+            dfnCollapsiblePaneHashMap.put(dfn, createCollapsiblePanesFor(dfn));
+            npPanel.add(dfnCollapsiblePaneHashMap.get(dfn));
+        }
+
+
         npPane.setContentPane(npPanel);
         npPane.setCollapsible(false);
         try {
@@ -266,6 +380,231 @@ public class PnlDFN extends NursingRecordsPanel {
             OPDE.error(e);
         }
         return npPane;
+    }
+
+    private CollapsiblePane createCollapsiblePanesFor(final DFN dfn) {
+        final CollapsiblePane dfnPane = new CollapsiblePane();
+        String fg = SYSConst.html_grey50;
+        if (dfn.getNursingProcess() != null) {
+            fg = "#" + dfn.getNursingProcess().getKategorie().getFgcontent();
+        }
+
+        /***
+         *      _   _ _____    _    ____  _____ ____
+         *     | | | | ____|  / \  |  _ \| ____|  _ \
+         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
+         *     |  _  | |___ / ___ \| |_| | |___|  _ <
+         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
+         *
+         */
+
+        JPanel titlePanelleft = new JPanel();
+        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
+
+        /***
+         *      _     _       _    _           _   _                _   _                _
+         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
+         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
+         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
+        JideButton btnDFN = GUITools.createHyperlinkButton("<html><font color=\"" + fg + "\">" + dfn.getIntervention().getBezeichnung() + DFNTools.getScheduleText(dfn, " <b>[", "]</b>") + "</html>", DFNTools.getIcon(dfn), null);
+//        title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+        btnDFN.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        if (!dfn.isOnDemand()) {
+            btnDFN.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    try {
+                        dfnPane.setCollapsed(!dfnPane.isCollapsed());
+                    } catch (PropertyVetoException e) {
+                        OPDE.error(e);
+                    }
+                }
+            });
+        }
+        titlePanelleft.add(btnDFN);
+
+
+        JPanel titlePanelright = new JPanel();
+        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+
+            /***
+             *      _     _            _                _
+             *     | |__ | |_ _ __    / \   _ __  _ __ | |_   _
+             *     | '_ \| __| '_ \  / _ \ | '_ \| '_ \| | | | |
+             *     | |_) | |_| | | |/ ___ \| |_) | |_) | | |_| |
+             *     |_.__/ \__|_| |_/_/   \_\ .__/| .__/|_|\__, |
+             *                             |_|   |_|      |___/
+             */
+            JButton btnApply = new JButton(SYSConst.icon22apply);
+            btnApply.setPressedIcon(SYSConst.icon22applyPressed);
+            btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnApply.setContentAreaFilled(false);
+            btnApply.setBorder(null);
+//            btnApply.setToolTipText(OPDE.lang.getString(internalClassID + ".btnadd.tooltip"));
+            btnApply.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    if (dfn.getStatus() == DFNTools.STATUS_ERLEDIGT) {
+                        return;
+                    }
+                    boolean changeable =
+                            !residentAbsent && bewohner.isActive() &&
+                                    dfn.getNursingProcess().getBis().after(new Date()) && // prescription is active
+                                    (dfn.getUser() == null ||
+                                            (dfn.getUser().equals(OPDE.getLogin().getUser()) &&
+                                                    new Period(new DateTime(dfn.getMdate()), new DateTime()).getMinutes() < DFN_MAX_MINUTES_TO_WITHDRAW));
+                    if (changeable) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+
+
+                            em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                            DFN myDFN = em.merge(dfn);
+                            em.lock(myDFN, LockModeType.OPTIMISTIC);
+
+//                            if (myDFN.isOnDemand()) {
+//                                em.remove(myDFN);
+//                                dfnCollapsiblePaneHashMap.remove(myDFN);
+//                                unassignedDFNArrayList.remove(myDFN);
+//                            } else {
+                            myDFN.setStatus(DFNTools.STATUS_ERLEDIGT);
+                            myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
+                            myDFN.setIst(new Date());
+                            myDFN.setiZeit(SYSCalendar.whatTimeIDis(new Date()));
+                            dfnCollapsiblePaneHashMap.put(myDFN, createCollapsiblePanesFor(myDFN));
+//                                dfnCollapsiblePaneHashMap.remove(dfn);
+                            int position = nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).indexOf(dfn);
+                            nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).remove(dfn);
+                            nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).add(position, myDFN);
+//                            }
+                            em.getTransaction().commit();
+                            refreshDisplay();
+                        } catch (OptimisticLockException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                    }
+                }
+            });
+            btnApply.setEnabled(!dfn.isOnDemand());
+            titlePanelright.add(btnApply);
+
+
+            /***
+             *      _     _          ____                     _
+             *     | |__ | |_ _ __  / ___|__ _ _ __   ___ ___| |
+             *     | '_ \| __| '_ \| |   / _` | '_ \ / __/ _ \ |
+             *     | |_) | |_| | | | |__| (_| | | | | (_|  __/ |
+             *     |_.__/ \__|_| |_|\____\__,_|_| |_|\___\___|_|
+             *
+             */
+            final JButton btnCancel = new JButton(SYSConst.icon22cancel);
+            btnCancel.setPressedIcon(SYSConst.icon22cancelPressed);
+            btnCancel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnCancel.setContentAreaFilled(false);
+            btnCancel.setBorder(null);
+//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                }
+            });
+            btnCancel.setEnabled(!dfn.isOnDemand());
+            titlePanelright.add(btnCancel);
+
+            /***
+             *      _     _         _____                 _
+             *     | |__ | |_ _ __ | ____|_ __ ___  _ __ | |_ _   _
+             *     | '_ \| __| '_ \|  _| | '_ ` _ \| '_ \| __| | | |
+             *     | |_) | |_| | | | |___| | | | | | |_) | |_| |_| |
+             *     |_.__/ \__|_| |_|_____|_| |_| |_| .__/ \__|\__, |
+             *                                     |_|        |___/
+             */
+            final JButton btnEmpty = new JButton(SYSConst.icon22empty);
+            btnEmpty.setPressedIcon(SYSConst.icon22emptyPressed);
+            btnEmpty.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnEmpty.setContentAreaFilled(false);
+            btnEmpty.setBorder(null);
+//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+            btnEmpty.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                }
+            });
+            titlePanelright.add(btnEmpty);
+        }
+
+
+        titlePanelleft.setOpaque(false);
+        titlePanelright.setOpaque(false);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setOpaque(false);
+
+        titlePanel.setLayout(new GridBagLayout());
+        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+
+        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 5), 0, 0));
+
+        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+        dfnPane.setTitleLabelComponent(titlePanel);
+        dfnPane.setSlidingDirection(SwingConstants.SOUTH);
+
+        /***
+         *       ___ ___  _  _ _____ ___ _  _ _____
+         *      / __/ _ \| \| |_   _| __| \| |_   _|
+         *     | (_| (_) | .` | | | | _|| .` | | |
+         *      \___\___/|_|\_| |_| |___|_|\_| |_|
+         *
+         */
+        if (dfn.getNursingProcess() != null) {
+            JTextPane contentPane = new JTextPane();
+            contentPane.setContentType("text/html");
+            contentPane.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML(dfn.getNursingProcess(), false)));
+            dfnPane.setContentPane(contentPane);
+            dfnPane.setBackground(dfn.getNursingProcess().getKategorie().getBackgroundContent());
+            dfnPane.setForeground(dfn.getNursingProcess().getKategorie().getForegroundContent());
+        }
+        try {
+            dfnPane.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+        dfnPane.setCollapsible(dfn.getNursingProcess() != null);
+        dfnPane.setHorizontalAlignment(SwingConstants.LEADING);
+        dfnPane.setOpaque(false);
+        return dfnPane;
     }
 
     private void prepareSearchArea() {
@@ -304,12 +643,12 @@ public class PnlDFN extends NursingRecordsPanel {
 
         cmbSchicht = new JComboBox(new DefaultComboBoxModel(strs));
         cmbSchicht.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
+        cmbSchicht.setSelectedIndex((int) SYSCalendar.whatShiftis(new Date()) + 1);
         cmbSchicht.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (!initPhase) {
-                    reloadTable();
+                    reloadDisplay();
                 }
             }
         });
@@ -327,7 +666,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     return;
                 }
                 if (evt.getPropertyName().equals("date")) {
-                    reloadTable();
+                    reloadDisplay();
                 }
             }
         });
@@ -406,31 +745,6 @@ public class PnlDFN extends NursingRecordsPanel {
         return list;
     }
 
-    private void jspDFNComponentResized(ComponentEvent evt) {
-//        JScrollPane jsp = (JScrollPane) evt.getComponent();
-//        Dimension dim = jsp.getSize();
-//        // Größe der Text Spalten im DFN ändern.
-//        // Summe der fixen Spalten  = 175 + ein bisschen
-//        int textWidth = dim.width - (50 + 80 + 55 + 80 + 25);
-//        TableColumnModel tcm1 = tblDFN.getColumnModel();
-//        if (tcm1.getColumnCount() < 4) {
-//            return;
-//        }
-//
-//        //tcm1.getColumn(TMDFN.COL_MassID).setPreferredWidth(50);
-//        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
-//        tcm1.getColumn(TMDFN.COL_ZEIT).setPreferredWidth(80);
-//        tcm1.getColumn(TMDFN.COL_STATUS).setPreferredWidth(55);
-//        tcm1.getColumn(TMDFN.COL_UKENNUNG).setPreferredWidth(80);
-//        tcm1.getColumn(TMDFN.COL_BEMDFN).setPreferredWidth(textWidth / 2);
-//
-//        //tcm1.getColumn(0).setHeaderValue("ID");
-//        tcm1.getColumn(TMDFN.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
-//        tcm1.getColumn(TMDFN.COL_ZEIT).setHeaderValue("Zeit");
-//        tcm1.getColumn(TMDFN.COL_STATUS).setHeaderValue("Status");
-//        tcm1.getColumn(TMDFN.COL_UKENNUNG).setHeaderValue("PflegerIn");
-//        tcm1.getColumn(TMDFN.COL_BEMDFN).setHeaderValue("Hinweis");
-    }
 
     private java.util.List<Component> addCommands() {
 
@@ -493,12 +807,6 @@ public class PnlDFN extends NursingRecordsPanel {
         //======== jspDFN ========
         {
             jspDFN.setBorder(new BevelBorder(BevelBorder.RAISED));
-            jspDFN.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    jspDFNComponentResized(e);
-                }
-            });
 
             //======== cpDFN ========
             {
@@ -538,25 +846,6 @@ public class PnlDFN extends NursingRecordsPanel {
 //        ignoreJDCEvent = false;
 //        reloadTable();
 //    }//GEN-LAST:event_jdcDatumPropertyChange
-
-    private void cmbSchichtItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSchichtItemStateChanged
-        if (evt.getStateChange() != ItemEvent.SELECTED) {
-            return;
-        }
-        reloadTable();
-    }//GEN-LAST:event_cmbSchichtItemStateChanged
-
-    private void reloadTable() {
-//        tblDFN.setModel(new TMDFN(bewohner, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
-//        tblDFN.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-//        jspDFN.dispatchEvent(new ComponentEvent(jspDFN, ComponentEvent.COMPONENT_RESIZED));
-//        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEZEICHNUNG).setCellRenderer(new RNDDFN());
-//        tblDFN.getColumnModel().getColumn(TMDFN.COL_ZEIT).setCellRenderer(new RNDDFN());
-//        tblDFN.getColumnModel().getColumn(TMDFN.COL_STATUS).setCellRenderer(new RNDDFN());
-//        tblDFN.getColumnModel().getColumn(TMDFN.COL_UKENNUNG).setCellRenderer(new RNDDFN());
-//        tblDFN.getColumnModel().getColumn(TMDFN.COL_BEMDFN).setCellRenderer(new RNDDFN());
-
-    }
 
     private void tblDFNMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDFNMousePressed
 //        if (readOnly) {

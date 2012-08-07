@@ -31,14 +31,6 @@
           <null/> 
          </object> 
         </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ComponentListener</string> 
-          <string>componentResized</string> 
-          <string>jspDFNComponentResized</string> 
-          <boolean>true</boolean> 
-         </object> 
-        </void> 
         <void property="name"> 
          <string>jspDFN</string> 
         </void> 

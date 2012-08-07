@@ -292,7 +292,7 @@ public class SYSTools {
 //        if (besonderheiten) {
 //            result += " <font color=\"blue\">&#9679;</font> ";
 //        }
-//        if (DBRetrieve.getAbwesendSeit(currentBW) != null) {
+//        if (DBRetrieve.absentSince(currentBW) != null) {
 //            result += " &rarr; ";
 //        }
 //        if (op.share.vorgang.DBHandling.hatVorgang(currentBW)) {

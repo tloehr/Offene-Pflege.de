@@ -788,7 +788,7 @@ public class SYSCalendar {
             }
             case DFNTools.SHIFT_LATE: {
                 id1 = DFNTools.BYTE_AFTERNOON;
-                id2 = DFNTools.BYTE_EVENING;
+                id2 = DFNTools.BYTE_LATE_AT_NIGHT;
                 break;
             }
             case DFNTools.SHIFT_VERY_LATE: {
@@ -816,7 +816,7 @@ public class SYSCalendar {
             }
             case DFNTools.SHIFT_LATE: {
                 id1 = DFNTools.STRING_AFTERNOON;
-                id2 = DFNTools.STRING_EVENING;
+                id2 = DFNTools.STRING_LATE_AT_NIGHT;
                 break;
             }
             case DFNTools.SHIFT_VERY_LATE: {
@@ -834,6 +834,66 @@ public class SYSCalendar {
 
         return new Pair<Date, Date>(new DateMidnight().toDateTime().plus(period1).toDate(), new DateMidnight().toDateTime().plus(period2).toDate());
     }
+
+
+    public static byte whatShiftis(Date date) {
+        byte timeID = whatTimeIDis(date);
+        byte shift;
+        if (DFNTools.BYTE_EARLY_IN_THE_MORNING <= timeID && timeID < DFNTools.BYTE_MORNING) {
+            shift = DFNTools.SHIFT_VERY_EARLY;
+        } else if (DFNTools.BYTE_MORNING <= timeID && timeID < DFNTools.BYTE_AFTERNOON) {
+            shift = DFNTools.SHIFT_EARLY;
+        } else if (DFNTools.BYTE_AFTERNOON <= timeID && timeID < DFNTools.BYTE_LATE_AT_NIGHT) {
+            shift = DFNTools.SHIFT_LATE;
+        } else {
+            shift = DFNTools.SHIFT_VERY_LATE;
+        }
+        return shift;
+    }
+
+    public static byte whatTimeIDis(Date date) {
+        byte timeid;
+
+        DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");
+
+        DateTime early_in_the_morning = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_EARLY_IN_THE_MORNING));
+        DateTime morning = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_MORNING));
+        DateTime noon = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_NOON));
+        DateTime afternoon = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_AFTERNOON));
+        DateTime evening = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_EVENING));
+        DateTime late_at_night = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_LATE_AT_NIGHT));
+
+        Period period_early_in_the_morning = new Period(early_in_the_morning.getHourOfDay(), early_in_the_morning.getMinuteOfHour(), early_in_the_morning.getSecondOfMinute(), early_in_the_morning.getMillisOfSecond());
+        Period period_morning = new Period(morning.getHourOfDay(), morning.getMinuteOfHour(), morning.getSecondOfMinute(), morning.getMillisOfSecond());
+        Period period_noon = new Period(noon.getHourOfDay(), noon.getMinuteOfHour(), noon.getSecondOfMinute(), noon.getMillisOfSecond());
+        Period period_afternoon = new Period(afternoon.getHourOfDay(), afternoon.getMinuteOfHour(), afternoon.getSecondOfMinute(), afternoon.getMillisOfSecond());
+        Period period_evening = new Period(evening.getHourOfDay(), evening.getMinuteOfHour(), evening.getSecondOfMinute(), evening.getMillisOfSecond());
+        Period period_late_at_night = new Period(late_at_night.getHourOfDay(), late_at_night.getMinuteOfHour(), late_at_night.getSecondOfMinute(), late_at_night.getMillisOfSecond());
+
+        DateTime ref = new DateTime(date);
+        DateTime eitm = new DateMidnight(date).toDateTime().plus(period_early_in_the_morning);
+        DateTime m = new DateMidnight(date).toDateTime().plus(period_morning);
+        DateTime n = new DateMidnight(date).toDateTime().plus(period_noon);
+        DateTime a = new DateMidnight(date).toDateTime().plus(period_afternoon);
+        DateTime e = new DateMidnight(date).toDateTime().plus(period_evening);
+        DateTime lan = new DateMidnight(date).toDateTime().plus(period_late_at_night);
+
+        if (eitm.compareTo(ref) <= 0 && ref.compareTo(m) < 0) {
+            timeid = DFNTools.BYTE_EARLY_IN_THE_MORNING;
+        } else if (m.compareTo(ref) <= 0 && ref.compareTo(n) < 0) {
+            timeid = DFNTools.BYTE_MORNING;
+        } else if (n.compareTo(ref) <= 0 && ref.compareTo(a) < 0) {
+            timeid = DFNTools.BYTE_NOON;
+        } else if (a.compareTo(ref) <= 0 && ref.compareTo(e) < 0) {
+            timeid = DFNTools.BYTE_AFTERNOON;
+        } else if (e.compareTo(ref) <= 0 && ref.compareTo(lan) < 0) {
+            timeid = DFNTools.BYTE_EVENING;
+        } else {
+            timeid = DFNTools.BYTE_LATE_AT_NIGHT;
+        }
+        return timeid;
+    }
+
 
     /**
      * EndOfMonth

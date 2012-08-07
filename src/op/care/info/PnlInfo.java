@@ -242,10 +242,10 @@ public class PnlInfo extends NursingRecordsPanel {
                     txtHTML.setText(null);
                     tabKat.setSelectedIndex(SYSPropsTools.getInteger(internalClassID + ":tabKatSelectedIndex"));
                     refreshDisplay();
-                    btnBWDied.setEnabled(bewohner.isAktiv());
-                    btnBWMovedOut.setEnabled(bewohner.isAktiv());
-                    btnBWisAway.setEnabled(bewohner.isAktiv() && !BWInfoTools.isAbwesend(bewohner));
-                    btnBWisBack.setEnabled(bewohner.isAktiv() && BWInfoTools.isAbwesend(bewohner));
+                    btnBWDied.setEnabled(bewohner.isActive());
+                    btnBWMovedOut.setEnabled(bewohner.isActive());
+                    btnBWisAway.setEnabled(bewohner.isActive() && !BWInfoTools.isAbwesend(bewohner));
+                    btnBWisBack.setEnabled(bewohner.isActive() && BWInfoTools.isAbwesend(bewohner));
                     initPhase = false;
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
@@ -410,7 +410,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     });
                 }
             });
-            btnBWDied.setEnabled(bewohner.isAktiv());
+            btnBWDied.setEnabled(bewohner.isActive());
             list.add(btnBWDied);
             /***
              *                                   _               _
@@ -472,7 +472,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     });
                 }
             });
-            btnBWMovedOut.setEnabled(bewohner.isAktiv());
+            btnBWMovedOut.setEnabled(bewohner.isActive());
             list.add(btnBWMovedOut);
             /***
              *      _          _
@@ -531,7 +531,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
                 }
             });
-            btnBWisAway.setEnabled(bewohner.isAktiv() && !BWInfoTools.isAbwesend(bewohner));
+            btnBWisAway.setEnabled(bewohner.isActive() && !BWInfoTools.isAbwesend(bewohner));
             list.add(btnBWisAway);
             /***
              *      _       ____             _
@@ -575,7 +575,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     }
                 }
             });
-            btnBWisBack.setEnabled(bewohner.isAktiv() && BWInfoTools.isAbwesend(bewohner));
+            btnBWisBack.setEnabled(bewohner.isActive() && BWInfoTools.isAbwesend(bewohner));
             list.add(btnBWisBack);
         }
 

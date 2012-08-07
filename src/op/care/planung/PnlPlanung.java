@@ -867,6 +867,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                 if (initPhase) return;
                 SYSPropsTools.storeState(internalClassID + ":tbInactive", tbInactive);
                 refreshDisplay();
+                //TODO: Wenn man die inactives ausblendet müssen auch die Kategorien unsichtbar werden, wenn sie nur unsichtbare enthalten.
             }
         });
         tbInactive.setHorizontalAlignment(SwingConstants.LEFT);

@@ -39,7 +39,7 @@ public class PnlUhrzeitDatum extends JPanel {
     public PnlUhrzeitDatum(Date preset, Date max) {
         initComponents();
         labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
-        labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time"));
+        labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
         this.preset = preset;
         jdcDatum.setDate(preset);
         jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_BIS_AUF_WEITERES : max);

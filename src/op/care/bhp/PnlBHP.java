@@ -94,7 +94,7 @@ public class PnlBHP extends NursingRecordsPanel {
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
         initPhase = true;
 
-        abwesend = BWInfoTools.getAbwesendSeit(bewohner) != null;
+        abwesend = BWInfoTools.absentSince(bewohner) != null;
         prepareSearchArea();
 
         initPhase = false;

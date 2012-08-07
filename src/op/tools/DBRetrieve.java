@@ -73,7 +73,7 @@ public class DBRetrieve {
 //     *
 //     * @return Datum des Beginns der Abwesenheitsperiode. =NULL wenn ANwesend.
 //     */
-//    public static Date getAbwesendSeit(String bwkennung) {
+//    public static Date absentSince(String bwkennung) {
 //        PreparedStatement stmt;
 //        ResultSet rs;
 //        Date d = null;

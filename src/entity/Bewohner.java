@@ -153,11 +153,11 @@ public class Bewohner implements Serializable {
     }
 
     /**
-     * Bewohner, die einer Station zugeordnet sind gelten als aktive Bewohner. Also nicht ausgezogen, sind zur Zeit aktuell.
+     * Residents that have no assigned stations are considered inactive, hence not present in the home anymore
      *
      * @return
      */
-    public boolean isAktiv() {
+    public boolean isActive() {
         return station != null;
     }
 

@@ -157,13 +157,13 @@ public class BWInfoTools {
      *
      * @return Date of the departure. null if not away.
      */
-    public static Date getAbwesendSeit(Bewohner bewohner) {
+    public static Date absentSince(Bewohner bewohner) {
         BWInfo lastabsence = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
         return lastabsence == null || lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
     }
 
     public static boolean isAbwesend(Bewohner bewohner) {
-        return getAbwesendSeit(bewohner) != null;
+        return absentSince(bewohner) != null;
     }
 
 //    /**

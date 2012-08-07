@@ -46,13 +46,13 @@ public class InterventionScheduleTools {
             if (headerNeeded) {
                 result += "<table id=\"fonttext\" border=\"1\">" +
                         "   <tr>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".early.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".morning.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".noon.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".afternoon.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".evening.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".late.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".repeat.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.earlyinthemorning.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.morning.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.noon.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.afternoon.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.evening.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.lateatnight.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + "</th>" +
                         "   </tr>";
             }
             String wdh = getWiederholung(termin);
@@ -70,9 +70,9 @@ public class InterventionScheduleTools {
             if (headerNeeded) {
                 result += "<table id=\"fonttext\" border=\"1\" >" +
                         "   <tr>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time.long") + "</th>" +
                         "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Number") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".repeat.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + "</th>" +
                         "   </tr>";
             }
 

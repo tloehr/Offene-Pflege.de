@@ -4,6 +4,7 @@ import entity.Bewohner;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.dfn.PnlDFN;
+import op.tools.GUITools;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -13,6 +14,7 @@ import org.joda.time.format.DateTimeFormat;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,12 +32,14 @@ public class DFNTools {
     public static final byte STATUS_ERLEDIGT = 1;
     public static final byte STATUS_VERWEIGERT = 2;
 
-    public static final String[] SHIFTTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
     public static final byte SHIFT_ALL = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
     public static final byte SHIFT_EARLY = 1;
     public static final byte SHIFT_LATE = 2;
     public static final byte SHIFT_VERY_LATE = 3;
+
+    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
+    public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
     public static final byte BYTE_TIMEOFDAY = 0;
     public static final byte BYTE_EARLY_IN_THE_MORNING = 1;
@@ -78,7 +82,7 @@ public class DFNTools {
 
         // If (for technical reasons) the lastdfn lies in the past (more than the usual 1 day),
         // then the generation is interated until the current day.
-        for (int days = 1; days <= Days.daysBetween(lastdfn.plusDays(1), new DateMidnight()).getDays()+1; days++) {
+        for (int days = 1; days <= Days.daysBetween(lastdfn.plusDays(1), new DateMidnight()).getDays() + 1; days++) {
 
             targetdate = lastdfn.plusDays(days);
 
@@ -331,7 +335,7 @@ public class DFNTools {
 
             String jpql = " SELECT DISTINCT dfn.nursingProcess " +
                     " FROM DFN dfn " +
-                    " WHERE dfn.bewohner = :bewohner AND dfn.soll >= :von AND dfn.soll <= :bis ";
+                    " WHERE dfn.bewohner = :bewohner AND dfn.nursingProcess IS NOT NULL AND dfn.soll >= :von AND dfn.soll <= :bis ";
 
             if (shift != SHIFT_ALL) {
                 jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
@@ -374,7 +378,8 @@ public class DFNTools {
 
             String jpql = " SELECT dfn " +
                     " FROM DFN dfn " +
-                    " WHERE dfn.nursingProcess = :np AND dfn.soll >= :von AND dfn.soll <= :bis ";
+                    " WHERE dfn.nursingProcess = :np " +
+                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
 
             if (shift != SHIFT_ALL) {
                 jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
@@ -387,6 +392,50 @@ public class DFNTools {
             Query query = em.createQuery(jpql);
 
             query.setParameter("np", np);
+            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
+            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+
+            if (shift != SHIFT_ALL) {
+                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
+                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
+                query.setParameter("timeid1", timeids.getFirst());
+                query.setParameter("timeid2", timeids.getSecond());
+                query.setParameter("time1", times.getFirst());
+                query.setParameter("time2", times.getSecond());
+            }
+
+            listDFN = new ArrayList<DFN>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return listDFN;
+    }
+
+    public static ArrayList<DFN> getDFNs(byte shift, Bewohner resident, Date date) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<DFN> listDFN = null;
+
+        try {
+
+            String jpql = " SELECT dfn " +
+                    " FROM DFN dfn " +
+                    " WHERE dfn.bewohner = :resident AND dfn.nursingProcess IS NULL " +
+                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+
+            if (shift != SHIFT_ALL) {
+                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
+                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
+
+            }
+
+            jpql = jpql + " ORDER BY dfn.intervention.bezeichnung ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("resident", resident);
             query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
             query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
@@ -433,5 +482,33 @@ public class DFNTools {
 
         result += SYSConst.html_div_close;
         return result;
+    }
+
+    public static Icon getIcon(DFN dfn) {
+        if (dfn.getStatus() == STATUS_ERLEDIGT) {
+            return SYSConst.icon22apply;
+        }
+        if (dfn.getStatus() == STATUS_OFFEN) {
+            return SYSConst.icon22empty;
+        }
+        if (dfn.getStatus() == STATUS_VERWEIGERT) {
+            return SYSConst.icon22cancel;
+        }
+        return null;
+    }
+
+    public static String getScheduleText(DFN dfn, String prefix, String postfix) {
+        String text = "";
+        if (!dfn.isOnDemand()) {
+            text = prefix;
+            if (dfn.getSollZeit() == BYTE_TIMEOFDAY) {
+                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
+            } else {
+                String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
+                text += msg[dfn.getsZeit()];
+            }
+            text += postfix;
+        }
+        return text;
     }
 }

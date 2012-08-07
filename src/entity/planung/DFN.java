@@ -226,6 +226,10 @@ public class DFN implements Serializable {
         return user;
     }
 
+    public boolean isOnDemand(){
+        return nursingProcess == null;
+    }
+
     public void setUser(Users user) {
         this.user = user;
     }
