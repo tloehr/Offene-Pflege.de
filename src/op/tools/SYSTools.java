@@ -1966,12 +1966,14 @@ public class SYSTools {
     }
 
     public static String left(String text, int size) {
+        OPDE.debug("IN: "+text);
         int originalLaenge = text.length();
         int max = Math.min(size, originalLaenge);
-        text = text.substring(0, max - 1);
+        text = text.substring(0, max);
         if (max < originalLaenge) {
             text += "...";
         }
+        OPDE.debug("OUT: "+text);
         return text;
     }
 

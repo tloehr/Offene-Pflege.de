@@ -28,25 +28,21 @@ package op.care.dfn;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.Bewohner;
 import entity.BewohnerTools;
-import entity.info.BWInfoTools;
-import entity.planung.DFN;
-import entity.planung.DFNTools;
-import entity.planung.NursingProcess;
-import entity.planung.NursingProcessTools;
-import entity.verordnungen.BHPTools;
+import entity.planung.*;
 import op.OPDE;
+import op.care.planung.massnahmen.PnlSelectIntervention;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -62,7 +58,10 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -83,14 +82,15 @@ public class PnlDFN extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JDateChooser jdcDatum;
     private JComboBox cmbSchicht;
-    private int DFN_MAX_MINUTES_TO_WITHDRAW;
-    private JideButton addButton;
+    //    private int DFN_MAX_MINUTES_TO_WITHDRAW;
+
     private ArrayList<NursingProcess> involvedNPs;
     private HashMap<DFN, CollapsiblePane> dfnCollapsiblePaneHashMap;
     private HashMap<NursingProcess, ArrayList<DFN>> nursingProcessArrayListHashMap;
     private ArrayList<DFN> unassignedDFNArrayList;
     private CollapsiblePane unassignedPane;
     private boolean residentAbsent;
+    private int MAX_TEXT_LENGTH = 110;
 
     public PnlDFN(Bewohner bewohner, JScrollPane jspSearch) {
         initComponents();
@@ -101,7 +101,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
 
     private void initPanel() {
-        DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
+//        DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
 //        planungCollapsiblePaneMap = new HashMap<NursingProcess, CollapsiblePane>();
 //        categoryCPMap = new HashMap<BWInfoKat, CollapsiblePane>();
 //        planungen = new HashMap<BWInfoKat, java.util.List<NursingProcess>>();
@@ -130,10 +130,13 @@ public class PnlDFN extends NursingRecordsPanel {
     public void change2Bewohner(Bewohner bewohner) {
         this.bewohner = bewohner;
         OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+
+        initPhase = true;
+        jdcDatum.setMinSelectableDate(DFNTools.getMinDatum(bewohner));
+        jdcDatum.setDate(new Date());
+        initPhase = false;
+
         reloadDisplay();
-
-
-        residentAbsent = bewohner.isActive() && BWInfoTools.absentSince(bewohner) != null;
 
 
 //        btnLock.setEnabled(readOnly);
@@ -215,7 +218,9 @@ public class PnlDFN extends NursingRecordsPanel {
         } else {
 
             cpDFN.removeAll();
-            involvedNPs.clear();
+            if (involvedNPs != null) {
+                involvedNPs.clear();
+            }
             dfnCollapsiblePaneHashMap.clear();
             nursingProcessArrayListHashMap.clear();
             involvedNPs = DFNTools.getInvolvedNPs((byte) (cmbSchicht.getSelectedIndex() - 1), bewohner, jdcDatum.getDate());
@@ -311,7 +316,7 @@ public class PnlDFN extends NursingRecordsPanel {
             fore = Color.BLACK;
             backcontent = Color.LIGHT_GRAY;
         } else {
-            title = np.getStichwort() + " (" + np.getKategorie().getBezeichnung() + ")";
+            title = "<html>" + (np.isAbgesetzt() ? "<s>" : "") + np.getStichwort() + (np.isAbgesetzt() ? "</s>" : "") + " (" + np.getKategorie().getBezeichnung() + ")" + (np.isAbgesetzt() ? " &rarr;" + DateFormat.getDateInstance().format(np.getBis()) : "") + "</html>";
             back = np.getKategorie().getBackgroundHeader();
             fore = np.getKategorie().getForegroundHeader();
             backcontent = np.getKategorie().getBackgroundContent();
@@ -319,24 +324,6 @@ public class PnlDFN extends NursingRecordsPanel {
 
         final CollapsiblePane npPane = new CollapsiblePane(title);
 
-//        katpane.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent mouseEvent) {
-//                try {
-//                    if (katpane.isCollapsed()) {
-//                        katpane.setCollapsed(false);
-//                    } else {
-//                        // collapse all children
-//                        for (NursingProcess planung : planungen.get(kat)) {
-//                            planungCollapsiblePaneMap.get(planung).setCollapsed(true);
-//                        }
-//                        katpane.setCollapsed(true);
-//                    }
-//                } catch (PropertyVetoException e) {
-//                    OPDE.error(e);
-//                }
-//            }
-//        });
         npPane.setSlidingDirection(SwingConstants.SOUTH);
         npPane.setBackground(back);
         npPane.setForeground(fore);
@@ -356,17 +343,6 @@ public class PnlDFN extends NursingRecordsPanel {
         }
 
         for (DFN dfn : (np == null ? unassignedDFNArrayList : nursingProcessArrayListHashMap.get(np))) {
-
-//            final JideButton btnDFN = GUITools.createHyperlinkButton(dfn.getIntervention().getBezeichnung(), SYSConst.icon22redo, null);
-//            btnDFN.setForeground(np.getKategorie().getForegroundContent());
-//            btnDFN.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//
-//                }
-//            });
-//            npPanel.add(btnDFN);
-
             dfnCollapsiblePaneHashMap.put(dfn, createCollapsiblePanesFor(dfn));
             npPanel.add(dfnCollapsiblePaneHashMap.get(dfn));
         }
@@ -409,7 +385,12 @@ public class PnlDFN extends NursingRecordsPanel {
          *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
          *
          */
-        JideButton btnDFN = GUITools.createHyperlinkButton("<html><font color=\"" + fg + "\">" + dfn.getIntervention().getBezeichnung() + DFNTools.getScheduleText(dfn, " <b>[", "]</b>") + "</html>", DFNTools.getIcon(dfn), null);
+        JideButton btnDFN = GUITools.createHyperlinkButton("<html><font color=\"" + fg + "\">" +
+                SYSTools.left(dfn.getIntervention().getBezeichnung(), MAX_TEXT_LENGTH) +
+                DFNTools.getScheduleText(dfn, " <b>[", "]</b>") +
+                ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <u>" + dfn.getUser().getUKennung() + "</u>" : "") +
+                "</html>", DFNTools.getIcon(dfn), null);
+
 //        title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
         btnDFN.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -447,20 +428,14 @@ public class PnlDFN extends NursingRecordsPanel {
             btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnApply.setContentAreaFilled(false);
             btnApply.setBorder(null);
-//            btnApply.setToolTipText(OPDE.lang.getString(internalClassID + ".btnadd.tooltip"));
             btnApply.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (dfn.getStatus() == DFNTools.STATUS_ERLEDIGT) {
+                    if (dfn.getStatus() == DFNTools.STATE_DONE) {
                         return;
                     }
-                    boolean changeable =
-                            !residentAbsent && bewohner.isActive() &&
-                                    dfn.getNursingProcess().getBis().after(new Date()) && // prescription is active
-                                    (dfn.getUser() == null ||
-                                            (dfn.getUser().equals(OPDE.getLogin().getUser()) &&
-                                                    new Period(new DateTime(dfn.getMdate()), new DateTime()).getMinutes() < DFN_MAX_MINUTES_TO_WITHDRAW));
-                    if (changeable) {
+
+                    if (DFNTools.isChangeable(dfn)) {
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
@@ -470,21 +445,16 @@ public class PnlDFN extends NursingRecordsPanel {
                             DFN myDFN = em.merge(dfn);
                             em.lock(myDFN, LockModeType.OPTIMISTIC);
 
-//                            if (myDFN.isOnDemand()) {
-//                                em.remove(myDFN);
-//                                dfnCollapsiblePaneHashMap.remove(myDFN);
-//                                unassignedDFNArrayList.remove(myDFN);
-//                            } else {
-                            myDFN.setStatus(DFNTools.STATUS_ERLEDIGT);
+                            myDFN.setStatus(DFNTools.STATE_DONE);
                             myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
                             myDFN.setIst(new Date());
                             myDFN.setiZeit(SYSCalendar.whatTimeIDis(new Date()));
+                            myDFN.setMdate(new Date());
                             dfnCollapsiblePaneHashMap.put(myDFN, createCollapsiblePanesFor(myDFN));
-//                                dfnCollapsiblePaneHashMap.remove(dfn);
                             int position = nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).indexOf(dfn);
                             nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).remove(dfn);
                             nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).add(position, myDFN);
-//                            }
+                            Collections.sort(nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()));
                             em.getTransaction().commit();
                             refreshDisplay();
                         } catch (OptimisticLockException ole) {
@@ -531,7 +501,53 @@ public class PnlDFN extends NursingRecordsPanel {
             btnCancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    if (dfn.getStatus() == DFNTools.STATE_REFUSED) {
+                        return;
+                    }
 
+                    if (DFNTools.isChangeable(dfn)) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+
+                            em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                            DFN myDFN = em.merge(dfn);
+                            em.lock(myDFN, LockModeType.OPTIMISTIC);
+
+                            myDFN.setStatus(DFNTools.STATE_REFUSED);
+                            myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
+                            myDFN.setIst(new Date());
+                            myDFN.setiZeit(SYSCalendar.whatTimeIDis(new Date()));
+                            myDFN.setMdate(new Date());
+                            dfnCollapsiblePaneHashMap.put(myDFN, createCollapsiblePanesFor(myDFN));
+                            int position = nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).indexOf(dfn);
+                            nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).remove(dfn);
+                            nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).add(position, myDFN);
+                            Collections.sort(nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()));
+
+                            em.getTransaction().commit();
+                            refreshDisplay();
+                        } catch (OptimisticLockException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                    }
                 }
             });
             btnCancel.setEnabled(!dfn.isOnDemand());
@@ -554,12 +570,164 @@ public class PnlDFN extends NursingRecordsPanel {
             btnEmpty.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    if (dfn.getStatus() == DFNTools.STATE_OPEN) {
+                        return;
+                    }
 
+                    if (DFNTools.isChangeable(dfn)) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+
+                            em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                            DFN myDFN = em.merge(dfn);
+                            em.lock(myDFN, LockModeType.OPTIMISTIC);
+
+                            // on demand DFNs are deleted if they not wanted anymore
+                            if (myDFN.isOnDemand()) {
+                                em.remove(myDFN);
+                                dfnCollapsiblePaneHashMap.remove(myDFN);
+                                unassignedDFNArrayList.remove(myDFN);
+                            } else {
+                                // the normal DFNs (those assigned to a NursingProcess) are reset to the OPEN state.
+                                myDFN.setStatus(DFNTools.STATE_OPEN);
+                                myDFN.setUser(null);
+                                myDFN.setIst(null);
+                                myDFN.setiZeit(null);
+                                myDFN.setMdate(new Date());
+                                dfnCollapsiblePaneHashMap.put(myDFN, createCollapsiblePanesFor(myDFN));
+                                int position = nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).indexOf(dfn);
+                                nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).remove(dfn);
+                                nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).add(position, myDFN);
+                                Collections.sort(nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()));
+                            }
+
+                            em.getTransaction().commit();
+                            refreshDisplay();
+                        } catch (OptimisticLockException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                    }
                 }
             });
             titlePanelright.add(btnEmpty);
-        }
 
+
+            /***
+             *      _     _         __  __ _             _
+             *     | |__ | |_ _ __ |  \/  (_)_ __  _   _| |_ ___  ___
+             *     | '_ \| __| '_ \| |\/| | | '_ \| | | | __/ _ \/ __|
+             *     | |_) | |_| | | | |  | | | | | | |_| | ||  __/\__ \
+             *     |_.__/ \__|_| |_|_|  |_|_|_| |_|\__,_|\__\___||___/
+             *
+             */
+            final JButton btnMinutes = new JButton(SYSConst.icon22clock);
+            final JidePopup popup = new JidePopup();
+            btnMinutes.setPressedIcon(SYSConst.icon22clockPressed);
+            btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnMinutes.setContentAreaFilled(false);
+            btnMinutes.setBorder(null);
+//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+            btnMinutes.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    if (!DFNTools.isChangeable(dfn)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                        return;
+                    }
+                    final JComboBox cmbMinutes = new JComboBox(SYSCalendar.getMinuteCMBModelForDFNs(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}));
+                    cmbMinutes.setRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            Pair<String, Integer> myValue = (Pair<String, Integer>) value;
+                            return super.getListCellRendererComponent(list, myValue.getFirst(), index, isSelected, cellHasFocus);
+                        }
+                    });
+                    cmbMinutes.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent ie) {
+                            if (ie.getStateChange() == ItemEvent.SELECTED) {
+                                popup.hidePopup();
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+                                    DFN myDFN = em.merge(dfn);
+                                    em.lock(myDFN, LockModeType.OPTIMISTIC);
+
+                                    myDFN.setMinutes(new BigDecimal(((Pair<String, Integer>) ie.getItem()).getSecond()));
+                                    myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
+                                    myDFN.setMdate(new Date());
+
+                                    dfnCollapsiblePaneHashMap.put(myDFN, createCollapsiblePanesFor(myDFN));
+
+                                    if (dfn.isOnDemand()) {
+                                        int position = unassignedDFNArrayList.indexOf(dfn);
+                                        unassignedDFNArrayList.remove(dfn);
+                                        unassignedDFNArrayList.add(position, myDFN);
+                                    } else {
+                                        int position = nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).indexOf(dfn);
+                                        nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).remove(dfn);
+                                        nursingProcessArrayListHashMap.get(myDFN.getNursingProcess()).add(position, myDFN);
+                                    }
+
+                                    em.getTransaction().commit();
+                                    refreshDisplay();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
+
+                            }
+                        }
+                    });
+
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.getContentPane().add(cmbMinutes);
+                    popup.setOwner(btnMinutes);
+                    popup.removeExcludedComponent(cmbMinutes);
+                    popup.setDefaultFocusComponent(cmbMinutes);
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                }
+            });
+            btnMinutes.setEnabled(dfn.getStatus() != DFNTools.STATE_OPEN);
+            titlePanelright.add(btnMinutes);
+
+
+        }
 
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);
@@ -580,6 +748,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
         dfnPane.setTitleLabelComponent(titlePanel);
         dfnPane.setSlidingDirection(SwingConstants.SOUTH);
+//        OPDE.debug("Dimension: " + dfnPane.getPreferredSize());
 
         /***
          *       ___ ___  _  _ _____ ___ _  _ _____
@@ -656,7 +825,6 @@ public class PnlDFN extends NursingRecordsPanel {
 
         jdcDatum = new JDateChooser(new Date());
         jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-        jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(bewohner));
 
         jdcDatum.setBackground(Color.WHITE);
         jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
@@ -750,41 +918,83 @@ public class PnlDFN extends NursingRecordsPanel {
 
         java.util.List<Component> list = new ArrayList<Component>();
 
+        /***
+         *      _     _            _       _     _
+         *     | |__ | |_ _ __    / \   __| | __| |
+         *     | '_ \| __| '_ \  / _ \ / _` |/ _` |
+         *     | |_) | |_| | | |/ ___ \ (_| | (_| |
+         *     |_.__/ \__|_| |_/_/   \_\__,_|\__,_|
+         *
+         */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), null);
-//            addButton.addActionListener(new ActionListener() {
+            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), null);
+            btnAdd.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+                    PnlSelectIntervention pnl = new PnlSelectIntervention(new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            popup.hidePopup();
+                            if (o != null) {
+                                Object[] objects = (Object[]) o;
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+
+                                    for (Object obj : objects) {
+                                        Intervention intervention = em.merge((Intervention) obj);
+                                        DFN dfn = em.merge(new DFN(bewohner, intervention));
+
+                                        dfnCollapsiblePaneHashMap.put(dfn, createCollapsiblePanesFor(dfn));
+                                        unassignedDFNArrayList.add(dfn);
+                                        Collections.sort(unassignedDFNArrayList);
+                                    }
+
+                                    em.getTransaction().commit();
+                                    refreshDisplay();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.getContentPane().add(pnl);
+                    popup.setOwner(btnAdd);
+                    popup.removeExcludedComponent(pnl);
+                    popup.setDefaultFocusComponent(pnl);
+                    GUITools.showPopup(popup, SwingConstants.EAST);
+                }
+            });
+            list.add(btnAdd);
+
+//            final JTextField textField = new JTextField("70");
+//            textField.addActionListener(new ActionListener() {
 //                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//
-//                    if (VerordnungTools.hasBedarf(bewohner)) {
-//
-//                        final JidePopup popup = new JidePopup();
-//
-//                        DlgBedarf dlg = new DlgBedarf(bewohner, new Closure() {
-//                            @Override
-//                            public void execute(Object o) {
-//                                popup.hidePopup();
-//                                if (o != null) {
-//                                    reloadTable();
-//                                }
-//                            }
-//                        });
-//
-//                        popup.setMovable(false);
-//                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                        popup.getContentPane().add(dlg);
-//                        popup.setOwner(addButton);
-//                        popup.removeExcludedComponent(addButton);
-//                        popup.setDefaultFocusComponent(dlg);
-//                        Point p = new Point(addButton.getX(), addButton.getY());
-//                        SwingUtilities.convertPointToScreen(p, addButton);
-//                        popup.showPopup(p.x, p.y - (int) dlg.getPreferredSize().getHeight()); // - (int) addButton.getPreferredSize().getHeight()
-//                    } else {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine Bedarfsverordnungen vorhanden"));
-//                    }
+//                public void actionPerformed(ActionEvent e) {
+//                    MAX_TEXT_LENGTH = Integer.parseInt(textField.getText());
+//                    reloadDisplay();
 //                }
 //            });
-            list.add(addButton);
+//            list.add(textField);
+
         }
 
         return list;
@@ -921,18 +1131,18 @@ public class PnlDFN extends NursingRecordsPanel {
 //
 //                public void actionPerformed(java.awt.event.ActionEvent evt) {
 //                    HashMap hm = new HashMap();
-//                    hm.put("Status", TMDFN.STATUS_VERWEIGERT);
+//                    hm.put("Status", TMDFN.STATE_REFUSED);
 //                    hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
 //                    hm.put("Ist", "!NOW!");
 //                    hm.put("IZeit", SYSCalendar.ermittleZeit());
 //                    DBHandling.updateRecord("DFN", hm, "DFNID", dfnid);
 //                    hm.clear();
-//                    tm.setUpdate(row, TMDFN.STATUS_VERWEIGERT);
+//                    tm.setUpdate(row, TMDFN.STATE_REFUSED);
 //                    //tm.reload(row, col);
 //                }
 //            });
 //            menu.add(itemPopupRefuse);
-//            ocs.setEnabled(this, "itemPopupRefuse", itemPopupRefuse, changeable && status == TMDFN.STATUS_OFFEN);
+//            ocs.setEnabled(this, "itemPopupRefuse", itemPopupRefuse, changeable && status == TMDFN.STATE_OPEN);
 //
 //            if (changeable) {
 //                menu.add(new JSeparator());
@@ -960,7 +1170,7 @@ public class PnlDFN extends NursingRecordsPanel {
 //                        }
 //                    });
 //                    menu.add(item);
-//                    item.setEnabled(status == TMDFN.STATUS_ERLEDIGT);
+//                    item.setEnabled(status == TMDFN.STATE_DONE);
 //                }
 //                text.clear();
 //            }
@@ -999,7 +1209,7 @@ public class PnlDFN extends NursingRecordsPanel {
 //        Object[] sel = DlgMassSelect.showDialog(parent, true);
 //        if (sel.length > 0) {
 //            HashMap hmnew = new HashMap();
-//            hmnew.put("Status", TMDFN.STATUS_ERLEDIGT);
+//            hmnew.put("Status", TMDFN.STATE_DONE);
 //            hmnew.put("UKennung", OPDE.getLogin().getUser().getUKennung());
 //            hmnew.put("BWKennung", bwkennung);
 //            hmnew.put("TermID", 0);

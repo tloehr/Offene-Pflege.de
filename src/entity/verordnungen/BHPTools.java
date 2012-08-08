@@ -44,7 +44,7 @@ public class BHPTools {
     public static Date getMinDatum(Bewohner bewohner) {
         Date date;
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.bewohner = :bewohner ORDER BY b.soll");
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.bewohner = :bewohner ORDER BY b.bhpid");
         query.setParameter("bewohner", bewohner);
         query.setMaxResults(1);
         try {

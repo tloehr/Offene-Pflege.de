@@ -289,6 +289,7 @@ public class SYSConst {
     public static final Icon icon16bysecond = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/bysecond.png"));
     public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
     public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
-    public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/history.png"));
+    public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock.png"));
+    public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock_pressed.png"));
     public static final Icon icon22addbw = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_bw.png"));
 }

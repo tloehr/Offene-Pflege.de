@@ -398,7 +398,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     // DFNs to delete
                                     Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
                                     delQuery.setParameter("nursingprocess", myOldNP);
-                                    delQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                     delQuery.executeUpdate();
 
                                     // Create new DFNs according to plan
@@ -627,7 +627,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     // DFNs to delete
                                     Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
                                     delQuery.setParameter("nursingprocess", myOldNP);
-                                    delQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                     delQuery.executeUpdate();
 
                                     // Refresh Display
@@ -704,7 +704,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 // DFNs to delete
                                 Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
                                 delQuery.setParameter("nursingprocess", myOldNP);
-                                delQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+                                delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                 delQuery.executeUpdate();
 
                                 em.remove(myOldNP);

@@ -2,6 +2,8 @@ package entity.planung;
 
 import entity.Bewohner;
 import entity.Users;
+import op.OPDE;
+import op.tools.SYSCalendar;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,18 +13,18 @@ import java.util.Date;
 @Entity
 @Table(name = "DFN")
 @NamedQueries({
-    @NamedQuery(name = "Dfn.findAll", query = "SELECT d FROM DFN d"),
-    @NamedQuery(name = "Dfn.findByDfnid", query = "SELECT d FROM DFN d WHERE d.dfnid = :dfnid"),
-    @NamedQuery(name = "Dfn.findBySoll", query = "SELECT d FROM DFN d WHERE d.soll = :soll"),
-    @NamedQuery(name = "Dfn.findByIst", query = "SELECT d FROM DFN d WHERE d.ist = :ist"),
-    @NamedQuery(name = "Dfn.findByStDatum", query = "SELECT d FROM DFN d WHERE d.stDatum = :stDatum"),
-    @NamedQuery(name = "Dfn.findBySZeit", query = "SELECT d FROM DFN d WHERE d.sZeit = :sZeit"),
-    @NamedQuery(name = "Dfn.findByIZeit", query = "SELECT d FROM DFN d WHERE d.iZeit = :iZeit"),
-    @NamedQuery(name = "Dfn.findByStatus", query = "SELECT d FROM DFN d WHERE d.status = :status"),
-    @NamedQuery(name = "Dfn.findByErforderlich", query = "SELECT d FROM DFN d WHERE d.erforderlich = :erforderlich"),
-    @NamedQuery(name = "Dfn.findByDauer", query = "SELECT d FROM DFN d WHERE d.dauer = :dauer"),
-    @NamedQuery(name = "Dfn.findByMdate", query = "SELECT d FROM DFN d WHERE d.mdate = :mdate")})
-public class DFN implements Serializable {
+        @NamedQuery(name = "Dfn.findAll", query = "SELECT d FROM DFN d"),
+        @NamedQuery(name = "Dfn.findByDfnid", query = "SELECT d FROM DFN d WHERE d.dfnid = :dfnid"),
+        @NamedQuery(name = "Dfn.findBySoll", query = "SELECT d FROM DFN d WHERE d.soll = :soll"),
+        @NamedQuery(name = "Dfn.findByIst", query = "SELECT d FROM DFN d WHERE d.ist = :ist"),
+        @NamedQuery(name = "Dfn.findByStDatum", query = "SELECT d FROM DFN d WHERE d.stDatum = :stDatum"),
+        @NamedQuery(name = "Dfn.findBySZeit", query = "SELECT d FROM DFN d WHERE d.sZeit = :sZeit"),
+        @NamedQuery(name = "Dfn.findByIZeit", query = "SELECT d FROM DFN d WHERE d.iZeit = :iZeit"),
+        @NamedQuery(name = "Dfn.findByStatus", query = "SELECT d FROM DFN d WHERE d.status = :status"),
+        @NamedQuery(name = "Dfn.findByErforderlich", query = "SELECT d FROM DFN d WHERE d.floating = :erforderlich"),
+        @NamedQuery(name = "Dfn.findByDauer", query = "SELECT d FROM DFN d WHERE d.dauer = :dauer"),
+        @NamedQuery(name = "Dfn.findByMdate", query = "SELECT d FROM DFN d WHERE d.mdate = :mdate")})
+public class DFN implements Serializable, Comparable<DFN> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +51,7 @@ public class DFN implements Serializable {
     private Byte status;
     @Basic(optional = false)
     @Column(name = "Erforderlich")
-    private boolean erforderlich;
+    private boolean floating;
     @Basic(optional = false)
     @Column(name = "Dauer")
     private BigDecimal dauer;
@@ -58,7 +60,7 @@ public class DFN implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
     @Version
-    @Column(name="version")
+    @Column(name = "version")
     private Long version;
 
 
@@ -93,19 +95,46 @@ public class DFN implements Serializable {
     public DFN() {
     }
 
+    /**
+     * standard constructor for new, unassigned DFNs
+     *
+     * @param resident
+     * @param intervention
+     */
+    public DFN(Bewohner resident, Intervention intervention) {
+
+        Date now = new Date();
+
+        this.interventionSchedule = null;
+        this.intervention = intervention;
+        this.nursingProcess = null;
+        this.dauer = intervention.getDauer();
+        this.bewohner = resident;
+        this.floating = false;
+        this.soll = now;
+        this.sZeit = SYSCalendar.whatTimeIDis(now);
+        this.ist = now;
+        this.iZeit = this.sZeit;
+        this.version = 0l;
+        this.status = DFNTools.STATE_DONE;
+        this.user = OPDE.getLogin().getUser();
+        this.bewohner = resident;
+        this.mdate = now;
+        this.stDatum = now;
+    }
 
     public DFN(InterventionSchedule interventionSchedule, Date soll, Byte sZeit) {
-        // Das sieht redundant aus, dient aber der Vereinfachung
+        // looks redundant but simplifies enormously
         this.interventionSchedule = interventionSchedule;
         this.intervention = interventionSchedule.getIntervention();
         this.nursingProcess = interventionSchedule.getNursingProcess();
         this.dauer = interventionSchedule.getDauer();
         this.bewohner = interventionSchedule.getNursingProcess().getBewohner();
-        this.erforderlich = interventionSchedule.isFloating();
+        this.floating = interventionSchedule.isFloating();
         this.soll = soll;
         this.version = 0l;
         this.sZeit = sZeit;
-        this.status = DFNTools.STATUS_OFFEN;
+        this.status = DFNTools.STATE_OPEN;
         this.mdate = new Date();
         this.stDatum = new Date();
     }
@@ -154,6 +183,7 @@ public class DFN implements Serializable {
         this.status = status;
     }
 
+    // SOll-IST   Target Actual
     public Byte getsZeit() {
         return sZeit;
     }
@@ -182,20 +212,20 @@ public class DFN implements Serializable {
         this.stDatum = stDatum;
     }
 
-    public boolean isErforderlich() {
-        return erforderlich;
+    public boolean isFloating() {
+        return floating;
     }
 
-    public void setErforderlich(boolean erforderlich) {
-        this.erforderlich = erforderlich;
+    public void setFloating(boolean floating) {
+        this.floating = floating;
     }
 
-    public BigDecimal getDauer() {
+    public BigDecimal getMinutes() {
         return dauer;
     }
 
-    public void setDauer(BigDecimal dauer) {
-        this.dauer = dauer;
+    public void setMinutes(BigDecimal minutes) {
+        this.dauer = minutes;
     }
 
     public Date getMdate() {
@@ -226,7 +256,7 @@ public class DFN implements Serializable {
         return user;
     }
 
-    public boolean isOnDemand(){
+    public boolean isOnDemand() {
         return nursingProcess == null;
     }
 
@@ -259,5 +289,24 @@ public class DFN implements Serializable {
         return "entity.rest.Dfn[dfnid=" + dfnid + "]";
     }
 
+    @Override
+    public int compareTo(DFN other) {
+        int result = sZeit.compareTo(other.getSollZeit());
+
+        OPDE.debug(result + " "+sZeit + ":" + other.getSollZeit());
+
+        if (result == 0) {
+            if (sZeit == DFNTools.BYTE_TIMEOFDAY) {
+                result = soll.compareTo(other.getSoll());
+            }
+        }
+        if (result == 0) {
+            result = intervention.getBezeichnung().compareTo(other.getIntervention().getBezeichnung());
+        }
+        if (result == 0) {
+            result = dfnid.compareTo(other.getDfnid());
+        }
+        return result;
+    }
 }
 

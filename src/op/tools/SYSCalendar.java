@@ -1474,4 +1474,23 @@ public class SYSCalendar {
 
         return hm;
     }
+
+
+    public static ComboBoxModel getMinuteCMBModelForDFNs(int[] mins) {
+        DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
+//        Pair<Integer, String>[]
+
+        dcbm.addElement(new Pair<String, Integer>("--", -1)); // empty selection
+
+        for (int min : mins){
+            if (min % 60 == 0){
+                dcbm.addElement(new Pair<String, Integer>(min / 60 + " " + OPDE.lang.getString("misc.msg.Hour(s)"), min));
+            } else {
+                dcbm.addElement(new Pair<String, Integer>(min + " " + OPDE.lang.getString("misc.msg.Minute(s)"), min));
+            }
+        }
+
+        return dcbm;
+
+    }
 }

@@ -1,6 +1,7 @@
 package entity.planung;
 
 import entity.Bewohner;
+import entity.info.BWInfoTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.dfn.PnlDFN;
@@ -17,6 +18,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -28,9 +30,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DFNTools {
-    public static final byte STATUS_OFFEN = 0;
-    public static final byte STATUS_ERLEDIGT = 1;
-    public static final byte STATUS_VERWEIGERT = 2;
+    public static final byte STATE_OPEN = 0;
+    public static final byte STATE_DONE = 1;
+    public static final byte STATE_REFUSED = 2;
 
     public static final byte SHIFT_ALL = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
@@ -74,9 +76,9 @@ public class DFNTools {
         }
 
 
-//        if (Days.daysBetween(targetdate, new DateMidnight()).getDays() != 1) {
-//            throw new IndexOutOfBoundsException(OPDE.lang.getString(internalClassID + ".exception.import"));
-//        }
+        if (Days.daysBetween(lastdfn.plusDays(1), new DateMidnight()).getDays() > 1) {
+            throw new IndexOutOfBoundsException(OPDE.lang.getString("The date of the last import is somewhere in the future. Can't be true."));
+        }
 
         DateMidnight targetdate = null;
 
@@ -114,13 +116,13 @@ public class DFNTools {
 
             Query forceQuery = em.createQuery(" UPDATE DFN d "
                     + " SET d.soll = :now "
-                    + " WHERE d.erforderlich = TRUE AND d.status = :status AND d.soll < :now1 "
+                    + " WHERE d.floating = TRUE AND d.status = :status AND d.soll < :now1 "
                     + " AND d.nursingProcess.von < :now2 AND d.nursingProcess.bis > :now3 ");
             forceQuery.setParameter("now", targetdate.toDate());
             forceQuery.setParameter("now1", targetdate.toDate());
             forceQuery.setParameter("now2", targetdate.toDate());
             forceQuery.setParameter("now3", targetdate.toDate());
-            forceQuery.setParameter("status", DFNTools.STATUS_OFFEN);
+            forceQuery.setParameter("status", DFNTools.STATE_OPEN);
 
             // Die nicht beachteten zu erzwingenden müssen noch auf das heutige Datum umgetragen werden.
             // Das erfolgt unabhängig von dem eingegebenen Stichtag.
@@ -320,7 +322,7 @@ public class DFNTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.nursingProcess = :planung AND dfn.status <> :status");
         query.setParameter("planung", planung);
-        query.setParameter("status", STATUS_OFFEN);
+        query.setParameter("status", STATE_OPEN);
         long num = (Long) query.getSingleResult();
         em.close();
         return num;
@@ -387,7 +389,7 @@ public class DFNTools {
 
             }
 
-            jpql = jpql + " ORDER BY dfn.intervention.bezeichnung ";
+//            jpql = jpql + " ORDER BY dfn.intervention.bezeichnung ";
 
             Query query = em.createQuery(jpql);
 
@@ -405,7 +407,7 @@ public class DFNTools {
             }
 
             listDFN = new ArrayList<DFN>(query.getResultList());
-
+            Collections.sort(listDFN);
         } catch (Exception se) {
             OPDE.fatal(se);
         } finally {
@@ -431,8 +433,6 @@ public class DFNTools {
 
             }
 
-            jpql = jpql + " ORDER BY dfn.intervention.bezeichnung ";
-
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
@@ -449,6 +449,7 @@ public class DFNTools {
             }
 
             listDFN = new ArrayList<DFN>(query.getResultList());
+            Collections.sort(listDFN);
 
         } catch (Exception se) {
             OPDE.fatal(se);
@@ -466,7 +467,7 @@ public class DFNTools {
         }
         result += "<b>" + dfn.getIntervention().getBezeichnung() + "</b>";
         result += "<font size=\"-1\">";
-        result += "<br/>Dauer: <b>" + dfn.getDauer() + "</b> " + OPDE.lang.getString("misc.msg.Minutes");
+        result += "<br/>Dauer: <b>" + dfn.getMinutes() + "</b> " + OPDE.lang.getString("misc.msg.Minutes");
 
         if (dfn.getNursingProcess() == null) { // on demand
             result += " " + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand");
@@ -485,13 +486,13 @@ public class DFNTools {
     }
 
     public static Icon getIcon(DFN dfn) {
-        if (dfn.getStatus() == STATUS_ERLEDIGT) {
+        if (dfn.getStatus() == STATE_DONE) {
             return SYSConst.icon22apply;
         }
-        if (dfn.getStatus() == STATUS_OFFEN) {
+        if (dfn.getStatus() == STATE_OPEN) {
             return SYSConst.icon22empty;
         }
-        if (dfn.getStatus() == STATUS_VERWEIGERT) {
+        if (dfn.getStatus() == STATE_REFUSED) {
             return SYSConst.icon22cancel;
         }
         return null;
@@ -500,15 +501,44 @@ public class DFNTools {
     public static String getScheduleText(DFN dfn, String prefix, String postfix) {
         String text = "";
         if (!dfn.isOnDemand()) {
-            text = prefix;
             if (dfn.getSollZeit() == BYTE_TIMEOFDAY) {
                 text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
             } else {
                 String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
                 text += msg[dfn.getsZeit()];
             }
-            text += postfix;
+        } else {
+            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
         }
-        return text;
+
+        return prefix + text + postfix;
     }
+
+    public static boolean isChangeable(DFN dfn) {
+        int DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
+        boolean residentAbsent = dfn.getBewohner().isActive() && BWInfoTools.absentSince(dfn.getBewohner()) != null;
+
+        return !residentAbsent && dfn.getBewohner().isActive() &&
+                (dfn.isOnDemand() || dfn.getNursingProcess().getBis().after(new Date())) && // prescription is active or it is unassigned
+                (dfn.getUser() == null ||
+                        (dfn.getUser().equals(OPDE.getLogin().getUser()) &&
+                                Minutes.minutesBetween(new DateTime(dfn.getMdate()), new DateTime()).getMinutes() < DFN_MAX_MINUTES_TO_WITHDRAW));
+    }
+
+
+    public static Date getMinDatum(Bewohner bewohner) {
+        Date date;
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT d FROM DFN d WHERE d.bewohner = :bewohner ORDER BY d.dfnid");
+        query.setParameter("bewohner", bewohner);
+        query.setMaxResults(1);
+        try {
+            date = ((DFN) query.getSingleResult()).getSoll();
+        } catch (Exception e) {
+            date = new Date();
+        }
+        em.close();
+        return date;
+    }
+
 }

@@ -29,8 +29,6 @@ package tablerenderer;
 
 import entity.planung.DFN;
 import entity.planung.DFNTools;
-import op.OPDE;
-import op.care.dfn.PnlDFN;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
@@ -61,19 +59,19 @@ public class RNDDFN
         DFN dfn = tmdfn.getListeDFN().get(row);
 
         color = panel.getBackground();
-        if (dfn.getStatus() == DFNTools.STATUS_OFFEN) {
+        if (dfn.getStatus() == DFNTools.STATE_OPEN) {
             if (isSelected) {
                 color = SYSConst.grey80;
             } else {
                 color = Color.white;
             }
-        } else if (dfn.getStatus() == DFNTools.STATUS_ERLEDIGT) {
+        } else if (dfn.getStatus() == DFNTools.STATE_DONE) {
             if (isSelected) {
                 color = SYSConst.darkolivegreen3;
             } else {
                 color = SYSConst.darkolivegreen1;
             }
-        } else { // (status == TMDFN.STATUS_VERWEIGERT
+        } else { // (status == TMDFN.STATE_REFUSED
             if (isSelected) {
                 color = SYSConst.salmon3;
             } else {
@@ -88,9 +86,9 @@ public class RNDDFN
             ImageIcon icon;
             ImageIcon icon2 = null;
             ImageIcon icon4 = null;
-            if (dfn.getStatus() == DFNTools.STATUS_OFFEN) {
+            if (dfn.getStatus() == DFNTools.STATE_OPEN) {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
-                if (dfn.isErforderlich()) {
+                if (dfn.isFloating()) {
                     int daysBetween = Days.daysBetween(new DateTime(dfn.getStDatum()), new DateTime()).getDays();
                     if (daysBetween < 4) {
                         icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/reload-green.png"));
@@ -100,13 +98,13 @@ public class RNDDFN
                         icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/reload-red.png"));
                     }
                 }
-            } else if (dfn.getStatus() == DFNTools.STATUS_ERLEDIGT) {
-                if (dfn.isErforderlich()) {
+            } else if (dfn.getStatus() == DFNTools.STATE_DONE) {
+                if (dfn.isFloating()) {
                     icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infogreen.png"));
                 }
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
             } else {
-                if (dfn.isErforderlich()) {
+                if (dfn.isFloating()) {
                     icon2 = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infogreen.png"));
                 }
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"));
