@@ -696,39 +696,42 @@ public class PnlPlanung extends NursingRecordsPanel {
                     new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<b>" + planung.getStichwort() + "</b>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                NursingProcess myOldNP = em.merge(planung);
+                            if (o.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    NursingProcess myOldNP = em.merge(planung);
 
-                                // DFNs to delete
-                                Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
-                                delQuery.setParameter("nursingprocess", myOldNP);
-                                delQuery.setParameter("status", DFNTools.STATE_OPEN);
-                                delQuery.executeUpdate();
+                                    // DFNs to delete
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                    delQuery.setParameter("nursingprocess", myOldNP);
+                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
+                                    delQuery.executeUpdate();
 
-                                em.remove(myOldNP);
-                                em.getTransaction().commit();
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
+                                    em.remove(myOldNP);
+                                    em.getTransaction().commit();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(planung.getStichwort(), "deleted"));
+                                // TODO: das reicht nicht. muss wohl mehr gemacht werden. die gelöschten bleiben stehen
+                                reloadDisplay();
                             }
-
-                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(planung.getStichwort(), "deleted"));
-                            reloadDisplay();
                         }
                     });
                 }

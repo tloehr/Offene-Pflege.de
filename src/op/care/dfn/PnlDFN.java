@@ -727,7 +727,48 @@ public class PnlDFN extends NursingRecordsPanel {
             titlePanelright.add(btnMinutes);
 
 
+            /***
+ *      _     _         ___        __
+ *     | |__ | |_ _ __ |_ _|_ __  / _| ___
+ *     | '_ \| __| '_ \ | || '_ \| |_ / _ \
+ *     | |_) | |_| | | || || | | |  _| (_) |
+ *     |_.__/ \__|_| |_|___|_| |_|_|  \___/
+ *
+ */
+            final JButton btnInfo = new JButton(SYSConst.icon22infoblue);
+            final JidePopup popupInfo = new JidePopup();
+            btnInfo.setPressedIcon(SYSConst.icon22infogreen);
+            btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnInfo.setContentAreaFilled(false);
+            btnInfo.setBorder(null);
+//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+            btnInfo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    if (!DFNTools.isChangeable(dfn)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                        return;
+                    }
+                    final JTextPane txt = new JTextPane();
+                    txt.setContentType("text/html");
+                    txt.setEditable(false);
+                    txt.setText(SYSTools.toHTML(dfn.getInterventionSchedule().getBemerkung()));
+
+                    popupInfo.setMovable(false);
+                    popupInfo.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popupInfo.getContentPane().add(new JScrollPane(txt));
+                    popupInfo.setOwner(btnInfo);
+                    popupInfo.removeExcludedComponent(txt);
+                    popupInfo.setDefaultFocusComponent(txt);
+                    GUITools.showPopup(popupInfo, SwingConstants.CENTER);
+                }
+            });
+
+            btnInfo.setEnabled(!dfn.isOnDemand() && !SYSTools.catchNull(dfn.getInterventionSchedule().getBemerkung()).isEmpty());
+            titlePanelright.add(btnInfo);
         }
+
+
 
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);

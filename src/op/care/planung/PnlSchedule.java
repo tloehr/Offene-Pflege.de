@@ -49,6 +49,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -59,7 +60,7 @@ public class PnlSchedule extends JPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung.pnlschedule";
 
     private boolean ignoreEvent = false;
-    private InterventionSchedule termin;
+    private InterventionSchedule is;
     private Closure actionBlock;
 
     private double splitRegularPos;
@@ -70,12 +71,11 @@ public class PnlSchedule extends JPanel {
 
     private JToggleButton tbFloating;
 
-    public PnlSchedule(InterventionSchedule termin, Closure actionBlock) {
+    public PnlSchedule(InterventionSchedule is, Closure actionBlock) {
         this.actionBlock = actionBlock;
-        this.termin = termin;
+        this.is = is;
         initComponents();
-        initPanel();
-        //TODO: Hier fehlt noch eine Möglichkeit eine Dauer festzulegen
+        initPanel();        
     }
 
     private void btnToTimeActionPerformed(ActionEvent e) {
@@ -113,6 +113,13 @@ public class PnlSchedule extends JPanel {
         spinMonat.setValue(1);
     }
 
+    private void txtMinutesFocusLost(FocusEvent e) {
+        BigDecimal bd = SYSTools.parseBigDecimal(txtMinutes.getText());
+        if (bd == null || bd.compareTo(BigDecimal.ZERO) <= 0){
+            txtMinutes.setText(is.getDauer().toPlainString());
+        }
+    }
+
 
     private void initPanel() {
 
@@ -127,67 +134,67 @@ public class PnlSchedule extends JPanel {
         spinMonat.setModel(new SpinnerNumberModel(1, 1, 12, 1));
         spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 31, 1));
 
-        spinTaeglich.setValue(Math.max(termin.getTaeglich(), 1));
-        spinWoche.setValue(Math.max(termin.getWoechentlich(), 1));
-        spinMonat.setValue(Math.max(termin.getMonatlich(), 1));
-        spinMonatTag.setValue(Math.max(termin.getTagNum(), 1));
+        spinTaeglich.setValue(Math.max(is.getTaeglich(), 1));
+        spinWoche.setValue(Math.max(is.getWoechentlich(), 1));
+        spinMonat.setValue(Math.max(is.getMonatlich(), 1));
+        spinMonatTag.setValue(Math.max(is.getTagNum(), 1));
 
         tabWdh.setSelectedIndex(TAB_DAILY);
 
-        if (termin.getWoechentlich() > 0) {
-            cbMon.setSelected(termin.getMon() > 0);
-            cbDie.setSelected(termin.getDie() > 0);
-            cbMit.setSelected(termin.getMit() > 0);
-            cbDon.setSelected(termin.getDon() > 0);
-            cbFre.setSelected(termin.getFre() > 0);
-            cbSam.setSelected(termin.getSam() > 0);
-            cbSon.setSelected(termin.getSon() > 0);
+        if (is.getWoechentlich() > 0) {
+            cbMon.setSelected(is.getMon() > 0);
+            cbDie.setSelected(is.getDie() > 0);
+            cbMit.setSelected(is.getMit() > 0);
+            cbDon.setSelected(is.getDon() > 0);
+            cbFre.setSelected(is.getFre() > 0);
+            cbSam.setSelected(is.getSam() > 0);
+            cbSon.setSelected(is.getSon() > 0);
             tabWdh.setSelectedIndex(TAB_WEEKLY);
         }
 
-        if (termin.getMonatlich() > 0) {
-            if (termin.getTagNum() > 0) {
+        if (is.getMonatlich() > 0) {
+            if (is.getTagNum() > 0) {
 
-                spinMonatTag.setValue(termin.getTagNum());
+                spinMonatTag.setValue(is.getTagNum());
                 cmbTag.setSelectedIndex(0);
             } else {
 
-                if (termin.getMon() > 0) {
+                if (is.getMon() > 0) {
                     cmbTag.setSelectedIndex(1);
-                    spinMonatTag.setValue(termin.getMon());
-                } else if (termin.getDie() > 0) {
+                    spinMonatTag.setValue(is.getMon());
+                } else if (is.getDie() > 0) {
                     cmbTag.setSelectedIndex(2);
-                    spinMonatTag.setValue(termin.getDie());
-                } else if (termin.getMit() > 0) {
+                    spinMonatTag.setValue(is.getDie());
+                } else if (is.getMit() > 0) {
                     cmbTag.setSelectedIndex(3);
-                    spinMonatTag.setValue(termin.getMit());
-                } else if (termin.getDon() > 0) {
+                    spinMonatTag.setValue(is.getMit());
+                } else if (is.getDon() > 0) {
                     cmbTag.setSelectedIndex(4);
-                    spinMonatTag.setValue(termin.getDon());
-                } else if (termin.getFre() > 0) {
+                    spinMonatTag.setValue(is.getDon());
+                } else if (is.getFre() > 0) {
                     cmbTag.setSelectedIndex(5);
-                    spinMonatTag.setValue(termin.getFre());
-                } else if (termin.getSam() > 0) {
+                    spinMonatTag.setValue(is.getFre());
+                } else if (is.getSam() > 0) {
                     cmbTag.setSelectedIndex(6);
-                    spinMonatTag.setValue(termin.getSam());
-                } else if (termin.getSon() > 0) {
+                    spinMonatTag.setValue(is.getSam());
+                } else if (is.getSon() > 0) {
                     cmbTag.setSelectedIndex(7);
-                    spinMonatTag.setValue(termin.getSon());
+                    spinMonatTag.setValue(is.getSon());
                 }
             }
             tabWdh.setSelectedIndex(TAB_MONTHLY);
         }
 
         jdcLDatum.setMinSelectableDate(new Date());
-        jdcLDatum.setDate(new Date(Math.max(termin.getLDatum().getTime(), new DateMidnight().getMillis())));
+        jdcLDatum.setDate(new Date(Math.max(is.getLDatum().getTime(), new DateMidnight().getMillis())));
 
-        txtNachtMo.setText(termin.getNachtMo().toString());
-        txtMorgens.setText(termin.getMorgens().toString());
-        txtMittags.setText(termin.getMittags().toString());
-        txtNachmittags.setText(termin.getNachmittags().toString());
-        txtAbends.setText(termin.getAbends().toString());
-        txtNachtAb.setText(termin.getNachtAb().toString());
-        txtUhrzeit.setText(termin.getUhrzeitAnzahl().toString());
+        txtNachtMo.setText(is.getNachtMo().toString());
+        txtMorgens.setText(is.getMorgens().toString());
+        txtMittags.setText(is.getMittags().toString());
+        txtNachmittags.setText(is.getNachmittags().toString());
+        txtAbends.setText(is.getAbends().toString());
+        txtNachtAb.setText(is.getNachtAb().toString());
+        txtUhrzeit.setText(is.getUhrzeitAnzahl().toString());
 
         txtMorgens.setBackground(SYSConst.lightblue);
         txtMittags.setBackground(SYSConst.gold7);
@@ -196,8 +203,8 @@ public class PnlSchedule extends JPanel {
         txtNachtAb.setBackground(SYSConst.bluegrey);
 
         Date now = null;
-        if (termin.getUhrzeitAnzahl() > 0) {
-            now = termin.getUhrzeit();
+        if (is.getUhrzeitAnzahl() > 0) {
+            now = is.getUhrzeit();
         } else {
             now = new Date();
         }
@@ -209,15 +216,18 @@ public class PnlSchedule extends JPanel {
             }
         }
         cmbUhrzeit.setSelectedItem(now);
-        lblUhrzeit.setText("Anzahl Massnahmen");
+        lblUhrzeit.setText(OPDE.lang.getString("misc.msg.Number"));
 
-        txtBemerkung.setText(termin.getBemerkung());
+        txtBemerkung.setText(is.getBemerkung());
 
+        lblMinutes.setText(OPDE.lang.getString("misc.msg.Minute(s)"));
+        txtMinutes.setText(is.getDauer().toPlainString());
+        
         tbFloating = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".floatinginterventions"));
-        tbFloating.setSelected(termin.isFloating());
+        tbFloating.setSelected(is.isFloating());
         panelMain.add(tbFloating, CC.xy(3, 5));
 
-        splitRegularPos = SYSTools.showSide(splitRegular, termin.getUhrzeit() != null ? SYSTools.RIGHT_LOWER_SIDE : SYSTools.LEFT_UPPER_SIDE);
+        splitRegularPos = SYSTools.showSide(splitRegular, is.getUhrzeit() != null ? SYSTools.RIGHT_LOWER_SIDE : SYSTools.LEFT_UPPER_SIDE);
     }
 
     /**
@@ -286,6 +296,8 @@ public class PnlSchedule extends JPanel {
         panel2 = new JPanel();
         jLabel13 = new JLabel();
         jdcLDatum = new JDateChooser();
+        lblMinutes = new JLabel();
+        txtMinutes = new JTextField();
         pnlBemerkung = new JPanel();
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
@@ -832,16 +844,33 @@ public class PnlSchedule extends JPanel {
 
             //======== panel2 ========
             {
-                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+                panel2.setLayout(new FormLayout(
+                    "default, $lcgap, default:grow, $ugap, default, $lcgap, default:grow",
+                    "default:grow"));
 
                 //---- jLabel13 ----
                 jLabel13.setText("Erst einplanen ab dem");
                 jLabel13.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(jLabel13);
+                panel2.add(jLabel13, CC.xy(1, 1));
 
                 //---- jdcLDatum ----
                 jdcLDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(jdcLDatum);
+                panel2.add(jdcLDatum, CC.xy(3, 1));
+
+                //---- lblMinutes ----
+                lblMinutes.setText("text");
+                lblMinutes.setFont(new Font("Arial", Font.PLAIN, 14));
+                panel2.add(lblMinutes, CC.xy(5, 1));
+
+                //---- txtMinutes ----
+                txtMinutes.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtMinutes.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMinutesFocusLost(e);
+                    }
+                });
+                panel2.add(txtMinutes, CC.xy(7, 1));
             }
             panelMain.add(panel2, CC.xy(3, 9));
 
@@ -887,7 +916,7 @@ public class PnlSchedule extends JPanel {
     private void cbSonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSonActionPerformed
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -895,54 +924,54 @@ public class PnlSchedule extends JPanel {
 
     private void cbSamActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSamActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbSamActionPerformed
 
     private void cbFreActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbFreActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbFreActionPerformed
 
     private void cbDonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDonActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbDonActionPerformed
 
     private void cbMitActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMitActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMitActionPerformed
 
     private void cbDieActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDieActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbDieActionPerformed
 
     private void cbMonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMonActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie müssen mindestens einen Wochentag angeben.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMonActionPerformed
 
-    private void spinMonatWTagStateChanged(ChangeEvent evt) {//GEN-FIRST:event_spinMonatWTagStateChanged
-
-        int monat = Integer.parseInt(spinMonat.getValue().toString());
-        if (monat == 0) {
-            spinMonat.setValue(1);
-        }
-
-    }//GEN-LAST:event_spinMonatWTagStateChanged
+//    private void spinMonatWTagStateChanged(ChangeEvent evt) {//GEN-FIRST:event_spinMonatWTagStateChanged
+//
+//        int monat = Integer.parseInt(spinMonat.getValue().toString());
+//        if (monat == 0) {
+//            spinMonat.setValue(1);
+//        }
+//
+//    }//GEN-LAST:event_spinMonatWTagStateChanged
 
     private void spinMonatTagStateChanged(ChangeEvent evt) {//GEN-FIRST:event_spinMonatTagStateChanged
 
@@ -959,7 +988,7 @@ public class PnlSchedule extends JPanel {
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         try {
             save();
-            actionBlock.execute(termin);
+            actionBlock.execute(is);
         } catch (NumberFormatException nfe) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".parseerror") + nfe.getLocalizedMessage(), 2));
         }
@@ -970,56 +999,57 @@ public class PnlSchedule extends JPanel {
         boolean splitSetToTime = splitRegularPos == 0d;
 
         if (!isAtLeastOneTxtFieldNotZero() && Double.parseDouble(txtUhrzeit.getText()) == 0d) {
-            throw new NumberFormatException("Alle Dosierungen sind Null.");
+            throw new NumberFormatException("Anzahl der Durchführungen steht auf null.");
         }
 
-        termin.setNachtMo(splitSetToTime ? (short) 0 : Short.parseShort(txtNachtMo.getText()));
-        termin.setMorgens(splitSetToTime ? (short) 0 : Short.parseShort(txtMorgens.getText()));
-        termin.setMittags(splitSetToTime ? (short) 0 : Short.parseShort(txtMittags.getText()));
-        termin.setNachmittags(splitSetToTime ? (short) 0 : Short.parseShort(txtNachmittags.getText()));
-        termin.setAbends(splitSetToTime ? (short) 0 : Short.parseShort(txtAbends.getText()));
-        termin.setNachtAb(splitSetToTime ? (short) 0 : Short.parseShort(txtNachtAb.getText()));
-        termin.setUhrzeitAnzahl(!splitSetToTime ? (short) 0 : Short.parseShort(txtUhrzeit.getText()));
-        termin.setUhrzeit(!splitSetToTime ? null : (Date) cmbUhrzeit.getSelectedItem());
+        is.setNachtMo(splitSetToTime ? (short) 0 : Short.parseShort(txtNachtMo.getText()));
+        is.setMorgens(splitSetToTime ? (short) 0 : Short.parseShort(txtMorgens.getText()));
+        is.setMittags(splitSetToTime ? (short) 0 : Short.parseShort(txtMittags.getText()));
+        is.setNachmittags(splitSetToTime ? (short) 0 : Short.parseShort(txtNachmittags.getText()));
+        is.setAbends(splitSetToTime ? (short) 0 : Short.parseShort(txtAbends.getText()));
+        is.setNachtAb(splitSetToTime ? (short) 0 : Short.parseShort(txtNachtAb.getText()));
+        is.setUhrzeitAnzahl(!splitSetToTime ? (short) 0 : Short.parseShort(txtUhrzeit.getText()));
+        is.setUhrzeit(!splitSetToTime ? null : (Date) cmbUhrzeit.getSelectedItem());
 
-        termin.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
-        termin.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
-        termin.setMonatlich(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Short.parseShort(spinMonat.getValue().toString()) : (short) 0);
-        termin.setLDatum(jdcLDatum.getDate());
+        is.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
+        is.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
+        is.setMonatlich(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Short.parseShort(spinMonat.getValue().toString()) : (short) 0);
+        is.setLDatum(jdcLDatum.getDate());
 
-        termin.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (short) 1 : (short) 0);
-        termin.setDie(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (short) 1 : (short) 0);
-        termin.setMit(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMit.isSelected() ? (short) 1 : (short) 0);
-        termin.setDon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDon.isSelected() ? (short) 1 : (short) 0);
-        termin.setFre(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbFre.isSelected() ? (short) 1 : (short) 0);
-        termin.setSam(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSam.isSelected() ? (short) 1 : (short) 0);
-        termin.setSon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSon.isSelected() ? (short) 1 : (short) 0);
+        is.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (short) 1 : (short) 0);
+        is.setDie(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (short) 1 : (short) 0);
+        is.setMit(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMit.isSelected() ? (short) 1 : (short) 0);
+        is.setDon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDon.isSelected() ? (short) 1 : (short) 0);
+        is.setFre(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbFre.isSelected() ? (short) 1 : (short) 0);
+        is.setSam(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSam.isSelected() ? (short) 1 : (short) 0);
+        is.setSon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSon.isSelected() ? (short) 1 : (short) 0);
 
         if (tabWdh.getSelectedIndex() == TAB_MONTHLY) {
             short s = Short.parseShort(spinMonatTag.getValue().toString());
-            termin.setTagNum(cmbTag.getSelectedIndex() == 0 ? s : (short) 0);
+            is.setTagNum(cmbTag.getSelectedIndex() == 0 ? s : (short) 0);
 
             if (cmbTag.getSelectedIndex() == 1) {
-                termin.setMon(s);
+                is.setMon(s);
             } else if (cmbTag.getSelectedIndex() == 2) {
-                termin.setDie(s);
+                is.setDie(s);
             } else if (cmbTag.getSelectedIndex() == 3) {
-                termin.setMit(s);
+                is.setMit(s);
             } else if (cmbTag.getSelectedIndex() == 4) {
-                termin.setDon(s);
+                is.setDon(s);
             } else if (cmbTag.getSelectedIndex() == 5) {
-                termin.setFre(s);
+                is.setFre(s);
             } else if (cmbTag.getSelectedIndex() == 6) {
-                termin.setSam(s);
+                is.setSam(s);
             } else if (cmbTag.getSelectedIndex() == 7) {
-                termin.setSon(s);
+                is.setSon(s);
             }
         }
 
-        termin.setFloating(tbFloating.isSelected());
-        termin.setBemerkung(txtBemerkung.getText());
+        is.setFloating(tbFloating.isSelected());
+        is.setBemerkung(txtBemerkung.getText());
+        is.setDauer(SYSTools.parseBigDecimal(txtMinutes.getText()));
 
-        if (!termin.isValid()) {
+        if (!is.isValid()) {
             throw new NumberFormatException("Anzahl muss min. 1 sein");
         }
 
@@ -1144,6 +1174,8 @@ public class PnlSchedule extends JPanel {
     private JPanel panel2;
     private JLabel jLabel13;
     private JDateChooser jdcLDatum;
+    private JLabel lblMinutes;
+    private JTextField txtMinutes;
     private JPanel pnlBemerkung;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
