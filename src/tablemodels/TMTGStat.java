@@ -28,10 +28,9 @@
 package tablemodels;
 
 
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import op.OPDE;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -57,7 +56,7 @@ public class TMTGStat extends AbstractTableModel {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT b, SUM(k.betrag) FROM Bewohner b " +
+                " SELECT b, SUM(k.betrag) FROM Resident b " +
                 " LEFT JOIN b.konto k " +
                 (alle ? "" : " WHERE b.station IS NOT NULL ") +
                 " GROUP BY b " +
@@ -84,17 +83,17 @@ public class TMTGStat extends AbstractTableModel {
         }
     }
 
-    public Bewohner getBewohner(int row){
-        return (Bewohner) listData.get(row)[0];
+    public Resident getBewohner(int row){
+        return (Resident) listData.get(row)[0];
     }
 
     public Object getValueAt(int row, int col) {
         Object result;
-        Bewohner bewohner = getBewohner(row);
+        Resident bewohner = getBewohner(row);
         BigDecimal saldo = listData.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) listData.get(row)[1];
         switch (col) {
             case COL_BW: {
-                result = SYSTools.htmlUmlautConversion("<b>"+BewohnerTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getBWKennung()+"]");
+                result = SYSTools.htmlUmlautConversion("<b>"+ ResidentTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getBWKennung()+"]");
                 break;
             }
             case COL_SALDO: {

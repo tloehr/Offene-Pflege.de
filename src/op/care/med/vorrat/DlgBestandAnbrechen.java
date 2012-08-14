@@ -30,14 +30,12 @@ import java.awt.event.*;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
-import javax.swing.border.*;
+
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
 
-import entity.Bewohner;
-import entity.verordnungen.*;
+import entity.info.Resident;
+import entity.prescription.*;
 import op.OPDE;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
@@ -51,16 +49,16 @@ import java.awt.*;
  */
 public class DlgBestandAnbrechen extends MyJDialog {
 
-    private MedVorrat vorrat;
+    private MedInventory inventory;
     private Closure actionBlock;
-    private MedBestand bestand;
+    private MedStock bestand;
 
     /**
      * Creates new form DlgBestandAnbrechen
      */
-    public DlgBestandAnbrechen(Darreichung darreichung, Bewohner bewohner, Closure actionBlock) {
+    public DlgBestandAnbrechen(TradeForm darreichung, Resident bewohner, Closure actionBlock) {
         super();
-        this.vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
+        this.inventory = TradeFormTools.getVorratZurDarreichung(bewohner, darreichung);
         this.bestand = null;
         this.actionBlock = actionBlock;
         initComponents();
@@ -151,8 +149,8 @@ public class DlgBestandAnbrechen extends MyJDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         //String classname = this.getName() + ".btnOKActionPerformed()";
         if (cmbBestID.getSelectedIndex() > 0) {
-            bestand = (MedBestand) cmbBestID.getSelectedItem();
-//            MedBestandTools.anbrechen(bestand);
+            bestand = (MedStock) cmbBestID.getSelectedItem();
+//            MedStockTools.anbrechen(bestand);
         }
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
@@ -169,16 +167,16 @@ public class DlgBestandAnbrechen extends MyJDialog {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT b FROM MedBestand b " +
+                " SELECT b FROM MedStock b " +
                 " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
                 " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
-        query.setParameter("vorrat", vorrat);
+        query.setParameter("vorrat", inventory);
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
         dcbm.insertElementAt("keine", 0);
         cmbBestID.setModel(dcbm);
-        cmbBestID.setRenderer(MedBestandTools.getBestandOnlyIDRenderer());
+        cmbBestID.setRenderer(MedStockTools.getBestandOnlyIDRenderer());
 
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
@@ -188,7 +186,7 @@ public class DlgBestandAnbrechen extends MyJDialog {
         if (cmbBestID.getSelectedIndex() == 0) {
             cmbBestID.setToolTipText(null);
         } else {
-            cmbBestID.setToolTipText(SYSTools.toHTML(MedBestandTools.getBestandTextAsHTML((MedBestand) cmbBestID.getSelectedItem())));
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getBestandTextAsHTML((MedStock) cmbBestID.getSelectedItem())));
         }
         btnOK.setEnabled(cmbBestID.getSelectedIndex() > 0);
     }//GEN-LAST:event_cmbBestIDItemStateChanged

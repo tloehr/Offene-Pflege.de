@@ -3,10 +3,11 @@
  * and open the template in the editor.
  */
 
-package entity.verordnungen;
+package entity.prescription;
 
 import entity.*;
 import entity.files.Sysver2file;
+import entity.info.Resident;
 import entity.planung.Intervention;
 import entity.vorgang.SYSVER2VORGANG;
 import entity.vorgang.VorgangElement;
@@ -76,18 +77,18 @@ import java.util.List;
 @Entity
 @Table(name = "BHPVerordnung")
 @NamedQueries({
-        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Verordnung b"),
-        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Verordnung b WHERE b.verid = :verid"),
-        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Verordnung b WHERE b.anDatum = :anDatum"),
+        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescriptions b"),
+        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescriptions b WHERE b.verid = :verid"),
+        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescriptions b WHERE b.anDatum = :anDatum"),
         @NamedQuery(name = "Verordnung.findByVorgang", query = " "
-                + " SELECT ve, av.pdca FROM Verordnung ve "
+                + " SELECT ve, av.pdca FROM Prescriptions ve "
                 + " JOIN ve.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Verordnung b WHERE b.abDatum = :abDatum"),
-        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Verordnung b WHERE b.bisPackEnde = :bisPackEnde"),
-        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Verordnung b WHERE b.verKennung = :verKennung"),
-        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Verordnung b WHERE b.stellplan = :stellplan")
+        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescriptions b WHERE b.abDatum = :abDatum"),
+        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescriptions b WHERE b.bisPackEnde = :bisPackEnde"),
+        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescriptions b WHERE b.verKennung = :verKennung"),
+        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescriptions b WHERE b.stellplan = :stellplan")
 
 })
 
@@ -99,11 +100,11 @@ import java.util.List;
 //                }
 //        ),
         @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
-                entities = @EntityResult(entityClass = Verordnung.class),
+                entities = @EntityResult(entityClass = Prescriptions.class),
                 columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
         ),
         @SqlResultSetMapping(name = "Verordnung.findAllBedarfResultMapping",
-                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Situationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
+                entities = {@EntityResult(entityClass = Prescriptions.class), @EntityResult(entityClass = Situationen.class), @EntityResult(entityClass = PrescriptionSchedule.class)},
                 columns = {@ColumnResult(name = "vor.Saldo"), @ColumnResult(name = "bisher.tagesdosis"), @ColumnResult(name = "bestand.APV"), @ColumnResult(name = "bestand.Summe"),
                         @ColumnResult(name = "bestand.BestID")
                 }
@@ -158,7 +159,7 @@ import java.util.List;
 
 })
 
-public class Verordnung implements Serializable, VorgangElement, Cloneable, Comparable<Verordnung> {
+public class Prescriptions implements Serializable, VorgangElement, Cloneable, Comparable<Prescriptions> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -195,9 +196,9 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
     private List<Sysver2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<SYSVER2VORGANG> attachedVorgaenge;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
-    private List<VerordnungPlanung> planungen;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    private List<PrescriptionSchedule> pSchedule;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<BHP> bhps;
     // ==
     // N:1 Relationen
@@ -210,13 +211,13 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
     private Users abgesetztDurch;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
     private Intervention massnahme;
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private Darreichung darreichung;
+    private TradeForm darreichung;
     @JoinColumn(name = "SitID", referencedColumnName = "SitID")
     @ManyToOne
     private Situationen situation;
@@ -234,20 +235,20 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
     private Arzt abArzt;
 
 
-    public Verordnung() {
+    public Prescriptions() {
     }
 
-    public Verordnung(Bewohner bewohner) {
+    public Prescriptions(Resident bewohner) {
         this.bewohner = bewohner;
         this.attachedFiles = new ArrayList<Sysver2file>();
         this.attachedVorgaenge = new ArrayList<SYSVER2VORGANG>();
-        this.planungen = new ArrayList<VerordnungPlanung>();
+        this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.anDatum = new Date();
         this.abDatum = SYSConst.DATE_BIS_AUF_WEITERES;
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Verordnung(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, Intervention massnahme, Darreichung darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Prescriptions(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, Intervention massnahme, TradeForm darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.anDatum = anDatum;
         this.abDatum = abDatum;
         this.bisPackEnde = bisPackEnde;
@@ -266,7 +267,7 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
         this.abKH = abKH;
         this.anArzt = anArzt;
         this.abArzt = abArzt;
-        this.planungen = new ArrayList<VerordnungPlanung>();
+        this.pSchedule = new ArrayList<PrescriptionSchedule>();
     }
 
     public Long getVerid() {
@@ -377,11 +378,11 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
         this.situation = situation;
     }
 
-    public Darreichung getDarreichung() {
+    public TradeForm getDarreichung() {
         return darreichung;
     }
 
-    public void setDarreichung(Darreichung darreichung) {
+    public void setDarreichung(TradeForm darreichung) {
         this.darreichung = darreichung;
     }
 
@@ -406,11 +407,11 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
     }
 
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 
@@ -434,8 +435,8 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
         return attachedVorgaenge;
     }
 
-    public List<VerordnungPlanung> getPlanungen() {
-        return planungen;
+    public List<PrescriptionSchedule> getPrescriptionSchedule() {
+        return pSchedule;
     }
 
     @Override
@@ -470,10 +471,10 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Verordnung)) {
+        if (!(object instanceof Prescriptions)) {
             return false;
         }
-        Verordnung other = (Verordnung) object;
+        Prescriptions other = (Prescriptions) object;
         if ((this.verid == null && other.verid != null) || (this.verid != null && !this.verid.equals(other.verid))) {
             return false;
         }
@@ -483,19 +484,19 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
 
     @Override
     public Object clone() {
-        final Verordnung copy = new Verordnung(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, bewohner, massnahme, darreichung, situation, anKH, abKH, anArzt, abArzt);
+        final Prescriptions copy = new Prescriptions(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, bewohner, massnahme, darreichung, situation, anKH, abKH, anArzt, abArzt);
 
-        CollectionUtils.forAllDo(planungen, new Closure() {
+        CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
-                VerordnungPlanung planungCopy = ((VerordnungPlanung) o).createCopy(copy);
-                copy.getPlanungen().add(planungCopy);
+                PrescriptionSchedule scheduleCopy = ((PrescriptionSchedule) o).createCopy(copy);
+                copy.getPrescriptionSchedule().add(scheduleCopy);
             }
         });
         return copy;
     }
 
     @Override
-    public int compareTo(Verordnung them) {
+    public int compareTo(Prescriptions them) {
         int result = ((Boolean) isAbgesetzt()).compareTo(them.isAbgesetzt()) * -1;
         if (result == 0) {
             result = ((Boolean) isBedarf()).compareTo(them.isBedarf()) * -1;
@@ -504,15 +505,16 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
             result = ((Boolean) hasMedi()).compareTo(them.hasMedi());
         }
         if (result == 0) {
-            result = VerordnungTools.getMassnahme(this).compareTo(VerordnungTools.getMassnahme(them));
+            result = PrescriptionsTools.getMassnahme(this).compareTo(PrescriptionsTools.getMassnahme(them));
         }
         return result;
     }
 
     @Override
     public String toString() {
-        return "Verordnung{" +
+        return "Prescriptions{" +
                 "verid=" + verid +
+                ", version=" + version +
                 ", anDatum=" + anDatum +
                 ", abDatum=" + abDatum +
                 ", bisPackEnde=" + bisPackEnde +
@@ -521,6 +523,8 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
                 ", stellplan=" + stellplan +
                 ", attachedFiles=" + attachedFiles +
                 ", attachedVorgaenge=" + attachedVorgaenge +
+                ", pSchedule=" + pSchedule +
+                ", bhps=" + bhps +
                 ", angesetztDurch=" + angesetztDurch +
                 ", abgesetztDurch=" + abgesetztDurch +
                 ", bewohner=" + bewohner +
@@ -533,6 +537,4 @@ public class Verordnung implements Serializable, VorgangElement, Cloneable, Comp
                 ", abArzt=" + abArzt +
                 '}';
     }
-
-
 }

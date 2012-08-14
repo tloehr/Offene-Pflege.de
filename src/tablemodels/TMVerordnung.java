@@ -26,8 +26,8 @@
  */
 package tablemodels;
 
-import entity.Bewohner;
-import entity.verordnungen.*;
+import entity.info.Resident;
+import entity.prescription.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 
@@ -46,12 +46,12 @@ public class TMVerordnung extends AbstractTableModel {
     public static final int COL_Dosis = 1;
     public static final int COL_Hinweis = 2;
     protected boolean mitBestand, abgesetzt;
-    protected Bewohner bewohner;
+    protected Resident bewohner;
     protected HashMap cache;
 
     protected List<Object[]> listeVerordnungen;
 
-    public TMVerordnung(Bewohner bewohner, boolean archiv, boolean bestand) {
+    public TMVerordnung(Resident bewohner, boolean archiv, boolean bestand) {
         super();
 
         this.bewohner = bewohner;
@@ -61,20 +61,20 @@ public class TMVerordnung extends AbstractTableModel {
         listeVerordnungen = new ArrayList<Object[]>();
 
         EntityManager em = OPDE.createEM();
-        Query queryVerordnung = em.createQuery("SELECT v FROM Verordnung v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.bewohner = :bewohner ");
+        Query queryVerordnung = em.createQuery("SELECT v FROM Prescriptions v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.bewohner = :bewohner ");
         if (!archiv) {
             queryVerordnung.setParameter("now", new Date());
         }
         queryVerordnung.setParameter("bewohner", bewohner);
-        List<Verordnung> listeVerordnung = queryVerordnung.getResultList();
+        List<Prescriptions> listeVerordnung = queryVerordnung.getResultList();
         em.close();
 
         int i = 0;
-        for (Verordnung verordnung : listeVerordnung) {
+        for (Prescriptions verordnung : listeVerordnung) {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i / 2, listeVerordnung.size()));
-            MedVorrat vorrat = verordnung.getDarreichung() == null ? null : DarreichungTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
-            MedBestand aktiverBestand = MedBestandTools.getBestandImAnbruch(vorrat);
-            listeVerordnungen.add(new Object[]{verordnung, vorrat, aktiverBestand});
+            MedInventory inventory = verordnung.getDarreichung() == null ? null : TradeFormTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
+            MedStock aktiverBestand = MedStockTools.getBestandImAnbruch(inventory);
+            listeVerordnungen.add(new Object[]{verordnung, inventory, aktiverBestand});
             i++;
         }
 
@@ -82,8 +82,8 @@ public class TMVerordnung extends AbstractTableModel {
         Collections.sort(listeVerordnungen, new Comparator<Object[]>() {
             @Override
             public int compare(Object[] us, Object[] them) {
-                Verordnung usVerordnung = (Verordnung) us[0];
-                Verordnung themVerordnung = (Verordnung) them[0];
+                Prescriptions usVerordnung = (Prescriptions) us[0];
+                Prescriptions themVerordnung = (Prescriptions) them[0];
                 return usVerordnung.compareTo(themVerordnung);
             }
         });
@@ -98,16 +98,16 @@ public class TMVerordnung extends AbstractTableModel {
 
     }
 
-    public Verordnung getVerordnung(int row) {
-        return (Verordnung) listeVerordnungen.get(row)[0];
+    public Prescriptions getPrescription(int row) {
+        return (Prescriptions) listeVerordnungen.get(row)[0];
     }
 
-    public MedVorrat getVorrat(int row) {
-        return (MedVorrat) listeVerordnungen.get(row)[1];
+    public MedInventory getVorrat(int row) {
+        return (MedInventory) listeVerordnungen.get(row)[1];
     }
 
-    public MedBestand getBestand(int row) {
-        return (MedBestand) listeVerordnungen.get(row)[2];
+    public MedStock getBestand(int row) {
+        return (MedStock) listeVerordnungen.get(row)[2];
     }
 
     public BigDecimal getVorratSaldo(int row) {
@@ -118,15 +118,15 @@ public class TMVerordnung extends AbstractTableModel {
         return (BigDecimal) listeVerordnungen.get(row)[4];
     }
 
-    public List<Verordnung> getVordnungenAt(int[] sel) {
-        ArrayList<Verordnung> selection = new ArrayList<Verordnung>();
+    public List<Prescriptions> getVordnungenAt(int[] sel) {
+        ArrayList<Prescriptions> selection = new ArrayList<Prescriptions>();
         if (sel == null) { // dann alle
             for (int i = 0; i < listeVerordnungen.size(); i++) {
-                selection.add(getVerordnung(i));
+                selection.add(getPrescription(i));
             }
         } else {
             for (int i : sel) {
-                selection.add(getVerordnung(i));
+                selection.add(getPrescription(i));
             }
         }
         return selection;
@@ -140,7 +140,7 @@ public class TMVerordnung extends AbstractTableModel {
 
 //    public void reload() {
 //        cache.clear();
-//        listeVerordnungen = VerordnungTools.getVerordnungenUndVorraeteUndBestaende(bewohner, this.abgesetzt);
+//        listeVerordnungen = VerordnungTools.getPrescriptionenUndVorraeteUndBestaende(bewohner, this.abgesetzt);
 //        Collections.sort(listeVerordnungen, comparator);
 //        fireTableDataChanged();
 //    }
@@ -172,11 +172,11 @@ public class TMVerordnung extends AbstractTableModel {
     private String getDosis(int row) {
         // Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand)
         String result = "";
-        if (cache.containsKey(getVerordnung(row))) {
-            result = cache.get(getVerordnung(row)).toString();
+        if (cache.containsKey(getPrescription(row))) {
+            result = cache.get(getPrescription(row)).toString();
         } else {
-            result = VerordnungTools.getDosis(getVerordnung(row), mitBestand, getVorrat(row), getBestand(row));
-            cache.put(getVerordnung(row), result);
+            result = PrescriptionsTools.getDosis(getPrescription(row), mitBestand, getVorrat(row), getBestand(row));
+            cache.put(getPrescription(row), result);
         }
         return result;
     }
@@ -184,13 +184,13 @@ public class TMVerordnung extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         Object result = null;
-        Verordnung verordnung = getVerordnung(row);
+        Prescriptions verordnung = getPrescription(row);
 
         switch (col) {
             case COL_MSSN: {
 
                 String res = "";
-                res = VerordnungTools.getMassnahme(verordnung);
+                res = PrescriptionsTools.getMassnahme(verordnung);
                 if (!verordnung.getAttachedFiles().isEmpty()) {
                     res += "<font color=\"green\">&#9679;</font>";
                 }
@@ -207,9 +207,9 @@ public class TMVerordnung extends AbstractTableModel {
             }
             case COL_Hinweis: {
 
-                String hinweis = VerordnungTools.getHinweis(verordnung);
-                String an = VerordnungTools.getAN(verordnung);
-                String ab = VerordnungTools.getAB(verordnung);
+                String hinweis = PrescriptionsTools.getHinweis(verordnung);
+                String an = PrescriptionsTools.getAN(verordnung);
+                String ab = PrescriptionsTools.getAB(verordnung);
 
                 ab = ab.isEmpty() ? "" : "<br/>" + ab;
                 hinweis = hinweis.isEmpty() ? "" : hinweis + "<br/>";

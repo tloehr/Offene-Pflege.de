@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import entity.Users;
 import op.OPDE;
@@ -14,23 +14,23 @@ import java.util.Date;
 @Entity
 @Table(name = "MPBestand")
 @NamedQueries({
-        @NamedQuery(name = "MedBestand.findAll", query = "SELECT m FROM MedBestand m"),
-        @NamedQuery(name = "MedBestand.findByBestID", query = "SELECT m FROM MedBestand m WHERE m.bestID = :bestID"),
-        @NamedQuery(name = "MedBestand.findByEin", query = "SELECT m FROM MedBestand m WHERE m.ein = :ein"),
-        @NamedQuery(name = "MedBestand.findByAnbruch", query = "SELECT m FROM MedBestand m WHERE m.anbruch = :anbruch"),
-        @NamedQuery(name = "MedBestand.findByAus", query = "SELECT m FROM MedBestand m WHERE m.aus = :aus"),
-        @NamedQuery(name = "MedBestand.findByText", query = "SELECT m FROM MedBestand m WHERE m.text = :text"),
-        @NamedQuery(name = "MedBestand.findByApv", query = "SELECT m FROM MedBestand m WHERE m.apv = :apv"),
-        @NamedQuery(name = "MedBestand.findByDarreichungAndBewohnerImAnbruch", query = " " +
-                " SELECT b FROM MedBestand b WHERE b.vorrat.bewohner = :bewohner AND b.darreichung = :darreichung " +
+        @NamedQuery(name = "MedStock.findAll", query = "SELECT m FROM MedStock m"),
+        @NamedQuery(name = "MedStock.findByBestID", query = "SELECT m FROM MedStock m WHERE m.bestID = :bestID"),
+        @NamedQuery(name = "MedStock.findByEin", query = "SELECT m FROM MedStock m WHERE m.ein = :ein"),
+        @NamedQuery(name = "MedStock.findByAnbruch", query = "SELECT m FROM MedStock m WHERE m.anbruch = :anbruch"),
+        @NamedQuery(name = "MedStock.findByAus", query = "SELECT m FROM MedStock m WHERE m.aus = :aus"),
+        @NamedQuery(name = "MedStock.findByText", query = "SELECT m FROM MedStock m WHERE m.text = :text"),
+        @NamedQuery(name = "MedStock.findByApv", query = "SELECT m FROM MedStock m WHERE m.apv = :apv"),
+        @NamedQuery(name = "MedStock.findByDarreichungAndBewohnerImAnbruch", query = " " +
+                " SELECT b FROM MedStock b WHERE b.inventory.bewohner = :bewohner AND b.darreichung = :darreichung " +
                 " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
-        @NamedQuery(name = "MedBestand.findByVorratImAnbruch", query = " " +
-                " SELECT b FROM MedBestand b WHERE b.vorrat = :vorrat " +
+        @NamedQuery(name = "MedStock.findByVorratImAnbruch", query = " " +
+                " SELECT b FROM MedStock b WHERE b.inventory = :vorrat " +
                 " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
-        @NamedQuery(name = "MedBestand.findByBewohnerImAnbruchMitSalden", query = " " +
-                " SELECT best, SUM(buch.menge) FROM MedBestand best" +
-                " JOIN best.buchungen buch" +
-                " WHERE best.vorrat.bewohner = :bewohner AND best.aus = '9999-12-31 23:59:59' " +
+        @NamedQuery(name = "MedStock.findByBewohnerImAnbruchMitSalden", query = " " +
+                " SELECT best, SUM(buch.menge) FROM MedStock best" +
+                " JOIN best.stockTransaction buch" +
+                " WHERE best.inventory.bewohner = :bewohner AND best.aus = '9999-12-31 23:59:59' " +
                 " AND best.anbruch < '9999-12-31 23:59:59' " +
                 " GROUP BY best ")
 })
@@ -39,7 +39,7 @@ import java.util.Date;
         // Das hier ist eine Liste aller Verordnungen eines Bewohners.
         // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
         // beigefügt.
-        @NamedNativeQuery(name = "MedBestand.findByVorratMitRestsumme", query = " " +
+        @NamedNativeQuery(name = "MedStock.findByVorratMitRestsumme", query = " " +
                 " SELECT best.BestID, sum.saldo " +
                 " FROM MPBestand best " +
                 " LEFT OUTER JOIN " +
@@ -54,7 +54,7 @@ import java.util.Date;
                 " ORDER BY best.ein, best.anbruch ")
 })
 
-public class MedBestand implements Serializable, Comparable<MedBestand> {
+public class MedStock implements Serializable, Comparable<MedStock> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,13 +82,13 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     @Column(name = "APV")
     private BigDecimal apv;
 
-    public MedBestand() {
+    public MedStock() {
     }
 
-    public MedBestand(MedVorrat vorrat, Darreichung darreichung, MedPackung packung, String text) {
+    public MedStock(MedInventory inventory, TradeForm darreichung, MedPackung packung, String text) {
         this.apv = BigDecimal.ONE;
 
-        this.vorrat = vorrat;
+        this.inventory = inventory;
         this.darreichung = darreichung;
         this.packung = packung;
         this.text = text;
@@ -96,7 +96,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         this.anbruch = SYSConst.DATE_BIS_AUF_WEITERES;
         this.aus = SYSConst.DATE_BIS_AUF_WEITERES;
         this.user = OPDE.getLogin().getUser();
-        this.buchungen = new ArrayList<MedBuchungen>();
+        this.stockTransaction = new ArrayList<MedStockTransaction>();
 
         this.naechsterBestand = null;
 
@@ -155,13 +155,13 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     // ==
     @JoinColumn(name = "nextbest", referencedColumnName = "BestID")
     @OneToOne
-    private MedBestand naechsterBestand;
+    private MedStock naechsterBestand;
 
     // ==
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand")
-    private Collection<MedBuchungen> buchungen;
+    private Collection<MedStockTransaction> stockTransaction;
 
     // N:1 Relationen
     @JoinColumn(name = "MPID", referencedColumnName = "MPID")
@@ -170,11 +170,11 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
 
     @JoinColumn(name = "VorID", referencedColumnName = "VorID")
     @ManyToOne
-    private MedVorrat vorrat;
+    private MedInventory inventory;
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private Darreichung darreichung;
+    private TradeForm darreichung;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -189,8 +189,8 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         this.user = user;
     }
 
-    public Collection<MedBuchungen> getBuchungen() {
-        return buchungen;
+    public Collection<MedStockTransaction> getStockTransaction() {
+        return stockTransaction;
     }
 
     public MedPackung getPackung() {
@@ -202,19 +202,19 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
         this.packung = packung;
     }
 
-    public MedVorrat getVorrat() {
-        return vorrat;
+    public MedInventory getInventory() {
+        return inventory;
     }
 
     public boolean hasNextBestand() {
         return naechsterBestand != null;
     }
 
-//    public void setVorrat(MedVorrat vorrat) {
-//        this.vorrat = vorrat;
+//    public void setVorrat(MedInventory inventory) {
+//        this.inventory = inventory;
 //    }
 
-    public Darreichung getDarreichung() {
+    public TradeForm getDarreichung() {
         return darreichung;
     }
 
@@ -222,11 +222,11 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
 //        this.darreichung = darreichung;
 //    }
 
-    public MedBestand getNaechsterBestand() {
+    public MedStock getNaechsterBestand() {
         return naechsterBestand;
     }
 
-    public void setNaechsterBestand(MedBestand naechsterBestand) {
+    public void setNaechsterBestand(MedStock naechsterBestand) {
         this.naechsterBestand = naechsterBestand;
     }
 
@@ -255,10 +255,10 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedBestand)) {
+        if (!(object instanceof MedStock)) {
             return false;
         }
-        MedBestand other = (MedBestand) object;
+        MedStock other = (MedStock) object;
         if ((this.bestID == null && other.bestID != null) || (this.bestID != null && !this.bestID.equals(other.bestID))) {
             return false;
         }
@@ -266,7 +266,7 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
     }
 
     @Override
-    public int compareTo(MedBestand o) {
+    public int compareTo(MedStock o) {
         int result = this.ein.compareTo(o.getEin());
         if (result == 0) {
             result = this.bestID.compareTo(o.getBestID());
@@ -277,6 +277,6 @@ public class MedBestand implements Serializable, Comparable<MedBestand> {
 
     @Override
     public String toString() {
-        return "MedBestand{bestID=" + bestID + '}';
+        return "MedStock{bestID=" + bestID + '}';
     }
 }

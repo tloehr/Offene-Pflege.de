@@ -34,7 +34,7 @@ import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.planung.Intervention;
 import entity.planung.InterventionTools;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.threads.DisplayMessage;
@@ -77,18 +77,18 @@ public class DlgVerordnung extends MyJDialog {
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
     private Closure actionBlock;
-    private Verordnung verordnung;
-    private List<VerordnungPlanung> planungenToDelete = null;
-    private Pair<Verordnung, List<VerordnungPlanung>> returnPackage = null;
+    private Prescriptions verordnung;
+    private List<PrescriptionSchedule> planungenToDelete = null;
+    private Pair<Prescriptions, List<PrescriptionSchedule>> returnPackage = null;
 
 
     /**
      * Creates new form DlgVerordnung
      */
-    public DlgVerordnung(Verordnung verordnung, int mode, Closure actionBlock) {
+    public DlgVerordnung(Prescriptions verordnung, int mode, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.verordnung = verordnung;
-        planungenToDelete = new ArrayList<VerordnungPlanung>();
+        planungenToDelete = new ArrayList<PrescriptionSchedule>();
         this.editMode = mode;
         initComponents();
         initDialog();
@@ -97,7 +97,7 @@ public class DlgVerordnung extends MyJDialog {
     }
 
     private void btnAddDosisActionPerformed(ActionEvent e) {
-        if (isBedarf() && verordnung.getPlanungen().size() > 0) {
+        if (isBedarf() && verordnung.getPrescriptionSchedule().size() > 0) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden.", 2));
             return;
         }
@@ -110,8 +110,8 @@ public class DlgVerordnung extends MyJDialog {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
-                        ((VerordnungPlanung) o).setVerordnung(verordnung);
-                        verordnung.getPlanungen().add(((VerordnungPlanung) o));
+                        ((PrescriptionSchedule) o).setPrescription(verordnung);
+                        verordnung.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
                         reloadTable();
                         popup.hidePopup();
                     }
@@ -122,8 +122,8 @@ public class DlgVerordnung extends MyJDialog {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
-                        ((VerordnungPlanung) o).setVerordnung(verordnung);
-                        verordnung.getPlanungen().add(((VerordnungPlanung) o));
+                        ((PrescriptionSchedule) o).setPrescription(verordnung);
+                        verordnung.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
                         reloadTable();
                         popup.hidePopup();
                     }
@@ -245,7 +245,7 @@ public class DlgVerordnung extends MyJDialog {
 
                 try {
                     MedPackung medPackung = (MedPackung) pznQuery.getSingleResult();
-                    cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{medPackung.getDarreichung()}));
+                    cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackung.getDarreichung()}));
                 } catch (NoResultException nre) {
                     OPDE.debug("Nichts passendes zu dieser PZN gefunden");
                 } catch (Exception ex) {
@@ -253,7 +253,7 @@ public class DlgVerordnung extends MyJDialog {
                 }
 
             } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
-                cmbMed.setModel(new DefaultComboBoxModel(DarreichungTools.findDarreichungByMedProduktText(em, txtMed.getText()).toArray()));
+                cmbMed.setModel(new DefaultComboBoxModel(TradeFormTools.findDarreichungByMedProduktText(em, txtMed.getText()).toArray()));
             }
             OPDE.getDisplayManager().setDBActionMessage(false);
             em.close();
@@ -757,7 +757,7 @@ public class DlgVerordnung extends MyJDialog {
         cmbMass.setRenderer(InterventionTools.getMassnahmenRenderer());
         jdcAN.setMinSelectableDate(new Date());
         jdcAB.setMinSelectableDate(new Date());
-        cmbMed.setRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
+        cmbMed.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
         cmbSit.setRenderer(SituationenTools.getSituationenRenderer());
         cmbMed.setModel(new DefaultComboBoxModel());
 
@@ -773,7 +773,7 @@ public class DlgVerordnung extends MyJDialog {
         txtBemerkung.setText(SYSTools.catchNull(verordnung.getBemerkung()));
 
         if (verordnung.hasMedi()) {
-            cmbMed.setModel(new DefaultComboBoxModel(new Darreichung[]{verordnung.getDarreichung()}));
+            cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{verordnung.getDarreichung()}));
         }
 
         cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
@@ -791,7 +791,7 @@ public class DlgVerordnung extends MyJDialog {
         cmbSit.setEnabled(editMode == ALLOW_ALL_EDIT);
 
         if (cmbMed.getSelectedItem() != null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(TradeFormTools.toPrettyString((TradeForm) cmbMed.getSelectedItem())));
             cbPackEnde.setEnabled(true);
         } else {
             cbPackEnde.setEnabled(false);
@@ -853,7 +853,7 @@ public class DlgVerordnung extends MyJDialog {
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
         cmbMass.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
-        cmbMass.setSelectedItem(((Darreichung) cmbMed.getSelectedItem()).getMedForm().getMassnahme());
+        cmbMass.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getMedForm().getMassnahme());
         cmbMass.setEnabled(false);
         txtMass.setText(null);
         txtMass.setEnabled(false);
@@ -923,8 +923,8 @@ public class DlgVerordnung extends MyJDialog {
         cbStellplan.setEnabled(!isBedarf());
         cbStellplan.setSelected(false);
 
-        planungenToDelete.addAll(verordnung.getPlanungen());
-        verordnung.getPlanungen().clear();
+        planungenToDelete.addAll(verordnung.getPrescriptionSchedule());
+        verordnung.getPrescriptionSchedule().clear();
 
         reloadTable();
 
@@ -971,7 +971,7 @@ public class DlgVerordnung extends MyJDialog {
         verordnung.setBisPackEnde(cbPackEnde.isSelected());
         verordnung.setBemerkung(txtBemerkung.getText());
         verordnung.setMassnahme((Intervention) cmbMass.getSelectedItem());
-        verordnung.setDarreichung((Darreichung) cmbMed.getSelectedItem());
+        verordnung.setDarreichung((TradeForm) cmbMed.getSelectedItem());
         verordnung.setStellplan(cbStellplan.isSelected());
 
         verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
@@ -1017,7 +1017,7 @@ public class DlgVerordnung extends MyJDialog {
         itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
+                PrescriptionSchedule planung = verordnung.getPrescriptionSchedule().toArray(new PrescriptionSchedule[0])[row];
                 final JidePopup popup = new JidePopup();
 
                 CleanablePanel dlg;
@@ -1063,9 +1063,9 @@ public class DlgVerordnung extends MyJDialog {
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                VerordnungPlanung planung = verordnung.getPlanungen().toArray(new VerordnungPlanung[0])[row];
-                verordnung.getPlanungen().remove(planung);
-                planungenToDelete.add(planung);
+                PrescriptionSchedule schedule = verordnung.getPrescriptionSchedule().toArray(new PrescriptionSchedule[0])[row];
+                verordnung.getPrescriptionSchedule().remove(schedule);
+                planungenToDelete.add(schedule);
                 reloadTable();
             }
         });

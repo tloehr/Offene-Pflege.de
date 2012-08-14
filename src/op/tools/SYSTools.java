@@ -408,7 +408,7 @@ public class SYSTools {
     }
 
     public static String anonymizeString(String in) {
-        String out = "["+OPDE.lang.getString("misc.msg.anon")+"]";
+        String out = "[" + OPDE.lang.getString("misc.msg.anon") + "]";
         if (!OPDE.isAnonym()) {
             out = in;
         }
@@ -1102,13 +1102,13 @@ public class SYSTools {
         return htmlUmlautConversion(out);
     }
 
-//    /**
+    //    /**
 //     * Fügt html Tags vor und hinter den Eingangsstring ein.
 //     *
 //     * @param in Eingangsstring
 //     * @return String mit HTML Erweiterungen.
 //     */
-   public static String toHTMLForScreen(String in) {
+    public static String toHTMLForScreen(String in) {
         String out = null;
 
         if (!catchNull(in).isEmpty()) {
@@ -1190,7 +1190,7 @@ public class SYSTools {
      * @return geänderter String
      */
     public static String htmlUmlautConversion(String in) {
-        if (in == null){
+        if (in == null) {
             return null;
         }
         String result = in;
@@ -1966,14 +1966,13 @@ public class SYSTools {
     }
 
     public static String left(String text, int size) {
-        OPDE.debug("IN: "+text);
+        OPDE.debug("IN: " + text);
         int originalLaenge = text.length();
         int max = Math.min(size, originalLaenge);
         text = text.substring(0, max);
         if (max < originalLaenge) {
             text += "...";
         }
-        OPDE.debug("OUT: "+text);
         return text;
     }
 
@@ -2037,6 +2036,29 @@ public class SYSTools {
     }
 
 
+    /**
+     * http://nakkaya.com/2009/11/08/command-line-progress-bar/
+     *
+     * @param percent
+     */
+    public static void printProgBar(int percent) {
+        StringBuilder bar = new StringBuilder("[");
+
+        for (int i = 0; i < 50; i++) {
+            if (i < (percent / 2)) {
+                bar.append("=");
+            } else if (i == (percent / 2)) {
+                bar.append(">");
+            } else {
+                bar.append(" ");
+            }
+        }
+
+        bar.append("]   " + percent + "%     ");
+        System.out.print("\r" + bar.toString());
+    }
+
+
     public static void removeSearchPanels(JPanel panelSearch, int positionToAddPanels) {
         if (panelSearch.getComponentCount() > positionToAddPanels) {
             int count = panelSearch.getComponentCount();
@@ -2044,6 +2066,22 @@ public class SYSTools {
                 panelSearch.remove(positionToAddPanels);
             }
         }
+    }
+
+    /**
+     * compares two objects. a null value is always "smaller" than a non null value.
+     * @param one
+     * @param two
+     * @return 1 if one != null && two == null, -1 if one == null && two != null, 0 if one and two are both == null or both != null.
+     */
+    public static int nullCompare(Object one, Object two){
+        if (one != null && two == null){
+            return 1;
+        }
+        if (one == null && two != null){
+            return -1;
+        }
+        return 0;
     }
 
 }

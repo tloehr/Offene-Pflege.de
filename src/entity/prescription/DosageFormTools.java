@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -13,7 +13,7 @@ import java.awt.*;
  * Time: 17:17
  * To change this template use File | Settings | File Templates.
  */
-public class MedFormenTools {
+public class DosageFormTools {
     public static final int APV1 = 0;
     public static final int APV_PER_DAF = 1;
     public static final int APV_PER_BW = 2;
@@ -32,8 +32,8 @@ public class MedFormenTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedFormen) {
-                    MedFormen form = (MedFormen) o;
+                } else if (o instanceof DosageForm) {
+                    DosageForm form = (DosageForm) o;
                     text = toPrettyString(form);
                 } else {
                     text = o.toString();
@@ -46,7 +46,7 @@ public class MedFormenTools {
         };
     }
 
-    public static String getAnwText(MedFormen form) {
+    public static String getAnwText(DosageForm form) {
 
         String result = "";
 
@@ -59,11 +59,11 @@ public class MedFormenTools {
         return result;
     }
 
-    public static String toPrettyString(MedFormen form) {
+    public static String toPrettyString(DosageForm form) {
         return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getZubereitung() + ", " + form.getAnwText());
     }
 
-    public static String toPrettyStringPackung(MedFormen form) {
+    public static String toPrettyStringPackung(DosageForm form) {
         String result = "";
         if (SYSTools.catchNull(form.getZubereitung()).isEmpty()){
             result = EINHEIT[form.getPackEinheit()] + " " + form.getAnwText();

@@ -1,6 +1,6 @@
 package entity.planung;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -70,7 +70,7 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -101,7 +101,7 @@ public class DFN implements Serializable, Comparable<DFN> {
      * @param resident
      * @param intervention
      */
-    public DFN(Bewohner resident, Intervention intervention) {
+    public DFN(Resident resident, Intervention intervention) {
 
         Date now = new Date();
 
@@ -244,11 +244,11 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.nursingProcess = nursingProcess;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 
@@ -293,7 +293,7 @@ public class DFN implements Serializable, Comparable<DFN> {
     public int compareTo(DFN other) {
         int result = sZeit.compareTo(other.getSollZeit());
 
-        OPDE.debug(result + " "+sZeit + ":" + other.getSollZeit());
+//        OPDE.debug(result + " "+sZeit + ":" + other.getSollZeit());
 
         if (result == 0) {
             if (sZeit == DFNTools.BYTE_TIMEOFDAY) {

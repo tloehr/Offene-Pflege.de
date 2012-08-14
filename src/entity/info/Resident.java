@@ -23,10 +23,10 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package entity;
+package entity.info;
 
+import entity.*;
 import op.OPDE;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
@@ -40,17 +40,17 @@ import java.util.Date;
 @Entity
 @Table(name = "Bewohner")
 @NamedQueries({
-        @NamedQuery(name = "Bewohner.findAll", query = "SELECT b FROM Bewohner b"),
-        @NamedQuery(name = "Bewohner.findAllActiveSorted", query = "SELECT b FROM Bewohner b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname"),
-        @NamedQuery(name = "Bewohner.findAllActiveSortedByStationen", query = "SELECT b FROM Bewohner b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
-        @NamedQuery(name = "Bewohner.findByBWKennung", query = "SELECT b FROM Bewohner b WHERE b.bWKennung = :bWKennung"),
-        @NamedQuery(name = "Bewohner.findByNachname", query = "SELECT b FROM Bewohner b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
-        @NamedQuery(name = "Bewohner.findByVorname", query = "SELECT b FROM Bewohner b WHERE b.vorname = :vorname"),
-        @NamedQuery(name = "Bewohner.findByGeschlecht", query = "SELECT b FROM Bewohner b WHERE b.geschlecht = :geschlecht"),
-        @NamedQuery(name = "Bewohner.findByGebDatum", query = "SELECT b FROM Bewohner b WHERE b.gebDatum = :gebDatum"),
-        @NamedQuery(name = "Bewohner.findByEditor", query = "SELECT b FROM Bewohner b WHERE b.editor = :editor"),
-        @NamedQuery(name = "Bewohner.findByAdminonly", query = "SELECT b FROM Bewohner b WHERE b.adminonly = :adminonly")})
-public class Bewohner implements Serializable {
+        @NamedQuery(name = "Bewohner.findAll", query = "SELECT b FROM Resident b"),
+        @NamedQuery(name = "Bewohner.findAllActiveSorted", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname"),
+        @NamedQuery(name = "Bewohner.findAllActiveSortedByStationen", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
+        @NamedQuery(name = "Bewohner.findByBWKennung", query = "SELECT b FROM Resident b WHERE b.bWKennung = :bWKennung"),
+        @NamedQuery(name = "Bewohner.findByNachname", query = "SELECT b FROM Resident b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
+        @NamedQuery(name = "Bewohner.findByVorname", query = "SELECT b FROM Resident b WHERE b.vorname = :vorname"),
+        @NamedQuery(name = "Bewohner.findByGeschlecht", query = "SELECT b FROM Resident b WHERE b.geschlecht = :geschlecht"),
+        @NamedQuery(name = "Bewohner.findByGebDatum", query = "SELECT b FROM Resident b WHERE b.gebDatum = :gebDatum"),
+        @NamedQuery(name = "Bewohner.findByEditor", query = "SELECT b FROM Resident b WHERE b.editor = :editor"),
+        @NamedQuery(name = "Bewohner.findByAdminonly", query = "SELECT b FROM Resident b WHERE b.adminonly = :adminonly")})
+public class Resident implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -109,10 +109,10 @@ public class Bewohner implements Serializable {
     @ManyToOne
     private Users editor;
 
-    public Bewohner() {
+    public Resident() {
     }
 
-    public Bewohner(String nachname, String vorname, int geschlecht, Date gebDatum) {
+    public Resident(String nachname, String vorname, int geschlecht, Date gebDatum) {
         this.bWKennung = null;
         this.nachname = nachname;
         this.vorname = vorname;
@@ -162,7 +162,7 @@ public class Bewohner implements Serializable {
     }
 
     public String getVorname() {
-        int index = (geschlecht == BewohnerTools.GESCHLECHT_MAENNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
+        int index = (geschlecht == ResidentTools.GESCHLECHT_MAENNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
         return SYSTools.anonymizeName(vorname, index);
     }
 
@@ -252,10 +252,10 @@ public class Bewohner implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Bewohner)) {
+        if (!(object instanceof Resident)) {
             return false;
         }
-        Bewohner other = (Bewohner) object;
+        Resident other = (Resident) object;
         if ((this.bWKennung == null && other.bWKennung != null) || (this.bWKennung != null && !this.bWKennung.equals(other.bWKennung))) {
             return false;
         }

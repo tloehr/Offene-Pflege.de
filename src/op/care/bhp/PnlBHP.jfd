@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -37,18 +37,13 @@
          <string>jspBHP</string> 
         </void> 
         <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTable</string> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>com.jidesoft.pane.CollapsiblePanes</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>com.jformdesigner.runtime.NullLayout</class> 
+          </object> 
           <void property="name"> 
-           <string>tblBHP</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.MouseListener</string> 
-            <string>mousePressed</string> 
-            <string>tblBHPMousePressed</string> 
-            <boolean>true</boolean> 
-           </object> 
+           <string>cpBHP</string> 
           </void> 
          </object> 
         </void> 

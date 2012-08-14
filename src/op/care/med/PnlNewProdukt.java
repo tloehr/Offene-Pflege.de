@@ -30,7 +30,7 @@ package op.care.med;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
 import entity.EntityTools;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.tools.SYSTools;
 

@@ -27,15 +27,10 @@
 
 package tablemodels;
 
-import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungPlanung;
-import entity.verordnungen.VerordnungPlanungTools;
-import op.OPDE;
+import entity.prescription.Prescriptions;
+import entity.prescription.PrescriptionScheduleTools;
 
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceUtil;
 import javax.swing.table.AbstractTableModel;
-import java.util.Collection;
 
 
 /**
@@ -47,11 +42,11 @@ public class TMDosis
 
     String anwendung;
 
-    Verordnung verordnung = null;
+    Prescriptions verordnung = null;
     //VerordnungPlanung[] planungen;
 
 
-    public TMDosis(String anwtext, Verordnung verordnung) {
+    public TMDosis(String anwtext, Prescriptions verordnung) {
         super();
 
         this.anwendung = anwtext;
@@ -59,7 +54,7 @@ public class TMDosis
     }
 
     public int getRowCount() {
-        return verordnung.getPlanungen().size();
+        return verordnung.getPrescriptionSchedule().size();
     }
 
     public int getColumnCount() {
@@ -76,7 +71,7 @@ public class TMDosis
         String result = "";
         switch (c) {
             case COL_Dosis: {
-                result = VerordnungPlanungTools.getDosisAsHTML(verordnung.getPlanungen().get(r), null, true);
+                result = PrescriptionScheduleTools.getDosisAsHTML(verordnung.getPrescriptionSchedule().get(r), null, true);
                 break;
             }
             default: {

@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,12 +8,12 @@ import java.util.Collection;
 @Entity
 @Table(name = "MPDarreichung")
 @NamedQueries({
-        @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM Darreichung m"),
-        @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM Darreichung m WHERE m.dafID = :dafID"),
-        @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM Darreichung m WHERE m.zusatz = :zusatz"),
-        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM Darreichung m WHERE m.medProdukt = :medProdukt ORDER BY m.medForm.zubereitung")
+        @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM TradeForm m"),
+        @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM TradeForm m WHERE m.dafID = :dafID"),
+        @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM TradeForm m WHERE m.zusatz = :zusatz"),
+        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM TradeForm m WHERE m.medProdukt = :medProdukt ORDER BY m.medForm.zubereitung")
 })
-public class Darreichung implements Serializable {
+public class TradeForm implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,21 +23,21 @@ public class Darreichung implements Serializable {
     @Column(name = "Zusatz")
     private String zusatz;
 
-    public Darreichung() {
+    public TradeForm() {
     }
 
-    public Darreichung(MedProdukte medProdukt) {
+    public TradeForm(MedProdukte medProdukt) {
         this.medProdukt = medProdukt;
         this.packungen = new ArrayList<MedPackung>();
-        this.bestaende = new ArrayList<MedBestand>();
+        this.bestaende = new ArrayList<MedStock>();
     }
 
-    public Darreichung(MedProdukte medProdukt, String zusatz, MedFormen medForm) {
+    public TradeForm(MedProdukte medProdukt, String zusatz, DosageForm medForm) {
         this.medProdukt = medProdukt;
         this.zusatz = zusatz;
         this.medForm = medForm;
         this.packungen = new ArrayList<MedPackung>();
-        this.bestaende = new ArrayList<MedBestand>();
+        this.bestaende = new ArrayList<MedStock>();
     }
 
     public Long getDafID() {
@@ -67,7 +67,7 @@ public class Darreichung implements Serializable {
     private Collection<MedPackung> packungen;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
-    private Collection<MedBestand> bestaende;
+    private Collection<MedStock> bestaende;
 
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")
@@ -76,7 +76,7 @@ public class Darreichung implements Serializable {
 
     @JoinColumn(name = "FormID", referencedColumnName = "FormID")
     @ManyToOne
-    private MedFormen medForm;
+    private DosageForm medForm;
 
     public MedProdukte getMedProdukt() {
         return medProdukt;
@@ -86,15 +86,15 @@ public class Darreichung implements Serializable {
         this.medProdukt = medProdukt;
     }
 
-    public MedFormen getMedForm() {
+    public DosageForm getMedForm() {
         return medForm;
     }
 
-    public void setMedForm(MedFormen medForm) {
+    public void setMedForm(DosageForm medForm) {
         this.medForm = medForm;
     }
 
-    public Collection<MedBestand> getBestaende() {
+    public Collection<MedStock> getMedStocks() {
         return bestaende;
     }
 
@@ -108,10 +108,10 @@ public class Darreichung implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Darreichung)) {
+        if (!(object instanceof TradeForm)) {
             return false;
         }
-        Darreichung other = (Darreichung) object;
+        TradeForm other = (TradeForm) object;
         if ((this.dafID == null && other.dafID != null) || (this.dafID != null && !this.dafID.equals(other.dafID))) {
             return false;
         }

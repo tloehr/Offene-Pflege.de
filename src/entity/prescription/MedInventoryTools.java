@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import op.OPDE;
 import op.tools.SYSConst;
@@ -23,7 +23,7 @@ import java.util.Date;
  * Time: 16:25
  * To change this template use File | Settings | File Templates.
  */
-public class MedVorratTools {
+public class MedInventoryTools {
 
     public static ListCellRenderer getMedVorratRenderer() {
         return new ListCellRenderer() {
@@ -32,9 +32,9 @@ public class MedVorratTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedVorrat) {
-                    MedVorrat vorrat = (MedVorrat) o;
-                    text = vorrat.getText();
+                } else if (o instanceof MedInventory) {
+                    MedInventory inventory = (MedInventory) o;
+                    text = inventory.getText();
                 } else {
                     text = o.toString();
                 }
@@ -43,21 +43,21 @@ public class MedVorratTools {
         };
     }
 
-    public static String getVorratAsHTML(MedVorrat vorrat) {
+    public static String getVorratAsHTML(MedInventory inventory) {
         String result = "";
 
-        String htmlcolor = vorrat.isAbgeschlossen() ? "gray" : "blue";
+        String htmlcolor = inventory.isAbgeschlossen() ? "gray" : "blue";
 
         result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
-        result += "<font color=\"" + htmlcolor + "\"><b><u>" + vorrat.getVorID() + "</u></b></font>&nbsp; ";
-        result += vorrat.getText();
+        result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getVorID() + "</u></b></font>&nbsp; ";
+        result += inventory.getText();
 
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        result += "<br/><font color=\"blue\">Eingang: " + df.format(vorrat.getVon()) + "</font>";
-        if (vorrat.isAbgeschlossen()) {
-            result += "<br/><font color=\"green\">Abschluss: " + df.format(vorrat.getBis()) + "</font>";
+        result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getVon()) + "</font>";
+        if (inventory.isAbgeschlossen()) {
+            result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getBis()) + "</font>";
         }
 
         result += "</font>";
@@ -65,27 +65,27 @@ public class MedVorratTools {
 
     }
 
-    public static BigDecimal getVorratSumme(MedVorrat vorrat) {
+    public static BigDecimal getVorratSumme(MedInventory inventory) {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
-        for (MedBestand bestand : vorrat.getBestaende()) {
-            BigDecimal summe = MedBestandTools.getBestandSumme(bestand);
+        for (MedStock bestand : inventory.getMedStocks()) {
+            BigDecimal summe = MedStockTools.getBestandSumme(bestand);
             result = result.add(summe);
         }
 //        long time2 = System.currentTimeMillis();
-//        OPDE.debug("MedVorratTools.getSumme(): " + (time2 - timeStart) + " millis");
+//        OPDE.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
         return result;
     }
 
-    public static BigDecimal getVorratSumme(EntityManager em, MedVorrat vorrat) throws Exception {
+    public static BigDecimal getVorratSumme(EntityManager em, MedInventory inventory) throws Exception {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
-        for (MedBestand bestand : vorrat.getBestaende()) {
-            BigDecimal summe = MedBestandTools.getBestandSumme(em, bestand);
+        for (MedStock bestand : inventory.getMedStocks()) {
+            BigDecimal summe = MedStockTools.getBestandSumme(em, bestand);
             result = result.add(summe);
         }
 //        long time2 = System.currentTimeMillis();
-//        OPDE.debug("MedVorratTools.getSumme(): " + (time2 - timeStart) + " millis");
+//        OPDE.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
         return result;
     }
 
@@ -104,16 +104,16 @@ public class MedVorratTools {
      * @param anweinheit true, dann wird in der Anwedungseinheit ausgebucht. false, in der Packungseinheit
      * @param bhp        BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
-    public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
+    public static void entnahmeVorrat(EntityManager em, MedInventory inventory, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
 
-        OPDE.debug("entnahmeVorrat/5: vorrat: " + vorrat);
+        OPDE.debug("entnahmeVorrat/5: inventory: " + inventory);
 
-        if (vorrat == null) {
+        if (inventory == null) {
             throw new Exception("Keine Packung im Anbruch");
         }
 
         if (anweinheit) { // Umrechnung der Anwendungs Menge in die Packungs-Menge.
-            MedBestand bestand = MedBestandTools.getBestandImAnbruch(vorrat);
+            MedStock bestand = MedStockTools.getBestandImAnbruch(inventory);
             BigDecimal apv = bestand.getApv();
 
             if (apv.equals(BigDecimal.ZERO)) {
@@ -124,7 +124,7 @@ public class MedVorratTools {
 
         OPDE.debug("entnahmeVorrat/5: menge: " + menge);
 
-        entnahmeVorrat(em, vorrat, menge, bhp);
+        entnahmeVorrat(em, inventory, menge, bhp);
     }
 
 
@@ -143,7 +143,7 @@ public class MedVorratTools {
 //     */
 //    public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
 //
-//        Query delQuery = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bhp = :bhp");
+//        Query delQuery = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.bhp = :bhp");
 //        delQuery.setParameter("bhp", bhp);
 //
 //        // Das hier passiert, wenn bei der Entnahme mehr als ein Bestand betroffen ist.
@@ -155,14 +155,14 @@ public class MedVorratTools {
 //    }
 
 
-    public static void entnahmeVorrat(EntityManager em, MedVorrat vorrat, BigDecimal wunschmenge, BHP bhp) throws Exception {
-        MedBestand bestand = em.merge(MedBestandTools.getBestandImAnbruch(vorrat));
+    public static void entnahmeVorrat(EntityManager em, MedInventory inventory, BigDecimal wunschmenge, BHP bhp) throws Exception {
+        MedStock bestand = em.merge(MedStockTools.getBestandImAnbruch(inventory));
         em.lock(bestand, LockModeType.OPTIMISTIC);
 
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal restsumme = MedBestandTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
+            BigDecimal restsumme = MedStockTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
 
             // normalerweise wird immer das hergegeben, was auch gewünscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
@@ -179,9 +179,9 @@ public class MedVorratTools {
             }
 
             // Also erst mal die Buchung für DIESEN Durchgang.
-            MedBuchungen buchung = em.merge(new MedBuchungen(bestand, entnahme.negate(), bhp));
-            bestand.getBuchungen().add(buchung);
-            bhp.getBuchungen().add(buchung);
+            MedStockTransaction buchung = em.merge(new MedStockTransaction(bestand, entnahme.negate(), bhp));
+            bestand.getStockTransaction().add(buchung);
+            bhp.getStockTransaction().add(buchung);
             OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
 
             /**
@@ -192,17 +192,17 @@ public class MedVorratTools {
             if (bestand.hasNextBestand()) {
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
 
-                    MedBestand naechsterBestand = em.merge(bestand.getNaechsterBestand());
+                    MedStock naechsterBestand = em.merge(bestand.getNaechsterBestand());
                     em.lock(naechsterBestand, LockModeType.OPTIMISTIC);
 
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Bzw. die Packung wurde mit dieser Gabe geleert.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
-                    MedBestandTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    MedStockTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_VORAB);
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
-                    entnahmeVorrat(em, vorrat, wunschmenge.subtract(entnahme), bhp);
+                    entnahmeVorrat(em, inventory, wunschmenge.subtract(entnahme), bhp);
                 }
             }
         }
@@ -213,7 +213,7 @@ public class MedVorratTools {
      * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
      * Der muss dann nur noch persistiert werden.
      *
-     * @param vorrat
+     * @param inventory
      * @param packung
      * @param darreichung
      * @param text
@@ -221,24 +221,24 @@ public class MedVorratTools {
      * @return
      * @throws Exception
      */
-    public static MedBestand einbuchenVorrat(MedVorrat vorrat, MedPackung packung, Darreichung darreichung, String text, BigDecimal menge) {
-        MedBestand bestand = null;
+    public static MedStock einbuchenVorrat(MedInventory inventory, MedPackung packung, TradeForm darreichung, String text, BigDecimal menge) {
+        MedStock bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            bestand = new MedBestand(vorrat, darreichung, packung, text);
-            bestand.setApv(MedBestandTools.getPassendesAPV(bestand));
-            MedBuchungen buchung = new MedBuchungen(bestand, menge);
-            bestand.getBuchungen().add(buchung);
+            bestand = new MedStock(inventory, darreichung, packung, text);
+            bestand.setApv(MedStockTools.getPassendesAPV(bestand));
+            MedStockTransaction buchung = new MedStockTransaction(bestand, menge);
+            bestand.getStockTransaction().add(buchung);
         }
         return bestand;
     }
 
 
-    public static MedBestand getNaechsteNochUngeoeffnete(MedVorrat vorrat) {
-        MedBestand bestand = null;
-        if (!vorrat.getBestaende().isEmpty()) {
-            MedBestand[] bestaende = vorrat.getBestaende().toArray(new MedBestand[0]);
+    public static MedStock getNaechsteNochUngeoeffnete(MedInventory inventory) {
+        MedStock bestand = null;
+        if (!inventory.getMedStocks().isEmpty()) {
+            MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
             Arrays.sort(bestaende); // nach Einbuchung
-            for (MedBestand myBestand : bestaende) {
+            for (MedStock myBestand : bestaende) {
                 if (!myBestand.isAngebrochen()) {
                     bestand = myBestand;
                     break;
@@ -248,12 +248,12 @@ public class MedVorratTools {
         return bestand;
     }
 
-    public static MedBestand getNaechsteNichtAbgeschlossene(MedVorrat vorrat) {
-        MedBestand bestand = null;
-        if (!vorrat.getBestaende().isEmpty()) {
-            MedBestand[] bestaende = vorrat.getBestaende().toArray(new MedBestand[0]);
+    public static MedStock getNaechsteNichtAbgeschlossene(MedInventory inventory) {
+        MedStock bestand = null;
+        if (!inventory.getMedStocks().isEmpty()) {
+            MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
             Arrays.sort(bestaende); // nach Einbuchung
-            for (MedBestand myBestand : bestaende) {
+            for (MedStock myBestand : bestaende) {
                 if (!myBestand.isAbgeschlossen()) {
                     bestand = myBestand;
                     break;
@@ -267,19 +267,19 @@ public class MedVorratTools {
      * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die z.Zt. keine
      * angebrochenen Bestände haben.
      *
-     * @param vorrat
+     * @param inventory
      * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
      */
-    public static MedBestand anbrechenNaechste(MedVorrat vorrat) {
-        MedBestand result = null;
+    public static MedStock anbrechenNaechste(MedInventory inventory) {
+        MedStock result = null;
 
 
-        java.util.List<MedBestand> list = new ArrayList(vorrat.getBestaende());
+        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
         Collections.sort(list);
 
-        for (MedBestand bestand : list) {
+        for (MedStock bestand : list) {
             if (bestand.getAus().equals(SYSConst.DATE_BIS_AUF_WEITERES) && bestand.getAnbruch().equals(SYSConst.DATE_BIS_AUF_WEITERES)) {
-                BigDecimal apv = MedBestandTools.getPassendesAPV(bestand);
+                BigDecimal apv = MedStockTools.getPassendesAPV(bestand);
                 bestand.setAnbruch(new Date());
                 bestand.setApv(apv);
                 result = bestand;
@@ -290,18 +290,18 @@ public class MedVorratTools {
         return result;
     }
 
-    public static MedFormen getForm(MedVorrat vorrat) {
+    public static DosageForm getForm(MedInventory inventory) {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT d.medForm FROM MedVorrat v " +
+                " SELECT d.medForm FROM MedInventory v " +
                 " JOIN v.bestaende b " +
                 " JOIN b.darreichung d" +
                 " WHERE v = :vorrat");
-        query.setParameter("vorrat", vorrat);
+        query.setParameter("vorrat", inventory);
         query.setMaxResults(1);
 
-        MedFormen form = (MedFormen) query.getSingleResult();
+        DosageForm form = (DosageForm) query.getSingleResult();
         em.close();
 
         return form;

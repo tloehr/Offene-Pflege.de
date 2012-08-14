@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import op.OPDE;
 import op.tools.SYSTools;
@@ -38,7 +38,7 @@ public class MedPackungTools {
     }
 
     public static String toPrettyString(MedPackung packung) {
-        String text = packung.getInhalt().toString() + " " + DarreichungTools.getPackungsEinheit(packung.getDarreichung()) + ", " + GROESSE[packung.getGroesse()] + ", ";
+        String text = packung.getInhalt().toString() + " " + TradeFormTools.getPackungsEinheit(packung.getDarreichung()) + ", " + GROESSE[packung.getGroesse()] + ", ";
         text += "PZN: " + packung.getPzn();
         return text;
     }

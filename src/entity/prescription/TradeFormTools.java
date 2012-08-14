@@ -1,6 +1,6 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSConst;
@@ -22,7 +22,7 @@ import java.util.List;
  * Time: 16:29
  * To change this template use File | Settings | File Templates.
  */
-public class DarreichungTools {
+public class TradeFormTools {
     public static final int SHORT = 0;
     public static final int MEDIUM = 1;
     public static final int LONG = 2;
@@ -35,8 +35,8 @@ public class DarreichungTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof Darreichung) {
-                    Darreichung darreichung = (Darreichung) o;
+                } else if (o instanceof TradeForm) {
+                    TradeForm darreichung = (TradeForm) o;
                     if (v == SHORT) {
                         text = darreichung.getZusatz();
                     } else if (v == MEDIUM) {
@@ -53,7 +53,7 @@ public class DarreichungTools {
     }
 
 
-    public static String toPrettyString(Darreichung darreichung) {
+    public static String toPrettyString(TradeForm darreichung) {
         String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
         String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
         String zusatz = SYSTools.catchNull(darreichung.getZusatz());
@@ -61,54 +61,54 @@ public class DarreichungTools {
         String text = darreichung.getMedProdukt().getBezeichnung();
         text += zusatz.isEmpty() ? "" : ", " + zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
         return text;
     }
 
-    public static String toPrettyStringMedium(Darreichung darreichung) {
+    public static String toPrettyStringMedium(TradeForm darreichung) {
         String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
         String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
         String zusatz = SYSTools.catchNull(darreichung.getZusatz());
 
         String text = zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? MedFormenTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
         return text;
     }
 
-    public static String getPackungsEinheit(Darreichung darreichung) {
-        return MedFormenTools.EINHEIT[darreichung.getMedForm().getPackEinheit()];
+    public static String getPackungsEinheit(TradeForm darreichung) {
+        return DosageFormTools.EINHEIT[darreichung.getMedForm().getPackEinheit()];
     }
 
 
-    public static List<Darreichung> findDarreichungByMedProduktText(EntityManager em, String suche) {
+    public static List<TradeForm> findDarreichungByMedProduktText(EntityManager em, String suche) {
         suche = "%" + suche.trim() + "%";
 
         Query query = em.createQuery(" " +
-                " SELECT d FROM Darreichung d " +
+                " SELECT d FROM TradeForm d " +
                 " WHERE d.medProdukt.bezeichnung like :suche" +
                 " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.medForm.zubereitung ");
 
         query.setParameter("suche", suche);
 
-        List<Darreichung> list = query.getResultList();
+        List<TradeForm> list = query.getResultList();
 
         return list;
     }
 
-    public static List<Darreichung> findDarreichungByMedProduktText(String suche) {
+    public static List<TradeForm> findDarreichungByMedProduktText(String suche) {
         suche = "%" + suche.trim() + "%";
 
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT d FROM Darreichung d " +
+                " SELECT d FROM TradeForm d " +
                 " WHERE d.medProdukt.bezeichnung like :suche" +
                 " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.medForm.zubereitung ");
 
         query.setParameter("suche", suche);
 
-        List<Darreichung> list = query.getResultList();
+        List<TradeForm> list = query.getResultList();
 
         em.close();
 
@@ -122,10 +122,10 @@ public class DarreichungTools {
      * @param bewohner
      * @param darreichung
      * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>.
-     * @see #getPassendeVorraeteZurDarreichung(entity.Bewohner, Darreichung)
+     * @see #getPassendeVorraeteZurDarreichung(entity.info.Resident, TradeForm)
      */
-    public static MedVorrat getVorratZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
-        MedVorrat result = null;
+    public static MedInventory getVorratZurDarreichung(Resident bewohner, TradeForm darreichung) {
+        MedInventory result = null;
         EntityManager em = OPDE.createEM();
         try {
             result = getVorratZurDarreichung(em, bewohner, darreichung);
@@ -143,11 +143,11 @@ public class DarreichungTools {
     }
 
 
-    public static MedVorrat getVorratZurDarreichung(EntityManager em, Bewohner bewohner, Darreichung darreichung) throws Exception {
-        Query query = em.createNamedQuery("MedVorrat.findActiveByBewohnerAndDarreichung");
+    public static MedInventory getVorratZurDarreichung(EntityManager em, Resident bewohner, TradeForm darreichung) throws Exception {
+        Query query = em.createNamedQuery("MedInventory.findActiveByBewohnerAndDarreichung");
         query.setParameter("bewohner", bewohner);
         query.setParameter("darreichung", darreichung);
-        return (MedVorrat) query.getSingleResult();
+        return (MedInventory) query.getSingleResult();
     }
 
 
@@ -187,32 +187,32 @@ public class DarreichungTools {
      * @param bewohner
      * @param darreichung
      * @return
-     * @see #getVorratZurDarreichung(entity.Bewohner, Darreichung)
+     * @see #getVorratZurDarreichung(entity.info.Resident, TradeForm)
      */
-    public static List<MedVorrat> getPassendeVorraeteZurDarreichung(Bewohner bewohner, Darreichung darreichung) {
+    public static List<MedInventory> getPassendeVorraeteZurDarreichung(Resident bewohner, TradeForm darreichung) {
         // TODO: das muss noch getestet werden
         EntityManager em = OPDE.createEM();
-        List<MedVorrat> liste;
+        List<MedInventory> liste;
 
         // 1. Form der gesuchten darreichung bestimmen.
-        MedFormen meineForm = darreichung.getMedForm();
+        DosageForm meineForm = darreichung.getMedForm();
 
         // 2. Alle äquivalenten Formen dazu finden
-        List<MedFormen> aehnlicheFormen;
+        List<DosageForm> aehnlicheFormen;
         if (meineForm.getEquiv() != 0) {
             Query query = em.createNamedQuery("MedFormen.findByEquiv");
             query.setParameter("equiv", meineForm.getEquiv());
             aehnlicheFormen = query.getResultList();
         } else {
-            aehnlicheFormen = new ArrayList<MedFormen>();
+            aehnlicheFormen = new ArrayList<DosageForm>();
             aehnlicheFormen.add(meineForm);
         }
 
         // 3. Anhand der Bestände die passenden Vorräte ermitteln
         Query queryVorraete = em.createQuery(" " +
-                " SELECT DISTINCT b.vorrat FROM MedBestand b " +
-                " WHERE b.vorrat.bewohner = :bewohner " +
-                " AND b.vorrat.bis = :bis " +
+                " SELECT DISTINCT b.inventory FROM MedStock b " +
+                " WHERE b.inventory.bewohner = :bewohner " +
+                " AND b.inventory.bis = :bis " +
                 " AND b.darreichung.medForm.formID  IN " +
                 " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );

@@ -1,7 +1,6 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import entity.Bewohner;
-import entity.Stationen;
+import entity.info.Resident;
 import entity.Users;
 import op.OPDE;
 import op.tools.SYSConst;
@@ -15,30 +14,30 @@ import java.util.Date;
 @Entity
 @Table(name = "MPVorrat")
 @NamedQueries({
-        @NamedQuery(name = "MedVorrat.findAll", query = "SELECT m FROM MedVorrat m"),
-        @NamedQuery(name = "MedVorrat.findByVorID", query = "SELECT m FROM MedVorrat m WHERE m.vorID = :vorID"),
-        @NamedQuery(name = "MedVorrat.findByText", query = "SELECT m FROM MedVorrat m WHERE m.text = :text"),
-        @NamedQuery(name = "MedVorrat.findByVon", query = "SELECT m FROM MedVorrat m WHERE m.von = :von"),
-        @NamedQuery(name = "MedVorrat.findByBis", query = "SELECT m FROM MedVorrat m WHERE m.bis = :bis"),
-        @NamedQuery(name = "MedVorrat.getSumme", query = " " +
-                " SELECT SUM(buch.menge) FROM MedVorrat vor JOIN vor.bestaende best JOIN best.buchungen buch WHERE vor = :vorrat "),
-        @NamedQuery(name = "MedVorrat.findActiveByBewohnerAndDarreichung", query = " " +
-                " SELECT DISTINCT vor FROM MedVorrat vor " +
-                " JOIN vor.bestaende best " +
+        @NamedQuery(name = "MedInventory.findAll", query = "SELECT m FROM MedInventory m"),
+        @NamedQuery(name = "MedInventory.findByVorID", query = "SELECT m FROM MedInventory m WHERE m.vorID = :vorID"),
+        @NamedQuery(name = "MedInventory.findByText", query = "SELECT m FROM MedInventory m WHERE m.text = :text"),
+        @NamedQuery(name = "MedInventory.findByVon", query = "SELECT m FROM MedInventory m WHERE m.von = :von"),
+        @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.bis = :bis"),
+        @NamedQuery(name = "MedInventory.getSumme", query = " " +
+                " SELECT SUM(buch.menge) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
+        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
+                " SELECT DISTINCT vor FROM MedInventory vor " +
+                " JOIN vor.medStocks best " +
                 " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
                 " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
-        @NamedQuery(name = "MedVorrat.findByBewohnerMitBestand", query = " " +
-                " SELECT best.vorrat, SUM(buch.menge) FROM MedBestand best " +
-                " JOIN best.buchungen buch " +
-                " WHERE best.vorrat.bewohner = :bewohner AND best.vorrat.bis = '9999-12-31 23:59:59' " +
-                " GROUP BY best.vorrat ")
+        @NamedQuery(name = "MedInventory.findByBewohnerMitBestand", query = " " +
+                " SELECT best.inventory, SUM(buch.menge) FROM MedStock best " +
+                " JOIN best.stockTransaction buch " +
+                " WHERE best.inventory.bewohner = :bewohner AND best.inventory.bis = '9999-12-31 23:59:59' " +
+                " GROUP BY best.inventory ")
 })
 
 @NamedNativeQueries({
         // Das hier ist eine Liste aller Verordnungen eines Bewohners.
         // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
         // beigefügt.
-        @NamedNativeQuery(name = "MedVorrat.findVorraeteMitSummen", query = " " +
+        @NamedNativeQuery(name = "MedInventory.findVorraeteMitSummen", query = " " +
                 " SELECT DISTINCT v.VorID, b.saldo" +
                 " FROM MPVorrat v " +
                 " LEFT OUTER JOIN (" +
@@ -54,13 +53,13 @@ import java.util.Date;
 })
 //
 //@SqlResultSetMappings({
-//        @SqlResultSetMapping(name = "MedVorrat.findVorraeteMitSummenResultMapping",
-//                entities = @EntityResult(entityClass = MedVorrat.class),
+//        @SqlResultSetMapping(name = "MedInventory.findVorraeteMitSummenResultMapping",
+//                entities = @EntityResult(entityClass = MedInventory.class),
 //                columns = @ColumnResult(name = "b.saldo")
 //        )
 //})
 
-public class MedVorrat implements Serializable {
+public class MedInventory implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,16 +81,16 @@ public class MedVorrat implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date bis;
 
-    public MedVorrat() {
+    public MedInventory() {
 
 
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 
@@ -103,13 +102,13 @@ public class MedVorrat implements Serializable {
         this.user = user;
     }
 
-    public MedVorrat(Bewohner bewohner, String text) {
+    public MedInventory(Resident bewohner, String text) {
         this.bewohner = bewohner;
         this.text = text;
         this.user = OPDE.getLogin().getUser();
         this.von = new Date();
         this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
-        this.bestaende = new ArrayList<MedBestand>();
+        this.medStocks = new ArrayList<MedStock>();
     }
 
     public Long getVorID() {
@@ -151,15 +150,15 @@ public class MedVorrat implements Serializable {
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorrat")
-    private Collection<MedBestand> bestaende;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "inventory")
+    private Collection<MedStock> medStocks;
 
     // ==
     // N:1 Relationen
     // ==
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     // ==
     // N:1 Relationen
     // ==
@@ -177,10 +176,10 @@ public class MedVorrat implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedVorrat)) {
+        if (!(object instanceof MedInventory)) {
             return false;
         }
-        MedVorrat other = (MedVorrat) object;
+        MedInventory other = (MedInventory) object;
         if ((this.vorID == null && other.vorID != null) || (this.vorID != null && !this.vorID.equals(other.vorID))) {
             return false;
         }
@@ -189,11 +188,11 @@ public class MedVorrat implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedVorrat[vorID=" + vorID + "]";
+        return "entity.rest.MedInventory[vorID=" + vorID + "]";
     }
 
-    public Collection<MedBestand> getBestaende() {
-        return bestaende;
+    public Collection<MedStock> getMedStocks() {
+        return medStocks;
     }
 }
                                        

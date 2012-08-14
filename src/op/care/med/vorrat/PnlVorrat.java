@@ -32,10 +32,10 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.tools.DlgYesNo;
 import op.threads.DisplayMessage;
@@ -93,9 +93,9 @@ import java.util.Date;
  */
 public class PnlVorrat extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.vorrat";
+    public static final String internalClassID = "nursingrecords.inventory";
 
-    private Bewohner bewohner;
+    private Resident bewohner;
     private boolean ignoreEvent;
     //    private Component thisDialog;
     private JPopupMenu menuV;
@@ -103,8 +103,8 @@ public class PnlVorrat extends NursingRecordsPanel {
     private PnlBuchungen pnlBuchungen;
 
     //    private OCSec ocs;
-    private MedVorrat vorrat;
-    private MedBestand bestand;
+    private MedInventory inventory;
+    private MedStock bestand;
 //    private JDialog thisComponent;
 
     private JScrollPane jspSearch;
@@ -114,20 +114,20 @@ public class PnlVorrat extends NursingRecordsPanel {
     /**
      * Creates new form DlgVorrat
      */
-    public PnlVorrat(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlVorrat(Resident bewohner, JScrollPane jspSearch) {
         super();
         ignoreEvent = true;
         this.jspSearch = jspSearch;
         initComponents();
         initDialog();
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
         ignoreEvent = false;
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         reloadVorratTable();
     }
 
@@ -296,8 +296,8 @@ public class PnlVorrat extends NursingRecordsPanel {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-//                    if (o instanceof MedBuchungen) {
-//                        recalculate(((MedBuchungen) o).getBestand());
+//                    if (o instanceof MedStockTransaction) {
+//                        recalculate(((MedStockTransaction) o).getBestand());
 //                    } else if (o instanceof MedBestand) {
 //                        recalculate((MedBestand) o);
 //                    } else {
@@ -319,9 +319,9 @@ public class PnlVorrat extends NursingRecordsPanel {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (!listSelectionEvent.getValueIsAdjusting()) {
                     if (tblVorrat.getSelectedRowCount() > 0) {
-                        MedVorrat myVorrat = ((TMVorraete) tblVorrat.getModel()).getVorrat(tblVorrat.getSelectedRow());
-                        if (!myVorrat.equals(vorrat)) {
-                            vorrat = myVorrat;
+                        MedInventory myInventory = ((TMVorraete) tblVorrat.getModel()).getVorrat(tblVorrat.getSelectedRow());
+                        if (!myInventory.equals(inventory)) {
+                            inventory = myInventory;
                             reloadBestandTable();
                         }
                     }
@@ -333,7 +333,7 @@ public class PnlVorrat extends NursingRecordsPanel {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (!listSelectionEvent.getValueIsAdjusting()) {
                     if (tblBestand.getSelectedRowCount() > 0) {
-                        MedBestand myBestand = ((TMBestand) tblBestand.getModel()).getBestand(tblBestand.getSelectedRow());
+                        MedStock myBestand = ((TMBestand) tblBestand.getModel()).getBestand(tblBestand.getSelectedRow());
                         if (!myBestand.equals(bestand)) {
                             bestand = myBestand;
                             pnlBuchungen.setBestand(bestand);
@@ -455,13 +455,13 @@ public class PnlVorrat extends NursingRecordsPanel {
             // Nur Zahlen.. Das ist eine BestID
             long bestid = Long.parseLong(search.getText());
             EntityManager em = OPDE.createEM();
-            bestand = em.find(MedBestand.class, bestid);
+            bestand = em.find(MedStock.class, bestid);
             em.close();
 
             if (bestand != null) {
-                if (!bewohner.equals(bestand.getVorrat().getBewohner())) {
-                    bewohner = bestand.getVorrat().getBewohner();
-                    OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+                if (!bewohner.equals(bestand.getInventory().getBewohner())) {
+                    bewohner = bestand.getInventory().getBewohner();
+                    OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Medikament gehört eine[m|r] anderen Bewohner[in]. Habe umgeschaltet.", 2));
                     OPDE.getMainframe().change2Bewohner(bewohner);
                 }
@@ -511,8 +511,8 @@ public class PnlVorrat extends NursingRecordsPanel {
                         em.getTransaction().begin();
                         bestand = em.merge(bestand);
                         em.lock(bestand, LockModeType.OPTIMISTIC);
-                        BigDecimal apv = MedBestandTools.getPassendesAPV(bestand);
-                        MedBestandTools.anbrechen(bestand, apv);
+                        BigDecimal apv = MedStockTools.getPassendesAPV(bestand);
+                        MedStockTools.anbrechen(bestand, apv);
                         em.getTransaction().commit();
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde angebrochen", 2));
                         reloadBestandTable();
@@ -581,7 +581,7 @@ public class PnlVorrat extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     bestand = em.merge(bestand);
-                                    MedBestandTools.abschliessen(em, bestand, "", MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+                                    MedStockTools.abschliessen(em, bestand, "", MedStockTransactionTools.STATUS_KORREKTUR_MANUELL);
                                     em.getTransaction().commit();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde abgeschlossen", 2));
                                     reloadBestandTable();
@@ -654,12 +654,12 @@ public class PnlVorrat extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     bestand = em.merge(bestand);
 
-                                    MedVorrat vorrat = em.merge(bestand.getVorrat());
+                                    MedInventory inventory = em.merge(bestand.getInventory());
 
                                     em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    em.lock(vorrat, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.lock(inventory, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                    vorrat.getBestaende().remove(bestand);
+                                    inventory.getMedStocks().remove(bestand);
                                     em.remove(bestand);
 
                                     em.getTransaction().commit();
@@ -703,7 +703,7 @@ public class PnlVorrat extends NursingRecordsPanel {
     private void tblVorratMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVorratMousePressed
         final TMVorraete tm = (TMVorraete) tblVorrat.getModel();
         if (tm.getRowCount() == 0) {
-            vorrat = null;
+            inventory = null;
             return;
         }
 
@@ -713,7 +713,7 @@ public class PnlVorrat extends NursingRecordsPanel {
         ListSelectionModel lsm = tblVorrat.getSelectionModel();
         lsm.setSelectionInterval(row, row);
 
-        vorrat = tm.getVorrat(row);
+        inventory = tm.getVorrat(row);
         reloadBestandTable();
 
         if (evt.isPopupTrigger()) {
@@ -727,7 +727,7 @@ public class PnlVorrat extends NursingRecordsPanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                    new DlgYesNo("Möchten Sie den Vorrat Nr. " + vorrat.getVorID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                    new DlgYesNo("Möchten Sie den Vorrat Nr. " + inventory.getVorID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -736,12 +736,12 @@ public class PnlVorrat extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
 
-                                    vorrat = em.merge(vorrat);
-                                    em.lock(vorrat, LockModeType.OPTIMISTIC);
-                                    em.remove(vorrat);
+                                    inventory = em.merge(inventory);
+                                    em.lock(inventory, LockModeType.OPTIMISTIC);
+                                    em.remove(inventory);
 
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + vorrat.getVorID() + " und alle zugehörigen Bestände und Buchungen wurden gelöscht.", 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + inventory.getVorID() + " und alle zugehörigen Bestände und Buchungen wurden gelöscht.", 2));
                                 } catch (OptimisticLockException ole) {
                                     em.getTransaction().rollback();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Vorrat wurde zwischenzeitlich geändert.", internalClassID));
@@ -770,7 +770,7 @@ public class PnlVorrat extends NursingRecordsPanel {
             itemPopupClose.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgYesNo("Möchten Sie den Vorrat Nr. " + vorrat.getVorID() + " wirklich abschließen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_end.png")), new Closure() {
+                    new DlgYesNo("Möchten Sie den Vorrat Nr. " + inventory.getVorID() + " wirklich abschließen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_end.png")), new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -779,24 +779,24 @@ public class PnlVorrat extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
 
-                                    vorrat = em.merge(vorrat);
-                                    em.lock(vorrat, LockModeType.OPTIMISTIC);
+                                    inventory = em.merge(inventory);
+                                    em.lock(inventory, LockModeType.OPTIMISTIC);
 
 
                                     // Alle Bestände abschliessen.
-                                    for (MedBestand bestand : vorrat.getBestaende()) {
+                                    for (MedStock bestand : inventory.getMedStocks()) {
                                         if (!bestand.isAbgeschlossen()) {
                                             bestand = em.merge(bestand);
                                             em.lock(bestand, LockModeType.OPTIMISTIC);
-                                            MedBestandTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
+                                            MedStockTools.abschliessen(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS);
                                         }
                                     }
 
                                     // Vorrat abschliessen
-                                    vorrat.setBis(new Date());
+                                    inventory.setBis(new Date());
 
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + vorrat.getVorID() + " und alle zugehörigen Bestände abgeschlossen", 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + inventory.getVorID() + " und alle zugehörigen Bestände abgeschlossen", 2));
 
                                 } catch (OptimisticLockException ole) {
                                     em.getTransaction().rollback();
@@ -828,11 +828,11 @@ public class PnlVorrat extends NursingRecordsPanel {
         reloadVorratTable(null);
     }
 
-    private void reloadVorratTable(MedBestand preselect) {
+    private void reloadVorratTable(MedStock preselect) {
 
         bestand = preselect;
 
-        if (preselect != null && preselect.getVorrat().isAbgeschlossen()) {
+        if (preselect != null && preselect.getInventory().isAbgeschlossen()) {
             ignoreEvent = true;
             cbClosedVorrat.setSelected(true);
             ignoreEvent = false;
@@ -844,10 +844,10 @@ public class PnlVorrat extends NursingRecordsPanel {
         query.setParameter(2, bewohner.getBWKennung());
         query.setParameter(3, cbClosedVorrat.isSelected());
 
-        java.util.List<Pair<MedVorrat, BigDecimal>> list = new ArrayList();
+        java.util.List<Pair<MedInventory, BigDecimal>> list = new ArrayList();
 
         for (Object[] objs : (java.util.List<Object[]>) query.getResultList()) {
-            list.add(new Pair<MedVorrat, BigDecimal>(em.find(MedVorrat.class, ((BigInteger) objs[0]).longValue()), (BigDecimal) objs[1]));
+            list.add(new Pair<MedInventory, BigDecimal>(em.find(MedInventory.class, ((BigInteger) objs[0]).longValue()), (BigDecimal) objs[1]));
         }
 
         TMVorraete tm = new TMVorraete(list);
@@ -860,7 +860,7 @@ public class PnlVorrat extends NursingRecordsPanel {
         em.close();
 
         if (preselect != null) {
-            int row = tm.findPositionOf(preselect.getVorrat());
+            int row = tm.findPositionOf(preselect.getInventory());
             tblVorrat.getSelectionModel().setSelectionInterval(row, row);
             scrollToCenter(tblVorrat, row, 0);
         } else {
@@ -894,7 +894,7 @@ public class PnlVorrat extends NursingRecordsPanel {
     }
 
     private void reloadBestandTable() {
-        if (vorrat == null) {
+        if (inventory == null) {
             tblBestand.setModel(new DefaultTableModel());
         } else {
 
@@ -906,14 +906,14 @@ public class PnlVorrat extends NursingRecordsPanel {
 
             EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("MedBestand.findByVorratMitRestsumme");
-            query.setParameter(1, vorrat.getVorID());
-            query.setParameter(2, vorrat.getVorID());
+            query.setParameter(1, inventory.getVorID());
+            query.setParameter(2, inventory.getVorID());
             query.setParameter(3, cbClosedBestand.isSelected());
 
-            java.util.List<Pair<MedBestand, BigDecimal>> list = new ArrayList();
+            java.util.List<Pair<MedStock, BigDecimal>> list = new ArrayList();
 
             for (Object[] objs : (java.util.List<Object[]>) query.getResultList()) {
-                list.add(new Pair<MedBestand, BigDecimal>(em.find(MedBestand.class, ((BigInteger) objs[0]).longValue()), (BigDecimal) objs[1]));
+                list.add(new Pair<MedStock, BigDecimal>(em.find(MedStock.class, ((BigInteger) objs[0]).longValue()), (BigDecimal) objs[1]));
             }
 
             TMBestand tm = new TMBestand(list);
@@ -937,13 +937,13 @@ public class PnlVorrat extends NursingRecordsPanel {
         }
     }
 
-    private void recalculate(MedBestand changed) {
+    private void recalculate(MedStock changed) {
 
-        BigDecimal newvorrat = MedVorratTools.getVorratSumme(changed.getVorrat());
-        BigDecimal newbestand = MedBestandTools.getBestandSumme(changed);
+        BigDecimal newvorrat = MedInventoryTools.getVorratSumme(changed.getInventory());
+        BigDecimal newbestand = MedStockTools.getBestandSumme(changed);
 
         TMVorraete tmv = (TMVorraete) tblVorrat.getModel();
-        int rowv = tmv.findPositionOf(changed.getVorrat());
+        int rowv = tmv.findPositionOf(changed.getInventory());
 
         TMBestand tmb = (TMBestand) tblBestand.getModel();
         int rowb = tmb.findPositionOf(changed);

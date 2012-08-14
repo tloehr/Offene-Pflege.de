@@ -33,7 +33,7 @@ import entity.Arzt;
 import entity.ArztTools;
 import entity.Krankenhaus;
 import entity.KrankenhausTools;
-import entity.verordnungen.Verordnung;
+import entity.prescription.Prescriptions;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -52,13 +52,13 @@ import java.awt.event.ItemListener;
  * @author root
  */
 public class DlgAbsetzen extends MyJDialog {
-    private Verordnung verordnung, verordnungToReturn;
+    private Prescriptions verordnung, verordnungToReturn;
     private Closure actionBlock;
 
     /**
      * Creates new form DlgAbsetzen
      */
-    public DlgAbsetzen(Verordnung verordnung, Closure actionBlock) {
+    public DlgAbsetzen(Prescriptions verordnung, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.verordnung = verordnung;
         initComponents();

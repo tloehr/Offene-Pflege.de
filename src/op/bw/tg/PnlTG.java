@@ -35,6 +35,8 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.*;
 import entity.files.SYSFilesTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -82,14 +84,14 @@ public class PnlTG extends CleanablePanel {
     private Date max;
     private BigDecimal betrag;
     private JPopupMenu menu;
-    private Bewohner bewohner;
+    private Resident bewohner;
     private CollapsiblePane panelText, panelTime;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JComboBox cmbVon, cmbBis, cmbMonat;
     private JXSearchField txtBW;
     private boolean ignoreDateComboEvent;
-    private HashMap<Bewohner, Object[]> searchSaldoButtonMap;
+    private HashMap<Resident, Object[]> searchSaldoButtonMap;
     private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
     private JComboBox cmbPast;
     private Closure bwchange;
@@ -607,7 +609,7 @@ public class PnlTG extends CleanablePanel {
 //            lblBetrag.setForeground(Color.BLACK);
 //        }
 
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner) + ", Saldo: " + nf.format(zeilensaldo));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner) + ", Saldo: " + nf.format(zeilensaldo));
 
 
     }
@@ -842,13 +844,13 @@ public class PnlTG extends CleanablePanel {
                 if (txtBW.getText().trim().isEmpty()) {
                     return;
                 }
-                BewohnerTools.findeBW(txtBW.getText().trim(), new Closure() {
+                ResidentTools.findeBW(txtBW.getText().trim(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o == null) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine(n) passende(n) Bewohner(in) gefunden.", 2));
                         } else {
-                            bewohner = (Bewohner) o;
+                            bewohner = (Resident) o;
                             reloadDisplay();
                         }
                     }
@@ -1050,12 +1052,12 @@ public class PnlTG extends CleanablePanel {
         JPanel mypanel = new JPanel();
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
-        searchSaldoButtonMap = new HashMap<Bewohner, Object[]>();
+        searchSaldoButtonMap = new HashMap<Resident, Object[]>();
 
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT b, SUM(k.betrag) FROM Bewohner b " +
+                " SELECT b, SUM(k.betrag) FROM Resident b " +
                 " LEFT JOIN b.konto k " +
                 " WHERE b.station IS NOT NULL " +
                 " GROUP BY b " +
@@ -1066,7 +1068,7 @@ public class PnlTG extends CleanablePanel {
         em.close();
 
         for (int row = 0; row < bwSearchList.size(); row++) {
-            final Bewohner myBewohner = (Bewohner) bwSearchList.get(row)[0];
+            final Resident myBewohner = (Resident) bwSearchList.get(row)[0];
             BigDecimal saldo = bwSearchList.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) bwSearchList.get(row)[1];
 
             String titel = "<html>" + myBewohner.getNachname() + ", " + myBewohner.getVorname() + " [" + myBewohner.getBWKennung() + "] <b><font " + (saldo.compareTo(BigDecimal.ZERO) < 0 ? "color=\"red\"" : "color=\"black\"") + ">" + currencyFormat.format(saldo) + "</font></b></html>";

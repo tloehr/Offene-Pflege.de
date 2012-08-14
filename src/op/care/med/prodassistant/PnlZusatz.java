@@ -6,7 +6,7 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -32,8 +32,8 @@ import java.util.Comparator;
  */
 public class PnlZusatz extends JPanel {
     private MedProdukte produkt;
-    private Darreichung darreichung;
-    private MedFormen form;
+    private TradeForm darreichung;
+    private DosageForm form;
     private Closure validate;
     private boolean ignoreEvent = false;
 
@@ -55,7 +55,7 @@ public class PnlZusatz extends JPanel {
             model.add(0, "<html><b>Nein, keins von diesen</b></html>");
             DefaultListModel lmDaf = SYSTools.list2dlm(model);
             lstDaf.setModel(lmDaf);
-            lstDaf.setCellRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
+            lstDaf.setCellRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
         }
         lblMsg.setVisible(!produkt.getDarreichungen().isEmpty());
         jsp1.setVisible(!produkt.getDarreichungen().isEmpty());
@@ -68,26 +68,26 @@ public class PnlZusatz extends JPanel {
         Collections.sort(listFormen, new Comparator<Object>() {
             @Override
             public int compare(Object us, Object them) {
-                return MedFormenTools.toPrettyString((MedFormen) us).compareTo(MedFormenTools.toPrettyString((MedFormen) them));
+                return DosageFormTools.toPrettyString((DosageForm) us).compareTo(DosageFormTools.toPrettyString((DosageForm) them));
             }
         });
 
         cmbFormen.setModel(SYSTools.list2cmb(listFormen));
-        cmbFormen.setRenderer(MedFormenTools.getMedFormenRenderer(0));
+        cmbFormen.setRenderer(DosageFormTools.getMedFormenRenderer(0));
         em.close();
 
-        form = (MedFormen) cmbFormen.getSelectedItem();
+        form = (DosageForm) cmbFormen.getSelectedItem();
         lblAPV.setVisible(!form.anwUndPackEinheitenGleich());
         lblPV.setVisible(!form.anwUndPackEinheitenGleich());
         txtA.setVisible(!form.anwUndPackEinheitenGleich());
 
-        darreichung = new Darreichung(produkt, "", form);
+        darreichung = new TradeForm(produkt, "", form);
         validate.execute(darreichung);
     }
 
     private void txtZusatzActionPerformed(ActionEvent e) {
         cmbFormen.setEnabled(true);
-        darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), form);
+        darreichung = new TradeForm(produkt, txtZusatz.getText().trim(), form);
         validate.execute(darreichung);
         if (lstDaf.isVisible() && lstDaf.getSelectedIndex() != 0){
             lstDaf.setSelectedIndex(0);
@@ -101,7 +101,7 @@ public class PnlZusatz extends JPanel {
         if (!e.getValueIsAdjusting()) {
             if (lstDaf.getSelectedIndex() > 0) {
                 ignoreEvent = true;
-                darreichung = (Darreichung) lstDaf.getSelectedValue();
+                darreichung = (TradeForm) lstDaf.getSelectedValue();
                 txtZusatz.setText(null);
                 cmbFormen.setEnabled(false);
                 validate.execute(darreichung);
@@ -111,7 +111,7 @@ public class PnlZusatz extends JPanel {
     }
 
     private void cmbFormenItemStateChanged(ItemEvent e) {
-        form = (MedFormen) cmbFormen.getSelectedItem();
+        form = (DosageForm) cmbFormen.getSelectedItem();
 
         lblAPV.setVisible(!form.anwUndPackEinheitenGleich());
         lblPV.setVisible(!form.anwUndPackEinheitenGleich());
@@ -119,10 +119,10 @@ public class PnlZusatz extends JPanel {
 
         if (!form.anwUndPackEinheitenGleich()) {
             txtA.setText("1");
-            lblPV.setText(" " + form.getAnwText() + " entsprechen 1 " + MedFormenTools.EINHEIT[form.getPackEinheit()]);
+            lblPV.setText(" " + form.getAnwText() + " entsprechen 1 " + DosageFormTools.EINHEIT[form.getPackEinheit()]);
         }
 
-        darreichung = new Darreichung(produkt, txtZusatz.getText().trim(), form);
+        darreichung = new TradeForm(produkt, txtZusatz.getText().trim(), form);
 
         validate.execute(darreichung);
     }

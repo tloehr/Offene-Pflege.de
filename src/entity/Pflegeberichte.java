@@ -5,6 +5,7 @@
 package entity;
 
 import entity.files.Syspb2file;
+import entity.info.Resident;
 import entity.vorgang.SYSPB2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.OPDE;
@@ -89,10 +90,10 @@ import java.util.Iterator;
         @EntityResult(entityClass = Pflegeberichte.class), columns =
         @ColumnResult(name = "num")),
         @SqlResultSetMapping(name = "Pflegeberichte.findBVAktivitaetResultMapping", entities =
-        @EntityResult(entityClass = Bewohner.class), columns =
+        @EntityResult(entityClass = Resident.class), columns =
         @ColumnResult(name = "mypbid")),
         @SqlResultSetMapping(name = "Pflegeberichte.findSozialZeitenResultMapping", entities =
-        @EntityResult(entityClass = Bewohner.class), columns =
+        @EntityResult(entityClass = Resident.class), columns =
                 {@ColumnResult(name = "sdauer"), @ColumnResult(name = "peadauer")})
 })
 @NamedNativeQueries({
@@ -203,7 +204,7 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
@@ -238,7 +239,7 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     public Pflegeberichte() {
     }
 
-    public Pflegeberichte(Bewohner bewohner) {
+    public Pflegeberichte(Resident bewohner) {
         this.pbid = 0l;
         this.bewohner = bewohner;
         this.user = OPDE.getLogin().getUser();
@@ -310,11 +311,11 @@ public class Pflegeberichte implements Serializable, VorgangElement {
         this.dauer = dauer;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 

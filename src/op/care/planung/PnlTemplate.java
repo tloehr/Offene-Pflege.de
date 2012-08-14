@@ -7,7 +7,7 @@ package op.care.planung;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.BewohnerTools;
+import entity.info.ResidentTools;
 import entity.planung.NursingProcess;
 import entity.planung.NursingProcessTools;
 import entity.system.SYSPropsTools;
@@ -99,7 +99,7 @@ public class PnlTemplate extends JPanel {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean b1) {
                 if (o instanceof NursingProcess) {
                     NursingProcess np = (NursingProcess) o;
-                    setText("<html>" + (np.isAbgesetzt() ? "<s>" : "") + np.getStichwort() + (np.isAbgesetzt() ? "</s>" : "") + " (" + BewohnerTools.getBWLabelTextKompakt(((NursingProcess) o).getBewohner()) + ")" + "</html>");
+                    setText("<html>" + (np.isAbgesetzt() ? "<s>" : "") + np.getStichwort() + (np.isAbgesetzt() ? "</s>" : "") + " (" + ResidentTools.getBWLabelTextKompakt(((NursingProcess) o).getBewohner()) + ")" + "</html>");
                 }
                 setForeground(Color.black);
                 if (isSelected) {

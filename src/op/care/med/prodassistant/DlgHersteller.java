@@ -11,8 +11,7 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
-import entity.verordnungen.MedHersteller;
-import op.OPDE;
+import entity.prescription.MedHersteller;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 

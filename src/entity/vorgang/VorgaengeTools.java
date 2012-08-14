@@ -6,8 +6,9 @@ package entity.vorgang;
 
 import entity.*;
 import entity.info.BWInfo;
+import entity.info.Resident;
 import entity.planung.NursingProcess;
-import entity.verordnungen.Verordnung;
+import entity.prescription.Prescriptions;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
@@ -106,7 +107,7 @@ public class VorgaengeTools {
         return elements;
     }
 
-    public static void endAllVorgaenge(Bewohner bewohner) {
+    public static void endAllVorgaenge(Resident bewohner) {
 
 
     }
@@ -145,7 +146,7 @@ public class VorgaengeTools {
         }
     }
 
-    public static Vorgaenge createVorgang(String title, VKat vkat, Bewohner bw) {
+    public static Vorgaenge createVorgang(String title, VKat vkat, Resident bw) {
         Vorgaenge vorgang = new Vorgaenge(title, bw, vkat);
         VBericht vbericht = new VBericht("Neuen Vorgang erstellt.", VBerichtTools.VBERICHT_ART_CREATE, vorgang);
         EntityManager em = OPDE.createEM();
@@ -342,10 +343,10 @@ public class VorgaengeTools {
         return pdca;
     }
 
-    private static JMenu getNeuMenu(VorgangElement element, Bewohner bewohner) {
+    private static JMenu getNeuMenu(VorgangElement element, Resident bewohner) {
         JMenu neu = new JMenu("Neu erstellen");
         final JTextField txt = new JTextField("");
-        final Bewohner bw = bewohner;
+        final Resident bw = bewohner;
         final VorgangElement finalElement = element;
         neu.add(txt);
         EntityManager em = OPDE.createEM();
@@ -381,7 +382,7 @@ public class VorgaengeTools {
      * @param bewohner
      * @return
      */
-    private static JMenu getVorgaenge2Assign(VorgangElement element, Bewohner bewohner, ActionListener callback) {
+    private static JMenu getVorgaenge2Assign(VorgangElement element, Resident bewohner, ActionListener callback) {
         JMenu result = new JMenu("Zuordnen zu");
         EntityManager em = OPDE.createEM();
         final ActionListener cb = callback;
@@ -402,7 +403,7 @@ public class VorgaengeTools {
             complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
             complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (element instanceof Verordnung) {
+        } else if (element instanceof Prescriptions) {
             complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWInfo) {
             complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
@@ -448,7 +449,7 @@ public class VorgaengeTools {
             query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
             query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (element instanceof Verordnung) {
+        } else if (element instanceof Prescriptions) {
             query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWInfo) {
             query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
@@ -480,7 +481,7 @@ public class VorgaengeTools {
     }
 
 
-    public static JMenu getVorgangContextMenu(Frame parent, VorgangElement element, Bewohner bewohner, ActionListener callback) {
+    public static JMenu getVorgangContextMenu(Frame parent, VorgangElement element, Resident bewohner, ActionListener callback) {
         JMenu menu = new JMenu("<html>Vorgänge <font color=\"red\">&#9679;</font></html>");
 
         // Neuer Vorgang Menü

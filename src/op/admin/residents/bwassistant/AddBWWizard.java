@@ -5,6 +5,8 @@ import com.jidesoft.wizard.*;
 import entity.*;
 import entity.info.BWInfo;
 import entity.info.BWInfoTypTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
 import op.OPDE;
@@ -34,7 +36,7 @@ public class AddBWWizard {
     public static final String internalClassID = "opde.admin.bw.wizard";
 
     private WizardDialog wizard;
-    private Bewohner bewohner;
+    private Resident bewohner;
     private Closure finishAction;
     private BWInfo bwinfo_hauf;
 
@@ -119,7 +121,7 @@ public class AddBWWizard {
             bewohner = em.merge(bewohner);
             bwinfo_hauf = em.merge(bwinfo_hauf);
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(BewohnerTools.getBWLabelTextKompakt(bewohner) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getBWLabelTextKompakt(bewohner) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
             finishAction.execute(bewohner);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -201,7 +203,7 @@ public class AddBWWizard {
             addComponent(new PnlBWBasisInfo(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    bewohner = (Bewohner) o;
+                    bewohner = (Resident) o;
                     setupWizardButtons();
                 }
             }), true);
@@ -413,7 +415,7 @@ public class AddBWWizard {
             String result = "<b>" + OPDE.lang.getString(internalClassID + ".page7.summaryline1") + "</b><br/>";
             result += OPDE.lang.getString(internalClassID + ".page7.summaryline2") + "<br/>";
             result += "<ul>";
-            result += "<li>" + BewohnerTools.getFullName(bewohner) + "</li>";
+            result += "<li>" + ResidentTools.getFullName(bewohner) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.bv") + ": " + bewohner.getBv1().getNameUndVorname() + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + ArztTools.getFullName(bewohner.getHausarzt()) + "</li>";

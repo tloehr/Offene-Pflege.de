@@ -1,6 +1,6 @@
 package op.tools;
 
-import entity.Bewohner;
+import entity.info.Resident;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,6 +11,6 @@ import entity.Bewohner;
  */
 public abstract class NursingRecordsPanel extends CleanablePanel {
 
-    public abstract void change2Bewohner(Bewohner bewohner);
+    public abstract void switchResident(Resident resident);
 
 }

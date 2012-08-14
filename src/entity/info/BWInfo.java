@@ -25,7 +25,6 @@
  */
 package entity.info;
 
-import entity.Bewohner;
 import entity.Users;
 import entity.files.Sysbwi2file;
 import entity.vorgang.SYSBWI2VORGANG;
@@ -103,7 +102,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
     private Users abgesetztDurch;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     // ==
     // M:N Relationen
     // ==
@@ -119,7 +118,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
     public BWInfo() {
     }
 
-    public BWInfo(BWInfoTyp bwinfotyp, Bewohner bewohner) {
+    public BWInfo(BWInfoTyp bwinfotyp, Resident bewohner) {
         this.properties = "";
         Date now = new Date();
 
@@ -141,7 +140,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
         this.attachedVorgaenge = new ArrayList<SYSBWI2VORGANG>();
     }
 
-    public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Bewohner bewohner) {
+    public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Resident bewohner) {
         this.von = von;
         this.bis = bis;
         this.xml = xml;
@@ -164,7 +163,7 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
         this.bwinfoid = bwinfoid;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 

@@ -36,6 +36,8 @@ import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.files.SYSFilesTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import entity.vorgang.VorgaengeTools;
 import op.OPDE;
@@ -84,7 +86,7 @@ public class PnlBerichte extends NursingRecordsPanel {
     private JToggleButton tbShowReplaced, tbShowIDs, tbFilesOnly;
     private JComboBox cmbAuswahl;
 
-    private Bewohner bewohner;
+    private Resident bewohner;
     private JPopupMenu menu;
     private boolean initPhase;
 
@@ -106,7 +108,7 @@ public class PnlBerichte extends NursingRecordsPanel {
     /**
      * Creates new form PnlBerichte
      */
-    public PnlBerichte(Bewohner bw, JScrollPane jspSearch) {
+    public PnlBerichte(Resident bw, JScrollPane jspSearch) {
         this.initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
@@ -121,7 +123,7 @@ public class PnlBerichte extends NursingRecordsPanel {
 
         this.initPhase = false;
 
-        change2Bewohner(bw);
+        switchResident(bw);
 
 
     }
@@ -217,9 +219,9 @@ public class PnlBerichte extends NursingRecordsPanel {
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         txtSearch.setText(null);
         reloadTable();
     }
@@ -378,9 +380,9 @@ public class PnlBerichte extends NursingRecordsPanel {
                                             em.getTransaction().rollback();
                                         }
 
-                                        //Class> entity.Bewohner
+                                        //Class> entity.info.Bewohner
                                         // if (((org.eclipse.persistence.exceptions.OptimisticLockException) ole.getCause()).getObject() instanceof Bewohner) {
-                                        if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                             OPDE.getMainframe().emptyFrame();
                                             OPDE.getMainframe().afterLogin();
                                         }
@@ -486,7 +488,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
-                                        if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                             OPDE.getMainframe().emptyFrame();
                                             OPDE.getMainframe().afterLogin();
                                         }
@@ -745,7 +747,7 @@ public class PnlBerichte extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }

@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import op.tools.SYSTools;
 

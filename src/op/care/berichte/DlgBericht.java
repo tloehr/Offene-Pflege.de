@@ -10,14 +10,12 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
-import com.toedter.calendar.JDateChooser;
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.PBerichtTAGS;
 import entity.PBerichtTAGSTools;
 import entity.Pflegeberichte;
 import op.tools.MyJDialog;
 import op.tools.PnlUhrzeitDatum;
-import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -26,21 +24,17 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.sql.Time;
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * @author Torsten Löhr
  */
 public class DlgBericht extends MyJDialog {
     private Pflegeberichte bericht;
-    private Bewohner bewohner;
+    private Resident bewohner;
     private PropertyChangeListener pcl;
     private final int DAUER = 3;
     private Closure actionBlock;
@@ -49,7 +43,7 @@ public class DlgBericht extends MyJDialog {
     private JLabel attentionIcon;
     private PnlUhrzeitDatum pnlUhrzeitDatum;
 
-    public DlgBericht(Bewohner bewohner, Closure actionBlock) {
+    public DlgBericht(Resident bewohner, Closure actionBlock) {
         super();
         this.bewohner = bewohner;
         this.actionBlock = actionBlock;

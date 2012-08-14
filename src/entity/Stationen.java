@@ -5,6 +5,8 @@
 
 package entity;
 
+import entity.info.Resident;
+
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
@@ -47,7 +49,7 @@ public class Stationen implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
     private Collection<Raeume> raeume;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
-    private Collection<Bewohner> bewohnerAufDieserStation;
+    private Collection<Resident> bewohnerAufDieserStation;
 
     public Stationen() {
     }
@@ -76,7 +78,7 @@ public class Stationen implements Serializable {
         this.einrichtung = einrichtung;
     }
 
-    public Collection<Bewohner> getBewohnerAufDieserStation() {
+    public Collection<Resident> getBewohnerAufDieserStation() {
         return bewohnerAufDieserStation;
     }
 

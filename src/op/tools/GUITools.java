@@ -2,8 +2,8 @@ package op.tools;
 
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.info.BWInfoTools;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
@@ -173,8 +173,8 @@ public class GUITools {
         return dropPanel;
     }
 
-    public static void setBWDisplay(Bewohner bewohner) {
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+    public static void setBWDisplay(Resident bewohner) {
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         if (BWInfoTools.isAbwesend(bewohner)) {
             OPDE.getDisplayManager().setIconAway();
         } else if (BWInfoTools.isVerstorben(bewohner)) {

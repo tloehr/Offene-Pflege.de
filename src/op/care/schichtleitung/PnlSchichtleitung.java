@@ -28,7 +28,6 @@
 package op.care.schichtleitung;
 
 import com.toedter.calendar.JDateChooser;
-import entity.Bewohner;
 import entity.EinrichtungenTools;
 import entity.files.SYSFilesTools;
 import op.tools.CleanablePanel;

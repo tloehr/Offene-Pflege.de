@@ -32,9 +32,9 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.*;
 import com.jidesoft.wizard.WizardDialog;
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.system.SYSPropsTools;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.Form;
@@ -76,9 +76,9 @@ public class DlgBestand extends MyJDialog {
 
     private BigDecimal menge;
     private MedPackung packung;
-    private Darreichung darreichung;
-    private Bewohner bewohner;
-    private MedVorrat vorrat;
+    private TradeForm darreichung;
+    private Resident bewohner;
+    private MedInventory inventory;
 
     private OverlayComboBox cmbVorrat, cmbBW;
     private DefaultOverlayable ovrVorrat, ovrBW;
@@ -92,7 +92,7 @@ public class DlgBestand extends MyJDialog {
     private PrinterType etiprinter;
     private Form form1;
 
-    public DlgBestand(Bewohner bewohner) {
+    public DlgBestand(Resident bewohner) {
         super();
         this.bewohner = bewohner;
         initComponents();
@@ -125,7 +125,7 @@ public class DlgBestand extends MyJDialog {
                 try {
                     packung = (MedPackung) query.getSingleResult();
                     darreichung = packung.getDarreichung();
-                    cmbMProdukt.setModel(new DefaultComboBoxModel(new Darreichung[]{darreichung}));
+                    cmbMProdukt.setModel(new DefaultComboBoxModel(new TradeForm[]{darreichung}));
                     cmbMProdukt.getModel().setSelectedItem(darreichung);
                 } catch (NoResultException nre) {
                     cmbMProdukt.setModel(new DefaultComboBoxModel());
@@ -137,7 +137,7 @@ public class DlgBestand extends MyJDialog {
                 }
             } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
 
-                List<Darreichung> list = DarreichungTools.findDarreichungByMedProduktText(txtMedSuche.getText());
+                List<TradeForm> list = TradeFormTools.findDarreichungByMedProduktText(txtMedSuche.getText());
                 cmbMProdukt.setModel(new DefaultComboBoxModel(list.toArray()));
 
             }
@@ -162,7 +162,7 @@ public class DlgBestand extends MyJDialog {
         form1 = etiprinter.getForms().get(OPDE.getProps().getProperty("etiform1"));
 
         menge = null;
-        cmbMProdukt.setRenderer(DarreichungTools.getDarreichungRenderer(DarreichungTools.LONG));
+        cmbMProdukt.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
 
         attentionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         infoIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.INFO));
@@ -173,7 +173,7 @@ public class DlgBestand extends MyJDialog {
         cmbVorrat.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
-                vorrat = (MedVorrat) itemEvent.getItem();
+                inventory = (MedInventory) itemEvent.getItem();
             }
         });
         cmbVorrat.setFont(SYSConst.ARIAL14);
@@ -197,7 +197,7 @@ public class DlgBestand extends MyJDialog {
             attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
         } else {
             txtBWSuche.setEnabled(false);
-            cmbBW.setModel(new DefaultComboBoxModel(new Bewohner[]{bewohner}));
+            cmbBW.setModel(new DefaultComboBoxModel(new Resident[]{bewohner}));
         }
 
         attentionIconMenge = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
@@ -439,7 +439,7 @@ public class DlgBestand extends MyJDialog {
         if (ignoreEvent || (evt != null && evt.getStateChange() != ItemEvent.SELECTED)) {
             return;
         }
-        bewohner = (Bewohner) cmbBW.getSelectedItem();
+        bewohner = (Resident) cmbBW.getSelectedItem();
         OPDE.debug("cmbPackungItemStateChanged: " + cmbBW.getSelectedItem());
         initCmbVorrat();
         setApply();
@@ -457,7 +457,7 @@ public class DlgBestand extends MyJDialog {
         if (menge == null && packung == null) {
             text += "Keine korrekte Mengenangabe. ";
         }
-        if (vorrat == null) {
+        if (inventory == null) {
             text += "Keinen Vorrat ausgewählt. ";
         }
 
@@ -490,17 +490,17 @@ public class DlgBestand extends MyJDialog {
             }
 
             darreichung = em.merge(darreichung);
-            vorrat = em.merge(vorrat);
+            inventory = em.merge(inventory);
 
-            if (vorrat.getVorID() == null) { // neuen Vorrat anlegen
-                vorrat.setText(darreichung.getMedProdukt().getBezeichnung());
+            if (inventory.getVorID() == null) { // neuen Vorrat anlegen
+                inventory.setText(darreichung.getMedProdukt().getBezeichnung());
             }
 
-            MedBestand bestand = em.merge(MedVorratTools.einbuchenVorrat(vorrat, packung, darreichung, txtBemerkung.getText(), menge));
-            vorrat.getBestaende().add(bestand);
+            MedStock bestand = em.merge(MedInventoryTools.einbuchenVorrat(inventory, packung, darreichung, txtBemerkung.getText(), menge));
+            inventory.getMedStocks().add(bestand);
 
-            if (MedBestandTools.getBestandImAnbruch(vorrat) == null) {
-                MedVorratTools.anbrechenNaechste(vorrat);
+            if (MedStockTools.getBestandImAnbruch(inventory) == null) {
+                MedInventoryTools.anbrechenNaechste(inventory);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neuer Vorrat wurde direkt angebrochen", 2));
             }
 
@@ -515,7 +515,7 @@ public class DlgBestand extends MyJDialog {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                 OPDE.getMainframe().emptyFrame();
                 OPDE.getMainframe().afterLogin();
             }
@@ -619,17 +619,17 @@ public class DlgBestand extends MyJDialog {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
             EntityManager em = OPDE.createEM();
             if (txtBWSuche.getText().trim().length() == 3) { // Könnte eine Suche nach der Kennung sein
-                bewohner = em.find(Bewohner.class, txtBWSuche.getText().trim());
+                bewohner = em.find(Resident.class, txtBWSuche.getText().trim());
                 if (bewohner != null) {
-                    dcbm = new DefaultComboBoxModel(new Bewohner[]{bewohner});
+                    dcbm = new DefaultComboBoxModel(new Resident[]{bewohner});
                 }
             }
 
             if (dcbm.getSize() == 0) { // Vielleicht Suche nach Nachname
 
-                Query query = em.createQuery(" SELECT b FROM Bewohner b WHERE b.station IS NOT NULL AND b.nachname like :nachname ORDER BY b.nachname, b.vorname ");
+                Query query = em.createQuery(" SELECT b FROM Resident b WHERE b.station IS NOT NULL AND b.nachname like :nachname ORDER BY b.nachname, b.vorname ");
                 query.setParameter("nachname", txtBWSuche.getText().trim() + "%");
-                java.util.List<Bewohner> listbw = query.getResultList();
+                java.util.List<Resident> listbw = query.getResultList();
 
                 dcbm = new DefaultComboBoxModel(listbw.toArray());
             }
@@ -637,7 +637,7 @@ public class DlgBestand extends MyJDialog {
             if (dcbm.getSize() > 0) {
                 cmbBW.setModel(dcbm);
                 cmbBW.setSelectedIndex(0);
-                bewohner = (Bewohner) cmbBW.getSelectedItem();
+                bewohner = (Resident) cmbBW.getSelectedItem();
             } else {
                 cmbBW.setModel(new DefaultComboBoxModel());
                 bewohner = null;
@@ -688,27 +688,27 @@ public class DlgBestand extends MyJDialog {
 //
 
 
-            cmbVorrat.setRenderer(MedVorratTools.getMedVorratRenderer());
+            cmbVorrat.setRenderer(MedInventoryTools.getMedVorratRenderer());
             if (darreichung == null) {
                 cmbVorrat.setModel(new DefaultComboBoxModel());
-                vorrat = null;
+                inventory = null;
             } else {
-                List<MedVorrat> vorraete = new ArrayList<MedVorrat>();
-                vorrat = DarreichungTools.getVorratZurDarreichung(bewohner, darreichung);
+                List<MedInventory> vorraete = new ArrayList<MedInventory>();
+                inventory = TradeFormTools.getVorratZurDarreichung(bewohner, darreichung);
 
-                if (vorrat == null) {
-                    vorraete = DarreichungTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
+                if (inventory == null) {
+                    vorraete = TradeFormTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
                 } else {
-                    vorraete.add(vorrat);
+                    vorraete.add(inventory);
                 }
                 cmbVorrat.setModel(new DefaultComboBoxModel(vorraete.toArray()));
             }
 
 //            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
             if (darreichung != null) {
-                if (vorrat == null) {
+                if (inventory == null) {
                     DefaultComboBoxModel dcbm = (DefaultComboBoxModel) cmbVorrat.getModel();
-                    dcbm.insertElementAt(new MedVorrat(bewohner, "<AUTOMATISCH>"), 0);
+                    dcbm.insertElementAt(new MedInventory(bewohner, "<AUTOMATISCH>"), 0);
                     cmbVorrat.setSelectedIndex(0);
 
                     if (dcbm.getSize() > 1) {
@@ -735,7 +735,7 @@ public class DlgBestand extends MyJDialog {
             return;
         }
 
-        darreichung = (Darreichung) cmbMProdukt.getSelectedItem();
+        darreichung = (TradeForm) cmbMProdukt.getSelectedItem();
 
         if (darreichung != null) {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel(darreichung.getPackungen().toArray());

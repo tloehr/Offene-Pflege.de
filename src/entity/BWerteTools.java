@@ -1,6 +1,8 @@
 package entity;
 
 
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.vorgang.SYSBWerte2VORGANG;
 import entity.vorgang.Vorgaenge;
 import op.OPDE;
@@ -77,7 +79,7 @@ public class BWerteTools {
      * @param bewohner
      * @return
      */
-    public static BWerte getFirstWert(Bewohner bewohner) {
+    public static BWerte getFirstWert(Resident bewohner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BWerte b WHERE b.bewohner = :bewohner ORDER BY b.pit ");
         query.setParameter("bewohner", bewohner);
@@ -94,7 +96,7 @@ public class BWerteTools {
      * @param type     des gesuchten Wertes
      * @return der Wert. <code>null</code>, wenn es keinen gibt.
      */
-    public static BWerte getLetztenBWert(Bewohner bewohner, int type) {
+    public static BWerte getLetztenBWert(Resident bewohner, int type) {
 
         BWerte result;
 
@@ -193,7 +195,7 @@ public class BWerteTools {
 
         String html = "";
 
-        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + BewohnerTools.getBWLabelText(bwerte.get(0).getBewohner()) + "</h1>";
+        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getBWLabelText(bwerte.get(0).getBewohner()) + "</h1>";
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader1") +
@@ -312,7 +314,7 @@ public class BWerteTools {
         return newOne;
     }
 
-    public static boolean hatEinfuhren(Bewohner bewohner) {
+    public static boolean hatEinfuhren(Resident bewohner) {
             boolean result = false;
 
             EntityManager em = OPDE.createEM();
@@ -327,7 +329,7 @@ public class BWerteTools {
             return result;
         }
 
-        public static boolean hatAusfuhren(Bewohner bewohner) {
+        public static boolean hatAusfuhren(Resident bewohner) {
             boolean result = false;
 
             EntityManager em = OPDE.createEM();

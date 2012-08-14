@@ -7,29 +7,21 @@ package op.admin.residents.bwassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
-import entity.Bewohner;
 import entity.Stationen;
 import op.OPDE;
-import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.Years;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
-import java.util.Vector;
 
 /**
  * @author Torsten Löhr

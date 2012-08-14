@@ -31,7 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
-import entity.verordnungen.VerordnungPlanung;
+import entity.prescription.PrescriptionSchedule;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
@@ -58,7 +58,7 @@ import java.util.Date;
 public class PnlRegelDosis extends CleanablePanel {
 
     private boolean ignoreEvent = false;
-    private VerordnungPlanung planung;
+    private PrescriptionSchedule planung;
     private Closure actionBlock;
 
     private double splitRegularPos;
@@ -67,12 +67,12 @@ public class PnlRegelDosis extends CleanablePanel {
     private final int TAB_WEEKLY = 1;
     private final int TAB_MONTHLY = 2;
 
-    public PnlRegelDosis(VerordnungPlanung planung, Closure actionBlock) {
+    public PnlRegelDosis(PrescriptionSchedule planung, Closure actionBlock) {
         this.actionBlock = actionBlock;
 //        this.currentSelectedTime = null;
 
         if (planung == null) {
-            planung = new VerordnungPlanung(false);
+            planung = new PrescriptionSchedule(false);
         }
         this.planung = planung;
         initComponents();

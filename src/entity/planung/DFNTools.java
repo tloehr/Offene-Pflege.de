@@ -1,14 +1,11 @@
 package entity.planung;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.info.BWInfoTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.dfn.PnlDFN;
-import op.tools.GUITools;
-import op.tools.Pair;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
+import op.tools.*;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
@@ -75,9 +72,8 @@ public class DFNTools {
             lastdfn = new DateMidnight(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTDFNIMPORT")));
         }
 
-
-        if (Days.daysBetween(lastdfn.plusDays(1), new DateMidnight()).getDays() > 1) {
-            throw new IndexOutOfBoundsException(OPDE.lang.getString("The date of the last import is somewhere in the future. Can't be true."));
+        if (lastdfn.isAfterNow()) {
+            throw new IndexOutOfBoundsException("The date of the last import is somewhere in the future. Can't be true.");
         }
 
         DateMidnight targetdate = null;
@@ -188,12 +184,13 @@ public class DFNTools {
 
                 row++;
 
+                SYSTools.printProgBar(row / maxrows * 100);
+
                 OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
                 OPDE.debug("==========================================");
                 OPDE.debug("MassTermin: " + termin.getTermID());
                 OPDE.debug("BWKennung: " + termin.getNursingProcess().getBewohner().getBWKennung());
                 OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
-
 
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(termin.getLDatum());
@@ -239,12 +236,12 @@ public class DFNTools {
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
                 // Bei ganzerTag=true werden all diese booleans zu true und damit neutralisiert.
-                boolean erstAbFM = wholeday || aktuelleZeit == SYSConst.FM;
-                boolean erstAbMO = wholeday || erstAbFM || aktuelleZeit == SYSConst.MO;
-                boolean erstAbMI = wholeday || erstAbMO || aktuelleZeit == SYSConst.MI;
-                boolean erstAbNM = wholeday || erstAbMI || aktuelleZeit == SYSConst.NM;
-                boolean erstAbAB = wholeday || erstAbNM || aktuelleZeit == SYSConst.AB;
-                boolean erstAbNA = wholeday || erstAbAB || aktuelleZeit == SYSConst.NA;
+                boolean erstAbFM = wholeday || aktuelleZeit == BYTE_EARLY_IN_THE_MORNING;
+                boolean erstAbMO = wholeday || erstAbFM || aktuelleZeit == BYTE_MORNING;
+                boolean erstAbMI = wholeday || erstAbMO || aktuelleZeit == BYTE_NOON;
+                boolean erstAbNM = wholeday || erstAbMI || aktuelleZeit == BYTE_AFTERNOON;
+                boolean erstAbAB = wholeday || erstAbNM || aktuelleZeit == BYTE_EVENING;
+                boolean erstAbNA = wholeday || erstAbAB || aktuelleZeit == BYTE_LATE_AT_NIGHT;
                 boolean uhrzeitOK = wholeday || (termin.getUhrzeit() != null && DateTimeComparator.getTimeOnlyInstance().compare(termin.getUhrzeit(), new DateTime(now)) > 0);
 
 
@@ -296,11 +293,11 @@ public class DFNTools {
                         // This adds a Time Value to a given Date
                         DateTime timeofday = new DateTime(termin.getUhrzeit());
                         Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
-                        Date neuerStichtag = targetdate.toDateTime().plus(period).toDate();
+                        Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
 //                        Date neuerStichtag = SYSCalendar.addTime2Date(stichtag.toDate(), termin.getUhrzeit());
-                        OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(neuerStichtag));
+                        OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
                         for (int dfncount = 1; dfncount <= termin.getUhrzeitAnzahl(); dfncount++) {
-                            em.merge(new DFN(termin, neuerStichtag, SYSConst.UZ));
+                            em.merge(new DFN(termin, newTargetdate, SYSConst.UZ));
                             numdfn++;
                         }
                     }
@@ -329,7 +326,7 @@ public class DFNTools {
     }
 
 
-    public static ArrayList<NursingProcess> getInvolvedNPs(byte shift, Bewohner resident, Date date) {
+    public static ArrayList<NursingProcess> getInvolvedNPs(byte shift, Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
         ArrayList<NursingProcess> listNP = null;
 
@@ -416,7 +413,7 @@ public class DFNTools {
         return listDFN;
     }
 
-    public static ArrayList<DFN> getDFNs(byte shift, Bewohner resident, Date date) {
+    public static ArrayList<DFN> getDFNs(byte shift, Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
         ArrayList<DFN> listDFN = null;
 
@@ -526,7 +523,7 @@ public class DFNTools {
     }
 
 
-    public static Date getMinDatum(Bewohner bewohner) {
+    public static Date getMinDatum(Resident bewohner) {
         Date date;
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT d FROM DFN d WHERE d.bewohner = :bewohner ORDER BY d.dfnid");

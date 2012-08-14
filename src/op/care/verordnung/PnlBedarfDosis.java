@@ -6,7 +6,7 @@ package op.care.verordnung;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.VerordnungPlanung;
+import entity.prescription.PrescriptionSchedule;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
@@ -27,14 +27,14 @@ import java.util.Date;
  * @author Torsten Löhr
  */
 public class PnlBedarfDosis extends CleanablePanel {
-    private VerordnungPlanung planung;
+    private PrescriptionSchedule planung;
     private Closure actionBlock;
 
-    public PnlBedarfDosis(VerordnungPlanung planung, Closure actionBlock) {
+    public PnlBedarfDosis(PrescriptionSchedule planung, Closure actionBlock) {
         this.actionBlock = actionBlock;
 
         if (planung == null) {
-            planung = new VerordnungPlanung(true);
+            planung = new PrescriptionSchedule(true);
         }
         this.planung = planung;
         initComponents();

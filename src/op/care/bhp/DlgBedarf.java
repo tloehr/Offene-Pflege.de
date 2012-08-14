@@ -28,8 +28,8 @@ package op.care.bhp;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Bewohner;
-import entity.verordnungen.*;
+import entity.info.Resident;
+import entity.prescription.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
@@ -46,7 +46,6 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Date;
 
@@ -56,7 +55,7 @@ import java.util.Date;
 public class DlgBedarf extends CleanablePanel {
 
     private Closure actionBlock;
-    private Bewohner bewohner;
+    private Resident bewohner;
     private BHP bhp;
 
 //    /**
@@ -74,7 +73,7 @@ public class DlgBedarf extends CleanablePanel {
 //        btnOK.setEnabled(!tm.isMaximaleTagesdosisErreicht(row));
 //    }
 
-    public DlgBedarf(Bewohner bewohner, Closure actionBlock) {
+    public DlgBedarf(Resident bewohner, Closure actionBlock) {
         super();
         this.bewohner = bewohner;
         this.actionBlock = actionBlock;
@@ -202,7 +201,7 @@ public class DlgBedarf extends CleanablePanel {
             try {
                 em.getTransaction().begin();
 
-                VerordnungPlanung vp = em.merge(tm.getVerordnungPlanung(row));
+                PrescriptionSchedule vp = em.merge(tm.getPrescriptionSchedule(row));
 
                 bhp = em.merge(new BHP(vp));
                 bhp.setUser(OPDE.getLogin().getUser());
@@ -210,13 +209,13 @@ public class DlgBedarf extends CleanablePanel {
                 bhp.setSoll(now);
                 bhp.setSollZeit(SYSConst.UZ);
                 bhp.setDosis(vp.getMaxEDosis());
-                bhp.setStatus(BHPTools.STATUS_ERLEDIGT);
+                bhp.setStatus(BHPTools.STATE_DONE);
                 bhp.setMDate(now);
                 bhp.setDauer((short) 0);
 
                 if (tm.getBestand(row) != null) {
-                    MedBestand bestand = em.merge(tm.getBestand(row));
-                    MedVorratTools.entnahmeVorrat(em, bestand.getVorrat(), vp.getMaxEDosis(), true, bhp);
+                    MedStock bestand = em.merge(tm.getBestand(row));
+                    MedInventoryTools.entnahmeVorrat(em, bestand.getInventory(), vp.getMaxEDosis(), true, bhp);
                 }
 
                 em.getTransaction().commit();
@@ -242,7 +241,7 @@ public class DlgBedarf extends CleanablePanel {
     }
 
     private void loadTable() {
-        tblBedarf.setModel(new TMBedarf(VerordnungTools.getBedarfsliste(bewohner)));
+        tblBedarf.setModel(new TMBedarf(PrescriptionsTools.getBedarfsliste(bewohner)));
         tblBedarf.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         jspBedarf.dispatchEvent(new ComponentEvent(jspBedarf, ComponentEvent.COMPONENT_RESIZED));

@@ -1,8 +1,6 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import com.sun.servicetag.SystemEnvironment;
 import entity.Users;
-import entity.files.Sysver2file;
 import op.OPDE;
 import op.tools.SYSCalendar;
 
@@ -11,40 +9,39 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 @Entity
 @Table(name = "BHPPlanung")
 @NamedQueries({
-        @NamedQuery(name = "VerordnungPlanung.findAll", query = "SELECT b FROM VerordnungPlanung b"),
-        @NamedQuery(name = "VerordnungPlanung.findByBhppid", query = "SELECT b FROM VerordnungPlanung b WHERE b.bhppid = :bhppid"),
-        @NamedQuery(name = "VerordnungPlanung.findByNachtMo", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtMo = :nachtMo"),
-        @NamedQuery(name = "VerordnungPlanung.findByMorgens", query = "SELECT b FROM VerordnungPlanung b WHERE b.morgens = :morgens"),
-        @NamedQuery(name = "VerordnungPlanung.findByMittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.mittags = :mittags"),
-        @NamedQuery(name = "VerordnungPlanung.findByNachmittags", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachmittags = :nachmittags"),
-        @NamedQuery(name = "VerordnungPlanung.findByAbends", query = "SELECT b FROM VerordnungPlanung b WHERE b.abends = :abends"),
-        @NamedQuery(name = "VerordnungPlanung.findByNachtAb", query = "SELECT b FROM VerordnungPlanung b WHERE b.nachtAb = :nachtAb"),
-        @NamedQuery(name = "VerordnungPlanung.findByUhrzeitDosis", query = "SELECT b FROM VerordnungPlanung b WHERE b.uhrzeitDosis = :uhrzeitDosis"),
-        @NamedQuery(name = "VerordnungPlanung.findByUhrzeit", query = "SELECT b FROM VerordnungPlanung b WHERE b.uhrzeit = :uhrzeit"),
-        @NamedQuery(name = "VerordnungPlanung.findByMaxAnzahl", query = "SELECT b FROM VerordnungPlanung b WHERE b.maxAnzahl = :maxAnzahl"),
-        @NamedQuery(name = "VerordnungPlanung.findByMaxEDosis", query = "SELECT b FROM VerordnungPlanung b WHERE b.maxEDosis = :maxEDosis"),
-        @NamedQuery(name = "VerordnungPlanung.findByTaeglich", query = "SELECT b FROM VerordnungPlanung b WHERE b.taeglich = :taeglich"),
-        @NamedQuery(name = "VerordnungPlanung.findByWoechentlich", query = "SELECT b FROM VerordnungPlanung b WHERE b.woechentlich = :woechentlich"),
-        @NamedQuery(name = "VerordnungPlanung.findByMonatlich", query = "SELECT b FROM VerordnungPlanung b WHERE b.monatlich = :monatlich"),
-        @NamedQuery(name = "VerordnungPlanung.findByTagNum", query = "SELECT b FROM VerordnungPlanung b WHERE b.tagNum = :tagNum"),
-        @NamedQuery(name = "VerordnungPlanung.findByMon", query = "SELECT b FROM VerordnungPlanung b WHERE b.mon = :mon"),
-        @NamedQuery(name = "VerordnungPlanung.findByDie", query = "SELECT b FROM VerordnungPlanung b WHERE b.die = :die"),
-        @NamedQuery(name = "VerordnungPlanung.findByMit", query = "SELECT b FROM VerordnungPlanung b WHERE b.mit = :mit"),
-        @NamedQuery(name = "VerordnungPlanung.findByDon", query = "SELECT b FROM VerordnungPlanung b WHERE b.don = :don"),
-        @NamedQuery(name = "VerordnungPlanung.findByFre", query = "SELECT b FROM VerordnungPlanung b WHERE b.fre = :fre"),
-        @NamedQuery(name = "VerordnungPlanung.findBySam", query = "SELECT b FROM VerordnungPlanung b WHERE b.sam = :sam"),
-        @NamedQuery(name = "VerordnungPlanung.findBySon", query = "SELECT b FROM VerordnungPlanung b WHERE b.son = :son"),
-        @NamedQuery(name = "VerordnungPlanung.findByLDatum", query = "SELECT b FROM VerordnungPlanung b WHERE b.lDatum = :lDatum"),
-        @NamedQuery(name = "VerordnungPlanung.findByVerordnungSorted", query = " " +
-                " SELECT vp FROM VerordnungPlanung vp WHERE vp.verordnung = :verordnung " +
+        @NamedQuery(name = "PrescriptionSchedule.findAll", query = "SELECT b FROM PrescriptionSchedule b"),
+        @NamedQuery(name = "PrescriptionSchedule.findByBhppid", query = "SELECT b FROM PrescriptionSchedule b WHERE b.bhppid = :bhppid"),
+        @NamedQuery(name = "PrescriptionSchedule.findByNachtMo", query = "SELECT b FROM PrescriptionSchedule b WHERE b.nachtMo = :nachtMo"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMorgens", query = "SELECT b FROM PrescriptionSchedule b WHERE b.morgens = :morgens"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMittags", query = "SELECT b FROM PrescriptionSchedule b WHERE b.mittags = :mittags"),
+        @NamedQuery(name = "PrescriptionSchedule.findByNachmittags", query = "SELECT b FROM PrescriptionSchedule b WHERE b.nachmittags = :nachmittags"),
+        @NamedQuery(name = "PrescriptionSchedule.findByAbends", query = "SELECT b FROM PrescriptionSchedule b WHERE b.abends = :abends"),
+        @NamedQuery(name = "PrescriptionSchedule.findByNachtAb", query = "SELECT b FROM PrescriptionSchedule b WHERE b.nachtAb = :nachtAb"),
+        @NamedQuery(name = "PrescriptionSchedule.findByUhrzeitDosis", query = "SELECT b FROM PrescriptionSchedule b WHERE b.uhrzeitDosis = :uhrzeitDosis"),
+        @NamedQuery(name = "PrescriptionSchedule.findByUhrzeit", query = "SELECT b FROM PrescriptionSchedule b WHERE b.uhrzeit = :uhrzeit"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMaxAnzahl", query = "SELECT b FROM PrescriptionSchedule b WHERE b.maxAnzahl = :maxAnzahl"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMaxEDosis", query = "SELECT b FROM PrescriptionSchedule b WHERE b.maxEDosis = :maxEDosis"),
+        @NamedQuery(name = "PrescriptionSchedule.findByTaeglich", query = "SELECT b FROM PrescriptionSchedule b WHERE b.taeglich = :taeglich"),
+        @NamedQuery(name = "PrescriptionSchedule.findByWoechentlich", query = "SELECT b FROM PrescriptionSchedule b WHERE b.woechentlich = :woechentlich"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMonatlich", query = "SELECT b FROM PrescriptionSchedule b WHERE b.monatlich = :monatlich"),
+        @NamedQuery(name = "PrescriptionSchedule.findByTagNum", query = "SELECT b FROM PrescriptionSchedule b WHERE b.tagNum = :tagNum"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMon", query = "SELECT b FROM PrescriptionSchedule b WHERE b.mon = :mon"),
+        @NamedQuery(name = "PrescriptionSchedule.findByDie", query = "SELECT b FROM PrescriptionSchedule b WHERE b.die = :die"),
+        @NamedQuery(name = "PrescriptionSchedule.findByMit", query = "SELECT b FROM PrescriptionSchedule b WHERE b.mit = :mit"),
+        @NamedQuery(name = "PrescriptionSchedule.findByDon", query = "SELECT b FROM PrescriptionSchedule b WHERE b.don = :don"),
+        @NamedQuery(name = "PrescriptionSchedule.findByFre", query = "SELECT b FROM PrescriptionSchedule b WHERE b.fre = :fre"),
+        @NamedQuery(name = "PrescriptionSchedule.findBySam", query = "SELECT b FROM PrescriptionSchedule b WHERE b.sam = :sam"),
+        @NamedQuery(name = "PrescriptionSchedule.findBySon", query = "SELECT b FROM PrescriptionSchedule b WHERE b.son = :son"),
+        @NamedQuery(name = "PrescriptionSchedule.findByLDatum", query = "SELECT b FROM PrescriptionSchedule b WHERE b.lDatum = :lDatum"),
+        @NamedQuery(name = "PrescriptionSchedule.findByprescriptionSorted", query = " " +
+                " SELECT vp FROM PrescriptionSchedule vp WHERE vp.prescription = :prescription " +
                 " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
 })
-public class VerordnungPlanung implements Serializable, Cloneable, Comparable<VerordnungPlanung> {
+public class PrescriptionSchedule implements Serializable, Cloneable, Comparable<PrescriptionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -102,11 +99,11 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     @Temporal(TemporalType.TIMESTAMP)
     private Date lDatum;
 
-    public VerordnungPlanung() {
+    public PrescriptionSchedule() {
 
     }
 
-    public VerordnungPlanung(boolean bedarf) {
+    public PrescriptionSchedule(boolean bedarf) {
         nachtMo = BigDecimal.ZERO;
         mittags = BigDecimal.ZERO;
         nachmittags = BigDecimal.ZERO;
@@ -120,7 +117,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         tagNum = 0;
         lDatum = new Date();
 
-        this.verordnung = null;
+        this.prescription = null;
 
         if (bedarf) {
             morgens = BigDecimal.ZERO;
@@ -145,7 +142,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     }
 
-    public VerordnungPlanung(BigDecimal nachtMo, BigDecimal morgens, BigDecimal mittags, BigDecimal nachmittags, BigDecimal abends, BigDecimal nachtAb, BigDecimal uhrzeitDosis, Date uhrzeit, Integer maxAnzahl, BigDecimal maxEDosis, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Date lDatum, Users user, Verordnung verordnung) {
+    public PrescriptionSchedule(BigDecimal nachtMo, BigDecimal morgens, BigDecimal mittags, BigDecimal nachmittags, BigDecimal abends, BigDecimal nachtAb, BigDecimal uhrzeitDosis, Date uhrzeit, Integer maxAnzahl, BigDecimal maxEDosis, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Date lDatum, Users user, Prescriptions prescription) {
         this.nachtMo = nachtMo;
         this.morgens = morgens;
         this.mittags = mittags;
@@ -169,8 +166,8 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         this.son = son;
         this.lDatum = lDatum;
         this.user = user;
-        this.verordnung = verordnung;
-//        this.verordnung.getPlanungen().add(this);
+        this.prescription = prescription;
+//        this.prescription.getPlanungen().add(this);
     }
 
     public Long getBhppid() {
@@ -355,8 +352,8 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     }
 
     /**
-     * LDatum enthält das Datum, an dem diese VerordnungPlanung zuletzt zu einer BHP geführt hat. Das Datum kann auch in der Zukunft liegen,
-     * dann wird der BHPImport solange warten, bis diese Verordnung "an der Reihe" ist. Das LDatum wird bei DlgVerabreichung ebenfalls gesetzt.
+     * LDatum enthält das Datum, an dem diese PrescriptionSchedule zuletzt zu einer BHP geführt hat. Das Datum kann auch in der Zukunft liegen,
+     * dann wird der BHPImport solange warten, bis diese prescription "an der Reihe" ist. Das LDatum wird bei DlgVerabreichung ebenfalls gesetzt.
      * Steht dort auf dem Dialog unter "Erste Verabreichung am".
      *
      * @return
@@ -378,20 +375,20 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
     // ==
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
     @ManyToOne
-    private Verordnung verordnung;
+    private Prescriptions prescription;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
-    public Verordnung getVerordnung() {
-        return verordnung;
+    public Prescriptions getPrescription() {
+        return prescription;
     }
 
-    public void setVerordnung(Verordnung verordnung) {
-        this.verordnung = verordnung;
-//        if (!this.verordnung.getPlanungen().contains(this)) {
-//            this.verordnung.getPlanungen().add(this);
+    public void setprescription(Prescriptions prescription) {
+        this.prescription = prescription;
+//        if (!this.prescription.getPlanungen().contains(this)) {
+//            this.prescription.getPlanungen().add(this);
 //        }
     }
 
@@ -401,6 +398,10 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public void setPrescription(Prescriptions prescription) {
+        this.prescription = prescription;
     }
 
     /**
@@ -546,7 +547,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        VerordnungPlanung that = (VerordnungPlanung) o;
+        PrescriptionSchedule that = (PrescriptionSchedule) o;
 
         if (bhppid != null ? !bhppid.equals(that.bhppid) : that.bhppid != null) return false;
         if (abends != null ? !abends.equals(that.abends) : that.abends != null) return false;
@@ -571,7 +572,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         if (uhrzeit != null ? !uhrzeit.equals(that.uhrzeit) : that.uhrzeit != null) return false;
         if (uhrzeitDosis != null ? !uhrzeitDosis.equals(that.uhrzeitDosis) : that.uhrzeitDosis != null) return false;
         if (user != null ? !user.equals(that.user) : that.user != null) return false;
-        if (verordnung != null ? !verordnung.equals(that.verordnung) : that.verordnung != null) return false;
+        if (prescription != null ? !prescription.equals(that.prescription) : that.prescription != null) return false;
         if (version != null ? !version.equals(that.version) : that.version != null) return false;
         if (woechentlich != null ? !woechentlich.equals(that.woechentlich) : that.woechentlich != null) return false;
 
@@ -604,25 +605,25 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
         result = 31 * result + (sam != null ? sam.hashCode() : 0);
         result = 31 * result + (son != null ? son.hashCode() : 0);
         result = 31 * result + (lDatum != null ? lDatum.hashCode() : 0);
-        result = 31 * result + (verordnung != null ? verordnung.hashCode() : 0);
+        result = 31 * result + (prescription != null ? prescription.hashCode() : 0);
         result = 31 * result + (user != null ? user.hashCode() : 0);
         return result;
     }
 
     @Override
     public Object clone() {
-        return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, verordnung);
+        return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, prescription);
     }
 
-    public VerordnungPlanung createCopy(Verordnung myverordnung) {
-        return new VerordnungPlanung(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, myverordnung);
+    public PrescriptionSchedule createCopy(Prescriptions myprescription) {
+        return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, myprescription);
     }
 
     /**
      * Vergleichsoperator für die Sortierung. Die Sortierung soll in folgender Reihenfolge sein:
      * <ol>
-     * <li>Zuerst die Verordnungen mit Zeiten</li>
-     * <li>Dann die Verordnungen mit Uhrzeiten</li>
+     * <li>Zuerst die prescriptionen mit Zeiten</li>
+     * <li>Dann die prescriptionen mit Uhrzeiten</li>
      * <li>Dann der Rest</li>
      * </ol>
      * Innerhalb der Gruppen wird nach dem PK sortiert. Bei den Uhrzeiten wird das compareTo von Date verwendet.
@@ -631,7 +632,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
      * @return
      */
     @Override
-    public int compareTo(VerordnungPlanung that) {
+    public int compareTo(PrescriptionSchedule that) {
         int result = 0;
 
         if (this.verwendetMaximalDosis() == that.verwendetMaximalDosis()) {
@@ -653,7 +654,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
 
     @Override
     public String toString() {
-        return "VerordnungPlanung{" +
+        return "PrescriptionSchedule{" +
                 "bhppid=" + bhppid +
                 ", nachtMo=" + nachtMo +
                 ", morgens=" + morgens +
@@ -678,7 +679,7 @@ public class VerordnungPlanung implements Serializable, Cloneable, Comparable<Ve
                 ", son=" + son +
                 ", lDatum=" + lDatum +
                 ", uKennung='" + user.getUKennung() + '\'' +
-                ", verordnung=" + verordnung +
+                ", prescription=" + prescription +
                 '}';
     }
 }

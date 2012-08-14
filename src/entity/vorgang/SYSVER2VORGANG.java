@@ -1,6 +1,6 @@
 package entity.vorgang;
 
-import entity.verordnungen.Verordnung;
+import entity.prescription.Prescriptions;
 
 import javax.persistence.*;
 
@@ -38,12 +38,12 @@ public class SYSVER2VORGANG {
 
     @ManyToOne
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
-    private Verordnung verordnung;
+    private Prescriptions verordnung;
 
     protected SYSVER2VORGANG() {
     }
 
-    public SYSVER2VORGANG(Vorgaenge vorgang, Verordnung verordnung) {
+    public SYSVER2VORGANG(Vorgaenge vorgang, Prescriptions verordnung) {
         this.id = 0;
         this.pdca = VorgaengeTools.PDCA_OFF;
         this.vorgang = vorgang;
@@ -66,11 +66,11 @@ public class SYSVER2VORGANG {
         this.vorgang = vorgang;
     }
 
-    public Verordnung getVerordnung() {
+    public Prescriptions getPrescription() {
         return verordnung;
     }
 
-    public void setVerordnung(Verordnung verordnung) {
+    public void setVerordnung(Prescriptions verordnung) {
         this.verordnung = verordnung;
     }
 }

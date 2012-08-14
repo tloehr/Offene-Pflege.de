@@ -2,7 +2,7 @@ package op.care.med.prodassistant;
 
 import com.jidesoft.dialog.*;
 import com.jidesoft.wizard.*;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
@@ -27,7 +27,7 @@ public class MedProductWizard {
 
     private WizardDialog wizard;
     private MedProdukte produkt;
-    private Darreichung darreichung;
+    private TradeForm darreichung;
     private MedPackung packung;
     private MedHersteller hersteller;
     private Closure finishAction;
@@ -130,7 +130,7 @@ public class MedProductWizard {
             darreichung.getPackungen().add(packung);
 
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + DarreichungTools.toPrettyString(darreichung) + ", " + MedPackungTools.toPrettyString(packung) + " erfolgreich eingetragen", 6));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + TradeFormTools.toPrettyString(darreichung) + ", " + MedPackungTools.toPrettyString(packung) + " erfolgreich eingetragen", 6));
             finishAction.execute(packung);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -273,7 +273,7 @@ public class MedProductWizard {
             pnlZusatz = new PnlZusatz(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    darreichung = (Darreichung) o;
+                    darreichung = (TradeForm) o;
                     setupWizardButtons();
                 }
             }, produkt);
@@ -303,7 +303,7 @@ public class MedProductWizard {
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         OPDE.debug("PackungPage OPENDED");
 //                        packung = null;
-                        pnlPackung.setLabelEinheit(MedFormenTools.toPrettyStringPackung(darreichung.getMedForm()));
+                        pnlPackung.setLabelEinheit(DosageFormTools.toPrettyStringPackung(darreichung.getMedForm()));
                         pnlPackung.setDarreichung(darreichung);
                     }
                 }
@@ -434,7 +434,7 @@ public class MedProductWizard {
             result += OPDE.lang.getString(internalClassID + ".summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + DarreichungTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + TradeFormTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
             result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackungTools.toPrettyString(packung) + "</b></li>";
 
             MedHersteller displayHersteller = hersteller == null ? produkt.getHersteller() : hersteller;

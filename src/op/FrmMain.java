@@ -39,8 +39,8 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
 import com.jidesoft.wizard.WizardDialog;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.files.SYSFilesTools;
@@ -99,14 +99,14 @@ public class FrmMain extends JFrame {
     }
 
     private CleanablePanel currentVisiblePanel;
-    private Bewohner currentBewohner;
+    private Resident currentBewohner;
     private JideButton previousProgButton;
     private DlgLogin dlgLogin;
     private LabelStatusBarItem labelUSER;
     private JScrollPane jspSearch, jspApps;
     private CollapsiblePanes panesSearch, panesApps;
     private Closure bwchange;
-    private HashMap<Bewohner, JideButton> bwButtonMap;
+    private HashMap<Resident, JideButton> bwButtonMap;
 //    private MouseListener blockingListener;
 
 
@@ -138,7 +138,7 @@ public class FrmMain extends JFrame {
         bwchange = new Closure() {
             @Override
             public void execute(Object o) {
-                currentBewohner = (Bewohner) o;
+                currentBewohner = (Resident) o;
             }
         };
 
@@ -278,7 +278,6 @@ public class FrmMain extends JFrame {
         btnVerlegung = new JButton();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
-        button1 = new JButton();
         pbMsg = new JProgressBar();
         btnReload = new JButton();
         splitPaneLeft = new JideSplitPane();
@@ -323,14 +322,14 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
 
                 //---- btnVerlegung ----
-                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
+                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/ambulance2.png")));
                 btnVerlegung.setBorder(null);
                 btnVerlegung.setBorderPainted(false);
                 btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.setSelectedIcon(null);
                 btnVerlegung.setToolTipText("Verlegungsbericht drucken");
                 btnVerlegung.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2_pressed.png")));
+                btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/48x48/ambulance2_pressed.png")));
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -362,16 +361,6 @@ public class FrmMain extends JFrame {
                 lblSubMsg.setForeground(new Color(105, 80, 69));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
-
-                //---- button1 ----
-                button1.setText("text");
-                button1.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        button1ActionPerformed(e);
-                    }
-                });
-                pnlMainMessage.add(button1, CC.xy(3, 7));
 
                 //---- pbMsg ----
                 pbMsg.setValue(50);
@@ -585,17 +574,17 @@ public class FrmMain extends JFrame {
     }
 
     private CollapsiblePane addNursingRecords(Stationen station) {
-        bwButtonMap = new HashMap<Bewohner, JideButton>();
+        bwButtonMap = new HashMap<Resident, JideButton>();
 
         EntityManager em = OPDE.createEM();
         Query query = null;
         if (station == null) {
-            query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
+            query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
         } else {
-            query = em.createQuery("SELECT b FROM Bewohner b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
+            query = em.createQuery("SELECT b FROM Resident b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
             query.setParameter("station", station);
         }
-        ArrayList<Bewohner> bewohnerliste = new ArrayList<Bewohner>(query.getResultList());
+        ArrayList<Resident> bewohnerliste = new ArrayList<Resident>(query.getResultList());
         em.close();
 
         CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getBezeichnung());
@@ -614,7 +603,7 @@ public class FrmMain extends JFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        for (final Bewohner innerbewohner : bewohnerliste) {
+        for (final Resident innerbewohner : bewohnerliste) {
 
             ActionListener actionListener = new ActionListener() {
                 @Override
@@ -633,7 +622,7 @@ public class FrmMain extends JFrame {
                         currentBewohner = innerbewohner;
 
                         if (currentVisiblePanel instanceof NursingRecordsPanel) {
-                            ((NursingRecordsPanel) currentVisiblePanel).change2Bewohner(innerbewohner);
+                            ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
                         } else {
                             setPanelTo(new PnlPflege(innerbewohner, jspSearch));
                         }
@@ -643,7 +632,7 @@ public class FrmMain extends JFrame {
 
             String titel = innerbewohner.getNachname() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getBWKennung() + "]";
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
-            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGeschlecht() == BewohnerTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
+            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGeschlecht() == ResidentTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
 //            button.putClientProperty("bewohner", innerbewohner);
 
@@ -655,7 +644,7 @@ public class FrmMain extends JFrame {
         return mypane;
     }
 
-    public void change2Bewohner(Bewohner bw) {
+    public void change2Bewohner(Resident bw) {
         if (previousProgButton != null) {
             previousProgButton.setBackground(Color.WHITE);
             previousProgButton.setOpaque(false);
@@ -797,7 +786,6 @@ public class FrmMain extends JFrame {
     private JButton btnVerlegung;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
-    private JButton button1;
     private JProgressBar pbMsg;
     private JButton btnReload;
     private JideSplitPane splitPaneLeft;

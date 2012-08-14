@@ -2,12 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.info;
 
-import entity.info.BWInfo;
-import entity.info.BWInfoTools;
-import entity.info.BWInfoTypTools;
-import entity.verordnungen.VerordnungTools;
+import entity.EntityTools;
+import entity.prescription.PrescriptionsTools;
 import op.OPDE;
 import op.tools.DlgListSelector;
 import op.tools.SYSTools;
@@ -27,49 +25,49 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class BewohnerTools {
+public class ResidentTools {
 
     public static final int GESCHLECHT_MAENNLICH = 1;
     public static final int GESCHLECHT_WEIBLICH = 2;
     public static final String GESCHLECHT[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
     public static final String ANREDE[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
 
-    public static Bewohner findByBWKennung(String bwkennung) {
+    public static Resident findByBWKennung(String bwkennung) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Bewohner.findByBWKennung");
         query.setParameter("bWKennung", bwkennung);
-        Bewohner bewohner = (Bewohner) query.getSingleResult();
+        Resident bewohner = (Resident) query.getSingleResult();
         em.close();
         return bewohner;
     }
 
-    public static JLabel getBWLabel(Bewohner bewohner) {
+    public static JLabel getBWLabel(Resident bewohner) {
         JLabel lblBW = new JLabel();
         setBWLabel(lblBW, bewohner);
         return lblBW;
     }
 
-    public static String getBWLabel1(Bewohner bewohner) {
+    public static String getBWLabel1(Resident bewohner) {
         return bewohner.getNachname() + ", " + bewohner.getVorname();
     }
 
-    public static String getBWLabel2(Bewohner bewohner) {
+    public static String getBWLabel2(Resident bewohner) {
         return "(*" + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + ") [" + bewohner.getBWKennung() + "]";
     }
 
-    public static String getBWLabelTextKompakt(Bewohner bewohner) {
+    public static String getBWLabelTextKompakt(Resident bewohner) {
         return bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getBWKennung() + "]";
     }
 
 
-    public static void setBWLabel(JLabel lblBW, Bewohner bewohner) {
+    public static void setBWLabel(JLabel lblBW, Resident bewohner) {
         lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
         lblBW.setHorizontalAlignment(SwingConstants.LEADING);
         lblBW.setForeground(new java.awt.Color(255, 51, 0));
         lblBW.setText(getBWLabelText(bewohner));
     }
 
-    public static String getFullName(Bewohner bewohner) {
+    public static String getFullName(Resident bewohner) {
         return ANREDE[bewohner.getGeschlecht()] + " " + bewohner.getVorname() + " " + bewohner.getNachname();
     }
 
@@ -77,7 +75,7 @@ public class BewohnerTools {
 //        return bewohner.getGeschlecht() == GESCHLECHT_WEIBLICH;
 //    }
 
-    public static String getBWLabelText(Bewohner bewohner) {
+    public static String getBWLabelText(Resident bewohner) {
         boolean verstorben = BWInfoTools.isVerstorben(bewohner);
         boolean ausgezogen = BWInfoTools.isVerstorben(bewohner);
         BWInfo hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("hauf"));
@@ -102,7 +100,7 @@ public class BewohnerTools {
      * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
      */
     public static void findeBW(String muster, Closure applyClosure) {
-        Bewohner bewohner = EntityTools.find(Bewohner.class, muster);
+        Resident bewohner = EntityTools.find(Resident.class, muster);
 
         if (bewohner == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
             muster += "%"; // MySQL Wildcard
@@ -110,7 +108,7 @@ public class BewohnerTools {
 
             Query query = em.createNamedQuery("Bewohner.findByNachname");
             query.setParameter("nachname", muster);
-            List<Bewohner> listBW = query.getResultList();
+            List<Resident> listBW = query.getResultList();
 
             DefaultListModel dlm = SYSTools.list2dlm(listBW);
 
@@ -135,10 +133,10 @@ public class BewohnerTools {
      * @param em       as it is quite a complex operation, it runs within a surrounding EM to trigger rollbacks if necessary
      * @param bewohner the resident in question
      */
-    public static void endOfStay(EntityManager em, Bewohner bewohner, Date enddate) throws Exception {
+    public static void endOfStay(EntityManager em, Resident bewohner, Date enddate) throws Exception {
         em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
         // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
-        VerordnungTools.alleAbsetzen(em, bewohner);
+        PrescriptionsTools.alleAbsetzen(em, bewohner);
         // Alle Planungen absetzen
         BWInfoTools.alleAbsetzen(em, bewohner);
         // Alle Bestände schließen

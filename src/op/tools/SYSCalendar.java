@@ -836,8 +836,7 @@ public class SYSCalendar {
     }
 
 
-    public static byte whatShiftis(Date date) {
-        byte timeID = whatTimeIDis(date);
+    public static byte whatShiftIs(byte timeID){
         byte shift;
         if (DFNTools.BYTE_EARLY_IN_THE_MORNING <= timeID && timeID < DFNTools.BYTE_MORNING) {
             shift = DFNTools.SHIFT_VERY_EARLY;
@@ -851,7 +850,11 @@ public class SYSCalendar {
         return shift;
     }
 
-    public static byte whatTimeIDis(Date date) {
+    public static byte whatShiftIs(Date date) {
+        return whatShiftIs(whatTimeIDIs(date));
+    }
+
+    public static byte whatTimeIDIs(Date date) {
         byte timeid;
 
         DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");

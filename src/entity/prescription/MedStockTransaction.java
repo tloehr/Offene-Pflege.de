@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import entity.Users;
 import op.OPDE;
@@ -11,14 +11,14 @@ import java.util.Date;
 @Entity
 @Table(name = "MPBuchung")
 @NamedQueries({
-        @NamedQuery(name = "MedBuchungen.findAll", query = "SELECT m FROM MedBuchungen m"),
-        @NamedQuery(name = "MedBuchungen.findByBuchID", query = "SELECT m FROM MedBuchungen m WHERE m.buchID = :buchID"),
-        @NamedQuery(name = "MedBuchungen.findByBestand", query = "SELECT m FROM MedBuchungen m WHERE m.bestand = :bestand ORDER BY m.pit"),
-        @NamedQuery(name = "MedBuchungen.findByMenge", query = "SELECT m FROM MedBuchungen m WHERE m.menge = :menge"),
-        @NamedQuery(name = "MedBuchungen.findByText", query = "SELECT m FROM MedBuchungen m WHERE m.text = :text"),
-        @NamedQuery(name = "MedBuchungen.findByStatus", query = "SELECT m FROM MedBuchungen m WHERE m.status = :status"),
-        @NamedQuery(name = "MedBuchungen.findByPit", query = "SELECT m FROM MedBuchungen m WHERE m.pit = :pit")})
-public class MedBuchungen implements Serializable {
+        @NamedQuery(name = "MedStockTransaction.findAll", query = "SELECT m FROM MedStockTransaction m"),
+        @NamedQuery(name = "MedStockTransaction.findByBuchID", query = "SELECT m FROM MedStockTransaction m WHERE m.buchID = :buchID"),
+        @NamedQuery(name = "MedStockTransaction.findByBestand", query = "SELECT m FROM MedStockTransaction m WHERE m.bestand = :bestand ORDER BY m.pit"),
+        @NamedQuery(name = "MedStockTransaction.findByMenge", query = "SELECT m FROM MedStockTransaction m WHERE m.menge = :menge"),
+        @NamedQuery(name = "MedStockTransaction.findByText", query = "SELECT m FROM MedStockTransaction m WHERE m.text = :text"),
+        @NamedQuery(name = "MedStockTransaction.findByStatus", query = "SELECT m FROM MedStockTransaction m WHERE m.status = :status"),
+        @NamedQuery(name = "MedStockTransaction.findByPit", query = "SELECT m FROM MedStockTransaction m WHERE m.pit = :pit")})
+public class MedStockTransaction implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,41 +41,41 @@ public class MedBuchungen implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
 
-    public MedBuchungen() {
+    public MedStockTransaction() {
     }
 
-    public MedBuchungen(MedBestand bestand, BigDecimal menge) {
+    public MedStockTransaction(MedStock bestand, BigDecimal menge) {
         this.pit = new Date();
         this.bestand = bestand;
         this.menge = menge;
         this.bhp = null;
-        this.status = MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND;
+        this.status = MedStockTransactionTools.STATUS_EINBUCHEN_ANFANGSBESTAND;
         this.user = OPDE.getLogin().getUser();
     }
 
-    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp) {
+    public MedStockTransaction(MedStock bestand, BigDecimal menge, BHP bhp) {
         this.bestand = bestand;
         this.menge = menge;
         this.pit = new Date();
         this.bhp = bhp;
-        this.status = MedBuchungenTools.STATUS_AUSBUCHEN_NORMAL;
+        this.status = MedStockTransactionTools.STATUS_AUSBUCHEN_NORMAL;
         this.user = OPDE.getLogin().getUser();
-//        bestand.getBuchungen().add(this);
-//        bhp.getBuchungen().add(this);
+//        bestand.getStockTransaction().add(this);
+//        bhp.getStockTransaction().add(this);
     }
 
-//    public MedBuchungen(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
+//    public MedStockTransaction(MedBestand bestand, BigDecimal menge, BHP bhp, short status) {
 //        this.bestand = bestand;
 //        this.menge = menge;
 //        this.pit = new Date();
 //        this.bhp = bhp;
 //        this.status = status;
 //        this.user = OPDE.getLogin().getUser();
-//        bestand.getBuchungen().add(this);
-//        bhp.getBuchungen().add(this);
+//        bestand.getStockTransaction().add(this);
+//        bhp.getStockTransaction().add(this);
 //    }
 
-    public MedBuchungen(MedBestand bestand, BigDecimal menge, short status) {
+    public MedStockTransaction(MedStock bestand, BigDecimal menge, short status) {
         this.bestand = bestand;
         this.menge = menge;
         this.pit = new Date();
@@ -132,7 +132,7 @@ public class MedBuchungen implements Serializable {
 //        this.bhp = bhp;
 //    }
 
-    public MedBestand getBestand() {
+    public MedStock getBestand() {
         return bestand;
     }
 
@@ -148,7 +148,7 @@ public class MedBuchungen implements Serializable {
     @JoinColumn(name = "BestID", referencedColumnName = "BestID")
     @ManyToOne
     //OWNER
-    private MedBestand bestand;
+    private MedStock bestand;
 
     @JoinColumn(name = "BHPID", referencedColumnName = "BHPID")
     @ManyToOne
@@ -170,10 +170,10 @@ public class MedBuchungen implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedBuchungen)) {
+        if (!(object instanceof MedStockTransaction)) {
             return false;
         }
-        MedBuchungen other = (MedBuchungen) object;
+        MedStockTransaction other = (MedStockTransaction) object;
         if ((this.buchID == null && other.buchID != null) || (this.buchID != null && !this.buchID.equals(other.buchID))) {
             return false;
         }
@@ -182,7 +182,7 @@ public class MedBuchungen implements Serializable {
 
     @Override
     public String toString() {
-        return "MedBuchungen{" +
+        return "MedStockTransaction{" +
                 "buchID=" + buchID +
                 ", menge=" + menge +
                 ", text='" + text + '\'' +

@@ -34,7 +34,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.care.med.vorrat.DlgBestand;
@@ -230,12 +230,12 @@ public class PnlMed extends CleanablePanel {
     }
 
 
-    private void btnEditDAF(Darreichung darreichung) {
+    private void btnEditDAF(TradeForm darreichung) {
 //        new DlgDAF(this, "", darreichung);
 //        createTree();
     }
 
-    private void btnDeleteDAF(Darreichung darreichung) {
+    private void btnDeleteDAF(TradeForm darreichung) {
 //        if (JOptionPane.showConfirmDialog(this, "Damit werden auch alle Zuordnungen und Packungen gelöscht.\n\nSind Sie sicher ?", DarreichungTools.toPrettyString(darreichung) + " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 //            return;
 //        }
@@ -267,11 +267,11 @@ public class PnlMed extends CleanablePanel {
         Query query = em.createNamedQuery("Darreichung.findByMedProdukt");
         query.setParameter("medProdukt", produkt);
 
-        java.util.List<Darreichung> listDAF = query.getResultList();
+        java.util.List<TradeForm> listDAF = query.getResultList();
         em.close();
 
 
-        for (Darreichung daf : listDAF) {
+        for (TradeForm daf : listDAF) {
             DefaultMutableTreeNode nodeDAF = new DefaultMutableTreeNode(daf);
             SYSTools.addAllNodes(nodeDAF, getPackung(daf));
             result.add(nodeDAF);
@@ -281,7 +281,7 @@ public class PnlMed extends CleanablePanel {
         return result;
     }
 
-    private java.util.List getPackung(Darreichung darreichung) {
+    private java.util.List getPackung(TradeForm darreichung) {
         java.util.List result = new ArrayList();
         for (MedPackung packung : darreichung.getPackungen()) {
             result.add(new DefaultMutableTreeNode(packung));
@@ -310,9 +310,9 @@ public class PnlMed extends CleanablePanel {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
                 MedProdukte myprod = (MedProdukte) node.getUserObject();
                 component.setText(myprod.getBezeichnung() + ", " + myprod.getHersteller().getFirma() + ", " + myprod.getHersteller().getOrt());
-            } else if (node.getUserObject() instanceof Darreichung) {
+            } else if (node.getUserObject() instanceof TradeForm) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
-                component.setText(DarreichungTools.toPrettyStringMedium((Darreichung) node.getUserObject()));
+                component.setText(TradeFormTools.toPrettyStringMedium((TradeForm) node.getUserObject()));
             } else if (node.getUserObject() instanceof MedPackung) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
                 component.setText(MedPackungTools.toPrettyString((MedPackung) node.getUserObject()));

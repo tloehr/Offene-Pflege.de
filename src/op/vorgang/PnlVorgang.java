@@ -15,8 +15,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.EntityTools;
 import entity.Users;
 import entity.vorgang.*;
@@ -67,7 +67,7 @@ public class PnlVorgang extends NursingRecordsPanel {
     private int laufendeOperation;
 
     protected Vorgaenge aktuellerVorgang;
-    protected Bewohner aktuellerBewohner;
+    protected Resident aktuellerBewohner;
     protected JPopupMenu menu;
     protected JFrame myFrame;
     protected double splitTDPercent, splitDOPercent, splitTEPercent, splitBCPercent;
@@ -81,7 +81,7 @@ public class PnlVorgang extends NursingRecordsPanel {
     private TaskPaneContentChangedListener taskPaneContentChangedListener;
     private Timeline textmessageTL;
 
-    public PnlVorgang(Vorgaenge vorgang, Bewohner bewohner, JFrame parent, TaskPaneContentChangedListener taskPaneContentChangedListener) {
+    public PnlVorgang(Vorgaenge vorgang, Resident bewohner, JFrame parent, TaskPaneContentChangedListener taskPaneContentChangedListener) {
         ignoreEvents = true;
         initComponents();
         this.taskPaneContentChangedListener = taskPaneContentChangedListener;
@@ -237,7 +237,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 //        panelSearch.add(pnlAlleVorgaenge);
 //    }
 
-    protected CollapsiblePane addVorgaengeFuerBW(Bewohner bewohner) {
+    protected CollapsiblePane addVorgaengeFuerBW(Resident bewohner) {
 
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
@@ -588,7 +588,7 @@ public class PnlVorgang extends NursingRecordsPanel {
         if (btnDetails.isSelected()) {
             ignoreEvents = true;
             txtTitel.setText(vorgang.getTitel());
-            lblBW.setText(vorgang.getBewohner() == null ? "Allgemeiner Vorgang" : BewohnerTools.getBWLabelText(vorgang.getBewohner()));
+            lblBW.setText(vorgang.getBewohner() == null ? "Allgemeiner Vorgang" : ResidentTools.getBWLabelText(vorgang.getBewohner()));
             lblStart.setText(DateFormat.getDateInstance().format(vorgang.getVon()));
             jdcWV.setDate(vorgang.getWv());
             lblEnde.setText(vorgang.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "noch nicht abgeschlossen" : DateFormat.getDateInstance().format(vorgang.getBis()));
@@ -1404,7 +1404,7 @@ public class PnlVorgang extends NursingRecordsPanel {
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         aktuellerBewohner = bewohner;
 //        SYSTools.removeSearchPanels(panelSearch, positionToAddPanels);
         panelSearch.clear();

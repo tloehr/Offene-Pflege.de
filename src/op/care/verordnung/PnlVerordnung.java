@@ -32,12 +32,12 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.system.UniqueTools;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgBestandAbschliessen;
@@ -48,7 +48,6 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 import tablemodels.TMVerordnung;
 import tablerenderer.RNDHTML;
 
@@ -79,7 +78,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.prescription";
 
-    private Bewohner bewohner;
+    private Resident bewohner;
     //    private JFrame parent;
     //    private boolean readOnly = false;
     private JPopupMenu menu;
@@ -100,20 +99,20 @@ public class PnlVerordnung extends NursingRecordsPanel {
     /**
      * Creates new form PnlVerordnung
      */
-    public PnlVerordnung(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlVerordnung(Resident bewohner, JScrollPane jspSearch) {
         initPhase = true;
         this.jspSearch = jspSearch;
         initComponents();
         prepareSearchArea();
         this.bewohner = bewohner;
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
         initPhase = false;
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         reloadTable();
     }
 
@@ -174,10 +173,10 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
     private void printVerordnungen(int[] sel) {
         try {
-            File temp = File.createTempFile("verordnungen", ".html");
+            File temp = File.createTempFile("prescription", ".html");
             temp.deleteOnExit();
-            List<Verordnung> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
-            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getVerordnungenAsHTML(listVerordnung, true));
+            List<Prescriptions> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
+            String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getPrescriptionenAsHTML(listVerordnung, true));
             SYSFilesTools.print(html, true);
         } catch (IOException e) {
             new DlgException(e);
@@ -191,7 +190,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             File temp = File.createTempFile("stellplan", ".html");
             temp.deleteOnExit();
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            String html = SYSTools.htmlUmlautConversion(VerordnungTools.getStellplanAsHTML(bewohner.getStation().getEinrichtung()));
+            String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getStellplanAsHTML(bewohner.getStation().getEinrichtung()));
             out.write(html);
             out.close();
             SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
@@ -213,12 +212,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
             lsm.setSelectionInterval(row, row);
         }
 
-        final List<Verordnung> selection = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(tblVerordnung.getSelectedRows());
+        final List<Prescriptions> selection = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(tblVerordnung.getSelectedRows());
 
         // Kontext Menü
         if (singleRowSelected && evt.isPopupTrigger()) {
             boolean readOnly = false;
-            final Verordnung selectedVerordnung = selection.get(0);
+            final Prescriptions selectedVerordnung = selection.get(0);
 
             long num = BHPTools.getNumBHPs(selectedVerordnung);
             boolean editAllowed = !readOnly && num == 0;
@@ -240,43 +239,43 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
-                                Pair<Verordnung, List<VerordnungPlanung>> result = (Pair<Verordnung, List<VerordnungPlanung>>) o;
+                                Pair<Prescriptions, List<PrescriptionSchedule>> result = (Pair<Prescriptions, List<PrescriptionSchedule>>) o;
                                 EntityManager em = OPDE.createEM();
-                                Verordnung verordnung = em.merge(result.getFirst());
+                                Prescriptions verordnung = em.merge(result.getFirst());
 
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(verordnung, LockModeType.OPTIMISTIC);
 
                                     // Änderung an bestehenden Planungen
-                                    for (VerordnungPlanung planung : verordnung.getPlanungen()) {
+                                    for (PrescriptionSchedule planung : verordnung.getPrescriptionSchedule()) {
                                         planung = em.merge(planung);
                                         em.lock(planung, LockModeType.OPTIMISTIC);
                                     }
 
                                     // Planungen die zukünftig wegfallen.
-                                    for (VerordnungPlanung planung : result.getSecond()) {
+                                    for (PrescriptionSchedule planung : result.getSecond()) {
                                         planung = em.merge(planung);
                                         em.lock(planung, LockModeType.OPTIMISTIC);
                                         em.remove(planung);
                                     }
 
                                     // Bei einer Korrektur werden alle bisherigen Einträge aus der BHP zuerst wieder entfernt.
-                                    Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.verordnung = :verordnung");
+                                    Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :verordnung");
                                     queryDELBHP.setParameter("verordnung", verordnung);
                                     queryDELBHP.executeUpdate();
 
                                     if (!verordnung.isBedarf()) {
-                                        BHPTools.generate(em, verordnung.getPlanungen(), new DateMidnight(), true);
+                                        BHPTools.generate(em, verordnung.getPrescriptionSchedule(), new DateMidnight(), true);
                                     }
 
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Korrigiert: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Korrigiert: " + PrescriptionsTools.toPrettyString(verordnung), 2));
                                 } catch (javax.persistence.OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -303,19 +302,19 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                    new DlgVerordnung((Verordnung) selectedVerordnung.clone(), DlgVerordnung.NO_CHANGE_MED_AND_SIT, new Closure() {
+                    new DlgVerordnung((Prescriptions) selectedVerordnung.clone(), DlgVerordnung.NO_CHANGE_MED_AND_SIT, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
                                 EntityManager em = OPDE.createEM();
 
-                                Pair<Verordnung, List<VerordnungPlanung>> result = (Pair<Verordnung, List<VerordnungPlanung>>) o;
+                                Pair<Prescriptions, List<PrescriptionSchedule>> result = (Pair<Prescriptions, List<PrescriptionSchedule>>) o;
 
                                 try {
                                     em.getTransaction().begin();
 
-                                    Verordnung newVerordnung = em.merge(result.getFirst());
-                                    Verordnung oldVerordnung = em.merge(selectedVerordnung);
+                                    Prescriptions newVerordnung = em.merge(result.getFirst());
+                                    Prescriptions oldVerordnung = em.merge(selectedVerordnung);
 
                                     em.lock(oldVerordnung, LockModeType.OPTIMISTIC);
 
@@ -335,16 +334,16 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     // Die neuen BHPs werden erzeugt.
                                     if (!newVerordnung.isBedarf()) {
                                         // ab der aktuellen Uhrzeit
-                                        BHPTools.generate(em, newVerordnung.getPlanungen(), new DateMidnight(), false);
+                                        BHPTools.generate(em, newVerordnung.getPrescriptionSchedule(), new DateMidnight(), false);
                                     }
 
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Geändert: " + VerordnungTools.toPrettyString(oldVerordnung), 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Geändert: " + PrescriptionsTools.toPrettyString(oldVerordnung), 2));
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -376,19 +375,19 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
-                                    Verordnung verordnung = (Verordnung) em.merge(o);
+                                    Prescriptions verordnung = (Prescriptions) em.merge(o);
                                     em.lock(verordnung, LockModeType.OPTIMISTIC);
                                     verordnung.setAbDatum(new Date());
                                     verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                                     BHPTools.cleanup(em, verordnung);
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Abgesetzt: " + PrescriptionsTools.toPrettyString(verordnung), 2));
 //                                    em.getEntityManagerFactory().getCache().evict(Verordnung.class);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -415,7 +414,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
-                                Verordnung myverordnung = null;
+                                Prescriptions myverordnung = null;
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     myverordnung = em.merge(selectedVerordnung);
@@ -423,17 +422,17 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.lock(myverordnung, LockModeType.OPTIMISTIC);
                                     em.remove(myverordnung);
 
-                                    Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.verordnung = :verordnung");
+                                    Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.prescription = :verordnung");
                                     delQuery.setParameter("verordnung", selectedVerordnung);
                                     delQuery.executeUpdate();
 
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gelöscht: " + VerordnungTools.toPrettyString(selectedVerordnung), 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gelöscht: " + PrescriptionsTools.toPrettyString(selectedVerordnung), 2));
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -459,7 +458,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             if (selectedVerordnung.hasMedi()) {
                 menu.add(new JSeparator());
 
-                final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
+                final MedStock bestandImAnbruch = MedStockTools.getBestandImAnbruch(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
                 boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt() && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
                 boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt() && bestandImAnbruch == null;
 
@@ -525,13 +524,13 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    final MedBestand bestandImAnbruch = MedBestandTools.getBestandImAnbruch(DarreichungTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
+                    final MedStock bestandImAnbruch = MedStockTools.getBestandImAnbruch(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
 
                     String message = "VerID: " + selectedVerordnung.getVerid();
                     if (bestandImAnbruch != null) {
-                        BigDecimal apv = MedBestandTools.getAPVperBW(bestandImAnbruch.getVorrat());
+                        BigDecimal apv = MedStockTools.getAPVperBW(bestandImAnbruch.getInventory());
                         BigDecimal apvBest = bestandImAnbruch.getApv();
-                        message += "  VorID: " + bestandImAnbruch.getVorrat().getVorID() + "  DafID: " + bestandImAnbruch.getDarreichung().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
+                        message += "  VorID: " + bestandImAnbruch.getInventory().getVorID() + "  DafID: " + bestandImAnbruch.getDarreichung().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
                     }
 
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, 10));
@@ -673,12 +672,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
             JideButton addButton = GUITools.createHyperlinkButton("Neue Verordnung eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgVerordnung(new Verordnung(bewohner), DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
+                    new DlgVerordnung(new Prescriptions(bewohner), DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
-                                Pair<Verordnung, List<VerordnungPlanung>> result = (Pair<Verordnung, List<VerordnungPlanung>>) o;
-                                Verordnung verordnung = result.getFirst();
+                                Pair<Prescriptions, List<PrescriptionSchedule>> result = (Pair<Prescriptions, List<PrescriptionSchedule>>) o;
+                                Prescriptions verordnung = result.getFirst();
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
@@ -686,15 +685,15 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
                                     verordnung = em.merge(verordnung);
                                     if (!verordnung.isBedarf()) {
-                                        BHPTools.generate(em, verordnung.getPlanungen(), new DateMidnight(), true);
+                                        BHPTools.generate(em, verordnung.getPrescriptionSchedule(), new DateMidnight(), true);
                                     }
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + VerordnungTools.toPrettyString(verordnung), 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + PrescriptionsTools.toPrettyString(verordnung), 2));
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }

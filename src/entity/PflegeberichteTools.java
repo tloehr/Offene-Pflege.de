@@ -5,6 +5,8 @@
 package entity;
 
 import entity.files.Syspb2file;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.vorgang.SYSPB2VORGANG;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -54,7 +56,7 @@ public class PflegeberichteTools {
         return mybericht;
     }
 
-    public static Pflegeberichte getFirstBericht(Bewohner bewohner) {
+    public static Pflegeberichte getFirstBericht(Resident bewohner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
         query.setParameter("bewohner", bewohner);
@@ -177,7 +179,7 @@ public class PflegeberichteTools {
         String text = SYSTools.replace(bericht.getText(), "\n", "<br/>");
 
         if (mitBWKennung) {
-            html += "<b>Pflegebericht für " + BewohnerTools.getBWLabelText(bericht.getBewohner()) + "</b>";
+            html += "<b>Pflegebericht für " + ResidentTools.getBWLabelText(bericht.getBewohner()) + "</b>";
         } else {
             html += "<b>Pflegebericht</b>";
         }
@@ -197,7 +199,7 @@ public class PflegeberichteTools {
         boolean ihavesomethingtoshow = false;
 
         if (!berichte.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + BewohnerTools.getBWLabelText(berichte.get(0).getBewohner()) : "") + "</h2>\n";
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getBWLabelText(berichte.get(0).getBewohner()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
             for (Pflegeberichte bericht : berichte) {
@@ -357,7 +359,7 @@ public class PflegeberichteTools {
                 "<th>BewohnerIn</th><th>Datum</th><th>Text</th><th>UKennung</th><th>BV</th></tr>");
 
         for (Object[] paar : list) {
-            Bewohner bewohner = (Bewohner) paar[0];
+            Resident bewohner = (Resident) paar[0];
             BigInteger pbid = (BigInteger) paar[1];
 
             // Bei Bedarf den Pflegebericht "einsammeln"
@@ -365,7 +367,7 @@ public class PflegeberichteTools {
 
             html.append("<tr>");
 
-            html.append("<td>" + BewohnerTools.getBWLabel1(bewohner) + "</td>");
+            html.append("<td>" + ResidentTools.getBWLabel1(bewohner) + "</td>");
             if (bericht == null) {
                 html.append("<td align=\"center\">--</td>");
                 html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
@@ -454,7 +456,7 @@ public class PflegeberichteTools {
                     for (Pflegeberichte bericht : list) {
                         html.append("<tr>");
 
-                        html.append("<td>" + BewohnerTools.getBWLabel1(bericht.getBewohner()) + "</td>");
+                        html.append("<td>" + ResidentTools.getBWLabel1(bericht.getBewohner()) + "</td>");
                         html.append("<td>" + df.format(bericht.getPit()) + "</td>");
                         html.append("<td>" + bericht.getText() + "</td>");
                         html.append("<td>" + bericht.getUser().getUKennung() + "</td>");
@@ -505,14 +507,14 @@ public class PflegeberichteTools {
             html.append("<table border=\"1\"><tr>" +
                     "<th>BewohnerIn</th><th>Dauer (Minuten)</th><th>Dauer (Stunden)</th><th>Stundenschnitt pro Tag</th><th>PEA (Minuten)</th><th>PEA (Stunden)</th><th>Stundenschnitt pro Tag</th></tr>");
             for (Object object : list) {
-                Bewohner bewohner = (Bewohner) ((Object[]) object)[0];
+                Resident bewohner = (Resident) ((Object[]) object)[0];
                 BigDecimal sdauer = (BigDecimal) ((Object[]) object)[1];
                 BigDecimal peadauer = (BigDecimal) ((Object[]) object)[2];
 
 
                 html.append("<tr>");
 
-                html.append("<td>" + BewohnerTools.getBWLabel1(bewohner) + "</td>");
+                html.append("<td>" + ResidentTools.getBWLabel1(bewohner) + "</td>");
                 html.append("<td>" + sdauer + "</td>");
                 html.append("<td>" + sdauer.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP) + "</td>");
                 html.append("<td>" + sdauer.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP) + "</td>");

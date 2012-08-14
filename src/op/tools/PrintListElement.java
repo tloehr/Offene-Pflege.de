@@ -1,6 +1,6 @@
 package op.tools;
 
-import entity.verordnungen.MedBestand;
+import entity.prescription.MedStock;
 import op.system.Form;
 import op.system.PrinterType;
 
@@ -21,8 +21,8 @@ public class PrintListElement implements Comparable {
     public int compareTo(Object o) {
 
         int result = 0;
-        if (((PrintListElement) o).getObject() instanceof MedBestand){
-            result = new Long(((MedBestand) object).getBestID()).compareTo(((MedBestand)((PrintListElement) o).getObject()).getBestID());
+        if (((PrintListElement) o).getObject() instanceof MedStock){
+            result = new Long(((MedStock) object).getBestID()).compareTo(((MedStock)((PrintListElement) o).getObject()).getBestID());
         }
         return result;
     }

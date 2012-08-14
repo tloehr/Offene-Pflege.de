@@ -30,8 +30,7 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
 import entity.files.SYSFilesTools;
 import entity.info.BWInfoTools;
 import entity.system.SYSPropsTools;
@@ -54,7 +53,7 @@ import java.beans.PropertyVetoException;
 public class PnlBWUebersicht extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.overview";
 
-    private Bewohner bewohner;
+    private Resident bewohner;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
     private JToggleButton tbMedi, tbBilanz, tbBerichte;
@@ -65,12 +64,12 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     /**
      * Creates new form PnlBWUebersicht
      */
-    public PnlBWUebersicht(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlBWUebersicht(Resident bewohner, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
         initPanel();
         prepareSearchArea();
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
     }
 
     private void initPanel() {
@@ -99,7 +98,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
 
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
         GUITools.setBWDisplay(bewohner);
         reloadDisplay();

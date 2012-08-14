@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,21 +33,21 @@ public class MedPackung implements Serializable {
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private Darreichung darreichung;
+    private TradeForm darreichung;
 
     public MedPackung() {
     }
 
-    public MedPackung(Darreichung darreichung) {
+    public MedPackung(TradeForm darreichung) {
         this.darreichung = darreichung;
 //        this.darreichung.getPackungen().add(this);
     }
 
-    public Darreichung getDarreichung() {
+    public TradeForm getDarreichung() {
         return darreichung;
     }
 
-    public void setDarreichung(Darreichung darreichung) {
+    public void setDarreichung(TradeForm darreichung) {
         this.darreichung = darreichung;
     }
 

@@ -6,9 +6,8 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.MedPackungTools;
-import entity.verordnungen.MedProdukte;
-import entity.verordnungen.MedProdukteTools;
+import entity.prescription.MedProdukte;
+import entity.prescription.MedProdukteTools;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

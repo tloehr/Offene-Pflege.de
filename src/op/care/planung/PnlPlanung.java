@@ -31,7 +31,7 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
 import entity.planung.*;
@@ -67,7 +67,7 @@ public class PnlPlanung extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess";
     private boolean initPhase;
 
-    private Bewohner bewohner;
+    private Resident bewohner;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
@@ -82,7 +82,7 @@ public class PnlPlanung extends NursingRecordsPanel {
     /**
      * Creates new form PnlPlanung
      */
-    public PnlPlanung(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlPlanung(Resident bewohner, JScrollPane jspSearch) {
         initPhase = true;
         this.jspSearch = jspSearch;
 //        standardActionListener = new ActionListener() {
@@ -95,7 +95,7 @@ public class PnlPlanung extends NursingRecordsPanel {
         initPanel();
         initPhase = false;
 
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
 
     }
 
@@ -118,7 +118,7 @@ public class PnlPlanung extends NursingRecordsPanel {
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
         GUITools.setBWDisplay(bewohner);
 //        categoryCPMap.clear();
@@ -414,7 +414,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -485,7 +485,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -565,7 +565,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -641,7 +641,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -714,7 +714,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -931,7 +931,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     }
@@ -1002,7 +1002,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                                 if (em.getTransaction().isActive()) {
                                                     em.getTransaction().rollback();
                                                 }
-                                                if (ole.getMessage().indexOf("Class> entity.Bewohner") > -1) {
+                                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                                     OPDE.getMainframe().emptyFrame();
                                                     OPDE.getMainframe().afterLogin();
                                                 }

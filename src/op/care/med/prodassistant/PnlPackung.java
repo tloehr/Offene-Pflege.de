@@ -6,10 +6,9 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.Darreichung;
-import entity.verordnungen.MedFormenTools;
-import entity.verordnungen.MedPackung;
-import entity.verordnungen.MedPackungTools;
+import entity.prescription.TradeForm;
+import entity.prescription.MedPackung;
+import entity.prescription.MedPackungTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
@@ -31,7 +30,7 @@ import java.math.BigDecimal;
 public class PnlPackung extends JPanel {
     String pzn;
     BigDecimal inhalt;
-    private Darreichung darreichung;
+    private TradeForm darreichung;
     private MedPackung packung;
     private Closure validate;
     private String template;
@@ -46,7 +45,7 @@ public class PnlPackung extends JPanel {
         initPanel();
     }
 
-    public void setDarreichung(Darreichung darreichung) {
+    public void setDarreichung(TradeForm darreichung) {
         this.darreichung = darreichung;
     }
 

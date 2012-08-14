@@ -7,7 +7,7 @@ package op.care;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.bw.tg.PnlTG;
@@ -28,10 +28,6 @@ import op.tools.SYSTools;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * @author Torsten Löhr
@@ -67,12 +63,12 @@ public class PnlPflege extends NursingRecordsPanel {
             OPDE.lang.getString(internalClassID + ".tab11"),
             OPDE.lang.getString(internalClassID + ".tab12")
     };
-    private Bewohner currentBewohner = null;
+    private Resident currentBewohner = null;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
     private NursingRecordsPanel previousPanel;
 
-    public PnlPflege(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlPflege(Resident bewohner, JScrollPane jspSearch) {
         initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
@@ -100,9 +96,9 @@ public class PnlPflege extends NursingRecordsPanel {
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         currentBewohner = bewohner;
-        ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).change2Bewohner(bewohner);
+        ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).switchResident(bewohner);
     }
 
     @Override
@@ -188,9 +184,9 @@ public class PnlPflege extends NursingRecordsPanel {
 //                    }
 //
 //                    @Override
-//                    public void change2Bewohner(Bewohner bewohner) {
+//                    public void switchResident(Bewohner bewohner) {
 //                        BewohnerTools.setBWLabel(bwlabel, bewohner);
-//                        pnlVorgang.change2Bewohner(bewohner);
+//                        pnlVorgang.switchResident(bewohner);
 //                        validate();
 //                    }
 //                };

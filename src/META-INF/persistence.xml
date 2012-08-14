@@ -9,7 +9,7 @@
         <class>entity.BWerte</class>
         <class>entity.Barbetrag</class>
         <class>entity.Betreuer</class>
-        <class>entity.Bewohner</class>
+        <class>entity.info.Resident</class>
         <class>entity.planung.DFN</class>
         <class>entity.Einrichtungen</class>
         <class>entity.Groups</class>
@@ -43,18 +43,18 @@
         <class>entity.system.SYSProps</class>
         <class>entity.system.Syslog</class>
         <class>entity.system.Unique</class>
-        <class>entity.verordnungen.BHP</class>
-        <class>entity.verordnungen.Darreichung</class>
-        <class>entity.verordnungen.MedBestand</class>
-        <class>entity.verordnungen.MedBuchungen</class>
-        <class>entity.verordnungen.MedFormen</class>
-        <class>entity.verordnungen.MedHersteller</class>
-        <class>entity.verordnungen.MedPackung</class>
-        <class>entity.verordnungen.MedProdukte</class>
-        <class>entity.verordnungen.MedVorrat</class>
-        <class>entity.verordnungen.Situationen</class>
-        <class>entity.verordnungen.Verordnung</class>
-        <class>entity.verordnungen.VerordnungPlanung</class>
+        <class>entity.prescription.BHP</class>
+        <class>entity.prescription.TradeForm</class>
+        <class>entity.prescription.MedStock</class>
+        <class>entity.prescription.MedStockTransaction</class>
+        <class>entity.prescription.DosageForm</class>
+        <class>entity.prescription.MedHersteller</class>
+        <class>entity.prescription.MedPackung</class>
+        <class>entity.prescription.MedProdukte</class>
+        <class>entity.prescription.MedInventory</class>
+        <class>entity.prescription.Situationen</class>
+        <class>entity.prescription.Prescriptions</class>
+        <class>entity.prescription.PrescriptionSchedule</class>
         <class>entity.vorgang.SYSBWI2VORGANG</class>
         <class>entity.vorgang.SYSBWerte2VORGANG</class>
         <class>entity.vorgang.SYSPB2VORGANG</class>

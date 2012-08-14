@@ -25,10 +25,10 @@
  */
 package entity.files;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.Pflegeberichte;
 import entity.info.BWInfo;
-import entity.verordnungen.Verordnung;
+import entity.prescription.Prescriptions;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.care.sysfiles.PnlFiles;
@@ -48,7 +48,6 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -93,7 +92,7 @@ public class SYSFilesTools {
      * @param file File Obkjekt der zu speichernden Datei
      * @return EB der neuen Datei. null bei Fehler.
      */
-    public static SYSFiles putFile(EntityManager em, FTPClient ftp, File file, Bewohner bewohner) throws Exception {
+    public static SYSFiles putFile(EntityManager em, FTPClient ftp, File file, Resident bewohner) throws Exception {
         SYSFiles sysfile = null;
 
         String md5 = SYSTools.getMD5Checksum(file);
@@ -115,23 +114,23 @@ public class SYSFilesTools {
         return sysfile;
     }
 
-    public static List<SYSFiles> putFiles(File[] files, Bewohner bewohner) {
+    public static List<SYSFiles> putFiles(File[] files, Resident bewohner) {
         return putFiles(files, bewohner, null);
     }
 
     public static List<SYSFiles> putFiles(File[] files, Object attachable) {
-        Bewohner bw = null;
+        Resident bw = null;
         if (attachable instanceof Pflegeberichte) {
             bw = ((Pflegeberichte) attachable).getBewohner();
-        } else if (attachable instanceof Verordnung) {
-            bw = ((Verordnung) attachable).getBewohner();
+        } else if (attachable instanceof Prescriptions) {
+            bw = ((Prescriptions) attachable).getBewohner();
         } else if (attachable instanceof BWInfo) {
             bw = ((BWInfo) attachable).getBewohner();
         }
         return putFiles(files, bw, attachable);
     }
 
-    public static List<SYSFiles> putFiles(File[] files, Bewohner bewohner, Object attachable) {
+    public static List<SYSFiles> putFiles(File[] files, Resident bewohner, Object attachable) {
 
         ArrayList<SYSFiles> successful = new ArrayList<SYSFiles>(files.length);
         FTPClient ftp = getFTPClient();
@@ -147,10 +146,10 @@ public class SYSFilesTools {
                             Syspb2file link = em.merge(new Syspb2file(sysfile, (Pflegeberichte) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getPbAssignCollection().add(link);
                             ((Pflegeberichte) attachable).getAttachedFiles().add(link);
-                        } else if (attachable instanceof Verordnung) {
-                            Sysver2file link = em.merge(new Sysver2file(sysfile, (Verordnung) attachable, OPDE.getLogin().getUser(), new Date()));
+                        } else if (attachable instanceof Prescriptions) {
+                            Sysver2file link = em.merge(new Sysver2file(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getVerAssignCollection().add(link);
-                            ((Verordnung) attachable).getAttachedFiles().add(link);
+                            ((Prescriptions) attachable).getAttachedFiles().add(link);
                         } else if (attachable instanceof BWInfo) {
                             Sysbwi2file link = em.merge(new Sysbwi2file(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getBwiAssignCollection().add(link);

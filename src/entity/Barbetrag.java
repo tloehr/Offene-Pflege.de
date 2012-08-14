@@ -5,6 +5,8 @@
 
 package entity;
 
+import entity.info.Resident;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -49,7 +51,7 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     public Barbetrag() {
     }
 
-    public Barbetrag(Date belegDatum, String belegtext, BigDecimal betrag, Bewohner bewohner, Users erstelltVon) {
+    public Barbetrag(Date belegDatum, String belegtext, BigDecimal betrag, Resident bewohner, Users erstelltVon) {
         this.belegDatum = belegDatum;
         this.belegtext = belegtext;
         this.betrag = betrag;
@@ -61,7 +63,7 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     @JoinColumn(name = "_editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users bearbeitetVon;
@@ -103,11 +105,11 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     }
 
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 

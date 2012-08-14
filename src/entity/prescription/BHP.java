@@ -1,7 +1,10 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import entity.Bewohner;
 import entity.Users;
+import entity.info.Resident;
+import entity.planung.DFNTools;
+import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -80,9 +83,9 @@ import java.util.Date;
         @NamedQuery(name = "BHP.findByMdate", query = "SELECT b FROM BHP b WHERE b.mdate = :mdate"),
         @NamedQuery(name = "BHP.findByDauer", query = "SELECT b FROM BHP b WHERE b.dauer = :dauer"),
         @NamedQuery(name = "BHP.numByNOTStatusAndVerordnung", query = " " +
-                " SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.verordnung = :verordnung AND bhp.status <> :status ")})
+                " SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.status <> :status ")})
 
-public class BHP implements Serializable {
+public class BHP implements Serializable, Comparable<BHP> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -90,7 +93,7 @@ public class BHP implements Serializable {
     @Column(name = "BHPID")
     private Long bhpid;
     @Version
-    @Column(name="version")
+    @Column(name = "version")
     private Long version;
     @Basic(optional = false)
     @Column(name = "Soll")
@@ -120,61 +123,61 @@ public class BHP implements Serializable {
     public BHP() {
     }
 
-    public BHP(VerordnungPlanung verordnungPlanung) {
-        // Das sieht redundant aus, dient aber der Vereinfachung
-        this.verordnungPlanung = verordnungPlanung;
-        this.verordnung = verordnungPlanung.getVerordnung();
-        this.bewohner = verordnungPlanung.getVerordnung().getBewohner();
-        this.darreichung = verordnungPlanung.getVerordnung().getDarreichung();
-        buchungen = new ArrayList<MedBuchungen>();
+    public BHP(PrescriptionSchedule prescriptionSchedule) {
+        // looks redundant but simplifies enormously
+        this.prescriptionSchedule = prescriptionSchedule;
+        this.prescription = this.prescriptionSchedule.getPrescription();
+        this.resident = this.prescriptionSchedule.getPrescription().getBewohner();
+        this.darreichung = this.prescriptionSchedule.getPrescription().getDarreichung();
+        stockTransaction = new ArrayList<MedStockTransaction>();
         this.version = 0l;
     }
 
-    public BHP(VerordnungPlanung verordnungPlanung, Date soll, Byte sZeit, BigDecimal dosis) {
-        // Das sieht redundant aus, dient aber der Vereinfachung
-        this.verordnungPlanung = verordnungPlanung;
-        this.verordnung = verordnungPlanung.getVerordnung();
-        this.bewohner = verordnungPlanung.getVerordnung().getBewohner();
-        this.darreichung = verordnungPlanung.getVerordnung().getDarreichung();
+    public BHP(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
+        // looks redundant but simplifies enormously
+        this.prescriptionSchedule = prescriptionSchedule;
+        this.prescription = this.prescriptionSchedule.getPrescription();
+        this.resident = this.prescriptionSchedule.getPrescription().getBewohner();
+        this.darreichung = this.prescriptionSchedule.getPrescription().getDarreichung();
         this.soll = soll;
         this.version = 0l;
         this.sZeit = sZeit;
         this.dosis = dosis;
-        this.status = BHPTools.STATUS_OFFEN;
+        this.status = BHPTools.STATE_OPEN;
         this.mdate = new Date();
-        buchungen = new ArrayList<MedBuchungen>();
+        stockTransaction = new ArrayList<MedStockTransaction>();
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")
-    private Collection<MedBuchungen> buchungen;
+    private Collection<MedStockTransaction> stockTransaction;
 
     @JoinColumn(name = "BHPPID", referencedColumnName = "BHPPID")
     @ManyToOne
-    private VerordnungPlanung verordnungPlanung;
+    private PrescriptionSchedule prescriptionSchedule;
 
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
     @ManyToOne
-    private Verordnung verordnung;
+    private Prescriptions prescription;
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident resident;
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private Darreichung darreichung;
+    private TradeForm darreichung;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
 
-    public VerordnungPlanung getVerordnungPlanung() {
-        return verordnungPlanung;
+    public PrescriptionSchedule getPrescriptionSchedule() {
+        return prescriptionSchedule;
     }
 
-    public void setVerordnungPlanung(VerordnungPlanung verordnungPlanung) {
-        this.verordnungPlanung = verordnungPlanung;
+    public void setPrescriptionSchedule(PrescriptionSchedule prescriptionSchedule) {
+        this.prescriptionSchedule = prescriptionSchedule;
     }
 
     public Users getUser() {
@@ -269,28 +272,37 @@ public class BHP implements Serializable {
         this.dauer = dauer;
     }
 
-    public Verordnung getVerordnung() {
-        return verordnung;
+    public Prescriptions getPrescription() {
+        return prescription;
     }
 
-    public void setVerordnung(Verordnung verordnung) {
-        this.verordnung = verordnung;
+    public void setPrescription(Prescriptions prescription) {
+        this.prescription = prescription;
     }
 
-    public Bewohner getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Bewohner bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
-    public Darreichung getDarreichung() {
+    public TradeForm getDarreichung() {
         return darreichung;
     }
 
-    public void setDarreichung(Darreichung darreichung) {
+    public void setDarreichung(TradeForm darreichung) {
         this.darreichung = darreichung;
+    }
+
+
+    public Byte getShift(){
+       if (sZeit == BHPTools.BYTE_TIMEOFDAY){
+           return SYSCalendar.whatShiftIs(this.soll);
+       } else {
+           return SYSCalendar.whatShiftIs(this.sZeit);
+       }
     }
 
     @Override
@@ -300,14 +312,14 @@ public class BHP implements Serializable {
         return hash;
     }
 
-    public Collection<MedBuchungen> getBuchungen() {
-        return buchungen;
+    public Collection<MedStockTransaction> getStockTransaction() {
+        return stockTransaction;
     }
 
     public boolean hasAbgesetzteBestand() {
         boolean yes = false;
-        if (buchungen != null) {
-            for (MedBuchungen buchung : buchungen) {
+        if (stockTransaction != null) {
+            for (MedStockTransaction buchung : stockTransaction) {
                 yes = buchung.getBestand().isAbgeschlossen();
                 if (yes) {
                     break;
@@ -315,6 +327,24 @@ public class BHP implements Serializable {
             }
         }
         return yes;
+    }
+
+    @Override
+    public int compareTo(BHP that) {
+        int result = this.getShift().compareTo(that.getShift());
+        if (result == 0) {
+            result = SYSTools.nullCompare(this.getDarreichung(), that.getDarreichung());
+        }
+        if (result == 0) {
+            result = sZeit.compareTo(that.getSollZeit());
+        }
+        if (result == 0) {
+            result = TradeFormTools.toPrettyString(prescription.getDarreichung()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getDarreichung()));
+        }
+        if (result == 0) {
+            result = bhpid.compareTo(that.getBHPid());
+        }
+        return result;
     }
 
     @Override
@@ -334,6 +364,7 @@ public class BHP implements Serializable {
     public String toString() {
         return "BHP{" +
                 "bhpid=" + bhpid +
+                ", version=" + version +
                 ", soll=" + soll +
                 ", ist=" + ist +
                 ", sZeit=" + sZeit +
@@ -343,7 +374,12 @@ public class BHP implements Serializable {
                 ", bemerkung='" + bemerkung + '\'' +
                 ", mdate=" + mdate +
                 ", dauer=" + dauer +
-                ", verordnungPlanung=" + verordnungPlanung +
+                ", stockTransaction=" + stockTransaction +
+                ", prescriptionSchedule=" + prescriptionSchedule +
+                ", prescription=" + prescription +
+                ", resident=" + resident +
+                ", darreichung=" + darreichung +
+                ", user=" + user +
                 '}';
     }
 }

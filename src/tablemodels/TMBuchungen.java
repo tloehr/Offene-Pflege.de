@@ -1,9 +1,6 @@
 package tablemodels;
 
-import entity.verordnungen.DarreichungTools;
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedBestandTools;
-import entity.verordnungen.MedBuchungen;
+import entity.prescription.MedStockTransaction;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
@@ -24,15 +21,15 @@ public class TMBuchungen extends AbstractTableModel {
     public static final int COL_Text = 2;
     public static final int COL_Menge = 3;
     public static final int COL_User = 4;
-    protected List<MedBuchungen> data;
+    protected List<MedStockTransaction> data;
     protected DateFormat df;
 
-    public TMBuchungen(List<MedBuchungen> data) {
+    public TMBuchungen(List<MedStockTransaction> data) {
         this.data = data;
         df = DateFormat.getDateInstance();
     }
 
-    public List<MedBuchungen> getData() {
+    public List<MedStockTransaction> getData() {
         return data;
     }
 

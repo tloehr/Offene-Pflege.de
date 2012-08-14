@@ -26,18 +26,16 @@
  */
 package tablemodels;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.planung.DFN;
 import entity.planung.DFNTools;
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Comparator;
 import java.util.Date;
@@ -61,7 +59,7 @@ public class TMDFN
     /**
      * @param schicht entsprechen OC_Const.ZEIT
      */
-    public TMDFN(Bewohner bewohner, Date datum, int schicht) {
+    public TMDFN(Resident bewohner, Date datum, int schicht) {
         super();
 
 //        if (schicht != SYSConst.ZEIT_ALLES) {

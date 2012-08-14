@@ -31,11 +31,10 @@ import entity.PflegeberichteTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.files.SYSFilesTools;
+import entity.prescription.MedStockTools;
 import entity.system.SYSPropsTools;
-import entity.verordnungen.MedBestandTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
-import op.tools.SYSPrint;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -368,7 +367,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             pbPart.setValue(0);
 //            String station = cmbStation.getSelectedItem().toString();
 //            html.append(DBHandling.getMediKontrolle(station, 1));
-            html.append(MedBestandTools.getMediKontrolle(em, (Stationen) cmbStation.getSelectedItem(), 1));
+            html.append(MedStockTools.getMediKontrolle(em, (Stationen) cmbStation.getSelectedItem(), 1));
             progress++;
             pbMain.setValue(progress);
         }

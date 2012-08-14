@@ -7,7 +7,7 @@ package op.admin.residents.bwassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
-import entity.Bewohner;
+import entity.info.Resident;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
@@ -71,11 +71,11 @@ public class PnlBWBasisInfo extends JPanel {
     private void check() {
         boolean complete = !vorname.isEmpty() && !nachname.isEmpty() && gebdatum != null;
         int geschlecht = cmbGender.getSelectedIndex() + 1;
-        Bewohner bewohner = null;
+        Resident bewohner = null;
         // Check if this resident has already been entered before.
         if (complete) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM Bewohner b WHERE b.nachname = :nachname AND b.vorname = :vorname AND b.gebDatum = :gebdatum AND b.geschlecht = :geschlecht ");
+            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.nachname = :nachname AND b.vorname = :vorname AND b.gebDatum = :gebdatum AND b.geschlecht = :geschlecht ");
             query.setParameter("nachname", nachname);
             query.setParameter("vorname", vorname);
             query.setParameter("gebdatum", gebdatum);
@@ -83,7 +83,7 @@ public class PnlBWBasisInfo extends JPanel {
             if (query.getResultList().size() > 0) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".alreadyexists"), DisplayMessage.WARNING));
             } else {
-                bewohner = new Bewohner(nachname, vorname, geschlecht, gebdatum);
+                bewohner = new Resident(nachname, vorname, geschlecht, gebdatum);
                 OPDE.getDisplayManager().clearSubMessages();
             }
             em.close();

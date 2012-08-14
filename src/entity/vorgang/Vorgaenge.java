@@ -4,7 +4,7 @@
  */
 package entity.vorgang;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -67,7 +67,7 @@ public class Vorgaenge implements Serializable {
     private Users besitzer;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     @JoinColumn(name = "VKatID", referencedColumnName = "VKatID")
     @ManyToOne
     private VKat kategorie;
@@ -111,7 +111,7 @@ public class Vorgaenge implements Serializable {
 //    @JoinTable(name = "SYSVER2VORGANG", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "VerID"))
-//    private Collection<Verordnung> verordnungen;
+//    private Collection<Verordnung> prescription;
 //    @ManyToMany
 //    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
@@ -121,7 +121,7 @@ public class Vorgaenge implements Serializable {
     public Vorgaenge() {
     }
 
-    public Vorgaenge(String titel, Bewohner bewohner, VKat kategorie) {
+    public Vorgaenge(String titel, Resident bewohner, VKat kategorie) {
         this.titel = titel;
         this.von = new Date();
         this.wv = SYSCalendar.addDate(new Date(), 7);
@@ -189,11 +189,11 @@ public class Vorgaenge implements Serializable {
         this.besitzer = besitzer;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 

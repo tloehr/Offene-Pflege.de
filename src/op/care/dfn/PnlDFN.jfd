@@ -66,24 +66,6 @@
       </void> 
      </object> 
     </void> 
-    <void method="add"> 
-     <object class="com.jformdesigner.model.FormNonVisual"> 
-      <string>javax.swing.ButtonGroup</string> 
-      <void property="name"> 
-       <string>bgSort</string> 
-      </void> 
-     </object> 
-     <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-      <null/> 
-      <void method="setProperty"> 
-       <string>location</string> 
-       <object class="java.awt.Point"> 
-        <int>0</int> 
-        <int>310</int> 
-       </object> 
-      </void> 
-     </object> 
-    </void> 
    </object> 
   </void> 
  </object> 

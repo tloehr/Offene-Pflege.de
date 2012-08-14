@@ -34,8 +34,8 @@ import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.BWerte;
 import entity.BWerteTools;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -72,7 +72,7 @@ import java.util.GregorianCalendar;
  */
 public class PnlVitalwerte extends NursingRecordsPanel {
 
-    private Bewohner bewohner;
+    private Resident bewohner;
 
     private boolean initPhase;
     private JComboBox cmbAuswahl;
@@ -87,7 +87,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     /**
      * Creates new form pnlVitalwerte
      */
-    public PnlVitalwerte(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlVitalwerte(Resident bewohner, JScrollPane jspSearch) {
         initPhase = true;
         this.bewohner = bewohner;
         this.jspSearch = jspSearch;
@@ -95,7 +95,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         initComponents();
         prepareSearchArea();
         initPanel();
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
         initPhase = false;
     }
 
@@ -150,9 +150,9 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         reloadTable();
     }
 

@@ -7,9 +7,9 @@ package op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.verordnungen.MedHersteller;
-import entity.verordnungen.MedHerstellerTools;
-import entity.verordnungen.MedProdukte;
+import entity.prescription.MedHersteller;
+import entity.prescription.MedHerstellerTools;
+import entity.prescription.MedProdukte;
 import op.OPDE;
 import org.apache.commons.collections.Closure;
 
@@ -21,8 +21,6 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * @author Torsten Löhr

@@ -5,9 +5,9 @@
 package op.care.med.vorrat;
 
 import com.jidesoft.popup.JidePopup;
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedBuchungen;
-import entity.verordnungen.MedBuchungenTools;
+import entity.prescription.MedStock;
+import entity.prescription.MedStockTransaction;
+import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
 import op.tools.DlgYesNo;
 import op.threads.DisplayMessage;
@@ -35,11 +35,11 @@ import java.awt.event.MouseEvent;
  */
 public class PnlBuchungen extends JPanel {
 
-    private MedBestand bestand;
+    private MedStock bestand;
     private JPopupMenu menuBuch;
     private Closure actionAfterUpdate;
 
-    public PnlBuchungen(MedBestand bestand, Closure actionAfterUpdate) {
+    public PnlBuchungen(MedStock bestand, Closure actionAfterUpdate) {
         this.bestand = bestand;
         this.actionAfterUpdate = actionAfterUpdate;
         initComponents();
@@ -79,7 +79,7 @@ public class PnlBuchungen extends JPanel {
         ListSelectionModel lsm = tblBuchung.getSelectionModel();
         lsm.setSelectionInterval(row, row);
 
-//        final MedBuchungen buchung = tm.getData().get(row);
+//        final MedStockTransaction buchung = tm.getData().get(row);
 
         if (actionAfterUpdate != null && evt.isPopupTrigger()) {
 
@@ -99,13 +99,13 @@ public class PnlBuchungen extends JPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
-                                    MedBuchungen mybuchung = em.merge(tm.getData().get(row));
+                                    MedStockTransaction mybuchung = em.merge(tm.getData().get(row));
                                     bestand = em.merge(bestand);
 
                                     em.lock(mybuchung, LockModeType.OPTIMISTIC);
                                     em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    em.lock(bestand.getVorrat(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    bestand.getBuchungen().remove(mybuchung);
+                                    em.lock(bestand.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    bestand.getStockTransaction().remove(mybuchung);
                                     em.remove(mybuchung);
                                     em.getTransaction().commit();
 
@@ -177,7 +177,7 @@ public class PnlBuchungen extends JPanel {
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-    public void setBestand(MedBestand bestand) {
+    public void setBestand(MedStock bestand) {
         this.bestand = bestand;
         reloadTable();
     }
@@ -198,9 +198,9 @@ public class PnlBuchungen extends JPanel {
                         bestand = em.merge(bestand);
                         em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                        Query query = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
+                        Query query = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
                         query.setParameter("bestand", bestand);
-                        query.setParameter("notStatus", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
+                        query.setParameter("notStatus", MedStockTransactionTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
                         query.executeUpdate();
 
                         em.getTransaction().commit();
@@ -230,17 +230,17 @@ public class PnlBuchungen extends JPanel {
         DlgEditBuchung dlg = new DlgEditBuchung(bestand, new Closure() {
             @Override
             public void execute(Object o) {
-                MedBuchungen myBuchung = null;
+                MedStockTransaction myBuchung = null;
                 if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
 
-                        myBuchung = (MedBuchungen) em.merge(o);
+                        myBuchung = (MedStockTransaction) em.merge(o);
                         bestand = em.merge(bestand);
 
                         em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                        em.lock(bestand.getVorrat(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        em.lock(bestand.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                         em.getTransaction().commit();
 

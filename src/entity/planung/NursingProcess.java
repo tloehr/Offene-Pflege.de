@@ -4,7 +4,7 @@
  */
 package entity.planung;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.Users;
 import entity.info.BWInfoKat;
 import entity.vorgang.SYSPLAN2VORGANG;
@@ -88,7 +88,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
     private Users abgesetztDurch;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
     private BWInfoKat kategorie;
@@ -107,7 +107,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
     public NursingProcess() {
     }
 
-    public NursingProcess(Bewohner bewohner) {
+    public NursingProcess(Resident bewohner) {
         this.bewohner = bewohner;
         this.angesetztDurch = OPDE.getLogin().getUser();
         interventionSchedules = new ArrayList<InterventionSchedule>();
@@ -201,11 +201,11 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         this.angesetztDurch = angesetztDurch;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 
@@ -284,7 +284,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         return von.compareTo(nursingProcess.getVon());
     }
 
-    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Bewohner bewohner, BWInfoKat kategorie, Collection<SYSPLAN2VORGANG> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
+    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, BWInfoKat kategorie, Collection<SYSPLAN2VORGANG> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
         this.stichwort = stichwort;
         this.situation = situation;
         this.ziel = ziel;

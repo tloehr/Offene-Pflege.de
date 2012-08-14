@@ -1,7 +1,6 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import javax.persistence.*;
-import javax.xml.crypto.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,13 +30,13 @@ public class MedProdukte implements Serializable {
     public MedProdukte(MedHersteller hersteller, String bezeichnung) {
         this.hersteller = hersteller;
         this.bezeichnung = bezeichnung;
-        this.darreichungen = new ArrayList<Darreichung>();
+        this.darreichungen = new ArrayList<TradeForm>();
     }
 
     public MedProdukte(String bezeichnung) {
         this.hersteller = null;
         this.bezeichnung = bezeichnung;
-        this.darreichungen = new ArrayList<Darreichung>();
+        this.darreichungen = new ArrayList<TradeForm>();
     }
 
     public Long getMedPID() {
@@ -65,7 +64,7 @@ public class MedProdukte implements Serializable {
         this.hersteller = hersteller;
     }
 
-    public Collection<Darreichung> getDarreichungen() {
+    public Collection<TradeForm> getDarreichungen() {
         return darreichungen;
     }
 
@@ -81,7 +80,7 @@ public class MedProdukte implements Serializable {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medProdukt")
-    private Collection<Darreichung> darreichungen;
+    private Collection<TradeForm> darreichungen;
 
     @Override
     public boolean equals(Object object) {

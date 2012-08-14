@@ -1,7 +1,7 @@
 package op.threads;
 
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedBestandTools;
+import entity.prescription.MedStock;
+import entity.prescription.MedStockTools;
 import op.OPDE;
 import op.system.PrinterType;
 import op.tools.PrintListElement;
@@ -158,15 +158,15 @@ public class PrintProcessor extends Thread {
 
     private Object getPrintableObject(PrintListElement element) {
         Object printableObject = null;
-        if (element.getObject() instanceof MedBestand) {
-            MedBestand bestand = (MedBestand) element.getObject();
+        if (element.getObject() instanceof MedStock) {
+            MedStock bestand = (MedStock) element.getObject();
             OPDE.debug("PrintProcessor druckt BestID: " + bestand.getBestID());
 //            if (element.getPrinter().isPageprinter()) {
 //                printableObject = new TKLabel(VorratTools.getVorrat4Printing(vorrat));
 //            } else {
 //                printableObject = element.getForm().getForm(VorratTools.getVorrat4Printing(vorrat));
 //            }
-            printableObject = element.getForm().getFormtext(MedBestandTools.getBestand4Printing(bestand));
+            printableObject = element.getForm().getFormtext(MedStockTools.getBestand4Printing(bestand));
         }
         return printableObject;
     }

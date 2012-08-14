@@ -4,6 +4,8 @@
  */
 package entity;
 
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
@@ -22,7 +24,7 @@ import java.util.List;
 public class BarbetragTools {
 
     // TGID, BelegDatum, Belegtext, Betrag, _creator, _editor, _cdate, _edate, _cancel
-    public static String getEinzelnAsHTML(List<Barbetrag> listTG, BigDecimal vortrag, Bewohner bewohner) {
+    public static String getEinzelnAsHTML(List<Barbetrag> listTG, BigDecimal vortrag, Resident bewohner) {
 
         SimpleDateFormat df = new SimpleDateFormat("MMMM yyyy");
         DecimalFormat currency = new DecimalFormat("######.00");
@@ -33,7 +35,7 @@ public class BarbetragTools {
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = "Barbetragsübersicht für " + BewohnerTools.getBWLabelText(bewohner);
+        String header = "Barbetragsübersicht für " + ResidentTools.getBWLabelText(bewohner);
 
         String html = "<html>\n"
                 + "<head>\n"

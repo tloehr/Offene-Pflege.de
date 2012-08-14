@@ -26,8 +26,8 @@
  */
 package tablerenderer;
 
-import entity.verordnungen.BHP;
-import entity.verordnungen.BHPTools;
+import entity.prescription.BHP;
+import entity.prescription.BHPTools;
 import op.tools.SYSConst;
 import tablemodels.TMBHP;
 
@@ -54,20 +54,20 @@ public class RNDBHP extends RNDHTML {
 
         color = panel.getBackground();
 
-        if (bhp.getStatus() != BHPTools.STATUS_OFFEN) {
+        if (bhp.getStatus() != BHPTools.STATE_OPEN) {
             if (isSelected) {
                 color = SYSConst.bluegrey;
-                if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
+                if (bhp.getStatus() == BHPTools.STATE_DONE) {
                     color = SYSConst.darkolivegreen4;
                 }
-                if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
+                if (bhp.getStatus() == BHPTools.STATE_REFUSED || bhp.getStatus() == BHPTools.STATE_REFUSED_DISCARDED) {
                     color = SYSConst.salmon4;
                 }
             } else {
-                if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
+                if (bhp.getStatus() == BHPTools.STATE_DONE) {
                     color = SYSConst.darkolivegreen2;
                 }
-                if (bhp.getStatus() == BHPTools.STATUS_VERWEIGERT || bhp.getStatus() == BHPTools.STATUS_VERWEIGERT_VERWORFEN) {
+                if (bhp.getStatus() == BHPTools.STATE_REFUSED || bhp.getStatus() == BHPTools.STATE_REFUSED_DISCARDED) {
                     color = SYSConst.salmon2;
                 }
             }
@@ -91,9 +91,9 @@ public class RNDBHP extends RNDHTML {
             }
 
             ImageIcon icon;
-            if (bhp.getStatus() == BHPTools.STATUS_OFFEN) {
+            if (bhp.getStatus() == BHPTools.STATE_OPEN) {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/infoyellow.png"));
-            } else if (bhp.getStatus() == BHPTools.STATUS_ERLEDIGT) {
+            } else if (bhp.getStatus() == BHPTools.STATE_DONE) {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
             } else {
                 icon = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/cancel.png"));

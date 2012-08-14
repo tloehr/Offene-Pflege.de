@@ -28,7 +28,7 @@ package op.care.med.vorrat;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -44,7 +44,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author tloehr
@@ -52,13 +51,13 @@ import java.util.Date;
 public class DlgBestandAbschliessen extends MyJDialog {
 
 
-    private MedBestand bestand;
+    private MedStock bestand;
     private Closure actionBlock;
 
     /**
      * Creates new form DlgBestandAnbruch
      */
-    public DlgBestandAbschliessen(MedBestand bestand, Closure actionBlock) {
+    public DlgBestandAbschliessen(MedStock bestand, Closure actionBlock) {
         super();
         this.actionBlock = actionBlock;
         this.bestand = bestand;
@@ -271,17 +270,17 @@ public class DlgBestandAbschliessen extends MyJDialog {
 ////        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
 
         String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getBestID() + "</b></font> abschließen.";
-        text += "<br/>" + MedBestandTools.getBestandTextAsHTML(bestand) + "</br>";
+        text += "<br/>" + MedStockTools.getBestandTextAsHTML(bestand) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(text));
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT b FROM MedBestand b " +
+                " SELECT b FROM MedStock b " +
                 " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
                 " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
-        query.setParameter("vorrat", bestand.getVorrat());
+        query.setParameter("vorrat", bestand.getInventory());
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
@@ -290,7 +289,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
         cmbBestID.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                String text = o instanceof MedBestand ? ((MedBestand) o).getBestID().toString() : o.toString();
+                String text = o instanceof MedStock ? ((MedStock) o).getBestID().toString() : o.toString();
                 return new JLabel(text);
             }
         });
@@ -299,11 +298,11 @@ public class DlgBestandAbschliessen extends MyJDialog {
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
 
-        lblEinheiten.setText(MedFormenTools.EINHEIT[bestand.getDarreichung().getMedForm().getPackEinheit()] + " verbraucht");
+        lblEinheiten.setText(DosageFormTools.EINHEIT[bestand.getDarreichung().getMedForm().getPackEinheit()] + " verbraucht");
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
-        rbStellen.setEnabled(bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV1);
+        rbStellen.setEnabled(bestand.getDarreichung().getMedForm().getStatus() == DosageFormTools.APV1);
     }
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
@@ -334,8 +333,8 @@ public class DlgBestandAbschliessen extends MyJDialog {
         if (cmbBestID.getSelectedIndex() == 0) {
             cmbBestID.setToolTipText(null);
         } else {
-            MedBestand myBestand = (MedBestand) cmbBestID.getSelectedItem();
-            cmbBestID.setToolTipText(SYSTools.toHTML(MedBestandTools.getBestandTextAsHTML(myBestand)));
+            MedStock myBestand = (MedStock) cmbBestID.getSelectedItem();
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getBestandTextAsHTML(myBestand)));
         }
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 
@@ -355,16 +354,16 @@ public class DlgBestandAbschliessen extends MyJDialog {
             OPDE.info("Bestands Nr. " + bestand.getBestID() + " wird abgeschlossen");
             OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUKennung());
 
-            MedBestand nextBest = null;
+            MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
-                nextBest = em.merge((MedBestand) cmbBestID.getSelectedItem());
+                nextBest = em.merge((MedStock) cmbBestID.getSelectedItem());
                 em.lock(nextBest, LockModeType.OPTIMISTIC);
             }
 
             if (rbStellen.isSelected()) {
                 bestand.setNaechsterBestand(nextBest);
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
-                MedBestandTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_VORAB);
+                MedStockTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_VORAB);
 
                 OPDE.info(classname + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
@@ -373,14 +372,14 @@ public class DlgBestandAbschliessen extends MyJDialog {
                 BigDecimal apv = bestand.getApv();
 
                 if (rbGefallen.isSelected()) {
-                    MedBestandTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
+                    MedStockTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedBestandTools.abschliessen(em,bestand, "Packung ist abgelaufen.", MedBuchungenTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
+                    MedStockTools.abschliessen(em, bestand, "Packung ist abgelaufen.", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
-                    MedBestandTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedBuchungenTools.STATUS_KORREKTUR_AUTO_LEER);
-                    apv = MedBestandTools.berechneAPV(bestand);
+                    MedStockTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_LEER);
+                    apv = MedStockTools.berechneAPV(bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
             }

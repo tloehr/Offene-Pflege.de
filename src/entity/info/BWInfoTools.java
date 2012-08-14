@@ -1,7 +1,7 @@
 package entity.info;
 
 import entity.*;
-import entity.verordnungen.VerordnungTools;
+import entity.prescription.PrescriptionsTools;
 import op.OPDE;
 import op.tools.*;
 import org.joda.time.DateTime;
@@ -55,7 +55,7 @@ public class BWInfoTools {
         return html;
     }
 
-    public static BWInfo getLastBWInfo(Bewohner bewohner, BWInfoTyp bwinfotyp) {
+    public static BWInfo getLastBWInfo(Resident bewohner, BWInfoTyp bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
         query.setParameter("bewohner", bewohner);
@@ -67,7 +67,7 @@ public class BWInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static BWInfo getFirstBWInfo(Bewohner bewohner, BWInfoTyp bwinfotyp) {
+    public static BWInfo getFirstBWInfo(Resident bewohner, BWInfoTyp bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
         query.setParameter("bewohner", bewohner);
@@ -79,7 +79,7 @@ public class BWInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static List<BWInfo> findByBewohnerUndTyp(Bewohner bewohner, BWInfoTyp typ) {
+    public static List<BWInfo> findByBewohnerUndTyp(Resident bewohner, BWInfoTyp typ) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
         query.setParameter("bewohner", bewohner);
@@ -89,7 +89,7 @@ public class BWInfoTools {
         return bwInfos;
     }
 
-    public static List<BWInfo> getActiveBWInfosByBewohnerUndKatArt(Bewohner bewohner, int katart) {
+    public static List<BWInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis AND b.bwinfotyp.bwInfokat.katArt = :katart ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
@@ -141,12 +141,12 @@ public class BWInfoTools {
     }
 
 
-    public static boolean isAusgezogen(Bewohner bewohner) {
+    public static boolean isAusgezogen(Resident bewohner) {
         BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
         return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
     }
 
-    public static boolean isVerstorben(Bewohner bewohner) {
+    public static boolean isVerstorben(Resident bewohner) {
         BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
         return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
     }
@@ -157,12 +157,12 @@ public class BWInfoTools {
      *
      * @return Date of the departure. null if not away.
      */
-    public static Date absentSince(Bewohner bewohner) {
+    public static Date absentSince(Resident bewohner) {
         BWInfo lastabsence = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
         return lastabsence == null || lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
     }
 
-    public static boolean isAbwesend(Bewohner bewohner) {
+    public static boolean isAbwesend(Resident bewohner) {
         return absentSince(bewohner) != null;
     }
 
@@ -455,7 +455,7 @@ public class BWInfoTools {
     }
 
 
-    public static String getUeberleitung(Bewohner bewohner, boolean withlongheader,
+    public static String getUeberleitung(Resident bewohner, boolean withlongheader,
                                          boolean medi, boolean bilanz, boolean bericht,
                                          boolean diag, boolean grundpflege, boolean haut, boolean vital) {
 
@@ -471,7 +471,7 @@ public class BWInfoTools {
 
         DateFormat df = DateFormat.getDateInstance();
         if (withlongheader) {
-            result += "<h2 id=\"fonth2\">" + BewohnerTools.getBWLabelText(bewohner) + "</h2>";
+            result += "<h2 id=\"fonth2\">" + ResidentTools.getBWLabelText(bewohner) + "</h2>";
         }
         result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
 
@@ -697,12 +697,12 @@ public class BWInfoTools {
          */
         if (medi) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM Verordnung b WHERE b.bewohner = :bewohner AND b.abDatum > :now ");
+            Query query = em.createQuery("SELECT b FROM Prescriptions b WHERE b.bewohner = :bewohner AND b.abDatum > :now ");
             query.setParameter("bewohner", bewohner);
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
-            result += VerordnungTools.getVerordnungenAsHTML(listeVerordnungen, false);
+            result += PrescriptionsTools.getPrescriptionenAsHTML(listeVerordnungen, false);
             em.close();
         }
 
@@ -926,7 +926,7 @@ public class BWInfoTools {
         return result;
     }
 
-    private static String getDiagnosen(Bewohner bewohner) {
+    private static String getDiagnosen(Resident bewohner) {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.bis > :now ORDER BY b.von DESC");
@@ -977,7 +977,7 @@ public class BWInfoTools {
         return props;
     }
 
-    public static void alleAbsetzen(EntityManager em, Bewohner bewohner) throws Exception {
+    public static void alleAbsetzen(EntityManager em, Resident bewohner) throws Exception {
         Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bis >= :now");
         query.setParameter("bewohner", bewohner);
         query.setParameter("now", new Date());

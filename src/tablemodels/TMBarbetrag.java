@@ -28,7 +28,7 @@
 package tablemodels;
 
 import entity.Barbetrag;
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -55,13 +55,13 @@ public class TMBarbetrag extends AbstractTableModel {
     //    int offset;
     Date von;
     Date bis;
-    Bewohner bewohner;
+    Resident bewohner;
     List<Barbetrag> listData;
 
     boolean editable = false;
 
 
-    public TMBarbetrag(Bewohner bewohner, Date von, Date bis, boolean editable) {
+    public TMBarbetrag(Resident bewohner, Date von, Date bis, boolean editable) {
         super();
 
         this.subset = von != null;

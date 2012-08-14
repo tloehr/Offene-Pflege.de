@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 /**
  * Created by shortelliJ IDEA.
@@ -7,7 +7,7 @@ package entity.verordnungen;
  * Time: 16:30
  * To change this template use File | Settings | File Templates.
  */
-public class MedBuchungenTools {
+public class MedStockTransactionTools {
     public static final short STATUS_AUSBUCHEN_NORMAL = 0;
     public static final short STATUS_EINBUCHEN_ANFANGSBESTAND = 1;
     public static final short STATUS_KORREKTUR_MANUELL = 2;

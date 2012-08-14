@@ -27,7 +27,7 @@
 
 package op.care.med;
 
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -36,24 +36,23 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.math.BigDecimal;
 
 /**
  * @author root
  */
 public class DlgDAF extends javax.swing.JDialog {
-    private Darreichung darreichung;
+    private TradeForm darreichung;
     private boolean editMode;
 
 
-    public DlgDAF(JFrame parent, String title, Darreichung darreichung) {
+    public DlgDAF(JFrame parent, String title, TradeForm darreichung) {
         super(parent, true);
         initComponents();
         this.darreichung = darreichung;
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("MedFormen.findAll");
-        cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new MedFormen[]{})));
-        cmbForm.setRenderer(MedFormenTools.getMedFormenRenderer(0));
+        cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
+        cmbForm.setRenderer(DosageFormTools.getMedFormenRenderer(0));
         em.close();
         editMode = darreichung.getDafID() != null;
 
@@ -233,7 +232,7 @@ public class DlgDAF extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
         darreichung.setZusatz(txtZusatz.getText());
-        darreichung.setMedForm((MedFormen) cmbForm.getSelectedItem());
+        darreichung.setMedForm((DosageForm) cmbForm.getSelectedItem());
 
 
         EntityManager em = OPDE.createEM();
@@ -258,7 +257,7 @@ public class DlgDAF extends javax.swing.JDialog {
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void cmbFormItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbFormItemStateChanged
-        MedFormen form = (MedFormen) evt.getItem();
+        DosageForm form = (DosageForm) evt.getItem();
 //        lblAnw.setText(MedFormenTools.EINHEIT[form.getAnwEinheit()]);
 //        lblPack.setText(MedFormenTools.EINHEIT[form.getPackEinheit()]);
 //        txtAPV.setText("1");

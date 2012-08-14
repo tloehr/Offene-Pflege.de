@@ -1,8 +1,6 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import entity.Arzt;
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -10,9 +8,6 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Created by IntelliJ IDEA.

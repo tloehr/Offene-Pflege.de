@@ -1,6 +1,6 @@
 package entity.planung;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.EntityTools;
 import entity.info.BWInfoKat;
 import op.OPDE;
@@ -23,7 +23,7 @@ import java.util.List;
 public class NursingProcessTools {
     public static final String UNIQUEID = "__plankenn";
 
-    public static List<NursingProcess> findByKategorieAndBewohner(Bewohner bewohner, BWInfoKat kat) {
+    public static List<NursingProcess> findByKategorieAndBewohner(Resident bewohner, BWInfoKat kat) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.bewohner = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
         query.setParameter("kat", kat);

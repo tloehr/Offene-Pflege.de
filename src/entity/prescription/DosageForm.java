@@ -1,4 +1,4 @@
-package entity.verordnungen;
+package entity.prescription;
 
 import entity.planung.Intervention;
 
@@ -8,19 +8,19 @@ import java.io.Serializable;
 @Entity
 @Table(name = "MPFormen")
 @NamedQueries({
-    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM MedFormen m ORDER BY m.zubereitung, m.anwText "),
-    @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM MedFormen m WHERE m.formID = :formID"),
-    @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM MedFormen m WHERE m.zubereitung = :zubereitung"),
-    @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM MedFormen m WHERE m.anwText = :anwText"),
-    @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM MedFormen m WHERE m.anwEinheit = :anwEinheit"),
-    @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM MedFormen m WHERE m.packEinheit = :packEinheit"),
-    @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM MedFormen m WHERE m.stellplan = :stellplan"),
-    @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM MedFormen m WHERE m.status = :status"),
-    @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM MedFormen m WHERE m.equiv = :equiv")})
+    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM DosageForm m ORDER BY m.zubereitung, m.anwText "),
+    @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM DosageForm m WHERE m.formID = :formID"),
+    @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM DosageForm m WHERE m.zubereitung = :zubereitung"),
+    @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM DosageForm m WHERE m.anwText = :anwText"),
+    @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM DosageForm m WHERE m.anwEinheit = :anwEinheit"),
+    @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM DosageForm m WHERE m.packEinheit = :packEinheit"),
+    @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM DosageForm m WHERE m.stellplan = :stellplan"),
+    @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM DosageForm m WHERE m.status = :status"),
+    @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM DosageForm m WHERE m.equiv = :equiv")})
 /**
  *
  */
-public class MedFormen implements Serializable {
+public class DosageForm implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +49,7 @@ public class MedFormen implements Serializable {
     @Column(name = "Equiv")
     private int equiv;
 
-    public MedFormen() {
+    public DosageForm() {
     }
 
 
@@ -150,10 +150,10 @@ public class MedFormen implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedFormen)) {
+        if (!(object instanceof DosageForm)) {
             return false;
         }
-        MedFormen other = (MedFormen) object;
+        DosageForm other = (DosageForm) object;
         if ((this.formID == null && other.formID != null) || (this.formID != null && !this.formID.equals(other.formID))) {
             return false;
         }

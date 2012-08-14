@@ -144,7 +144,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/ambulance2.png</string> 
+              <string>/artwork/48x48/ambulance2.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -177,7 +177,7 @@
              <string>pressedIcon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/ambulance2_pressed.png</string> 
+              <string>/artwork/48x48/ambulance2_pressed.png</string> 
              </object> 
             </void> 
             <void property="name"> 
@@ -313,37 +313,6 @@
             <void method="setProperty"> 
              <string>gridX</string> 
              <int>5</int> 
-            </void> 
-           </object> 
-          </void> 
-          <void method="add"> 
-           <object class="com.jformdesigner.model.FormComponent"> 
-            <string>javax.swing.JButton</string> 
-            <void method="setProperty"> 
-             <string>text</string> 
-             <string>text</string> 
-            </void> 
-            <void property="name"> 
-             <string>button1</string> 
-            </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.ActionListener</string> 
-              <string>actionPerformed</string> 
-              <string>button1ActionPerformed</string> 
-              <boolean>true</boolean> 
-             </object> 
-            </void> 
-           </object> 
-           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-            <class>com.jgoodies.forms.layout.CellConstraints</class> 
-            <void method="setProperty"> 
-             <string>gridX</string> 
-             <int>3</int> 
-            </void> 
-            <void method="setProperty"> 
-             <string>gridY</string> 
-             <int>7</int> 
             </void> 
            </object> 
           </void> 

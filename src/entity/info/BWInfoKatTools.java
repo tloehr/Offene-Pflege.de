@@ -1,6 +1,5 @@
 package entity.info;
 
-import entity.verordnungen.Darreichung;
 import op.OPDE;
 import op.care.info.PnlInfo;
 import op.tools.InternalClassACL;

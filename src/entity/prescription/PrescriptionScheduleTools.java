@@ -1,6 +1,5 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -16,13 +15,13 @@ import java.text.SimpleDateFormat;
  * Time: 15:35
  * To change this template use File | Settings | File Templates.
  */
-public class VerordnungPlanungTools {
+public class PrescriptionScheduleTools {
     public static final int ZEIT = 0;
     public static final int UHRZEIT = 1;
     public static final int MAXDOSIS = 2;
 
 
-    public static int getTerminStatus(VerordnungPlanung planung) {
+    public static int getTerminStatus(PrescriptionSchedule planung) {
         int status = 0;
         if (planung.verwendetZeiten()) {
             status = ZEIT;
@@ -44,7 +43,7 @@ public class VerordnungPlanungTools {
      * @param writeTaeglich hiermit kann man festlegen, ob bei den Dosierungen, die jeden Tag gegeben werden sollen, das Wort <i>täglich</i> in die Wiederholungsspalte geschrieben wird oder nicht.
      * @return
      */
-    public static String getWiederholung(VerordnungPlanung planung, boolean writeTaeglich) {
+    public static String getWiederholung(PrescriptionSchedule planung, boolean writeTaeglich) {
         String result = "<div id=\"fonttext\">";
 
         if (planung.isTaeglich()) {
@@ -121,7 +120,7 @@ public class VerordnungPlanungTools {
         return result + "</div>";
     }
 
-    public static String getDosisAsHTML(VerordnungPlanung planung, VerordnungPlanung vorherigePlanung, boolean singleUsageOnly) {
+    public static String getDosisAsHTML(PrescriptionSchedule planung, PrescriptionSchedule vorherigePlanung, boolean singleUsageOnly) {
         String result = "<div id=\"fonttext\">";
 
         // Wenn die vorherige Planung null ist, dann muss das hier der De erste durchlauf sein
@@ -197,30 +196,30 @@ public class VerordnungPlanungTools {
     }
 
 
-    public static String getHinweis(VerordnungPlanung planung, boolean writeTaeglich) {
+    public static String getHinweis(PrescriptionSchedule planung, boolean writeTaeglich) {
         String result = "";
 
         // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
         if (planung.verwendetMaximalDosis()) {
             result += "Maximale Tagesdosis: ";
-            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()];
+            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + DosageFormTools.EINHEIT[planung.getPrescription().getDarreichung().getMedForm().getAnwEinheit()];
             result += "<br/>";
         } else if (planung.verwendetUhrzeit()) {
 
             result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + " Uhr</u></b> ";
             result += HTMLTools.printDouble(planung.getUhrzeitDosis());
-            result += planung.getVerordnung().hasMedi() ? " " + MedFormenTools.EINHEIT[planung.getVerordnung().getDarreichung().getMedForm().getAnwEinheit()] : "x";
+            result += planung.getPrescription().hasMedi() ? " " + DosageFormTools.EINHEIT[planung.getPrescription().getDarreichung().getMedForm().getAnwEinheit()] : "x";
             result += "<br/>";
         }
 
         String wiederholung = getWiederholung(planung, writeTaeglich);
         result += wiederholung;
 
-        if (!SYSTools.catchNull(planung.getVerordnung().getBemerkung()).isEmpty()) {
+        if (!SYSTools.catchNull(planung.getPrescription().getBemerkung()).isEmpty()) {
             if (!wiederholung.isEmpty()) {
                 result += "<br/>";
             }
-            result += "<b><u>Bemerkung:</u></b> " + planung.getVerordnung().getBemerkung();
+            result += "<b><u>Bemerkung:</u></b> " + planung.getPrescription().getBemerkung();
         }
 
         return result.equals("") ? "&nbsp;" : result;

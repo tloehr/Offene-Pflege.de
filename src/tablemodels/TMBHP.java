@@ -26,11 +26,10 @@
  */
 package tablemodels;
 
-import entity.Bewohner;
-import entity.verordnungen.BHP;
-import entity.verordnungen.BHPTools;
-import entity.verordnungen.Verordnung;
-import entity.verordnungen.VerordnungTools;
+import entity.info.Resident;
+import entity.prescription.BHP;
+import entity.prescription.BHPTools;
+import entity.prescription.PrescriptionsTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -67,7 +66,7 @@ public class TMBHP extends AbstractTableModel {
     /**
      * @param schicht entsprechen OC_Const.ZEIT
      */
-    public TMBHP(Bewohner bewohner, Date datum, int schicht) {
+    public TMBHP(Resident bewohner, Date datum, int schicht) {
         super();
 
         comparator = new Comparator<Object[]>() {
@@ -203,7 +202,7 @@ public class TMBHP extends AbstractTableModel {
 
         switch (col) {
             case COL_BEZEICHNUNG: {
-                result = VerordnungTools.getMassnahme(bhp.getVerordnungPlanung().getVerordnung());
+                result = PrescriptionsTools.getMassnahme(bhp.getPrescriptionSchedule().getPrescription());
                 break;
             }
             case COL_DOSIS: {
@@ -223,7 +222,7 @@ public class TMBHP extends AbstractTableModel {
                 break;
             }
             case COL_UKENNUNG: {
-                result = SYSTools.catchNull(bhp.getUser().getUKennung());
+                result = bhp.getStatus() != BHPTools.STATE_OPEN ? bhp.getUser().getUKennung() : "";
                 break;
             }
             case COL_BEMPLAN: {
@@ -235,8 +234,8 @@ public class TMBHP extends AbstractTableModel {
                         result = result.toString() + "<i>nächster anzubrechender Bestand Nr.: " + nextbest + "<i><br/>";
                     }
                 }
-                if (!SYSTools.catchNull(bhp.getVerordnungPlanung().getVerordnung().getBemerkung()).isEmpty()) {
-                    result = result.toString() + "<b>Bemerkung:</b> " + bhp.getVerordnungPlanung().getVerordnung().getBemerkung();
+                if (!SYSTools.catchNull(bhp.getPrescriptionSchedule().getPrescription().getBemerkung()).isEmpty()) {
+                    result = result.toString() + "<b>Bemerkung:</b> " + bhp.getPrescriptionSchedule().getPrescription().getBemerkung();
                 }
                 break;
             }

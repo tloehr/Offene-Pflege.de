@@ -1,10 +1,8 @@
 package tablemodels;
 
-import entity.verordnungen.DarreichungTools;
-import entity.verordnungen.MedFormenTools;
-import entity.verordnungen.MedVorrat;
-import entity.verordnungen.MedVorratTools;
-import op.OPDE;
+import entity.prescription.DosageFormTools;
+import entity.prescription.MedInventory;
+import entity.prescription.MedInventoryTools;
 import op.tools.Pair;
 import op.tools.SYSConst;
 
@@ -22,9 +20,9 @@ import java.util.List;
 public class TMVorraete extends AbstractTableModel {
     public static final int COL_NAME = 0;
     public static final int COL_MENGE = 1;
-    protected List<Pair<MedVorrat, BigDecimal>> data;
+    protected List<Pair<MedInventory, BigDecimal>> data;
 
-    public TMVorraete(List<Pair<MedVorrat, BigDecimal>> data) {
+    public TMVorraete(List<Pair<MedInventory, BigDecimal>> data) {
         this.data = data;
     }
 
@@ -34,22 +32,22 @@ public class TMVorraete extends AbstractTableModel {
     }
 
     public void setBestandsMenge(int row, BigDecimal menge) {
-        data.set(row, new Pair<MedVorrat, BigDecimal>(getVorrat(row), menge));
+        data.set(row, new Pair<MedInventory, BigDecimal>(getVorrat(row), menge));
     }
 
 
-    public List<Pair<MedVorrat, BigDecimal>> getData() {
+    public List<Pair<MedInventory, BigDecimal>> getData() {
         return data;
     }
 
-    public MedVorrat getVorrat(int row) {
+    public MedInventory getVorrat(int row) {
         return data.get(row).getFirst();
     }
 
-    public int findPositionOf(MedVorrat vorrat) {
+    public int findPositionOf(MedInventory inventory) {
         int pos = -1;
-        for (Pair<MedVorrat, BigDecimal> pair : data) {
-            if (pair.getFirst().equals(vorrat)) {
+        for (Pair<MedInventory, BigDecimal> pair : data) {
+            if (pair.getFirst().equals(inventory)) {
                 pos = data.indexOf(pair);
                 break;
             }
@@ -72,11 +70,11 @@ public class TMVorraete extends AbstractTableModel {
         Object result = "";
         switch (col) {
             case COL_NAME: {
-                result = MedVorratTools.getVorratAsHTML(getVorrat(row));
+                result = MedInventoryTools.getVorratAsHTML(getVorrat(row));
                 break;
             }
             case COL_MENGE: {
-                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + MedFormenTools.EINHEIT[MedVorratTools.getForm(getVorrat(row)).getPackEinheit()] + "</font>";
+                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + DosageFormTools.EINHEIT[MedInventoryTools.getForm(getVorrat(row)).getPackEinheit()] + "</font>";
                 break;
             }
             default: {

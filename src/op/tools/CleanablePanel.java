@@ -27,9 +27,6 @@
 
 package op.tools;
 
-import entity.Bewohner;
-import op.events.TaskPaneContentChangedListener;
-
 /**
  * @author tloehr
  */

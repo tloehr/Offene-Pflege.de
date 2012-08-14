@@ -10,7 +10,7 @@ import entity.Pflegeberichte;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import entity.info.BWInfo;
-import entity.verordnungen.Verordnung;
+import entity.prescription.Prescriptions;
 import op.OPDE;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
@@ -137,7 +137,7 @@ public class DlgFiles extends MyJDialog {
             query.setParameter("pflegebericht", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
             Collections.sort(files);
-        } else if (attachable instanceof Verordnung) {
+        } else if (attachable instanceof Prescriptions) {
             Query query = em.createNamedQuery("SYSFiles.findByVerordnung", SYSFiles.class);
             query.setParameter("verordnung", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());

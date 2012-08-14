@@ -30,7 +30,7 @@ package op.care.med.vorrat;
 import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -50,10 +50,10 @@ public class DlgEditBuchung extends JPanel {
     private Closure actionBlock;
     private BigDecimal bestandsumme;
     private BigDecimal packgroesse;
-    private MedBestand bestand;
-    private MedBuchungen buchung;
+    private MedStock bestand;
+    private MedStockTransaction buchung;
 
-    public DlgEditBuchung(MedBestand bestand, Closure actionBlock) {
+    public DlgEditBuchung(MedStock bestand, Closure actionBlock) {
         this.bestand = bestand;
         this.actionBlock = actionBlock;
         this.buchung = null;
@@ -67,9 +67,9 @@ public class DlgEditBuchung extends JPanel {
     private void initDialog() {
         initComponents();
 //        setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
-        bestandsumme = MedBestandTools.getBestandSumme(bestand);
+        bestandsumme = MedStockTools.getBestandSumme(bestand);
 
-        lblEinheit.setText(DarreichungTools.getPackungsEinheit(bestand.getDarreichung()));
+        lblEinheit.setText(TradeFormTools.getPackungsEinheit(bestand.getDarreichung()));
 
         if (bestand.hasPackung()) {
             packgroesse = bestand.getPackung().getInhalt();
@@ -181,7 +181,7 @@ public class DlgEditBuchung extends JPanel {
     }//GEN-LAST:event_btnBuchungActionPerformed
 
     private void save() {
-        buchung = new MedBuchungen(bestand, menge, MedBuchungenTools.STATUS_KORREKTUR_MANUELL);
+        buchung = new MedStockTransaction(bestand, menge, MedStockTransactionTools.STATUS_KORREKTUR_MANUELL);
         buchung.setText(txtText.getText());
     }
 
@@ -189,7 +189,7 @@ public class DlgEditBuchung extends JPanel {
         return txtText;
     }
 
-    public MedBuchungen getBuchung() {
+    public MedStockTransaction getBuchung() {
         return buchung;
     }
 

@@ -25,14 +25,13 @@
  */
 package entity.files;
 
-import entity.Bewohner;
+import entity.info.Resident;
 import entity.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author tloehr
@@ -105,7 +104,7 @@ public class SYSFiles implements Serializable, Comparable {
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
     //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
 //    private Collection<Sysbw2file> bwAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
@@ -118,7 +117,7 @@ public class SYSFiles implements Serializable, Comparable {
     public SYSFiles() {
     }
 
-    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user, Bewohner bewohner) {
+    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user, Resident bewohner) {
         this.filename = filename;
         this.md5 = md5;
         this.filedate = filedate;
@@ -173,11 +172,11 @@ public class SYSFiles implements Serializable, Comparable {
         return md5;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 

@@ -26,7 +26,7 @@
  */
 package tablemodels;
 
-import entity.verordnungen.*;
+import entity.prescription.*;
 import op.tools.SYSConst;
 
 import javax.swing.table.AbstractTableModel;
@@ -69,16 +69,16 @@ public class TMBedarf
         return String.class;
     }
 
-    public Verordnung getVerordnung(int row) {
-        return (Verordnung) listeBedarf.get(row)[0];
+    public Prescriptions getPrescription(int row) {
+        return (Prescriptions) listeBedarf.get(row)[0];
     }
 
     public Situationen getSituation(int row) {
         return (Situationen) listeBedarf.get(row)[1];
     }
 
-    public VerordnungPlanung getVerordnungPlanung(int row) {
-        return (VerordnungPlanung) listeBedarf.get(row)[2];
+    public PrescriptionSchedule getPrescriptionSchedule(int row) {
+        return (PrescriptionSchedule) listeBedarf.get(row)[2];
     }
 
     public BigDecimal getVorratSaldo(int row) {
@@ -101,23 +101,23 @@ public class TMBedarf
         return (BigDecimal) listeBedarf.get(row)[6];
     }
 
-    public Darreichung getDarreichung(int row) {
-        return (Darreichung) listeBedarf.get(row)[5];
+    public TradeForm getDarreichung(int row) {
+        return (TradeForm) listeBedarf.get(row)[5];
     }
 
-    public MedBestand getBestand(int row) {
-        return (MedBestand) listeBedarf.get(row)[8];
+    public MedStock getBestand(int row) {
+        return (MedStock) listeBedarf.get(row)[8];
     }
 
     public boolean isMaximaleTagesdosisErreicht(int row) {
-        VerordnungPlanung vp = getVerordnungPlanung(row);
+        PrescriptionSchedule vp = getPrescriptionSchedule(row);
         BigDecimal maxTagesdosis = vp.getMaxEDosis().multiply(new BigDecimal(vp.getMaxAnzahl()));
         BigDecimal bisherigeTagesdosisPlusEineGabe = getTagesdosisBisher(row).add(vp.getMaxEDosis());
         return bisherigeTagesdosisPlusEineGabe.compareTo(maxTagesdosis) > 0;
     }
 
-    public MedVorrat getVorrat(int row) {
-        return getBestand(row) == null ? null : getBestand(row).getVorrat();
+    public MedInventory getVorrat(int row) {
+        return getBestand(row) == null ? null : getBestand(row).getInventory();
     }
 
     /**
@@ -126,11 +126,11 @@ public class TMBedarf
      */
     protected String getDosis(int row) {
         String result = "";
-        if (cache.containsKey(getVerordnung(row))) {
-            result = cache.get(getVerordnung(row)).toString();
+        if (cache.containsKey(getPrescription(row))) {
+            result = cache.get(getPrescription(row)).toString();
         } else {
-            result = VerordnungTools.getDosis(getVerordnung(row), true, getVorrat(row), getBestand(row));
-            cache.put(getVerordnung(row), result);
+            result = PrescriptionsTools.getDosis(getPrescription(row), true, getVorrat(row), getBestand(row));
+            cache.put(getPrescription(row), result);
         }
         return result;
     }
@@ -138,7 +138,7 @@ public class TMBedarf
     @Override
     public Object getValueAt(int row, int col) {
 
-        String result = "<font size=\"+1\">"+VerordnungTools.getMassnahme(getVerordnung(row))+"</font>";
+        String result = "<font size=\"+1\">"+ PrescriptionsTools.getMassnahme(getPrescription(row))+"</font>";
 
         result += SYSConst.html_fontface;
         result += "<br/>" + getDosis(row);
@@ -149,11 +149,11 @@ public class TMBedarf
             result += "<br/><b>Keine weitere Gabe des Medikamentes mehr möglich. Tagesdosis ist erreicht</b>";
         } else {
 
-            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : MedFormenTools.EINHEIT[getDarreichung(row).getMedForm().getAnwEinheit()];
+            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : DosageFormTools.EINHEIT[getDarreichung(row).getMedForm().getAnwEinheit()];
         }
 
         result += "</font>";
-        result += "<br/>" + VerordnungTools.getHinweis(getVerordnung(row));
+        result += "<br/>" + PrescriptionsTools.getHinweis(getPrescription(row));
 
 
         return result;

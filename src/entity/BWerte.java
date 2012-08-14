@@ -4,6 +4,7 @@
  */
 package entity;
 
+import entity.info.Resident;
 import entity.vorgang.SYSBWerte2VORGANG;
 import entity.vorgang.VorgangElement;
 
@@ -93,7 +94,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Bewohner bewohner;
+    private Resident bewohner;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
 //    private Collection<Sysbwerte2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
@@ -111,11 +112,11 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
     public BWerte() {
     }
 
-    public BWerte(Bewohner bewohner, Users user) {
+    public BWerte(Resident bewohner, Users user) {
         this(new Date(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", new Date(), new Date(), BWerteTools.UNKNOWN, null, null, null, user, bewohner);
     }
 
-    public BWerte(Date pit, BigDecimal wert2, BigDecimal wert3, BigDecimal wert, String bemerkung, Date cdate, Date mdate, Integer type, Users editedBy, BWerte replacedBy, BWerte replacementFor, Users user, Bewohner bewohner) {
+    public BWerte(Date pit, BigDecimal wert2, BigDecimal wert3, BigDecimal wert, String bemerkung, Date cdate, Date mdate, Integer type, Users editedBy, BWerte replacedBy, BWerte replacementFor, Users user, Resident bewohner) {
         this.pit = pit;
         this.wert2 = wert2;
         this.wert3 = wert3;
@@ -219,7 +220,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         return attachedVorgaenge;
     }
 
-    public Bewohner getBewohner() {
+    public Resident getBewohner() {
         return bewohner;
     }
 
@@ -256,7 +257,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         replacementFor = null;
     }
 
-    public void setBewohner(Bewohner bewohner) {
+    public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
     }
 

@@ -1,6 +1,6 @@
-package entity.verordnungen;
+package entity.prescription;
 
-import entity.BewohnerTools;
+import entity.info.ResidentTools;
 import entity.Stationen;
 import op.OPDE;
 import op.tools.SYSConst;
@@ -25,7 +25,7 @@ import java.util.List;
  * Time: 14:28
  * To change this template use File | Settings | File Templates.
  */
-public class MedBestandTools {
+public class MedStockTools {
 //    public static boolean apvNeuberechnung = true;
 
     public static ListCellRenderer getBestandOnlyIDRenderer() {
@@ -35,8 +35,8 @@ public class MedBestandTools {
                 String text;
                 if (o == null) {
                     text = "<i>Keine Auswahl</i>";//SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedBestand) {
-                    text = ((MedBestand) o).getBestID().toString();
+                } else if (o instanceof MedStock) {
+                    text = ((MedStock) o).getBestID().toString();
                 } else {
                     text = o.toString();
                 }
@@ -71,15 +71,15 @@ public class MedBestandTools {
     /**
      * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
      *
-     * @param vorrat
+     * @param inventory
      * @return der angebrochene Bestand. null, wenn es keinen gab.
      */
-    public static MedBestand getBestandImAnbruch(MedVorrat vorrat) {
-        MedBestand bestand = null;
-        if (vorrat != null && vorrat.getBestaende() != null) {
-            Iterator<MedBestand> itBestand = vorrat.getBestaende().iterator();
+    public static MedStock getBestandImAnbruch(MedInventory inventory) {
+        MedStock bestand = null;
+        if (inventory != null && inventory.getMedStocks() != null) {
+            Iterator<MedStock> itBestand = inventory.getMedStocks().iterator();
             while (itBestand.hasNext()) {
-                MedBestand b = itBestand.next();
+                MedStock b = itBestand.next();
                 if (b.isAngebrochen() && !b.isAbgeschlossen()) {
                     bestand = b;
                     break;
@@ -113,7 +113,7 @@ public class MedBestandTools {
      * @param bestand
      * @return
      */
-    public static void anbrechen(MedBestand bestand, BigDecimal apv) throws Exception {
+    public static void anbrechen(MedStock bestand, BigDecimal apv) throws Exception {
         if (apv == null) {
             throw new NullPointerException("apv darf nicht null sein");
         }
@@ -126,11 +126,11 @@ public class MedBestandTools {
         bestand.setApv(apv);
     }
 
-    public static HashMap getBestand4Printing(MedBestand bestand) {
+    public static HashMap getBestand4Printing(MedStock bestand) {
         OPDE.debug("BestandID: " + bestand.getBestID());
 
         HashMap hm = new HashMap();
-        hm.put("bestand.darreichung", DarreichungTools.toPrettyString(bestand.getDarreichung()));
+        hm.put("bestand.darreichung", TradeFormTools.toPrettyString(bestand.getDarreichung()));
 
         String pzn = bestand.getPackung().getPzn() == null ? "??" : bestand.getPackung().getPzn();
         hm.put("bestand.packung.pzn", pzn);
@@ -138,9 +138,9 @@ public class MedBestandTools {
         hm.put("bestand.eingang", bestand.getEin());
         hm.put("bestand.userkurz", bestand.getUser().getUKennung());
         hm.put("bestand.userlang", bestand.getUser().getNameUndVorname());
-        hm.put("bestand.vorrat.bewohnername", BewohnerTools.getBWLabel1(bestand.getVorrat().getBewohner()));
-        hm.put("bestand.vorrat.bewohnergebdatum", bestand.getVorrat().getBewohner().getGebDatum());
-        hm.put("bestand.vorrat.bewohnerkennung", bestand.getVorrat().getBewohner().getBWKennung());
+        hm.put("bestand.vorrat.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getBewohner()));
+        hm.put("bestand.vorrat.bewohnergebdatum", bestand.getInventory().getBewohner().getGebDatum());
+        hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getBewohner().getBWKennung());
 
         return hm;
     }
@@ -157,8 +157,8 @@ public class MedBestandTools {
 //        }
 //
 //        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getBestID()));
-//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getVorrat().getBewohner()));
-//        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getVorrat().getBewohner()));
+//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getInventory().getBewohner()));
+//        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getInventory().getBewohner()));
 //
 //        result += SYSPrint.EPL2_PRINT;
 //
@@ -175,10 +175,10 @@ public class MedBestandTools {
 //    }
 
 
-    public static BigDecimal getBestandSumme(MedBestand bestand) {
+    public static BigDecimal getBestandSumme(MedStock bestand) {
         BigDecimal result = BigDecimal.ZERO;
 
-        for (MedBuchungen buchung : bestand.getBuchungen()) {
+        for (MedStockTransaction buchung : bestand.getStockTransaction()) {
             result = result.add(buchung.getMenge());
         }
         return result;
@@ -190,12 +190,12 @@ public class MedBestandTools {
      * @param bestand die entsprechende Packung
      * @return die Summe in der Packungs Einheit.
      */
-    public static BigDecimal getBestandSumme(EntityManager em, MedBestand bestand) throws Exception {
+    public static BigDecimal getBestandSumme(EntityManager em, MedStock bestand) throws Exception {
         BigDecimal result;
 
         Query query = em.createQuery(" " +
                 " SELECT SUM(bu.menge) " +
-                " FROM MedBestand b " +
+                " FROM MedStock b " +
                 " JOIN b.buchungen bu " +
                 " WHERE b = :bestand ");
 
@@ -220,25 +220,25 @@ public class MedBestandTools {
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
      */
-    public static void abschliessen(EntityManager em, MedBestand bestand, String text, short status) throws Exception {
+    public static void abschliessen(EntityManager em, MedStock bestand, String text, short status) throws Exception {
         BigDecimal bestandsumme = getBestandSumme(bestand);
-        MedBuchungen abschlussBuchung = new MedBuchungen(bestand, bestandsumme.negate(), status);
+        MedStockTransaction abschlussBuchung = new MedStockTransaction(bestand, bestandsumme.negate(), status);
         abschlussBuchung.setText(text);
-        bestand.getBuchungen().add(abschlussBuchung);
+        bestand.getStockTransaction().add(abschlussBuchung);
         bestand.setAus(new Date());
         bestand.setNaechsterBestand(null);
 
         if (bestand.hasNextBestand()) {
-            MedBestandTools.anbrechen(bestand.getNaechsterBestand(), berechneAPV(bestand));
+            MedStockTools.anbrechen(bestand.getNaechsterBestand(), berechneAPV(bestand));
             OPDE.info("Nächste Packung mit Bestands Nr.: " + bestand.getNaechsterBestand().getBestID() + " wird nun angebrochen.");
         } else {
 
             // es wurde kein nächster angebrochen ?
             // könnte es sein, dass dieser Vorrat keine Packungen mehr hat ?
-            if (MedVorratTools.getNaechsteNochUngeoeffnete(bestand.getVorrat()) == null) {
+            if (MedInventoryTools.getNaechsteNochUngeoeffnete(bestand.getInventory()) == null) {
                 // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                 // Die müssen dann jetzt nämlich abgeschlossen werden.
-                for (Verordnung verordnung : VerordnungTools.getVerordnungenByVorrat(bestand.getVorrat())) {
+                for (Prescriptions verordnung : PrescriptionsTools.getPrescriptionenByVorrat(bestand.getInventory())) {
                     if (verordnung.isBisPackEnde()) {
                         verordnung = em.merge(verordnung);
                         em.lock(verordnung, LockModeType.OPTIMISTIC);
@@ -253,10 +253,10 @@ public class MedBestandTools {
         }
     }
 
-    private static MedBuchungen getAnfangsBuchung(MedBestand bestand) {
-        MedBuchungen result = null;
-        for (MedBuchungen buchung : bestand.getBuchungen()) {
-            if (buchung.getStatus() == MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND) {
+    private static MedStockTransaction getAnfangsBuchung(MedStock bestand) {
+        MedStockTransaction result = null;
+        for (MedStockTransaction buchung : bestand.getStockTransaction()) {
+            if (buchung.getStatus() == MedStockTransactionTools.STATUS_EINBUCHEN_ANFANGSBESTAND) {
                 result = buchung;
                 break;
             }
@@ -267,11 +267,11 @@ public class MedBestandTools {
     /**
      * @param bestand, für den das Verhältnis neu berechnet werden soll.
      */
-    public static BigDecimal berechneAPV(MedBestand bestand) throws Exception {
+    public static BigDecimal berechneAPV(MedStock bestand) throws Exception {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getMedForm().getStatus() != MedFormenTools.APV1) {
+        if (bestand.getDarreichung().getMedForm().getStatus() != DosageFormTools.APV1) {
 
             // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
             // drin war. Meist das, was auf der Packung steht.
@@ -337,8 +337,8 @@ public class MedBestandTools {
      * @return die Korrektur Buchung
      * @throws Exception
      */
-    public static MedBuchungen setzeBestandAuf(EntityManager em, MedBestand bestand, BigDecimal soll, String text, short status) throws Exception {
-        MedBuchungen result = null;
+    public static MedStockTransaction setzeBestandAuf(EntityManager em, MedStock bestand, BigDecimal soll, String text, short status) throws Exception {
+        MedStockTransaction result = null;
         bestand = em.merge(bestand);
 
         BigDecimal bestandSumme = getBestandSumme(em, bestand);
@@ -352,19 +352,19 @@ public class MedBestandTools {
             }
 
             // passende Buchung anlegen.
-            result = em.merge(new MedBuchungen(bestand, korrektur, status));
+            result = em.merge(new MedStockTransaction(bestand, korrektur, status));
             result.setText(text);
         }
         return result;
     }
 
-    public static String getBestandTextAsHTML(MedBestand bestand) {
+    public static String getBestandTextAsHTML(MedStock bestand) {
         String result = "";
         result += "<font color=\"blue\"><b>" + bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
             result += "PZN: " + bestand.getPackung().getPzn() + ", ";
-            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + MedFormenTools.EINHEIT[bestand.getDarreichung().getMedForm().getPackEinheit()] + " ";
+            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getDarreichung().getMedForm().getPackEinheit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getDarreichung().getMedForm().getZubereitung());
             String anwtext = SYSTools.catchNull(bestand.getDarreichung().getMedForm().getAnwText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
@@ -374,14 +374,14 @@ public class MedBestandTools {
         return result;
     }
 
-    public static String getBestandAsHTML(MedBestand bestand) {
+    public static String getBestandAsHTML(MedStock bestand) {
         String result = "";
 
         String htmlcolor = bestand.isAbgeschlossen() ? "gray" : "red";
 
         result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
-        result += DarreichungTools.toPrettyString(bestand.getDarreichung());
+        result += TradeFormTools.toPrettyString(bestand.getDarreichung());
 
         if (bestand.getPackung() != null) {
             result += ", " + MedPackungTools.toPrettyString(bestand.getPackung());
@@ -419,9 +419,9 @@ public class MedBestandTools {
 //            em.getTransaction().begin();
 //            bestand = em.merge(bestand);
 //            em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//            Query query = em.createQuery("DELETE FROM MedBuchungen b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
+//            Query query = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
 //            query.setParameter("bestand", bestand);
-//            query.setParameter("notStatus", MedBuchungenTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
+//            query.setParameter("notStatus", MedStockTransactionTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
 //            query.executeUpdate();
 //            em.getTransaction().commit();
 //        } catch (OptimisticLockException ole) {
@@ -461,29 +461,29 @@ public class MedBestandTools {
     /**
      * Ermittelt für einen bestimmten Bestand ein passendes APV.
      */
-    public static BigDecimal getPassendesAPV(MedBestand bestand) {
+    public static BigDecimal getPassendesAPV(MedStock bestand) {
 
         BigDecimal apv = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_BW) {
-            apv = getAPVperBW(bestand.getVorrat());
-        } else if (bestand.getDarreichung().getMedForm().getStatus() == MedFormenTools.APV_PER_DAF) {
+        if (bestand.getDarreichung().getMedForm().getStatus() == DosageFormTools.APV_PER_BW) {
+            apv = getAPVperBW(bestand.getInventory());
+        } else if (bestand.getDarreichung().getMedForm().getStatus() == DosageFormTools.APV_PER_DAF) {
             apv = getAPVperDAF(bestand.getDarreichung());
         }
 
         return apv;
     }
 
-    public static BigDecimal getAPVperBW(MedVorrat vorrat) {
+    public static BigDecimal getAPVperBW(MedInventory inventory) {
         BigDecimal apv;
 
-        if (!vorrat.getBestaende().isEmpty()) {
+        if (!inventory.getMedStocks().isEmpty()) {
             apv = BigDecimal.ZERO;
-            for (MedBestand bestand : vorrat.getBestaende()) {
+            for (MedStock bestand : inventory.getMedStocks()) {
                 apv.add(bestand.getApv());
             }
             // Arithmetisches Mittel
-            apv = apv.divide(new BigDecimal(vorrat.getBestaende().size()), BigDecimal.ROUND_UP);
+            apv = apv.divide(new BigDecimal(inventory.getMedStocks().size()), BigDecimal.ROUND_UP);
         } else {
             apv = BigDecimal.ONE;
         }
@@ -493,8 +493,8 @@ public class MedBestandTools {
 //        BigDecimal result = null;
 //
 //        try {
-//            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.vorrat = :vorrat");
-//            query.setParameter("vorrat", vorrat);
+//            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.inventory = :inventory");
+//            query.setParameter("inventory", inventory);
 //            result = (BigDecimal) query.getSingleResult();
 //        } catch (NoResultException nre) {
 //            result = BigDecimal.ONE; // Im Zweifel ist das 1
@@ -506,17 +506,17 @@ public class MedBestandTools {
         return apv;
     }
 
-    public static BigDecimal getAPVperDAF(Darreichung darreichung) {
+    public static BigDecimal getAPVperDAF(TradeForm darreichung) {
 
         BigDecimal apv = null;
 
-        if (!darreichung.getBestaende().isEmpty()) {
+        if (!darreichung.getMedStocks().isEmpty()) {
             apv = BigDecimal.ZERO;
-            for (MedBestand bestand : darreichung.getBestaende()) {
+            for (MedStock bestand : darreichung.getMedStocks()) {
                 apv.add(bestand.getApv());
             }
             // Arithmetisches Mittel
-            apv = apv.divide(new BigDecimal(darreichung.getBestaende().size()), BigDecimal.ROUND_UP);
+            apv = apv.divide(new BigDecimal(darreichung.getMedStocks().size()), BigDecimal.ROUND_UP);
         } else {
             // Im Zweifel ist das 1
             apv = BigDecimal.ONE;
@@ -545,7 +545,7 @@ public class MedBestandTools {
         StringBuilder html = new StringBuilder(1000);
 
         String jpql = " " +
-                " SELECT b FROM MedBestand b " +
+                " SELECT b FROM MedStock b " +
                 " WHERE b.vorrat.bewohner.station = :station AND b.vorrat.bewohner.adminonly <> 2 " +
                 " AND b.anbruch < :anbruch AND b.aus = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
                 " ORDER BY b.vorrat.bewohner.nachname, b.vorrat.bewohner.vorname, b.vorrat.text, b.anbruch ";
@@ -553,7 +553,7 @@ public class MedBestandTools {
         Query query = em.createQuery(jpql);
         query.setParameter("anbruch", new Date());
         query.setParameter("station", station);
-        List<MedBestand> list = query.getResultList();
+        List<MedStock> list = query.getResultList();
 
         DateFormat df = DateFormat.getDateInstance();
         if (!list.isEmpty())
@@ -575,11 +575,11 @@ public class MedBestandTools {
         html.append("<table border=\"1\"><tr>" +
                 "<th>BewohnerIn</th><th>BestNr</th><th>Präparat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th><th>#8</th></tr>");
 
-        for (MedBestand bestand : list) {
+        for (MedStock bestand : list) {
             html.append("<tr>");
-            html.append("<td>" + BewohnerTools.getBWLabelTextKompakt(bestand.getVorrat().getBewohner()) + "</td>");
+            html.append("<td>" + ResidentTools.getBWLabelTextKompakt(bestand.getInventory().getBewohner()) + "</td>");
             html.append("<td>" + bestand.getBestID() + "</td>");
-            html.append("<td>" + DarreichungTools.toPrettyString(bestand.getDarreichung()) + "</td>");
+            html.append("<td>" + TradeFormTools.toPrettyString(bestand.getDarreichung()) + "</td>");
             html.append("<td>" + df.format(bestand.getAnbruch()) + "</td>");
             html.append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
             html.append("</tr>");

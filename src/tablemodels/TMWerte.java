@@ -28,12 +28,9 @@ package tablemodels;
 
 import entity.BWerte;
 import entity.BWerteTools;
-import entity.Bewohner;
+import entity.info.Resident;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -55,7 +52,7 @@ public class TMWerte
 
     private boolean showids = false;
     private ArrayList<BWerte> content;
-    private Bewohner bewohner;
+    private Resident bewohner;
 
     /**
      * Ein einfaches Tablemodel zur Anzeige der Bewohnerwerte für den gewünschten Bewohner. Rendert alles in HTML.
@@ -65,7 +62,7 @@ public class TMWerte
      * @param showedits
      * @param showids
      */
-    public TMWerte(Date from, Bewohner bewohner, int type, boolean showedits, boolean showids) {
+    public TMWerte(Date from, Resident bewohner, int type, boolean showedits, boolean showids) {
         super();
         this.showids = showids;
         this.bewohner = bewohner;

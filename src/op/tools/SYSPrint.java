@@ -26,26 +26,6 @@
  */
 package op.tools;
 
-import entity.files.SYSFiles;
-import entity.files.SYSFilesTools;
-import entity.verordnungen.MedBestand;
-import entity.verordnungen.MedBestandTools;
-import op.OPDE;
-
-import javax.print.*;
-import javax.print.attribute.Attribute;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.MediaSizeName;
-import javax.swing.*;
-import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Date;
-
 /**
  * @author tloehr
  */
@@ -118,7 +98,7 @@ public class SYSPrint {
 //            PRINTER = OPDE.getProps().get("etiprinter1").toString();
 //        }
 //
-//        text = MedBestandTools.getBestandText4Print(bestand);
+//        text = MedStockTools.getBestandText4Print(bestand);
 //
 //        printLabel(text);
 //    }

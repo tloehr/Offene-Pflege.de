@@ -13,8 +13,8 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.system.SYSPropsTools;
@@ -75,7 +75,7 @@ public class PnlInfo extends NursingRecordsPanel {
     public final Icon icon16pit = new ImageIcon(getClass().getResource("/artwork/16x16/bw/pointintime.png"));
 
     private final int MAX_HTML_LENGTH = 80;
-    private Bewohner bewohner;
+    private Resident bewohner;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
@@ -91,7 +91,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private boolean initPhase;
 
-    public PnlInfo(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlInfo(Resident bewohner, JScrollPane jspSearch) {
         initPhase = true;
         this.jspSearch = jspSearch;
         this.bewohner = bewohner;
@@ -133,11 +133,11 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
 
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
         GUITools.setBWDisplay(bewohner);
         reloadDisplay();
@@ -381,7 +381,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     props.setProperty("hauf", "verstorben");
                                     BWInfoTools.setContent(hauf, props);
 
-                                    BewohnerTools.endOfStay(em, em.merge(bewohner), dod);
+                                    ResidentTools.endOfStay(em, em.merge(bewohner), dod);
                                     em.getTransaction().commit();
                                     btnBWDied.setEnabled(false);
                                     btnBWMovedOut.setEnabled(false);
@@ -442,7 +442,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     props.setProperty("hauf", "verstorben");
                                     BWInfoTools.setContent(hauf, props);
 
-                                    BewohnerTools.endOfStay(em, em.merge(bewohner), dod);
+                                    ResidentTools.endOfStay(em, em.merge(bewohner), dod);
                                     em.getTransaction().commit();
                                     btnBWDied.setEnabled(false);
                                     btnBWMovedOut.setEnabled(false);

@@ -34,7 +34,7 @@ import entity.planung.DFNTools;
 import entity.system.SYSLogin;
 import entity.system.SYSPropsTools;
 import entity.system.SyslogTools;
-import entity.verordnungen.BHPTools;
+import entity.prescription.BHPTools;
 import op.system.FrmInit;
 import op.system.PrinterTypes;
 import op.threads.DisplayManager;
@@ -57,7 +57,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
-import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
@@ -654,16 +653,6 @@ public class OPDE {
             if (cl.hasOption("d")) {
                 EntityManager em = OPDE.createEM();
 
-//                int offset;
-//                String sOffset = cl.getOptionValue("d");
-//                OPDE.debug(cl.getOptionValue("d"));
-//                try {
-//                    offset = Integer.parseInt(sOffset);
-//                } catch (NumberFormatException ex) {
-//                    offset = 0;
-//                }
-//
-
                 try {
                     em.getTransaction().begin();
                     Users rootUser = em.find(Users.class, "root");
@@ -672,7 +661,6 @@ public class OPDE {
                     OPDE.setLogin(rootLogin);
                     initProps();
 
-//                    DateMidnight stichtag = new DateMidnight().plusDays(offset);
                     DFNTools.generate(em);
                     em.getTransaction().commit();
                 } catch (Exception ex) {
@@ -697,26 +685,16 @@ public class OPDE {
             if (cl.hasOption("b")) {
 
                 EntityManager em = OPDE.createEM();
-                int offset;
-                String sOffset = cl.getOptionValue("b");
-                OPDE.debug(cl.getOptionValue("b"));
-                try {
-                    offset = Integer.parseInt(sOffset);
-                } catch (NumberFormatException ex) {
-                    offset = 0;
-                }
 
                 try {
                     em.getTransaction().begin();
                     Users rootUser = em.find(Users.class, "root");
 
-                    SYSLogin rootLogin = new SYSLogin(rootUser);
-                    em.persist(rootLogin);
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
                     OPDE.setLogin(rootLogin);
                     initProps();
 
-                    DateMidnight stichtag = new DateMidnight().plusDays(offset);
-                    BHPTools.generate(em, stichtag.toDate());
+                    BHPTools.generate(em);
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     if (em.getTransaction().isActive()) {

@@ -278,6 +278,10 @@ public class SYSConst {
     public static final Icon icon22redoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo_pressed.png"));
     public static final Icon icon22ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2.png"));
     public static final Icon icon22ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2_pressed.png"));
+    public static final Icon icon32ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2.png"));
+    public static final Icon icon32ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2_pressed.png"));
+    public static final Icon icon48ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/ambulance2.png"));
+    public static final Icon icon48ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2_pressed.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon22delete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete.png"));
     public static final Icon icon22deletePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete_pressed.png"));

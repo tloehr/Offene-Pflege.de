@@ -29,8 +29,8 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
-import entity.Bewohner;
-import entity.BewohnerTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import op.OPDE;
@@ -63,19 +63,19 @@ import java.util.Collections;
 public class PnlFiles extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.files";
     private JPopupMenu menu;
-    private Bewohner bewohner;
+    private Resident bewohner;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
     /**
      * Creates new form PnlFiles
      */
-    public PnlFiles(Bewohner bewohner, JScrollPane jspSearch) {
+    public PnlFiles(Resident bewohner, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
 
         initPanel();
-        change2Bewohner(bewohner);
+        switchResident(bewohner);
     }
 
 
@@ -91,9 +91,9 @@ public class PnlFiles extends NursingRecordsPanel {
     }
 
     @Override
-    public void change2Bewohner(Bewohner bewohner) {
+    public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(BewohnerTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         reloadTable();
     }
 

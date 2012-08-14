@@ -30,9 +30,9 @@ package op.care.med;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.EntityTools;
-import entity.verordnungen.DarreichungTools;
-import entity.verordnungen.MedPackung;
-import entity.verordnungen.MedPackungTools;
+import entity.prescription.TradeFormTools;
+import entity.prescription.MedPackung;
+import entity.prescription.MedPackungTools;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -65,7 +65,7 @@ public class DlgPack extends javax.swing.JDialog {
             txtInhalt.setText(packung.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
             cmbGroesse.setSelectedIndex(packung.getGroesse());
         }
-        lblPackEinheit.setText(DarreichungTools.getPackungsEinheit(packung.getDarreichung()));
+        lblPackEinheit.setText(TradeFormTools.getPackungsEinheit(packung.getDarreichung()));
         SYSTools.centerOnParent(parent, this);
         pack();
         setVisible(true);

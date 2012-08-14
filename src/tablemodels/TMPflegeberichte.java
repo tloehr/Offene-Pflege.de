@@ -26,12 +26,10 @@
  */
 package tablemodels;
 
-import entity.Bewohner;
 import entity.Pflegeberichte;
 import entity.PflegeberichteTools;
 import op.tools.SYSTools;
 
-import javax.persistence.Query;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 
