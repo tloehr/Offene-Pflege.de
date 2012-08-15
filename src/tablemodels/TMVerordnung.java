@@ -73,7 +73,7 @@ public class TMVerordnung extends AbstractTableModel {
         for (Prescriptions verordnung : listeVerordnung) {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i / 2, listeVerordnung.size()));
             MedInventory inventory = verordnung.getDarreichung() == null ? null : TradeFormTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
-            MedStock aktiverBestand = MedStockTools.getBestandImAnbruch(inventory);
+            MedStock aktiverBestand = MedStockTools.getStockInUse(inventory);
             listeVerordnungen.add(new Object[]{verordnung, inventory, aktiverBestand});
             i++;
         }
@@ -190,7 +190,7 @@ public class TMVerordnung extends AbstractTableModel {
             case COL_MSSN: {
 
                 String res = "";
-                res = PrescriptionsTools.getMassnahme(verordnung);
+                res = PrescriptionsTools.getPrescriptionAsText(verordnung);
                 if (!verordnung.getAttachedFiles().isEmpty()) {
                     res += "<font color=\"green\">&#9679;</font>";
                 }

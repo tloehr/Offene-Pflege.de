@@ -67,7 +67,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //                apv = new APV(BigDecimal.ONE, false, null, darreichung);
 //            }
 //
-//            if (darreichung.getMedForm().getStatus() == MedFormenTools.APV1) {
+//            if (darreichung.getDosageForm().getStatus() == MedFormenTools.APV1) {
 //                txtAPV.setText("1");
 //                txtAPV.setEnabled(false);
 //            } else {
@@ -75,7 +75,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //                txtAPV.setEnabled(true);
 //            }
 
-            cmbForm.setSelectedItem(darreichung.getMedForm());
+            cmbForm.setSelectedItem(darreichung.getDosageForm());
             txtZusatz.setText(SYSTools.catchNull(darreichung.getZusatz()));
 
         } else {
@@ -232,7 +232,7 @@ public class DlgDAF extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
         darreichung.setZusatz(txtZusatz.getText());
-        darreichung.setMedForm((DosageForm) cmbForm.getSelectedItem());
+        darreichung.setDosageForm((DosageForm) cmbForm.getSelectedItem());
 
 
         EntityManager em = OPDE.createEM();
@@ -243,7 +243,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //                apv = em.merge(apv);
             } else {
                 em.persist(darreichung);
-//                apv.setTauschen(darreichung.getMedForm().getStatus() == MedFormenTools.APV_PER_DAF);
+//                apv.setTauschen(darreichung.getDosageForm().getStatus() == MedFormenTools.APV_PER_DAF);
 //                em.persist(apv);
             }
             em.getTransaction().commit();

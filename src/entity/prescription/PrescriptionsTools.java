@@ -4,11 +4,12 @@
  */
 package entity.prescription;
 
-import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.Einrichtungen;
 import entity.Stationen;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import op.OPDE;
+import op.care.verordnung.PnlVerordnung;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -310,7 +311,7 @@ public class PrescriptionsTools {
         return html;
     }
 
-    public static String getMassnahme(Prescriptions verordnung) {
+    public static String getPrescriptionAsText(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
         if (verordnung.isAbgesetzt()) {
@@ -322,27 +323,27 @@ public class PrescriptionsTools {
             // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
 
             MedInventory inventory = TradeFormTools.getVorratZurDarreichung(verordnung.getBewohner(), verordnung.getDarreichung());
-            MedStock aktuellerAnbruch = MedStockTools.getBestandImAnbruch(inventory);
+            MedStock aktuellerAnbruch = MedStockTools.getStockInUse(inventory);
 
             if (aktuellerAnbruch != null) {
                 if (!aktuellerAnbruch.getDarreichung().equals(verordnung.getDarreichung())) { // Nur bei Abweichung.
-                    result += "<b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ") +
+                    result += "<b>" + aktuellerAnbruch.getDarreichung().getMedProdukt().getBezeichnung() +
                             (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b>" +
-                            (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
-                            (aktuellerAnbruch.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getMedForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getMedForm().getAnwText());
-                    result += " <i>(ursprünglich verordnet: " + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ");
+                            (aktuellerAnbruch.getDarreichung().getDosageForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getDosageForm().getZubereitung()) + " " +
+                            (aktuellerAnbruch.getDarreichung().getDosageForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getDarreichung().getDosageForm().getAnwEinheit()] : aktuellerAnbruch.getDarreichung().getDosageForm().getAnwText());
+                    result += " <i>(" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".originalprescription") + ": " + verordnung.getDarreichung().getMedProdukt().getBezeichnung();
                     result += (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + ")</i>";
                 } else {
-                    result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
+                    result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung()
                             + (aktuellerAnbruch.getDarreichung().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getZusatz()) + "</b>" +
-                            (aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getMedForm().getZubereitung()) + " " +
-                            (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
+                            (aktuellerAnbruch.getDarreichung().getDosageForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getDarreichung().getDosageForm().getZubereitung()) + " " +
+                            (verordnung.getDarreichung().getDosageForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getDosageForm().getAnwEinheit()] : verordnung.getDarreichung().getDosageForm().getAnwText());
                 }
             } else {
-                result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung().replaceAll("-", "- ")
+                result += "<b>" + verordnung.getDarreichung().getMedProdukt().getBezeichnung()
                         + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz()) + "</b>" +
-                        (verordnung.getDarreichung().getMedForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getDarreichung().getMedForm().getZubereitung()) + " " +
-                        (verordnung.getDarreichung().getMedForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getMedForm().getAnwEinheit()] : verordnung.getDarreichung().getMedForm().getAnwText());
+                        (verordnung.getDarreichung().getDosageForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getDarreichung().getDosageForm().getZubereitung()) + " " +
+                        (verordnung.getDarreichung().getDosageForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getDarreichung().getDosageForm().getAnwEinheit()] : verordnung.getDarreichung().getDosageForm().getAnwText());
             }
 
 
@@ -352,6 +353,29 @@ public class PrescriptionsTools {
         }
 
         return result + "</div>";
+    }
+
+    public static String getPrescriptionAsShortText(Prescriptions verordnung) {
+        String result = "";
+
+        if (verordnung.isAbgesetzt()) {
+            result += "<s>"; // Abgesetzte
+        }
+        if (!verordnung.hasMedi()) {
+            result += verordnung.getMassnahme().getBezeichnung();
+        } else {
+
+
+            result += verordnung.getDarreichung().getMedProdukt().getBezeichnung()
+                    + (verordnung.getDarreichung().getZusatz().isEmpty() ? "" : " " + verordnung.getDarreichung().getZusatz());
+
+
+        }
+        if (verordnung.isAbgesetzt()) {
+            result += "</s>"; // Abgesetzte
+        }
+
+        return result;
     }
 
     public static String getHinweis(Prescriptions verordnung) {
@@ -369,9 +393,7 @@ public class PrescriptionsTools {
 
     public static String getAN(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-        String datum = sdf.format(verordnung.getAnDatum());
-
+        String datum = DateFormat.getDateInstance().format(verordnung.getAnDatum());
 
         result += "<font color=\"green\">" + datum + "; ";
         if (verordnung.getAnKH() != null) {
@@ -392,9 +414,7 @@ public class PrescriptionsTools {
         String result = "<div id=\"fonttext\">";
 
         if (verordnung.isBegrenzt()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
-            String datum = sdf.format(verordnung.getAbDatum());
-
+            String datum = DateFormat.getDateInstance().format(verordnung.getAbDatum());
 
             result += "<font color=\"" + (verordnung.isAbgesetzt() ? "red" : "lime") + "\">" + datum + "; ";
 
@@ -464,16 +484,16 @@ public class PrescriptionsTools {
 
                     if (vorratSumme != null && vorratSumme.compareTo(BigDecimal.ZERO) > 0) {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + SYSTools.roundScale2(vorratSumme) + " " +
-                                SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] +
+                                SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getDosageForm().getPackEinheit()] +
                                 "</font></b>";
-                        if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
+                        if (!bestandImAnbruch.getDarreichung().getDosageForm().anwUndPackEinheitenGleich()) {
 
                             BigDecimal anwmenge = vorratSumme.multiply(bestandImAnbruch.getApv());
 
 
                             //double anwmenge = SYSTools.roundScale2(rs.getDouble("saldo") * rs.getDouble("APV"));
                             result += " <i>entspricht " + SYSTools.roundScale2(anwmenge) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-                                    DosageFormTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm());
+                                    DosageFormTools.getUsageText(bestandImAnbruch.getDarreichung().getDosageForm());
                             result += " (bei einem APV von " + SYSTools.roundScale2(bestandImAnbruch.getApv()) + " zu 1)";
                             result += "</i>";
                         }
@@ -482,13 +502,13 @@ public class PrescriptionsTools {
 
                         if (vorratSumme.compareTo(bestandSumme) != 0) {
                             result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + bestandSumme.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                    SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getMedForm().getPackEinheit()] + "</font></b>";
-                            if (!bestandImAnbruch.getDarreichung().getMedForm().anwUndPackEinheitenGleich()) {
+                                    SYSConst.EINHEIT[bestandImAnbruch.getDarreichung().getDosageForm().getPackEinheit()] + "</font></b>";
+                            if (!bestandImAnbruch.getDarreichung().getDosageForm().anwUndPackEinheitenGleich()) {
                                 //double anwmenge = SYSTools.roundScale2(rs.getDouble("bestsumme") * rs.getDouble("APV"));
                                 BigDecimal anwmenge = bestandSumme.multiply(bestandImAnbruch.getApv());
 
                                 result += " <i>entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +//SYSConst.EINHEIT[rs.getInt("f.AnwEinheit")]+"</i>";
-                                        DosageFormTools.getAnwText(bestandImAnbruch.getDarreichung().getMedForm()) + "</i>";
+                                        DosageFormTools.getUsageText(bestandImAnbruch.getDarreichung().getDosageForm()) + "</i>";
                             }
                         }
 
@@ -523,7 +543,7 @@ public class PrescriptionsTools {
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
-    public static List<Prescriptions> getPrescriptionenByVorrat(MedInventory inventory) {
+    public static List<Prescriptions> getPrescriptionsByInventory(MedInventory inventory) {
         EntityManager em = OPDE.createEM();
 
         List<BigInteger> list = null;
@@ -546,15 +566,21 @@ public class PrescriptionsTools {
         return result;
     }
 
+    public static String getPrescriptionAsHTML(Prescriptions prescription, boolean withheader, boolean withlongheader) {
+        ArrayList<Prescriptions> single = new ArrayList<Prescriptions>();
+        single.add(prescription);
+        return getPrescriptionAsHTML(single, withheader, withlongheader);
+    }
+
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
      */
-    public static String getPrescriptionenAsHTML(List<Prescriptions> list, boolean withlongheader) {
+    public static String getPrescriptionAsHTML(List<Prescriptions> list, boolean withheader, boolean withlongheader) {
         String result = "";
 
         if (!list.isEmpty()) {
             Prescriptions verordnung = list.get(0);
-            result += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getBWLabelText(verordnung.getBewohner()) : "") + "</h2>";
+            result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getBWLabelText(verordnung.getBewohner()) : "") + "</h2>" : "";
 
 //            if (verordnung.getBewohner().getStation() != null) {
 //                result += EinrichtungenTools.getAsText(verordnung.getBewohner().getStation().getEinrichtung());
@@ -568,8 +594,8 @@ public class PrescriptionsTools {
                 verordnung = itVerordnung.next();
 
                 result += "<tr>";
-                result += "<td valign=\"top\">" + getMassnahme(verordnung) + "</td>";
-                result += "<td valign=\"top\">" + getDosis(verordnung) + "<br/>";
+                result += "<td valign=\"top\">" + getPrescriptionAsText(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getDosis(verordnung, true, null, null) + "<br/>";
                 result += getHinweis(verordnung) + "</td>";
                 result += "<td valign=\"top\">" + getAN(verordnung) + "</td>";
                 //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";

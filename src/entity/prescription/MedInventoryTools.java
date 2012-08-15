@@ -113,7 +113,7 @@ public class MedInventoryTools {
         }
 
         if (anweinheit) { // Umrechnung der Anwendungs Menge in die Packungs-Menge.
-            MedStock bestand = MedStockTools.getBestandImAnbruch(inventory);
+            MedStock bestand = MedStockTools.getStockInUse(inventory);
             BigDecimal apv = bestand.getApv();
 
             if (apv.equals(BigDecimal.ZERO)) {
@@ -156,7 +156,7 @@ public class MedInventoryTools {
 
 
     public static void entnahmeVorrat(EntityManager em, MedInventory inventory, BigDecimal wunschmenge, BHP bhp) throws Exception {
-        MedStock bestand = em.merge(MedStockTools.getBestandImAnbruch(inventory));
+        MedStock bestand = em.merge(MedStockTools.getStockInUse(inventory));
         em.lock(bestand, LockModeType.OPTIMISTIC);
 
         OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);

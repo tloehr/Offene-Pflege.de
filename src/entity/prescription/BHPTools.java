@@ -4,16 +4,15 @@ import entity.info.Resident;
 import entity.planung.DFN;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.tools.Pair;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.care.bhp.PnlBHP;
+import op.tools.*;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -35,12 +34,14 @@ public class BHPTools {
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 2;
 
-    public static final byte SHIFT_ALL = -1;
+    public static final byte SHIFT_ON_DEMAND = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
     public static final byte SHIFT_EARLY = 1;
     public static final byte SHIFT_LATE = 2;
     public static final byte SHIFT_VERY_LATE = 3;
 
+    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY","EARLY","LATE","VERY_LATE"};
+    public static final String[] SHIFT_TEXT = new String[]{PnlBHP.internalClassID+".shift.veryearly",PnlBHP.internalClassID+".shift.early",PnlBHP.internalClassID+".shift.late",PnlBHP.internalClassID+".shift.verylate"};
     public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
     public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
@@ -372,6 +373,38 @@ public class BHPTools {
             em.close();
         }
         return listBHP;
+    }
+
+    public static String getScheduleText(BHP bhp, String prefix, String postfix) {
+        String text = "";
+        if (!bhp.isOnDemand()) {
+            if (bhp.getSollZeit() == BYTE_TIMEOFDAY) {
+                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll());
+            } else {
+                String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
+                text += msg[bhp.getSollZeit()];
+            }
+        } else {
+            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll());
+        }
+
+        return prefix + text + postfix;
+    }
+
+    public static Icon getIcon(BHP bhp) {
+        if (bhp.getStatus() == STATE_DONE) {
+            return SYSConst.icon22apply;
+        }
+        if (bhp.getStatus() == STATE_OPEN) {
+            return SYSConst.icon22empty;
+        }
+        if (bhp.getStatus() == STATE_REFUSED) {
+            return SYSConst.icon22cancel;
+        }
+        if (bhp.getStatus() == STATE_REFUSED_DISCARDED) {
+            return SYSConst.icon22deleteall;
+        }
+        return null;
     }
 
 }

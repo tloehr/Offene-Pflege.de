@@ -28,6 +28,7 @@ package op.tools;
 
 import com.toedter.calendar.JDateChooser;
 import entity.planung.DFNTools;
+import entity.prescription.BHPTools;
 import op.OPDE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -1495,5 +1496,19 @@ public class SYSCalendar {
 
         return dcbm;
 
+    }
+
+    public static Color getFGSHIFT(Byte shift){
+        if (shift == BHPTools.SHIFT_ON_DEMAND){
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift]+"_FGSHIFT"));
+    }
+
+    public static Color getBGSHIFT(Byte shift){
+        if (shift == BHPTools.SHIFT_ON_DEMAND){
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift]+"_BGSHIFT"));
     }
 }

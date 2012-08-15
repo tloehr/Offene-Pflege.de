@@ -112,7 +112,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.bewohner = resident;
         this.floating = false;
         this.soll = now;
-        this.sZeit = SYSCalendar.whatTimeIDis(now);
+        this.sZeit = SYSCalendar.whatTimeIDIs(now);
         this.ist = now;
         this.iZeit = this.sZeit;
         this.version = 0l;

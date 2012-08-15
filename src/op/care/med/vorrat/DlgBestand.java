@@ -499,7 +499,7 @@ public class DlgBestand extends MyJDialog {
             MedStock bestand = em.merge(MedInventoryTools.einbuchenVorrat(inventory, packung, darreichung, txtBemerkung.getText(), menge));
             inventory.getMedStocks().add(bestand);
 
-            if (MedStockTools.getBestandImAnbruch(inventory) == null) {
+            if (MedStockTools.getStockInUse(inventory) == null) {
                 MedInventoryTools.anbrechenNaechste(inventory);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neuer Vorrat wurde direkt angebrochen", 2));
             }

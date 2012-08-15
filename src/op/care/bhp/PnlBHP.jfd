@@ -40,7 +40,7 @@
          <object class="com.jformdesigner.model.FormContainer"> 
           <string>com.jidesoft.pane.CollapsiblePanes</string> 
           <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>com.jformdesigner.runtime.NullLayout</class> 
+           <class>javax.swing.BoxLayout</class> 
           </object> 
           <void property="name"> 
            <string>cpBHP</string> 

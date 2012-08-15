@@ -107,6 +107,8 @@ public class SYSConst {
     public static Color yellow4 = new Color(0x8B, 0x8B, 0x00);
     public static Color grey80 = new Color(0xc7, 0xc7, 0xc5);
     public static Color grey50 = new Color(0x74, 0x71, 0x70);
+
+
     //Gray50  	747170
     public static char eurosymbol = '\u20AC';
     public static final GregorianCalendar VON_ANFANG_AN = new GregorianCalendar(1970, GregorianCalendar.JANUARY, 1, 0, 0, 0);
@@ -138,7 +140,6 @@ public class SYSConst {
     public static final int ZEIT_SPAET = 2;
     public static final int ZEIT_NACHT_AB = 3;
     public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
-
 
 
     public static final String html_arial14 = "face=\"" + ARIAL14.getFamily() + "\"";
@@ -261,6 +262,8 @@ public class SYSConst {
     public static final Icon icon22applyPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply_pressed.png"));
     public static final Icon icon22cancel = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/cancel.png"));
     public static final Icon icon22cancelPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/cancel_pressed.png"));
+    public static final Icon icon22deleteall = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/deleteall.png"));
+    public static final Icon icon22deleteallPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/deleteall_pressed.png"));
     public static final Icon icon22empty = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/empty.png"));
     public static final Icon icon22emptyPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/empty_pressed.png"));
     public static final Icon icon16redStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/redstar.png"));
@@ -296,8 +299,8 @@ public class SYSConst {
     public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock.png"));
     public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock_pressed.png"));
     public static final Icon icon22addbw = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_bw.png"));
-    public static final Icon icon22infoblue= new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoblue.png"));
-    public static final Icon icon22infored= new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infored.png"));
-    public static final Icon icon22infogreen= new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infogreen.png"));
-    public static final Icon icon22infoyellow= new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoyellow.png"));
+    public static final Icon icon22infoblue = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoblue.png"));
+    public static final Icon icon22infored = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infored.png"));
+    public static final Icon icon22infogreen = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infogreen.png"));
+    public static final Icon icon22infoyellow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoyellow.png"));
 }

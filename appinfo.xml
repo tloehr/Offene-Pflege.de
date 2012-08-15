@@ -17,7 +17,9 @@
 
             Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
-        <class name="admin.residents.cash" short="Barbeträge" long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true" javaclass="op.bw.tg.PnlTG" icon="coins.png">
+        <class name="admin.residents.cash" short="Barbeträge"
+               long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true"
+               javaclass="op.bw.tg.PnlTG" icon="coins.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <delete langbundle="appinfo.default.acl.delete"/>
             <insert langbundle="appinfo.default.acl.insert"/>
@@ -26,9 +28,9 @@
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
         <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
-        long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
+               long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
             <insert langbundle="appinfo.default.acl.insert"/>
-            <select  langbundle="appinfo.default.acl.select"/>
+            <select langbundle="appinfo.default.acl.select"/>
             <execute langbundle="appinfo.default.acl.execute"/>
             <print langbundle="appinfo.default.acl.print"/>
             <delete langbundle="appinfo.default.acl.delete"/>
@@ -36,23 +38,25 @@
             <update langbundle="appinfo.default.acl.update"/>
         </class>
         <class name="nursingrecords.files" short="Pflegeakte/Dateien"
-        long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Anzeige von Dateien, die dem/der BewohnerIn zugeordnet wurden.">
+               long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Anzeige von Dateien, die dem/der BewohnerIn zugeordnet wurden.">
             <insert langbundle="appinfo.default.acl.insert"/>
-            <select  langbundle="appinfo.default.acl.select"/>
+            <select langbundle="appinfo.default.acl.select"/>
             <execute langbundle="appinfo.default.acl.execute"/>
             <delete langbundle="appinfo.default.acl.delete"/>
         </class>
-        <class name="nursingrecords.reports" short="Pflegeakte/Pflegeberichte" long="Das Modul zur Bearbeitung und Anzeige von Pflegeberichten.">
+        <class name="nursingrecords.reports" short="Pflegeakte/Pflegeberichte"
+               long="Das Modul zur Bearbeitung und Anzeige von Pflegeberichten.">
             <insert langbundle="appinfo.default.acl.insert"/>
-            <select  langbundle="appinfo.default.acl.select"/>
+            <select langbundle="appinfo.default.acl.select"/>
             <execute langbundle="appinfo.default.acl.execute"/>
             <print langbundle="appinfo.default.acl.print"/>
             <cancel langbundle="appinfo.default.acl.cancel"/>
             <update langbundle="appinfo.default.acl.update"/>
         </class>
-        <class name="nursingrecords.vitalparameters" short="Pflegeakte/Bewohnerwerte" long="Das Modul zur Bearbeitung und Anzeige von Vitalwerten.">
+        <class name="nursingrecords.vitalparameters" short="Pflegeakte/Bewohnerwerte"
+               long="Das Modul zur Bearbeitung und Anzeige von Vitalwerten.">
             <insert langbundle="appinfo.default.acl.insert"/>
-            <select  langbundle="appinfo.default.acl.select"/>
+            <select langbundle="appinfo.default.acl.select"/>
             <execute langbundle="appinfo.default.acl.execute"/>
             <print langbundle="appinfo.default.acl.print"/>
             <cancel langbundle="appinfo.default.acl.cancel"/>
@@ -63,16 +67,22 @@
             <insert langbundle="appinfo.default.acl.insert"/>
             <update langbundle="appinfo.default.acl.update"/>
         </class>
-        <class name="nursingrecords.bhpimport" short="BHPImport" long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
+        <class name="nursingrecords.bhpimport" short="BHPImport"
+               long="Import-Modul, das die täglichen BHPs für alle aktiven Verordnungen erstellt.">
         </class>
-        <class name="opde.tickets" short="Vorgänge" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen." main="true" javaclass="op.vorgang.PnlVorgang" icon="link-symbol.png">
-            <manager  langbundle="appinfo.default.acl.manager"/>
+        <class name="opde.tickets" short="Vorgänge" long="Das Modul zur Bearbeitung und Anzeige von Vorgängen."
+               main="true" javaclass="op.vorgang.PnlVorgang" icon="link-symbol.png">
+            <manager langbundle="appinfo.default.acl.manager"/>
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
-        <class name="opde.medication" short="Medikamente" long="Medikamente eingeben, buchen, korrigieren. All das können Sie hier." main="true" javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
+        <class name="opde.medication" short="Medikamente"
+               long="Medikamente eingeben, buchen, korrigieren. All das können Sie hier." main="true"
+               javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
-        <class name="nursingrecords.info" short="Pflegeakte/Informationen" long="Hier können Informationen zu den BewohnerInnen eingegeben werden." javaclass="op.care.info.PnlInfo">
+        <class name="nursingrecords.info" short="Pflegeakte/Informationen"
+               long="Hier können Informationen zu den BewohnerInnen eingegeben werden."
+               javaclass="op.care.info.PnlInfo">
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.insert"/>
             <update langbundle="appinfo.default.acl.update"/>
@@ -101,6 +111,25 @@
         <property key="barbetrag_pagebreak_after_element_no" value="30"/>
         <property key="bhp_max_minutes_to_withdraw" value="30"/>
         <property key="dfn_max_minutes_to_withdraw" value="30"/>
+        <property key="bhp_max_minutes_to_withdraw" value="30"/>
+        <property key="dfn_max_minutes_to_withdraw" value="30"/>
+        <property key="VERY_EARLY_FGSHIFT" value="FFECF5"/>
+        <property key="VERY_EARLY_BGSHIFT" value="FF62B0"/>
+        <property key="VERY_EARLY_FGBHP" value="FF62B0"/>
+        <property key="VERY_EARLY_BGBHP" value="FFC8E3"/>
+        <property key="EARLY_FGSHIFT" value="ECF4FF"/>
+        <property key="EARLY_BGSHIFT" value="62A9FF"/>
+        <property key="EARLY_FGBHP" value="62A9FF"/>
+        <property key="EARLY_BGBHP" value="D0E6FF"/>
+        <property key="LATE_FGSHIFT" value="F3F8F4"/>
+        <property key="LATE_BGSHIFT" value="59955C"/>
+        <property key="LATE_FGBHP" value="59955C"/>
+        <property key="LATE_BGBHP" value="DBEADC"/>
+        <property key="VERY_LATE_FGSHIFT" value="FFE3FF"/>
+        <property key="VERY_LATE_BGSHIFT" value="990099"/>
+        <property key="VERY_LATE_FGBHP" value="990099"/>
+        <property key="VERY_LATE_BGBHP" value="FFA8FF"/>
+
     </properties>
 
 </app>

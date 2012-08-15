@@ -303,7 +303,7 @@ public class MedProductWizard {
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         OPDE.debug("PackungPage OPENDED");
 //                        packung = null;
-                        pnlPackung.setLabelEinheit(DosageFormTools.toPrettyStringPackung(darreichung.getMedForm()));
+                        pnlPackung.setLabelEinheit(DosageFormTools.toPrettyStringPackung(darreichung.getDosageForm()));
                         pnlPackung.setDarreichung(darreichung);
                     }
                 }

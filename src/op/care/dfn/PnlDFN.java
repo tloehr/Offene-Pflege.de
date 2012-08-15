@@ -774,6 +774,7 @@ public class PnlDFN extends NursingRecordsPanel {
         if (dfn.getNursingProcess() != null) {
             JTextPane contentPane = new JTextPane();
             contentPane.setContentType("text/html");
+            contentPane.setEditable(false);
             contentPane.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML(dfn.getNursingProcess(), false)));
             dfnPane.setContentPane(contentPane);
             dfnPane.setBackground(dfn.getNursingProcess().getKategorie().getBackgroundContent());

@@ -11,7 +11,7 @@ import java.util.Collection;
         @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM TradeForm m"),
         @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM TradeForm m WHERE m.dafID = :dafID"),
         @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM TradeForm m WHERE m.zusatz = :zusatz"),
-        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM TradeForm m WHERE m.medProdukt = :medProdukt ORDER BY m.medForm.zubereitung")
+        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM TradeForm m WHERE m.medProdukt = :medProdukt ORDER BY m.dosageForm.zubereitung")
 })
 public class TradeForm implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -32,10 +32,10 @@ public class TradeForm implements Serializable {
         this.bestaende = new ArrayList<MedStock>();
     }
 
-    public TradeForm(MedProdukte medProdukt, String zusatz, DosageForm medForm) {
+    public TradeForm(MedProdukte medProdukt, String zusatz, DosageForm dosageForm) {
         this.medProdukt = medProdukt;
         this.zusatz = zusatz;
-        this.medForm = medForm;
+        this.dosageForm = dosageForm;
         this.packungen = new ArrayList<MedPackung>();
         this.bestaende = new ArrayList<MedStock>();
     }
@@ -76,7 +76,7 @@ public class TradeForm implements Serializable {
 
     @JoinColumn(name = "FormID", referencedColumnName = "FormID")
     @ManyToOne
-    private DosageForm medForm;
+    private DosageForm dosageForm;
 
     public MedProdukte getMedProdukt() {
         return medProdukt;
@@ -86,12 +86,12 @@ public class TradeForm implements Serializable {
         this.medProdukt = medProdukt;
     }
 
-    public DosageForm getMedForm() {
-        return medForm;
+    public DosageForm getDosageForm() {
+        return dosageForm;
     }
 
-    public void setMedForm(DosageForm medForm) {
-        this.medForm = medForm;
+    public void setDosageForm(DosageForm dosageForm) {
+        this.dosageForm = dosageForm;
     }
 
     public Collection<MedStock> getMedStocks() {

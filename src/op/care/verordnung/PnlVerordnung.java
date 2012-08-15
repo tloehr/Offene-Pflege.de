@@ -176,7 +176,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             File temp = File.createTempFile("prescription", ".html");
             temp.deleteOnExit();
             List<Prescriptions> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
-            String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getPrescriptionenAsHTML(listVerordnung, true));
+            String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getPrescriptionAsHTML(listVerordnung, true, true));
             SYSFilesTools.print(html, true);
         } catch (IOException e) {
             new DlgException(e);
@@ -458,7 +458,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             if (selectedVerordnung.hasMedi()) {
                 menu.add(new JSeparator());
 
-                final MedStock bestandImAnbruch = MedStockTools.getBestandImAnbruch(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
+                final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
                 boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt() && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
                 boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt() && bestandImAnbruch == null;
 
@@ -524,7 +524,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    final MedStock bestandImAnbruch = MedStockTools.getBestandImAnbruch(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
+                    final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
 
                     String message = "VerID: " + selectedVerordnung.getVerid();
                     if (bestandImAnbruch != null) {

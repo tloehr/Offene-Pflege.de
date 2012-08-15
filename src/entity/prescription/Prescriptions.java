@@ -505,7 +505,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
             result = ((Boolean) hasMedi()).compareTo(them.hasMedi());
         }
         if (result == 0) {
-            result = PrescriptionsTools.getMassnahme(this).compareTo(PrescriptionsTools.getMassnahme(them));
+            result = PrescriptionsTools.getPrescriptionAsText(this).compareTo(PrescriptionsTools.getPrescriptionAsText(them));
         }
         return result;
     }

@@ -74,7 +74,7 @@ public class MedStockTools {
      * @param inventory
      * @return der angebrochene Bestand. null, wenn es keinen gab.
      */
-    public static MedStock getBestandImAnbruch(MedInventory inventory) {
+    public static MedStock getStockInUse(MedInventory inventory) {
         MedStock bestand = null;
         if (inventory != null && inventory.getMedStocks() != null) {
             Iterator<MedStock> itBestand = inventory.getMedStocks().iterator();
@@ -238,7 +238,7 @@ public class MedStockTools {
             if (MedInventoryTools.getNaechsteNochUngeoeffnete(bestand.getInventory()) == null) {
                 // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                 // Die müssen dann jetzt nämlich abgeschlossen werden.
-                for (Prescriptions verordnung : PrescriptionsTools.getPrescriptionenByVorrat(bestand.getInventory())) {
+                for (Prescriptions verordnung : PrescriptionsTools.getPrescriptionsByInventory(bestand.getInventory())) {
                     if (verordnung.isBisPackEnde()) {
                         verordnung = em.merge(verordnung);
                         em.lock(verordnung, LockModeType.OPTIMISTIC);
@@ -271,7 +271,7 @@ public class MedStockTools {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getMedForm().getStatus() != DosageFormTools.APV1) {
+        if (bestand.getDarreichung().getDosageForm().getStatus() != DosageFormTools.APV1) {
 
             // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
             // drin war. Meist das, was auf der Packung steht.
@@ -364,9 +364,9 @@ public class MedStockTools {
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
             result += "PZN: " + bestand.getPackung().getPzn() + ", ";
-            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getDarreichung().getMedForm().getPackEinheit()] + " ";
-            String zubereitung = SYSTools.catchNull(bestand.getDarreichung().getMedForm().getZubereitung());
-            String anwtext = SYSTools.catchNull(bestand.getDarreichung().getMedForm().getAnwText());
+            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getDarreichung().getDosageForm().getPackEinheit()] + " ";
+            String zubereitung = SYSTools.catchNull(bestand.getDarreichung().getDosageForm().getZubereitung());
+            String anwtext = SYSTools.catchNull(bestand.getDarreichung().getDosageForm().getAnwText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
             result += "</b></font>";
         }
@@ -465,9 +465,9 @@ public class MedStockTools {
 
         BigDecimal apv = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getMedForm().getStatus() == DosageFormTools.APV_PER_BW) {
+        if (bestand.getDarreichung().getDosageForm().getStatus() == DosageFormTools.APV_PER_BW) {
             apv = getAPVperBW(bestand.getInventory());
-        } else if (bestand.getDarreichung().getMedForm().getStatus() == DosageFormTools.APV_PER_DAF) {
+        } else if (bestand.getDarreichung().getDosageForm().getStatus() == DosageFormTools.APV_PER_DAF) {
             apv = getAPVperDAF(bestand.getDarreichung());
         }
 

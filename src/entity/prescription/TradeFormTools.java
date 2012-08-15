@@ -54,30 +54,30 @@ public class TradeFormTools {
 
 
     public static String toPrettyString(TradeForm darreichung) {
-        String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
-        String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
+        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getZubereitung());
+        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getAnwText());
         String zusatz = SYSTools.catchNull(darreichung.getZusatz());
 
         String text = darreichung.getMedProdukt().getBezeichnung();
         text += zusatz.isEmpty() ? "" : ", " + zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getAnwEinheit()] : anwtext;
         return text;
     }
 
     public static String toPrettyStringMedium(TradeForm darreichung) {
-        String zubereitung = SYSTools.catchNull(darreichung.getMedForm().getZubereitung());
-        String anwtext = SYSTools.catchNull(darreichung.getMedForm().getAnwText());
+        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getZubereitung());
+        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getAnwText());
         String zusatz = SYSTools.catchNull(darreichung.getZusatz());
 
         String text = zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getMedForm().getAnwEinheit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getAnwEinheit()] : anwtext;
         return text;
     }
 
     public static String getPackungsEinheit(TradeForm darreichung) {
-        return DosageFormTools.EINHEIT[darreichung.getMedForm().getPackEinheit()];
+        return DosageFormTools.EINHEIT[darreichung.getDosageForm().getPackEinheit()];
     }
 
 
@@ -195,7 +195,7 @@ public class TradeFormTools {
         List<MedInventory> liste;
 
         // 1. Form der gesuchten darreichung bestimmen.
-        DosageForm meineForm = darreichung.getMedForm();
+        DosageForm meineForm = darreichung.getDosageForm();
 
         // 2. Alle äquivalenten Formen dazu finden
         List<DosageForm> aehnlicheFormen;

@@ -1064,18 +1064,16 @@ public class SYSTools {
         return dbl;
     }
 
-    public static String printDouble4Jasper(double d) {
-        String dbl = Double.toString(d);
-        if (d == 0d) {
-            dbl = "";
-        } else if (dbl.substring(dbl.length() - 2).equals(".0")) {
+    public static String getAsHTML(BigDecimal bd) {
+        String dbl = bd.toPlainString();
+        if (dbl.substring(dbl.length() - 2).equals(".00")) {
             dbl = dbl.substring(0, dbl.length() - 2);
-        } else if (dbl.equals("0.5")) {
-            dbl = "<sup>1</sup>/<sub>2</sub>";
+        } else if (dbl.equals("0.50")) {
+            dbl = "&frac12;";
         } else if (dbl.equals("0.25")) {
-            dbl = "<sup>1</sup>/<sub>4</sub>";
+            dbl = "&frac14;";
         } else if (dbl.equals("0.75")) {
-            dbl = "<sup>3</sup>/<sub>4</sub>";
+            dbl = "&frac34;";
         } else if (dbl.equals("0.33")) {
             dbl = "<sup>1</sup>/<sub>3</sub>";
         }
@@ -1228,34 +1226,48 @@ public class SYSTools {
         return dcbm;
     }
 
-
-    public static Color getColor(String colorname) {
+    /**
+     * Creates a Color object according to the names of the Java color constants.
+     * A HTML color string like "62A9FF" may also be used. Please remove the leading "#".
+     * @param colornameOrHTMLCode
+     * @return the desired color. Defaults to BLACK, in case of an error.
+     */
+    public static Color getColor(String colornameOrHTMLCode) {
         Color color = Color.black;
 
-        if (colorname.equalsIgnoreCase("red")) {
+        if (colornameOrHTMLCode.equalsIgnoreCase("red")) {
             color = Color.red;
-        } else if (colorname.equalsIgnoreCase("blue")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("blue")) {
             color = Color.blue;
-        } else if (colorname.equalsIgnoreCase("green")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("green")) {
             color = Color.green;
-        } else if (colorname.equalsIgnoreCase("yellow")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("yellow")) {
             color = Color.yellow;
-        } else if (colorname.equalsIgnoreCase("cyan")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("cyan")) {
             color = Color.CYAN;
-        } else if (colorname.equalsIgnoreCase("light_gray")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("light_gray")) {
             color = Color.LIGHT_GRAY;
-        } else if (colorname.equalsIgnoreCase("dark_gray")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_gray")) {
             color = Color.DARK_GRAY;
-        } else if (colorname.equalsIgnoreCase("gray")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("gray")) {
             color = Color.GRAY;
-        } else if (colorname.equalsIgnoreCase("pink")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("pink")) {
             color = Color.PINK;
-        } else if (colorname.equalsIgnoreCase("magenta")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("magenta")) {
             color = Color.MAGENTA;
-        } else if (colorname.equalsIgnoreCase("white")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("white")) {
             color = Color.WHITE;
-        } else if (colorname.equalsIgnoreCase("orange")) {
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("orange")) {
             color = Color.ORANGE;
+        } else {
+            try {
+                int red = Integer.parseInt(colornameOrHTMLCode.substring(0, 2), 16);
+                int green = Integer.parseInt(colornameOrHTMLCode.substring(2, 4), 16);
+                int blue = Integer.parseInt(colornameOrHTMLCode.substring(4), 16);
+                color = new Color(red, green, blue);
+            } catch (NumberFormatException nfe) {
+                color = Color.BLACK;
+            }
         }
         return color;
     }
@@ -1966,7 +1978,7 @@ public class SYSTools {
     }
 
     public static String left(String text, int size) {
-        OPDE.debug("IN: " + text);
+//        OPDE.debug("IN: " + text);
         int originalLaenge = text.length();
         int max = Math.min(size, originalLaenge);
         text = text.substring(0, max);
@@ -2070,15 +2082,16 @@ public class SYSTools {
 
     /**
      * compares two objects. a null value is always "smaller" than a non null value.
+     *
      * @param one
      * @param two
      * @return 1 if one != null && two == null, -1 if one == null && two != null, 0 if one and two are both == null or both != null.
      */
-    public static int nullCompare(Object one, Object two){
-        if (one != null && two == null){
+    public static int nullCompare(Object one, Object two) {
+        if (one != null && two == null) {
             return 1;
         }
-        if (one == null && two != null){
+        if (one == null && two != null) {
             return -1;
         }
         return 0;

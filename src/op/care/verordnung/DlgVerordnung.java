@@ -853,7 +853,7 @@ public class DlgVerordnung extends MyJDialog {
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
         cmbMass.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
-        cmbMass.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getMedForm().getMassnahme());
+        cmbMass.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getMassnahme());
         cmbMass.setEnabled(false);
         txtMass.setText(null);
         txtMass.setEnabled(false);
@@ -1124,7 +1124,7 @@ public class DlgVerordnung extends MyJDialog {
     private void reloadTable() {
         String zubereitung = "x";
         if (verordnung.getDarreichung() != null) {
-            zubereitung = verordnung.getDarreichung().getMedForm().getZubereitung();
+            zubereitung = verordnung.getDarreichung().getDosageForm().getZubereitung();
         }
 
         tblDosis.setModel(new TMDosis(zubereitung, verordnung));

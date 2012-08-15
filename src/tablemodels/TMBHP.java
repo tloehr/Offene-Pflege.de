@@ -41,6 +41,7 @@ import javax.swing.table.AbstractTableModel;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -202,7 +203,7 @@ public class TMBHP extends AbstractTableModel {
 
         switch (col) {
             case COL_BEZEICHNUNG: {
-                result = PrescriptionsTools.getMassnahme(bhp.getPrescriptionSchedule().getPrescription());
+                result = PrescriptionsTools.getPrescriptionAsText(bhp.getPrescriptionSchedule().getPrescription());
                 break;
             }
             case COL_DOSIS: {
@@ -250,4 +251,6 @@ public class TMBHP extends AbstractTableModel {
         }
         return result;
     }
+
+
 }

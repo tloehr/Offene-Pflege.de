@@ -138,7 +138,7 @@ public class TMBedarf
     @Override
     public Object getValueAt(int row, int col) {
 
-        String result = "<font size=\"+1\">"+ PrescriptionsTools.getMassnahme(getPrescription(row))+"</font>";
+        String result = "<font size=\"+1\">"+ PrescriptionsTools.getPrescriptionAsText(getPrescription(row))+"</font>";
 
         result += SYSConst.html_fontface;
         result += "<br/>" + getDosis(row);
@@ -149,7 +149,7 @@ public class TMBedarf
             result += "<br/><b>Keine weitere Gabe des Medikamentes mehr möglich. Tagesdosis ist erreicht</b>";
         } else {
 
-            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : DosageFormTools.EINHEIT[getDarreichung(row).getMedForm().getAnwEinheit()];
+            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : DosageFormTools.EINHEIT[getDarreichung(row).getDosageForm().getAnwEinheit()];
         }
 
         result += "</font>";

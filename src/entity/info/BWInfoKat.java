@@ -5,6 +5,8 @@
 
 package entity.info;
 
+import op.tools.SYSTools;
+
 import javax.persistence.*;
 import java.awt.*;
 import java.io.Serializable;
@@ -75,11 +77,7 @@ public class BWInfoKat implements Serializable, Comparable {
     }
 
     public Color getForegroundHeader() {
-        int red = Integer.parseInt(fgheader.substring(0, 2), 16);
-        int green = Integer.parseInt(fgheader.substring(2, 4), 16);
-        int blue = Integer.parseInt(fgheader.substring(4), 16);
-
-        return new Color(red, green, blue);
+        return SYSTools.getColor(fgheader);
     }
 
     public Color getForegroundContent() {

@@ -46,8 +46,7 @@ public class DosageFormTools {
         };
     }
 
-    public static String getAnwText(DosageForm form) {
-
+    public static String getUsageText(DosageForm form) {
         String result = "";
 
         if (form.getAnwText() != null && !form.getAnwText().isEmpty()) {

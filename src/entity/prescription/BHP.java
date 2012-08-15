@@ -2,11 +2,12 @@ package entity.prescription;
 
 import entity.Users;
 import entity.info.Resident;
-import entity.planung.DFNTools;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -244,6 +245,31 @@ public class BHP implements Serializable, Comparable<BHP> {
         return dosis;
     }
 
+    public boolean hasMed() {
+        return prescription.getDarreichung() != null;
+    }
+
+    public String getFGHTML() {
+        if (isOnDemand()) {
+            return "#" + OPDE.getProps().getProperty("ON_DEMAND_FGBHP");
+        }
+        return "#" + OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP");
+    }
+
+    public Color getFG() {
+        if (isOnDemand()) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
+    }
+
+    public Color getBG() {
+        if (isOnDemand()) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
+    }
+
     public void setDosis(BigDecimal dosis) {
         this.dosis = dosis;
     }
@@ -296,13 +322,17 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.darreichung = darreichung;
     }
 
+    public boolean isOnDemand() {
+        return prescriptionSchedule == null;
+    }
 
-    public Byte getShift(){
-       if (sZeit == BHPTools.BYTE_TIMEOFDAY){
-           return SYSCalendar.whatShiftIs(this.soll);
-       } else {
-           return SYSCalendar.whatShiftIs(this.sZeit);
-       }
+
+    public Byte getShift() {
+        if (sZeit == BHPTools.BYTE_TIMEOFDAY) {
+            return SYSCalendar.whatShiftIs(this.soll);
+        } else {
+            return SYSCalendar.whatShiftIs(this.sZeit);
+        }
     }
 
     @Override
@@ -339,7 +369,11 @@ public class BHP implements Serializable, Comparable<BHP> {
             result = sZeit.compareTo(that.getSollZeit());
         }
         if (result == 0) {
-            result = TradeFormTools.toPrettyString(prescription.getDarreichung()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getDarreichung()));
+            if (prescription.hasMedi()) {
+                result = TradeFormTools.toPrettyString(prescription.getDarreichung()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getDarreichung()));
+            } else {
+                result = this.prescription.getMassnahme().getBezeichnung().compareTo(that.getPrescription().getMassnahme().getBezeichnung());
+            }
         }
         if (result == 0) {
             result = bhpid.compareTo(that.getBHPid());
