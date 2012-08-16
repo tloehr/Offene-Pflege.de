@@ -496,7 +496,7 @@ public class DlgBestand extends MyJDialog {
                 inventory.setText(darreichung.getMedProdukt().getBezeichnung());
             }
 
-            MedStock bestand = em.merge(MedInventoryTools.einbuchenVorrat(inventory, packung, darreichung, txtBemerkung.getText(), menge));
+            MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, packung, darreichung, txtBemerkung.getText(), menge));
             inventory.getMedStocks().add(bestand);
 
             if (MedStockTools.getStockInUse(inventory) == null) {
@@ -688,13 +688,13 @@ public class DlgBestand extends MyJDialog {
 //
 
 
-            cmbVorrat.setRenderer(MedInventoryTools.getMedVorratRenderer());
+            cmbVorrat.setRenderer(MedInventoryTools.getInventoryRenderer());
             if (darreichung == null) {
                 cmbVorrat.setModel(new DefaultComboBoxModel());
                 inventory = null;
             } else {
                 List<MedInventory> vorraete = new ArrayList<MedInventory>();
-                inventory = TradeFormTools.getVorratZurDarreichung(bewohner, darreichung);
+                inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
 
                 if (inventory == null) {
                     vorraete = TradeFormTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);

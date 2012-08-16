@@ -22,7 +22,7 @@ import java.util.Date;
         @NamedQuery(name = "MedStock.findByText", query = "SELECT m FROM MedStock m WHERE m.text = :text"),
         @NamedQuery(name = "MedStock.findByApv", query = "SELECT m FROM MedStock m WHERE m.apv = :apv"),
         @NamedQuery(name = "MedStock.findByDarreichungAndBewohnerImAnbruch", query = " " +
-                " SELECT b FROM MedStock b WHERE b.inventory.bewohner = :bewohner AND b.darreichung = :darreichung " +
+                " SELECT b FROM MedStock b WHERE b.inventory.resident = :bewohner AND b.tradeform = :darreichung " +
                 " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
         @NamedQuery(name = "MedStock.findByVorratImAnbruch", query = " " +
                 " SELECT b FROM MedStock b WHERE b.inventory = :vorrat " +
@@ -30,7 +30,7 @@ import java.util.Date;
         @NamedQuery(name = "MedStock.findByBewohnerImAnbruchMitSalden", query = " " +
                 " SELECT best, SUM(buch.menge) FROM MedStock best" +
                 " JOIN best.stockTransaction buch" +
-                " WHERE best.inventory.bewohner = :bewohner AND best.aus = '9999-12-31 23:59:59' " +
+                " WHERE best.inventory.resident = :bewohner AND best.aus = '9999-12-31 23:59:59' " +
                 " AND best.anbruch < '9999-12-31 23:59:59' " +
                 " GROUP BY best ")
 })
@@ -89,7 +89,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.apv = BigDecimal.ONE;
 
         this.inventory = inventory;
-        this.darreichung = darreichung;
+        this.tradeform = tradeform;
         this.packung = packung;
         this.text = text;
         this.ein = new Date();
@@ -174,7 +174,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private TradeForm darreichung;
+    private TradeForm tradeform;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -214,11 +214,11 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 //        this.inventory = inventory;
 //    }
 
-    public TradeForm getDarreichung() {
-        return darreichung;
+    public TradeForm getTradeForm() {
+        return tradeform;
     }
 
-//    public void setDarreichung(Darreichung darreichung) {
+//    public void setTradeForm(Darreichung darreichung) {
 //        this.darreichung = darreichung;
 //    }
 

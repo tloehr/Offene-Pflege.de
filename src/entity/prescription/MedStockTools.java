@@ -48,8 +48,8 @@ public class MedStockTools {
 //    public static MedBestand findByVerordnungImAnbruch(Verordnung verordnung) {
 //        EntityManager em = OPDE.createEM();
 //        Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
-//        query.setParameter("bewohner", verordnung.getBewohner());
-//        query.setParameter("darreichung", verordnung.getDarreichung());
+//        query.setParameter("bewohner", verordnung.getResident());
+//        query.setParameter("darreichung", verordnung.getTradeForm());
 //
 //        MedBestand result = null;
 //
@@ -130,7 +130,7 @@ public class MedStockTools {
         OPDE.debug("BestandID: " + bestand.getBestID());
 
         HashMap hm = new HashMap();
-        hm.put("bestand.darreichung", TradeFormTools.toPrettyString(bestand.getDarreichung()));
+        hm.put("bestand.darreichung", TradeFormTools.toPrettyString(bestand.getTradeForm()));
 
         String pzn = bestand.getPackung().getPzn() == null ? "??" : bestand.getPackung().getPzn();
         hm.put("bestand.packung.pzn", pzn);
@@ -138,9 +138,9 @@ public class MedStockTools {
         hm.put("bestand.eingang", bestand.getEin());
         hm.put("bestand.userkurz", bestand.getUser().getUKennung());
         hm.put("bestand.userlang", bestand.getUser().getNameUndVorname());
-        hm.put("bestand.vorrat.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getBewohner()));
-        hm.put("bestand.vorrat.bewohnergebdatum", bestand.getInventory().getBewohner().getGebDatum());
-        hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getBewohner().getBWKennung());
+        hm.put("bestand.vorrat.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
+        hm.put("bestand.vorrat.bewohnergebdatum", bestand.getInventory().getResident().getGebDatum());
+        hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getResident().getBWKennung());
 
         return hm;
     }
@@ -151,14 +151,14 @@ public class MedStockTools {
 //
 //        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
 //        result += SYSPrint.EPL2_labelformat(57, 19, 3);
-//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getDarreichung())); // bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz())
+//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz())
 //        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
 //            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUKennung() + ")");
 //        }
 //
 //        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getBestID()));
-//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getInventory().getBewohner()));
-//        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getInventory().getBewohner()));
+//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getInventory().getResident()));
+//        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getInventory().getResident()));
 //
 //        result += SYSPrint.EPL2_PRINT;
 //
@@ -187,20 +187,20 @@ public class MedStockTools {
     /**
      * Ermittelt die Menge, die in einer Packung noch enthalten ist.
      *
-     * @param bestand die entsprechende Packung
+     * @param stock die entsprechende Packung
      * @return die Summe in der Packungs Einheit.
      */
-    public static BigDecimal getBestandSumme(EntityManager em, MedStock bestand) throws Exception {
+    public static BigDecimal getBestandSumme(EntityManager em, MedStock stock) throws Exception {
         BigDecimal result;
 
         Query query = em.createQuery(" " +
-                " SELECT SUM(bu.menge) " +
-                " FROM MedStock b " +
-                " JOIN b.buchungen bu " +
-                " WHERE b = :bestand ");
+                " SELECT SUM(tx.menge) " +
+                " FROM MedStock st " +
+                " JOIN st.stockTransaction tx " +
+                " WHERE st = :stock ");
 
         try {
-            query.setParameter("bestand", bestand);
+            query.setParameter("stock", stock);
             result = (BigDecimal) query.getSingleResult();
         } catch (NoResultException nre) {
             result = BigDecimal.ZERO;
@@ -235,11 +235,11 @@ public class MedStockTools {
 
             // es wurde kein nächster angebrochen ?
             // könnte es sein, dass dieser Vorrat keine Packungen mehr hat ?
-            if (MedInventoryTools.getNaechsteNochUngeoeffnete(bestand.getInventory()) == null) {
+            if (MedInventoryTools.getNextToOpen(bestand.getInventory()) == null) {
                 // Dann prüfen, ob dieser Vorrat zu Verordnungen gehört, die nur bis Packungs Ende laufen sollen
                 // Die müssen dann jetzt nämlich abgeschlossen werden.
                 for (Prescriptions verordnung : PrescriptionsTools.getPrescriptionsByInventory(bestand.getInventory())) {
-                    if (verordnung.isBisPackEnde()) {
+                    if (verordnung.isTillEndOfPackage()) {
                         verordnung = em.merge(verordnung);
                         em.lock(verordnung, LockModeType.OPTIMISTIC);
                         verordnung.setAbDatum(new Date());
@@ -271,7 +271,7 @@ public class MedStockTools {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getDosageForm().getStatus() != DosageFormTools.APV1) {
+        if (bestand.getTradeForm().getDosageForm().getStatus() != DosageFormTools.APV1) {
 
             // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
             // drin war. Meist das, was auf der Packung steht.
@@ -360,13 +360,13 @@ public class MedStockTools {
 
     public static String getBestandTextAsHTML(MedStock bestand) {
         String result = "";
-        result += "<font color=\"blue\"><b>" + bestand.getDarreichung().getMedProdukt().getBezeichnung() + " " + bestand.getDarreichung().getZusatz() + ", ";
+        result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
             result += "PZN: " + bestand.getPackung().getPzn() + ", ";
-            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getDarreichung().getDosageForm().getPackEinheit()] + " ";
-            String zubereitung = SYSTools.catchNull(bestand.getDarreichung().getDosageForm().getZubereitung());
-            String anwtext = SYSTools.catchNull(bestand.getDarreichung().getDosageForm().getAnwText());
+            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackEinheit()] + " ";
+            String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getZubereitung());
+            String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getAnwText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
             result += "</b></font>";
         }
@@ -381,7 +381,7 @@ public class MedStockTools {
 
         result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
-        result += TradeFormTools.toPrettyString(bestand.getDarreichung());
+        result += TradeFormTools.toPrettyString(bestand.getTradeForm());
 
         if (bestand.getPackung() != null) {
             result += ", " + MedPackungTools.toPrettyString(bestand.getPackung());
@@ -465,10 +465,10 @@ public class MedStockTools {
 
         BigDecimal apv = BigDecimal.ONE;
 
-        if (bestand.getDarreichung().getDosageForm().getStatus() == DosageFormTools.APV_PER_BW) {
+        if (bestand.getTradeForm().getDosageForm().getStatus() == DosageFormTools.APV_PER_BW) {
             apv = getAPVperBW(bestand.getInventory());
-        } else if (bestand.getDarreichung().getDosageForm().getStatus() == DosageFormTools.APV_PER_DAF) {
-            apv = getAPVperDAF(bestand.getDarreichung());
+        } else if (bestand.getTradeForm().getDosageForm().getStatus() == DosageFormTools.APV_PER_DAF) {
+            apv = getAPVperDAF(bestand.getTradeForm());
         }
 
         return apv;
@@ -546,9 +546,9 @@ public class MedStockTools {
 
         String jpql = " " +
                 " SELECT b FROM MedStock b " +
-                " WHERE b.vorrat.bewohner.station = :station AND b.vorrat.bewohner.adminonly <> 2 " +
+                " WHERE b.inventory.resident.station = :station AND b.inventory.resident.adminonly <> 2 " +
                 " AND b.anbruch < :anbruch AND b.aus = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
-                " ORDER BY b.vorrat.bewohner.nachname, b.vorrat.bewohner.vorname, b.vorrat.text, b.anbruch ";
+                " ORDER BY b.inventory.resident.nachname, b.inventory.resident.vorname, b.inventory.text, b.anbruch ";
 
         Query query = em.createQuery(jpql);
         query.setParameter("anbruch", new Date());
@@ -577,9 +577,9 @@ public class MedStockTools {
 
         for (MedStock bestand : list) {
             html.append("<tr>");
-            html.append("<td>" + ResidentTools.getBWLabelTextKompakt(bestand.getInventory().getBewohner()) + "</td>");
+            html.append("<td>" + ResidentTools.getBWLabelTextKompakt(bestand.getInventory().getResident()) + "</td>");
             html.append("<td>" + bestand.getBestID() + "</td>");
-            html.append("<td>" + TradeFormTools.toPrettyString(bestand.getDarreichung()) + "</td>");
+            html.append("<td>" + TradeFormTools.toPrettyString(bestand.getTradeForm()) + "</td>");
             html.append("<td>" + df.format(bestand.getAnbruch()) + "</td>");
             html.append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
             html.append("</tr>");

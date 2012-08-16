@@ -702,7 +702,7 @@ public class BWInfoTools {
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
-            result += PrescriptionsTools.getPrescriptionAsHTML(listeVerordnungen, true, false);
+            result += PrescriptionsTools.getPrescriptionAsHTML(listeVerordnungen, true, false, false);
             em.close();
         }
 

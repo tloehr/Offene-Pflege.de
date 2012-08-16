@@ -129,6 +129,10 @@
         <property key="VERY_LATE_BGSHIFT" value="990099"/>
         <property key="VERY_LATE_FGBHP" value="990099"/>
         <property key="VERY_LATE_BGBHP" value="FFA8FF"/>
+        <property key="ON_DEMAND_FGSHIFT" value="F5F5E2"/>
+        <property key="ON_DEMAND_BGSHIFT" value="D1D17A"/>
+        <property key="ON_DEMAND_FGBHP" value="D1D17A"/>
+        <property key="ON_DEMAND_BGBHP" value="EEEECE"/>
 
     </properties>
 

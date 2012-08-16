@@ -21,15 +21,15 @@ import java.util.Date;
         @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.bis = :bis"),
         @NamedQuery(name = "MedInventory.getSumme", query = " " +
                 " SELECT SUM(buch.menge) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
-        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
-                " SELECT DISTINCT vor FROM MedInventory vor " +
-                " JOIN vor.medStocks best " +
-                " WHERE vor.bewohner = :bewohner AND best.darreichung = :darreichung " +
-                " AND vor.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
+//        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
+//                " SELECT DISTINCT inv FROM MedInventory inv " +
+//                " JOIN inv.medStocks stock " +
+//                " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +
+//                " AND inv.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
         @NamedQuery(name = "MedInventory.findByBewohnerMitBestand", query = " " +
                 " SELECT best.inventory, SUM(buch.menge) FROM MedStock best " +
                 " JOIN best.stockTransaction buch " +
-                " WHERE best.inventory.bewohner = :bewohner AND best.inventory.bis = '9999-12-31 23:59:59' " +
+                " WHERE best.inventory.resident = :bewohner AND best.inventory.bis = '9999-12-31 23:59:59' " +
                 " GROUP BY best.inventory ")
 })
 
@@ -86,12 +86,8 @@ public class MedInventory implements Serializable {
 
     }
 
-    public Resident getBewohner() {
-        return bewohner;
-    }
-
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
     public Users getUser() {
@@ -102,8 +98,8 @@ public class MedInventory implements Serializable {
         this.user = user;
     }
 
-    public MedInventory(Resident bewohner, String text) {
-        this.bewohner = bewohner;
+    public MedInventory(Resident resident, String text) {
+        this.resident = resident;
         this.text = text;
         this.user = OPDE.getLogin().getUser();
         this.von = new Date();
@@ -158,7 +154,7 @@ public class MedInventory implements Serializable {
     // ==
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     // ==
     // N:1 Relationen
     // ==

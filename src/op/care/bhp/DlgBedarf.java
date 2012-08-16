@@ -215,7 +215,7 @@ public class DlgBedarf extends CleanablePanel {
 
                 if (tm.getBestand(row) != null) {
                     MedStock bestand = em.merge(tm.getBestand(row));
-                    MedInventoryTools.entnahmeVorrat(em, bestand.getInventory(), vp.getMaxEDosis(), true, bhp);
+                    MedInventoryTools.takeFrom(em, bestand.getInventory(), vp.getMaxEDosis(), true, bhp);
                 }
 
                 em.getTransaction().commit();

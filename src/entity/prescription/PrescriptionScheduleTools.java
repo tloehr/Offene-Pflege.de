@@ -202,13 +202,13 @@ public class PrescriptionScheduleTools {
         // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
         if (planung.verwendetMaximalDosis()) {
             result += "Maximale Tagesdosis: ";
-            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + DosageFormTools.EINHEIT[planung.getPrescription().getDarreichung().getDosageForm().getAnwEinheit()];
+            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + DosageFormTools.EINHEIT[planung.getPrescription().getTradeForm().getDosageForm().getAnwEinheit()];
             result += "<br/>";
         } else if (planung.verwendetUhrzeit()) {
 
             result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + " Uhr</u></b> ";
             result += HTMLTools.printDouble(planung.getUhrzeitDosis());
-            result += planung.getPrescription().hasMedi() ? " " + DosageFormTools.EINHEIT[planung.getPrescription().getDarreichung().getDosageForm().getAnwEinheit()] : "x";
+            result += planung.getPrescription().hasMed() ? " " + DosageFormTools.EINHEIT[planung.getPrescription().getTradeForm().getDosageForm().getAnwEinheit()] : "x";
             result += "<br/>";
         }
 

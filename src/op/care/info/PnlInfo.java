@@ -1394,7 +1394,7 @@ public class PnlInfo extends NursingRecordsPanel {
             if (shallBeCollapsible) {
                 panelForBWInfoTyp.setCollapsed(SYSPropsTools.isBooleanTrue(internalClassID + ":panelCollapsed:" + typ.getBwinftyp(), true));
             }
-//            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt()));
+//            panelForBWInfoTyp.setVisible((tbEmpty.isSelected() || ersterBWInfo != null) && tbInactive.isSelected() || (ersterBWInfo != null && !ersterBWInfo.isDiscontinued()));
 
         } catch (PropertyVetoException e) {
             OPDE.error(e);

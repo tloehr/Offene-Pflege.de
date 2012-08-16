@@ -176,7 +176,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             File temp = File.createTempFile("prescription", ".html");
             temp.deleteOnExit();
             List<Prescriptions> listVerordnung = ((TMVerordnung) tblVerordnung.getModel()).getVordnungenAt(sel);
-            String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getPrescriptionAsHTML(listVerordnung, true, true));
+            String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getPrescriptionAsHTML(listVerordnung, true, true, false));
             SYSFilesTools.print(html, true);
         } catch (IOException e) {
             new DlgException(e);
@@ -221,8 +221,8 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
             long num = BHPTools.getNumBHPs(selectedVerordnung);
             boolean editAllowed = !readOnly && num == 0;
-            boolean changeAllowed = !readOnly && !selectedVerordnung.isBedarf() && !selectedVerordnung.isAbgesetzt() && num > 0;
-            boolean absetzenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt();
+            boolean changeAllowed = !readOnly && !selectedVerordnung.isOnDemand() && !selectedVerordnung.isDiscontinued() && num > 0;
+            boolean absetzenAllowed = !readOnly && !selectedVerordnung.isDiscontinued();
             boolean deleteAllowed = !readOnly && num == 0;
 
             SYSTools.unregisterListeners(menu);
@@ -265,7 +265,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     queryDELBHP.setParameter("verordnung", verordnung);
                                     queryDELBHP.executeUpdate();
 
-                                    if (!verordnung.isBedarf()) {
+                                    if (!verordnung.isOnDemand()) {
                                         BHPTools.generate(em, verordnung.getPrescriptionSchedule(), new DateMidnight(), true);
                                     }
 
@@ -332,7 +332,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     BHPTools.cleanup(em, oldVerordnung);
 
                                     // Die neuen BHPs werden erzeugt.
-                                    if (!newVerordnung.isBedarf()) {
+                                    if (!newVerordnung.isOnDemand()) {
                                         // ab der aktuellen Uhrzeit
                                         BHPTools.generate(em, newVerordnung.getPrescriptionSchedule(), new DateMidnight(), false);
                                     }
@@ -455,12 +455,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
             itemPopupDelete.setEnabled(deleteAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
-            if (selectedVerordnung.hasMedi()) {
+            if (selectedVerordnung.hasMed()) {
                 menu.add(new JSeparator());
 
-                final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
-                boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt() && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
-                boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isAbgesetzt() && bestandImAnbruch == null;
+                final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(bewohner, selectedVerordnung.getTradeForm()));
+                boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
+                boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch == null;
 
                 JMenuItem itemPopupCloseBestand = new JMenuItem("Bestand abschließen");
                 itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
@@ -483,7 +483,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        new DlgBestandAnbrechen(selectedVerordnung.getDarreichung(), selectedVerordnung.getBewohner(), new Closure() {
+                        new DlgBestandAnbrechen(selectedVerordnung.getTradeForm(), selectedVerordnung.getResident(), new Closure() {
                             @Override
                             public void execute(Object o) {
                                 if (o != null) {
@@ -508,12 +508,12 @@ public class PnlVerordnung extends NursingRecordsPanel {
             });
             menu.add(itemPopupPrint);
 
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isDiscontinued() && singleRowSelected) {
 //                menu.add(new JSeparator());
 //                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, standardActionListener));
 //            }
 //
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isAbgesetzt() && singleRowSelected) {
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isDiscontinued() && singleRowSelected) {
 //                menu.add(new JSeparator());
 //                menu.add(VorgaengeTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
 //            }
@@ -524,13 +524,13 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupInfo.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getVorratZurDarreichung(bewohner, selectedVerordnung.getDarreichung()));
+                    final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(bewohner, selectedVerordnung.getTradeForm()));
 
                     String message = "VerID: " + selectedVerordnung.getVerid();
                     if (bestandImAnbruch != null) {
                         BigDecimal apv = MedStockTools.getAPVperBW(bestandImAnbruch.getInventory());
                         BigDecimal apvBest = bestandImAnbruch.getApv();
-                        message += "  VorID: " + bestandImAnbruch.getInventory().getVorID() + "  DafID: " + bestandImAnbruch.getDarreichung().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
+                        message += "  VorID: " + bestandImAnbruch.getInventory().getVorID() + "  DafID: " + bestandImAnbruch.getTradeForm().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
                     }
 
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, 10));
@@ -684,7 +684,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
                                     verordnung.setVerKennung(UniqueTools.getNewUID(em, "__verkenn").getUid());
                                     verordnung = em.merge(verordnung);
-                                    if (!verordnung.isBedarf()) {
+                                    if (!verordnung.isOnDemand()) {
                                         BHPTools.generate(em, verordnung.getPrescriptionSchedule(), new DateMidnight(), true);
                                     }
                                     em.getTransaction().commit();

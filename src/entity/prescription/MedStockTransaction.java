@@ -184,13 +184,6 @@ public class MedStockTransaction implements Serializable {
     public String toString() {
         return "MedStockTransaction{" +
                 "buchID=" + buchID +
-                ", menge=" + menge +
-                ", text='" + text + '\'' +
-                ", status=" + status +
-                ", pit=" + pit +
-                ", bestand=" + bestand +
-                ", bhp=" + bhp +
-                ", user=" + user +
                 '}';
     }
 }

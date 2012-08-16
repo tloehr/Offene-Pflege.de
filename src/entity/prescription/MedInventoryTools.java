@@ -25,7 +25,7 @@ import java.util.Date;
  */
 public class MedInventoryTools {
 
-    public static ListCellRenderer getMedVorratRenderer() {
+    public static ListCellRenderer getInventoryRenderer() {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -43,7 +43,7 @@ public class MedInventoryTools {
         };
     }
 
-    public static String getVorratAsHTML(MedInventory inventory) {
+    public static String getInventoryAsHTML(MedInventory inventory) {
         String result = "";
 
         String htmlcolor = inventory.isAbgeschlossen() ? "gray" : "blue";
@@ -65,7 +65,7 @@ public class MedInventoryTools {
 
     }
 
-    public static BigDecimal getVorratSumme(MedInventory inventory) {
+    public static BigDecimal getInventorySum(MedInventory inventory) {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock bestand : inventory.getMedStocks()) {
@@ -77,7 +77,7 @@ public class MedInventoryTools {
         return result;
     }
 
-    public static BigDecimal getVorratSumme(EntityManager em, MedInventory inventory) throws Exception {
+    public static BigDecimal getInventorySum(EntityManager em, MedInventory inventory) throws Exception {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock bestand : inventory.getMedStocks()) {
@@ -104,9 +104,9 @@ public class MedInventoryTools {
      * @param anweinheit true, dann wird in der Anwedungseinheit ausgebucht. false, in der Packungseinheit
      * @param bhp        BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
-    public static void entnahmeVorrat(EntityManager em, MedInventory inventory, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
+    public static void takeFrom(EntityManager em, MedInventory inventory, BigDecimal menge, boolean anweinheit, BHP bhp) throws Exception {
 
-        OPDE.debug("entnahmeVorrat/5: inventory: " + inventory);
+        OPDE.debug("takeFrom/5: inventory: " + inventory);
 
         if (inventory == null) {
             throw new Exception("Keine Packung im Anbruch");
@@ -122,9 +122,9 @@ public class MedInventoryTools {
             menge = menge.divide(apv, 4, BigDecimal.ROUND_UP);
         }
 
-        OPDE.debug("entnahmeVorrat/5: menge: " + menge);
+        OPDE.debug("takeFrom/5: menge: " + menge);
 
-        entnahmeVorrat(em, inventory, menge, bhp);
+        takeFrom(em, inventory, menge, bhp);
     }
 
 
@@ -155,11 +155,11 @@ public class MedInventoryTools {
 //    }
 
 
-    public static void entnahmeVorrat(EntityManager em, MedInventory inventory, BigDecimal wunschmenge, BHP bhp) throws Exception {
+    public static void takeFrom(EntityManager em, MedInventory inventory, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedStock bestand = em.merge(MedStockTools.getStockInUse(inventory));
         em.lock(bestand, LockModeType.OPTIMISTIC);
 
-        OPDE.debug("entnahmeVorrat/4: bestand: " + bestand);
+        OPDE.debug("takeFrom/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal restsumme = MedStockTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
@@ -179,10 +179,10 @@ public class MedInventoryTools {
             }
 
             // Also erst mal die Buchung für DIESEN Durchgang.
-            MedStockTransaction buchung = em.merge(new MedStockTransaction(bestand, entnahme.negate(), bhp));
-            bestand.getStockTransaction().add(buchung);
-            bhp.getStockTransaction().add(buchung);
-            OPDE.debug("entnahmeVorrat/4: buchung: " + buchung);
+            MedStockTransaction tx = em.merge(new MedStockTransaction(bestand, entnahme.negate(), bhp));
+            bestand.getStockTransaction().add(tx);
+            bhp.getStockTransaction().add(tx);
+            OPDE.debug("takeFrom/4: tx: " + tx);
 
             /**
              * Gibt es schon eine neue Packung ? Wenn nicht, dann nehmen brechen wir ab.
@@ -202,7 +202,7 @@ public class MedInventoryTools {
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
-                    entnahmeVorrat(em, inventory, wunschmenge.subtract(entnahme), bhp);
+                    takeFrom(em, inventory, wunschmenge.subtract(entnahme), bhp);
                 }
             }
         }
@@ -221,7 +221,7 @@ public class MedInventoryTools {
      * @return
      * @throws Exception
      */
-    public static MedStock einbuchenVorrat(MedInventory inventory, MedPackung packung, TradeForm darreichung, String text, BigDecimal menge) {
+    public static MedStock addTo(MedInventory inventory, MedPackung packung, TradeForm darreichung, String text, BigDecimal menge) {
         MedStock bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             bestand = new MedStock(inventory, darreichung, packung, text);
@@ -233,7 +233,7 @@ public class MedInventoryTools {
     }
 
 
-    public static MedStock getNaechsteNochUngeoeffnete(MedInventory inventory) {
+    public static MedStock getNextToOpen(MedInventory inventory) {
         MedStock bestand = null;
         if (!inventory.getMedStocks().isEmpty()) {
             MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
@@ -248,20 +248,20 @@ public class MedInventoryTools {
         return bestand;
     }
 
-    public static MedStock getNaechsteNichtAbgeschlossene(MedInventory inventory) {
-        MedStock bestand = null;
-        if (!inventory.getMedStocks().isEmpty()) {
-            MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
-            Arrays.sort(bestaende); // nach Einbuchung
-            for (MedStock myBestand : bestaende) {
-                if (!myBestand.isAbgeschlossen()) {
-                    bestand = myBestand;
-                    break;
-                }
-            }
-        }
-        return bestand;
-    }
+//    public static MedStock getNaechsteNichtAbgeschlossene(MedInventory inventory) {
+//        MedStock bestand = null;
+//        if (!inventory.getMedStocks().isEmpty()) {
+//            MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
+//            Arrays.sort(bestaende); // nach Einbuchung
+//            for (MedStock myBestand : bestaende) {
+//                if (!myBestand.isAbgeschlossen()) {
+//                    bestand = myBestand;
+//                    break;
+//                }
+//            }
+//        }
+//        return bestand;
+//    }
 
     /**
      * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die z.Zt. keine
@@ -294,11 +294,11 @@ public class MedInventoryTools {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT d.medForm FROM MedInventory v " +
-                " JOIN v.bestaende b " +
-                " JOIN b.darreichung d" +
-                " WHERE v = :vorrat");
-        query.setParameter("vorrat", inventory);
+                " SELECT tf.dosageForm FROM MedInventory i " +
+                " JOIN i.medStocks s " +
+                " JOIN s.tradeform tf" +
+                " WHERE i = :inventory");
+        query.setParameter("inventory", inventory);
         query.setMaxResults(1);
 
         DosageForm form = (DosageForm) query.getSingleResult();

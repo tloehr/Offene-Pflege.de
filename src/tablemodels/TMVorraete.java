@@ -70,7 +70,7 @@ public class TMVorraete extends AbstractTableModel {
         Object result = "";
         switch (col) {
             case COL_NAME: {
-                result = MedInventoryTools.getVorratAsHTML(getVorrat(row));
+                result = MedInventoryTools.getInventoryAsHTML(getVorrat(row));
                 break;
             }
             case COL_MENGE: {

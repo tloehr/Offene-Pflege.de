@@ -459,8 +459,8 @@ public class PnlVorrat extends NursingRecordsPanel {
             em.close();
 
             if (bestand != null) {
-                if (!bewohner.equals(bestand.getInventory().getBewohner())) {
-                    bewohner = bestand.getInventory().getBewohner();
+                if (!bewohner.equals(bestand.getInventory().getResident())) {
+                    bewohner = bestand.getInventory().getResident();
                     OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Medikament gehört eine[m|r] anderen Bewohner[in]. Habe umgeschaltet.", 2));
                     OPDE.getMainframe().change2Bewohner(bewohner);
@@ -939,7 +939,7 @@ public class PnlVorrat extends NursingRecordsPanel {
 
     private void recalculate(MedStock changed) {
 
-        BigDecimal newvorrat = MedInventoryTools.getVorratSumme(changed.getInventory());
+        BigDecimal newvorrat = MedInventoryTools.getInventorySum(changed.getInventory());
         BigDecimal newbestand = MedStockTools.getBestandSumme(changed);
 
         TMVorraete tmv = (TMVorraete) tblVorrat.getModel();

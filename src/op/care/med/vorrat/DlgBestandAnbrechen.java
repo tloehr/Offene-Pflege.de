@@ -58,7 +58,7 @@ public class DlgBestandAnbrechen extends MyJDialog {
      */
     public DlgBestandAnbrechen(TradeForm darreichung, Resident bewohner, Closure actionBlock) {
         super();
-        this.inventory = TradeFormTools.getVorratZurDarreichung(bewohner, darreichung);
+        this.inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
         this.bestand = null;
         this.actionBlock = actionBlock;
         initComponents();

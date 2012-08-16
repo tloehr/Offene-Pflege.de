@@ -25,14 +25,6 @@
          <string>border</string> 
          <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
         </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ComponentListener</string> 
-          <string>componentResized</string> 
-          <string>jspBHPComponentResized</string> 
-          <boolean>true</boolean> 
-         </object> 
-        </void> 
         <void property="name"> 
          <string>jspBHP</string> 
         </void> 

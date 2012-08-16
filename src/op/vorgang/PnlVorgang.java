@@ -396,8 +396,8 @@ public class PnlVorgang extends NursingRecordsPanel {
 //                    mapanel.add(new AbstractAction() {
 //                        {
 //                            String titel = innervorgang.getTitel();
-//                            if (innervorgang.getBewohner() != null) {
-//                                titel += " [" + innervorgang.getBewohner().getBWKennung() + "]";
+//                            if (innervorgang.getResident() != null) {
+//                                titel += " [" + innervorgang.getResident().getBWKennung() + "]";
 //                            }
 //                            putValue(Action.NAME, titel);
 //                        }
@@ -454,7 +454,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 //                pnlAlleVorgaenge.add(new AbstractAction() {
 //                    {
 //                        putValue(Action.NAME, innervorgang.getTitel());
-//                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
+//                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getResident() == null ? "allgemeiner Vorgang" : innervorgang.getResident().getNachname()));
 //                    }
 //
 //                    @Override
@@ -487,7 +487,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 //                pnlVorgaengeRunningOut.add(new AbstractAction() {
 //                    {
 //                        putValue(Action.NAME, innervorgang.getTitel());
-//                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getBewohner() == null ? "allgemeiner Vorgang" : innervorgang.getBewohner().getNachname()));
+//                        putValue(Action.SHORT_DESCRIPTION, (innervorgang.getResident() == null ? "allgemeiner Vorgang" : innervorgang.getResident().getNachname()));
 //                    }
 //
 //                    @Override

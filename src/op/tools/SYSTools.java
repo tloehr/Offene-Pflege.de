@@ -1066,8 +1066,8 @@ public class SYSTools {
 
     public static String getAsHTML(BigDecimal bd) {
         String dbl = bd.toPlainString();
-        if (dbl.substring(dbl.length() - 2).equals(".00")) {
-            dbl = dbl.substring(0, dbl.length() - 2);
+        if (dbl.endsWith(".00")) {
+            dbl = dbl.substring(0, dbl.length() - 3);
         } else if (dbl.equals("0.50")) {
             dbl = "&frac12;";
         } else if (dbl.equals("0.25")) {

@@ -66,7 +66,7 @@ public class TradeForm implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
     private Collection<MedPackung> packungen;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeform")
     private Collection<MedStock> bestaende;
 
     // N:1 Relationen

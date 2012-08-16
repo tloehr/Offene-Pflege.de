@@ -1,11 +1,14 @@
 package entity.prescription;
 
+import entity.info.BWInfoTools;
 import entity.info.Resident;
-import entity.planung.DFN;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.bhp.PnlBHP;
-import op.tools.*;
+import op.tools.GUITools;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
@@ -32,7 +35,7 @@ public class BHPTools {
     public static final byte STATE_OPEN = 0;
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
-    public static final byte STATE_REFUSED_DISCARDED = 2;
+    public static final byte STATE_REFUSED_DISCARDED = 3;
 
     public static final byte SHIFT_ON_DEMAND = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
@@ -40,8 +43,8 @@ public class BHPTools {
     public static final byte SHIFT_LATE = 2;
     public static final byte SHIFT_VERY_LATE = 3;
 
-    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY","EARLY","LATE","VERY_LATE"};
-    public static final String[] SHIFT_TEXT = new String[]{PnlBHP.internalClassID+".shift.veryearly",PnlBHP.internalClassID+".shift.early",PnlBHP.internalClassID+".shift.late",PnlBHP.internalClassID+".shift.verylate"};
+    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
+    public static final String[] SHIFT_TEXT = new String[]{PnlBHP.internalClassID + ".shift.veryearly", PnlBHP.internalClassID + ".shift.early", PnlBHP.internalClassID + ".shift.late", PnlBHP.internalClassID + ".shift.verylate"};
     public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
     public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
@@ -128,7 +131,7 @@ public class BHPTools {
                     // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
                     " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
-                    " AND vp.lDatum <= :ldatum AND v.bewohner.adminonly <> 2 " +
+                    " AND vp.lDatum <= :ldatum AND v.resident.adminonly <> 2 " +
                     " ORDER BY vp.bhppid ");
 
             // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
@@ -226,7 +229,7 @@ public class BHPTools {
             pSchedule = em.merge(pSchedule);
             em.lock(pSchedule, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             em.lock(em.merge(pSchedule.getPrescription()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            em.lock(pSchedule.getPrescription().getBewohner(), LockModeType.OPTIMISTIC);
+            em.lock(pSchedule.getPrescription().getResident(), LockModeType.OPTIMISTIC);
 
             if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isTaeglich() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
 
@@ -237,7 +240,7 @@ public class BHPTools {
                 OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
                 OPDE.debug("==========================================");
                 OPDE.debug("BHPPID: " + pSchedule.getBhppid());
-                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getBewohner().getBWKennung());
+                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getBWKennung());
                 OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
 
 
@@ -347,6 +350,70 @@ public class BHPTools {
         return numbhp;
     }
 
+
+    /**
+     * Returns all exisiting (persisted) and all potential (not yet persisted) BHPs for a
+     * prescription which is OnDemand.
+     *
+     * @param prescription
+     * @param date
+     * @return
+     */
+    public static ArrayList<BHP> getBHPsOnDemand(Prescriptions prescription, Date date) {
+
+        if (!prescription.isOnDemand()) {
+            OPDE.fatal(new Exception("prescriptions need to be ON DEMAND for this"));
+        }
+
+        EntityManager em = OPDE.createEM();
+        ArrayList<BHP> listBHP = null;
+
+        try {
+
+            PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(0);
+            Date now = new Date();
+
+
+            // TODO: doppelt. muss nur die fehlenden hinzufügen.
+            String jpql = " SELECT bhp " +
+                    " FROM BHP bhp " +
+                    " WHERE bhp.prescription = :prescription " +
+                    " AND bhp.soll >= :from AND bhp.soll <= :to ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("prescription", prescription);
+            query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
+            query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+
+            listBHP = new ArrayList<BHP>(query.getResultList());
+
+            // On Demand prescriptions have exactly one schedule.
+            // There may not be more than MaxAnzahl BHPs resulting from this prescription.
+            if (listBHP.size() < schedule.getMaxAnzahl()) {
+                // Still some BHPs to go
+                for (int i = listBHP.size(); i < schedule.getMaxAnzahl(); i++) {
+
+                    BHP bhp = new BHP(schedule);
+                    bhp.setIst(now);
+                    bhp.setSoll(date);
+                    bhp.setSollZeit(BYTE_TIMEOFDAY);
+                    bhp.setDosis(schedule.getMaxEDosis());
+                    bhp.setStatus(BHPTools.STATE_OPEN);
+
+                    listBHP.add(bhp);
+                }
+            }
+
+            Collections.sort(listBHP);
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return listBHP;
+    }
+
     public static ArrayList<BHP> getBHPs(Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
@@ -385,7 +452,13 @@ public class BHPTools {
                 text += msg[bhp.getSollZeit()];
             }
         } else {
-            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll());
+
+            if (bhp.getStatus() == STATE_DONE) {
+                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + OPDE.lang.getString("misc.msg.Time.short");
+            } else {
+                text += "--";
+            }
+
         }
 
         return prefix + text + postfix;
@@ -406,5 +479,50 @@ public class BHPTools {
         }
         return null;
     }
+
+    public static boolean isChangeable(BHP bhp) {
+        int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("bhp_max_minutes_to_withdraw"));
+        //        boolean changeable =
+//                // Diese Kontrolle stellt sicher, dass ein User nur seine eigenen Einträge und das auch nur
+//                // eine halbe Stunde lang bearbeiten kann.
+//                // Ausserdem kann man nur dann etwas geben, wenn es
+//                //      a) eine Massnahmen ohne Medikation ist
+//                //      ODER
+//                //      (
+//                //          b) ein angebrochener Bestand vorhanden ist
+//                //          UND
+//                //          c)  das häkchen NICHT gesetzt ist oder wenn es gesetzt ist, kann man es
+//                //              nur dann wieder wegnehmen, wenn es derselbe Benutzer FRüH GENUG tut.
+//                //              Und auch nur dann, wenn nicht mehrere Packungen beim Ausbuchen betroffen waren.
+//                //          )
+//                //      )
+//                !abwesend &&
+//                        !bhp.getPrescription().isDiscontinued()
+//                        // Offener Status geht immer
+//                        && (
+//                        bhp.getStatus() == BHPTools.STATE_OPEN
+//                                // Nicht mehr offen ?
+//                                // Dann nur wenn derselbe Benutzer dass wieder rückgängig machen will
+//                                ||
+//                                (bhp.getUser().equals(OPDE.getLogin().getUser())
+//                                        // und es noch früh genug ist (30 Minuten)
+//                                        && SYSCalendar.earlyEnough(bhp.getMDate().getTime(), BHP_MAX_MINUTES_TO_WITHDRAW)
+//                                        // und kein abgesetzter Bestand beteiligt ist. Das verhindert einfach, dass bei
+//                                        // eine Rückgabe eines Vorrates verhindert wird, wenn bei Abhaken eine Packung leer wurde und direkt eine neue
+//                                        // angebrochen wurde.
+//                                        && !bhp.isClosedStockInvolved()
+//                                )
+//                );
+//
+        boolean residentAbsent = bhp.getResident().isActive() && BWInfoTools.absentSince(bhp.getResident()) != null;
+
+        return !residentAbsent && bhp.getResident().isActive() &&
+                bhp.getPrescription().getAbDatum().after(new Date()) && // prescription is active or it is unassigned
+                (bhp.getUser() == null ||
+                        (bhp.getUser().equals(OPDE.getLogin().getUser()) &&
+                                Minutes.minutesBetween(new DateTime(bhp.getMDate()), new DateTime()).getMinutes() < BHP_MAX_MINUTES_TO_WITHDRAW)) &&
+                !bhp.isClosedStockInvolved();
+    }
+
 
 }

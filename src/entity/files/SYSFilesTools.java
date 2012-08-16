@@ -123,7 +123,7 @@ public class SYSFilesTools {
         if (attachable instanceof Pflegeberichte) {
             bw = ((Pflegeberichte) attachable).getBewohner();
         } else if (attachable instanceof Prescriptions) {
-            bw = ((Prescriptions) attachable).getBewohner();
+            bw = ((Prescriptions) attachable).getResident();
         } else if (attachable instanceof BWInfo) {
             bw = ((BWInfo) attachable).getBewohner();
         }
@@ -379,7 +379,7 @@ public class SYSFilesTools {
 //                    Collections.sort(files);
 //                } else if (attachable instanceof Verordnung) {
 //                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
-//                    query.setParameter("bewohner", ((Pflegeberichte) attachable).getBewohner());
+//                    query.setParameter("bewohner", ((Pflegeberichte) attachable).getResident());
 //                    files = new ArrayList<SYSFiles>(query.getResultList());
 //                    Collections.sort(files);
 //                }

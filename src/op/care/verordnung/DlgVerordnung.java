@@ -767,13 +767,13 @@ public class DlgVerordnung extends MyJDialog {
         cmbAN.setSelectedItem(verordnung.getAnArzt());
         cmbKHAn.setSelectedItem(verordnung.getAnKH());
 
-        cbPackEnde.setSelected(verordnung.isBisPackEnde());
+        cbPackEnde.setSelected(verordnung.isTillEndOfPackage());
 
 //            jdcAN.setEnabled(editMode == EDIT_MODE);
         txtBemerkung.setText(SYSTools.catchNull(verordnung.getBemerkung()));
 
-        if (verordnung.hasMedi()) {
-            cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{verordnung.getDarreichung()}));
+        if (verordnung.hasMed()) {
+            cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{verordnung.getTradeForm()}));
         }
 
         cmbMass.setEnabled(cmbMed.getModel().getSize() == 0);
@@ -796,7 +796,7 @@ public class DlgVerordnung extends MyJDialog {
         } else {
             cbPackEnde.setEnabled(false);
         }
-        if (!verordnung.isAbgesetzt()) {
+        if (!verordnung.isDiscontinued()) {
             cbAB.setSelected(false);
             lblAB.setText("");
             cmbAB.setSelectedIndex(-1);
@@ -877,7 +877,7 @@ public class DlgVerordnung extends MyJDialog {
         boolean massOK = cmbMass.getSelectedItem() != null;
         boolean dosisVorhanden = tblDosis.getModel().getRowCount() > 0;
 //        btnSave.setEnabled(ansetzungOK && absetzungOK && medOK && massOK && dosisVorhanden);
-//        cbPackEnde.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
+//        cbPackEnde.setEnabled(!isOnDemand() && cmbMed.getModel().getSize() > 0);
 
 
         String ursache = "";
@@ -971,7 +971,7 @@ public class DlgVerordnung extends MyJDialog {
         verordnung.setBisPackEnde(cbPackEnde.isSelected());
         verordnung.setBemerkung(txtBemerkung.getText());
         verordnung.setMassnahme((Intervention) cmbMass.getSelectedItem());
-        verordnung.setDarreichung((TradeForm) cmbMed.getSelectedItem());
+        verordnung.setTradeForm((TradeForm) cmbMed.getSelectedItem());
         verordnung.setStellplan(cbStellplan.isSelected());
 
         verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
@@ -984,7 +984,7 @@ public class DlgVerordnung extends MyJDialog {
             return;
         }
 
-        if (verordnung.isAbgesetzt() && !SYSCalendar.isInFuture(jdcAB.getDate().getTime())) {
+        if (verordnung.isDiscontinued() && !SYSCalendar.isInFuture(jdcAB.getDate().getTime())) {
             JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
             return;
         }
@@ -1021,7 +1021,7 @@ public class DlgVerordnung extends MyJDialog {
                 final JidePopup popup = new JidePopup();
 
                 CleanablePanel dlg;
-                if (verordnung.isBedarf()) {
+                if (verordnung.isOnDemand()) {
                     dlg = new PnlBedarfDosis(planung, new Closure() {
                         @Override
                         public void execute(Object o) {
@@ -1123,8 +1123,8 @@ public class DlgVerordnung extends MyJDialog {
 
     private void reloadTable() {
         String zubereitung = "x";
-        if (verordnung.getDarreichung() != null) {
-            zubereitung = verordnung.getDarreichung().getDosageForm().getZubereitung();
+        if (verordnung.getTradeForm() != null) {
+            zubereitung = verordnung.getTradeForm().getDosageForm().getZubereitung();
         }
 
         tblDosis.setModel(new TMDosis(zubereitung, verordnung));

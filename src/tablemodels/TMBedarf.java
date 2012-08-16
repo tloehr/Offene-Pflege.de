@@ -129,7 +129,7 @@ public class TMBedarf
         if (cache.containsKey(getPrescription(row))) {
             result = cache.get(getPrescription(row)).toString();
         } else {
-            result = PrescriptionsTools.getDosis(getPrescription(row), true, getVorrat(row), getBestand(row));
+            result = PrescriptionsTools.getDosis(getPrescription(row), true);
             cache.put(getPrescription(row), result);
         }
         return result;

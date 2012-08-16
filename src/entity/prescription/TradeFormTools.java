@@ -1,7 +1,7 @@
 package entity.prescription;
 
-import entity.info.Resident;
 import entity.EntityTools;
+import entity.info.Resident;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -87,7 +87,7 @@ public class TradeFormTools {
         Query query = em.createQuery(" " +
                 " SELECT d FROM TradeForm d " +
                 " WHERE d.medProdukt.bezeichnung like :suche" +
-                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.medForm.zubereitung ");
+                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.dosageForm.zubereitung ");
 
         query.setParameter("suche", suche);
 
@@ -104,7 +104,7 @@ public class TradeFormTools {
         Query query = em.createQuery(" " +
                 " SELECT d FROM TradeForm d " +
                 " WHERE d.medProdukt.bezeichnung like :suche" +
-                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.medForm.zubereitung ");
+                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.dosageForm.zubereitung ");
 
         query.setParameter("suche", suche);
 
@@ -120,15 +120,15 @@ public class TradeFormTools {
      * Sie implementiert Punkt 1 der dort beschriebenen 2 Antworten.
      *
      * @param bewohner
-     * @param darreichung
+     * @param tradeform
      * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>.
      * @see #getPassendeVorraeteZurDarreichung(entity.info.Resident, TradeForm)
      */
-    public static MedInventory getVorratZurDarreichung(Resident bewohner, TradeForm darreichung) {
+    public static MedInventory getInventory4TradeForm(Resident bewohner, TradeForm tradeform) {
         MedInventory result = null;
         EntityManager em = OPDE.createEM();
         try {
-            result = getVorratZurDarreichung(em, bewohner, darreichung);
+            result = getInventory4TradeForm(em, bewohner, tradeform);
         } catch (NoResultException nre) {
             result = null;
         } catch (NonUniqueResultException nure) {
@@ -143,10 +143,14 @@ public class TradeFormTools {
     }
 
 
-    public static MedInventory getVorratZurDarreichung(EntityManager em, Resident bewohner, TradeForm darreichung) throws Exception {
-        Query query = em.createNamedQuery("MedInventory.findActiveByBewohnerAndDarreichung");
-        query.setParameter("bewohner", bewohner);
-        query.setParameter("darreichung", darreichung);
+    public static MedInventory getInventory4TradeForm(EntityManager em, Resident resident, TradeForm tradeform) throws Exception {
+        Query query = em.createQuery(" SELECT DISTINCT inv FROM MedInventory inv " +
+                " JOIN inv.medStocks stock " +
+                " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +
+                " AND inv.bis = :to");
+        query.setParameter("resident", resident);
+        query.setParameter("tradeform", tradeform);
+        query.setParameter("to", SYSConst.DATE_BIS_AUF_WEITERES);
         return (MedInventory) query.getSingleResult();
     }
 
@@ -155,7 +159,7 @@ public class TradeFormTools {
      * Um diese Methode zu verstehen muss man sich einige Fakten und Konzepte klar machen,
      * die wir bei der Entwicklung von OPDE bzgl. der Medikamente angewendet haben. Bitte beachten Sie
      * dass mit dieser Methode der Punkt 2 der beschrieben Antworten implementiert wird. Punkt 1 finden
-     * sie in der Methode <code>getVorratZurDarreichung</code> umgesetzt.
+     * sie in der Methode <code>getInventory4TradeForm</code> umgesetzt.
      * <p/>
      * Eine <b>Darreichung</b> ist eine genaue Definition eines Medikaments, bei einer bestimmten Stärke, ein
      * Hersteller, eine Darreichungsform (bitte vom Begriff Darreichung unterscheiden), eine Anwendungseinheit,
@@ -184,18 +188,18 @@ public class TradeFormTools {
      * äquivalente Form (z.B. Tabletten sind zu Dragees gleichwertig wie zu Filmtabletten etc.).</li>
      * </ol>
      *
-     * @param bewohner
-     * @param darreichung
+     * @param resident
+     * @param tradeform
      * @return
-     * @see #getVorratZurDarreichung(entity.info.Resident, TradeForm)
+     * @see #getInventory4TradeForm(entity.info.Resident, TradeForm)
      */
-    public static List<MedInventory> getPassendeVorraeteZurDarreichung(Resident bewohner, TradeForm darreichung) {
+    public static List<MedInventory> getPassendeVorraeteZurDarreichung(Resident resident, TradeForm tradeform) {
         // TODO: das muss noch getestet werden
         EntityManager em = OPDE.createEM();
         List<MedInventory> liste;
 
         // 1. Form der gesuchten darreichung bestimmen.
-        DosageForm meineForm = darreichung.getDosageForm();
+        DosageForm meineForm = tradeform.getDosageForm();
 
         // 2. Alle äquivalenten Formen dazu finden
         List<DosageForm> aehnlicheFormen;
@@ -211,13 +215,13 @@ public class TradeFormTools {
         // 3. Anhand der Bestände die passenden Vorräte ermitteln
         Query queryVorraete = em.createQuery(" " +
                 " SELECT DISTINCT b.inventory FROM MedStock b " +
-                " WHERE b.inventory.bewohner = :bewohner " +
-                " AND b.inventory.bis = :bis " +
-                " AND b.darreichung.medForm.formID  IN " +
+                " WHERE b.inventory.resident = :resident " +
+                " AND b.inventory.bis = :to " +
+                " AND b.tradeform.dosageForm.formID  IN " +
                 " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );
-        queryVorraete.setParameter("bewohner", bewohner);
-        queryVorraete.setParameter("bis", SYSConst.DATE_BIS_AUF_WEITERES);
+        queryVorraete.setParameter("resident", resident);
+        queryVorraete.setParameter("to", SYSConst.DATE_BIS_AUF_WEITERES);
 
         liste = queryVorraete.getResultList();
         em.close();

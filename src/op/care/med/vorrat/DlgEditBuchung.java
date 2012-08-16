@@ -69,7 +69,7 @@ public class DlgEditBuchung extends JPanel {
 //        setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
         bestandsumme = MedStockTools.getBestandSumme(bestand);
 
-        lblEinheit.setText(TradeFormTools.getPackungsEinheit(bestand.getDarreichung()));
+        lblEinheit.setText(TradeFormTools.getPackungsEinheit(bestand.getTradeForm()));
 
         if (bestand.hasPackung()) {
             packgroesse = bestand.getPackung().getInhalt();

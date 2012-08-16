@@ -61,7 +61,7 @@ public class TMVerordnung extends AbstractTableModel {
         listeVerordnungen = new ArrayList<Object[]>();
 
         EntityManager em = OPDE.createEM();
-        Query queryVerordnung = em.createQuery("SELECT v FROM Prescriptions v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.bewohner = :bewohner ");
+        Query queryVerordnung = em.createQuery("SELECT v FROM Prescriptions v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.resident = :bewohner ");
         if (!archiv) {
             queryVerordnung.setParameter("now", new Date());
         }
@@ -72,7 +72,7 @@ public class TMVerordnung extends AbstractTableModel {
         int i = 0;
         for (Prescriptions verordnung : listeVerordnung) {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i / 2, listeVerordnung.size()));
-            MedInventory inventory = verordnung.getDarreichung() == null ? null : TradeFormTools.getVorratZurDarreichung(bewohner, verordnung.getDarreichung());
+            MedInventory inventory = verordnung.getTradeForm() == null ? null : TradeFormTools.getInventory4TradeForm(bewohner, verordnung.getTradeForm());
             MedStock aktiverBestand = MedStockTools.getStockInUse(inventory);
             listeVerordnungen.add(new Object[]{verordnung, inventory, aktiverBestand});
             i++;
@@ -175,7 +175,7 @@ public class TMVerordnung extends AbstractTableModel {
         if (cache.containsKey(getPrescription(row))) {
             result = cache.get(getPrescription(row)).toString();
         } else {
-            result = PrescriptionsTools.getDosis(getPrescription(row), mitBestand, getVorrat(row), getBestand(row));
+            result = PrescriptionsTools.getDosis(getPrescription(row), mitBestand);
             cache.put(getPrescription(row), result);
         }
         return result;

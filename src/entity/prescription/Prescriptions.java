@@ -211,13 +211,13 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
     private Users abgesetztDurch;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
     private Intervention massnahme;
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private TradeForm darreichung;
+    private TradeForm tradeform;
     @JoinColumn(name = "SitID", referencedColumnName = "SitID")
     @ManyToOne
     private Situationen situation;
@@ -238,8 +238,8 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
     public Prescriptions() {
     }
 
-    public Prescriptions(Resident bewohner) {
-        this.bewohner = bewohner;
+    public Prescriptions(Resident resident) {
+        this.resident = resident;
         this.attachedFiles = new ArrayList<Sysver2file>();
         this.attachedVorgaenge = new ArrayList<SYSVER2VORGANG>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
@@ -248,7 +248,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Prescriptions(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, Intervention massnahme, TradeForm darreichung, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Prescriptions(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.anDatum = anDatum;
         this.abDatum = abDatum;
         this.bisPackEnde = bisPackEnde;
@@ -259,9 +259,9 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
         this.attachedVorgaenge = attachedVorgaenge;
         this.angesetztDurch = angesetztDurch;
         this.abgesetztDurch = abgesetztDurch;
-        this.bewohner = bewohner;
+        this.resident = resident;
         this.massnahme = massnahme;
-        this.darreichung = darreichung;
+        this.tradeform = tradeform;
         this.situation = situation;
         this.anKH = anKH;
         this.abKH = abKH;
@@ -330,7 +330,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
         this.abArzt = abArzt;
     }
 
-    public boolean isBisPackEnde() {
+    public boolean isTillEndOfPackage() {
         return bisPackEnde;
     }
 
@@ -370,20 +370,20 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
         return situation;
     }
 
-    public boolean hasMedi() {
-        return darreichung != null;
+    public boolean hasMed() {
+        return tradeform != null;
     }
 
     public void setSituation(Situationen situation) {
         this.situation = situation;
     }
 
-    public TradeForm getDarreichung() {
-        return darreichung;
+    public TradeForm getTradeForm() {
+        return tradeform;
     }
 
-    public void setDarreichung(TradeForm darreichung) {
-        this.darreichung = darreichung;
+    public void setTradeForm(TradeForm tradeform) {
+        this.tradeform = tradeform;
     }
 
     public Intervention getMassnahme() {
@@ -407,15 +407,15 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
     }
 
 
-    public Resident getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
-    public boolean isAbgesetzt() {
+    public boolean isDiscontinued() {
         return abDatum.before(new Date());
     }
 
@@ -423,7 +423,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
         return abDatum.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
-    public boolean isBedarf() {
+    public boolean isOnDemand() {
         return situation != null;
     }
 
@@ -484,7 +484,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
 
     @Override
     public Object clone() {
-        final Prescriptions copy = new Prescriptions(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, bewohner, massnahme, darreichung, situation, anKH, abKH, anArzt, abArzt);
+        final Prescriptions copy = new Prescriptions(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, resident, massnahme, tradeform, situation, anKH, abKH, anArzt, abArzt);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
@@ -497,12 +497,12 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
 
     @Override
     public int compareTo(Prescriptions them) {
-        int result = ((Boolean) isAbgesetzt()).compareTo(them.isAbgesetzt()) * -1;
+        int result = ((Boolean) isDiscontinued()).compareTo(them.isDiscontinued()) * -1;
         if (result == 0) {
-            result = ((Boolean) isBedarf()).compareTo(them.isBedarf()) * -1;
+            result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
         }
         if (result == 0) {
-            result = ((Boolean) hasMedi()).compareTo(them.hasMedi());
+            result = ((Boolean) hasMed()).compareTo(them.hasMed());
         }
         if (result == 0) {
             result = PrescriptionsTools.getPrescriptionAsText(this).compareTo(PrescriptionsTools.getPrescriptionAsText(them));
@@ -527,9 +527,9 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
                 ", bhps=" + bhps +
                 ", angesetztDurch=" + angesetztDurch +
                 ", abgesetztDurch=" + abgesetztDurch +
-                ", bewohner=" + bewohner +
+                ", resident=" + resident +
                 ", massnahme=" + massnahme +
-                ", darreichung=" + darreichung +
+                ", tradeform=" + tradeform +
                 ", situation=" + situation +
                 ", anKH=" + anKH +
                 ", abKH=" + abKH +

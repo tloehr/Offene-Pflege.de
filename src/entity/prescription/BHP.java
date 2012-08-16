@@ -120,6 +120,9 @@ public class BHP implements Serializable, Comparable<BHP> {
     private Date mdate;
     @Column(name = "Dauer")
     private Short dauer;
+    @Basic(optional = false)
+    @Column(name = "nanotime")
+    private Long nanotime;
 
     public BHP() {
     }
@@ -128,20 +131,23 @@ public class BHP implements Serializable, Comparable<BHP> {
         // looks redundant but simplifies enormously
         this.prescriptionSchedule = prescriptionSchedule;
         this.prescription = this.prescriptionSchedule.getPrescription();
-        this.resident = this.prescriptionSchedule.getPrescription().getBewohner();
-        this.darreichung = this.prescriptionSchedule.getPrescription().getDarreichung();
+        this.resident = this.prescriptionSchedule.getPrescription().getResident();
+        this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
         stockTransaction = new ArrayList<MedStockTransaction>();
         this.version = 0l;
+        this.nanotime = System.nanoTime();
+        this.mdate = new Date();
     }
 
     public BHP(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
         // looks redundant but simplifies enormously
         this.prescriptionSchedule = prescriptionSchedule;
         this.prescription = this.prescriptionSchedule.getPrescription();
-        this.resident = this.prescriptionSchedule.getPrescription().getBewohner();
-        this.darreichung = this.prescriptionSchedule.getPrescription().getDarreichung();
+        this.resident = this.prescriptionSchedule.getPrescription().getResident();
+        this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
         this.soll = soll;
         this.version = 0l;
+        this.nanotime = System.nanoTime();
         this.sZeit = sZeit;
         this.dosis = dosis;
         this.status = BHPTools.STATE_OPEN;
@@ -166,7 +172,7 @@ public class BHP implements Serializable, Comparable<BHP> {
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private TradeForm darreichung;
+    private TradeForm tradeform;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -246,7 +252,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public boolean hasMed() {
-        return prescription.getDarreichung() != null;
+        return prescription.getTradeForm() != null;
     }
 
     public String getFGHTML() {
@@ -314,39 +320,44 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.resident = resident;
     }
 
-    public TradeForm getDarreichung() {
-        return darreichung;
-    }
-
-    public void setDarreichung(TradeForm darreichung) {
-        this.darreichung = darreichung;
+    public TradeForm getTradeForm() {
+        return tradeform;
     }
 
     public boolean isOnDemand() {
-        return prescriptionSchedule == null;
+        return prescription.isOnDemand();
     }
 
 
     public Byte getShift() {
+        if (isOnDemand()) {
+            return BHPTools.SHIFT_ON_DEMAND;
+        }
         if (sZeit == BHPTools.BYTE_TIMEOFDAY) {
             return SYSCalendar.whatShiftIs(this.soll);
-        } else {
-            return SYSCalendar.whatShiftIs(this.sZeit);
         }
+        return SYSCalendar.whatShiftIs(this.sZeit);
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (bhpid != null ? bhpid.hashCode() : 0);
-        return hash;
-    }
+//    @Override
+//    public int hashCode() {
+//        int hash = 0;
+//        hash += (bhpid != null ? bhpid.hashCode() : 0);
+//        return hash;
+//    }
 
     public Collection<MedStockTransaction> getStockTransaction() {
         return stockTransaction;
     }
 
-    public boolean hasAbgesetzteBestand() {
+    /**
+     * This method tells, whether there was more than one stock involved in order to provide the necessary medication in the cause of the
+     * application of this BHP. This can only happen when a stock is closed in advance. After clicking this BHP the first stock is emptied and
+     * then the next stock is opened.
+     *
+     * @return true or false
+     */
+    public boolean isClosedStockInvolved() {
         boolean yes = false;
         if (stockTransaction != null) {
             for (MedStockTransaction buchung : stockTransaction) {
@@ -363,57 +374,59 @@ public class BHP implements Serializable, Comparable<BHP> {
     public int compareTo(BHP that) {
         int result = this.getShift().compareTo(that.getShift());
         if (result == 0) {
-            result = SYSTools.nullCompare(this.getDarreichung(), that.getDarreichung());
+            result = SYSTools.nullCompare(this.getTradeForm(), that.getTradeForm());
         }
         if (result == 0) {
             result = sZeit.compareTo(that.getSollZeit());
         }
         if (result == 0) {
-            if (prescription.hasMedi()) {
-                result = TradeFormTools.toPrettyString(prescription.getDarreichung()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getDarreichung()));
+            if (prescription.hasMed()) {
+                result = TradeFormTools.toPrettyString(prescription.getTradeForm()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getTradeForm()));
             } else {
                 result = this.prescription.getMassnahme().getBezeichnung().compareTo(that.getPrescription().getMassnahme().getBezeichnung());
             }
         }
         if (result == 0) {
-            result = bhpid.compareTo(that.getBHPid());
+            result = nanotime.compareTo(that.nanotime);
+        }
+        if (result == 0) {
+            bhpid.compareTo(that.bhpid);
         }
         return result;
     }
 
-    @Override
-    public boolean equals(Object object) {
 
-        if (!(object instanceof BHP)) {
-            return false;
-        }
-        BHP other = (BHP) object;
-        if ((this.bhpid == null && other.bhpid != null) || (this.bhpid != null && !this.bhpid.equals(other.bhpid))) {
-            return false;
-        }
-        return true;
+//    @Override
+//    public boolean equals(Object object) {
+//        if (!(object instanceof BHP)) {
+//            return false;
+//        }
+//        BHP other = (BHP) object;
+//        if ((this.bhpid == null && other.bhpid != null) || (this.bhpid != null && !this.bhpid.equals(other.bhpid))) {
+//            return false;
+//        }
+//        return true;
+//    }
+
+
+    @Override
+    public boolean equals(Object o) {
+
+        BHP other = (BHP) o;
+        return new Integer(hashCode()).equals(other.hashCode());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bhpid != null ? bhpid.hashCode() : 0;
+        result = 31 * result + (nanotime != null ? nanotime.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "BHP{" +
                 "bhpid=" + bhpid +
-                ", version=" + version +
-                ", soll=" + soll +
-                ", ist=" + ist +
-                ", sZeit=" + sZeit +
-                ", iZeit=" + iZeit +
-                ", dosis=" + dosis +
-                ", status=" + status +
-                ", bemerkung='" + bemerkung + '\'' +
-                ", mdate=" + mdate +
-                ", dauer=" + dauer +
-                ", stockTransaction=" + stockTransaction +
-                ", prescriptionSchedule=" + prescriptionSchedule +
-                ", prescription=" + prescription +
-                ", resident=" + resident +
-                ", darreichung=" + darreichung +
-                ", user=" + user +
                 '}';
     }
 }
