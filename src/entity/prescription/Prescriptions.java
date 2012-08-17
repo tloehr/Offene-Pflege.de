@@ -462,25 +462,68 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (verid != null ? verid.hashCode() : 0);
-        return hash;
-    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    @Override
-    public boolean equals(Object object) {
+        Prescriptions that = (Prescriptions) o;
 
-        if (!(object instanceof Prescriptions)) {
+        if (bisPackEnde != that.bisPackEnde) return false;
+        if (stellplan != that.stellplan) return false;
+        if (verKennung != that.verKennung) return false;
+        if (abArzt != null ? !abArzt.equals(that.abArzt) : that.abArzt != null) return false;
+        if (abDatum != null ? !abDatum.equals(that.abDatum) : that.abDatum != null) return false;
+        if (abKH != null ? !abKH.equals(that.abKH) : that.abKH != null) return false;
+        if (abgesetztDurch != null ? !abgesetztDurch.equals(that.abgesetztDurch) : that.abgesetztDurch != null)
             return false;
-        }
-        Prescriptions other = (Prescriptions) object;
-        if ((this.verid == null && other.verid != null) || (this.verid != null && !this.verid.equals(other.verid))) {
+        if (anArzt != null ? !anArzt.equals(that.anArzt) : that.anArzt != null) return false;
+        if (anDatum != null ? !anDatum.equals(that.anDatum) : that.anDatum != null) return false;
+        if (anKH != null ? !anKH.equals(that.anKH) : that.anKH != null) return false;
+        if (angesetztDurch != null ? !angesetztDurch.equals(that.angesetztDurch) : that.angesetztDurch != null)
             return false;
-        }
+        if (attachedFiles != null ? !attachedFiles.equals(that.attachedFiles) : that.attachedFiles != null)
+            return false;
+        if (attachedVorgaenge != null ? !attachedVorgaenge.equals(that.attachedVorgaenge) : that.attachedVorgaenge != null)
+            return false;
+        if (bemerkung != null ? !bemerkung.equals(that.bemerkung) : that.bemerkung != null) return false;
+        if (bhps != null ? !bhps.equals(that.bhps) : that.bhps != null) return false;
+        if (massnahme != null ? !massnahme.equals(that.massnahme) : that.massnahme != null) return false;
+
+        if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
+        if (situation != null ? !situation.equals(that.situation) : that.situation != null) return false;
+        if (tradeform != null ? !tradeform.equals(that.tradeform) : that.tradeform != null) return false;
+        if (verid != null ? !verid.equals(that.verid) : that.verid != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int result = verid != null ? verid.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (anDatum != null ? anDatum.hashCode() : 0);
+        result = 31 * result + (abDatum != null ? abDatum.hashCode() : 0);
+        result = 31 * result + (bisPackEnde ? 1 : 0);
+        result = 31 * result + (int) (verKennung ^ (verKennung >>> 32));
+        result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
+        result = 31 * result + (stellplan ? 1 : 0);
+        result = 31 * result + (attachedFiles != null ? attachedFiles.hashCode() : 0);
+        result = 31 * result + (attachedVorgaenge != null ? attachedVorgaenge.hashCode() : 0);
+
+        result = 31 * result + (bhps != null ? bhps.hashCode() : 0);
+        result = 31 * result + (angesetztDurch != null ? angesetztDurch.hashCode() : 0);
+        result = 31 * result + (abgesetztDurch != null ? abgesetztDurch.hashCode() : 0);
+        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+        result = 31 * result + (massnahme != null ? massnahme.hashCode() : 0);
+        result = 31 * result + (tradeform != null ? tradeform.hashCode() : 0);
+        result = 31 * result + (situation != null ? situation.hashCode() : 0);
+        result = 31 * result + (anKH != null ? anKH.hashCode() : 0);
+        result = 31 * result + (abKH != null ? abKH.hashCode() : 0);
+        result = 31 * result + (anArzt != null ? anArzt.hashCode() : 0);
+        result = 31 * result + (abArzt != null ? abArzt.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public Object clone() {

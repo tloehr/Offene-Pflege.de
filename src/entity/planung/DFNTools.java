@@ -1,7 +1,7 @@
 package entity.planung;
 
-import entity.info.Resident;
 import entity.info.BWInfoTools;
+import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.dfn.PnlDFN;
@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,15 +164,15 @@ public class DFNTools {
      */
     public static int generate(EntityManager em, List<InterventionSchedule> list, DateMidnight targetdate, boolean wholeday) {
 //        GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
-        int maxrows = list.size();
+        BigDecimal maxrows = new BigDecimal(list.size());
         int numdfn = 0;
 
         long now = System.currentTimeMillis();
         byte aktuelleZeit = SYSCalendar.ermittleZeit(now);
 
-        int row = 0;
+        BigDecimal row = BigDecimal.ZERO;
 
-        OPDE.debug("MaxRows: " + maxrows);
+//        OPDE.debug("MaxRows: " + maxrows);
 
         for (InterventionSchedule termin : list) {
 
@@ -182,47 +183,49 @@ public class DFNTools {
 
             if (!SYSCalendar.isInFuture(termin.getLDatum()) && (termin.isTaeglich() || termin.isPassenderWochentag(targetdate.toDate()) || termin.isPassenderTagImMonat(targetdate.toDate()))) {
 
-                row++;
+                row = row.add(BigDecimal.ONE);
+                int progress = row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue();
+                SYSTools.printProgBar(progress);
 
-                SYSTools.printProgBar(row / maxrows * 100);
+                OPDE.debug(progress);
 
-                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
-                OPDE.debug("==========================================");
-                OPDE.debug("MassTermin: " + termin.getTermID());
-                OPDE.debug("BWKennung: " + termin.getNursingProcess().getBewohner().getBWKennung());
-                OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
+//                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
+//                OPDE.debug("==========================================");
+//                OPDE.debug("MassTermin: " + termin.getTermID());
+//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getBewohner().getBWKennung());
+//                OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
 
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(termin.getLDatum());
 
-                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
-                OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(targetdate.toDate()));
+//                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
+//                OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(targetdate.toDate()));
 
                 // Genaue Ermittlung der Treffer
                 // =============================
                 if (termin.isTaeglich()) {
-                    OPDE.debug("Eine tägliche Planung");
+//                    OPDE.debug("Eine tägliche Planung");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der stichtag getroffen wurde oder überschritten ist.
                     while (Days.daysBetween(ldatum, targetdate).getDays() > 0) {
-                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere tage: " + termin.getTaeglich());
+//                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere tage: " + termin.getTaeglich());
                         ldatum = ldatum.plusDays(termin.getTaeglich());
                     }
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem Stichtag
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
                 } else if (termin.isWoechentlich()) {
-                    OPDE.debug("Eine wöchentliche Planung");
+//                    OPDE.debug("Eine wöchentliche Planung");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
-                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + termin.getWoechentlich());
+//                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + termin.getWoechentlich());
                         ldatum = ldatum.plusWeeks(termin.getWoechentlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Weeks.weeksBetween(ldatum, targetdate).getWeeks() == 0;
                 } else if (termin.isMonatlich()) {
-                    OPDE.debug("Eine monatliche Planung");
+//                    OPDE.debug("Eine monatliche Planung");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
-                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + termin.getMonatlich());
+//                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + termin.getMonatlich());
                         ldatum = ldatum.plusMonths(termin.getMonatlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest im selben Monat desselben Jahres liegt.
@@ -230,8 +233,8 @@ public class DFNTools {
                     treffer = Months.monthsBetween(ldatum, targetdate).getMonths() == 0;
                 }
 
-                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
-                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
+//                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
+//                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
 
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
@@ -247,42 +250,42 @@ public class DFNTools {
 
                 if (treffer) {
                     if (erstAbFM && termin.getNachtMo() > 0) {
-                        OPDE.debug("SYSConst.FM, " + termin.getNachtMo());
+//                        OPDE.debug("SYSConst.FM, " + termin.getNachtMo());
                         for (int dfncount = 1; dfncount <= termin.getNachtMo(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), BYTE_EARLY_IN_THE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMO && termin.getMorgens() > 0) {
-                        OPDE.debug("SYSConst.MO, " + termin.getMorgens());
+//                        OPDE.debug("SYSConst.MO, " + termin.getMorgens());
                         for (int dfncount = 1; dfncount <= termin.getMorgens(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), BYTE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMI && termin.getMittags() > 0) {
-                        OPDE.debug("SYSConst.MI, " + termin.getMittags());
+//                        OPDE.debug("SYSConst.MI, " + termin.getMittags());
                         for (int dfncount = 1; dfncount <= termin.getMittags(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), BYTE_NOON));
                             numdfn++;
                         }
                     }
                     if (erstAbNM && termin.getNachmittags() > 0) {
-                        OPDE.debug("SYSConst.NM, " + termin.getNachmittags());
+//                        OPDE.debug("SYSConst.NM, " + termin.getNachmittags());
                         for (int dfncount = 1; dfncount <= termin.getNachmittags(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), BYTE_AFTERNOON));
                             numdfn++;
                         }
                     }
                     if (erstAbAB && termin.getAbends() > 0) {
-                        OPDE.debug("SYSConst.AB, " + termin.getAbends());
+//                        OPDE.debug("SYSConst.AB, " + termin.getAbends());
                         for (int dfncount = 1; dfncount <= termin.getAbends(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), BYTE_EVENING));
                             numdfn++;
                         }
                     }
                     if (erstAbNA && termin.getNachtAb() > 0) {
-                        OPDE.debug("SYSConst.NA, " + termin.getNachtAb());
+//                        OPDE.debug("SYSConst.NA, " + termin.getNachtAb());
                         for (int dfncount = 1; dfncount <= termin.getNachtAb(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), BYTE_LATE_AT_NIGHT));
                             numdfn++;
@@ -295,7 +298,7 @@ public class DFNTools {
                         Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
                         Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
 //                        Date neuerStichtag = SYSCalendar.addTime2Date(stichtag.toDate(), termin.getUhrzeit());
-                        OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
+//                        OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
                         for (int dfncount = 1; dfncount <= termin.getUhrzeitAnzahl(); dfncount++) {
                             em.merge(new DFN(termin, newTargetdate, SYSConst.UZ));
                             numdfn++;
@@ -306,11 +309,11 @@ public class DFNTools {
                     termin.setLDatum(targetdate.toDate());
                 }
             } else {
-                OPDE.debug("///////////////////////////////////////////////////////////");
-                OPDE.debug("Folgender MassTermin wurde nicht angenommen: " + termin);
+//                OPDE.debug("///////////////////////////////////////////////////////////");
+//                OPDE.debug("Folgender MassTermin wurde nicht angenommen: " + termin);
             }
         }
-        OPDE.debug("Erzeugte DFNs: " + numdfn);
+//        OPDE.debug("Erzeugte DFNs: " + numdfn);
         return numdfn;
     }
 

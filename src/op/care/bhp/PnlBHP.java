@@ -33,6 +33,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.info.Resident;
 import entity.info.ResidentTools;
@@ -127,91 +128,6 @@ public class PnlBHP extends NursingRecordsPanel {
         reloadDisplay();
     }
 
-//    private void refreshDisplay() {
-//        cpBHP.removeAll();
-//        shiftMAPpane.clear();
-//        bhpCollapsiblePaneHashMap.clear();
-//
-//        for (Byte shift : new Byte[]{BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
-//            shiftMAPpane.put(shift, refreshCPFor(shift));
-//            cpBHP.add(shiftMAPpane.get(shift));
-//            try {
-//                shiftMAPpane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
-//            } catch (PropertyVetoException e) {
-//                OPDE.debug(e);
-//            }
-//
-//        }
-//
-//
-////        // this adds unassigned DFNs to the panel
-////        unassignedPane = createCollapsiblePanesFor((NursingProcess) null);
-////        if (unassignedPane != null) {
-////            cpDFN.add(unassignedPane);
-////        }
-//
-//        cpBHP.addExpansion();
-//    }
-
-    private void refreshDisplay(Byte shift) {
-        cpBHP.removeAll();
-        shiftMAPpane.put(shift, refreshCPFor(shift));
-
-        for (Byte myShift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
-            cpBHP.add(shiftMAPpane.get(myShift));
-            try {
-                shiftMAPpane.get(shift).setCollapsed(false);
-            } catch (PropertyVetoException e) {
-                OPDE.debug(e);
-            }
-        }
-        cpBHP.addExpansion();
-
-    }
-
-    /**
-     * creates a CP for a specific shit WITHOUT requesting data from the DB. It only uses
-     * the in-memory-lists.
-     *
-     * @param shift
-     * @return
-     */
-    private CollapsiblePane refreshCPFor(final Byte shift) {
-        String title = "";
-
-        if (shift == BHPTools.SHIFT_ON_DEMAND) {
-            title = OPDE.lang.getString(internalClassID + ".ondemand");
-        } else {
-            title = GUITools.getLocalizedMessages(BHPTools.SHIFT_TEXT)[shift];
-        }
-
-        final CollapsiblePane prPane = new CollapsiblePane(title);
-
-        prPane.setSlidingDirection(SwingConstants.SOUTH);
-        prPane.setBackground(SYSCalendar.getBGSHIFT(shift));
-        prPane.setForeground(SYSCalendar.getFGSHIFT(shift));
-        prPane.setOpaque(false);
-
-        JPanel prPanel = new JPanel();
-        prPanel.setLayout(new VerticalLayout());
-
-        if (shiftMAPBHP.containsKey(shift)) {
-            for (BHP bhp : shiftMAPBHP.get(shift)) {
-                prPanel.setBackground(bhp.getBG());
-                bhpCollapsiblePaneHashMap.put(bhp, createCPFor(bhp));
-                prPanel.add(bhpCollapsiblePaneHashMap.get(bhp));
-            }
-            prPane.setCollapsible(true);
-        } else {
-            prPane.setCollapsible(false);
-        }
-
-        prPane.setContentPane(prPanel);
-
-        return prPane;
-    }
-
-
     private void reloadDisplay() {
         /***
          *               _                 _ ____  _           _
@@ -273,7 +189,6 @@ public class PnlBHP extends NursingRecordsPanel {
 
         } else {
 
-            cpBHP.removeAll();
             bhpCollapsiblePaneHashMap.clear();
             if (shiftMAPBHP != null) {
                 for (Byte key : shiftMAPBHP.keySet()) {
@@ -288,8 +203,6 @@ public class PnlBHP extends NursingRecordsPanel {
                 shiftMAPpane.clear();
             }
 
-            cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
-
             for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
                 if (!shiftMAPBHP.containsKey(bhp.getShift())) {
                     shiftMAPBHP.put(bhp.getShift(), new ArrayList<BHP>());
@@ -297,53 +210,110 @@ public class PnlBHP extends NursingRecordsPanel {
                 shiftMAPBHP.get(bhp.getShift()).add(bhp);
             }
 
-            /***
-             *                  ____                                 _
-             *       ___  _ __ |  _ \  ___ _ __ ___   __ _ _ __   __| |
-             *      / _ \| '_ \| | | |/ _ \ '_ ` _ \ / _` | '_ \ / _` |
-             *     | (_) | | | | |_| |  __/ | | | | | (_| | | | | (_| |
-             *      \___/|_| |_|____/ \___|_| |_| |_|\__,_|_| |_|\__,_|
-             *
-             */
-            for (Prescriptions onDemand : PrescriptionsTools.getOnDemandPrescriptions(resident, jdcDatum.getDate())) {
-                if (!shiftMAPBHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
-                    shiftMAPBHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
-                }
-                shiftMAPBHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(onDemand, jdcDatum.getDate()));
+            if (!shiftMAPBHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
+                shiftMAPBHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
             }
-//            shiftMAPpane.put(BHPTools.SHIFT_ON_DEMAND, createCP4(BHPTools.SHIFT_ON_DEMAND));
-//            cpBHP.add(shiftMAPpane.get(BHPTools.SHIFT_ON_DEMAND));
-//            try {
-//                shiftMAPpane.get(BHPTools.SHIFT_ON_DEMAND).setCollapsed(true);
-//            } catch (PropertyVetoException e) {
-//                OPDE.debug(e);
-//            }
+            shiftMAPBHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
 
-            /***
-             *                           _
-             *      _ __ ___  __ _ _   _| | __ _ _ __
-             *     | '__/ _ \/ _` | | | | |/ _` | '__|
-             *     | | |  __/ (_| | |_| | | (_| | |
-             *     |_|  \___|\__, |\__,_|_|\__,_|_|
-             *               |___/
-             */
             for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
                 shiftMAPpane.put(shift, createCP4(shift));
-                cpBHP.add(shiftMAPpane.get(shift));
                 try {
-                    shiftMAPpane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
+                    shiftMAPpane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
                 } catch (PropertyVetoException e) {
                     OPDE.debug(e);
                 }
             }
-            cpBHP.addExpansion();
+
+            buildPanel();
 
         }
         initPhase = false;
     }
 
+    private void buildPanel() {
+        cpBHP.removeAll();
+        cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
+        cpBHP.add(shiftMAPpane.get(BHPTools.SHIFT_ON_DEMAND));
+        for (Byte shift : new Byte[]{BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+            cpBHP.add(shiftMAPpane.get(shift));
+            try {
+                shiftMAPpane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
+            } catch (PropertyVetoException e) {
+                OPDE.debug(e);
+            }
+        }
+        cpBHP.addExpansion();
+    }
 
-    private CollapsiblePane createCP4(final Byte shift) {
+    private CollapsiblePane createCP4(Byte shift) {
+        if (shift == BHPTools.SHIFT_ON_DEMAND) {
+            return createCP4OnDemand();
+        } else {
+            return createCP4Shift(shift);
+        }
+    }
+
+    private CollapsiblePane createCP4OnDemand() {
+        /***
+         *                          _        ____ ____  _  _    ___        ____                                 _
+         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / _ \ _ __ |  _ \  ___ _ __ ___   __ _ _ __   __| |
+         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_| | | | '_ \| | | |/ _ \ '_ ` _ \ / _` | '_ \ / _` |
+         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _| |_| | | | | |_| |  __/ | | | | | (_| | | | | (_| |
+         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|  \___/|_| |_|____/ \___|_| |_| |_|\__,_|_| |_|\__,_|
+         *
+         */
+        String title = OPDE.lang.getString(internalClassID + ".ondemand");
+
+        final CollapsiblePane mainPane = new CollapsiblePane(title);
+        mainPane.setSlidingDirection(SwingConstants.SOUTH);
+        mainPane.setBackground(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_ON_DEMAND));
+        mainPane.setForeground(SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
+        mainPane.setOpaque(false);
+
+
+        if (!shiftMAPBHP.get(BHPTools.SHIFT_ON_DEMAND).isEmpty()) {
+            Prescriptions currentPrescription = null;
+            CollapsiblePane sitPane = null;
+            JPanel sitPanel = null;
+            JPanel sitOuterPanel = new JPanel();
+            sitOuterPanel.setLayout(new VerticalLayout());
+            for (BHP bhp : shiftMAPBHP.get(BHPTools.SHIFT_ON_DEMAND)) {
+                OPDE.debug(bhp.getPrescription().getVerid());
+                OPDE.debug(currentPrescription != null ? currentPrescription.getVerid() : "null");
+                if (currentPrescription == null || bhp.getPrescription().getVerid().longValue() != currentPrescription.getVerid().longValue()) {
+                    if (currentPrescription != null) {
+                        sitPane.setContentPane(sitPanel);
+//                        prPane.add(sitPane);
+                        sitOuterPanel.add(sitPane);
+                    }
+                    currentPrescription = bhp.getPrescription();
+                    sitPanel = new JPanel();
+                    sitPanel.setLayout(new VerticalLayout());
+                    sitPanel.setBackground(bhp.getBG());
+                    sitPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<b>" + currentPrescription.getSituation().getText()) + "</b>");
+                    sitPane.setSlidingDirection(SwingConstants.SOUTH);
+                    sitPane.setBackground(ColorUtils.getDerivedColor(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_ON_DEMAND), 0.4f)); // a little darker
+                    sitPane.setForeground(SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
+                    sitPane.setOpaque(false);
+                }
+
+                sitPane.setContentPane(sitPanel);
+                sitOuterPanel.add(sitPane);
+
+                bhpCollapsiblePaneHashMap.put(bhp, createCPFor(bhp));
+                sitPanel.add(bhpCollapsiblePaneHashMap.get(bhp));
+            }
+            mainPane.setContentPane(sitOuterPanel);
+            mainPane.setCollapsible(true);
+        } else {
+            mainPane.setContentPane(new JPanel());
+            mainPane.setCollapsible(false);
+        }
+
+        return mainPane;
+    }
+
+    private CollapsiblePane createCP4Shift(final Byte shift) {
         /***
          *                          _        ____ ____  _  _
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |
@@ -352,16 +322,9 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = "";
-
-        if (shift == BHPTools.SHIFT_ON_DEMAND) {
-            title = OPDE.lang.getString(internalClassID + ".ondemand");
-        } else {
-            title = GUITools.getLocalizedMessages(BHPTools.SHIFT_TEXT)[shift];
-        }
+        String title = GUITools.getLocalizedMessages(BHPTools.SHIFT_TEXT)[shift];
 
         final CollapsiblePane prPane = new CollapsiblePane(title);
-
         prPane.setSlidingDirection(SwingConstants.SOUTH);
         prPane.setBackground(SYSCalendar.getBGSHIFT(shift));
         prPane.setForeground(SYSCalendar.getFGSHIFT(shift));
@@ -376,24 +339,18 @@ public class PnlBHP extends NursingRecordsPanel {
                 bhpCollapsiblePaneHashMap.put(bhp, createCPFor(bhp));
                 prPanel.add(bhpCollapsiblePaneHashMap.get(bhp));
             }
+            prPane.setContentPane(prPanel);
             prPane.setCollapsible(true);
         } else {
+            prPane.setContentPane(prPanel);
             prPane.setCollapsible(false);
         }
-
-        prPane.setContentPane(prPanel);
-
-//        prPane.setEmphasized(shift == SYSCalendar.whatShiftIs(new Date()));
 
         return prPane;
     }
 
     private CollapsiblePane createCPFor(final BHP bhp) {
         final CollapsiblePane bhpPane = new CollapsiblePane();
-        String fg = SYSConst.html_grey50;
-//        if (dfn.getNursingProcess() != null) {
-//            fg = "#" + dfn.getNursingProcess().getKategorie().getFgcontent();
-//        }
 
         /***
          *      _   _ _____    _    ____  _____ ____
@@ -503,7 +460,9 @@ public class PnlBHP extends NursingRecordsPanel {
                             Collections.sort(shiftMAPBHP.get(myBHP.getShift()));
 
                             em.getTransaction().commit();
-                            refreshDisplay(myBHP.getShift());
+
+                            shiftMAPpane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                            buildPanel();
                         } catch (OptimisticLockException ole) {
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
@@ -574,7 +533,8 @@ public class PnlBHP extends NursingRecordsPanel {
                             Collections.sort(shiftMAPBHP.get(myBHP.getShift()));
 
                             em.getTransaction().commit();
-                            refreshDisplay(myBHP.getShift());
+                            shiftMAPpane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                            buildPanel();
                         } catch (OptimisticLockException ole) {
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
@@ -649,7 +609,8 @@ public class PnlBHP extends NursingRecordsPanel {
                             Collections.sort(shiftMAPBHP.get(myBHP.getShift()));
 
                             em.getTransaction().commit();
-                            refreshDisplay(myBHP.getShift());
+                            shiftMAPpane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                            buildPanel();
                         } catch (OptimisticLockException ole) {
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
@@ -729,7 +690,8 @@ public class PnlBHP extends NursingRecordsPanel {
                             Collections.sort(shiftMAPBHP.get(myBHP.getShift()));
 
                             em.getTransaction().commit();
-                            refreshDisplay(myBHP.getShift());
+                            shiftMAPpane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                            buildPanel();
                         } catch (OptimisticLockException ole) {
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
@@ -776,8 +738,9 @@ public class PnlBHP extends NursingRecordsPanel {
             txt.setEditable(false);
 
             popupInfo.setMovable(false);
-            popupInfo.getContentPane().setLayout(new BoxLayout(popupInfo.getContentPane(), BoxLayout.LINE_AXIS));
-            popupInfo.getContentPane().add(new JScrollPane(txt));
+//            popupInfo.getContentPane().setLayout(new BoxLayout(popupInfo.getContentPane(), BoxLayout.LINE_AXIS));
+//            popupInfo.getContentPane().add(new JScrollPane(txt));
+            popupInfo.setContentPane(new JScrollPane(txt));
             popupInfo.removeExcludedComponent(txt);
             popupInfo.setDefaultFocusComponent(txt);
 
@@ -787,7 +750,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent actionEvent) {
                     popupInfo.setOwner(btnInfo);
                     txt.setText(SYSTools.toHTMLForScreen(bhp.getPrescription().getBemerkung()));
-                    GUITools.showPopup(popupInfo, SwingConstants.CENTER);
+                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
                 }
             });
 
@@ -879,343 +842,6 @@ public class PnlBHP extends NursingRecordsPanel {
         add(jspBHP);
     }// </editor-fold>//GEN-END:initComponents
 
-//    private void tblBHPMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBHPMousePressed
-//        if (!OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
-//            return;
-//        } // Hier dürfen nur Examen dran.
-//        final TMBHP tm = (TMBHP) tblBHP.getModel();
-//        if (tm.getRowCount() == 0) {
-//            return;
-//        }
-//        Point p = evt.getPoint();
-//        final int col = tblBHP.columnAtPoint(p);
-//        final int row = tblBHP.rowAtPoint(p);
-//
-//        Point p2 = evt.getPoint();
-//        // Convert a coordinate relative to a component's bounds to screen coordinates
-//        SwingUtilities.convertPointToScreen(p2, tblBHP);
-//
-//        final Point screenposition = p2;
-//
-//        ListSelectionModel lsm = tblBHP.getSelectionModel();
-//        lsm.setSelectionInterval(row, row);
-//
-//        BHP bhp = tm.getBHP(row);
-////        Verordnung verordnung = bhp.getPrescription();
-//
-//        boolean changeable =
-//                // Diese Kontrolle stellt sicher, dass ein User nur seine eigenen Einträge und das auch nur
-//                // eine halbe Stunde lang bearbeiten kann.
-//                // Ausserdem kann man nur dann etwas geben, wenn es
-//                //      a) eine Massnahmen ohne Medikation ist
-//                //      ODER
-//                //      (
-//                //          b) ein angebrochener Bestand vorhanden ist
-//                //          UND
-//                //          c)  das häkchen NICHT gesetzt ist oder wenn es gesetzt ist, kann man es
-//                //              nur dann wieder wegnehmen, wenn es derselbe Benutzer FRüH GENUG tut.
-//                //              Und auch nur dann, wenn nicht mehrere Packungen beim Ausbuchen betroffen waren.
-//                //          )
-//                //      )
-//                !abwesend &&
-//                        !bhp.getPrescription().isDiscontinued()
-//                        // Offener Status geht immer
-//                        && (
-//                        bhp.getStatus() == BHPTools.STATE_OPEN
-//                                // Nicht mehr offen ?
-//                                // Dann nur wenn derselbe Benutzer dass wieder rückgängig machen will
-//                                ||
-//                                (bhp.getUser().equals(OPDE.getLogin().getUser())
-//                                        // und es noch früh genug ist (30 Minuten)
-//                                        && SYSCalendar.earlyEnough(bhp.getMDate().getTime(), BHP_MAX_MINUTES_TO_WITHDRAW)
-//                                        // und kein abgesetzter Bestand beteiligt ist. Das verhindert einfach, dass bei
-//                                        // eine Rückgabe eines Vorrates verhindert wird, wenn bei Abhaken eine Packung leer wurde und direkt eine neue
-//                                        // angebrochen wurde.
-//                                        && !bhp.isClosedStockInvolved()
-//                                )
-//                );
-//
-//        OPDE.debug(changeable ? "BHP changeable" : "BHP NOT changeable");
-//
-//        if (changeable) {
-//            if (!evt.isPopupTrigger() && col == TMBHP.COL_STATUS) { // Drückt auch wirklich mit der LINKEN Maustaste auf die mittlere Spalte.
-//
-//                byte status = bhp.getStatus();
-//                MedInventory inventory = bhp.getPrescription().hasMed() ? TradeFormTools.getInventory4TradeForm(resident, bhp.getPrescription().getTradeForm()) : null;
-//
-//                boolean deleted = false; // für das richtige fireTableRows....
-//                if (!bhp.getPrescription().hasMed() || status != BHPTools.STATE_OPEN || MedStockTools.getStockInUse(inventory) != null) {
-//                    status++;
-//                    if (status > 1) {
-//                        status = BHPTools.STATE_OPEN;
-//                    }
-//                    EntityManager em = OPDE.createEM();
-//
-//                    try {
-//                        em.getTransaction().begin();
-//
-//                        bhp = em.merge(bhp);
-//
-//                        em.lock(bhp.getPrescription(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//                        em.lock(bhp, LockModeType.OPTIMISTIC);
-//
-//                        bhp.setStatus(status);
-//                        bhp.setMDate(new Date());
-//                        if (status == BHPTools.STATE_OPEN) {
-//                            bhp.setUser(null);
-//                            bhp.setIst(null);
-//                            bhp.setiZeit(null);
-//                            bhp.setBemerkung(null);
-//                        } else {
-//                            bhp.setUser(em.merge(OPDE.getLogin().getUser()));
-//                            bhp.setIst(new Date());
-//                            bhp.setiZeit(SYSCalendar.ermittleZeit());
-//                        }
-//
-//                        if (bhp.getPrescription().hasMed()) {
-//                            if (status == BHPTools.STATE_DONE) {
-//                                MedInventoryTools.takeFrom(em, em.merge(inventory), bhp.getDosis(), true, bhp);
-//                            } else {
-//                                for (MedStockTransaction buchung : bhp.getStockTransaction()) {
-//                                    em.remove(buchung);
-//                                }
-//                                bhp.getStockTransaction().clear();
-//                            }
-//                        }
-//                        // Wenn man eine Massnahme aus der Bedarfsmedikation
-//                        // rückgängig macht, wird sie gelöscht.
-//                        if (bhp.getPrescription().isOnDemand() && status == BHPTools.STATE_OPEN) {
-//                            em.remove(bhp);
-//                            deleted = true;
-//                        }
-//                        em.getTransaction().commit();
-//                    } catch (OptimisticLockException ole) {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
-//                        em.getTransaction().rollback();
-//                        deleted = true; // damit alles neu geladen wird.
-//                    } catch (Exception ex) {
-//                        if (em.getTransaction().isActive()) {
-//                            em.getTransaction().rollback();
-//                        }
-//                        OPDE.fatal(ex);
-//                    } finally {
-//                        em.close();
-//                    }
-//                    reloadTable();
-////                    if (deleted) {
-////                        reloadTable();
-////                    } else {
-////                        tm.setBHP(row, bhp);
-////                        tm.fireTableRowsUpdated(row, row);
-////                    }
-//                }
-//            }
-//        }
-//
-//        if (!changeable && !evt.isPopupTrigger()) { // sagen warum das nicht ging
-//
-//            String msg = "";
-//
-//            if (abwesend) {
-//                msg += "BewohnerIn ist abwesend. ";
-//            } else if (bhp.getPrescription().isDiscontinued()) {
-//                msg += "Die Verordnung ist abgesetzt. ";
-//            }
-//
-//            if (bhp.getStatus() != BHPTools.STATE_OPEN) {
-//                if (!bhp.getUser().equals(OPDE.getLogin().getUser())) {
-//                    msg += "Nur derselbe Benutzer kann das Häkchen wieder wegnehmen. ";
-//                } else if (!SYSCalendar.earlyEnough(bhp.getMDate().getTime(), BHP_MAX_MINUTES_TO_WITHDRAW)) {
-//                    msg += "Zu spät, sie können das Häkchen nur " + BHP_MAX_MINUTES_TO_WITHDRAW + " Minuten lang wieder zurück nehmen. ";
-//                } else if (bhp.isClosedStockInvolved()) {
-//                    msg += "Beim Abhaken wurde eine Packung abgeschlossen und eine neue angebrochen. ";
-//                }
-//            }
-//
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(msg, DisplayMessage.WARNING));
-//
-//        }
-//
-//        // Nun noch Menüeinträge
-//        if (evt.isPopupTrigger()) {
-//            SYSTools.unregisterListeners(menu);
-//            menu = new JPopupMenu();
-//            final BHP myBHP = bhp;
-//            if (bhp.getPrescription().hasMed()) {
-//                JMenuItem itemPopupXDiscard = new JMenuItem("Verweigert (Medikament wird trotzdem ausgebucht.)");
-//                itemPopupXDiscard.addActionListener(new java.awt.event.ActionListener() {
-//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                        EntityManager em = OPDE.createEM();
-//                        try {
-//                            em.getTransaction().begin();
-//                            BHP innerbhp = em.merge(myBHP);
-//                            em.lock(innerbhp.getPrescription(), LockModeType.OPTIMISTIC);
-//                            em.lock(innerbhp, LockModeType.OPTIMISTIC);
-//
-//                            innerbhp.setStatus(BHPTools.STATE_REFUSED_DISCARDED);
-//                            innerbhp.setUser(em.merge(OPDE.getLogin().getUser()));
-//                            innerbhp.setIst(new Date());
-//                            innerbhp.setiZeit(SYSCalendar.ermittleZeit());
-//                            innerbhp.setMDate(new Date());
-//
-//                            MedInventory inventory = TradeFormTools.getInventory4TradeForm(em, innerbhp.getPrescriptionSchedule().getPrescription().getResident(), innerbhp.getPrescriptionSchedule().getPrescription().getTradeForm());
-//                            MedInventoryTools.takeFrom(em, inventory, innerbhp.getDosis(), innerbhp);
-//
-//                            em.getTransaction().commit();
-//                            tm.setBHP(row, innerbhp);
-//                            tm.fireTableRowsUpdated(row, row);
-//                        } catch (OptimisticLockException ole) {
-//                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
-//                            em.getTransaction().rollback();
-//                            reloadTable();
-//                        } catch (Exception e) {
-//                            em.getTransaction().rollback();
-//                            OPDE.fatal(e);
-//                        } finally {
-//                            em.close();
-//                        }
-//                    }
-//                });
-//                menu.add(itemPopupXDiscard);
-//                itemPopupXDiscard.setEnabled(myBHP.getStatus() == BHPTools.STATE_OPEN);
-//
-////                menu.add(new JSeparator());
-//            }
-//            //-----------------------------------------
-//            String str = "Verweigert";
-//            if (bhp.getPrescription().hasMed()) {
-//                str = "Verweigert (Medikament wird nicht ausgebucht.)";
-//            }
-//
-//            JMenuItem itemPopupXPreserve = new JMenuItem(str);
-//            itemPopupXPreserve.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    EntityManager em = OPDE.createEM();
-//                    try {
-//                        em.getTransaction().begin();
-//                        BHP innerBHP = em.merge(myBHP);
-//                        em.lock(innerBHP, LockModeType.OPTIMISTIC);
-//                        em.lock(innerBHP.getPrescription(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//
-//                        innerBHP.setStatus(BHPTools.STATE_REFUSED);
-//                        innerBHP.setUser(em.merge(OPDE.getLogin().getUser()));
-//                        innerBHP.setIst(new Date());
-//                        innerBHP.setiZeit(SYSCalendar.ermittleZeit());
-//                        innerBHP.setMDate(new Date());
-//                        em.getTransaction().commit();
-//                        tm.setBHP(row, innerBHP);
-//                        tm.fireTableRowsUpdated(row, row);
-//                    } catch (OptimisticLockException ole) {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, 2));
-//                        em.getTransaction().rollback();
-//                        reloadTable();
-//                    } catch (Exception e) {
-//                        em.getTransaction().rollback();
-//                        OPDE.fatal(e);
-//                    } finally {
-//                        em.close();
-//                    }
-//                }
-//            });
-//            menu.add(itemPopupXPreserve);
-//            itemPopupXPreserve.setEnabled(changeable && myBHP.getStatus() == BHPTools.STATE_OPEN);
-//
-//            if (bhp.getPrescription().hasMed()) {
-//
-//
-//                final MedStock bestand = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, bhp.getPrescription().getTradeForm()));
-//
-//                if (bestand != null) {
-//
-//                    menu.add(new JSeparator());
-//
-//                    JMenuItem itemPopupBuchungen = new JMenuItem("Buchungen von Bestands Nr. " + bestand.getBestID() + " anzeigen");
-//                    itemPopupBuchungen.addActionListener(new java.awt.event.ActionListener() {
-//
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                            final JidePopup popup = new JidePopup();
-//
-//                            PnlBuchungen dlg = new PnlBuchungen(bestand, null);
-//
-//                            popup.setMovable(false);
-//                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                            popup.getContentPane().add(dlg);
-//                            popup.setOwner(tblBHP);
-//                            popup.removeExcludedComponent(tblBHP);
-//                            popup.setDefaultFocusComponent(dlg);
-//                            popup.showPopup(screenposition.x, screenposition.y);
-//                        }
-//                    });
-//                    menu.add(itemPopupBuchungen);
-//                    itemPopupBuchungen.setEnabled(true);
-//                }
-//            }
-//
-//            if (OPDE.isAdmin()) {
-//                menu.add(new JSeparator());
-//                final BHP mybhp = bhp;
-//                JMenuItem itemPopupINFO = new JMenuItem("Infos anzeigen");
-//                itemPopupINFO.addActionListener(new java.awt.event.ActionListener() {
-//                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                        String message = "BHPID: " + mybhp.getBHPid();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, 10));
-//                    }
-//                });
-//                menu.add(itemPopupINFO);
-//            }
-//
-//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//        }
-//    }//GEN-LAST:event_tblBHPMousePressed
-//
-//
-//    private void jspBHPComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspBHPComponentResized
-//        JScrollPane jsp = (JScrollPane) evt.getComponent();
-//        Dimension dim = jsp.getSize();
-//        // Größe der Text Spalten im DFN ändern.
-//        // Summe der fixen Spalten  = 175 + ein bisschen
-//        int textWidth = dim.width - (50 + 80 + 35 + 80 + 25);
-//        TableColumnModel tcm1 = tblBHP.getColumnModel();
-//        if (tcm1.getColumnCount() < 6) {
-//            return;
-//        }
-//
-//        //tcm1.getColumn(TMBHP.COL_massid).setPreferredWidth(50);
-//        tcm1.getColumn(TMBHP.COL_BEZEICHNUNG).setPreferredWidth(textWidth / 2);
-//        tcm1.getColumn(TMBHP.COL_DOSIS).setPreferredWidth(50);
-//        tcm1.getColumn(TMBHP.COL_ZEIT).setPreferredWidth(80);
-//        tcm1.getColumn(TMBHP.COL_STATUS).setPreferredWidth(35);
-//        tcm1.getColumn(TMBHP.COL_UKENNUNG).setPreferredWidth(80);
-//        tcm1.getColumn(TMBHP.COL_BEMPLAN).setPreferredWidth(textWidth / 2);
-////        tcm1.getColumn(TMBHP.COL_BEMBHP).setPreferredWidth(35);
-//
-//        //tcm1.getColumn(0).setHeaderValue("ID");
-//        tcm1.getColumn(TMBHP.COL_BEZEICHNUNG).setHeaderValue("Bezeichnung");
-//        tcm1.getColumn(TMBHP.COL_DOSIS).setHeaderValue("Dosis");
-//        tcm1.getColumn(TMBHP.COL_ZEIT).setHeaderValue("Zeit");
-//        tcm1.getColumn(TMBHP.COL_STATUS).setHeaderValue("Status");
-//        tcm1.getColumn(TMBHP.COL_UKENNUNG).setHeaderValue("PflegerIn");
-//        tcm1.getColumn(TMBHP.COL_BEMPLAN).setHeaderValue("Hinweis");
-////        tcm1.getColumn(TMBHP.COL_BEMBHP).setHeaderValue("!");
-//    }//GEN-LAST:event_jspBHPComponentResized
-//
-//    private void reloadTable() {
-//
-//        tblBHP.setModel(new TMBHP(resident, jdcDatum.getDate(), cmbSchicht.getSelectedIndex() - 1));
-//        tblBHP.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-//        jspBHP.dispatchEvent(new ComponentEvent(jspBHP, ComponentEvent.COMPONENT_RESIZED));
-//        tblBHP.getColumnModel().getColumn(TMBHP.COL_BEZEICHNUNG).setCellRenderer(new RNDBHP());
-//        tblBHP.getColumnModel().getColumn(TMBHP.COL_DOSIS).setCellRenderer(new RNDBHP());
-//        tblBHP.getColumnModel().getColumn(TMBHP.COL_ZEIT).setCellRenderer(new RNDBHP());
-//        tblBHP.getColumnModel().getColumn(TMBHP.COL_STATUS).setCellRenderer(new RNDBHP());
-//        tblBHP.getColumnModel().getColumn(TMBHP.COL_UKENNUNG).setCellRenderer(new RNDBHP());
-//        tblBHP.getColumnModel().getColumn(TMBHP.COL_BEMPLAN).setCellRenderer(new RNDBHP());
-////        tblBHP.getColumnModel().getColumn(TMBHP.COL_BEMBHP).setCellRenderer(new RNDBHP());
-//
-//    }
 
     private void prepareSearchArea() {
         searchPanes = new CollapsiblePanes();

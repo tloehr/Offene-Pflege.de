@@ -572,7 +572,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         if (uhrzeit != null ? !uhrzeit.equals(that.uhrzeit) : that.uhrzeit != null) return false;
         if (uhrzeitDosis != null ? !uhrzeitDosis.equals(that.uhrzeitDosis) : that.uhrzeitDosis != null) return false;
         if (user != null ? !user.equals(that.user) : that.user != null) return false;
-        if (prescription != null ? !prescription.equals(that.prescription) : that.prescription != null) return false;
+//        if (prescription != null ? !prescription.equals(that.prescription) : that.prescription != null) return false;
         if (version != null ? !version.equals(that.version) : that.version != null) return false;
         if (woechentlich != null ? !woechentlich.equals(that.woechentlich) : that.woechentlich != null) return false;
 
@@ -605,7 +605,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         result = 31 * result + (sam != null ? sam.hashCode() : 0);
         result = 31 * result + (son != null ? son.hashCode() : 0);
         result = 31 * result + (lDatum != null ? lDatum.hashCode() : 0);
-        result = 31 * result + (prescription != null ? prescription.hashCode() : 0);
+//        result = 31 * result + (prescription != null ? prescription.hashCode() : 0);
         result = 31 * result + (user != null ? user.hashCode() : 0);
         return result;
     }

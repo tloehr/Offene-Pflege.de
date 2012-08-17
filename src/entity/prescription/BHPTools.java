@@ -17,11 +17,9 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -104,7 +102,6 @@ public class BHPTools {
         String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
 
-
         DateMidnight lastbhp = new DateMidnight().minusDays(1);
         if (OPDE.getProps().containsKey("LASTDFNIMPORT")) {
             lastbhp = new DateMidnight(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTBHPIMPORT")));
@@ -138,7 +135,7 @@ public class BHPTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.important(em, "[BHPImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
+            OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
 
             select.setParameter("andatum", new Date(SYSCalendar.startOfDay(targetdate.toDate())));
             select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(targetdate.toDate())));
@@ -148,7 +145,7 @@ public class BHPTools {
 
             numbhp += generate(em, list, targetdate, true);
 
-            OPDE.important(em, "[BHPImport] Durchgeführt. targetdate: " + DateFormat.getDateInstance().format(targetdate.toDate()) + " Anzaghl erzeugter BHPs: " + numbhp);
+            OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString(internalClassID + ".numCreatedEntities") + ": " + numbhp);
         }
 
         SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -166,6 +163,7 @@ public class BHPTools {
      * @param prescription um die es geht.
      */
     public static void cleanup(EntityManager em, Prescriptions prescription) throws Exception {
+
         Date now = new Date();
 
         int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
@@ -214,15 +212,19 @@ public class BHPTools {
      * @return die Anzahl der erzeugten BHPs.
      */
     public static int generate(EntityManager em, List<PrescriptionSchedule> list, DateMidnight targetdate, boolean wholeday) {
-        int maxrows = list.size();
+        String internalClassID = "nursingrecords.bhpimport";
+        BigDecimal maxrows = new BigDecimal(list.size());
         int numbhp = 0;
 
         long now = System.currentTimeMillis();
         byte aktuelleZeit = SYSCalendar.ermittleZeit(now);
 
-        int row = 0;
+        BigDecimal row = BigDecimal.ZERO;
 
-        OPDE.debug("MaxRows: " + maxrows);
+//        OPDE.debug("MaxRows: " + maxrows);
+
+        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate"));
+        System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 
         for (PrescriptionSchedule pSchedule : list) {
 
@@ -233,48 +235,47 @@ public class BHPTools {
 
             if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isTaeglich() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
 
-                row++;
+                row = row.add(BigDecimal.ONE);
+                SYSTools.printProgBar(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
 
-                SYSTools.printProgBar(row / maxrows * 100);
-
-                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
-                OPDE.debug("==========================================");
-                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
-                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getBWKennung());
-                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
+//                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
+//                OPDE.debug("==========================================");
+//                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
+//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getBWKennung());
+//                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
 
 
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(pSchedule.getLDatum());
 
-                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(pSchedule.getLDatum()));
-                OPDE.debug("targetdate: " + DateFormat.getDateTimeInstance().format(targetdate.toDate()));
+//                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(pSchedule.getLDatum()));
+//                OPDE.debug("targetdate: " + DateFormat.getDateTimeInstance().format(targetdate.toDate()));
 
                 // Genaue Ermittlung der Treffer
                 // =============================
                 if (pSchedule.isTaeglich()) {
-                    OPDE.debug("Eine tägliche pSchedule");
+//                    OPDE.debug("Eine tägliche pSchedule");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der targetdate getroffen wurde oder überschritten ist.
                     while (Days.daysBetween(ldatum, targetdate).getDays() > 0) {
-                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere tage: " + pSchedule.getTaeglich());
+//                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere tage: " + pSchedule.getTaeglich());
                         ldatum = ldatum.plusDays(pSchedule.getTaeglich());
                     }
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem targetdate
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
                 } else if (pSchedule.isWoechentlich()) {
-                    OPDE.debug("Eine wöchentliche pSchedule");
+//                    OPDE.debug("Eine wöchentliche pSchedule");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
-                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere Wochen: " + pSchedule.getWoechentlich());
+//                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere Wochen: " + pSchedule.getWoechentlich());
                         ldatum = ldatum.plusWeeks(pSchedule.getWoechentlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem targetdate ist ODER es zumindest in der selben Kalenderwoche liegt.
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Weeks.weeksBetween(ldatum, targetdate).getWeeks() == 0;
                 } else if (pSchedule.isMonatlich()) {
-                    OPDE.debug("Eine monatliche pSchedule");
+//                    OPDE.debug("Eine monatliche pSchedule");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
-                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere Monate: " + pSchedule.getMonatlich());
+//                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere Monate: " + pSchedule.getMonatlich());
                         ldatum = ldatum.plusMonths(pSchedule.getMonatlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem targetdate ist ODER es zumindest im selben Monat desselben Jahres liegt.
@@ -282,8 +283,8 @@ public class BHPTools {
                     treffer = Months.monthsBetween(ldatum, targetdate).getMonths() == 0;
                 }
 
-                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
-                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
+//                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
+//                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
 
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
@@ -299,32 +300,32 @@ public class BHPTools {
                 if (treffer) {
                     if (erstAbFM && pSchedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
                         //OPDE.debug(bhp);
-                        OPDE.debug("SYSConst.FM, " + pSchedule.getNachtMo());
+//                        OPDE.debug("SYSConst.FM, " + pSchedule.getNachtMo());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_EARLY_IN_THE_MORNING, pSchedule.getNachtMo()));
                         numbhp++;
                     }
                     if (erstAbMO && pSchedule.getMorgens().compareTo(BigDecimal.ZERO) > 0) {
-                        OPDE.debug("SYSConst.MO, " + pSchedule.getMorgens());
+//                        OPDE.debug("SYSConst.MO, " + pSchedule.getMorgens());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_MORNING, pSchedule.getMorgens()));
                         numbhp++;
                     }
                     if (erstAbMI && pSchedule.getMittags().compareTo(BigDecimal.ZERO) > 0) {
-                        OPDE.debug("SYSConst.MI, " + pSchedule.getMittags());
+//                        OPDE.debug("SYSConst.MI, " + pSchedule.getMittags());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_NOON, pSchedule.getMittags()));
                         numbhp++;
                     }
                     if (erstAbNM && pSchedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0) {
-                        OPDE.debug("SYSConst.NM, " + pSchedule.getNachmittags());
+//                        OPDE.debug("SYSConst.NM, " + pSchedule.getNachmittags());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_AFTERNOON, pSchedule.getNachmittags()));
                         numbhp++;
                     }
                     if (erstAbAB && pSchedule.getAbends().compareTo(BigDecimal.ZERO) > 0) {
-                        OPDE.debug("SYSConst.AB, " + pSchedule.getAbends());
+//                        OPDE.debug("SYSConst.AB, " + pSchedule.getAbends());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_EVENING, pSchedule.getAbends()));
                         numbhp++;
                     }
                     if (erstAbNA && pSchedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
-                        OPDE.debug("SYSConst.NA, " + pSchedule.getNachtAb());
+//                        OPDE.debug("SYSConst.NA, " + pSchedule.getNachtAb());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_LATE_AT_NIGHT, pSchedule.getNachtAb()));
                         numbhp++;
                     }
@@ -332,7 +333,7 @@ public class BHPTools {
                         DateTime timeofday = new DateTime(pSchedule.getUhrzeit());
                         Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
                         Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
-                        OPDE.debug("SYSConst.UZ, " + pSchedule.getUhrzeitDosis() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
+//                        OPDE.debug("SYSConst.UZ, " + pSchedule.getUhrzeitDosis() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
                         em.merge(new BHP(pSchedule, newTargetdate, SYSConst.UZ, pSchedule.getUhrzeitDosis()));
                         numbhp++;
                     }
@@ -342,39 +343,32 @@ public class BHPTools {
 
                 }
             } else {
-                OPDE.debug("///////////////////////////////////////////////////////////");
-                OPDE.debug("Folgende pSchedule wurde nicht angenommen: " + pSchedule);
+//                OPDE.debug("///////////////////////////////////////////////////////////");
+//                OPDE.debug("Folgende pSchedule wurde nicht angenommen: " + pSchedule);
             }
         }
-        OPDE.debug("Erzeugte BHPs: " + numbhp);
+//        OPDE.debug("Erzeugte BHPs: " + numbhp);
         return numbhp;
     }
 
 
     /**
-     * Returns all exisiting (persisted) and all potential (not yet persisted) BHPs for a
-     * prescription which is OnDemand.
+     * retrieves a list of BHPs for a given resident for a given day. Only OnDemand prescriptions are used (not regular ones)
      *
-     * @param prescription
+     * @param resident
      * @param date
      * @return
      */
-    public static ArrayList<BHP> getBHPsOnDemand(Prescriptions prescription, Date date) {
+    public static ArrayList<BHP> getBHPsOnDemand(Resident resident, Date date) {
 
-        if (!prescription.isOnDemand()) {
-            OPDE.fatal(new Exception("prescriptions need to be ON DEMAND for this"));
-        }
+        List<Prescriptions> listPrescriptions = PrescriptionsTools.getOnDemandPrescriptions(resident, date);
 
         EntityManager em = OPDE.createEM();
-        ArrayList<BHP> listBHP = null;
+        ArrayList<BHP> listBHP = new ArrayList<BHP>();
 
         try {
-
-            PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(0);
             Date now = new Date();
 
-
-            // TODO: doppelt. muss nur die fehlenden hinzufügen.
             String jpql = " SELECT bhp " +
                     " FROM BHP bhp " +
                     " WHERE bhp.prescription = :prescription " +
@@ -382,30 +376,42 @@ public class BHPTools {
 
             Query query = em.createQuery(jpql);
 
-            query.setParameter("prescription", prescription);
-            query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
-            query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+            for (Prescriptions prescription : listPrescriptions) {
+                query.setParameter("prescription", prescription);
+                query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
+                query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
-            listBHP = new ArrayList<BHP>(query.getResultList());
+                ArrayList<BHP> listBHP4ThisPrescription = new ArrayList<BHP>(query.getResultList());
 
-            // On Demand prescriptions have exactly one schedule.
-            // There may not be more than MaxAnzahl BHPs resulting from this prescription.
-            if (listBHP.size() < schedule.getMaxAnzahl()) {
-                // Still some BHPs to go
-                for (int i = listBHP.size(); i < schedule.getMaxAnzahl(); i++) {
-
-                    BHP bhp = new BHP(schedule);
-                    bhp.setIst(now);
-                    bhp.setSoll(date);
-                    bhp.setSollZeit(BYTE_TIMEOFDAY);
-                    bhp.setDosis(schedule.getMaxEDosis());
-                    bhp.setStatus(BHPTools.STATE_OPEN);
-
-                    listBHP.add(bhp);
+                PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(0);
+                // On Demand prescriptions have exactly one schedule, hence the .get(0).
+                // There may not be more than MaxAnzahl BHPs resulting from this prescription.
+                if (listBHP4ThisPrescription.size() < schedule.getMaxAnzahl()) {
+                    // Still some BHPs to go ?
+                    for (int i = listBHP4ThisPrescription.size(); i < schedule.getMaxAnzahl(); i++) {
+                        BHP bhp = new BHP(schedule);
+                        bhp.setIst(now);
+                        bhp.setSoll(date);
+                        bhp.setSollZeit(BYTE_TIMEOFDAY);
+                        bhp.setDosis(schedule.getMaxEDosis());
+                        bhp.setStatus(BHPTools.STATE_OPEN);
+                        listBHP4ThisPrescription.add(bhp);
+                    }
                 }
+                listBHP.addAll(listBHP4ThisPrescription);
             }
 
-            Collections.sort(listBHP);
+            Collections.sort(listBHP, new Comparator<BHP>() {
+                @Override
+                public int compare(BHP o1, BHP o2) {
+                    int result = o1.getPrescription().compareTo(o2.getPrescription());
+                    int result = o1.getPrescription().compareTo(o2.getPrescription());
+                    if (result == 0){
+                        result = o1.getStatus().compareTo(o2.getStatus());
+                    }
+                    return result;  //To change body of implemented methods use File | Settings | File Templates.
+                }
+            });
         } catch (Exception se) {
             OPDE.fatal(se);
         } finally {
@@ -414,6 +420,13 @@ public class BHPTools {
         return listBHP;
     }
 
+    /**
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
+     *
+     * @param resident
+     * @param date
+     * @return
+     */
     public static ArrayList<BHP> getBHPs(Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
@@ -422,7 +435,7 @@ public class BHPTools {
 
             String jpql = " SELECT bhp " +
                     " FROM BHP bhp " +
-                    " WHERE bhp.resident = :resident " +
+                    " WHERE bhp.resident = :resident AND bhp.prescription.situation IS NULL " +
                     " AND bhp.soll >= :von AND bhp.soll <= :bis ";
 
             Query query = em.createQuery(jpql);
