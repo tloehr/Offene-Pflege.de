@@ -27,8 +27,8 @@
 package tablemodels;
 
 import entity.info.Resident;
-import entity.planung.DFN;
-import entity.planung.DFNTools;
+import entity.nursingprocess.DFN;
+import entity.nursingprocess.DFNTools;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
@@ -72,7 +72,7 @@ public class TMDFN
 
             Query query = em.createQuery(" SELECT dfn " +
                     " FROM DFN dfn " +
-                    " WHERE dfn.bewohner = :bewohner AND dfn.soll >= :von AND dfn.soll <= :bis " +
+                    " WHERE dfn.resident = :bewohner AND dfn.soll >= :von AND dfn.soll <= :bis " +
                     " ORDER BY dfn.nursingProcess.kategorie.bezeichnung, dfn.nursingProcess.stichwort, dfn.intervention.bezeichnung ");
 
             query.setParameter("bewohner", bewohner);

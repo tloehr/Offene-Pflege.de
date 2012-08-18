@@ -59,7 +59,7 @@ public class DlgBericht extends javax.swing.JDialog {
     private boolean logout = false;
 
     /**
-     * Creates new form DlgBericht
+     * Creates new form DlgReport
      */
     public DlgBericht(PnlUebergabe parent, Einrichtungen einrichtung, Date datum) {
         super(parent.getPflege(), false);

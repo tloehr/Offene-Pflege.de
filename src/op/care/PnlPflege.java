@@ -11,7 +11,7 @@ import entity.info.Resident;
 import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.bw.tg.PnlTG;
-import op.care.berichte.PnlBerichte;
+import op.care.reports.PnlReport;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
 import op.care.info.PnlInfo;
@@ -126,7 +126,7 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_PB: {
-                previousPanel = new PnlBerichte(currentBewohner, jspSearch);
+                previousPanel = new PnlReport(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_PB, previousPanel);
 
                 break;
@@ -253,7 +253,7 @@ public class PnlPflege extends NursingRecordsPanel {
         for (int i = 0; i < tabs.length; i++) {
             jtpPflegeakte.add(tabs[i], new JPanel());
         }
-//        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlBerichte.internalClassID, InternalClassACL.EXECUTE));
+//        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlReport.internalClassID, InternalClassACL.EXECUTE));
 //        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
         jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlTG.internalClassID, InternalClassACL.EXECUTE));
     }

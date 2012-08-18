@@ -1,4 +1,4 @@
-package entity.planung;
+package entity.nursingprocess;
 
 import entity.info.BWInfoTools;
 import entity.info.Resident;
@@ -32,12 +32,14 @@ public class DFNTools {
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
 
-    public static final byte SHIFT_ALL = -1;
+    public static final byte SHIFT_ON_DEMAND = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
     public static final byte SHIFT_EARLY = 1;
     public static final byte SHIFT_LATE = 2;
     public static final byte SHIFT_VERY_LATE = 3;
 
+    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
+    public static final String[] SHIFT_TEXT = new String[]{PnlDFN.internalClassID + ".shift.veryearly", PnlDFN.internalClassID + ".shift.early", PnlDFN.internalClassID + ".shift.late", PnlDFN.internalClassID + ".shift.verylate"};
     public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
     public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
@@ -94,7 +96,7 @@ public class DFNTools {
                     // Also alle, die bis EINSCHLIESSLICH heute gültig sind.
                     " WHERE p.von <= :von AND p.bis >= :bis " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
-                    " AND mt.lDatum <= :ldatum AND p.bewohner.adminonly <> 2 " +
+                    " AND mt.lDatum <= :ldatum AND p.resident.adminonly <> 2 " +
                     " ORDER BY mt.termID ");
 
             // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
@@ -179,7 +181,7 @@ public class DFNTools {
             termin = em.merge(termin);
             em.lock(termin, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             em.lock(em.merge(termin.getNursingProcess()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            em.lock(termin.getNursingProcess().getBewohner(), LockModeType.OPTIMISTIC);
+            em.lock(termin.getNursingProcess().getResident(), LockModeType.OPTIMISTIC);
 
             if (!SYSCalendar.isInFuture(termin.getLDatum()) && (termin.isTaeglich() || termin.isPassenderWochentag(targetdate.toDate()) || termin.isPassenderTagImMonat(targetdate.toDate()))) {
 
@@ -187,12 +189,12 @@ public class DFNTools {
                 int progress = row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue();
                 SYSTools.printProgBar(progress);
 
-                OPDE.debug(progress);
+                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
 
 //                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("MassTermin: " + termin.getTermID());
-//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getBewohner().getBWKennung());
+//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getBWKennung());
 //                OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
 
                 boolean treffer = false;
@@ -329,50 +331,14 @@ public class DFNTools {
     }
 
 
-    public static ArrayList<NursingProcess> getInvolvedNPs(byte shift, Resident resident, Date date) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<NursingProcess> listNP = null;
-
-        try {
-
-            String jpql = " SELECT DISTINCT dfn.nursingProcess " +
-                    " FROM DFN dfn " +
-                    " WHERE dfn.bewohner = :bewohner AND dfn.nursingProcess IS NOT NULL AND dfn.soll >= :von AND dfn.soll <= :bis ";
-
-            if (shift != SHIFT_ALL) {
-                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
-                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
-
-            }
-
-            jpql = jpql + " ORDER BY dfn.nursingProcess.kategorie.bezeichnung, dfn.nursingProcess.stichwort, dfn.nursingProcess.planID ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("bewohner", resident);
-            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
-            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
-
-            if (shift != SHIFT_ALL) {
-                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
-                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
-                query.setParameter("timeid1", timeids.getFirst());
-                query.setParameter("timeid2", timeids.getSecond());
-                query.setParameter("time1", times.getFirst());
-                query.setParameter("time2", times.getSecond());
-            }
-
-            listNP = new ArrayList<NursingProcess>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return listNP;
-    }
-
-    public static ArrayList<DFN> getDFNs(byte shift, NursingProcess np, Date date) {
+    /**
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
+     *
+     * @param resident
+     * @param date
+     * @return
+     */
+    public static ArrayList<DFN> getDFNs(Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
         ArrayList<DFN> listDFN = null;
 
@@ -380,58 +346,8 @@ public class DFNTools {
 
             String jpql = " SELECT dfn " +
                     " FROM DFN dfn " +
-                    " WHERE dfn.nursingProcess = :np " +
+                    " WHERE dfn.resident = :resident " +
                     " AND dfn.soll >= :von AND dfn.soll <= :bis ";
-
-            if (shift != SHIFT_ALL) {
-                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
-                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
-
-            }
-
-//            jpql = jpql + " ORDER BY dfn.intervention.bezeichnung ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("np", np);
-            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
-            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
-
-            if (shift != SHIFT_ALL) {
-                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
-                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
-                query.setParameter("timeid1", timeids.getFirst());
-                query.setParameter("timeid2", timeids.getSecond());
-                query.setParameter("time1", times.getFirst());
-                query.setParameter("time2", times.getSecond());
-            }
-
-            listDFN = new ArrayList<DFN>(query.getResultList());
-            Collections.sort(listDFN);
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return listDFN;
-    }
-
-    public static ArrayList<DFN> getDFNs(byte shift, Resident resident, Date date) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<DFN> listDFN = null;
-
-        try {
-
-            String jpql = " SELECT dfn " +
-                    " FROM DFN dfn " +
-                    " WHERE dfn.bewohner = :resident AND dfn.nursingProcess IS NULL " +
-                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
-
-            if (shift != SHIFT_ALL) {
-                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
-                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
-
-            }
 
             Query query = em.createQuery(jpql);
 
@@ -439,15 +355,6 @@ public class DFNTools {
             query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
             query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
-            if (shift != SHIFT_ALL) {
-                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
-                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
-                query.setParameter("timeid1", timeids.getFirst());
-                query.setParameter("timeid2", timeids.getSecond());
-                query.setParameter("time1", times.getFirst());
-                query.setParameter("time2", times.getSecond());
-            }
-
             listDFN = new ArrayList<DFN>(query.getResultList());
             Collections.sort(listDFN);
 
@@ -458,6 +365,137 @@ public class DFNTools {
         }
         return listDFN;
     }
+
+
+//    public static ArrayList<NursingProcess> getInvolvedNPs(byte shift, Resident resident, Date date) {
+//        EntityManager em = OPDE.createEM();
+//        ArrayList<NursingProcess> listNP = null;
+//
+//        try {
+//
+//            String jpql = " SELECT DISTINCT dfn.nursingProcess " +
+//                    " FROM DFN dfn " +
+//                    " WHERE dfn.resident = :bewohner AND dfn.nursingProcess IS NOT NULL AND dfn.soll >= :von AND dfn.soll <= :bis ";
+//
+//            if (shift != SHIFT_ALL) {
+//                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
+//                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
+//
+//            }
+//
+//            jpql = jpql + " ORDER BY dfn.nursingProcess.kategorie.bezeichnung, dfn.nursingProcess.stichwort, dfn.nursingProcess.planID ";
+//
+//            Query query = em.createQuery(jpql);
+//
+//            query.setParameter("bewohner", resident);
+//            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
+//            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+//
+//            if (shift != SHIFT_ALL) {
+//                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
+//                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
+//                query.setParameter("timeid1", timeids.getFirst());
+//                query.setParameter("timeid2", timeids.getSecond());
+//                query.setParameter("time1", times.getFirst());
+//                query.setParameter("time2", times.getSecond());
+//            }
+//
+//            listNP = new ArrayList<NursingProcess>(query.getResultList());
+//
+//        } catch (Exception se) {
+//            OPDE.fatal(se);
+//        } finally {
+//            em.close();
+//        }
+//        return listNP;
+//    }
+
+//    public static ArrayList<DFN> getDFNs(byte shift, NursingProcess np, Date date) {
+//        EntityManager em = OPDE.createEM();
+//        ArrayList<DFN> listDFN = null;
+//
+//        try {
+//
+//            String jpql = " SELECT dfn " +
+//                    " FROM DFN dfn " +
+//                    " WHERE dfn.nursingProcess = :np " +
+//                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+//
+//            if (shift != SHIFT_ALL) {
+//                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
+//                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
+//
+//            }
+//
+////            jpql = jpql + " ORDER BY dfn.intervention.bezeichnung ";
+//
+//            Query query = em.createQuery(jpql);
+//
+//            query.setParameter("np", np);
+//            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
+//            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+//
+//            if (shift != SHIFT_ALL) {
+//                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
+//                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
+//                query.setParameter("timeid1", timeids.getFirst());
+//                query.setParameter("timeid2", timeids.getSecond());
+//                query.setParameter("time1", times.getFirst());
+//                query.setParameter("time2", times.getSecond());
+//            }
+//
+//            listDFN = new ArrayList<DFN>(query.getResultList());
+//            Collections.sort(listDFN);
+//        } catch (Exception se) {
+//            OPDE.fatal(se);
+//        } finally {
+//            em.close();
+//        }
+//        return listDFN;
+//    }
+//
+//    public static ArrayList<DFN> getDFNs(byte shift, Resident resident, Date date) {
+//        EntityManager em = OPDE.createEM();
+//        ArrayList<DFN> listDFN = null;
+//
+//        try {
+//
+//            String jpql = " SELECT dfn " +
+//                    " FROM DFN dfn " +
+//                    " WHERE dfn.resident = :resident AND dfn.nursingProcess IS NULL " +
+//                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+//
+//            if (shift != SHIFT_ALL) {
+//                jpql = jpql + " AND ((dfn.sZeit >= :timeid1 AND dfn.sZeit <= :timeid2) OR " +
+//                        " (dfn.sZeit = 0 AND dfn.soll >= :time1 AND dfn.soll <= :time2)) ";
+//
+//            }
+//
+//            Query query = em.createQuery(jpql);
+//
+//            query.setParameter("resident", resident);
+//            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
+//            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+//
+//            if (shift != SHIFT_ALL) {
+//                Pair<Date, Date> times = SYSCalendar.getTimeOfDay4Shift(shift);
+//                Pair<Byte, Byte> timeids = SYSCalendar.getTimeIDs4Shift(shift);
+//                query.setParameter("timeid1", timeids.getFirst());
+//                query.setParameter("timeid2", timeids.getSecond());
+//                query.setParameter("time1", times.getFirst());
+//                query.setParameter("time2", times.getSecond());
+//            }
+//
+//            listDFN = new ArrayList<DFN>(query.getResultList());
+//            Collections.sort(listDFN);
+//
+//        } catch (Exception se) {
+//            OPDE.fatal(se);
+//        } finally {
+//            em.close();
+//        }
+//        return listDFN;
+//    }
 
     public static String getInterventionAsHTML(DFN dfn) {
         String result = SYSConst.html_div_open;
@@ -508,7 +546,7 @@ public class DFNTools {
                 text += msg[dfn.getsZeit()];
             }
         } else {
-            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
+            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll()) + " " + OPDE.lang.getString("misc.msg.Time.short");
         }
 
         return prefix + text + postfix;
@@ -516,9 +554,9 @@ public class DFNTools {
 
     public static boolean isChangeable(DFN dfn) {
         int DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
-        boolean residentAbsent = dfn.getBewohner().isActive() && BWInfoTools.absentSince(dfn.getBewohner()) != null;
+        boolean residentAbsent = dfn.getResident().isActive() && BWInfoTools.absentSince(dfn.getResident()) != null;
 
-        return !residentAbsent && dfn.getBewohner().isActive() &&
+        return !residentAbsent && dfn.getResident().isActive() &&
                 (dfn.isOnDemand() || dfn.getNursingProcess().getBis().after(new Date())) && // prescription is active or it is unassigned
                 (dfn.getUser() == null ||
                         (dfn.getUser().equals(OPDE.getLogin().getUser()) &&
@@ -529,7 +567,7 @@ public class DFNTools {
     public static Date getMinDatum(Resident bewohner) {
         Date date;
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT d FROM DFN d WHERE d.bewohner = :bewohner ORDER BY d.dfnid");
+        Query query = em.createQuery("SELECT d FROM DFN d WHERE d.resident = :bewohner ORDER BY d.dfnid");
         query.setParameter("bewohner", bewohner);
         query.setMaxResults(1);
         try {

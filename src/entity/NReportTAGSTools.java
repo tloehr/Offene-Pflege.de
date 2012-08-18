@@ -4,7 +4,6 @@
  */
 package entity;
 
-import entity.files.SYSFiles;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSConst;
@@ -27,7 +26,7 @@ import java.util.Iterator;
 /**
  * @author tloehr
  */
-public class PBerichtTAGSTools {
+public class NReportTAGSTools {
 
     public static ListCellRenderer getPBerichtTAGSRenderer() {
 //        final int v = verbosity;
@@ -37,8 +36,8 @@ public class PBerichtTAGSTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof PBerichtTAGS) {
-                    PBerichtTAGS tag = (PBerichtTAGS) o;
+                } else if (o instanceof NReportTAGS) {
+                    NReportTAGS tag = (NReportTAGS) o;
                     text = tag.getBezeichnung() + " ("+tag.getKurzbezeichnung()+")";
                 } else {
                     text = o.toString();
@@ -51,23 +50,23 @@ public class PBerichtTAGSTools {
     /**
      * Erstellt ein JMenu bestehend aus Checkboxen. Für jede aktive PBerichtTag jeweils eine.
      * Wenn man die anklickt, wird eine Markierung zum Bericht hinzugefügt. Dieses Menü
-     * wird in PnlBerichte verwendet. Als Kontextmenü für die einzelnen Berichtszeilen.
+     * wird in PnlReport verwendet. Als Kontextmenü für die einzelnen Berichtszeilen.
      *
      * @param bericht Der Bericht, für den das Menü erzeugt werden soll.
      *                Je nachdem, welche Tags diesem Bericht schon zugewiesen sind, werden die Checkboxen bereits angeklickt oder auch nicht.
      *                Für das Menü wird ein Listener definiert, der weitere Tags setzt oder entfernt.
      * @return das vorbereitete Menü
      */
-    public static JMenu createMenuForTags(Pflegeberichte bericht) {
-        final Pflegeberichte finalbericht = bericht;
+    public static JMenu createMenuForTags(NReport bericht) {
+        final NReport finalbericht = bericht;
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
-        ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
+        ArrayList<NReportTAGS> tags = new ArrayList(query.getResultList());
 
         JMenu menu = new JMenu("Text-Markierungen");
-        Iterator<PBerichtTAGS> itTags = tags.iterator();
+        Iterator<NReportTAGS> itTags = tags.iterator();
         while (itTags.hasNext()) {
-            final PBerichtTAGS tag = itTags.next();
+            final NReportTAGS tag = itTags.next();
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
             cb.setForeground(tag.getColor());
             if (tag.isBesonders()) {
@@ -120,13 +119,13 @@ public class PBerichtTAGSTools {
      * @param layout    Ein Layoutmanager für das Panel.
      * @return das Panel zur weiteren Verwendung.
      */
-    public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect, LayoutManager layout) {
+    public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<NReportTAGS> preselect, LayoutManager layout) {
         EntityManager em = OPDE.createEM();
         MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
-        ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
+        ArrayList<NReportTAGS> tags = new ArrayList(query.getResultList());
         JPanel panel = new JPanel(layout);
-        for (PBerichtTAGS tag : tags) {
+        for (NReportTAGS tag : tags) {
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
             cb.setForeground(tag.getColor());
             if (tag.isBesonders()) {
@@ -152,15 +151,15 @@ public class PBerichtTAGSTools {
      * @param preselect Eine Collection aus Tags besteht. Damit kann man einstellen, welche Boxen schon vorher angeklickt sein sollen.
      * @return das Panel zur weiteren Verwendung.
      */
-    public static JPanel getCheckBoxPanelForTags(ItemListener listener, Collection<PBerichtTAGS> preselect) {
+    public static JPanel getCheckBoxPanelForTags(ItemListener listener, Collection<NReportTAGS> preselect) {
         EntityManager em = OPDE.createEM();
         JPanel panel = new JPanel(new VerticalLayout());
         MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
-        ArrayList<PBerichtTAGS> tags = new ArrayList(query.getResultList());
-        Iterator<PBerichtTAGS> itTags = tags.iterator();
+        ArrayList<NReportTAGS> tags = new ArrayList(query.getResultList());
+        Iterator<NReportTAGS> itTags = tags.iterator();
         while (itTags.hasNext()) {
-            PBerichtTAGS tag = itTags.next();
+            NReportTAGS tag = itTags.next();
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
             cb.setBackground(Color.WHITE);
             cb.setForeground(tag.getColor());
@@ -183,8 +182,8 @@ public class PBerichtTAGSTools {
      * Kleine Hilfsmethode, die ich brauche um festzustellen ob ein bestimmter bericht
      * ein Sozial Bericht ist.
      */
-    public static boolean isSozial(Pflegeberichte bericht) {
-        Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();
+    public static boolean isSozial(NReport bericht) {
+        Iterator<NReportTAGS> itTags = bericht.getTags().iterator();
         boolean yes = false;
         while (!yes && itTags.hasNext()) {
             yes = itTags.next().getKurzbezeichnung().equalsIgnoreCase("soz");

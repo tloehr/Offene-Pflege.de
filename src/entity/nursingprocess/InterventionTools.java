@@ -1,4 +1,4 @@
-package entity.planung;
+package entity.nursingprocess;
 
 import entity.EntityTools;
 import op.OPDE;

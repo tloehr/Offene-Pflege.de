@@ -1,4 +1,4 @@
-package entity.planung;
+package entity.nursingprocess;
 
 import entity.info.Resident;
 import entity.EntityTools;
@@ -25,7 +25,7 @@ public class NursingProcessTools {
 
     public static List<NursingProcess> findByKategorieAndBewohner(Resident bewohner, BWInfoKat kat) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.bewohner = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
         query.setParameter("kat", kat);
         query.setParameter("bewohner", bewohner);
         List<NursingProcess> planungen = query.getResultList();
@@ -35,7 +35,7 @@ public class NursingProcessTools {
 
     public static List<NursingProcess> getTemplates(String topic, boolean includeInactives) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.stichwort like :topic " + (includeInactives ? "" : " AND p.bis > :now ") + " ORDER BY p.stichwort, p.bewohner.bWKennung, p.von");
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.stichwort like :topic " + (includeInactives ? "" : " AND p.bis > :now ") + " ORDER BY p.stichwort, p.resident.bWKennung, p.von");
         query.setParameter("topic", EntityTools.getMySQLsearchPattern(topic));
         if (!includeInactives) {
             query.setParameter("now", new Date());

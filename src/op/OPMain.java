@@ -68,7 +68,7 @@ public class OPMain extends javax.swing.JFrame {
         menuStructure = new ArrayList();
         menuStructure.add(new String[]{"Pflege/Pflegeakte", "op.FrmMain", "pflegeakte.png"});
         menuStructure.add(new String[]{"Pflege/Medikamente", "op.care.med.FrmMed", "agt_virussafe.png"});
-        menuStructure.add(new String[]{"Pflege/Massnahmen", "op.care.planung.massnahmen.FrmMassnahmen", "work.png"});
+        menuStructure.add(new String[]{"Pflege/Massnahmen", "op.care.nursingprocess.massnahmen.FrmMassnahmen", "work.png"});
         menuStructure.add(new String[]{"Bewohner/Bewohnerdaten", "op.bw.admin.FrmBWAttr", "groupevent.png"});
         menuStructure.add(new String[]{"Bewohner/Barbeträge", "op.bw.tg.FrmTG", "coins.png"});
         menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});

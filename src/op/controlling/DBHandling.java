@@ -30,8 +30,6 @@ import entity.*;
 import op.OPDE;
 import op.tools.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.swing.*;
 import java.sql.*;
 import java.text.DateFormat;
@@ -265,11 +263,11 @@ public class DBHandling {
 //
 //        try {
 //
-////        Query query = em.createNamedQuery("PBerichtTAGS.findByKurzbezeichnung");
+////        Query query = em.createNamedQuery("NReportTAGS.findByKurzbezeichnung");
 ////        query.setParameter("kurzbezeichnung", "soz");
-////        PBerichtTAGS sozTag = (PBerichtTAGS) query.getSingleResult();
+////        NReportTAGS sozTag = (NReportTAGS) query.getSingleResult();
 ////
-////        PflegeberichteTools.getBerichteASHTML(em, "", sozTag, headertiefe,sozialwochen );
+////        NReportTools.getBerichteASHTML(em, "", sozTag, headertiefe,sozialwochen );
 //
 //        StringBuilder html = new StringBuilder(1000);
 //        String sql = "" +
@@ -1179,9 +1177,9 @@ public class DBHandling {
 
                     html.append("<td>" + datum + " " + rs.getString("c.UKennung") + "</td>");
 
-                    if (rs.getString("c.tbl").equals("Pflegeberichte")) {
-                        Pflegeberichte bericht = EntityTools.find(Pflegeberichte.class, rs.getLong("c.pk"));
-                        html.append("<td>" + PflegeberichteTools.getBerichtAsHTML(bericht, false) + "</td>");
+                    if (rs.getString("c.tbl").equals("NReport")) {
+                        NReport bericht = EntityTools.find(NReport.class, rs.getLong("c.pk"));
+                        html.append("<td>" + NReportTools.getBerichtAsHTML(bericht, false) + "</td>");
                     } else {
 //                        BWInfo bwinfo = new BWInfo(rs.getLong("c.pk"));
 //                        ArrayList content = bwinfo.getAttribute();

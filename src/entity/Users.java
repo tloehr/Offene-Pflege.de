@@ -85,9 +85,9 @@ public class Users implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<Sysver2file> sysver2fileCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<Pflegeberichte> pflegeberichte;
+    private Collection<NReport> NReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "editedBy")
-    private Collection<Pflegeberichte> korrigiertePflegeberichte;
+    private Collection<NReport> korrigierteNReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
 

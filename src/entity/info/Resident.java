@@ -80,14 +80,14 @@ public class Resident implements Serializable {
     private Collection<Barbetrag> konto;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
-//    private Collection<Pflegeberichte> pflegeberichteCollection;
+//    private Collection<NReport> pflegeberichteCollection;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<Verordnung> verordnungCollection;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<BWInfo> bwinfoCollection;
 //
 //    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
-//    private Collection<Pflegeberichte> pflegberichte;
+//    private Collection<NReport> pflegberichte;
 
     // Bewohner, die keiner Pflegestation zugeordnet sind, gelten als inaktiv.
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")

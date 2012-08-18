@@ -1,11 +1,13 @@
-package entity.planung;
+package entity.nursingprocess;
 
-import entity.info.Resident;
 import entity.Users;
+import entity.info.Resident;
 import op.OPDE;
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -70,7 +72,7 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
@@ -109,7 +111,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.intervention = intervention;
         this.nursingProcess = null;
         this.dauer = intervention.getDauer();
-        this.bewohner = resident;
+        this.resident = resident;
         this.floating = false;
         this.soll = now;
         this.sZeit = SYSCalendar.whatTimeIDIs(now);
@@ -118,7 +120,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.version = 0l;
         this.status = DFNTools.STATE_DONE;
         this.user = OPDE.getLogin().getUser();
-        this.bewohner = resident;
+        this.resident = resident;
         this.mdate = now;
         this.stDatum = now;
     }
@@ -129,7 +131,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.intervention = interventionSchedule.getIntervention();
         this.nursingProcess = interventionSchedule.getNursingProcess();
         this.dauer = interventionSchedule.getDauer();
-        this.bewohner = interventionSchedule.getNursingProcess().getBewohner();
+        this.resident = interventionSchedule.getNursingProcess().getResident();
         this.floating = interventionSchedule.isFloating();
         this.soll = soll;
         this.version = 0l;
@@ -236,20 +238,44 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.mdate = mdate;
     }
 
+    public Byte getShift() {
+        if (isOnDemand()) {
+            return DFNTools.SHIFT_ON_DEMAND;
+        }
+        if (sZeit == DFNTools.BYTE_TIMEOFDAY) {
+            return SYSCalendar.whatShiftIs(this.soll);
+        }
+        return SYSCalendar.whatShiftIs(this.sZeit);
+    }
+
     public NursingProcess getNursingProcess() {
         return nursingProcess;
+    }
+
+    public Color getFG() {
+        if (isOnDemand()) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
+    }
+
+    public Color getBG() {
+        if (isOnDemand()) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
     }
 
     public void setNursingProcess(NursingProcess nursingProcess) {
         this.nursingProcess = nursingProcess;
     }
 
-    public Resident getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident bewohner) {
+        this.resident = bewohner;
     }
 
     public Users getUser() {
@@ -291,10 +317,18 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     @Override
     public int compareTo(DFN other) {
-        int result = sZeit.compareTo(other.getSollZeit());
-
-//        OPDE.debug(result + " "+sZeit + ":" + other.getSollZeit());
-
+        int result = this.getShift().compareTo(other.getShift());
+        if (result == 0) {
+            result = SYSTools.nullCompare(this.nursingProcess, other.getNursingProcess());
+        }
+        if (result == 0) {
+            if (this.getNursingProcess() != null){
+                result = this.nursingProcess.getPlanID().compareTo(other.getNursingProcess().getPlanID());
+            }
+        }
+        if (result == 0) {
+            result = sZeit.compareTo(other.getSollZeit());
+        }
         if (result == 0) {
             if (sZeit == DFNTools.BYTE_TIMEOFDAY) {
                 result = soll.compareTo(other.getSoll());

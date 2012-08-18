@@ -1,4 +1,4 @@
-package entity.planung;
+package entity.nursingprocess;
 
 import java.text.DateFormat;
 

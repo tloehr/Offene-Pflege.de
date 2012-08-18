@@ -32,7 +32,6 @@ import op.tools.SYSCalendar;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Date;
@@ -109,7 +108,7 @@ public class TMUebergabe
         OPDE.debug(berichte);
         Object[] bericht = (Object[]) berichte.get(row);
         // Zur Info
-        // bericht[LIST_BERICHT] enthält immer das Berichte Objekt (entweder Ubergabebuch oder Pflegeberichte)
+        // bericht[LIST_BERICHT] enthält immer das Berichte Objekt (entweder Ubergabebuch oder NReport)
         // bericht[1] ist 1, wenn der aktuelle User den Bericht bestätigt hat. 0 sonst.
 
         if (bericht[LIST_BERICHT] instanceof Uebergabebuch) {
@@ -144,11 +143,11 @@ public class TMUebergabe
         } else {
             switch (col) {
                 case COL_PIT: {
-                    result = PflegeberichteTools.getDatumUndUser((Pflegeberichte) bericht[LIST_BERICHT], false, false);
+                    result = NReportTools.getDatumUndUser((NReport) bericht[LIST_BERICHT], false, false);
                     break;
                 }
                 case COL_INFO: {
-                    result = PflegeberichteTools.getBewohnerName((Pflegeberichte) bericht[LIST_BERICHT]);
+                    result = NReportTools.getBewohnerName((NReport) bericht[LIST_BERICHT]);
                     break;
                 }
                 case COL_HTML: {
@@ -158,7 +157,7 @@ public class TMUebergabe
                                            result = "<font color=\"green\"><b>OK</b> ";
                                        }
 
-                    result = result + PflegeberichteTools.getAsHTML((Pflegeberichte) bericht[LIST_BERICHT]) + "</font>";
+                    result = result + NReportTools.getAsHTML((NReport) bericht[LIST_BERICHT]) + "</font>";
 //                    result = ;
                     break;
                 }

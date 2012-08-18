@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity.planung;
+package entity.nursingprocess;
 
 import entity.info.Resident;
 import entity.Users;
@@ -88,7 +88,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
     private Users abgesetztDurch;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
     private BWInfoKat kategorie;
@@ -108,7 +108,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
     }
 
     public NursingProcess(Resident bewohner) {
-        this.bewohner = bewohner;
+        this.resident = bewohner;
         this.angesetztDurch = OPDE.getLogin().getUser();
         interventionSchedules = new ArrayList<InterventionSchedule>();
         kontrollen = new ArrayList<NPControl>();
@@ -201,12 +201,12 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         this.angesetztDurch = angesetztDurch;
     }
 
-    public Resident getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident bewohner) {
+        this.resident = bewohner;
     }
 
     public BWInfoKat getKategorie() {
@@ -295,7 +295,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         this.version = version;
         this.angesetztDurch = angesetztDurch;
         this.abgesetztDurch = abgesetztDurch;
-        this.bewohner = bewohner;
+        this.resident = bewohner;
         this.kategorie = kategorie;
         this.attachedVorgaenge = attachedVorgaenge;
         this.kontrollen = kontrollen;
@@ -304,7 +304,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
 
     @Override
     public NursingProcess clone() {
-        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, bewohner, kategorie, new ArrayList<SYSPLAN2VORGANG>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
+        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, resident, kategorie, new ArrayList<SYSPLAN2VORGANG>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
         for (InterventionSchedule is : interventionSchedules){
             InterventionSchedule myIS = is.clone();
             myIS.setNursingProcess(myNewNP);
@@ -315,6 +315,6 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
 
     @Override
     public String toString() {
-        return "entity.planung.Planung[planID=" + planID + "]";
+        return "entity.nursingprocess.Planung[planID=" + planID + "]";
     }
 }

@@ -204,7 +204,7 @@ public class PnlRegelDosis extends CleanablePanel {
         Date now = null;
         if (planung.getUhrzeitDosis().compareTo(BigDecimal.ZERO) > 0) {
             splitRegularPos = 0.0d;
-//            currentSelectedTime = planung.getUhrzeit();
+//            currentSelectedTime = nursingprocess.getUhrzeit();
             now = planung.getUhrzeit();
 //            cmbUhrzeit.setSelectedItem(currentSelectedTime);
         } else {

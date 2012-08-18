@@ -716,12 +716,12 @@ public class BWInfoTools {
          */
         if (bericht) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT p FROM Pflegeberichte p "
-                    + " WHERE p.bewohner = :bewohner AND p.pit >= :von "
+            Query query = em.createQuery("SELECT p FROM NReport p "
+                    + " WHERE p.resident = :bewohner AND p.pit >= :von "
                     + " ORDER BY p.pit DESC ");
             query.setParameter("bewohner", bewohner);
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
-            result += PflegeberichteTools.getBerichteAsHTML(query.getResultList(), true, false);
+            result += NReportTools.getBerichteAsHTML(query.getResultList(), true, false);
             em.close();
 
         }

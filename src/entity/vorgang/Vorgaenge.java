@@ -96,7 +96,7 @@ public class Vorgaenge implements Serializable {
 //    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "PBID"))
-//    private Collection<Pflegeberichte> pflegeberichte;
+//    private Collection<NReport> pflegeberichte;
 //    @ManyToMany
 //    @JoinTable(name = "SYSBWI2VORGANG", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =

@@ -447,7 +447,7 @@ public class PnlUebergabe extends CleanablePanel {
                             uebergabe.getUsersAcknowledged().add(new Uebergabe2User(uebergabe, OPDE.getLogin().getUser()));
                             em.merge(uebergabe);
                         } else {
-                            Pflegeberichte pflegebericht = (Pflegeberichte) bericht[TMUebergabe.LIST_BERICHT];
+                            NReport pflegebericht = (NReport) bericht[TMUebergabe.LIST_BERICHT];
                             pflegebericht.getUsersAcknowledged().add(new PB2User(pflegebericht, OPDE.getLogin().getUser()));
                             em.merge(pflegebericht);
                         }
@@ -552,10 +552,10 @@ public class PnlUebergabe extends CleanablePanel {
                         }
                     }
                 } else {
-                    if (((Pflegeberichte) bericht).getUsersAcknowledged().isEmpty()) {
+                    if (((NReport) bericht).getUsersAcknowledged().isEmpty()) {
                         menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
                     } else {
-                        ArrayList<PB2User> usersackn = new ArrayList<PB2User>(((Pflegeberichte) bericht).getUsersAcknowledged());
+                        ArrayList<PB2User> usersackn = new ArrayList<PB2User>(((NReport) bericht).getUsersAcknowledged());
                         Collections.sort(usersackn);
                         Iterator<PB2User> it = usersackn.iterator();
                         while (it.hasNext()) {

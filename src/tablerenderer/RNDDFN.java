@@ -27,8 +27,8 @@
 
 package tablerenderer;
 
-import entity.planung.DFN;
-import entity.planung.DFNTools;
+import entity.nursingprocess.DFN;
+import entity.nursingprocess.DFNTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;

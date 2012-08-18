@@ -6,14 +6,12 @@ package entity;
 
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -25,16 +23,16 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "PBericht_TAGS")
 @NamedQueries({
-    @NamedQuery(name = "PBerichtTAGS.findAll", query = "SELECT p FROM PBerichtTAGS p"),
-    @NamedQuery(name = "PBerichtTAGS.findAllActive", query = "SELECT p FROM PBerichtTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung "),
-    @NamedQuery(name = "PBerichtTAGS.findByPbtagid", query = "SELECT p FROM PBerichtTAGS p WHERE p.pbtagid = :pbtagid"),
-    @NamedQuery(name = "PBerichtTAGS.findByBezeichnung", query = "SELECT p FROM PBerichtTAGS p WHERE p.bezeichnung = :bezeichnung"),
-    @NamedQuery(name = "PBerichtTAGS.findByKurzbezeichnung", query = "SELECT p FROM PBerichtTAGS p WHERE p.kurzbezeichnung = :kurzbezeichnung"),
-    @NamedQuery(name = "PBerichtTAGS.findByAktiv", query = "SELECT p FROM PBerichtTAGS p WHERE p.aktiv = :aktiv"),
-    @NamedQuery(name = "PBerichtTAGS.findBySystem", query = "SELECT p FROM PBerichtTAGS p WHERE p.system = :system"),
-    @NamedQuery(name = "PBerichtTAGS.findByFarbe", query = "SELECT p FROM PBerichtTAGS p WHERE p.farbe = :farbe")
+    @NamedQuery(name = "PBerichtTAGS.findAll", query = "SELECT p FROM NReportTAGS p"),
+    @NamedQuery(name = "PBerichtTAGS.findAllActive", query = "SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung "),
+    @NamedQuery(name = "PBerichtTAGS.findByPbtagid", query = "SELECT p FROM NReportTAGS p WHERE p.pbtagid = :pbtagid"),
+    @NamedQuery(name = "PBerichtTAGS.findByBezeichnung", query = "SELECT p FROM NReportTAGS p WHERE p.bezeichnung = :bezeichnung"),
+    @NamedQuery(name = "PBerichtTAGS.findByKurzbezeichnung", query = "SELECT p FROM NReportTAGS p WHERE p.kurzbezeichnung = :kurzbezeichnung"),
+    @NamedQuery(name = "PBerichtTAGS.findByAktiv", query = "SELECT p FROM NReportTAGS p WHERE p.aktiv = :aktiv"),
+    @NamedQuery(name = "PBerichtTAGS.findBySystem", query = "SELECT p FROM NReportTAGS p WHERE p.system = :system"),
+    @NamedQuery(name = "PBerichtTAGS.findByFarbe", query = "SELECT p FROM NReportTAGS p WHERE p.farbe = :farbe")
 })
-public class PBerichtTAGS implements Serializable {
+public class NReportTAGS implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final Color[] COLORS = new Color[]{Color.BLACK, Color.WHITE, Color.CYAN, Color.RED, Color.GREEN, Color.BLUE, Color.PINK, Color.MAGENTA, Color.YELLOW, Color.GRAY, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.ORANGE};
@@ -64,9 +62,9 @@ public class PBerichtTAGS implements Serializable {
     @Column(name = "Sort")
     private int sort;
 //    @ManyToMany(mappedBy = "tags")
-//    private Collection<Pflegeberichte> pflegeberichte;
+//    private Collection<NReport> pflegeberichte;
 
-    public PBerichtTAGS() {
+    public NReportTAGS() {
     }
 
     public Long getPbtagid() {
@@ -101,7 +99,7 @@ public class PBerichtTAGS implements Serializable {
         this.besonders = besonders;
     }
 
-//    public Collection<Pflegeberichte> getPflegeberichte() {
+//    public Collection<NReport> getNReport() {
 //        return pflegeberichte;
 //    }
 
@@ -143,10 +141,10 @@ public class PBerichtTAGS implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof PBerichtTAGS)) {
+        if (!(object instanceof NReportTAGS)) {
             return false;
         }
-        PBerichtTAGS other = (PBerichtTAGS) object;
+        NReportTAGS other = (NReportTAGS) object;
         if ((this.pbtagid == null && other.pbtagid != null) || (this.pbtagid != null && !this.pbtagid.equals(other.pbtagid))) {
             return false;
         }
@@ -155,6 +153,6 @@ public class PBerichtTAGS implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.PBerichtTAGS[pbtagid=" + pbtagid + "]";
+        return "entity.NReportTAGS[pbtagid=" + pbtagid + "]";
     }
 }

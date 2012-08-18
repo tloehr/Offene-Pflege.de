@@ -28,17 +28,12 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.planung.NursingProcess;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

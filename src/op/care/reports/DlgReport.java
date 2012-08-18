@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Mon Apr 23 16:41:35 CEST 2012
  */
 
-package op.care.berichte;
+package op.care.reports;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -10,10 +10,10 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
+import entity.NReport;
+import entity.NReportTAGS;
 import entity.info.Resident;
-import entity.PBerichtTAGS;
-import entity.PBerichtTAGSTools;
-import entity.Pflegeberichte;
+import entity.NReportTAGSTools;
 import op.tools.MyJDialog;
 import op.tools.PnlUhrzeitDatum;
 import op.tools.SYSTools;
@@ -32,8 +32,8 @@ import java.util.Date;
 /**
  * @author Torsten Löhr
  */
-public class DlgBericht extends MyJDialog {
-    private Pflegeberichte bericht;
+public class DlgReport extends MyJDialog {
+    private NReport bericht;
     private Resident bewohner;
     private PropertyChangeListener pcl;
     private final int DAUER = 3;
@@ -43,7 +43,7 @@ public class DlgBericht extends MyJDialog {
     private JLabel attentionIcon;
     private PnlUhrzeitDatum pnlUhrzeitDatum;
 
-    public DlgBericht(Resident bewohner, Closure actionBlock) {
+    public DlgReport(Resident bewohner, Closure actionBlock) {
         super();
         this.bewohner = bewohner;
         this.actionBlock = actionBlock;
@@ -54,16 +54,16 @@ public class DlgBericht extends MyJDialog {
     private void initDialog() {
 
         Date now = new Date();
-        bericht = new Pflegeberichte(bewohner);
+        bericht = new NReport(bewohner);
         bericht.setPit(now);
         bericht.setText("");
         bericht.setDauer(DAUER);
 
-        pnlTags.setViewportView(PBerichtTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
+        pnlTags.setViewportView(NReportTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 JCheckBox cb = (JCheckBox) e.getSource();
-                PBerichtTAGS tag = (PBerichtTAGS) cb.getClientProperty("UserObject");
+                NReportTAGS tag = (NReportTAGS) cb.getClientProperty("UserObject");
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     bericht.getTags().remove(tag);
                 } else {

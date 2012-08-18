@@ -31,16 +31,14 @@ package tablemodels;
  * @author tloehr
  */
 
-import entity.planung.InterventionSchedule;
-import entity.planung.InterventionScheduleTools;
-import entity.planung.NursingProcess;
+import entity.nursingprocess.InterventionSchedule;
+import entity.nursingprocess.InterventionScheduleTools;
+import entity.nursingprocess.NursingProcess;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
 import java.util.Collections;
 
 /**

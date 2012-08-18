@@ -100,7 +100,6 @@ public class GUITools {
      * @param location where to show the popup in relation to the <code>reference</code>. Use the SwingConstants above.
      */
     public static void showPopup(JidePopup popup, int location) {
-
         Container content = popup.getContentPane();
         Point p2 = new Point(popup.getOwner().getX(), popup.getOwner().getY());
         SwingUtilities.convertPointToScreen(p2, popup.getOwner());

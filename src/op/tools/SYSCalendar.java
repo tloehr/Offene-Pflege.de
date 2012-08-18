@@ -27,14 +27,18 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
-import entity.planung.DFNTools;
+import entity.EntityTools;
+import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
+import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import tablemodels.TMPflegeberichte;
 
 import javax.swing.*;
 import java.awt.*;
@@ -837,7 +841,7 @@ public class SYSCalendar {
     }
 
 
-    public static byte whatShiftIs(byte timeID){
+    public static byte whatShiftIs(byte timeID) {
         byte shift;
         if (DFNTools.BYTE_EARLY_IN_THE_MORNING <= timeID && timeID < DFNTools.BYTE_MORNING) {
             shift = DFNTools.SHIFT_VERY_EARLY;
@@ -852,6 +856,7 @@ public class SYSCalendar {
     }
 
     public static byte whatShiftIs(Date date) {
+        // TODO: not clean enough. there should be one method for DFNs and one method for BHPs. even though they may do the same.
         return whatShiftIs(whatTimeIDIs(date));
     }
 
@@ -1486,8 +1491,8 @@ public class SYSCalendar {
 
         dcbm.addElement(new Pair<String, Integer>("--", -1)); // empty selection
 
-        for (int min : mins){
-            if (min % 60 == 0){
+        for (int min : mins) {
+            if (min % 60 == 0) {
                 dcbm.addElement(new Pair<String, Integer>(min / 60 + " " + OPDE.lang.getString("misc.msg.Hour(s)"), min));
             } else {
                 dcbm.addElement(new Pair<String, Integer>(min + " " + OPDE.lang.getString("misc.msg.Minute(s)"), min));
@@ -1498,17 +1503,42 @@ public class SYSCalendar {
 
     }
 
-    public static Color getFGSHIFT(Byte shift){
-        if (shift == BHPTools.SHIFT_ON_DEMAND){
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
+
+    public static JPopupMenu getMinutesMenu(int[] mins, final Closure action) {
+        JPopupMenu timemenu = new JPopupMenu(OPDE.lang.getString("misc.commands.changeeffort"));
+
+        for (int min : mins) {
+            String title = "";
+            if (min % 60 == 0) {
+                title = min / 60 + " " + OPDE.lang.getString("misc.msg.Hour(s)");
+            } else {
+                title = min + " " + OPDE.lang.getString("misc.msg.Minute(s)");
+            }
+
+            JMenuItem item = new JMenuItem(title);
+            final int minutes = min;
+            item.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    action.execute(minutes);
+                }
+            });
+            timemenu.add(item);
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift]+"_FGSHIFT"));
+
+        return timemenu;
     }
 
-    public static Color getBGSHIFT(Byte shift){
-        if (shift == BHPTools.SHIFT_ON_DEMAND){
+    public static Color getFGSHIFT(Byte shift) {
+        if (shift == BHPTools.SHIFT_ON_DEMAND) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_FGSHIFT"));
+    }
+
+    public static Color getBGSHIFT(Byte shift) {
+        if (shift == BHPTools.SHIFT_ON_DEMAND) {
             return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift]+"_BGSHIFT"));
+        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
     }
 }

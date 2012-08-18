@@ -31,7 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
-import entity.planung.InterventionSchedule;
+import entity.nursingprocess.InterventionSchedule;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;

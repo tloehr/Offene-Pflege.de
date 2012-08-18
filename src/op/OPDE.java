@@ -30,7 +30,7 @@ import com.jidesoft.wizard.WizardStyle;
 import entity.Users;
 import entity.UsersTools;
 import entity.files.SYSFilesTools;
-import entity.planung.DFNTools;
+import entity.nursingprocess.DFNTools;
 import entity.system.SYSLogin;
 import entity.system.SYSPropsTools;
 import entity.system.SyslogTools;
@@ -42,7 +42,7 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
-import org.joda.time.DateMidnight;
+import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -621,10 +621,9 @@ public class OPDE {
 
             // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
-            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-//            jpaProps.put("eclipselink.logging.level", "FINER");
+//            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+            jpaProps.put("eclipselink.logging.level", JavaLog.OFF_LABEL);
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
-
 
             /***
              *     __     __            _
@@ -695,6 +694,7 @@ public class OPDE {
                     initProps();
 
                     BHPTools.generate(em);
+
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     if (em.getTransaction().isActive()) {

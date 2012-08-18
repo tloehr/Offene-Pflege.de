@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.Pflegeberichte;
+import entity.NReport;
 import entity.Users;
 
 import javax.persistence.*;
@@ -59,7 +59,7 @@ public class Syspb2file implements Serializable {
     private SYSFiles sysfile;
     @JoinColumn(name = "PBID", referencedColumnName = "PBID")
     @ManyToOne
-    private Pflegeberichte pflegebericht;
+    private NReport pflegebericht;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
@@ -67,18 +67,18 @@ public class Syspb2file implements Serializable {
     public Syspb2file() {
     }
 
-    public Syspb2file(SYSFiles sysfile, Pflegeberichte pflegebericht, Users user, Date pit) {
+    public Syspb2file(SYSFiles sysfile, NReport pflegebericht, Users user, Date pit) {
         this.sysfile = sysfile;
         this.pflegebericht = pflegebericht;
         this.user = user;
         this.pit = pit;
     }
 
-    public Pflegeberichte getPflegebericht() {
+    public NReport getPflegebericht() {
         return pflegebericht;
     }
 
-    public void setPflegebericht(Pflegeberichte pflegebericht) {
+    public void setPflegebericht(NReport pflegebericht) {
         this.pflegebericht = pflegebericht;
     }
 

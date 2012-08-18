@@ -26,8 +26,8 @@
  */
 package tablemodels;
 
-import entity.Pflegeberichte;
-import entity.PflegeberichteTools;
+import entity.NReport;
+import entity.NReportTools;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
@@ -45,21 +45,21 @@ public class TMPflegeberichte
 //    public static final int COL_Text = 3;
     public static final int COL_BERICHT = 99;
     boolean showIDs;
-    ArrayList<Pflegeberichte> pflegeberichte = new ArrayList();
+    ArrayList<NReport> NReport = new ArrayList();
 
 
-    public TMPflegeberichte(ArrayList<Pflegeberichte> pflegeberichte, boolean showIDs) {
+    public TMPflegeberichte(ArrayList<NReport> NReport, boolean showIDs) {
         this.showIDs = showIDs;
-        this.pflegeberichte = pflegeberichte;
+        this.NReport = NReport;
     }
 
     @Override
     public int getRowCount() {
-        return pflegeberichte.size();
+        return NReport.size();
     }
 
-    public ArrayList<Pflegeberichte> getPflegeberichte() {
-        return pflegeberichte;
+    public ArrayList<NReport> getNReport() {
+        return NReport;
     }
 
     @Override
@@ -67,8 +67,8 @@ public class TMPflegeberichte
         return 3;
     }
 
-    public void setPflegebericht(int row, Pflegeberichte bericht){
-        pflegeberichte.set(row, bericht);
+    public void setPflegebericht(int row, NReport bericht){
+        NReport.set(row, bericht);
         fireTableRowsUpdated(row, row);
     }
 
@@ -80,20 +80,20 @@ public class TMPflegeberichte
     @Override
     public Object getValueAt(int row, int col) {
         Object result = "";
-        Pflegeberichte bericht = pflegeberichte.get(row);
+        NReport bericht = NReport.get(row);
 
 
         switch (col) {
             case COL_PIT: {
-                result = SYSTools.toHTML(PflegeberichteTools.getDatumUndUser(bericht, showIDs, true));
+                result = SYSTools.toHTML(NReportTools.getDatumUndUser(bericht, showIDs, true));
                 break;
             }
             case COL_Flags: {
-                result = SYSTools.toHTML(PflegeberichteTools.getTagsAsHTML(bericht));
+                result = SYSTools.toHTML(NReportTools.getTagsAsHTML(bericht));
                 break;
             }
             case COL_HTML: {
-                result = SYSTools.toHTML(PflegeberichteTools.getAsHTML(bericht));
+                result = SYSTools.toHTML(NReportTools.getAsHTML(bericht));
                 break;
             }
             default: {

@@ -6,7 +6,7 @@ package op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Pflegeberichte;
+import entity.NReport;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import entity.info.BWInfo;
@@ -132,7 +132,7 @@ public class DlgFiles extends MyJDialog {
     private ArrayList<SYSFiles> getAttachedFilesList(Object attachable) {
         ArrayList<SYSFiles> files = null;
         EntityManager em = OPDE.createEM();
-        if (attachable instanceof Pflegeberichte) {
+        if (attachable instanceof NReport) {
             Query query = em.createNamedQuery("SYSFiles.findByPB", SYSFiles.class);
             query.setParameter("pflegebericht", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());

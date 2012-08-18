@@ -24,28 +24,28 @@ import java.util.Iterator;
 @Entity
 @Table(name = "Pflegeberichte")
 @NamedQueries({
-        @NamedQuery(name = "Pflegeberichte.findAll", query = "SELECT p FROM Pflegeberichte p"),
-        @NamedQuery(name = "Pflegeberichte.findByPbid", query = "SELECT p FROM Pflegeberichte p WHERE p.pbid = :pbid"),
-        @NamedQuery(name = "Pflegeberichte.findFirst", query = "SELECT p FROM Pflegeberichte p WHERE p.pbid = :pbid"),
+        @NamedQuery(name = "Pflegeberichte.findAll", query = "SELECT p FROM NReport p"),
+        @NamedQuery(name = "Pflegeberichte.findByPbid", query = "SELECT p FROM NReport p WHERE p.pbid = :pbid"),
+        @NamedQuery(name = "Pflegeberichte.findFirst", query = "SELECT p FROM NReport p WHERE p.pbid = :pbid"),
 
-//        @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriod", query = " "
-//                + " SELECT p FROM Pflegeberichte p "
+//        @NamedQuery(name = "NReport.findByBewohnerWithinPeriod", query = " "
+//                + " SELECT p FROM NReport p "
 //                + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
 //                + " ORDER BY p.pit DESC "),
         /**
-         * Ermittelt Pflegeberichte eines Bewohner innerhalb eines bestimmten Zeitraums.
+         * Ermittelt NReport eines Bewohner innerhalb eines bestimmten Zeitraums.
          * Nur die als Besonders markiert sind.
          */
         @NamedQuery(name = "Pflegeberichte.findAllByBewohner", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner "
+                + " SELECT p FROM NReport p "
+                + " WHERE p.resident = :bewohner "
                 + " ORDER BY p.pit "),
         /**
          * Sucht Berichte für einen Bewohner mit einem bestimmten Suchbegriff.
          */
         @NamedQuery(name = "Pflegeberichte.findByBewohnerAndSearchText", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner "
+                + " SELECT p FROM NReport p "
+                + " WHERE p.resident = :bewohner "
                 + " AND p.text like :search "
                 + " ORDER BY p.pit DESC "),
         /**
@@ -53,53 +53,53 @@ import java.util.Iterator;
          * Lässt die geänderten jedoch weg.
          */
         @NamedQuery(name = "Pflegeberichte.findByBewohnerAndSearchTextWithoutEdits", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner "
+                + " SELECT p FROM NReport p "
+                + " WHERE p.resident = :bewohner "
                 + " AND p.text like :search "
                 + " AND p.editedBy is null "
                 + " ORDER BY p.pit DESC "),
 //        /**
 //         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
 //         */
-//        @NamedQuery(name = "Pflegeberichte.findByBewohnerAndTagsWithoutEdits", query = " "
-//                + " SELECT p FROM Pflegeberichte p "
+//        @NamedQuery(name = "NReport.findByBewohnerAndTagsWithoutEdits", query = " "
+//                + " SELECT p FROM NReport p "
 //                + " WHERE p.bewohner = :bewohner "
-//                + " AND p.tags IN (SELECT p1.tags FROM PBerichtTAGS t JOIN t.pflegeberichte p1 WHERE p1=p and t.pbtagid IN (1,5,7,9))"
+//                + " AND p.tags IN (SELECT p1.tags FROM NReportTAGS t JOIN t.pflegeberichte p1 WHERE p1=p and t.pbtagid IN (1,5,7,9))"
 //                + " AND p.editedBy is null "
 //                + " ORDER BY p.pit DESC "),
         /**
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
         @NamedQuery(name = "Pflegeberichte.findByVorgang", query = " "
-                + " SELECT p, av.pdca FROM Pflegeberichte p "
+                + " SELECT p, av.pdca FROM NReport p "
                 + " JOIN p.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
         /**
-         * Ermittelt Pflegeberichte eines Bewohner innerhalb eines bestimmten Zeitraums. Diesmal aber ohne
+         * Ermittelt NReport eines Bewohner innerhalb eines bestimmten Zeitraums. Diesmal aber ohne
          * die gelöschten und geänderten.
          */
         @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriodWithoutEdits", query = " "
-                + " SELECT p FROM Pflegeberichte p "
-                + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
+                + " SELECT p FROM NReport p "
+                + " WHERE p.resident = :bewohner AND p.pit >= :von AND p.pit <= :bis "
                 + " AND p.editedBy is null "
                 + " ORDER BY p.pit DESC ")
 })
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Pflegeberichte.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
-        @EntityResult(entityClass = Pflegeberichte.class), columns =
+        @SqlResultSetMapping(name = "NReport.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
+        @EntityResult(entityClass = NReport.class), columns =
         @ColumnResult(name = "num")),
-        @SqlResultSetMapping(name = "Pflegeberichte.findBVAktivitaetResultMapping", entities =
+        @SqlResultSetMapping(name = "NReport.findBVAktivitaetResultMapping", entities =
         @EntityResult(entityClass = Resident.class), columns =
         @ColumnResult(name = "mypbid")),
-        @SqlResultSetMapping(name = "Pflegeberichte.findSozialZeitenResultMapping", entities =
+        @SqlResultSetMapping(name = "NReport.findSozialZeitenResultMapping", entities =
         @EntityResult(entityClass = Resident.class), columns =
                 {@ColumnResult(name = "sdauer"), @ColumnResult(name = "peadauer")})
 })
 @NamedNativeQueries({
         /**
          * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
-         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Pflegeberichte mit einer
+         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen NReport mit einer
          * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
          * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
          * Objekt ist immer der Pflegebericht, das zweiter ist ein Long Wert, der das count Ergebnis
@@ -118,9 +118,9 @@ import java.util.Iterator;
                 + "     AND tag.PBTAGID = 1 "
                 + "     AND p.editBy IS NULL "
                 + " GROUP BY p.PBID "
-                + " ORDER BY p.PIT DESC", resultSetMapping = "Pflegeberichte.findByEinrichtungAndDatumAndAckUserResultMapping"),
+                + " ORDER BY p.PIT DESC", resultSetMapping = "NReport.findByEinrichtungAndDatumAndAckUserResultMapping"),
         /**
-         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) Pflegeberichte
+         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) NReport
          * seit dem angegebenen Datum heraus.
          */
         @NamedNativeQuery(name = "Pflegeberichte.findBVAktivitaet", query = ""
@@ -133,9 +133,9 @@ import java.util.Iterator;
                 "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
                 " ) a ON a.BWKennung = b.BWKennung " +
                 " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
-                " ORDER BY b.BWKennung, a.pit ", resultSetMapping = "Pflegeberichte.findBVAktivitaetResultMapping"),
+                " ORDER BY b.BWKennung, a.pit ", resultSetMapping = "NReport.findBVAktivitaetResultMapping"),
         /**
-         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) Pflegeberichte
+         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) NReport
          * seit dem angegebenen Datum heraus.
          */
         @NamedNativeQuery(name = "Pflegeberichte.findSozialZeiten", query = ""
@@ -156,15 +156,15 @@ import java.util.Iterator;
                 "                  WHERE pt.Kurzbezeichnung='pea' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
                 "                  GROUP BY BWKennung " +
                 " ) pea ON pea.BWKennung = b.BWKennung" +
-                " WHERE b.StatID IS NOT NULL ", resultSetMapping = "Pflegeberichte.findSozialZeitenResultMapping")
+                " WHERE b.StatID IS NOT NULL ", resultSetMapping = "NReport.findSozialZeitenResultMapping")
 })
-public class Pflegeberichte implements Serializable, VorgangElement {
+public class NReport implements Serializable, VorgangElement, Comparable<NReport> {
 
     /*
      * Native Queries
      */
 //    public static String NativeFindByEinrichtungAndDatum = " "
-//            + " SELECT p.*, ifnull(p2u.num,0) num FROM Pflegeberichte p "
+//            + " SELECT p.*, ifnull(p2u.num,0) num FROM NReport p "
 //            + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
 //            + " INNER JOIN PB2TAGS tag ON tag.PBID = p.PBID "
 //            + " INNER JOIN Stationen stat ON stat.StatID = bw.StatID "
@@ -204,16 +204,16 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
     @JoinColumn(name = "ReplacedBy", referencedColumnName = "PBID")
     @OneToOne
-    private Pflegeberichte replacedBy;
+    private NReport replacedBy;
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
     @OneToOne
-    private Pflegeberichte replacementFor;
+    private NReport replacementFor;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pflegebericht")
     private Collection<Syspb2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
@@ -228,7 +228,7 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     @JoinTable(name = "PB2TAGS", joinColumns =
     @JoinColumn(name = "PBID"), inverseJoinColumns =
     @JoinColumn(name = "PBTAGID"))
-    private Collection<PBerichtTAGS> tags;
+    private Collection<NReportTAGS> tags;
 //    @ManyToMany
 //    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
 //    @JoinColumn(name = "PBID"), inverseJoinColumns =
@@ -236,15 +236,15 @@ public class Pflegeberichte implements Serializable, VorgangElement {
 //    private Collection<Vorgaenge> vorgaenge;
 
 
-    public Pflegeberichte() {
+    public NReport() {
     }
 
-    public Pflegeberichte(Resident bewohner) {
+    public NReport(Resident resident) {
         this.pbid = 0l;
-        this.bewohner = bewohner;
+        this.resident = resident;
         this.user = OPDE.getLogin().getUser();
         this.attachedFiles = new ArrayList<Syspb2file>();
-        this.tags = new ArrayList<PBerichtTAGS>();
+        this.tags = new ArrayList<NReportTAGS>();
     }
 
     public Long getPbid() {
@@ -295,7 +295,7 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     }
 
     public String getText() {
-        SYSTools.anonymizeText(bewohner.getNachnameNieAnonym(), text);
+        SYSTools.anonymizeText(resident.getNachnameNieAnonym(), text);
         return text;
     }
 
@@ -311,12 +311,8 @@ public class Pflegeberichte implements Serializable, VorgangElement {
         this.dauer = dauer;
     }
 
-    public Resident getBewohner() {
-        return bewohner;
-    }
-
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
     public Collection<Syspb2file> getAttachedFiles() {
@@ -337,7 +333,7 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     public boolean isBesonders() {
         boolean found = false;
 
-        Iterator<PBerichtTAGS> it = tags.iterator();
+        Iterator<NReportTAGS> it = tags.iterator();
         while (!found && it.hasNext()) {
             found = it.next().isBesonders();
         }
@@ -345,7 +341,7 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     }
 
     /**
-     * Pflegeberichte, die gelöscht oder geändert wurden enthalten als <code>editBy</code> den User, der die Änderung vorgenommen hat.
+     * NReport, die gelöscht oder geändert wurden enthalten als <code>editBy</code> den User, der die Änderung vorgenommen hat.
      * Ein normaler, ungeänderter, ungelöschter Bericht gibt hier <code>null</code> zurück.
      *
      * @return User, der geändert oder gelöscht hat oder null, wenn ungeändert.
@@ -364,11 +360,11 @@ public class Pflegeberichte implements Serializable, VorgangElement {
      *
      * @return
      */
-    public Pflegeberichte getReplacedBy() {
+    public NReport getReplacedBy() {
         return replacedBy;
     }
 
-    public void setReplacedBy(Pflegeberichte replacedBy) {
+    public void setReplacedBy(NReport replacedBy) {
         this.replacedBy = replacedBy;
     }
 
@@ -390,19 +386,19 @@ public class Pflegeberichte implements Serializable, VorgangElement {
      *
      * @return
      */
-    public Pflegeberichte getReplacementFor() {
+    public NReport getReplacementFor() {
         return replacementFor;
     }
 
-    public void setReplacementFor(Pflegeberichte replacementFor) {
+    public void setReplacementFor(NReport replacementFor) {
         this.replacementFor = replacementFor;
     }
 
-    public Collection<PBerichtTAGS> getTags() {
+    public Collection<NReportTAGS> getTags() {
         return tags;
     }
 
-//    public void setTags(Collection<PBerichtTAGS> tags) {
+//    public void setTags(Collection<NReportTAGS> tags) {
 //        this.tags = tags;
 //    }
 
@@ -427,12 +423,12 @@ public class Pflegeberichte implements Serializable, VorgangElement {
 
     @Override
     public String getContentAsHTML() {
-        return PflegeberichteTools.getBerichtAsHTML(this, false);
+        return NReportTools.getBerichtAsHTML(this, false);
     }
 
     @Override
     public String getPITAsHTML() {
-        return PflegeberichteTools.getPITAsHTML(this);
+        return NReportTools.getPITAsHTML(this);
     }
 
     @Override
@@ -443,10 +439,10 @@ public class Pflegeberichte implements Serializable, VorgangElement {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Pflegeberichte)) {
+        if (!(object instanceof NReport)) {
             return false;
         }
-        Pflegeberichte other = (Pflegeberichte) object;
+        NReport other = (NReport) object;
         if ((this.pbid == null && other.pbid != null) || (this.pbid != null && !this.pbid.equals(other.pbid))) {
             return false;
         }
@@ -455,11 +451,17 @@ public class Pflegeberichte implements Serializable, VorgangElement {
 
     @Override
     public String toString() {
-        return "entity.Pflegeberichte[pbid=" + pbid + "]";
+        return "entity.NReport[pbid=" + pbid + "]";
     }
 
     @Override
     public long getPITInMillis() {
         return pit.getTime();
+    }
+
+    @Override
+    public int compareTo(NReport other) {
+        int result = this.getPit().compareTo(other.getPit());
+        return result;
     }
 }

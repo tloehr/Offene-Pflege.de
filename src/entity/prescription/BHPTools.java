@@ -17,7 +17,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -75,6 +74,22 @@ public class BHPTools {
         return num;
     }
 
+    public static Comparator<BHP> getOnDemandComparator(){
+        return new Comparator<BHP>() {
+                @Override
+                public int compare(BHP o1, BHP o2) {
+                    int result = o1.getPrescription().getSituation().getText().toUpperCase().compareTo(o2.getPrescription().getSituation().getText().toUpperCase());
+                    if (result == 0) {
+                        result = o1.getPrescription().compareTo(o2.getPrescription());
+                    }
+                    if (result == 0) {
+                        result = o1.getStatus().compareTo(o2.getStatus());
+                    }
+                    return result;
+                }
+            };
+    }
+
     public static Date getMinDatum(Resident bewohner) {
         Date date;
         EntityManager em = OPDE.createEM();
@@ -103,7 +118,7 @@ public class BHPTools {
         int numbhp = 0;
 
         DateMidnight lastbhp = new DateMidnight().minusDays(1);
-        if (OPDE.getProps().containsKey("LASTDFNIMPORT")) {
+        if (OPDE.getProps().containsKey("LASTBHPIMPORT")) {
             lastbhp = new DateMidnight(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTBHPIMPORT")));
         }
 
@@ -237,7 +252,7 @@ public class BHPTools {
 
                 row = row.add(BigDecimal.ONE);
                 SYSTools.printProgBar(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
-
+                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
 //                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
@@ -401,17 +416,7 @@ public class BHPTools {
                 listBHP.addAll(listBHP4ThisPrescription);
             }
 
-            Collections.sort(listBHP, new Comparator<BHP>() {
-                @Override
-                public int compare(BHP o1, BHP o2) {
-                    int result = o1.getPrescription().compareTo(o2.getPrescription());
-                    int result = o1.getPrescription().compareTo(o2.getPrescription());
-                    if (result == 0){
-                        result = o1.getStatus().compareTo(o2.getStatus());
-                    }
-                    return result;  //To change body of implemented methods use File | Settings | File Templates.
-                }
-            });
+            Collections.sort(listBHP, getOnDemandComparator());
         } catch (Exception se) {
             OPDE.fatal(se);
         } finally {

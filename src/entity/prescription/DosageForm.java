@@ -1,6 +1,6 @@
 package entity.prescription;
 
-import entity.planung.Intervention;
+import entity.nursingprocess.Intervention;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -7,11 +7,14 @@ package entity;
 import entity.files.Syspb2file;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.nursingprocess.DFN;
 import entity.vorgang.SYSPB2VORGANG;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -20,15 +23,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author tloehr
  */
-public class PflegeberichteTools {
+public class NReportTools {
 
     /**
      * Marks a nursing report as "deleted". It is then incative but can still be read.
@@ -36,9 +36,9 @@ public class PflegeberichteTools {
      * @param bericht
      * @return
      */
-    public static Pflegeberichte deleteBericht(EntityManager em, Pflegeberichte bericht) throws Exception {
+    public static NReport deleteBericht(EntityManager em, NReport bericht) throws Exception {
 
-        Pflegeberichte mybericht = em.merge(bericht);
+        NReport mybericht = em.merge(bericht);
         em.lock(mybericht, LockModeType.OPTIMISTIC);
 
         mybericht.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
@@ -56,13 +56,13 @@ public class PflegeberichteTools {
         return mybericht;
     }
 
-    public static Pflegeberichte getFirstBericht(Resident bewohner) {
+    public static NReport getFirstBericht(Resident bewohner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
         query.setParameter("bewohner", bewohner);
         query.setFirstResult(0);
         query.setMaxResults(1);
-        Pflegeberichte p = (Pflegeberichte) query.getSingleResult();
+        NReport p = (NReport) query.getSingleResult();
         em.close();
         return p;
     }
@@ -77,7 +77,7 @@ public class PflegeberichteTools {
      * @param newBericht siehe oben
      * @return Erfolg oder nicht
      */
-    public static void changeBericht(EntityManager em, Pflegeberichte oldBericht, Pflegeberichte newBericht) throws Exception {
+    public static void changeBericht(EntityManager em, NReport oldBericht, NReport newBericht) throws Exception {
 //        boolean success = false;
 //        EntityManager em = OPDE.createEM();
 //        em.getTransaction().begin();
@@ -130,8 +130,8 @@ public class PflegeberichteTools {
      * @param source
      * @return
      */
-    public static Pflegeberichte copyBericht(Pflegeberichte source) {
-        Pflegeberichte target = new Pflegeberichte(source.getBewohner());
+    public static NReport copyBericht(NReport source) {
+        NReport target = new NReport(source.getResident());
         target.setDauer(source.getDauer());
         target.setEditedBy(source.getEditedBy());
         target.setEditpit(source.getEditpit());
@@ -141,16 +141,16 @@ public class PflegeberichteTools {
         target.setText(source.getText());
         target.setUser(source.getUser());
 
-        Iterator<PBerichtTAGS> tags = source.getTags().iterator();
+        Iterator<NReportTAGS> tags = source.getTags().iterator();
         while (tags.hasNext()) {
-            PBerichtTAGS tag = tags.next();
+            NReportTAGS tag = tags.next();
             target.getTags().add(tag);
         }
 
         return target;
     }
 
-//    public static boolean saveBericht(Pflegeberichte newBericht) {
+//    public static boolean saveBericht(NReport newBericht) {
 //        boolean success = false;
 //        EntityManager em = OPDE.createEM();
 //        em.getTransaction().begin();
@@ -174,12 +174,12 @@ public class PflegeberichteTools {
      * @param mitBWKennung
      * @return
      */
-    public static String getBerichtAsHTML(Pflegeberichte bericht, boolean mitBWKennung) {
+    public static String getBerichtAsHTML(NReport bericht, boolean mitBWKennung) {
         String html = "";
         String text = SYSTools.replace(bericht.getText(), "\n", "<br/>");
 
         if (mitBWKennung) {
-            html += "<b>Pflegebericht für " + ResidentTools.getBWLabelText(bericht.getBewohner()) + "</b>";
+            html += "<b>Pflegebericht für " + ResidentTools.getBWLabelText(bericht.getResident()) + "</b>";
         } else {
             html += "<b>Pflegebericht</b>";
         }
@@ -187,22 +187,22 @@ public class PflegeberichteTools {
         return html;
     }
 
-    public static String getPITAsHTML(Pflegeberichte bericht) {
+    public static String getPITAsHTML(NReport bericht) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
         html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
         return html;
     }
 
-    public static String getBerichteAsHTML(List<Pflegeberichte> berichte, boolean nurBesonderes, boolean withlongheader) {
+    public static String getBerichteAsHTML(List<NReport> berichte, boolean nurBesonderes, boolean withlongheader) {
         String html = "";
         boolean ihavesomethingtoshow = false;
 
         if (!berichte.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getBWLabelText(berichte.get(0).getBewohner()) : "") + "</h2>\n";
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getBWLabelText(berichte.get(0).getResident()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
-            for (Pflegeberichte bericht : berichte) {
+            for (NReport bericht : berichte) {
                 if (!nurBesonderes || bericht.isBesonders()) {
                     ihavesomethingtoshow = true;
                     html += "<tr>";
@@ -220,7 +220,7 @@ public class PflegeberichteTools {
         return html;
     }
 
-    private static String getHTMLColor(Pflegeberichte bericht) {
+    private static String getHTMLColor(NReport bericht) {
         String color = "";
         if (bericht.isReplaced() || bericht.isDeleted()) {
             color = SYSConst.html_lightslategrey;
@@ -230,11 +230,11 @@ public class PflegeberichteTools {
         return color;
     }
 
-    public static String getTagsAsHTML(Pflegeberichte bericht) {
+    public static String getTagsAsHTML(NReport bericht) {
         String result = "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">";
-        Iterator<PBerichtTAGS> itTags = bericht.getTags().iterator();
+        Iterator<NReportTAGS> itTags = bericht.getTags().iterator();
         while (itTags.hasNext()) {
-            PBerichtTAGS tag = itTags.next();
+            NReportTAGS tag = itTags.next();
             result += (tag.isBesonders() ? "<b>" : "");
             result += tag.getKurzbezeichnung();
             result += (tag.isBesonders() ? "</b>" : "");
@@ -244,7 +244,7 @@ public class PflegeberichteTools {
         return result;
     }
 
-    public static String getDatumUndUser(Pflegeberichte bericht, boolean showIDs, boolean showMinutes) {
+    public static String getDatumUndUser(NReport bericht, boolean showIDs, boolean showMinutes) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
@@ -262,7 +262,7 @@ public class PflegeberichteTools {
      *
      * @return
      */
-    public static String getAsHTML(Pflegeberichte bericht) {
+    public static String getAsHTML(NReport bericht) {
         String result = "";
 
         String fonthead = "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">";
@@ -290,7 +290,7 @@ public class PflegeberichteTools {
         return result;
     }
 
-//    public static String getAsText(Pflegeberichte bericht) {
+//    public static String getAsText(NReport bericht) {
 //        String result = "";
 //        DateFormat df = DateFormat.getDateTimeInstance();
 //        if (bericht.isDeleted()) {
@@ -310,9 +310,9 @@ public class PflegeberichteTools {
 //        return result;
 //    }
 
-    public static String getBewohnerName(Pflegeberichte bericht) {
+    public static String getBewohnerName(NReport bericht) {
         String result = "";
-        result = bericht.getBewohner().getNachname() + ", " + bericht.getBewohner().getVorname();
+        result = bericht.getResident().getNachname() + ", " + bericht.getResident().getVorname();
         return "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">" + result + "</font>";
     }
 
@@ -336,7 +336,7 @@ public class PflegeberichteTools {
 //        String sql = " SELECT b.*, a.PBID " +
 //                " FROM Bewohner b " +
 //                " LEFT OUTER JOIN ( " +
-//                "    SELECT pb.* FROM Pflegeberichte pb " +
+//                "    SELECT pb.* FROM NReport pb " +
 //                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
 //                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
 //                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
@@ -363,7 +363,7 @@ public class PflegeberichteTools {
             BigInteger pbid = (BigInteger) paar[1];
 
             // Bei Bedarf den Pflegebericht "einsammeln"
-            Pflegeberichte bericht = pbid == null ? null : em.find(Pflegeberichte.class, pbid.longValue());
+            NReport bericht = pbid == null ? null : em.find(NReport.class, pbid.longValue());
 
             html.append("<tr>");
 
@@ -396,10 +396,10 @@ public class PflegeberichteTools {
 
 
     /**
-     * Durchsucht die Pflegeberichte nach einem oder mehreren Suchbegriffen
+     * Durchsucht die NReport nach einem oder mehreren Suchbegriffen
      */
 
-    public static String getBerichteASHTML(EntityManager em, String suche, PBerichtTAGS tag, int headertiefe, int monate) {
+    public static String getBerichteASHTML(EntityManager em, String suche, NReportTAGS tag, int headertiefe, int monate) {
         StringBuilder html = new StringBuilder(1000);
         String where = "";
         String htmlbeschreibung = "";
@@ -411,7 +411,7 @@ public class PflegeberichteTools {
             html.append("Berichtsuche nicht möglich.");
             html.append("</h" + headertiefe + ">");
         } else {
-            jpql = "SELECT p FROM Pflegeberichte p JOIN p.tags t WHERE p.pit >= :date AND t = :tag";
+            jpql = "SELECT p FROM NReport p JOIN p.tags t WHERE p.pit >= :date AND t = :tag";
 
             if (!suche.trim().isEmpty()) {
                 where = " AND p.text like :search ";
@@ -443,7 +443,7 @@ public class PflegeberichteTools {
                 }
 
                 query.setParameter("date", SYSCalendar.addField(new Date(), monate * -1, GregorianCalendar.MONTH));
-                List<Pflegeberichte> list = query.getResultList();
+                List<NReport> list = query.getResultList();
                 html.append("<h" + headertiefe + ">");
                 html.append("Suchergebnisse in den Berichten der letzten " + monate + " Monate");
                 html.append("</h" + headertiefe + ">");
@@ -453,10 +453,10 @@ public class PflegeberichteTools {
                     DateFormat df = DateFormat.getDateTimeInstance();
                     html.append("<table border=\"1\"><tr>" +
                             "<th>BewohnerIn</th><th>Datum/Uhrzeit</th><th>Text</th><th>UKennung</th></tr>");
-                    for (Pflegeberichte bericht : list) {
+                    for (NReport bericht : list) {
                         html.append("<tr>");
 
-                        html.append("<td>" + ResidentTools.getBWLabel1(bericht.getBewohner()) + "</td>");
+                        html.append("<td>" + ResidentTools.getBWLabel1(bericht.getResident()) + "</td>");
                         html.append("<td>" + df.format(bericht.getPit()) + "</td>");
                         html.append("<td>" + bericht.getText() + "</td>");
                         html.append("<td>" + bericht.getUser().getUKennung() + "</td>");
@@ -473,7 +473,6 @@ public class PflegeberichteTools {
 
         return html.toString();
     }
-
 
     public static String getSozialZeiten(EntityManager em, int headertiefe, Date monat) {
         StringBuilder html = new StringBuilder(1000);
@@ -535,6 +534,42 @@ public class PflegeberichteTools {
         }
 
         return html.toString();
+    }
+
+    /**
+     *
+     *
+     * @param resident
+     * @param startdate
+     * @param weeksback
+     * @return
+     */
+    public static ArrayList<NReport> getReports(Resident resident, Date startdate, int weeksback) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+
+        try {
+
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " WHERE nr.resident = :resident " +
+                    " AND nr.pit >= :from AND nr.pit <= :to " +
+                    " ORDER BY nr.pit ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("resident", resident);
+            query.setParameter("from", new DateMidnight(startdate).minusWeeks(weeksback).toDate());
+            query.setParameter("to", new DateMidnight(startdate).plusDays(1).toDateTime().minusSeconds(1).toDate());
+
+            list = new ArrayList<NReport>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
     }
 
 }

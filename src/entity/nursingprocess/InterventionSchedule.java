@@ -3,9 +3,8 @@
  * and open the template in the editor.
  */
 
-package entity.planung;
+package entity.nursingprocess;
 
-import op.OPDE;
 import op.tools.SYSCalendar;
 import org.joda.time.DateMidnight;
 

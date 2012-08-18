@@ -29,7 +29,7 @@ package op.care.planung;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
-import entity.planung.NursingProcess;
+import entity.nursingprocess.NursingProcess;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.Pair;

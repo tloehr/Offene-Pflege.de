@@ -34,7 +34,7 @@ import com.jidesoft.swing.JideButton;
 import entity.info.Resident;
 import entity.info.BWInfoKat;
 import entity.info.BWInfoKatTools;
-import entity.planung.*;
+import entity.nursingprocess.*;
 import entity.system.SYSPropsTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
@@ -976,7 +976,7 @@ public class PnlPlanung extends NursingRecordsPanel {
                                 // that selected template is cloned and handed over to the DlgPlanung for further editing
                                 NursingProcess template = ((NursingProcess) o).clone();
                                 template.setPlanKennung(-2); // so the next dialog knows thats a template
-                                template.setBewohner(bewohner);
+                                template.setResident(bewohner);
                                 template.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
                                 template.setAbgesetztDurch(null);
                                 template.setAngesetztDurch(OPDE.getLogin().getUser());

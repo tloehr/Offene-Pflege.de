@@ -25,8 +25,8 @@
  */
 package entity.files;
 
+import entity.NReport;
 import entity.info.Resident;
-import entity.Pflegeberichte;
 import entity.info.BWInfo;
 import entity.prescription.Prescriptions;
 import op.OPDE;
@@ -120,8 +120,8 @@ public class SYSFilesTools {
 
     public static List<SYSFiles> putFiles(File[] files, Object attachable) {
         Resident bw = null;
-        if (attachable instanceof Pflegeberichte) {
-            bw = ((Pflegeberichte) attachable).getBewohner();
+        if (attachable instanceof NReport) {
+            bw = ((NReport) attachable).getResident();
         } else if (attachable instanceof Prescriptions) {
             bw = ((Prescriptions) attachable).getResident();
         } else if (attachable instanceof BWInfo) {
@@ -142,10 +142,10 @@ public class SYSFilesTools {
                 for (File file : files) {
                     SYSFiles sysfile = putFile(em, ftp, file, bewohner);
                     if (attachable != null) {
-                        if (attachable instanceof Pflegeberichte) {
-                            Syspb2file link = em.merge(new Syspb2file(sysfile, (Pflegeberichte) attachable, OPDE.getLogin().getUser(), new Date()));
+                        if (attachable instanceof NReport) {
+                            Syspb2file link = em.merge(new Syspb2file(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getPbAssignCollection().add(link);
-                            ((Pflegeberichte) attachable).getAttachedFiles().add(link);
+                            ((NReport) attachable).getAttachedFiles().add(link);
                         } else if (attachable instanceof Prescriptions) {
                             Sysver2file link = em.merge(new Sysver2file(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getVerAssignCollection().add(link);
@@ -372,14 +372,14 @@ public class SYSFilesTools {
 //                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 //                ArrayList<SYSFiles> files = null;
 //                EntityManager em = OPDE.createEM();
-//                if (attachable instanceof Pflegeberichte) {
+//                if (attachable instanceof NReport) {
 //                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
 //                    query.setParameter("bericht", attachable);
 //                    files = new ArrayList<SYSFiles>(query.getResultList());
 //                    Collections.sort(files);
 //                } else if (attachable instanceof Verordnung) {
 //                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
-//                    query.setParameter("bewohner", ((Pflegeberichte) attachable).getResident());
+//                    query.setParameter("bewohner", ((NReport) attachable).getResident());
 //                    files = new ArrayList<SYSFiles>(query.getResultList());
 //                    Collections.sort(files);
 //                }

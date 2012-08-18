@@ -35,7 +35,7 @@ import entity.files.SYSFilesTools;
 import entity.info.BWInfoTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.care.berichte.PnlBerichte;
+import op.care.reports.PnlReport;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
@@ -183,7 +183,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         labelPanel.add(tbMedi);
         SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
 
-        tbBerichte = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlBerichte.internalClassID));
+        tbBerichte = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlReport.internalClassID));
         tbBerichte.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

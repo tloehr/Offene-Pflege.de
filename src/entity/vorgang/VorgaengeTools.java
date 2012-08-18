@@ -7,7 +7,7 @@ package entity.vorgang;
 import entity.*;
 import entity.info.BWInfo;
 import entity.info.Resident;
-import entity.planung.NursingProcess;
+import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescriptions;
 import op.OPDE;
 import op.tools.DlgException;
@@ -178,8 +178,8 @@ public class VorgaengeTools {
 //        try{
 //        Object connectionObject = null;
 //        String elementBezeichnung = "";
-//        if (element instanceof Pflegeberichte) {
-//            connectionObject = new SYSPB2VORGANG(vorgang, (Pflegeberichte) element);
+//        if (element instanceof NReport) {
+//            connectionObject = new SYSPB2VORGANG(vorgang, (NReport) element);
 //            elementBezeichnung = "Pflegebericht";
 //        } else if (element instanceof BWerte) {
 //            connectionObject = new SYSBWerte2VORGANG(vorgang, (BWerte) element);
@@ -215,7 +215,7 @@ public class VorgaengeTools {
 //        }
 //
 //        // Connection Objekt korregieren
-//        if (element instanceof Pflegeberichte) {
+//        if (element instanceof NReport) {
 //            ((SYSPB2VORGANG) connectionObject).setPdca(pdca);
 //        } else if (element instanceof BWerte) {
 //            ((SYSBWerte2VORGANG) connectionObject).setPdca(pdca);
@@ -248,7 +248,7 @@ public class VorgaengeTools {
 //        EntityManager em = OPDE.createEM();
 //        String elementBezeichnung = "";
 //        Query query = null;
-//        if (element instanceof Pflegeberichte) {
+//        if (element instanceof NReport) {
 //            query = em.createNamedQuery("SYSPB2VORGANG.findByElementAndVorgang");
 //            elementBezeichnung = "Pflegebericht";
 //        } else if (element instanceof BWerte) {
@@ -277,7 +277,7 @@ public class VorgaengeTools {
 //        while (it.hasNext()) {
 //            Object obj = it.next();
 //            short pdca = PDCA_OFF;
-//            if (element instanceof Pflegeberichte) {
+//            if (element instanceof NReport) {
 //                pdca = ((SYSPB2VORGANG) obj).getPdca();
 //            } else {
 //
@@ -399,7 +399,7 @@ public class VorgaengeTools {
 
         // 2. Alle die Vorgänge entfernen, zu denen das betreffenden Object bereits zugeordnet wurde.
         Query complement = null;
-        if (element instanceof Pflegeberichte) {
+        if (element instanceof NReport) {
             complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
             complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
@@ -445,7 +445,7 @@ public class VorgaengeTools {
         // 1. Alle aktiven Vorgänge suchen, die diesem Element zugeordnet sind.
         List<Vorgaenge> vorgaenge = new ArrayList();
         Query query = null;
-        if (element instanceof Pflegeberichte) {
+        if (element instanceof NReport) {
             query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
         } else if (element instanceof BWerte) {
             query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");

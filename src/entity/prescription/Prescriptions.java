@@ -8,7 +8,7 @@ package entity.prescription;
 import entity.*;
 import entity.files.Sysver2file;
 import entity.info.Resident;
-import entity.planung.Intervention;
+import entity.nursingprocess.Intervention;
 import entity.vorgang.SYSVER2VORGANG;
 import entity.vorgang.VorgangElement;
 import op.OPDE;

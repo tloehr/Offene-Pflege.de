@@ -26,8 +26,8 @@
  */
 package op.controlling;
 
-import entity.PBerichtTAGS;
-import entity.PflegeberichteTools;
+import entity.NReportTAGS;
+import entity.NReportTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.files.SYSFilesTools;
@@ -235,7 +235,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
 
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PBerichtTAGS) o).getBezeichnung(), i, isSelected, cellHasFocus);
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((NReportTAGS) o).getBezeichnung(), i, isSelected, cellHasFocus);
             }
         });
         SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
@@ -307,7 +307,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             lblProgress.setText("BV Aktivitäten");
             pbPart.setValue(0);
             int bvwochen = Integer.parseInt(spinBVWochen.getValue().toString());
-            html.append(PflegeberichteTools.getBVBerichte(em, 1, bvwochen));
+            html.append(NReportTools.getBVBerichte(em, 1, bvwochen));
             progress++;
             pbMain.setValue(progress);
         }
@@ -377,11 +377,11 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             if (html.length() > 0) {
                 html.append("<p style=\"page-break-before: always\"/>");
             }
-            lblProgress.setText("Pflegeberichte durchsuchen");
+            lblProgress.setText("NReport durchsuchen");
             pbPart.setValue(0);
             int berichtemonate = Integer.parseInt(spinBerichteMonate.getValue().toString());
 //            html.append(DBHandling.getBerichte(txtBerichte.getText(), (ListElement) cmbTags.getSelectedItem(), 1, berichtemonate, o));
-            html.append(PflegeberichteTools.getBerichteASHTML(em, txtBerichte.getText(), (PBerichtTAGS) cmbTags.getSelectedItem(), 1, berichtemonate));
+            html.append(NReportTools.getBerichteASHTML(em, txtBerichte.getText(), (NReportTAGS) cmbTags.getSelectedItem(), 1, berichtemonate));
             progress++;
             pbMain.setValue(progress);
         }
@@ -431,9 +431,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             int sozialmonate = Integer.parseInt(spinSozialMonate.getValue().toString());
             Query query = em.createNamedQuery("PBerichtTAGS.findByKurzbezeichnung");
             query.setParameter("kurzbezeichnung", "soz");
-            PBerichtTAGS sozTag = (PBerichtTAGS) query.getSingleResult();
+            NReportTAGS sozTag = (NReportTAGS) query.getSingleResult();
 
-            html.append(PflegeberichteTools.getBerichteASHTML(em, "", sozTag, 1, sozialmonate));
+            html.append(NReportTools.getBerichteASHTML(em, "", sozTag, 1, sozialmonate));
 //            html.append(DBHandling.getSozialBerichte("", "", 1, sozialmonate));
             progress++;
             pbMain.setValue(progress);
@@ -447,7 +447,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
             pbPart.setValue(0);
             Date monat = (Date) cmbPEAMonat.getSelectedItem();
 //            html.append(DBHandling.getSozialZeiten(1, monat));
-            html.append(PflegeberichteTools.getSozialZeiten(em, 1, monat));
+            html.append(NReportTools.getSozialZeiten(em, 1, monat));
             progress++;
             pbMain.setValue(progress);
         }

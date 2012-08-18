@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Diese Entity verbindet Pflegeberichte mit Usern. Damit kann man
+ * Diese Entity verbindet NReport mit Usern. Damit kann man
  * speichern, wer welchen Pflegebericht im Übergabeprotokoll zur Kenntnis
  * genommen hat.
  *
@@ -35,7 +35,7 @@ public class PB2User implements Serializable, Comparable<PB2User> {
     private Date pit;
     @JoinColumn(name = "PBID", referencedColumnName = "PBID")
     @ManyToOne
-    private Pflegeberichte bericht;
+    private NReport bericht;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
@@ -47,13 +47,13 @@ public class PB2User implements Serializable, Comparable<PB2User> {
         this.pkid = pkid;
     }
 
-    public PB2User(Pflegeberichte bericht, Users user) {
+    public PB2User(NReport bericht, Users user) {
         this.bericht = bericht;
         this.user = user;
         this.pit = new Date();
     }
 
-    public Pflegeberichte getBericht() {
+    public NReport getBericht() {
         return bericht;
     }
 
