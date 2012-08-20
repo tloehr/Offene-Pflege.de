@@ -3,6 +3,7 @@ package entity;
 
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.nursingprocess.DFNTools;
 import entity.vorgang.SYSBWerte2VORGANG;
 import entity.vorgang.Vorgaenge;
 import op.OPDE;
@@ -63,7 +64,7 @@ public class BWerteTools {
             if (bwert.isReplaced() || bwert.isDeleted()) {
                 color = SYSConst.html_lightslategrey;
             } else {
-                color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bwert.getPit()));
+                color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
             }
         }
         String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getNameUndVorname();
@@ -133,7 +134,7 @@ public class BWerteTools {
             if (bwert.isReplaced() || bwert.isDeleted()) {
                 color = SYSConst.html_lightslategrey;
             } else {
-                color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bwert.getPit()));
+                color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
             }
         }
 //        if (!bwert.getAttachedFiles().isEmpty()) {
@@ -178,7 +179,7 @@ public class BWerteTools {
                 if (wert.isReplaced() || wert.isDeleted()) {
                     color = SYSConst.html_lightslategrey;
                 } else {
-                    color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(wert.getPit()));
+                    color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(wert.getPit())] + "_FGBHP");
                 }
             }
             result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + OPDE.lang.getString("misc.msg.comment") + ":</b> " + wert.getBemerkung() + "</font>";

@@ -27,6 +27,7 @@
 package op.tools;
 
 import op.OPDE;
+import org.apache.commons.collections.bag.SynchronizedSortedBag;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,6 +109,9 @@ public class SYSConst {
     public static Color grey80 = new Color(0xc7, 0xc7, 0xc5);
     public static Color grey50 = new Color(0x74, 0x71, 0x70);
 
+    public static Color colorWeekday = SYSTools.getColor("FFE6D0");
+    public static Color colorWeekend = SYSTools.getColor("FFC895");
+    public static Color colorHolliday = SYSTools.getColor("FF800D");
 
     //Gray50  	747170
     public static char eurosymbol = '\u20AC';
@@ -292,8 +296,11 @@ public class SYSConst {
     public static final Icon icon22infogreen = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infogreen.png"));
     public static final Icon icon22infored = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infored.png"));
     public static final Icon icon22infoyellow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoyellow.png"));
+    public static final Icon icon22undo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/undo.png"));
     public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
     public static final Icon icon22redoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo_pressed.png"));
+    public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
+    public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));
     public static final Icon icon22stop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22stopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
     public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
@@ -305,5 +312,6 @@ public class SYSConst {
     public static final Icon icon48delete = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/editdelete.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon22apply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply.png"));
-
+    public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));
+    public static final Icon icon22down = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1downarrow.png"));
 }

@@ -149,7 +149,7 @@ public class EntityTools {
     }
 
     public static String getMySQLsearchPattern(String pattern) {
-        pattern = pattern.replaceAll("%", "");
+        pattern = pattern.trim().replaceAll("%", "");
         pattern = "%" + pattern + "%";
         return pattern;
     }

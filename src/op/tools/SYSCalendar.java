@@ -27,18 +27,15 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
-import entity.EntityTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import op.OPDE;
-import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import tablemodels.TMPflegeberichte;
 
 import javax.swing.*;
 import java.awt.*;
@@ -689,7 +686,8 @@ public class SYSCalendar {
         return ermittleSchicht(date.getTime());
     }
 
-    public static String getHTMLColor4Schicht(int schicht) {
+    public static String getHTMLColor4Schicht(Byte schicht) {
+
         String color = "";
         switch (schicht) {
             case SYSConst.ZEIT_FRUEH: {
@@ -1540,5 +1538,19 @@ public class SYSCalendar {
             return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
         }
         return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
+    }
+
+    public static Color getFG(Byte shift) {
+        if (shift == -1) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
+    }
+
+    public static Color getBG(Byte shift) {
+        if (shift == -1) {
+            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+        }
+        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
     }
 }

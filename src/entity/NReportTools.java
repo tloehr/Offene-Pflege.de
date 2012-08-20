@@ -8,6 +8,7 @@ import entity.files.Syspb2file;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFN;
+import entity.nursingprocess.DFNTools;
 import entity.vorgang.SYSPB2VORGANG;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -56,7 +57,7 @@ public class NReportTools {
         return mybericht;
     }
 
-    public static NReport getFirstBericht(Resident bewohner) {
+    public static NReport getFirstReport(Resident bewohner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
         query.setParameter("bewohner", bewohner);
@@ -170,16 +171,16 @@ public class NReportTools {
     /**
      * Berichtdarstellung für die Vorgänge.
      *
-     * @param bericht
-     * @param mitBWKennung
+     * @param nReport
+     * @param withResident
      * @return
      */
-    public static String getBerichtAsHTML(NReport bericht, boolean mitBWKennung) {
+    public static String getNReportAsHTML(NReport nReport, boolean withResident) {
         String html = "";
-        String text = SYSTools.replace(bericht.getText(), "\n", "<br/>");
+        String text = SYSTools.replace(nReport.getText(), "\n", "<br/>");
 
-        if (mitBWKennung) {
-            html += "<b>Pflegebericht für " + ResidentTools.getBWLabelText(bericht.getResident()) + "</b>";
+        if (withResident) {
+            html += "<b>Pflegebericht für " + ResidentTools.getBWLabelText(nReport.getResident()) + "</b>";
         } else {
             html += "<b>Pflegebericht</b>";
         }
@@ -187,10 +188,10 @@ public class NReportTools {
         return html;
     }
 
-    public static String getPITAsHTML(NReport bericht) {
+    public static String getPITAsHTML(NReport nReport) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
-        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
+        html += df.format(nReport.getPit()) + "; " + nReport.getUser().getNameUndVorname();
         return html;
     }
 
@@ -220,18 +221,18 @@ public class NReportTools {
         return html;
     }
 
-    private static String getHTMLColor(NReport bericht) {
+    private static String getHTMLColor(NReport nReport) {
         String color = "";
-        if (bericht.isReplaced() || bericht.isDeleted()) {
+        if (nReport.isReplaced() || nReport.isDeleted()) {
             color = SYSConst.html_lightslategrey;
         } else {
-            color = SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bericht.getPit().getTime()));
+            color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP");
         }
         return color;
     }
 
     public static String getTagsAsHTML(NReport bericht) {
-        String result = "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">";
+        String result = "";
         Iterator<NReportTAGS> itTags = bericht.getTags().iterator();
         while (itTags.hasNext()) {
             NReportTAGS tag = itTags.next();
@@ -240,7 +241,7 @@ public class NReportTools {
             result += (tag.isBesonders() ? "</b>" : "");
             result += (itTags.hasNext() ? " " : "");
         }
-        result += "</font></div>";
+        result += "";
         return result;
     }
 
@@ -254,7 +255,7 @@ public class NReportTools {
         if (showIDs) {
             result += "<br/><i>(" + bericht.getPbid() + ")</i>";
         }
-        return "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">" + result + "</font></div>";
+        return result;
     }
 
     /**
@@ -262,53 +263,43 @@ public class NReportTools {
      *
      * @return
      */
-    public static String getAsHTML(NReport bericht) {
+    public static String getAsHTML(NReport nReport) {
         String result = "";
 
-        String fonthead = "<div id=\"fonttext\"><font " + getHTMLColor(bericht) + ">";
+//        String fonthead = "<div id=\"fonttext\"><font #" + OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP") + ">";
+
+        result += getDatumUndUser(nReport, false, true);
+
+        result += SYSTools.catchNull(getTagsAsHTML(nReport)," [","]") + " ";
 
         DateFormat df = DateFormat.getDateTimeInstance();
-        //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
-        if (bericht.isDeleted()) {
-            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bericht.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bericht.getEditedBy().getNameUndVorname() + "</i><br/>";
+
+        if (nReport.isDeleted()) {
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getNameUndVorname() + "</i><br/>";
         }
-        if (bericht.isReplacement() && !bericht.isReplaced()) {
-            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bericht.getReplacementFor().getEditpit()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + bericht.getReplacementFor().getPbid() + "</i><br/>";
+        if (nReport.isReplacement() && !nReport.isReplaced()) {
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditpit()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "</i><br/>";
         }
-        if (bericht.isReplaced()) {
-            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bericht.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bericht.getEditedBy().getNameUndVorname();
-            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + bericht.getReplacedBy().getPbid() + "</i><br/>";
+        if (nReport.isReplaced()) {
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getNameUndVorname();
+            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "</i><br/>";
         }
-        if (!bericht.getAttachedFiles().isEmpty()) {
-            result += "<font color=\"green\">&#9679;</font>";
-        }
-        if (!bericht.getAttachedVorgaenge().isEmpty()) {
-            result += "<font color=\"red\">&#9679;</font>";
-        }
-        result += SYSTools.replace(bericht.getText(), "\n", "<br/>");
-        result = fonthead + result + "</font></div>";
+//        if (!nReport.getAttachedFiles().isEmpty()) {
+//            result += "<font color=\"green\">&#9679;</font>";
+//        }
+//        if (!nReport.getAttachedVorgaenge().isEmpty()) {
+//            result += "<font color=\"red\">&#9679;</font>";
+//        }
+
+        result += "<p>["+nReport.getPbid()+"] "+SYSTools.replace(nReport.getText(), "\n", "<br/>") +"<p/>";
+
+
+
+
         return result;
     }
 
-//    public static String getAsText(NReport bericht) {
-//        String result = "";
-//        DateFormat df = DateFormat.getDateTimeInstance();
-//        if (bericht.isDeleted()) {
-//            result += "Gelöschter Eintrag. Gelöscht am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
-//            result += "\n=========================\n\n";
-//        }
-//        if (bericht.isReplacement()) {
-//            result += "Dies ist ein Eintrag, der nachbearbeitet wurde.\nAm/um: " + df.format(bericht.getReplacementFor().getEditpit()) + "\nDer Originaleintrag hatte die Bericht-Nummer: " + bericht.getReplacementFor().getPbid();
-//            result += "\n=========================\n\n";
-//        }
-//        if (bericht.isReplaced()) {
-//            result += "Dies ist ein Eintrag, der durch eine Nachbearbeitung ungültig wurde. Bitte ignorieren.\nÄnderung wurde am/um: " + df.format(bericht.getEditpit()) + " von " + bericht.getEditedBy().getNameUndVorname();
-//            result += "\nDer Korrektureintrag hat die Bericht-Nummer: " + bericht.getReplacedBy().getPbid();
-//            result += "\n=========================\n\n";
-//        }
-//        result += bericht.getText();
-//        return result;
-//    }
+
 
     public static String getBewohnerName(NReport bericht) {
         String result = "";
@@ -398,7 +389,6 @@ public class NReportTools {
     /**
      * Durchsucht die NReport nach einem oder mehreren Suchbegriffen
      */
-
     public static String getBerichteASHTML(EntityManager em, String suche, NReportTAGS tag, int headertiefe, int monate) {
         StringBuilder html = new StringBuilder(1000);
         String where = "";
@@ -561,6 +551,69 @@ public class NReportTools {
             query.setParameter("resident", resident);
             query.setParameter("from", new DateMidnight(startdate).minusWeeks(weeksback).toDate());
             query.setParameter("to", new DateMidnight(startdate).plusDays(1).toDateTime().minusSeconds(1).toDate());
+
+            list = new ArrayList<NReport>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    /**
+     *
+     * @param resident
+     * @param search
+     * @return
+     */
+    public static ArrayList<NReport> getReports(Resident resident, String search) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+
+        try {
+
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " WHERE nr.resident = :resident " +
+                    " AND nr.text like :search " +
+                    " ORDER BY nr.pit ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("resident", resident);
+            query.setParameter("search",EntityTools.getMySQLsearchPattern(search));
+
+            list = new ArrayList<NReport>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    /**
+     *
+     * @param resident
+     * @return
+     */
+    public static ArrayList<NReport> getReportsWithFilesOnly(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+
+        try {
+
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " JOIN nr.attachedFiles nraf " +
+                    " WHERE nr.resident = :resident " +
+                    " ORDER BY nr.pit ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
 
             list = new ArrayList<NReport>(query.getResultList());
 

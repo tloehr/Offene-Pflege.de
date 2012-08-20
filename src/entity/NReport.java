@@ -380,6 +380,10 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
         return editedBy != null && replacedBy == null && replacementFor == null;
     }
 
+    public boolean isObsolete() {
+        return isDeleted() || isReplaced();
+    }
+
     /**
      * Ein "Ersatzbericht", "weiss" wer er mal war, indem er in <code>replacementFor</code> auf den alten,
      * ersetzten Bericht zeigt. Normale Berichte geben hier <code>null</code> zurück.
@@ -423,7 +427,7 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
 
     @Override
     public String getContentAsHTML() {
-        return NReportTools.getBerichtAsHTML(this, false);
+        return NReportTools.getNReportAsHTML(this, false);
     }
 
     @Override

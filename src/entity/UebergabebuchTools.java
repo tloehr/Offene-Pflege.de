@@ -4,6 +4,8 @@
  */
 package entity;
 
+import entity.nursingprocess.DFNTools;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
@@ -26,7 +28,7 @@ public class UebergabebuchTools {
     }
 
     private static String getHTMLColor(Uebergabebuch bericht) {
-        return SYSCalendar.getHTMLColor4Schicht(SYSCalendar.ermittleSchicht(bericht.getPit().getTime()));
+        return OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bericht.getPit())] + "_FGBHP");
     }
 
     /**

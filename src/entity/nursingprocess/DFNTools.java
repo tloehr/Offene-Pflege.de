@@ -5,7 +5,10 @@ import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.dfn.PnlDFN;
-import op.tools.*;
+import op.tools.GUITools;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
@@ -103,7 +106,7 @@ public class DFNTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.important(em, "[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
+            OPDE.info("[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
 
             select.setParameter("von", targetdate.toDate());
             select.setParameter("bis", targetdate.plusDays(1).toDateTime().minusMinutes(1).toDate());
@@ -127,11 +130,9 @@ public class DFNTools {
             // Das erfolgt unabhängig von dem eingegebenen Stichtag.
             // Nur bei uneingeschränkten Imports.
             int affectedOldDFNs = forceQuery.executeUpdate();
-            OPDE.debug("Notwendige Massnahmen werden übertragen...");
 
-
-            OPDE.important(em, "[DFNImport] Durchgeführt. Stichtag: " + DateFormat.getDateInstance().format(targetdate.toDate()) + " Anzaghl erzeugter DFNs: " + numdfn);
-            OPDE.important(em, affectedOldDFNs + " notwendige Massnahmen wurden übertragen.");
+            OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString(internalClassID + ".numCreatedEntities") + ": " + numdfn);
+            OPDE.important(em, affectedOldDFNs + " " + OPDE.lang.getString(internalClassID + ".floatingMoved"));
         }
 
         SYSPropsTools.storeProp(em, "LASTDFNIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -165,7 +166,7 @@ public class DFNTools {
      * @return die Anzahl der erzeugten BHPs.
      */
     public static int generate(EntityManager em, List<InterventionSchedule> list, DateMidnight targetdate, boolean wholeday) {
-//        GregorianCalendar gcStichtag = SYSCalendar.toGC(stichtag);
+        String internalClassID = "nursingrecords.dfnimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numdfn = 0;
 
@@ -174,9 +175,14 @@ public class DFNTools {
 
         BigDecimal row = BigDecimal.ZERO;
 
-//        OPDE.debug("MaxRows: " + maxrows);
+        System.out.println("------------------------------------------");
+        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate())));
+        System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 
         for (InterventionSchedule termin : list) {
+
+            row = row.add(BigDecimal.ONE);
+            SYSTools.printProgBar(row.divide(maxrows, 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
 
             termin = em.merge(termin);
             em.lock(termin, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -185,11 +191,8 @@ public class DFNTools {
 
             if (!SYSCalendar.isInFuture(termin.getLDatum()) && (termin.isTaeglich() || termin.isPassenderWochentag(targetdate.toDate()) || termin.isPassenderTagImMonat(targetdate.toDate()))) {
 
-                row = row.add(BigDecimal.ONE);
-                int progress = row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue();
-                SYSTools.printProgBar(progress);
 
-                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
+//                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
 
 //                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
@@ -315,7 +318,9 @@ public class DFNTools {
 //                OPDE.debug("Folgender MassTermin wurde nicht angenommen: " + termin);
             }
         }
-//        OPDE.debug("Erzeugte DFNs: " + numdfn);
+
+        System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numdfn);
+        System.out.println("------------------------------------------");
         return numdfn;
     }
 

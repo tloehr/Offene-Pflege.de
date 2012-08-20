@@ -30,6 +30,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
@@ -39,9 +41,11 @@ import entity.NReportTAGSTools;
 import entity.NReportTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.nursingprocess.DFNTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -49,6 +53,7 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.format.DateTimeFormat;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -61,11 +66,9 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author root
@@ -73,7 +76,7 @@ import java.util.HashMap;
 public class PnlReport extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.reports";
-
+    private int MAX_TEXT_LENGTH = 80;
     /**
      * Dies ist immer der zur Zeit ausgewählte Bericht. null, wenn nichts ausgewählt ist. Wenn mehr als ein
      * Bericht ausgewählt wurde, steht hier immer der Verweis auf den ERSTEN Bericht der Auswahl.
@@ -87,7 +90,7 @@ public class PnlReport extends NursingRecordsPanel {
     private JComboBox cmbAuswahl;
 
     private HashMap<DateMidnight, ArrayList<NReport>> dayMap;
-    private HashMap<DateMidnight, CollapsiblePane> dayCPMap;
+    //    private HashMap<DateMidnight, CollapsiblePane> dayCPMap;
     private HashMap<NReport, CollapsiblePane> reportMap;
 
     private Resident resident;
@@ -96,18 +99,8 @@ public class PnlReport extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
+    private NReport firstReport;
 
-    /**
-     * Dieser Actionlistener wird gebraucht, damit die einzelnen Menüpunkte des Kontextmenüs, nachdem sie
-     * aufgerufen wurden, einen reloadTable() auslösen können.
-     */
-    private ActionListener standardActionListener;
-
-
-    /**
-     * Diese Liste enhtält die Menge der Tags, die im Suchfenster gesetzt wurden.
-     */
-    private ArrayList<NReportTAGS> tagFilter;
 
     /**
      * Creates new form PnlReport
@@ -116,13 +109,7 @@ public class PnlReport extends NursingRecordsPanel {
         this.initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
-//        standardActionListener = new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                reloadTable();
-//            }
-//        };
 
-        tagFilter = new ArrayList<NReportTAGS>();
         prepareSearchArea();
 
         initPanel();
@@ -134,8 +121,9 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     private void initPanel() {
+
         dayMap = new HashMap<DateMidnight, ArrayList<NReport>>();
-        dayCPMap = new HashMap<DateMidnight, CollapsiblePane>();
+//        dayCPMap = new HashMap<DateMidnight, CollapsiblePane>();
         reportMap = new HashMap<NReport, CollapsiblePane>();
         prepareSearchArea();
     }
@@ -151,8 +139,11 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void reload() {
-        reloadDisplay();
-
+        if (tbFilesOnly.isSelected()) {
+            reloadDisplay(NReportTools.getReportsWithFilesOnly(resident));
+        } else {
+            reloadDisplay(NReportTools.getReports(resident, jdcVon.getDate(), WEEKS_BACK));
+        }
     }
 
     /**
@@ -195,7 +186,10 @@ public class PnlReport extends NursingRecordsPanel {
         this.resident = bewohner;
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
         txtSearch.setText(null);
-        reloadDisplay();
+        firstReport = NReportTools.getFirstReport(resident);
+        jdcVon.setMaxSelectableDate(new Date());
+        jdcVon.setMinSelectableDate(firstReport.getPit());
+        reload();
     }
 
 //    private void printBericht(int[] sel) {
@@ -521,11 +515,14 @@ public class PnlReport extends NursingRecordsPanel {
         labelPanel.setLayout(new VerticalLayout(5));
 
         txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setFont(SYSConst.ARIAL14);
         txtSearch.setInstantSearchDelay(750);
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reloadDisplay();
+                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
+                    reloadDisplay(NReportTools.getReports(resident, txtSearch.getText()));
+                }
             }
         });
 
@@ -534,6 +531,7 @@ public class PnlReport extends NursingRecordsPanel {
 
         jdcVon = new JDateChooser(new Date());
         jdcVon.setBackground(Color.WHITE);
+        jdcVon.setFont(SYSConst.ARIAL14);
         jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -543,7 +541,7 @@ public class PnlReport extends NursingRecordsPanel {
                 if (!evt.getPropertyName().equals("date")) {
                     return;
                 }
-                reloadDisplay();
+                reloadDisplay(NReportTools.getReports(resident, jdcVon.getDate(), WEEKS_BACK));
             }
         });
         labelPanel.add(jdcVon);
@@ -553,61 +551,6 @@ public class PnlReport extends NursingRecordsPanel {
         buttonPanel.setLayout(new HorizontalLayout(5));
         buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
-        homeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                NReport first = NReportTools.getFirstBericht(resident);
-                jdcVon.setDate(first == null ? SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.WEEK_OF_MONTH) : first.getPit());
-            }
-        });
-        homeButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start_pressed.png")));
-        homeButton.setBorder(null);
-        homeButton.setBorderPainted(false);
-        homeButton.setOpaque(false);
-        homeButton.setContentAreaFilled(false);
-        homeButton.setToolTipText(OPDE.lang.getString("misc.nav.home"));
-        homeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        JButton twoweeksButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/2weeksback.png")));
-        twoweeksButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                jdcVon.setDate(SYSCalendar.addField(new Date(), -2, GregorianCalendar.WEEK_OF_MONTH));
-            }
-        });
-        twoweeksButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/2weeksback-pressed.png")));
-        twoweeksButton.setBorder(null);
-        twoweeksButton.setBorderPainted(false);
-        twoweeksButton.setOpaque(false);
-        twoweeksButton.setContentAreaFilled(false);
-        twoweeksButton.setToolTipText(OPDE.lang.getString("misc.nav.2weeksback"));
-        twoweeksButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-
-        JButton fourweeksButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/4weeksback.png")));
-        fourweeksButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                jdcVon.setDate(SYSCalendar.addDate(jdcVon.getDate(), 1));
-            }
-        });
-        fourweeksButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/4weeksback-pressed.png")));
-        fourweeksButton.setBorder(null);
-        fourweeksButton.setBorderPainted(false);
-        fourweeksButton.setOpaque(false);
-        fourweeksButton.setContentAreaFilled(false);
-        fourweeksButton.setToolTipText(OPDE.lang.getString("misc.nav.4weeksback"));
-        fourweeksButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-
-        buttonPanel.add(homeButton);
-        buttonPanel.add(twoweeksButton);
-        buttonPanel.add(fourweeksButton);
-
-
-        labelPanel.add(buttonPanel);
-
         EntityManager em = OPDE.createEM();
         MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
         Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
@@ -616,29 +559,31 @@ public class PnlReport extends NursingRecordsPanel {
 
         dcbm.insertElementAt(OPDE.lang.getString("misc.commands.noselection"), 0);
         cmbAuswahl = new JComboBox(dcbm);
+        cmbAuswahl.setFont(SYSConst.ARIAL14);
         cmbAuswahl.setRenderer(NReportTAGSTools.getPBerichtTAGSRenderer());
+        cmbAuswahl.setSelectedIndex(0);
         cmbAuswahl.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-                SYSPropsTools.storeState(internalClassID + ":cmbAuswahl", cmbAuswahl);
-                reloadDisplay();
+//                SYSPropsTools.storeState(internalClassID + ":cmbAuswahl", cmbAuswahl);
+                buildPanel();
             }
         });
         labelPanel.add(cmbAuswahl);
-        SYSPropsTools.restoreState(internalClassID + ":cmbAuswahl", cmbAuswahl);
+//        SYSPropsTools.restoreState(internalClassID + ":cmbAuswahl", cmbAuswahl);
 
         tbFilesOnly = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.filesonly"));
         tbFilesOnly.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbFilesOnly", tbFilesOnly);
-                reloadDisplay();
+//                SYSPropsTools.storeState(internalClassID + ":tbFilesOnly", tbFilesOnly);
+                reload();
             }
         });
         labelPanel.add(tbFilesOnly);
-        SYSPropsTools.restoreState(internalClassID + ":tbFilesOnly", tbFilesOnly);
+//        SYSPropsTools.restoreState(internalClassID + ":tbFilesOnly", tbFilesOnly);
         tbFilesOnly.setHorizontalAlignment(SwingConstants.LEFT);
 
         tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showreplaced"));
@@ -646,27 +591,30 @@ public class PnlReport extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbShowReplaced", tbShowReplaced);
-                reloadDisplay();
+//                SYSPropsTools.storeState(internalClassID + ":tbShowReplaced", tbShowReplaced);
+                buildPanel();
             }
         });
         labelPanel.add(tbShowReplaced);
-        SYSPropsTools.restoreState(internalClassID + ":tbShowReplaced", tbShowReplaced);
+//        SYSPropsTools.restoreState(internalClassID + ":tbShowReplaced", tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
-        tbShowIDs = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showpks"));
-        tbShowIDs.addItemListener(new ItemListener() {
+
+        JideButton resetButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbShowIDs", tbShowIDs);
-                reloadDisplay();
+            public void actionPerformed(ActionEvent actionEvent) {
+                initPhase = true;
+                jdcVon.setDate(new Date());
+                cmbAuswahl.setSelectedIndex(0);
+                tbFilesOnly.setSelected(false);
+                tbShowReplaced.setSelected(false);
+                txtSearch.setText(null);
+                initPhase = false;
+                reload();
             }
         });
-        tbShowIDs.setHorizontalAlignment(SwingConstants.LEFT);
+        labelPanel.add(resetButton);
 
-        labelPanel.add(tbShowIDs);
-        SYSPropsTools.restoreState(internalClassID + ":tbShowIDs", tbShowIDs);
 
         CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
@@ -706,14 +654,22 @@ public class PnlReport extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgReport(resident, new Closure() {
                         @Override
-                        public void execute(Object bericht) {
-                            if (bericht != null) {
+                        public void execute(Object report) {
+                            if (report != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    em.merge(bericht);
+                                    NReport myReport = (NReport) em.merge(report);
                                     em.getTransaction().commit();
+                                    DateMidnight dm = new DateMidnight(myReport.getPit());
+                                    if (!dayMap.containsKey(dm)){
+                                        dayMap.put(dm, new ArrayList<NReport>());
+                                    }
+                                    dayMap.get(dm).add(myReport);
+                                    Collections.sort(dayMap.get(dm));
+                                    reportMap.put(myReport, createCP4(myReport));
+                                    buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -731,7 +687,6 @@ public class PnlReport extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
-                                reloadDisplay();
                             }
                         }
                     });
@@ -816,7 +771,7 @@ public class PnlReport extends NursingRecordsPanel {
 //
 //    }
 
-    private void reloadDisplay() {
+    private void reloadDisplay(ArrayList<NReport> reportList) {
         /***
          *               _                 _ ____  _           _
          *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
@@ -827,6 +782,7 @@ public class PnlReport extends NursingRecordsPanel {
          */
         initPhase = true;
         dayMap.clear();
+        reportMap.clear();
 
 
         final boolean withworker = false;
@@ -875,103 +831,242 @@ public class PnlReport extends NursingRecordsPanel {
 
         } else {
 
-            // insert the reports into the appropriate sublists
-            for (NReport report : NReportTools.getReports(resident, jdcVon.getDate(), WEEKS_BACK)) {
+            // insert the reports into the appropriate sublists and create the CPs
+            for (NReport report : reportList) {
                 DateMidnight dateMidnight = new DateMidnight(report.getPit());
                 if (!dayMap.containsKey(dateMidnight)) {
                     dayMap.put(dateMidnight, new ArrayList<NReport>());
                 }
                 dayMap.get(dateMidnight).add(report);
+                reportMap.put(report, createCP4(report));
             }
 
-            // now create a create a CP for every single day. Even the empty ones.
-            DateMidnight start = new DateMidnight(jdcVon.getDate());
-            DateMidnight end = new DateMidnight(start.minusWeeks(WEEKS_BACK));
-            for (DateMidnight date = start; date.isAfter(end); date = date.minusDays(1)) {
-                dayCPMap.put(date, createCP4(date));
-//                shiftMAPpane.put(shift, createCP4(shift));
-//                try {
-//                    shiftMAPpane.get(shift).setCollapsed(shift == DFNTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
-//                } catch (PropertyVetoException e) {
-//                    OPDE.debug(e);
-//                }
-            }
-
-            buildPanel(true);
+            buildPanel();
         }
         initPhase = false;
     }
 
 
-    private CollapsiblePane createCP4(DateMidnight dateMidnight) {
+    private CollapsiblePane createCP4(final NReport report) {
+        String title = "[" + DateFormat.getTimeInstance(DateFormat.SHORT).format(report.getPit()) + "] " + SYSTools.left(report.getText(), MAX_TEXT_LENGTH) + SYSTools.catchNull(NReportTools.getTagsAsHTML(report), " [", "]");
+        title = (report.isObsolete() ? "<s>" : "") + title + (report.isObsolete() ? "</s>" : "");
+        final CollapsiblePane cp = new CollapsiblePane();
+
         /***
-         *                          _        ____ ____  _  _
-         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |
-         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_
-         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _|
-         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
+         *      _   _ _____    _    ____  _____ ____
+         *     | | | | ____|  / \  |  _ \| ____|  _ \
+         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
+         *     |  _  | |___ / ___ \| |_| | |___|  _ <
+         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
          *
          */
-        SimpleDateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy");
-        String title = df.format(dateMidnight.toDate());
 
-        final CollapsiblePane dayPane = new CollapsiblePane(title);
-        dayPane.setSlidingDirection(SwingConstants.SOUTH);
+        JPanel titlePanelleft = new JPanel();
+        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
-        if (dateMidnight.getDayOfWeek() == DateTimeConstants.SATURDAY || dateMidnight.getDayOfWeek() == DateTimeConstants.SUNDAY) {
-            dayPane.setBackground(Color.pink);
-        } else {
-            dayPane.setBackground(Color.LIGHT_GRAY);
-        }
-//        npPane.setForeground(SYSCalendar.getFGSHIFT(DFNTools.SHIFT_ON_DEMAND));
-        dayPane.setOpaque(false);
 
-        JPanel dayPanel = new JPanel();
-        dayPanel.setLayout(new VerticalLayout());
+        /***
+         *      _     _       _    _           _   _                _   _                _
+         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
+         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
+         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
+        JideButton btnReport = GUITools.createHyperlinkButton(SYSTools.toHTMLForScreen(title), null, null);
+        btnReport.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnReport.setBackground(SYSCalendar.getBG(SYSCalendar.whatShiftIs(report.getPit())));
+        btnReport.setForeground(report.isObsolete() ? Color.gray : Color.black);
 
-        if (dayMap.containsKey(dateMidnight)) {
-            for (NReport report : dayMap.get(dateMidnight)) {
-                OPDE.debug(report.getPbid());
-                reportMap.put(report, createCP4(report));
-                dayPanel.add(reportMap.get(report));
-            }
-        }
+        titlePanelleft.add(btnReport);
 
-        dayPane.setContentPane(dayPanel);
-        dayPane.setCollapsible(false);
+        JPanel titlePanelright = new JPanel();
+        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
-        return dayPane;
-    }
+        titlePanelleft.setOpaque(false);
+        titlePanelright.setOpaque(false);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setOpaque(false);
 
-    private CollapsiblePane createCP4(NReport report) {
-        CollapsiblePane cp = new CollapsiblePane(SYSTools.left(report.getText(), 80));
-        cp.setBackground(SYSCalendar.getBGSHIFT(SYSCalendar.whatShiftIs(report.getPit())).brighter());
+        titlePanel.setLayout(new GridBagLayout());
+        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+
+        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 5), 0, 0));
+
+        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+        cp.setTitleLabelComponent(titlePanel);
+        cp.setSlidingDirection(SwingConstants.SOUTH);
+
         try {
             cp.setCollapsed(true);
         } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
+
+
+        /***
+         *       ___ ___  _  _ _____ ___ _  _ _____
+         *      / __/ _ \| \| |_   _| __| \| |_   _|
+         *     | (_| (_) | .` | | | | _|| .` | | |
+         *      \___\___/|_|\_| |_| |___|_|\_| |_|
+         *
+         */
+
+        cp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                JTextPane contentPane = new JTextPane();
+                contentPane.setContentType("text/html");
+                contentPane.setEditable(false);
+                contentPane.setText(SYSTools.toHTMLForScreen(NReportTools.getAsHTML(report)));
+                cp.setContentPane(contentPane);
+            }
+        });
+        cp.setHorizontalAlignment(SwingConstants.LEADING);
+        cp.setOpaque(false);
+
         return cp;
     }
 
-    private void buildPanel(boolean resetCollapseState) {
+    private void buildPanel() {
+        OPDE.debug(cpReports.getComponentCount());
         cpReports.removeAll();
+
+        JButton older = new JButton(OPDE.lang.getString("misc.msg.olderEntries"), SYSConst.icon22down);
+        older.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (reportMap.containsKey(firstReport)) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noOlderEntries")));
+                    return;
+                }
+                DateMidnight dm = new DateMidnight(jdcVon.getDate());
+                jdcVon.setDate(dm.minusWeeks(WEEKS_BACK).minusDays(1).toDate());
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        jspReports.getVerticalScrollBar().setValue(0);
+                    }
+                });
+            }
+        });
+        JButton newer = new JButton(OPDE.lang.getString("misc.msg.newerEntries"), SYSConst.icon22up);
+        newer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (new DateMidnight(jdcVon.getDate()).plusWeeks(WEEKS_BACK).isAfterNow()) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noNewerEntries")));
+                    return;
+                }
+                DateMidnight dm = new DateMidnight(jdcVon.getDate());
+                jdcVon.setDate(dm.plusWeeks(WEEKS_BACK).plusDays(1).toDate());
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        jspReports.getVerticalScrollBar().setValue(jspReports.getVerticalScrollBar().getMaximum());
+                    }
+                });
+            }
+        });
+
         cpReports.setLayout(new JideBoxLayout(cpReports, JideBoxLayout.Y_AXIS));
 
-        DateMidnight start = new DateMidnight(jdcVon.getDate());
-        DateMidnight end = new DateMidnight(start.minusWeeks(WEEKS_BACK));
-        for (DateMidnight date = start; date.isAfter(end); date = date.minusDays(1)) {
+        cpReports.add(newer);
+        NReportTAGS tag = cmbAuswahl.getSelectedIndex() == 0 ? null : (NReportTAGS) cmbAuswahl.getSelectedItem();
 
-            cpReports.add(dayCPMap.get(date));
-            if (resetCollapseState) {
-//                try {
-//                    shiftMAPpane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
-//                } catch (PropertyVetoException e) {
-//                    OPDE.debug(e);
-//                }
+        boolean empty = true;
+
+        if (!dayMap.isEmpty()) {
+
+            ArrayList<DateMidnight> dateList = new ArrayList(dayMap.keySet());
+            Collections.sort(dateList, new Comparator<DateMidnight>() {
+                @Override
+                public int compare(DateMidnight o1, DateMidnight o2) {
+                    return o1.compareTo(o2) * -1;
+                }
+            });
+
+            int year = dateList.get(0).getYear();
+            int currentYear = year;
+            HashMap hollidays = SYSCalendar.getFeiertage(year);
+
+            for (DateMidnight date : dateList) {
+
+                if (date.getYear() != currentYear) {
+                    currentYear = date.getYear();
+                    hollidays = SYSCalendar.getFeiertage(currentYear);
+                }
+
+
+                JPanel dayPanel = new JPanel();
+                dayPanel.setLayout(new VerticalLayout());
+
+                for (NReport report : dayMap.get(date)) {
+
+                    NReport report2add = report;
+
+                    if (tag != null && !report.getTags().contains(tag)) {
+                        report2add = null;
+                    }
+
+                    if (report.isObsolete() && !tbShowReplaced.isSelected()) {
+                        report2add = null;
+                    }
+
+                    if (report2add != null) {
+                        dayPanel.add(reportMap.get(report2add));
+                    }
+
+                }
+
+                if (dayPanel.getComponentCount() > 0) {
+                    // create header panel for that day
+                    SimpleDateFormat df = new SimpleDateFormat("EEEE, dd.MM.yyyy");
+
+                    String holliday = SYSTools.catchNull(hollidays.get(DateTimeFormat.forPattern("yyyy-MM-dd").print(date)));
+                    String title = df.format(date.toDate()) + (holliday.isEmpty() ? "" : " " + holliday);
+
+                    final CollapsiblePane dayPane = new CollapsiblePane(title);
+                    dayPane.setSlidingDirection(SwingConstants.SOUTH);
+                    dayPane.setFont(SYSConst.ARIAL20);
+
+                    if (!holliday.isEmpty()) {
+                        dayPane.setBackground(SYSConst.colorHolliday);
+                    } else if (date.getDayOfWeek() == DateTimeConstants.SATURDAY || date.getDayOfWeek() == DateTimeConstants.SUNDAY) {
+                        dayPane.setBackground(SYSConst.colorWeekend);
+                    } else {
+                        dayPane.setBackground(SYSConst.colorWeekday);
+                    }
+                    dayPane.setContentPane(dayPanel);
+                    dayPane.setCollapsible(false);
+                    dayPane.setOpaque(false);
+
+                    cpReports.add(dayPane);
+                    empty = false;
+                }
             }
         }
+
+        if (empty) {
+            CollapsiblePane emptyCP = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".noreports"));
+            emptyCP.setCollapsible(false);
+            try {
+                emptyCP.setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                OPDE.error(e);
+            }
+            cpReports.add(emptyCP);
+        }
+
+        cpReports.add(older);
         cpReports.addExpansion();
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

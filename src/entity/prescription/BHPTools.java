@@ -74,20 +74,20 @@ public class BHPTools {
         return num;
     }
 
-    public static Comparator<BHP> getOnDemandComparator(){
+    public static Comparator<BHP> getOnDemandComparator() {
         return new Comparator<BHP>() {
-                @Override
-                public int compare(BHP o1, BHP o2) {
-                    int result = o1.getPrescription().getSituation().getText().toUpperCase().compareTo(o2.getPrescription().getSituation().getText().toUpperCase());
-                    if (result == 0) {
-                        result = o1.getPrescription().compareTo(o2.getPrescription());
-                    }
-                    if (result == 0) {
-                        result = o1.getStatus().compareTo(o2.getStatus());
-                    }
-                    return result;
+            @Override
+            public int compare(BHP o1, BHP o2) {
+                int result = o1.getPrescription().getSituation().getText().toUpperCase().compareTo(o2.getPrescription().getSituation().getText().toUpperCase());
+                if (result == 0) {
+                    result = o1.getPrescription().compareTo(o2.getPrescription());
                 }
-            };
+                if (result == 0) {
+                    result = o1.getStatus().compareTo(o2.getStatus());
+                }
+                return result;
+            }
+        };
     }
 
     public static Date getMinDatum(Resident bewohner) {
@@ -150,7 +150,7 @@ public class BHPTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
+            OPDE.info(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
 
             select.setParameter("andatum", new Date(SYSCalendar.startOfDay(targetdate.toDate())));
             select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(targetdate.toDate())));
@@ -237,11 +237,13 @@ public class BHPTools {
         BigDecimal row = BigDecimal.ZERO;
 
 //        OPDE.debug("MaxRows: " + maxrows);
-
-        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate"));
+        System.out.println("------------------------------------------");
+        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
         System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 
         for (PrescriptionSchedule pSchedule : list) {
+            row = row.add(BigDecimal.ONE);
+            SYSTools.printProgBar(row.divide(maxrows, 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
 
             pSchedule = em.merge(pSchedule);
             em.lock(pSchedule, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -250,9 +252,8 @@ public class BHPTools {
 
             if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isTaeglich() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
 
-                row = row.add(BigDecimal.ONE);
-                SYSTools.printProgBar(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
-                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
+
+//                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
 //                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
@@ -362,7 +363,19 @@ public class BHPTools {
 //                OPDE.debug("Folgende pSchedule wurde nicht angenommen: " + pSchedule);
             }
         }
+
+
+//                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
+//                OPDE.debug("==========================================");
+//                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
+//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getBWKennung());
+//                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
+
 //        OPDE.debug("Erzeugte BHPs: " + numbhp);
+        System.out.println();
+        System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
+        System.out.println("------------------------------------------");
+
         return numbhp;
     }
 

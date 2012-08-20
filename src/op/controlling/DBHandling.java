@@ -1179,7 +1179,7 @@ public class DBHandling {
 
                     if (rs.getString("c.tbl").equals("NReport")) {
                         NReport bericht = EntityTools.find(NReport.class, rs.getLong("c.pk"));
-                        html.append("<td>" + NReportTools.getBerichtAsHTML(bericht, false) + "</td>");
+                        html.append("<td>" + NReportTools.getNReportAsHTML(bericht, false) + "</td>");
                     } else {
 //                        BWInfo bwinfo = new BWInfo(rs.getLong("c.pk"));
 //                        ArrayList content = bwinfo.getAttribute();
