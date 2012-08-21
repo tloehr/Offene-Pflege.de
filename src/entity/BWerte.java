@@ -5,8 +5,8 @@
 package entity;
 
 import entity.info.Resident;
-import entity.vorgang.SYSBWerte2VORGANG;
-import entity.vorgang.VorgangElement;
+import entity.process.SYSVAL2PROCESS;
+import entity.process.QProcessElement;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,11 +24,11 @@ import java.util.Date;
         /**
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
-//        @NamedQuery(name = "BWerte.findByVorgang", query = " "
-//                + " SELECT b, av.pdca FROM BWerte b "
-//                + " JOIN b.attachedVorgaenge av"
-//                + " JOIN av.vorgang v"
-//                + " WHERE v = :vorgang "),
+        @NamedQuery(name = "BWerte.findByVorgang", query = " "
+                + " SELECT b FROM BWerte b "
+                + " JOIN b.attachedVorgaenge av"
+                + " JOIN av.vorgang v"
+                + " WHERE v = :process "),
         @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM BWerte b WHERE b.bwid = :bwid"),
         @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM BWerte b WHERE b.pit = :pit"),
         @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM BWerte b WHERE b.wert = :wert"),
@@ -36,7 +36,7 @@ import java.util.Date;
         @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM BWerte b WHERE b.replacementFor = :replacementFor"),
         @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM BWerte b WHERE b.cdate = :cdate"),
         @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM BWerte b WHERE b.mdate = :mdate")})
-public class BWerte implements Serializable, VorgangElement, Cloneable {
+public class BWerte implements Serializable, QProcessElement, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -98,7 +98,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
 //    private Collection<Sysbwerte2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
-    private Collection<SYSBWerte2VORGANG> attachedVorgaenge;
+    private Collection<SYSVAL2PROCESS> attachedVorgaenge;
 
 //    // ==
 //    // M:N Relationen
@@ -107,7 +107,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
 //    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
 //    @JoinColumn(name = "BWID"), inverseJoinColumns =
 //    @JoinColumn(name = "VorgangID"))
-//    private Collection<Vorgaenge> vorgaenge;
+//    private Collection<QProcess> vorgaenge;
 
     public BWerte() {
     }
@@ -216,7 +216,7 @@ public class BWerte implements Serializable, VorgangElement, Cloneable {
         return type == BWerteTools.ERBRECHEN || type == BWerteTools.STUHLGANG;
     }
 
-    public Collection<SYSBWerte2VORGANG> getAttachedVorgaenge() {
+    public Collection<SYSVAL2PROCESS> getAttachedVorgaenge() {
         return attachedVorgaenge;
     }
 

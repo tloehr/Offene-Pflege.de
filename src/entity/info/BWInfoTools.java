@@ -2,6 +2,7 @@ package entity.info;
 
 import entity.*;
 import entity.prescription.PrescriptionsTools;
+import entity.reports.NReportTools;
 import op.OPDE;
 import op.tools.*;
 import org.joda.time.DateTime;

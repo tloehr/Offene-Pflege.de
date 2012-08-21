@@ -26,6 +26,7 @@
 package entity;
 
 import entity.files.*;
+import entity.reports.NReport;
 import entity.system.SYSLogin;
 import op.tools.SYSTools;
 
@@ -79,9 +80,9 @@ public class Users implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSFiles> sysfilesCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<Sysbwi2file> sysbwi2fileCollection;
+    private Collection<SYSBWI2FILE> SYSBWI2FILECollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<Syspb2file> syspb2fileCollection;
+    private Collection<SYSPB2FILE> SYSPB2FILECollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<Sysver2file> sysver2fileCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")

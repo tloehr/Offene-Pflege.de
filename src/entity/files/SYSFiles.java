@@ -41,7 +41,7 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
         @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
-        @NamedQuery(name = "SYSFiles.findByBWKennung", query = "SELECT s FROM SYSFiles s WHERE s.bewohner = :bewohner"),
+        @NamedQuery(name = "SYSFiles.findByBWKennung", query = "SELECT s FROM SYSFiles s WHERE s.resident = :bewohner"),
         @NamedQuery(name = "SYSFiles.findByFilename", query = "SELECT s FROM SYSFiles s WHERE s.filename = :filename"),
         @NamedQuery(name = "SYSFiles.findByMd5", query = "SELECT s FROM SYSFiles s WHERE s.md5 = :md5"),
         @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
@@ -52,11 +52,11 @@ import java.util.Date;
 //                + " FROM SYSFiles s "
 //                + " JOIN s.verAssignCollection sf "
 //                + " WHERE sf.verordnung = :verordnung"),
-        @NamedQuery(name = "SYSFiles.findByPB", query = ""
+        @NamedQuery(name = "SYSFiles.findByNReport", query = ""
                 + " SELECT s "
                 + " FROM SYSFiles s "
                 + " JOIN s.pbAssignCollection sf "
-                + " WHERE sf.pflegebericht = :pflegebericht "),
+                + " WHERE sf.nReport = :nReport "),
         @NamedQuery(name = "SYSFiles.findByBWInfo", query = ""
                 + " SELECT s "
                 + " FROM SYSFiles s "
@@ -104,27 +104,27 @@ public class SYSFiles implements Serializable, Comparable {
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
 //    private Collection<Sysbw2file> bwAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Syspb2file> pbAssignCollection;
+    private Collection<SYSPB2FILE> pbAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Sysbwi2file> bwiAssignCollection;
+    private Collection<SYSBWI2FILE> bwiAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Sysver2file> verAssignCollection;
 
     public SYSFiles() {
     }
 
-    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user, Resident bewohner) {
+    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user, Resident resident) {
         this.filename = filename;
         this.md5 = md5;
         this.filedate = filedate;
         this.filesize = filesize;
         this.user = user;
         this.pit = new Date();
-        this.bewohner = bewohner;
+        this.resident = resident;
     }
 
 
@@ -132,7 +132,7 @@ public class SYSFiles implements Serializable, Comparable {
 //        return bwAssignCollection;
 //    }
 
-    public Collection<Sysbwi2file> getBwiAssignCollection() {
+    public Collection<SYSBWI2FILE> getBwiAssignCollection() {
         return bwiAssignCollection;
     }
 
@@ -144,7 +144,7 @@ public class SYSFiles implements Serializable, Comparable {
         this.user = user;
     }
 
-    public Collection<Syspb2file> getPbAssignCollection() {
+    public Collection<SYSPB2FILE> getPbAssignCollection() {
         return pbAssignCollection;
     }
 
@@ -172,12 +172,12 @@ public class SYSFiles implements Serializable, Comparable {
         return md5;
     }
 
-    public Resident getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
     public String getRemoteFilename() {

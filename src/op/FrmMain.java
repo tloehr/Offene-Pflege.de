@@ -57,7 +57,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
-import op.vorgang.PnlVorgang;
+import op.vorgang.PnlProcess;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -565,8 +565,8 @@ public class FrmMain extends JFrame {
         currentBewohner = null;
         if (classname.equals("op.bw.tg.PnlTG")) {
             panel = new PnlTG(jspSearch, bwchange);
-        } else if (classname.equals("op.vorgang.PnlVorgang")) {
-            panel = new PnlVorgang(null, null, this, null);
+        } else if (classname.equals("op.process.PnlProcess")) {
+            panel = new PnlProcess(null, null, this, null);
         } else if (classname.equals("op.care.med.PnlMed")) {
             panel = new PnlMed(jspSearch);
         }

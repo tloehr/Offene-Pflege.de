@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.reports;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -153,6 +153,6 @@ public class NReportTAGS implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.NReportTAGS[pbtagid=" + pbtagid + "]";
+        return "entity.reports.NReportTAGS[pbtagid=" + pbtagid + "]";
     }
 }

@@ -2,14 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.reports;
 
-import entity.files.Syspb2file;
+import entity.PB2User;
+import entity.Users;
+import entity.files.SYSPB2FILE;
 import entity.info.Resident;
-import entity.vorgang.SYSPB2VORGANG;
-import entity.vorgang.VorgangElement;
+import entity.process.SYSNR2PROCESS;
+import entity.process.QProcessElement;
 import op.OPDE;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -71,7 +75,7 @@ import java.util.Iterator;
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
         @NamedQuery(name = "Pflegeberichte.findByVorgang", query = " "
-                + " SELECT p, av.pdca FROM NReport p "
+                + " SELECT p FROM NReport p "
                 + " JOIN p.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
@@ -158,8 +162,7 @@ import java.util.Iterator;
                 " ) pea ON pea.BWKennung = b.BWKennung" +
                 " WHERE b.StatID IS NOT NULL ", resultSetMapping = "NReport.findSozialZeitenResultMapping")
 })
-public class NReport implements Serializable, VorgangElement, Comparable<NReport> {
-
+public class NReport implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
     /*
      * Native Queries
      */
@@ -198,7 +201,7 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
     private String text;
     @Basic(optional = false)
     @Column(name = "Dauer")
-    private int dauer;
+    private int minutes;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
@@ -214,12 +217,12 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacementFor;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pflegebericht")
-    private Collection<Syspb2file> attachedFiles;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
+    private Collection<SYSPB2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
     private Collection<PB2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pflegebericht")
-    private Collection<SYSPB2VORGANG> attachedVorgaenge;
+    private Collection<SYSNR2PROCESS> attachedVorgaenge;
 
     // ==
     // M:N Relationen
@@ -230,21 +233,43 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
     @JoinColumn(name = "PBTAGID"))
     private Collection<NReportTAGS> tags;
 //    @ManyToMany
-//    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
+//    @JoinTable(name = "SYSNR2PROCESS", joinColumns =
 //    @JoinColumn(name = "PBID"), inverseJoinColumns =
 //    @JoinColumn(name = "VorgangID"))
-//    private Collection<Vorgaenge> vorgaenge;
+//    private Collection<QProcess> vorgaenge;
 
 
     public NReport() {
     }
 
     public NReport(Resident resident) {
-        this.pbid = 0l;
+        this.pit = new Date();
+        this.text = "";
+        this.minutes = 3;
         this.resident = resident;
         this.user = OPDE.getLogin().getUser();
-        this.attachedFiles = new ArrayList<Syspb2file>();
+        this.attachedFiles = new ArrayList<SYSPB2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
+        this.attachedVorgaenge = new ArrayList<SYSNR2PROCESS>();
+        this.usersAcknowledged = new ArrayList<PB2User>();
+        this.version = 0l;
+    }
+
+    public NReport(Date pit, Date editpit, String text, int minutes, Users user, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
+        this.pit = pit;
+        this.editpit = editpit;
+        this.text = text;
+        this.minutes = minutes;
+        this.user = user;
+        this.resident = resident;
+        this.editedBy = editedBy;
+        this.replacedBy = replacedBy;
+        this.replacementFor = replacementFor;
+        this.attachedFiles = new ArrayList<SYSPB2FILE>();
+        this.tags = new ArrayList<NReportTAGS>();
+        this.attachedVorgaenge = new ArrayList<SYSNR2PROCESS>();
+        this.usersAcknowledged = new ArrayList<PB2User>();
+        this.version = 0l;
     }
 
     public Long getPbid() {
@@ -303,23 +328,23 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
         this.text = text;
     }
 
-    public int getDauer() {
-        return dauer;
+    public int getMinutes() {
+        return minutes;
     }
 
-    public void setDauer(int dauer) {
-        this.dauer = dauer;
+    public void setMinutes(int dauer) {
+        this.minutes = dauer;
     }
 
     public Resident getResident() {
         return resident;
     }
 
-    public Collection<Syspb2file> getAttachedFiles() {
+    public Collection<SYSPB2FILE> getAttachedFiles() {
         return attachedFiles;
     }
 
-    public void setAttachedFiles(Collection<Syspb2file> attachedFiles) {
+    public void setAttachedFiles(Collection<SYSPB2FILE> attachedFiles) {
         this.attachedFiles = attachedFiles;
     }
 
@@ -414,7 +439,7 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
         this.user = user;
     }
 
-    public Collection<SYSPB2VORGANG> getAttachedVorgaenge() {
+    public Collection<SYSNR2PROCESS> getAttachedVorgaenge() {
         return attachedVorgaenge;
     }
 
@@ -455,7 +480,34 @@ public class NReport implements Serializable, VorgangElement, Comparable<NReport
 
     @Override
     public String toString() {
-        return "entity.NReport[pbid=" + pbid + "]";
+        return "entity.reports.NReport[pbid=" + pbid + "]";
+    }
+
+    @Override
+    public Object clone() {
+
+        final NReport clonedReport = new NReport(pit, editpit, text, minutes, user, resident, editedBy, null, null);
+
+        CollectionUtils.forAllDo(tags, new Closure() {
+            public void execute(Object o) {
+                clonedReport.tags.add((NReportTAGS) o);
+            }
+        });
+
+        CollectionUtils.forAllDo(attachedVorgaenge, new Closure() {
+            public void execute(Object o) {
+                SYSNR2PROCESS oldAssignment = (SYSNR2PROCESS) o;
+                clonedReport.attachedVorgaenge.add(new SYSNR2PROCESS(oldAssignment.getVorgang(), clonedReport));
+            }
+        });
+
+        CollectionUtils.forAllDo(attachedFiles, new Closure() {
+            public void execute(Object o) {
+                SYSPB2FILE oldAssignment = (SYSPB2FILE) o;
+                clonedReport.attachedFiles.add(new SYSPB2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getUser(), clonedReport.getPit()));
+            }
+        });
+        return clonedReport;
     }
 
     @Override

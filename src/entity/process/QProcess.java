@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity.vorgang;
+package entity.process;
 
 import entity.info.Resident;
 import entity.Users;
@@ -21,19 +21,19 @@ import java.util.Date;
 @Entity
 @Table(name = "Vorgaenge")
 @NamedQueries({
-        @NamedQuery(name = "Vorgaenge.findAll", query = "SELECT v FROM Vorgaenge v "),
-        @NamedQuery(name = "Vorgaenge.findAllActiveSorted", query = "SELECT v FROM Vorgaenge v WHERE v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findByVorgangID", query = "SELECT v FROM Vorgaenge v WHERE v.vorgangID = :vorgangID"),
-        @NamedQuery(name = "Vorgaenge.findByTitel", query = "SELECT v FROM Vorgaenge v WHERE v.titel = :titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveByBesitzer", query = "SELECT v FROM Vorgaenge v WHERE v.besitzer = :besitzer AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findInactiveByBesitzer", query = "SELECT v FROM Vorgaenge v WHERE v.besitzer = :besitzer AND v.bis < '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveByBewohner", query = "SELECT v FROM Vorgaenge v WHERE v.bewohner = :bewohner AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveRunningOut", query = "SELECT v FROM Vorgaenge v WHERE v.bis = '9999-12-31 23:59:59' AND v.wv <= :wv ORDER BY v.wv"),
-        @NamedQuery(name = "Vorgaenge.findByVon", query = "SELECT v FROM Vorgaenge v WHERE v.von = :von"),
-        @NamedQuery(name = "Vorgaenge.findByWv", query = "SELECT v FROM Vorgaenge v WHERE v.wv = :wv"),
-        @NamedQuery(name = "Vorgaenge.findByBis", query = "SELECT v FROM Vorgaenge v WHERE v.bis = :bis"),
-        @NamedQuery(name = "Vorgaenge.findByPdca", query = "SELECT v FROM Vorgaenge v WHERE v.pdca = :pdca")})
-public class Vorgaenge implements Serializable {
+        @NamedQuery(name = "Vorgaenge.findAll", query = "SELECT v FROM QProcess v "),
+        @NamedQuery(name = "Vorgaenge.findAllActiveSorted", query = "SELECT v FROM QProcess v WHERE v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
+        @NamedQuery(name = "Vorgaenge.findByVorgangID", query = "SELECT v FROM QProcess v WHERE v.vorgangID = :vorgangID"),
+        @NamedQuery(name = "Vorgaenge.findByTitel", query = "SELECT v FROM QProcess v WHERE v.titel = :titel"),
+        @NamedQuery(name = "Vorgaenge.findActiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.besitzer = :besitzer AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
+        @NamedQuery(name = "Vorgaenge.findInactiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.besitzer = :besitzer AND v.bis < '9999-12-31 23:59:59' ORDER BY v.titel"),
+        @NamedQuery(name = "Vorgaenge.findActiveByBewohner", query = "SELECT v FROM QProcess v WHERE v.bewohner = :bewohner AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
+        @NamedQuery(name = "Vorgaenge.findActiveRunningOut", query = "SELECT v FROM QProcess v WHERE v.bis = '9999-12-31 23:59:59' AND v.wv <= :wv ORDER BY v.wv"),
+        @NamedQuery(name = "Vorgaenge.findByVon", query = "SELECT v FROM QProcess v WHERE v.von = :von"),
+        @NamedQuery(name = "Vorgaenge.findByWv", query = "SELECT v FROM QProcess v WHERE v.wv = :wv"),
+        @NamedQuery(name = "Vorgaenge.findByBis", query = "SELECT v FROM QProcess v WHERE v.bis = :bis"),
+        @NamedQuery(name = "Vorgaenge.findByPdca", query = "SELECT v FROM QProcess v WHERE v.pdca = :pdca")})
+public class QProcess implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -56,9 +56,6 @@ public class Vorgaenge implements Serializable {
     @Column(name = "Bis")
     @Temporal(TemporalType.TIMESTAMP)
     private Date bis;
-    @Basic(optional = false)
-    @Column(name = "PDCA")
-    private short pdca;
     @JoinColumn(name = "Ersteller", referencedColumnName = "UKennung")
     @ManyToOne
     private Users ersteller;
@@ -70,45 +67,45 @@ public class Vorgaenge implements Serializable {
     private Resident bewohner;
     @JoinColumn(name = "VKatID", referencedColumnName = "VKatID")
     @ManyToOne
-    private VKat kategorie;
+    private PCat kategorie;
     //
     // 1:n Relationen
     //
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<VBericht> vorgangsBerichte;
+    private Collection<PReport> vorgangsBerichte;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSPB2VORGANG> attachedPflegeberichte;
+    private Collection<SYSNR2PROCESS> attachedPflegeberichte;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSVER2VORGANG> attachedVerordnungen;
+    private Collection<SYSPRE2PROCESS> attachedVerordnungen;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSBWI2VORGANG> attachedBWInfos;
+    private Collection<SYSINF2PROCESS> attachedBWInfos;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSPLAN2VORGANG> attachedPlanungen;
+    private Collection<SYSNP2PROCESS> attachedPlanungen;
 
     // ==
     // M:N Relationen
     // ==
 //    @ManyToMany
-//    @JoinTable(name = "SYSPB2VORGANG", joinColumns =
+//    @JoinTable(name = "SYSNR2PROCESS", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "PBID"))
 //    private Collection<NReport> pflegeberichte;
 //    @ManyToMany
-//    @JoinTable(name = "SYSBWI2VORGANG", joinColumns =
+//    @JoinTable(name = "SYSINF2PROCESS", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "BWInfoID"))
 //    private Collection<BWInfo> bwinfos;
 //    @ManyToMany
-//    @JoinTable(name = "SYSPLAN2VORGANG", joinColumns =
+//    @JoinTable(name = "SYSNP2PROCESS", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "PlanID"))
 //    private Collection<Planung> planungen;
 //    @ManyToMany
-//    @JoinTable(name = "SYSVER2VORGANG", joinColumns =
+//    @JoinTable(name = "SYSPRE2PROCESS", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "VerID"))
 //    private Collection<Verordnung> prescription;
@@ -118,10 +115,10 @@ public class Vorgaenge implements Serializable {
 //    @JoinColumn(name = "BWID"))
 //    private Collection<BWerte> bwerte;
 
-    public Vorgaenge() {
+    public QProcess() {
     }
 
-    public Vorgaenge(String titel, Resident bewohner, VKat kategorie) {
+    public QProcess(String titel, Resident bewohner, PCat kategorie) {
         this.titel = titel;
         this.von = new Date();
         this.wv = SYSCalendar.addDate(new Date(), 7);
@@ -173,14 +170,6 @@ public class Vorgaenge implements Serializable {
         this.bis = bis;
     }
 
-    public short getPdca() {
-        return pdca;
-    }
-
-    public void setPdca(short pdca) {
-        this.pdca = pdca;
-    }
-
     public Users getBesitzer() {
         return besitzer;
     }
@@ -205,11 +194,11 @@ public class Vorgaenge implements Serializable {
         this.ersteller = ersteller;
     }
 
-    public VKat getKategorie() {
+    public PCat getKategorie() {
         return kategorie;
     }
 
-    public void setKategorie(VKat kategorie) {
+    public void setKategorie(PCat kategorie) {
         this.kategorie = kategorie;
     }
 
@@ -227,10 +216,10 @@ public class Vorgaenge implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Vorgaenge)) {
+        if (!(object instanceof QProcess)) {
             return false;
         }
-        Vorgaenge other = (Vorgaenge) object;
+        QProcess other = (QProcess) object;
         if ((this.vorgangID == null && other.vorgangID != null) || (this.vorgangID != null && !this.vorgangID.equals(other.vorgangID))) {
             return false;
         }
@@ -239,6 +228,6 @@ public class Vorgaenge implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.vorgang.Vorgaenge[vorgangID=" + vorgangID + "]";
+        return "entity.process.QProcess[vorgangID=" + vorgangID + "]";
     }
 }

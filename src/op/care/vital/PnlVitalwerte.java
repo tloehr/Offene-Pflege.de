@@ -450,7 +450,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 //                if (!alreadyEdited && singleRowSelected) {
 //                    menu.add(new JSeparator());
 //                    // #0000003
-//                    menu.add(op.share.vorgang.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
+//                    menu.add(op.share.process.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
 //
 //                    Query query = em.createNamedQuery("BWerte.findByBwid");
 //                    query.setParameter("bwid", bwid);
@@ -464,7 +464,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
 //                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
 //                    menu.add(new JSeparator());
-//                    menu.add(VorgaengeTools.getVorgangContextMenu(parent, aktuellerWert, bewohner, standardActionListener));
+//                    menu.add(QProcessTools.getVorgangContextMenu(parent, aktuellerWert, bewohner, standardActionListener));
 //                }
 
 

@@ -4,7 +4,7 @@
  */
 
 /*
- * PnlVorgang.java
+ * PnlProcess.java
  *
  * Created on 03.06.2011, 16:38:35
  */
@@ -19,7 +19,8 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.EntityTools;
 import entity.Users;
-import entity.vorgang.*;
+import entity.process.*;
+import entity.process.QProcess;
 import op.OPDE;
 import op.events.TaskPaneContentChangedEvent;
 import op.events.TaskPaneContentChangedListener;
@@ -52,7 +53,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class PnlVorgang extends NursingRecordsPanel {
+public class PnlProcess extends NursingRecordsPanel {
 
     public static final String internalClassID = "opde.tickets";
     private static int speedSlow = 700;
@@ -66,7 +67,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 
     private int laufendeOperation;
 
-    protected Vorgaenge aktuellerVorgang;
+    protected QProcess aktuellerVorgang;
     protected Resident aktuellerBewohner;
     protected JPopupMenu menu;
     protected JFrame myFrame;
@@ -81,7 +82,7 @@ public class PnlVorgang extends NursingRecordsPanel {
     private TaskPaneContentChangedListener taskPaneContentChangedListener;
     private Timeline textmessageTL;
 
-    public PnlVorgang(Vorgaenge vorgang, Resident bewohner, JFrame parent, TaskPaneContentChangedListener taskPaneContentChangedListener) {
+    public PnlProcess(QProcess vorgang, Resident bewohner, JFrame parent, TaskPaneContentChangedListener taskPaneContentChangedListener) {
         ignoreEvents = true;
         initComponents();
         this.taskPaneContentChangedListener = taskPaneContentChangedListener;
@@ -101,7 +102,7 @@ public class PnlVorgang extends NursingRecordsPanel {
         laufendeOperation = LAUFENDE_OPERATION_NICHTS;
 
         listOwner.setModel(SYSTools.newListModel("Users.findByStatusSorted", new Object[]{"status", 1}));
-        cmbKat.setModel(SYSTools.newComboboxModel("VKat.findAllSorted"));
+        cmbKat.setModel(SYSTools.newComboboxModel("PCat.findAllSorted"));
 
         splitTDPercent = SYSTools.showSide(splitTableDetails, SYSTools.LEFT_UPPER_SIDE);
         splitDOPercent = SYSTools.showSide(splitDetailsOwner, SYSTools.LEFT_UPPER_SIDE);
@@ -245,8 +246,8 @@ public class PnlVorgang extends NursingRecordsPanel {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
         query.setParameter("bewohner", bewohner);
-        List<Vorgaenge> listVorgaenge = query.getResultList();
-        Iterator<Vorgaenge> it = listVorgaenge.iterator();
+        List<QProcess> listProceses = query.getResultList();
+        Iterator<QProcess> it = listProceses.iterator();
         em.close();
 
         CollapsiblePane bwpanel = new CollapsiblePane(bewohner.getNachname() + ", " + bewohner.getVorname());
@@ -257,9 +258,9 @@ public class PnlVorgang extends NursingRecordsPanel {
         }
 
 
-        if (!listVorgaenge.isEmpty()) {
+        if (!listProceses.isEmpty()) {
             while (it.hasNext()) {
-                final Vorgaenge innervorgang = it.next();
+                final QProcess innervorgang = it.next();
                 JideButton buttonBW = GUITools.createHyperlinkButton(innervorgang.getTitel(), null, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -287,17 +288,17 @@ public class PnlVorgang extends NursingRecordsPanel {
 //
 //        for (Bewohner bw : bewohner) {
 //
-//            Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
+//            Query query = em.createNamedQuery("QProcess.findActiveByBewohner");
 //            query.setParameter("bewohner", bw);
-//            List<Vorgaenge> listVorgaenge = query.getResultList();
-//            Iterator<Vorgaenge> it = listVorgaenge.iterator();
+//            List<QProcess> listVorgaenge = query.getResultList();
+//            Iterator<QProcess> it = listVorgaenge.iterator();
 //
 //            if (!listVorgaenge.isEmpty()) {
 //                JXTaskPane bwpanel = new JXTaskPane(bw.getNachname() + ", " + bw.getVorname());
 //                bwpanel.setCollapsed(true);
 //
 //                while (it.hasNext()) {
-//                    final Vorgaenge innervorgang = it.next();
+//                    final QProcess innervorgang = it.next();
 //                    bwpanel.add(new AbstractAction() {
 //                        {
 //                            putValue(Action.NAME, innervorgang.getTitel());
@@ -332,8 +333,8 @@ public class PnlVorgang extends NursingRecordsPanel {
 //
 //                    @Override
 //                    public boolean isEnabled(JTable table, int row, int col) {
-//                        VorgangElement element = ((TMElement) tblElements.getModel()).getElement(row);
-//                        boolean systemBericht = (element instanceof VBericht) && ((VBericht) element).isSystem();
+//                        QProcessElement element = ((TMElement) tblElements.getModel()).getElement(row);
+//                        boolean systemBericht = (element instanceof PReport) && ((PReport) element).isSystem();
 //                        return !systemBericht;
 //                    }
 //                }};
@@ -348,11 +349,11 @@ public class PnlVorgang extends NursingRecordsPanel {
             EntityManager em = OPDE.createEM();
             Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
             query.setParameter("besitzer", selectedUser);
-            List<Vorgaenge> listVorgaenge = query.getResultList();
-            Iterator<Vorgaenge> it = listVorgaenge.iterator();
+            List<QProcess> listProceses = query.getResultList();
+            Iterator<QProcess> it = listProceses.iterator();
 
             while (it.hasNext()) {
-                final Vorgaenge innervorgang = it.next();
+                final QProcess innervorgang = it.next();
                 pnlVorgaengeByMA.add(new AbstractAction() {
                     {
                         putValue(Action.NAME, innervorgang.getTitel());
@@ -381,17 +382,17 @@ public class PnlVorgang extends NursingRecordsPanel {
 //
 //        for (Users user : listeUser) {
 //
-//            Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
+//            Query query = em.createNamedQuery("QProcess.findActiveByBesitzer");
 //            query.setParameter("besitzer", user);
-//            List<Vorgaenge> listVorgaenge = query.getResultList();
-//            Iterator<Vorgaenge> it = listVorgaenge.iterator();
+//            List<QProcess> listVorgaenge = query.getResultList();
+//            Iterator<QProcess> it = listVorgaenge.iterator();
 //
 //            if (!listVorgaenge.isEmpty()) {
 //                JXTaskPane mapanel = new JXTaskPane(user.getNachname() + ", " + user.getVorname());
 //                mapanel.setCollapsed(true);
 //
 //                while (it.hasNext()) {
-//                    final Vorgaenge innervorgang = it.next();
+//                    final QProcess innervorgang = it.next();
 //                    OPDE.debug(innervorgang);
 //                    mapanel.add(new AbstractAction() {
 //                        {
@@ -444,13 +445,13 @@ public class PnlVorgang extends NursingRecordsPanel {
 //
 //        if (pnlAlleVorgaenge.isEnabled()) {
 //            EntityManager em = OPDE.createEM();
-//            Query query = em.createNamedQuery("Vorgaenge.findAllActiveSorted");
-//            ArrayList<Vorgaenge> alleAktiven = new ArrayList(query.getResultList());
+//            Query query = em.createNamedQuery("QProcess.findAllActiveSorted");
+//            ArrayList<QProcess> alleAktiven = new ArrayList(query.getResultList());
 //
-//            Iterator<Vorgaenge> it = alleAktiven.iterator();
+//            Iterator<QProcess> it = alleAktiven.iterator();
 //
 //            while (it.hasNext()) {
-//                final Vorgaenge innervorgang = it.next();
+//                final QProcess innervorgang = it.next();
 //                pnlAlleVorgaenge.add(new AbstractAction() {
 //                    {
 //                        putValue(Action.NAME, innervorgang.getTitel());
@@ -476,14 +477,14 @@ public class PnlVorgang extends NursingRecordsPanel {
 //
 //        if (pnlVorgaengeRunningOut.isEnabled()) {
 //            EntityManager em = OPDE.createEM();
-//            Query query = em.createNamedQuery("Vorgaenge.findActiveRunningOut");
+//            Query query = em.createNamedQuery("QProcess.findActiveRunningOut");
 //            query.setParameter("wv", SYSCalendar.addDate(new Date(), 4)); // 4 Tage von heute aus gerechnet.
-//            ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
+//            ArrayList<QProcess> vorgaenge = new ArrayList(query.getResultList());
 //
-//            Iterator<Vorgaenge> it = vorgaenge.iterator();
+//            Iterator<QProcess> it = vorgaenge.iterator();
 //
 //            while (it.hasNext()) {
-//                final Vorgaenge innervorgang = it.next();
+//                final QProcess innervorgang = it.next();
 //                pnlVorgaengeRunningOut.add(new AbstractAction() {
 //                    {
 //                        putValue(Action.NAME, innervorgang.getTitel());
@@ -508,13 +509,13 @@ public class PnlVorgang extends NursingRecordsPanel {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Vorgaenge.findActiveByBesitzer");
         query.setParameter("besitzer", OPDE.getLogin().getUser());
-        ArrayList<Vorgaenge> byBesitzer = new ArrayList(query.getResultList());
+        ArrayList<QProcess> byBesitzer = new ArrayList(query.getResultList());
 
-        Iterator<Vorgaenge> it = byBesitzer.iterator();
+        Iterator<QProcess> it = byBesitzer.iterator();
 
         while (it.hasNext()) {
 
-            final Vorgaenge innervorgang = it.next();
+            final QProcess innervorgang = it.next();
 
             pnlMyVorgaenge.add(new AbstractAction() {
 
@@ -547,12 +548,12 @@ public class PnlVorgang extends NursingRecordsPanel {
         Query query = em.createNamedQuery("Vorgaenge.findInactiveByBesitzer");
         query.setParameter("besitzer", OPDE.getLogin().getUser());
 
-        ArrayList<Vorgaenge> vorgaenge = new ArrayList(query.getResultList());
+        ArrayList<QProcess> proceses = new ArrayList(query.getResultList());
 
-        Iterator<Vorgaenge> it = vorgaenge.iterator();
+        Iterator<QProcess> it = proceses.iterator();
 
         while (it.hasNext()) {
-            final Vorgaenge innervorgang = it.next();
+            final QProcess innervorgang = it.next();
             pnlMeineAltenVorgaenge.add(new AbstractAction() {
                 {
                     putValue(Action.NAME, innervorgang.getTitel());
@@ -570,12 +571,12 @@ public class PnlVorgang extends NursingRecordsPanel {
 
         }
 
-        pnlMeineAltenVorgaenge.setTitle("Meine alten Vorgänge (" + vorgaenge.size() + ")");
+        pnlMeineAltenVorgaenge.setTitle("Meine alten Vorgänge (" + proceses.size() + ")");
         em.close();
     }
 
 
-    protected void loadDetails(Vorgaenge vorgang) {
+    protected void loadDetails(QProcess vorgang) {
         lblVorgang.setText(vorgang.getTitel() + " [" + (vorgang.getBewohner() == null ? "allgemein" : vorgang.getBewohner().getBWKennung()) + "]");
 
         // Wenn nötig, laufende Operation abbrechen und obere Knopfreihe anzeigen.
@@ -595,7 +596,7 @@ public class PnlVorgang extends NursingRecordsPanel {
             lblCreator.setText(vorgang.getErsteller().getNameUndVorname());
             lblOwner.setText(vorgang.getBesitzer().getNameUndVorname());
             cmbKat.setSelectedItem(vorgang.getKategorie());
-            lblPDCA.setText(VorgaengeTools.PDCA[vorgang.getPdca()]);
+            lblPDCA.setText(QProcessTools.PDCA[vorgang.getPdca()]);
             listOwner.setSelectedValue(vorgang.getBesitzer(), true);
 
             // ACLs
@@ -621,7 +622,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 
         switch (laufendeOperation) {
             case LAUFENDE_OPERATION_BERICHT_EINGABE: {
-                VBericht vbericht = new VBericht(pnlEditor.getHTML(), VBerichtTools.VBERICHT_ART_USER, aktuellerVorgang);
+                PReport vbericht = new PReport(pnlEditor.getHTML(), PReportTools.VBERICHT_ART_USER, aktuellerVorgang);
                 EntityTools.persist(vbericht);
                 //((TMElement) tblElements.getModel()).addVBericht(vbericht);
                 loadTable(aktuellerVorgang);
@@ -633,7 +634,7 @@ public class PnlVorgang extends NursingRecordsPanel {
                 try {
                     em.getTransaction().begin();
                     if (pdcaChanged) {
-                        VBericht vbericht = new VBericht("PDCA Stufe erhöht auf: " + VorgaengeTools.PDCA[aktuellerVorgang.getPdca()], VBerichtTools.VBERICHT_ART_PDCA, aktuellerVorgang);
+                        PReport vbericht = new PReport("PDCA Stufe erhöht auf: " + QProcessTools.PDCA[aktuellerVorgang.getPdca()], PReportTools.VBERICHT_ART_PDCA, aktuellerVorgang);
                         vbericht.setPdca(aktuellerVorgang.getPdca());
                         em.persist(vbericht);
                     }
@@ -713,7 +714,7 @@ public class PnlVorgang extends NursingRecordsPanel {
         if (ignoreEvents) return;
         setCenterButtons2Edit("Änderungen speichern ?");
         laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
-        aktuellerVorgang.setKategorie((VKat) cmbKat.getSelectedItem());
+        aktuellerVorgang.setKategorie((PCat) cmbKat.getSelectedItem());
 
     }
 
@@ -737,8 +738,8 @@ public class PnlVorgang extends NursingRecordsPanel {
     private void btnPDCAPlusActionPerformed(ActionEvent e) {
         setCenterButtons2Edit("Änderungen speichern ?");
         laufendeOperation = LAUFENDE_OPERATION_VORGANG_BEARBEITEN;
-        aktuellerVorgang.setPdca(VorgaengeTools.incPDCA(aktuellerVorgang.getPdca()));
-        lblPDCA.setText(VorgaengeTools.PDCA[aktuellerVorgang.getPdca()]);
+        aktuellerVorgang.setPdca(QProcessTools.incPDCA(aktuellerVorgang.getPdca()));
+        lblPDCA.setText(QProcessTools.PDCA[aktuellerVorgang.getPdca()]);
         btnPDCAPlus.setEnabled(false);
         pdcaChanged = true;
     }
@@ -768,13 +769,13 @@ public class PnlVorgang extends NursingRecordsPanel {
 
     private void btnEndReactivateActionPerformed(ActionEvent e) {
         if (aktuellerVorgang.isAbgeschlossen()) {
-            VorgaengeTools.reopenVorgang(aktuellerVorgang);
+            QProcessTools.reopenVorgang(aktuellerVorgang);
             //new TextFlash(lblMessage, "Vorgang wieder geöffnet", true, false, 600).execute();
             btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
             btnEndReactivate.setToolTipText("Vorgang abschließen");
 
         } else {
-            VorgaengeTools.endVorgang(aktuellerVorgang);
+            QProcessTools.endVorgang(aktuellerVorgang);
             //new TextFlash(lblMessage, "Vorgang abgeschlossen", true, false, 600).execute();
             btnEndReactivate.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/reload.png")));
             btnEndReactivate.setToolTipText("Vorgang wieder aktivieren");
@@ -807,7 +808,7 @@ public class PnlVorgang extends NursingRecordsPanel {
 //            btnDelete.setText(null);
 //            alternatingFlash = null;
 //            btnCancel1.setVisible(false);
-//            VorgaengeTools.deleteVorgang(aktuellerVorgang);
+//            QProcessTools.deleteVorgang(aktuellerVorgang);
 //            btnDetails.setSelected(false);
 //            loadTable(null);
 //        } else {
@@ -896,7 +897,7 @@ public class PnlVorgang extends NursingRecordsPanel {
     }
 
 
-    protected void loadTable(Vorgaenge vorgang) {
+    protected void loadTable(QProcess vorgang) {
         aktuellerVorgang = vorgang;
 
         if (vorgang == null) {
@@ -905,11 +906,11 @@ public class PnlVorgang extends NursingRecordsPanel {
 
             lblVorgang.setText(vorgang.getTitel() + " [" + (vorgang.getBewohner() == null ? "allgemein" : vorgang.getBewohner().getBWKennung()) + "]");
 
-            List<VorgangElement> elements = new ArrayList<VorgangElement>(VorgaengeTools.findElementeByVorgang(vorgang, btnSystemInfo.isSelected()));
+            List<QProcessElement> elementQs = new ArrayList<QProcessElement>(QProcessTools.findElementeByVorgang(vorgang, btnSystemInfo.isSelected()));
 
             tblElements.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-            tblElements.setModel(new TMElement(elements));
+            tblElements.setModel(new TMElement(elementQs));
             tblElements.getColumnModel().getColumn(TMElement.COL_PIT).setCellRenderer(new RNDHTML());
             tblElements.getColumnModel().getColumn(TMElement.COL_PDCA).setCellRenderer(new RNDHTML());
             tblElements.getColumnModel().getColumn(TMElement.COL_CONTENT).setCellRenderer(new RNDHTML());
@@ -950,11 +951,11 @@ public class PnlVorgang extends NursingRecordsPanel {
         }
 
         btnEndReactivate.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL));
-        //btnDelete.setEnabled(vorgang != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
+        //btnDelete.setEnabled(process != null && !btnDetails.isSelected() && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE));
 
         btnAddBericht.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
         btnSystemInfo.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
-        //btnDelElement.setEnabled(vorgang != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+        //btnDelElement.setEnabled(process != null && OPDE.getInternalClasses().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
         btnDetails.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
         btnPrint.setEnabled(vorgang != null && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT));
 
@@ -978,6 +979,7 @@ public class PnlVorgang extends NursingRecordsPanel {
         tblElements = new JTable();
         pnlEditor = new PnlEditor();
         splitDetailsOwner = new JSplitPane();
+        panel1 = new JPanel();
         pnlDetails = new JPanel();
         label1 = new JLabel();
         lblBW = new JLabel();
@@ -1023,8 +1025,8 @@ public class PnlVorgang extends NursingRecordsPanel {
             }
         });
         setLayout(new FormLayout(
-                "$rgap, 0dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
-                "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
+            "$rgap, 0dlu, $rgap, 316dlu:grow, 0dlu, $rgap",
+            "$rgap, 0dlu, default, $lgap, fill:default:grow, $lgap, 22dlu, 0dlu, $lgap, 1dlu"));
 
         //---- lblVorgang ----
         lblVorgang.setFont(new Font("Lucida Grande", Font.BOLD, 18));
@@ -1070,15 +1072,15 @@ public class PnlVorgang extends NursingRecordsPanel {
 
                     //---- tblElements ----
                     tblElements.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ));
                     tblElements.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                     tblElements.addMouseListener(new MouseAdapter() {
@@ -1105,137 +1107,143 @@ public class PnlVorgang extends NursingRecordsPanel {
                     }
                 });
 
-                //======== pnlDetails ========
+                //======== panel1 ========
                 {
-                    pnlDetails.setLayout(new FormLayout(
+                    panel1.setLayout(new BorderLayout());
+
+                    //======== pnlDetails ========
+                    {
+                        pnlDetails.setLayout(new FormLayout(
                             "0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 0dlu",
                             "0dlu, 9*($lgap, fill:default)"));
 
-                    //---- label1 ----
-                    label1.setText("Titel");
-                    pnlDetails.add(label1, CC.xywh(3, 3, 2, 1));
+                        //---- label1 ----
+                        label1.setText("Titel");
+                        pnlDetails.add(label1, CC.xywh(3, 3, 2, 1));
 
-                    //---- lblBW ----
-                    lblBW.setText("Allgemeiner Vorgang");
-                    lblBW.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    lblBW.setForeground(Color.blue);
-                    pnlDetails.add(lblBW, CC.xywh(5, 5, 3, 1));
+                        //---- lblBW ----
+                        lblBW.setText("Allgemeiner Vorgang");
+                        lblBW.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        lblBW.setForeground(Color.blue);
+                        pnlDetails.add(lblBW, CC.xywh(5, 5, 3, 1));
 
-                    //---- label2 ----
-                    label2.setText("Erstellt am");
-                    pnlDetails.add(label2, CC.xywh(3, 7, 2, 1));
+                        //---- label2 ----
+                        label2.setText("Erstellt am");
+                        pnlDetails.add(label2, CC.xywh(3, 7, 2, 1));
 
-                    //---- label3 ----
-                    label3.setText("Wiedervorlage");
-                    pnlDetails.add(label3, CC.xywh(3, 9, 2, 1));
+                        //---- label3 ----
+                        label3.setText("Wiedervorlage");
+                        pnlDetails.add(label3, CC.xywh(3, 9, 2, 1));
 
-                    //---- label4 ----
-                    label4.setText("Abgeschlossen am");
-                    pnlDetails.add(label4, CC.xywh(3, 11, 2, 1));
+                        //---- label4 ----
+                        label4.setText("Abgeschlossen am");
+                        pnlDetails.add(label4, CC.xywh(3, 11, 2, 1));
 
-                    //---- label5 ----
-                    label5.setText("Erstellt von");
-                    pnlDetails.add(label5, CC.xywh(3, 13, 2, 1));
+                        //---- label5 ----
+                        label5.setText("Erstellt von");
+                        pnlDetails.add(label5, CC.xywh(3, 13, 2, 1));
 
-                    //---- label6 ----
-                    label6.setText("Wird bearbeitet von");
-                    pnlDetails.add(label6, CC.xywh(3, 15, 2, 1));
+                        //---- label6 ----
+                        label6.setText("Wird bearbeitet von");
+                        pnlDetails.add(label6, CC.xywh(3, 15, 2, 1));
 
-                    //---- txtTitel ----
-                    txtTitel.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    txtTitel.addCaretListener(new CaretListener() {
-                        @Override
-                        public void caretUpdate(CaretEvent e) {
-                            txtTitelCaretUpdate(e);
-                        }
-                    });
-                    pnlDetails.add(txtTitel, CC.xywh(5, 3, 3, 1));
+                        //---- txtTitel ----
+                        txtTitel.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        txtTitel.addCaretListener(new CaretListener() {
+                            @Override
+                            public void caretUpdate(CaretEvent e) {
+                                txtTitelCaretUpdate(e);
+                            }
+                        });
+                        pnlDetails.add(txtTitel, CC.xywh(5, 3, 3, 1));
 
-                    //---- lblStart ----
-                    lblStart.setText("15.05.2011");
-                    lblStart.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblStart, CC.xywh(5, 7, 3, 1));
+                        //---- lblStart ----
+                        lblStart.setText("15.05.2011");
+                        lblStart.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        pnlDetails.add(lblStart, CC.xywh(5, 7, 3, 1));
 
-                    //---- lblEnde ----
-                    lblEnde.setText("noch nicht abgeschlossen");
-                    lblEnde.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblEnde, CC.xywh(5, 11, 3, 1));
+                        //---- lblEnde ----
+                        lblEnde.setText("noch nicht abgeschlossen");
+                        lblEnde.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        pnlDetails.add(lblEnde, CC.xywh(5, 11, 3, 1));
 
-                    //---- lblCreator ----
-                    lblCreator.setText("text");
-                    lblCreator.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblCreator, CC.xywh(5, 13, 3, 1));
+                        //---- lblCreator ----
+                        lblCreator.setText("text");
+                        lblCreator.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        pnlDetails.add(lblCreator, CC.xywh(5, 13, 3, 1));
 
-                    //---- lblOwner ----
-                    lblOwner.setText("text");
-                    lblOwner.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblOwner, CC.xy(5, 15));
+                        //---- lblOwner ----
+                        lblOwner.setText("text");
+                        lblOwner.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        pnlDetails.add(lblOwner, CC.xy(5, 15));
 
-                    //---- jdcWV ----
-                    jdcWV.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    jdcWV.addPropertyChangeListener(new PropertyChangeListener() {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent e) {
-                            jdcWVPropertyChange(e);
-                        }
-                    });
-                    pnlDetails.add(jdcWV, CC.xywh(5, 9, 3, 1));
+                        //---- jdcWV ----
+                        jdcWV.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        jdcWV.addPropertyChangeListener(new PropertyChangeListener() {
+                            @Override
+                            public void propertyChange(PropertyChangeEvent e) {
+                                jdcWVPropertyChange(e);
+                            }
+                        });
+                        pnlDetails.add(jdcWV, CC.xywh(5, 9, 3, 1));
 
-                    //---- btnAssign ----
-                    btnAssign.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-                    btnAssign.setToolTipText("Vorgang an anderen Benutzer \u00fcberweisen");
-                    btnAssign.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
-                    btnAssign.setBackground(new Color(204, 238, 238));
-                    btnAssign.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            btnAssignItemStateChanged(e);
-                        }
-                    });
-                    pnlDetails.add(btnAssign, CC.xy(7, 15));
+                        //---- btnAssign ----
+                        btnAssign.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                        btnAssign.setToolTipText("Vorgang an anderen Benutzer \u00fcberweisen");
+                        btnAssign.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
+                        btnAssign.setBackground(new Color(204, 238, 238));
+                        btnAssign.addItemListener(new ItemListener() {
+                            @Override
+                            public void itemStateChanged(ItemEvent e) {
+                                btnAssignItemStateChanged(e);
+                            }
+                        });
+                        pnlDetails.add(btnAssign, CC.xy(7, 15));
 
-                    //---- label7 ----
-                    label7.setText("Geh\u00f6rt zu:");
-                    pnlDetails.add(label7, CC.xy(3, 17));
+                        //---- label7 ----
+                        label7.setText("Geh\u00f6rt zu:");
+                        pnlDetails.add(label7, CC.xy(3, 17));
 
-                    //---- cmbKat ----
-                    cmbKat.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-                    cmbKat.setToolTipText("Kategorie des Vorgangs");
-                    cmbKat.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            cmbKatItemStateChanged(e);
-                        }
-                    });
-                    cmbKat.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusGained(FocusEvent e) {
-                            cmbKatFocusGained(e);
-                        }
-                    });
-                    pnlDetails.add(cmbKat, CC.xywh(5, 17, 3, 1));
+                        //---- cmbKat ----
+                        cmbKat.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+                        cmbKat.setToolTipText("Kategorie des Vorgangs");
+                        cmbKat.addItemListener(new ItemListener() {
+                            @Override
+                            public void itemStateChanged(ItemEvent e) {
+                                cmbKatItemStateChanged(e);
+                            }
+                        });
+                        cmbKat.addFocusListener(new FocusAdapter() {
+                            @Override
+                            public void focusGained(FocusEvent e) {
+                                cmbKatFocusGained(e);
+                            }
+                        });
+                        pnlDetails.add(cmbKat, CC.xywh(5, 17, 3, 1));
 
-                    //---- label8 ----
-                    label8.setText("PDCA Zyklus");
-                    pnlDetails.add(label8, CC.xy(3, 19));
+                        //---- label8 ----
+                        label8.setText("PDCA Zyklus");
+                        pnlDetails.add(label8, CC.xy(3, 19));
 
-                    //---- lblPDCA ----
-                    lblPDCA.setText("Plan");
-                    lblPDCA.setFont(new Font("Lucida Grande", Font.BOLD, 16));
-                    pnlDetails.add(lblPDCA, CC.xywh(5, 19, 2, 1));
+                        //---- lblPDCA ----
+                        lblPDCA.setText("Plan");
+                        lblPDCA.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+                        pnlDetails.add(lblPDCA, CC.xywh(5, 19, 2, 1));
 
-                    //---- btnPDCAPlus ----
-                    btnPDCAPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-                    btnPDCAPlus.setToolTipText("PDCA Zyklus einen Schritt weiter drehen");
-                    btnPDCAPlus.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnPDCAPlusActionPerformed(e);
-                        }
-                    });
-                    pnlDetails.add(btnPDCAPlus, CC.xy(7, 19));
+                        //---- btnPDCAPlus ----
+                        btnPDCAPlus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                        btnPDCAPlus.setToolTipText("PDCA Zyklus einen Schritt weiter drehen");
+                        btnPDCAPlus.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                btnPDCAPlusActionPerformed(e);
+                            }
+                        });
+                        pnlDetails.add(btnPDCAPlus, CC.xy(7, 19));
+                    }
+                    panel1.add(pnlDetails, BorderLayout.CENTER);
                 }
-                splitDetailsOwner.setLeftComponent(pnlDetails);
+                splitDetailsOwner.setLeftComponent(panel1);
 
                 //======== scrollPane1 ========
                 {
@@ -1456,6 +1464,7 @@ public class PnlVorgang extends NursingRecordsPanel {
     private JTable tblElements;
     private PnlEditor pnlEditor;
     private JSplitPane splitDetailsOwner;
+    private JPanel panel1;
     private JPanel pnlDetails;
     private JLabel label1;
     private JLabel lblBW;

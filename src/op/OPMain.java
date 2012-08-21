@@ -74,7 +74,7 @@ public class OPMain extends javax.swing.JFrame {
         menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});
         menuStructure.add(new String[]{"System/Datei-Manager", "op.sysfiles.FrmFilesManager", "kfm.png"});
         menuStructure.add(new String[]{"Controlling/Controlling", "op.controlling.FrmCtrlMonitor", "kfind.png"});
-//        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.vorgang.FrmVorgang", "utilities-file-archiver.png"});
+//        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.process.FrmVorgang", "utilities-file-archiver.png"});
 
         frames = new HashMap();
         //this.setTitle(OPDE.getLocalProps().getProperty("program.PROGNAME") + ", Version " + OPDE.getLocalProps().getProperty("program.VERSION") +
@@ -361,7 +361,7 @@ public class OPMain extends javax.swing.JFrame {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     ///newVrgFrame();
-                    newFrame("op.share.vorgang.PnlVorgang");
+                    newFrame("op.share.process.PnlProcess");
                 }
             });
             menu.add(itemPopupEnd);
@@ -369,7 +369,7 @@ public class OPMain extends javax.swing.JFrame {
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         } else {
             if (evt.getClickCount() == 2) {
-                newFrame("op.share.vorgang.PnlVorgang");
+                newFrame("op.share.process.PnlProcess");
             }
         }
     }//GEN-LAST:event_tblVorgangMousePressed

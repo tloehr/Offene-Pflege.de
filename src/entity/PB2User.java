@@ -5,6 +5,8 @@
 
 package entity;
 
+import entity.reports.NReport;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;

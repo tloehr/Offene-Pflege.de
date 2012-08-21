@@ -273,6 +273,8 @@ public class SYSConst {
     public static final Icon icon22ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2_pressed.png"));
     public static final Icon icon22applyPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply_pressed.png"));
     public static final Icon icon22attach = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/attach.png"));
+    public static final Icon icon22link = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/link-symbol.png"));
+    public static final Icon icon22linkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/link-symbol_pressed.png"));
     public static final Icon icon22attachPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/attach_pressed.png"));
     public static final Icon icon22cancel = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/cancel.png"));
     public static final Icon icon22cancelPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/cancel_pressed.png"));
@@ -295,12 +297,16 @@ public class SYSConst {
     public static final Icon icon22infoblue = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoblue.png"));
     public static final Icon icon22infogreen = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infogreen.png"));
     public static final Icon icon22infored = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infored.png"));
+    public static final Icon icon22print = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1.png"));
+    public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
     public static final Icon icon22infoyellow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoyellow.png"));
     public static final Icon icon22undo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/undo.png"));
     public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
     public static final Icon icon22redoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo_pressed.png"));
     public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
     public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));
+    public static final Icon icon22todo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo.png"));
+    public static final Icon icon22todoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo_pressed.png"));
     public static final Icon icon22stop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22stopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
     public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
@@ -311,6 +317,8 @@ public class SYSConst {
     public static final Icon icon48ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2_pressed.png"));
     public static final Icon icon48delete = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/editdelete.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
+//    public static final Icon icon48attach = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/attach"));
+    public static final Icon icon48kgetdock = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/kget_dock.png"));
     public static final Icon icon22apply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply.png"));
     public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));
     public static final Icon icon22down = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1downarrow.png"));

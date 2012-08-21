@@ -26,9 +26,9 @@
  */
 package tablemodels;
 
-import entity.vorgang.VBericht;
-import entity.vorgang.VorgaengeTools;
-import entity.vorgang.VorgangElement;
+import entity.process.QProcessElement;
+import entity.process.QProcessTools;
+import entity.process.PReport;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
@@ -80,7 +80,7 @@ public class TMElement extends AbstractTableModel {
 //                    "   WHERE v.TableName='BWInfo' AND v.VorgangID = ? " +
 //                    " UNION " +
 //                    "   SELECT 5 tblidx, vb.VBID pk, vb.Datum, vb.UKennung ukennung, '', '', '', Art, vb.VBID VAID" +
-//                    "   FROM VBericht vb " +
+//                    "   FROM PReport vb " +
 //                    "   WHERE vb.VorgangID = ? " +
 //                    (system ? "" : "AND Art = 0 ") +
 //                    " ) as va " +
@@ -109,7 +109,7 @@ public class TMElement extends AbstractTableModel {
 //
 //        em.getTransaction().begin();
 //        try {
-//            if (element instanceof VBericht) {
+//            if (element instanceof PReport) {
 //                sourcemodel.remove(element);
 //                mymodel.remove(element);
 //                pdca.remove(row);
@@ -157,7 +157,7 @@ public class TMElement extends AbstractTableModel {
      * @param row
      * @return
      */
-//    public VorgangElement getElement(int row) {
+//    public QProcessElement getElement(int row) {
 //        return mymodel.get(row);
 //    }
 
@@ -199,28 +199,28 @@ public class TMElement extends AbstractTableModel {
     @Override
     public Object getValueAt(int r, int c) {
         Object result = "";
-        VorgangElement element = null;
-        short pdca = VorgaengeTools.PDCA_OFF;
+        QProcessElement elementQ = null;
+        short pdca = QProcessTools.PDCA_OFF;
 
         if (mymodel.get(r) instanceof Object[]){
-            element = (VorgangElement) ((Object[]) mymodel.get(r))[0];
+            elementQ = (QProcessElement) ((Object[]) mymodel.get(r))[0];
             pdca = (Short) ((Object[]) mymodel.get(r))[1];
-        } else if (mymodel.get(r) instanceof VBericht){
-            element = (VorgangElement) mymodel.get(r);
-            pdca = ((VBericht) element).getPdca();
+        } else if (mymodel.get(r) instanceof PReport){
+            elementQ = (QProcessElement) mymodel.get(r);
+            pdca = ((PReport) elementQ).getPdca();
         }
 
         switch (c) {
             case COL_CONTENT: {
-                result = element.getContentAsHTML();
+                result = elementQ.getContentAsHTML();
                 break;
             }
             case COL_PIT: {
-                result = element.getPITAsHTML();
+                result = elementQ.getPITAsHTML();
                 break;
             }
             case COL_PDCA: {
-                result = VorgaengeTools.PDCA[pdca];
+                result = QProcessTools.PDCA[pdca];
                 break;
             }
             default: {

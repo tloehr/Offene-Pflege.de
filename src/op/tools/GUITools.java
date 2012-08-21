@@ -99,7 +99,7 @@ public class GUITools {
      * @param popup    the JidePopup to show
      * @param location where to show the popup in relation to the <code>reference</code>. Use the SwingConstants above.
      */
-    public static void showPopup(JidePopup popup, int location) {
+    public static void showPopup(JidePopup popup, int location, boolean keepOnScreen) {
         Container content = popup.getContentPane();
         Point p2 = new Point(popup.getOwner().getX(), popup.getOwner().getY());
         SwingUtilities.convertPointToScreen(p2, popup.getOwner());
@@ -154,6 +154,10 @@ public class GUITools {
             }
         }
         popup.showPopup(x, y);
+    }
+
+    public static void showPopup(JidePopup popup, int location) {
+        showPopup(popup, location, true);
     }
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener) {

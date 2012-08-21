@@ -621,8 +621,8 @@ public class OPDE {
 
             // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
-//            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-            jpaProps.put("eclipselink.logging.level", JavaLog.OFF_LABEL);
+            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+//            jpaProps.put("eclipselink.logging.level", JavaLog.OFF_LABEL);
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
             /***

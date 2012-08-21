@@ -69,10 +69,10 @@ public class TMVorgang extends AbstractTableModel {
 //        String sql =
 //                " SELECT v.VorgangID, v.Titel, v.BWKennung, v.Von, v.WV, v.Bis, v.Ersteller, v.Besitzer, " +
 //                " vk.Text, vk.Art, ocu1.Nachname, ocu1.Vorname, ocu2.Nachname, ocu2.Vorname, v.BWKennung " +
-//                " FROM Vorgaenge v " +
+//                " FROM QProcess v " +
 //                " INNER JOIN OCUsers ocu1 ON ocu1.UKennung = v.Besitzer " +
 //                " INNER JOIN OCUsers ocu2 ON ocu2.UKennung = v.Ersteller " +
-//                " INNER JOIN VKat vk ON v.VKatID = vk.VKatID " +
+//                " INNER JOIN PCat vk ON v.VKatID = vk.VKatID " +
 //                " WHERE v.VorgangID = ? ";
 //
 //        try {

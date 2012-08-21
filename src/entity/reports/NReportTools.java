@@ -2,23 +2,19 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
 */
-package entity;
+package entity.reports;
 
-import entity.files.Syspb2file;
+import entity.EntityTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.nursingprocess.DFN;
 import entity.nursingprocess.DFNTools;
-import entity.vorgang.SYSPB2VORGANG;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,25 +33,25 @@ public class NReportTools {
      * @param bericht
      * @return
      */
-    public static NReport deleteBericht(EntityManager em, NReport bericht) throws Exception {
-
-        NReport mybericht = em.merge(bericht);
-        em.lock(mybericht, LockModeType.OPTIMISTIC);
-
-        mybericht.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-
-        for (Syspb2file oldAssignment : mybericht.getAttachedFiles()) {
-            em.remove(oldAssignment);
-        }
-        mybericht.getAttachedFiles().clear();
-
-        for (SYSPB2VORGANG oldAssignment : mybericht.getAttachedVorgaenge()) {
-            em.remove(oldAssignment);
-        }
-        mybericht.getAttachedVorgaenge().clear();
-
-        return mybericht;
-    }
+//    public static NReport deleteBericht(EntityManager em, NReport bericht) throws Exception {
+//
+//        NReport mybericht = em.merge(bericht);
+//        em.lock(mybericht, LockModeType.OPTIMISTIC);
+//
+//        mybericht.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+//
+//        for (SYSPB2FILE oldAssignment : mybericht.getAttachedFiles()) {
+//            em.remove(oldAssignment);
+//        }
+//        mybericht.getAttachedFiles().clear();
+//
+//        for (SYSNR2PROCESS oldAssignment : mybericht.getAttachedVorgaenge()) {
+//            em.remove(oldAssignment);
+//        }
+//        mybericht.getAttachedVorgaenge().clear();
+//
+//        return mybericht;
+//    }
 
     public static NReport getFirstReport(Resident bewohner) {
         EntityManager em = OPDE.createEM();
@@ -69,87 +65,52 @@ public class NReportTools {
     }
 
 
+    public static boolean isChangeable(NReport nReport) {
+        OPDE.debug(nReport.getPbid());
+        return !nReport.isObsolete() && nReport.getUsersAcknowledged().isEmpty() && (OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser()));
+    }
+
+
     /**
      * Führt die notwendigen Änderungen an den Entities durch, wenn ein Bericht geändert wurde. Dazu gehört auch die Dateien
      * und Vorgänge umzubiegen. Der alte Bericht verliert seine Dateien und Vorgänge. Es werden auch die
      * notwendigen Querverweise zwischen dem alten und dem neuen Bericht erstellt.
      *
-     * @param oldBericht der Bericht, der durch den <code>newBericht</code> ersetzt werden soll.
-     * @param newBericht siehe oben
+     * @param oldReport der Bericht, der durch den <code>newReport</code> ersetzt werden soll.
+     * @param newReport siehe oben
      * @return Erfolg oder nicht
      */
-    public static void changeBericht(EntityManager em, NReport oldBericht, NReport newBericht) throws Exception {
-//        boolean success = false;
-//        EntityManager em = OPDE.createEM();
-//        em.getTransaction().begin();
-//        try {
-        oldBericht = em.merge(oldBericht);
-        newBericht = em.merge(newBericht);
-        em.lock(oldBericht, LockModeType.OPTIMISTIC);
-        em.lock(newBericht, LockModeType.OPTIMISTIC);
-        newBericht.setReplacementFor(oldBericht);
-
-        // Dateien umbiegen
-//            Iterator<Syspb2file> files = oldBericht.getAttachedFiles().iterator();
-        for (Syspb2file oldAssignment : oldBericht.getAttachedFiles()) {
-            // Diesen Umweg muss ich wählen, dass Syspb2file eigentlich
-            // die JOIN Relation einer M:N Rel ist.
-            Syspb2file newAssignment = em.merge(new Syspb2file(oldAssignment.getSysfile(), newBericht, oldAssignment.getUser(), oldAssignment.getPit()));
-            newBericht.getAttachedFiles().add(newAssignment);
-            em.remove(oldAssignment);
-        }
-        oldBericht.getAttachedFiles().clear();
-
-        // Vorgänge umbiegen
-        for (SYSPB2VORGANG oldAssignment : oldBericht.getAttachedVorgaenge()) {
-            SYSPB2VORGANG newAssignment = em.merge(new SYSPB2VORGANG(oldAssignment.getVorgang(), newBericht));
-            newBericht.getAttachedVorgaenge().add(newAssignment);
-            em.remove(oldAssignment);
-        }
-        oldBericht.getAttachedVorgaenge().clear();
-        oldBericht.setEditedBy(em.merge(OPDE.getLogin().getUser()));
-        oldBericht.setEditpit(new Date());
-        oldBericht.setReplacedBy(newBericht);
-
-
-//            success = true;
-//        } catch (Exception e) {
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-//        return success;
-    }
+//    public static void editReport(EntityManager em, NReport oldReport, NReport newReport) throws Exception {
+//
+//
+//    }
 
     /**
      * liefert eine Kopie eines Berichtes, die noch nicht persistiert wurde. * Somit ist PBID = 0
-     * Gilt nicht für die Mappings (Dateien oder Vorgänge). Die werden erst bei changeBericht() geändert.
+     * Gilt nicht für die Mappings (Dateien oder Vorgänge). Die werden erst bei editReport() geändert.
      *
      * @param source
      * @return
      */
-    public static NReport copyBericht(NReport source) {
-        NReport target = new NReport(source.getResident());
-        target.setDauer(source.getDauer());
-        target.setEditedBy(source.getEditedBy());
-        target.setEditpit(source.getEditpit());
-        target.setPit(source.getPit());
-        target.setReplacedBy(source.getReplacedBy());
-        target.setReplacementFor(source.getReplacementFor());
-        target.setText(source.getText());
-        target.setUser(source.getUser());
-
-        Iterator<NReportTAGS> tags = source.getTags().iterator();
-        while (tags.hasNext()) {
-            NReportTAGS tag = tags.next();
-            target.getTags().add(tag);
-        }
-
-        return target;
-    }
+//    public static NReport copyBericht(NReport source) {
+//        NReport target = new NReport(source.getResident());
+//        target.setMinutes(source.getMinutes());
+//        target.setEditedBy(source.getEditedBy());
+//        target.setEditpit(source.getEditpit());
+//        target.setPit(source.getPit());
+//        target.setReplacedBy(source.getReplacedBy());
+//        target.setReplacementFor(source.getReplacementFor());
+//        target.setText(source.getText());
+//        target.setUser(source.getUser());
+//
+//        Iterator<NReportTAGS> tags = source.getTags().iterator();
+//        while (tags.hasNext()) {
+//            NReportTAGS tag = tags.next();
+//            target.getTags().add(tag);
+//        }
+//
+//        return target;
+//    }
 
 //    public static boolean saveBericht(NReport newBericht) {
 //        boolean success = false;
@@ -250,7 +211,7 @@ public class NReportTools {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
         if (showMinutes && !bericht.isDeleted() && !bericht.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + bericht.getDauer() + " " + OPDE.lang.getString("misc.msg.Minutes");
+            result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + bericht.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)");
         }
         if (showIDs) {
             result += "<br/><i>(" + bericht.getPbid() + ")</i>";
@@ -270,7 +231,7 @@ public class NReportTools {
 
         result += getDatumUndUser(nReport, false, true);
 
-        result += SYSTools.catchNull(getTagsAsHTML(nReport)," [","]") + " ";
+        result += SYSTools.catchNull(getTagsAsHTML(nReport), " [", "]") + " ";
 
         DateFormat df = DateFormat.getDateTimeInstance();
 
@@ -291,14 +252,11 @@ public class NReportTools {
 //            result += "<font color=\"red\">&#9679;</font>";
 //        }
 
-        result += "<p>["+nReport.getPbid()+"] "+SYSTools.replace(nReport.getText(), "\n", "<br/>") +"<p/>";
-
-
+        result += "<p>[" + nReport.getPbid() + "] " + SYSTools.replace(nReport.getText(), "\n", "<br/>") + "<p/>";
 
 
         return result;
     }
-
 
 
     public static String getBewohnerName(NReport bericht) {
@@ -527,8 +485,6 @@ public class NReportTools {
     }
 
     /**
-     *
-     *
      * @param resident
      * @param startdate
      * @param weeksback
@@ -563,7 +519,6 @@ public class NReportTools {
     }
 
     /**
-     *
      * @param resident
      * @param search
      * @return
@@ -583,7 +538,7 @@ public class NReportTools {
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
-            query.setParameter("search",EntityTools.getMySQLsearchPattern(search));
+            query.setParameter("search", EntityTools.getMySQLsearchPattern(search));
 
             list = new ArrayList<NReport>(query.getResultList());
 
@@ -596,7 +551,6 @@ public class NReportTools {
     }
 
     /**
-     *
      * @param resident
      * @return
      */

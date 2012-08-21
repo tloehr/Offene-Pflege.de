@@ -174,8 +174,8 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_VORGANG: {
-//                previousPanel =   new PnlVorgang(parent, bewohner)
-//                final PnlVorgang pnlVorgang = new PnlVorgang(parent, bewohner);
+//                previousPanel =   new PnlProcess(parent, bewohner)
+//                final PnlProcess pnlVorgang = new PnlProcess(parent, bewohner);
 //                NursingRecordsPanel cp = new CleanablePanel() {
 //
 //                    @Override

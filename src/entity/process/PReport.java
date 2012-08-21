@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity.vorgang;
+package entity.process;
 
 import entity.Users;
 import op.OPDE;
@@ -17,16 +17,16 @@ import java.util.Date;
 @Entity
 @Table(name = "VBericht")
 @NamedQueries({
-        @NamedQuery(name = "VBericht.findAll", query = "SELECT v FROM VBericht v"),
-        @NamedQuery(name = "VBericht.findByVbid", query = "SELECT v FROM VBericht v WHERE v.vbid = :vbid"),
-        @NamedQuery(name = "VBericht.findByPit", query = "SELECT v FROM VBericht v WHERE v.pit = :pit"),
-        @NamedQuery(name = "VBericht.findByArt", query = "SELECT v FROM VBericht v WHERE v.art = :art"),
-        @NamedQuery(name = "VBericht.findByVorgang", query = "SELECT v FROM VBericht v WHERE v.vorgang = :vorgang "),
+        @NamedQuery(name = "VBericht.findAll", query = "SELECT v FROM PReport v"),
+        @NamedQuery(name = "VBericht.findByVbid", query = "SELECT v FROM PReport v WHERE v.vbid = :vbid"),
+        @NamedQuery(name = "VBericht.findByPit", query = "SELECT v FROM PReport v WHERE v.pit = :pit"),
+        @NamedQuery(name = "VBericht.findByArt", query = "SELECT v FROM PReport v WHERE v.art = :art"),
+        @NamedQuery(name = "VBericht.findByVorgang", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang "),
         // 0 heisst nur normale Berichte.
         // VBERICHT_ART_USER = 0;
-        @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM VBericht v WHERE v.vorgang = :vorgang AND v.art = 0"),
-        @NamedQuery(name = "VBericht.findByPdca", query = "SELECT v FROM VBericht v WHERE v.pdca = :pdca")})
-public class VBericht implements Serializable, VorgangElement {
+        @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang AND v.art = 0"),
+        @NamedQuery(name = "VBericht.findByPdca", query = "SELECT v FROM PReport v WHERE v.pdca = :pdca")})
+public class PReport implements Serializable, QProcessElement {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -44,24 +44,20 @@ public class VBericht implements Serializable, VorgangElement {
     @Basic(optional = false)
     @Column(name = "Art")
     private short art;
-    @Basic(optional = false)
-    @Column(name = "PDCA")
-    private short pdca;
     @JoinColumn(name = "VorgangID", referencedColumnName = "VorgangID")
     @ManyToOne
-    private Vorgaenge vorgang;
+    private QProcess vorgang;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
-    public VBericht() {
+    public PReport() {
     }
 
-    public VBericht(String text, short art, Vorgaenge vorgang) {
+    public PReport(String text, short art, QProcess vorgang) {
         this.text = text;
         this.art = art;
         this.vorgang = vorgang;
-        this.pdca = VorgaengeTools.PDCA_OFF;
         this.pit = new Date();
         this.user = OPDE.getLogin().getUser();
     }
@@ -74,11 +70,11 @@ public class VBericht implements Serializable, VorgangElement {
         this.vbid = vbid;
     }
 
-    public Vorgaenge getVorgang() {
+    public QProcess getVorgang() {
         return vorgang;
     }
 
-    public void setVorgang(Vorgaenge vorgang) {
+    public void setVorgang(QProcess vorgang) {
         this.vorgang = vorgang;
     }
 
@@ -106,14 +102,6 @@ public class VBericht implements Serializable, VorgangElement {
         this.art = art;
     }
 
-    public short getPdca() {
-        return pdca;
-    }
-
-    public void setPdca(short pdca) {
-        this.pdca = pdca;
-    }
-
     public Users getUser() {
         return user;
     }
@@ -123,12 +111,12 @@ public class VBericht implements Serializable, VorgangElement {
     }
 
     public boolean isSystem() {
-        return art != VBerichtTools.VBERICHT_ART_USER;
+        return art != PReportTools.VBERICHT_ART_USER;
     }
 
     @Override
     public String getContentAsHTML() {
-        return VBerichtTools.getBerichtAsHTML(this);
+        return PReportTools.getBerichtAsHTML(this);
     }
 
     @Override
@@ -138,7 +126,7 @@ public class VBericht implements Serializable, VorgangElement {
 
     @Override
     public String getPITAsHTML() {
-        return VBerichtTools.getPITAsHTML(this);
+        return PReportTools.getPITAsHTML(this);
     }
 
     @Override
@@ -156,10 +144,10 @@ public class VBericht implements Serializable, VorgangElement {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof VBericht)) {
+        if (!(object instanceof PReport)) {
             return false;
         }
-        VBericht other = (VBericht) object;
+        PReport other = (PReport) object;
         if ((this.vbid == null && other.vbid != null) || (this.vbid != null && !this.vbid.equals(other.vbid))) {
             return false;
         }
@@ -168,6 +156,6 @@ public class VBericht implements Serializable, VorgangElement {
 
     @Override
     public String toString() {
-        return "entity.vorgang.VBericht[vbid=" + vbid + "]";
+        return "entity.process.PReport[vbid=" + vbid + "]";
     }
 }

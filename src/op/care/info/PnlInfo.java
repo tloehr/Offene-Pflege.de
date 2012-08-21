@@ -50,29 +50,29 @@ import java.util.List;
 public class PnlInfo extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.info";
 
-    public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
-    public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
-
-    public final Icon icon22addPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png"));
-    public final Icon icon22attach = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach.png"));
-    public final Icon icon22attachPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach_pressed.png"));
-    public final Icon icon22edit = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread.png"));
-    public final Icon icon22editPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread_pressed.png"));
-    public final Icon icon22gotoEnd = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png"));
-    public final Icon icon22gotoEndPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end_pressed.png"));
-    public final Icon icon22stop = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop.png"));
-    public final Icon icon22stopPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop_pressed.png"));
-    public final Icon icon48stop = new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_stop.png"));
-    public final Icon icon22delete = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png"));
-    public final Icon icon22deletePressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete_pressed.png"));
-    public final Icon icon48delete = new ImageIcon(getClass().getResource("/artwork/48x48/bw/editdelete.png"));
-    public final Icon icon22view = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag.png"));
-    public final Icon icon22viewPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag-selected.png"));
-    public final Icon icon22changePeriod = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page.png"));
-    public final Icon icon22changePeriodPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page_pressed.png"));
-    public final Icon icon16bysecond = new ImageIcon(getClass().getResource("/artwork/16x16/bw/bysecond.png"));
-    public final Icon icon16byday = new ImageIcon(getClass().getResource("/artwork/16x16/bw/byday.png"));
-    public final Icon icon16pit = new ImageIcon(getClass().getResource("/artwork/16x16/bw/pointintime.png"));
+//    public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
+//    public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
+//
+//    public final Icon icon22addPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png"));
+//    public final Icon icon22attach = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach.png"));
+//    public final Icon icon22attachPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach_pressed.png"));
+//    public final Icon icon22edit = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread.png"));
+//    public final Icon icon22editPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread_pressed.png"));
+//    public final Icon icon22gotoEnd = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png"));
+//    public final Icon icon22gotoEndPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end_pressed.png"));
+//    public final Icon icon22stop = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop.png"));
+//    public final Icon icon22stopPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop_pressed.png"));
+//    public final Icon icon48stop = new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_stop.png"));
+//    public final Icon icon22delete = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png"));
+//    public final Icon icon22deletePressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete_pressed.png"));
+//    public final Icon icon48delete = new ImageIcon(getClass().getResource("/artwork/48x48/bw/editdelete.png"));
+//    public final Icon icon22view = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag.png"));
+//    public final Icon icon22viewPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag-selected.png"));
+//    public final Icon icon22changePeriod = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page.png"));
+//    public final Icon icon22changePeriodPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page_pressed.png"));
+//    public final Icon icon16bysecond = new ImageIcon(getClass().getResource("/artwork/16x16/bw/bysecond.png"));
+//    public final Icon icon16byday = new ImageIcon(getClass().getResource("/artwork/16x16/bw/byday.png"));
+//    public final Icon icon16pit = new ImageIcon(getClass().getResource("/artwork/16x16/bw/pointintime.png"));
 
     private final int MAX_HTML_LENGTH = 80;
     private Resident bewohner;
@@ -667,12 +667,12 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private Icon getIcon(BWInfoTyp typ) {
         if (typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            return icon16pit;
+            return SYSConst.icon16pit;
         }
         if (typ.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
-            return icon16byday;
+            return SYSConst.icon16byday;
         }
-        return icon16bysecond;
+        return SYSConst.icon16bysecond;
     }
 
     private String getUserInfoAsHTML(BWInfo bwinfo) {
@@ -751,8 +751,8 @@ public class PnlInfo extends NursingRecordsPanel {
              *
              */
             if (ersterBWInfo != null) {
-                final JToggleButton btnView = new JToggleButton(icon22view);
-                btnView.setSelectedIcon(icon22viewPressed);
+                final JToggleButton btnView = new JToggleButton(SYSConst.icon22view);
+                btnView.setSelectedIcon(SYSConst.icon22viewPressed);
                 btnView.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnView.setContentAreaFilled(false);
                 btnView.setBorder(null);
@@ -788,8 +788,8 @@ public class PnlInfo extends NursingRecordsPanel {
              *
              */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
-                JButton btnAdd = new JButton(icon22add);
-                btnAdd.setPressedIcon(icon22addPressed);
+                JButton btnAdd = new JButton(SYSConst.icon22add);
+                btnAdd.setPressedIcon(SYSConst.icon22addPressed);
                 btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnAdd.setContentAreaFilled(false);
                 btnAdd.setBorder(null);
@@ -866,8 +866,8 @@ public class PnlInfo extends NursingRecordsPanel {
              *
              */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {  // => ACL_MATRIX
-                JButton btnEdit = new JButton(icon22edit);
-                btnEdit.setPressedIcon(icon22editPressed);
+                JButton btnEdit = new JButton(SYSConst.icon22edit);
+                btnEdit.setPressedIcon(SYSConst.icon22editPressed);
                 btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnEdit.setContentAreaFilled(false);
                 btnEdit.setBorder(null);
@@ -922,15 +922,15 @@ public class PnlInfo extends NursingRecordsPanel {
              *                                                     |_|
              */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
-                JButton btnStop = new JButton(icon22stop);
-                btnStop.setPressedIcon(icon22stopPressed);
+                JButton btnStop = new JButton(SYSConst.icon22stop);
+                btnStop.setPressedIcon(SYSConst.icon22stopPressed);
                 btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnStop.setContentAreaFilled(false);
                 btnStop.setBorder(null);
                 btnStop.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + ersterBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + ersterBWInfo.getHtml(), icon48stop, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + ersterBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + ersterBWInfo.getHtml(), SYSConst.icon48stop, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -977,15 +977,15 @@ public class PnlInfo extends NursingRecordsPanel {
              *
              */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
-                JButton btnDelete = new JButton(icon22delete);
-                btnDelete.setPressedIcon(icon22deletePressed);
+                JButton btnDelete = new JButton(SYSConst.icon22delete);
+                btnDelete.setPressedIcon(SYSConst.icon22deletePressed);
                 btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnDelete.setContentAreaFilled(false);
                 btnDelete.setBorder(null);
                 btnDelete.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete") + "<br/>" + ersterBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + ersterBWInfo.getHtml(), icon48delete, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete") + "<br/>" + ersterBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + ersterBWInfo.getHtml(), SYSConst.icon48delete, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1031,8 +1031,8 @@ public class PnlInfo extends NursingRecordsPanel {
              *
              */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) { // => ACL_MATRIX
-                JButton btnAttach = new JButton(icon22attach);
-                btnAttach.setPressedIcon(icon22attachPressed);
+                JButton btnAttach = new JButton(SYSConst.icon22attach);
+                btnAttach.setPressedIcon(SYSConst.icon22attachPressed);
                 btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnAttach.setContentAreaFilled(false);
                 btnAttach.setBorder(null);
@@ -1050,7 +1050,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 btnAttach.setEnabled(ersterBWInfo != null && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme());
 
                 if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && ersterBWInfo.getAttachedFiles().size() > 0) {
-                    JLabel lblNum = new JLabel(Integer.toString(ersterBWInfo.getAttachedFiles().size()), icon16redStar, SwingConstants.CENTER);
+                    JLabel lblNum = new JLabel(Integer.toString(ersterBWInfo.getAttachedFiles().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
                     lblNum.setFont(SYSConst.ARIAL10BOLD);
                     lblNum.setForeground(Color.YELLOW);
                     lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -1120,8 +1120,8 @@ public class PnlInfo extends NursingRecordsPanel {
                      *     |____/ \__,_|\__|\__\___/|_| |_|    \_/  |_|\___| \_/\_/    \____\___/|_| |_|\__\___|_| |_|\__|
                      *
                      */
-                    JToggleButton btnView = new JToggleButton(icon22view);
-                    btnView.setSelectedIcon(icon22viewPressed);
+                    JToggleButton btnView = new JToggleButton(SYSConst.icon22view);
+                    btnView.setSelectedIcon(SYSConst.icon22viewPressed);
                     btnView.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnView.setContentAreaFilled(false);
                     btnView.setBorder(null);
@@ -1146,8 +1146,8 @@ public class PnlInfo extends NursingRecordsPanel {
                      *                                                   |_|
                      */
                     if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.CANCEL)) { // => ACL_MATRIX
-                        JButton btnStop = new JButton(icon22stop);
-                        btnStop.setPressedIcon(icon22stopPressed);
+                        JButton btnStop = new JButton(SYSConst.icon22stop);
+                        btnStop.setPressedIcon(SYSConst.icon22stopPressed);
                         btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
                         btnStop.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         btnStop.setContentAreaFilled(false);
@@ -1155,7 +1155,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         btnStop.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent actionEvent) {
-                                new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + innerBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + innerBWInfo.getHtml(), icon48stop, new Closure() {
+                                new DlgYesNo(OPDE.lang.getString("misc.questions.cancel") + "<br/>" + innerBWInfo.getBwinfotyp().getBWInfoKurz() + "<br/>" + innerBWInfo.getHtml(), SYSConst.icon48stop, new Closure() {
                                     @Override
                                     public void execute(Object answer) {
                                         if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1201,8 +1201,8 @@ public class PnlInfo extends NursingRecordsPanel {
                      *     |____/ \__,_|\__|\__\___/|_| |_|  \____|_| |_|\__,_|_| |_|\__, |\___| |_|   \___|_|  |_|\___/ \__,_|
                      *                                                               |___/
                      */
-                    final JButton btnChangePeriod = new JButton(icon22changePeriod);
-                    btnChangePeriod.setPressedIcon(icon22changePeriodPressed);
+                    final JButton btnChangePeriod = new JButton(SYSConst.icon22changePeriod);
+                    btnChangePeriod.setPressedIcon(SYSConst.icon22changePeriodPressed);
                     btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnChangePeriod.setContentAreaFilled(false);
                     btnChangePeriod.setBorder(null);
@@ -1324,8 +1324,8 @@ public class PnlInfo extends NursingRecordsPanel {
                      *
                      */
                     if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.INSERT)) {    // => ACL_MATRIX
-                        JButton btnAttach = new JButton(icon22attach);
-                        btnAttach.setPressedIcon(icon22attachPressed);
+                        JButton btnAttach = new JButton(SYSConst.icon22attach);
+                        btnAttach.setPressedIcon(SYSConst.icon22attachPressed);
                         btnAttach.setAlignmentX(Component.RIGHT_ALIGNMENT);
                         btnAttach.setContentAreaFilled(false);
                         btnAttach.setBorder(null);
@@ -1350,7 +1350,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         });
 
                         if (innerBWInfo.getAttachedFiles().size() > 0) {
-                            JLabel lblNum = new JLabel(Integer.toString(innerBWInfo.getAttachedFiles().size()), icon16redStar, SwingConstants.CENTER);
+                            JLabel lblNum = new JLabel(Integer.toString(innerBWInfo.getAttachedFiles().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
                             lblNum.setFont(SYSConst.ARIAL10BOLD);
                             lblNum.setForeground(Color.YELLOW);
                             lblNum.setHorizontalTextPosition(SwingConstants.CENTER);

@@ -2,19 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity.vorgang;
+package entity.process;
 
 import entity.EntityTools;
-import op.OPDE;
 
-import javax.persistence.EntityManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 /**
  * @author tloehr
  */
-public class VBerichtTools {
+public class PReportTools {
 
     public static final short VBERICHT_ART_USER = 0;
     public static final short VBERICHT_ART_ASSIGN_ELEMENT = 1;
@@ -25,10 +23,9 @@ public class VBerichtTools {
     public static final short VBERICHT_ART_REOPEN = 6;
     public static final short VBERICHT_ART_EDIT = 7;
     public static final short VBERICHT_ART_WV = 8;
-    public static final short VBERICHT_ART_PDCA = 9;
-    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt", "SYS PDCA Stufe erhöht"};
+    public static final String[] VBERICHT_ARTEN = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
 
-    public static String getBerichtAsHTML(VBericht bericht) {
+    public static String getBerichtAsHTML(PReport bericht) {
         String html = "";
         html += "<b>Vorgangsbericht</b>";
         if (bericht.getArt() > 0) {
@@ -39,7 +36,7 @@ public class VBerichtTools {
         return html;
     }
 
-    public static String getPITAsHTML(VBericht bericht) {
+    public static String getPITAsHTML(PReport bericht) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
         if (bericht.getArt() != VBERICHT_ART_USER) {
@@ -52,8 +49,8 @@ public class VBerichtTools {
         return html;
     }
 
-    public static void newBericht(Vorgaenge vorgang, String text, short art) {
-        VBericht vbericht = new VBericht(text, art, vorgang);
+    public static void newBericht(QProcess vorgang, String text, short art) {
+        PReport vbericht = new PReport(text, art, vorgang);
         EntityTools.persist(vbericht);
     }
 }

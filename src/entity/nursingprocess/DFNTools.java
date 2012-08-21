@@ -175,8 +175,8 @@ public class DFNTools {
 
         BigDecimal row = BigDecimal.ZERO;
 
-        System.out.println("------------------------------------------");
-        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate())));
+//        System.out.println("------------------------------------------");
+        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
         System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 
         for (InterventionSchedule termin : list) {
@@ -319,8 +319,9 @@ public class DFNTools {
             }
         }
 
+        System.out.println();
         System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numdfn);
-        System.out.println("------------------------------------------");
+//        System.out.println("------------------------------------------");
         return numdfn;
     }
 

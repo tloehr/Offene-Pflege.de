@@ -6,7 +6,7 @@ package op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.NReport;
+import entity.reports.NReport;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import entity.info.BWInfo;
@@ -69,7 +69,7 @@ public class DlgFiles extends MyJDialog {
     private JPanel getFileDropPanel() {
         JPanel dropPanel = new JPanel();
         dropPanel.setLayout(new BorderLayout());
-        JLabel dropLabel = new JLabel(OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"), new ImageIcon(Double.class.getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);
+        JLabel dropLabel = new JLabel(OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"), SYSConst.icon48kgetdock, SwingConstants.CENTER);
         dropLabel.setFont(SYSConst.ARIAL20);
         dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -133,8 +133,8 @@ public class DlgFiles extends MyJDialog {
         ArrayList<SYSFiles> files = null;
         EntityManager em = OPDE.createEM();
         if (attachable instanceof NReport) {
-            Query query = em.createNamedQuery("SYSFiles.findByPB", SYSFiles.class);
-            query.setParameter("pflegebericht", attachable);
+            Query query = em.createNamedQuery("SYSFiles.findByNReport", SYSFiles.class);
+            query.setParameter("nReport", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
             Collections.sort(files);
         } else if (attachable instanceof Prescriptions) {

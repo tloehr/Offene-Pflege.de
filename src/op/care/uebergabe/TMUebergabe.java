@@ -27,6 +27,8 @@
 package op.care.uebergabe;
 
 import entity.*;
+import entity.reports.NReport;
+import entity.reports.NReportTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 

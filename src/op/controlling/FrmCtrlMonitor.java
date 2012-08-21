@@ -26,8 +26,8 @@
  */
 package op.controlling;
 
-import entity.NReportTAGS;
-import entity.NReportTools;
+import entity.reports.NReportTAGS;
+import entity.reports.NReportTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.files.SYSFilesTools;

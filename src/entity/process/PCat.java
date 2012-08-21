@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity.vorgang;
+package entity.process;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,12 +14,12 @@ import java.io.Serializable;
 @Entity
 @Table(name = "VKat")
 @NamedQueries({
-        @NamedQuery(name = "VKat.findAll", query = "SELECT v FROM VKat v"),
-        @NamedQuery(name = "VKat.findAllSorted", query = "SELECT v FROM VKat v ORDER BY v.text"),
-        @NamedQuery(name = "VKat.findByVKatID", query = "SELECT v FROM VKat v WHERE v.vKatID = :vKatID"),
-        @NamedQuery(name = "VKat.findByText", query = "SELECT v FROM VKat v WHERE v.text = :text"),
-        @NamedQuery(name = "VKat.findByArt", query = "SELECT v FROM VKat v WHERE v.art = :art")})
-public class VKat implements Serializable {
+        @NamedQuery(name = "VKat.findAll", query = "SELECT v FROM PCat v"),
+        @NamedQuery(name = "VKat.findAllSorted", query = "SELECT v FROM PCat v ORDER BY v.text"),
+        @NamedQuery(name = "VKat.findByVKatID", query = "SELECT v FROM PCat v WHERE v.vKatID = :vKatID"),
+        @NamedQuery(name = "VKat.findByText", query = "SELECT v FROM PCat v WHERE v.text = :text"),
+        @NamedQuery(name = "VKat.findByArt", query = "SELECT v FROM PCat v WHERE v.art = :art")})
+public class PCat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,16 +33,16 @@ public class VKat implements Serializable {
     @Column(name = "Art")
     private short art;
 
-    public VKat() {
+    public PCat() {
     }
 
-    public VKat(Long vKatID) {
+    public PCat(Long vKatID) {
         this.vKatID = vKatID;
     }
 
-    public VKat(String text) {
+    public PCat(String text) {
         this.text = text;
-        this.art = VKatTools.VKAT_ART_ALLGEMEIN;
+        this.art = PCatTools.VKAT_ART_ALLGEMEIN;
     }
 
     public Long getVKatID() {
@@ -79,10 +79,10 @@ public class VKat implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof VKat)) {
+        if (!(object instanceof PCat)) {
             return false;
         }
-        VKat other = (VKat) object;
+        PCat other = (PCat) object;
         if ((this.vKatID == null && other.vKatID != null) || (this.vKatID != null && !this.vKatID.equals(other.vKatID))) {
             return false;
         }

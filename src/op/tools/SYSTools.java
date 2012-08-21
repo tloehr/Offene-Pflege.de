@@ -295,7 +295,7 @@ public class SYSTools {
 //        if (DBRetrieve.absentSince(currentBW) != null) {
 //            result += " &rarr; ";
 //        }
-//        if (op.share.vorgang.DBHandling.hatVorgang(currentBW)) {
+//        if (op.share.process.DBHandling.hatVorgang(currentBW)) {
 //            result += " <font color=\"red\">&#9679;</font> ";
 //        }
 //        if (bwinfo5.isVerstorben()) {

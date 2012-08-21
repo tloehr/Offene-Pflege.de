@@ -7,8 +7,8 @@ package entity.nursingprocess;
 import entity.info.Resident;
 import entity.Users;
 import entity.info.BWInfoKat;
-import entity.vorgang.SYSPLAN2VORGANG;
-import entity.vorgang.VorgangElement;
+import entity.process.QProcessElement;
+import entity.process.SYSNP2PROCESS;
 import op.OPDE;
 import op.tools.SYSConst;
 import org.joda.time.DateTime;
@@ -29,7 +29,7 @@ import java.util.List;
         @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM NursingProcess p"),
         @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.planID = :planID"),
         @NamedQuery(name = "Planung.findByVorgang", query = " "
-                + " SELECT p, av.pdca FROM NursingProcess p "
+                + " SELECT p FROM NursingProcess p "
                 + " JOIN p.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
@@ -38,7 +38,7 @@ import java.util.List;
         @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.bis = :bis"),
         @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.planKennung = :planKennung"),
         @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nKontrolle = :nKontrolle")})
-public class NursingProcess implements Serializable, VorgangElement, Comparable<NursingProcess>, Cloneable {
+public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -97,7 +97,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
-    private Collection<SYSPLAN2VORGANG> attachedVorgaenge;
+    private Collection<SYSNP2PROCESS> attachedVorgaenge;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<NPControl> kontrollen;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
@@ -112,7 +112,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         this.angesetztDurch = OPDE.getLogin().getUser();
         interventionSchedules = new ArrayList<InterventionSchedule>();
         kontrollen = new ArrayList<NPControl>();
-        attachedVorgaenge = new ArrayList<SYSPLAN2VORGANG>();
+        attachedVorgaenge = new ArrayList<SYSNP2PROCESS>();
         nKontrolle = new DateTime().plusWeeks(4).toDate();
         von = new Date();
         bis = SYSConst.DATE_BIS_AUF_WEITERES;
@@ -217,7 +217,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         this.kategorie = kategorie;
     }
 
-    public Collection<SYSPLAN2VORGANG> getAttachedVorgaenge() {
+    public Collection<SYSNP2PROCESS> getAttachedVorgaenge() {
         return attachedVorgaenge;
     }
 
@@ -284,7 +284,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
         return von.compareTo(nursingProcess.getVon());
     }
 
-    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, BWInfoKat kategorie, Collection<SYSPLAN2VORGANG> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
+    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, BWInfoKat kategorie, Collection<SYSNP2PROCESS> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
         this.stichwort = stichwort;
         this.situation = situation;
         this.ziel = ziel;
@@ -304,7 +304,7 @@ public class NursingProcess implements Serializable, VorgangElement, Comparable<
 
     @Override
     public NursingProcess clone() {
-        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, resident, kategorie, new ArrayList<SYSPLAN2VORGANG>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
+        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, resident, kategorie, new ArrayList<SYSNP2PROCESS>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
         for (InterventionSchedule is : interventionSchedules){
             InterventionSchedule myIS = is.clone();
             myIS.setNursingProcess(myNewNP);

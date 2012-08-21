@@ -26,8 +26,8 @@
  */
 package tablemodels;
 
-import entity.NReport;
-import entity.NReportTools;
+import entity.reports.NReport;
+import entity.reports.NReportTools;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;

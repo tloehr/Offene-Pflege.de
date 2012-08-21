@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.reports;
 
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSConst;
@@ -129,7 +130,7 @@ public class NReportTAGSTools {
             JCheckBox cb = new JCheckBox(tag.getBezeichnung());
             cb.setForeground(tag.getColor());
             if (tag.isBesonders()) {
-                cb.setFont(SYSConst.ARIAL14);
+                cb.setFont(SYSConst.ARIAL14BOLD);
             }
             cb.putClientProperty("UserObject", tag);
 

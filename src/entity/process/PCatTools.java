@@ -1,4 +1,4 @@
-package entity.vorgang;
+package entity.process;
 
 import entity.EntityTools;
 import op.OPDE;
@@ -13,7 +13,7 @@ import javax.persistence.Query;
  * Time: 14:07
  * To change this template use File | Settings | File Templates.
  */
-public class VKatTools {
+public class PCatTools {
 
     public static final int VKAT_ART_ALLGEMEIN = 0;
     public static final int VKAT_ART_PFLEGE = 1;
@@ -22,16 +22,16 @@ public class VKatTools {
     public static final int VKAT_ART_VERWALTUNG = 4;
     public static final int VKAT_ART_BESCHWERDE = 5;
 
-    public static VKat addKat(String kat) {
-        VKat vkat = null;
+    public static PCat addKat(String kat) {
+        PCat vkat = null;
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("VKat.findByText");
         query.setParameter("text", kat.trim());
         if (query.getResultList().isEmpty()){
-            vkat = new VKat(kat.trim());
+            vkat = new PCat(kat.trim());
             EntityTools.persist(vkat);
         } else {
-            vkat = (VKat) query.getResultList().get(0);
+            vkat = (PCat) query.getResultList().get(0);
         }
         em.close();
         return vkat;

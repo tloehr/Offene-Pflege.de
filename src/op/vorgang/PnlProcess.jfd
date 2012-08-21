@@ -8,10 +8,26 @@
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
      <object class="com.jformdesigner.model.FormContainer"> 
-      <string>op.tools.CleanablePanel</string> 
+      <string>javax.swing.JPanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>javax.swing.BoxLayout</class> 
       </object> 
+      <void method="setProperty"> 
+       <string>border</string> 
+       <object class="javax.swing.border.LineBorder"> 
+        <object class="java.awt.Color" field="black"/> 
+        <int>1</int> 
+        <boolean>true</boolean> 
+       </object> 
+      </void> 
+      <void method="addEvent"> 
+       <object class="com.jformdesigner.model.FormEvent"> 
+        <string>java.awt.event.ComponentListener</string> 
+        <string>componentResized</string> 
+        <string>thisComponentResized</string> 
+        <boolean>true</boolean> 
+       </object> 
+      </void> 
       <void property="name"> 
        <string>this</string> 
       </void> 
@@ -22,7 +38,7 @@
          <class>javax.swing.JScrollPane</class> 
         </object> 
         <void property="name"> 
-         <string>jspReports</string> 
+         <string>jspProcess</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
@@ -35,7 +51,7 @@
            </void> 
           </object> 
           <void property="name"> 
-           <string>cpReports</string> 
+           <string>cpProcess</string> 
           </void> 
          </object> 
         </void> 
@@ -47,15 +63,15 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>715</int> 
-        <int>415</int> 
+        <int>1200</int> 
+        <int>695</int> 
        </object> 
       </void> 
       <void method="setProperty"> 
        <string>location</string> 
        <object class="java.awt.Point"> 
         <int>0</int> 
-        <int>25</int> 
+        <int>0</int> 
        </object> 
       </void> 
      </object> 

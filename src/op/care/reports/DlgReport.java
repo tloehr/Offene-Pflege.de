@@ -10,10 +10,9 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
-import entity.NReport;
-import entity.NReportTAGS;
-import entity.info.Resident;
-import entity.NReportTAGSTools;
+import entity.reports.NReport;
+import entity.reports.NReportTAGS;
+import entity.reports.NReportTAGSTools;
 import op.tools.MyJDialog;
 import op.tools.PnlUhrzeitDatum;
 import op.tools.SYSTools;
@@ -24,7 +23,6 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -33,52 +31,43 @@ import java.util.Date;
  * @author Torsten Löhr
  */
 public class DlgReport extends MyJDialog {
-    private NReport bericht;
-    private Resident bewohner;
-    private PropertyChangeListener pcl;
-    private final int DAUER = 3;
+    private NReport nReport;
     private Closure actionBlock;
     private OverlayTextField txtDauer;
     private DefaultOverlayable ovrDauer;
     private JLabel attentionIcon;
     private PnlUhrzeitDatum pnlUhrzeitDatum;
+    private int defaultMinutes;
 
-    public DlgReport(Resident bewohner, Closure actionBlock) {
+    public DlgReport(NReport nReport, Closure actionBlock) {
         super();
-        this.bewohner = bewohner;
+        this.nReport = nReport;
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
     }
 
     private void initDialog() {
-
-        Date now = new Date();
-        bericht = new NReport(bewohner);
-        bericht.setPit(now);
-        bericht.setText("");
-        bericht.setDauer(DAUER);
-
         pnlTags.setViewportView(NReportTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 JCheckBox cb = (JCheckBox) e.getSource();
                 NReportTAGS tag = (NReportTAGS) cb.getClientProperty("UserObject");
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    bericht.getTags().remove(tag);
+                    nReport.getTags().remove(tag);
                 } else {
-                    bericht.getTags().add(tag);
+                    nReport.getTags().add(tag);
                 }
             }
-        }, bericht.getTags(), new GridLayout(0, 1)));
+        }, nReport.getTags(), new GridLayout(0, 1)));
 
-        pnlUhrzeitDatum = new PnlUhrzeitDatum(new Date());
+        pnlUhrzeitDatum = new PnlUhrzeitDatum(nReport.getPit());
         panel1.add(pnlUhrzeitDatum, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
+        txtBericht.setText(nReport.getText());
+        defaultMinutes = nReport.getMinutes();
+        txtDauer = new OverlayTextField(Integer.toString(defaultMinutes));
 
-        txtBericht.setText("");
-
-        txtDauer = new OverlayTextField(Integer.toString(DAUER));
         txtDauer.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent focusEvent) {
@@ -105,24 +94,24 @@ public class DlgReport extends MyJDialog {
     private void txtDauerFocusLost(FocusEvent e) {
         NumberFormat nf = NumberFormat.getIntegerInstance();
         String test = txtDauer.getText();
-        int dauer = DAUER;
+        int dauer = defaultMinutes;
         try {
             Number num = nf.parse(test);
             dauer = num.intValue();
             if (dauer < 0) {
-                dauer = DAUER;
-                txtDauer.setText(Integer.toString(DAUER));
+                dauer = defaultMinutes;
+                txtDauer.setText(Integer.toString(defaultMinutes));
             }
         } catch (ParseException ex) {
-            dauer = DAUER;
-            txtDauer.setText(Integer.toString(DAUER));
+            dauer = defaultMinutes;
+            txtDauer.setText(Integer.toString(defaultMinutes));
         }
-        ovrDauer.setOverlayVisible(dauer == DAUER);
-        bericht.setDauer(dauer);
+        ovrDauer.setOverlayVisible(dauer == defaultMinutes);
+        nReport.setMinutes(dauer);
     }
 
     private void txtBerichtCaretUpdate(CaretEvent e) {
-        bericht.setText(txtBericht.getText());
+        nReport.setText(txtBericht.getText());
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -131,8 +120,8 @@ public class DlgReport extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        bericht.setPit(pnlUhrzeitDatum.getPIT());
-        actionBlock.execute(bericht);
+        nReport.setPit(pnlUhrzeitDatum.getPIT());
+        actionBlock.execute(nReport);
         dispose();
     }
 

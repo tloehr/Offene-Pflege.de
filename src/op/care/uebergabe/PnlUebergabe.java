@@ -30,6 +30,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import entity.reports.NReport;
 import op.FrmMain;
 import op.OCSec;
 import op.OPDE;

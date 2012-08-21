@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.NReport;
+import entity.reports.NReport;
 import entity.info.Resident;
 import entity.info.BWInfo;
 import entity.prescription.Prescriptions;
@@ -143,7 +143,7 @@ public class SYSFilesTools {
                     SYSFiles sysfile = putFile(em, ftp, file, bewohner);
                     if (attachable != null) {
                         if (attachable instanceof NReport) {
-                            Syspb2file link = em.merge(new Syspb2file(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
+                            SYSPB2FILE link = em.merge(new SYSPB2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getPbAssignCollection().add(link);
                             ((NReport) attachable).getAttachedFiles().add(link);
                         } else if (attachable instanceof Prescriptions) {
@@ -151,7 +151,7 @@ public class SYSFilesTools {
                             sysfile.getVerAssignCollection().add(link);
                             ((Prescriptions) attachable).getAttachedFiles().add(link);
                         } else if (attachable instanceof BWInfo) {
-                            Sysbwi2file link = em.merge(new Sysbwi2file(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
+                            SYSBWI2FILE link = em.merge(new SYSBWI2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getBwiAssignCollection().add(link);
                             ((BWInfo) attachable).getAttachedFiles().add(link);
                         }
@@ -347,73 +347,14 @@ public class SYSFilesTools {
         handleFile(getFile(sysfile), action);
     }
 
-    public static JMenuItem getFileMenu(final Object attachable, final Closure afterAttach) {
-        final JMenuItem itemPopupAttach = new JMenuItem(OPDE.lang.getString(PnlFiles.internalClassID), new ImageIcon(Double.class.getResource("/artwork/22x22/bw/attach.png")));
-        itemPopupAttach.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new DlgFiles(attachable, afterAttach);
-            }
-        });
-        return itemPopupAttach;
-    }
-
-
-
-//    public static JMenuItem getFileListPopupMenu(JTable o, Point p, Object a) {
-//        final Object attachable = a;
-//        final JTable owner = o;
-//        final Point point = p;
-//        final JMenuItem itemPopupAttachments = new JMenuItem(OPDE.lang.getString(PnlFiles.internalClassID + ".Attachments"), new ImageIcon(Double.class.getResource("/artwork/22x22/bw/attach.png")));
-//        itemPopupAttachments.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                final JidePopup popup = new JidePopup();
-//                popup.setMovable(false);
-//                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                ArrayList<SYSFiles> files = null;
-//                EntityManager em = OPDE.createEM();
-//                if (attachable instanceof NReport) {
-//                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2PB", SYSFiles.class);
-//                    query.setParameter("bericht", attachable);
-//                    files = new ArrayList<SYSFiles>(query.getResultList());
-//                    Collections.sort(files);
-//                } else if (attachable instanceof Verordnung) {
-//                    Query query = em.createNamedQuery("SYSFiles.findByBWKennung2VER", SYSFiles.class);
-//                    query.setParameter("bewohner", ((NReport) attachable).getResident());
-//                    files = new ArrayList<SYSFiles>(query.getResultList());
-//                    Collections.sort(files);
-//                }
-//                em.close();
-//
-//                final JList list = new JList(files.toArray());
-//                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//                list.setCellRenderer(getSYSFilesRenderer());
-////                list.setBorder(new EmptyBorder(10, 10, 10, 10));
-//                list.addListSelectionListener(new ListSelectionListener() {
-//                    @Override
-//                    public void valueChanged(ListSelectionEvent listSelectionEvent) {
-//                        if (!listSelectionEvent.getValueIsAdjusting()) {
-//                            handleFile((SYSFiles) list.getSelectedValue(), Desktop.Action.OPEN);
-//                            popup.hidePopup();
-//                        }
-//                    }
-//                });
-//                JPanel borderPanel = new JPanel();
-//                borderPanel.setLayout(new BoxLayout(borderPanel, BoxLayout.LINE_AXIS));
-//                borderPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-//                borderPanel.add(new JScrollPane(list));
-//                popup.setOwner(owner);
-//                popup.removeExcludedComponent(owner);
-//                popup.getContentPane().add(borderPanel);
-//                popup.setDefaultFocusComponent(list);
-//
-//                SwingUtilities.convertPointToScreen(point, owner);
-//                popup.showPopup(point.x, point.y);
-//
+//    public static JMenuItem getFileMenu(final Object attachable, final Closure afterAttach) {
+//        final JMenuItem itemPopupAttach = new JMenuItem(OPDE.lang.getString(PnlFiles.internalClassID), SYSConst.icon22attach);
+//        itemPopupAttach.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                new DlgFiles(attachable, afterAttach);
 //            }
 //        });
-//        return itemPopupAttachments;
-//
+//        return itemPopupAttach;
 //    }
 
     public static FTPClient getFTPClient() {

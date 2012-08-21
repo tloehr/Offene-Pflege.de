@@ -38,9 +38,9 @@ import java.util.Date;
 @Entity
 @Table(name = "SYSBWI2FILE")
 @NamedQueries({
-        @NamedQuery(name = "Sysbwi2file.findAll", query = "SELECT s FROM Sysbwi2file s"),
-        @NamedQuery(name = "Sysbwi2file.findById", query = "SELECT s FROM Sysbwi2file s WHERE s.id = :id")})
-public class Sysbwi2file implements Serializable {
+        @NamedQuery(name = "Sysbwi2file.findAll", query = "SELECT s FROM SYSBWI2FILE s"),
+        @NamedQuery(name = "Sysbwi2file.findById", query = "SELECT s FROM SYSBWI2FILE s WHERE s.id = :id")})
+public class SYSBWI2FILE implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -95,10 +95,10 @@ public class Sysbwi2file implements Serializable {
     }
 
 
-    public Sysbwi2file() {
+    public SYSBWI2FILE() {
     }
 
-    public Sysbwi2file(SYSFiles sysfile, BWInfo bwinfo, Users user, Date pit) {
+    public SYSBWI2FILE(SYSFiles sysfile, BWInfo bwinfo, Users user, Date pit) {
         this.sysfile = sysfile;
         this.bwinfo = bwinfo;
         this.user = user;
@@ -122,10 +122,10 @@ public class Sysbwi2file implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof Sysbwi2file)) {
+        if (!(object instanceof SYSBWI2FILE)) {
             return false;
         }
-        Sysbwi2file other = (Sysbwi2file) object;
+        SYSBWI2FILE other = (SYSBWI2FILE) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -134,6 +134,6 @@ public class Sysbwi2file implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.files.Sysbwi2file[id=" + id + "]";
+        return "entity.files.SYSBWI2FILE[id=" + id + "]";
     }
 }

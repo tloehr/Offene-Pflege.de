@@ -612,7 +612,6 @@ public class PnlDFN extends NursingRecordsPanel {
              *
              */
             final JButton btnMinutes = new JButton(SYSConst.icon22clock);
-            final JidePopup popup = new JidePopup();
             btnMinutes.setPressedIcon(SYSConst.icon22clockPressed);
             btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnMinutes.setContentAreaFilled(false);

@@ -515,7 +515,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 //
 //            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isDiscontinued() && singleRowSelected) {
 //                menu.add(new JSeparator());
-//                menu.add(VorgaengeTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
+//                menu.add(QProcessTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
 //            }
 
 

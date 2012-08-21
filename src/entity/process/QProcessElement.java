@@ -2,18 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity.vorgang;
+package entity.process;
 
 /**
  * Dieses Interface dient dazu, dass ich mit den Elementen eines Vorgangs
  * in den Hilfsklassen einheitlich umgehen kann. Ich definiere
  * hier einfach alle Methoden und Eigenschaften, welche diese
- * Klasse gemeinsam haben. Somit können alle Entitäten, die ein VorgangElement sind
+ * Klasse gemeinsam haben. Somit können alle Entitäten, die ein QProcessElement sind
  * an bestehende Vorgänge angehangen werden.
  *
  * @author tloehr
  */
-public interface VorgangElement {
+public interface QProcessElement {
 
     /**
      * Hilfsmethode, die bei der Comparator Klasse dazu dient, das Sortierkriterium zu erhalten.

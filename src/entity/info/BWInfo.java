@@ -26,9 +26,9 @@
 package entity.info;
 
 import entity.Users;
-import entity.files.Sysbwi2file;
-import entity.vorgang.SYSBWI2VORGANG;
-import entity.vorgang.VorgangElement;
+import entity.files.SYSBWI2FILE;
+import entity.process.QProcessElement;
+import entity.process.SYSINF2PROCESS;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -50,7 +50,7 @@ import java.util.Properties;
         @NamedQuery(name = "BWInfo.findAll", query = "SELECT b FROM BWInfo b"),
         @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM BWInfo b WHERE b.bwinfoid = :bwinfoid"),
         @NamedQuery(name = "BWInfo.findByVorgang", query = " "
-                + " SELECT bw, av.pdca FROM BWInfo bw "
+                + " SELECT bw FROM BWInfo bw "
                 + " JOIN bw.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
@@ -58,7 +58,7 @@ import java.util.Properties;
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
         @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_ASC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von ASC"),
         @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis")})
-public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparable<BWInfo> {
+public class BWInfo implements Serializable, QProcessElement, Cloneable, Comparable<BWInfo> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -110,9 +110,9 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
-    private Collection<Sysbwi2file> attachedFiles;
+    private Collection<SYSBWI2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
-    private Collection<SYSBWI2VORGANG> attachedVorgaenge;
+    private Collection<SYSINF2PROCESS> attachedVorgaenge;
 
 
     public BWInfo() {
@@ -136,8 +136,8 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
         this.bwinfotyp = bwinfotyp;
         this.angesetztDurch = OPDE.getLogin().getUser();
         this.bewohner = bewohner;
-        this.attachedFiles = new ArrayList<Sysbwi2file>();
-        this.attachedVorgaenge = new ArrayList<SYSBWI2VORGANG>();
+        this.attachedFiles = new ArrayList<SYSBWI2FILE>();
+        this.attachedVorgaenge = new ArrayList<SYSINF2PROCESS>();
     }
 
     public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Resident bewohner) {
@@ -151,8 +151,8 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
         this.angesetztDurch = OPDE.getLogin().getUser();
         this.abgesetztDurch = null;
         this.bewohner = bewohner;
-        this.attachedFiles = new ArrayList<Sysbwi2file>();
-        this.attachedVorgaenge = new ArrayList<SYSBWI2VORGANG>();
+        this.attachedFiles = new ArrayList<SYSBWI2FILE>();
+        this.attachedVorgaenge = new ArrayList<SYSINF2PROCESS>();
     }
 
     public Long getBwinfoid() {
@@ -252,11 +252,11 @@ public class BWInfo implements Serializable, VorgangElement, Cloneable, Comparab
     }
 
 
-    public Collection<Sysbwi2file> getAttachedFiles() {
+    public Collection<SYSBWI2FILE> getAttachedFiles() {
         return attachedFiles;
     }
 
-    public Collection<SYSBWI2VORGANG> getAttachedVorgaenge() {
+    public Collection<SYSINF2PROCESS> getAttachedVorgaenge() {
         return attachedVorgaenge;
     }
 

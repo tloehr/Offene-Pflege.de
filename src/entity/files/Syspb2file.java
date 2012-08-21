@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.NReport;
+import entity.reports.NReport;
 import entity.Users;
 
 import javax.persistence.*;
@@ -41,9 +41,9 @@ import java.util.Date;
 @Entity
 @Table(name = "SYSPB2FILE")
 @NamedQueries({
-        @NamedQuery(name = "Syspb2file.findAll", query = "SELECT s FROM Syspb2file s"),
-        @NamedQuery(name = "Syspb2file.findById", query = "SELECT s FROM Syspb2file s WHERE s.id = :id")})
-public class Syspb2file implements Serializable {
+        @NamedQuery(name = "Syspb2file.findAll", query = "SELECT s FROM SYSPB2FILE s"),
+        @NamedQuery(name = "Syspb2file.findById", query = "SELECT s FROM SYSPB2FILE s WHERE s.id = :id")})
+public class SYSPB2FILE implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,27 +59,27 @@ public class Syspb2file implements Serializable {
     private SYSFiles sysfile;
     @JoinColumn(name = "PBID", referencedColumnName = "PBID")
     @ManyToOne
-    private NReport pflegebericht;
+    private NReport nReport;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
-    public Syspb2file() {
+    public SYSPB2FILE() {
     }
 
-    public Syspb2file(SYSFiles sysfile, NReport pflegebericht, Users user, Date pit) {
+    public SYSPB2FILE(SYSFiles sysfile, NReport nReport, Users user, Date pit) {
         this.sysfile = sysfile;
-        this.pflegebericht = pflegebericht;
+        this.nReport = nReport;
         this.user = user;
         this.pit = pit;
     }
 
-    public NReport getPflegebericht() {
-        return pflegebericht;
+    public NReport getNReport() {
+        return nReport;
     }
 
-    public void setPflegebericht(NReport pflegebericht) {
-        this.pflegebericht = pflegebericht;
+    public void setNReport(NReport nReport) {
+        this.nReport = nReport;
     }
 
     public Users getUser() {
@@ -120,10 +120,10 @@ public class Syspb2file implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Syspb2file)) {
+        if (!(object instanceof SYSPB2FILE)) {
             return false;
         }
-        Syspb2file other = (Syspb2file) object;
+        SYSPB2FILE other = (SYSPB2FILE) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -132,6 +132,6 @@ public class Syspb2file implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.files.Syspb2file[id=" + id + "]";
+        return "entity.files.SYSPB2FILE[id=" + id + "]";
     }
 }

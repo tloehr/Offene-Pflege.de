@@ -4,8 +4,7 @@ package entity;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
-import entity.vorgang.SYSBWerte2VORGANG;
-import entity.vorgang.Vorgaenge;
+import entity.process.*;
 import op.OPDE;
 import op.care.vital.PnlVitalwerte;
 import op.tools.SYSCalendar;
@@ -242,17 +241,17 @@ public class BWerteTools {
             mywert.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
 
 //            // Datei Zuordnungen entfernen
-//            Iterator<Syspb2file> files = bericht.getAttachedFiles().iterator();
+//            Iterator<SYSPB2FILE> files = bericht.getAttachedFiles().iterator();
 //            while (files.hasNext()) {
-//                Syspb2file oldAssignment = files.next();
+//                SYSPB2FILE oldAssignment = files.next();
 //                em.remove(oldAssignment);
 //            }
 //            bericht.getAttachedFiles().clear();
 
             // Vorgangszuordnungen entfernen
-            Iterator<SYSBWerte2VORGANG> vorgaenge = mywert.getAttachedVorgaenge().iterator();
+            Iterator<SYSVAL2PROCESS> vorgaenge = mywert.getAttachedVorgaenge().iterator();
             while (vorgaenge.hasNext()) {
-                SYSBWerte2VORGANG oldAssignment = vorgaenge.next();
+                SYSVAL2PROCESS oldAssignment = vorgaenge.next();
                 em.remove(oldAssignment);
             }
             mywert.getAttachedVorgaenge().clear();
@@ -295,10 +294,10 @@ public class BWerteTools {
             oldOne.setReplacedBy(newOne);
 
             // Vorgänge umbiegen
-            for (SYSBWerte2VORGANG oldAssignment : oldOne.getAttachedVorgaenge()) {
-                Vorgaenge vorgang = oldAssignment.getVorgang();
+            for (SYSVAL2PROCESS oldAssignment : oldOne.getAttachedVorgaenge()) {
+                QProcess vorgang = oldAssignment.getVorgang();
                 em.lock(vorgang, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                SYSBWerte2VORGANG newAssignment = em.merge(new SYSBWerte2VORGANG(vorgang, newOne));
+                SYSVAL2PROCESS newAssignment = em.merge(new SYSVAL2PROCESS(vorgang, newOne));
                 newOne.getAttachedVorgaenge().add(newAssignment);
                 em.remove(oldAssignment);
             }

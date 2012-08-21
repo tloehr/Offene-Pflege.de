@@ -20,8 +20,8 @@
         <class>entity.nursingprocess.Intervention</class>
         <class>entity.Mitarbeiter</class>
         <class>entity.PB2User</class>
-        <class>entity.NReportTAGS</class>
-        <class>entity.NReport</class>
+        <class>entity.reports.NReportTAGS</class>
+        <class>entity.reports.NReport</class>
         <class>entity.nursingprocess.NPControl</class>
         <class>entity.nursingprocess.NursingProcess</class>
         <class>entity.QSQuery</class>
@@ -31,8 +31,8 @@
         <class>entity.Uebergabebuch</class>
         <class>entity.Users</class>
         <class>entity.files.SYSFiles</class>
-        <class>entity.files.Sysbwi2file</class>
-        <class>entity.files.Syspb2file</class>
+        <class>entity.files.SYSBWI2FILE</class>
+        <class>entity.files.SYSPB2FILE</class>
         <class>entity.files.Sysver2file</class>
         <class>entity.info.BWInfo</class>
         <class>entity.info.BWInfoKat</class>
@@ -55,14 +55,14 @@
         <class>entity.prescription.Situationen</class>
         <class>entity.prescription.Prescriptions</class>
         <class>entity.prescription.PrescriptionSchedule</class>
-        <class>entity.vorgang.SYSBWI2VORGANG</class>
-        <class>entity.vorgang.SYSBWerte2VORGANG</class>
-        <class>entity.vorgang.SYSPB2VORGANG</class>
-        <class>entity.vorgang.SYSPLAN2VORGANG</class>
-        <class>entity.vorgang.SYSVER2VORGANG</class>
-        <class>entity.vorgang.VBericht</class>
-        <class>entity.vorgang.VKat</class>
-        <class>entity.vorgang.Vorgaenge</class>
+        <class>entity.QProcess.SYSINF2PROCESS</class>
+        <class>entity.QProcess.SYSVAL2PROCESS</class>
+        <class>entity.QProcess.SYSNR2PROCESS</class>
+        <class>entity.QProcess.SYSNP2PROCESS</class>
+        <class>entity.QProcess.SYSPRE2PROCESS</class>
+        <class>entity.QProcess.PReport</class>
+        <class>entity.QProcess.PCat</class>
+        <class>entity.QProcess.QProcess</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>

@@ -9,8 +9,8 @@ import entity.*;
 import entity.files.Sysver2file;
 import entity.info.Resident;
 import entity.nursingprocess.Intervention;
-import entity.vorgang.SYSVER2VORGANG;
-import entity.vorgang.VorgangElement;
+import entity.process.SYSPRE2PROCESS;
+import entity.process.QProcessElement;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -81,7 +81,7 @@ import java.util.List;
         @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescriptions b WHERE b.verid = :verid"),
         @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescriptions b WHERE b.anDatum = :anDatum"),
         @NamedQuery(name = "Verordnung.findByVorgang", query = " "
-                + " SELECT ve, av.pdca FROM Prescriptions ve "
+                + " SELECT ve FROM Prescriptions ve "
                 + " JOIN ve.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
@@ -159,7 +159,7 @@ import java.util.List;
 
 })
 
-public class Prescriptions implements Serializable, VorgangElement, Cloneable, Comparable<Prescriptions> {
+public class Prescriptions implements Serializable, QProcessElement, Cloneable, Comparable<Prescriptions> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -195,7 +195,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<Sysver2file> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
-    private List<SYSVER2VORGANG> attachedVorgaenge;
+    private List<SYSPRE2PROCESS> attachedVorgaenge;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
@@ -241,14 +241,14 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
     public Prescriptions(Resident resident) {
         this.resident = resident;
         this.attachedFiles = new ArrayList<Sysver2file>();
-        this.attachedVorgaenge = new ArrayList<SYSVER2VORGANG>();
+        this.attachedVorgaenge = new ArrayList<SYSPRE2PROCESS>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.anDatum = new Date();
         this.abDatum = SYSConst.DATE_BIS_AUF_WEITERES;
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Prescriptions(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSVER2VORGANG> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Prescriptions(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.anDatum = anDatum;
         this.abDatum = abDatum;
         this.bisPackEnde = bisPackEnde;
@@ -431,7 +431,7 @@ public class Prescriptions implements Serializable, VorgangElement, Cloneable, C
         return attachedFiles;
     }
 
-    public List<SYSVER2VORGANG> getAttachedVorgaenge() {
+    public List<SYSPRE2PROCESS> getAttachedVorgaenge() {
         return attachedVorgaenge;
     }
 
