@@ -60,7 +60,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>relgap, linegap, fill:13dlu, linegap, fill:11dlu, linegap, fill:15dlu, linegap, relgap</string> 
+            <string>relgap, linegap, pref, linegap, fill:11dlu, linegap, fill:15dlu, linegap, relgap</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -97,7 +97,7 @@
              <object class="java.awt.Font"> 
               <string>Arial Rounded MT Bold</string> 
               <int>0</int> 
-              <int>16</int> 
+              <int>22</int> 
              </object> 
             </void> 
             <void method="setProperty"> 

@@ -27,7 +27,6 @@ public class Intervention implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "MassID")
     private Long massID;
     @Basic(optional = false)

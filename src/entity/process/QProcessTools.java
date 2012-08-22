@@ -4,15 +4,20 @@
  */
 package entity.process;
 
-import entity.*;
+import entity.BWerte;
+import entity.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescriptions;
 import entity.reports.NReport;
 import op.OPDE;
 import op.tools.DlgException;
 import op.tools.SYSConst;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -113,7 +118,7 @@ public class QProcessTools {
             em.getTransaction().begin();
             PReport systemBericht = new PReport("Vorgang abgeschlossen", PReportTools.VBERICHT_ART_CLOSE, vorgang);
             em.persist(systemBericht);
-            vorgang.setBis(new Date());
+            vorgang.setTo(new Date());
             em.merge(vorgang);
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -130,7 +135,7 @@ public class QProcessTools {
             em.getTransaction().begin();
             PReport systemBericht = new PReport("Vorgang wieder geöffnet", PReportTools.VBERICHT_ART_REOPEN, vorgang);
             em.persist(systemBericht);
-            vorgang.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
+            vorgang.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
             em.merge(vorgang);
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -298,7 +303,7 @@ public class QProcessTools {
             PReport systemBericht = new PReport("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), PReportTools.VBERICHT_ART_WV, vorgang);
             em.persist(systemBericht);
 
-            vorgang.setWv(wv);
+            vorgang.setRevision(wv);
             em.merge(vorgang);
 
             em.getTransaction().commit();
@@ -308,6 +313,60 @@ public class QProcessTools {
         } finally {
             em.close();
         }
+    }
+
+    public static String getAsHTML(QProcess qProcess) {
+        String html = "";
+        html += "<h2>" + qProcess.getTitle() + "</h2>";
+
+        if (qProcess.getResident() != null) {
+            html += "<br/>Vorgang gehört zu BewohnerIn: <b>" + ResidentTools.getLabelText(qProcess.getResident()) + "</b><br/>";
+        } else {
+            html += "<br/>Allgemeiner Vorgang<br/>";
+        }
+        html += "<b>Von:</b> " + DateFormat.getDateInstance().format(qProcess.getFrom());
+        if (qProcess.isClosed()) {
+            html += "&nbsp;&nbsp;<b>Bis:</b> " + DateFormat.getDateInstance().format(qProcess.getTo());
+        }
+
+        DateMidnight revision = new DateMidnight(qProcess.getRevision());
+        if (revision.isAfterNow()) {
+            int daysBetween = Days.daysBetween(new DateTime(), revision).getDays();
+
+            if (daysBetween > 7) {
+                html += "<font " + SYSConst.html_darkgreen + ">";
+            } else if (daysBetween == 0) {
+                html += "<font " + SYSConst.html_gold7 + ">";
+            } else {
+                html += "<font " + SYSConst.html_darkorange + ">";
+            }
+        } else {
+            html += "<font " + SYSConst.html_darkred + ">";
+        }
+        html += "&nbsp;&nbsp;<b>Wiedervorlage:</b> ";
+        html += DateFormat.getDateInstance().format(qProcess.getRevision()) + "</font>";
+        html += "<br/><b>Erstellt von:</b> " + qProcess.getCreator().getNameUndVorname();
+        html += "&nbsp;&nbsp;<b>Aktueller Besitzer:</b> " + qProcess.getOwner().getNameUndVorname();
+
+        return html;
+    }
+
+    public static List<QProcess> getProcesses4(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.resident = :resident");
+        query.setParameter("resident", resident);
+        ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
+        em.close();
+        return list;
+    }
+
+    public static List<QProcess> getProcesses4(Users owner) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.owner = :owner");
+        query.setParameter("owner", owner);
+        ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
+        em.close();
+        return list;
     }
 
     private static JMenu getNeuMenu(QProcessElement elementQ, Resident bewohner) {
@@ -329,7 +388,7 @@ public class QProcessTools {
                     if (!txt.getText().trim().isEmpty()) {
                         QProcess vorgang = createVorgang(txt.getText(), kat, bw);
                         add(finalElementQ, vorgang);
-                        OPDE.debug("Vorgang '" + vorgang.getTitel() + "' für Bewohner '" + bw.getBWKennung() + "' angelegt. Element mit ID " + finalElementQ.getID() + " zugeordnet.");
+                        OPDE.debug("Vorgang '" + vorgang.getTitle() + "' für Bewohner '" + bw.getBWKennung() + "' angelegt. Element mit ID " + finalElementQ.getID() + " zugeordnet.");
                     }
                 }
             });
@@ -386,7 +445,7 @@ public class QProcessTools {
         Iterator<QProcess> it = proceses.iterator();
         while (it.hasNext()) {
             final QProcess vorgang = it.next();
-            JMenuItem mi = new JMenuItem(vorgang.getTitel());
+            JMenuItem mi = new JMenuItem(vorgang.getTitle());
             // Bei Aufruf eines Menüs, wird dass Element an den Vorgang angehangen.
             mi.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -432,7 +491,7 @@ public class QProcessTools {
         Iterator<QProcess> it = proceses.iterator();
         while (it.hasNext()) {
             final QProcess vorgang = it.next();
-            JMenuItem mi = new JMenuItem(vorgang.getTitel());
+            JMenuItem mi = new JMenuItem(vorgang.getTitle());
             // Bei Aufruf eines Menüs, wird dass Element vom Vorgang entfernt
             mi.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {

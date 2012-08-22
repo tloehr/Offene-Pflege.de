@@ -41,7 +41,6 @@ public class BWerte implements Serializable, QProcessElement, Cloneable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "BWID")
     private Long bwid;
     @Version
@@ -310,6 +309,11 @@ public class BWerte implements Serializable, QProcessElement, Cloneable {
         int hash = 0;
         hash += (bwid != null ? bwid.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String getTitle() {
+        return BWerteTools.getTitle(this);
     }
 
     @Override

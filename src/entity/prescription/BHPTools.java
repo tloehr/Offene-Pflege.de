@@ -238,7 +238,7 @@ public class BHPTools {
 
 //        OPDE.debug("MaxRows: " + maxrows);
         System.out.println("------------------------------------------");
-        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
+        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
         System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 
         for (PrescriptionSchedule pSchedule : list) {

@@ -24,6 +24,7 @@ import op.tools.CleanablePanel;
 import op.tools.InternalClassACL;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
+import op.process.PnlProcess;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -174,31 +175,8 @@ public class PnlPflege extends NursingRecordsPanel {
                 break;
             }
             case TAB_VORGANG: {
-//                previousPanel =   new PnlProcess(parent, bewohner)
-//                final PnlProcess pnlVorgang = new PnlProcess(parent, bewohner);
-//                NursingRecordsPanel cp = new CleanablePanel() {
-//
-//                    @Override
-//                    public void cleanup() {
-//                        pnlVorgang.cleanup();
-//                    }
-//
-//                    @Override
-//                    public void switchResident(Bewohner bewohner) {
-//                        BewohnerTools.setBWLabel(bwlabel, bewohner);
-//                        pnlVorgang.switchResident(bewohner);
-//                        validate();
-//                    }
-//                };
-//                bwlabel = BewohnerTools.getBWLabel(bewohner);
-////                            bwlabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-//                BoxLayout boxLayout = new BoxLayout(cp, BoxLayout.PAGE_AXIS);
-//                cp.setLayout(boxLayout);
-//                cp.add(bwlabel);
-//                cp.add(pnlVorgang);
-//
-//                jtpPflegeakte.setComponentAt(TAB_VORGANG, cp);
-//                jtpPflegeakte.setTitleAt(TAB_VORGANG, "Vorgänge");
+                previousPanel = new PnlProcess(currentBewohner, jspSearch);
+                jtpPflegeakte.setComponentAt(TAB_VORGANG, previousPanel);
                 break;
             }
             case TAB_FILES: {

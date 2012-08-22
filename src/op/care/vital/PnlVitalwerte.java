@@ -152,7 +152,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
         reloadTable();
     }
 

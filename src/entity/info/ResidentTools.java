@@ -64,7 +64,7 @@ public class ResidentTools {
         lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
         lblBW.setHorizontalAlignment(SwingConstants.LEADING);
         lblBW.setForeground(new java.awt.Color(255, 51, 0));
-        lblBW.setText(getBWLabelText(bewohner));
+        lblBW.setText(getLabelText(bewohner));
     }
 
     public static String getFullName(Resident bewohner) {
@@ -75,7 +75,7 @@ public class ResidentTools {
 //        return bewohner.getGeschlecht() == GESCHLECHT_WEIBLICH;
 //    }
 
-    public static String getBWLabelText(Resident bewohner) {
+    public static String getLabelText(Resident bewohner) {
         boolean verstorben = BWInfoTools.isVerstorben(bewohner);
         boolean ausgezogen = BWInfoTools.isVerstorben(bewohner);
         BWInfo hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("hauf"));

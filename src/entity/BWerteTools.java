@@ -170,6 +170,19 @@ public class BWerteTools {
         return SYSTools.htmlUmlautConversion(colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
     }
 
+
+    public static String getTitle(BWerte param){
+        String result ="";
+        if (param.getType() == RR) {
+            result += "<b>" + param.getWert() + "/" + param.getWert2() + " " + EINHEIT[RR] + " " + WERTE[PULS] + ": " + param.getWert3() + " " + EINHEIT[PULS] + "</b>";
+        } else if (param.getType() == STUHLGANG || param.getType() == ERBRECHEN) {
+            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
+        } else {
+            result += "<b>" + param.getWert() + " " + EINHEIT[param.getType()] + "</b>";
+        }
+        return result;
+    }
+
     public static String getBemerkungAsHTML(BWerte wert, boolean colorize) {
         String result = "";
         if (!SYSTools.catchNull(wert.getBemerkung()).isEmpty()) {
@@ -195,7 +208,7 @@ public class BWerteTools {
 
         String html = "";
 
-        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getBWLabelText(bwerte.get(0).getBewohner()) + "</h1>";
+        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(bwerte.get(0).getBewohner()) + "</h1>";
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader1") +

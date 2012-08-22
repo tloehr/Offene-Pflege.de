@@ -583,7 +583,7 @@ public class PnlInfo extends NursingRecordsPanel {
 //            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
 //                @Override
 //                public void actionPerformed(ActionEvent actionEvent) {
-//                    SYSFilesTools.print("<h1 id=\"fonth1\" >" + OPDE.lang.getString(internalClassID) + ": " + BewohnerTools.getBWLabelText(bewohner) + "</h1>" + getHTML(), true);
+//                    SYSFilesTools.print("<h1 id=\"fonth1\" >" + OPDE.lang.getString(internalClassID) + ": " + BewohnerTools.getLabelText(bewohner) + "</h1>" + getHTML(), true);
 //                }
 //            });
 //            mypanel.add(printButton);

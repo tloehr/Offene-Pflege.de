@@ -2,13 +2,12 @@
  * Created by JFormDesigner on Tue Aug 21 17:15:05 CEST 2012
  */
 
-package op.vorgang;
+package op.process;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.*;
 import javax.swing.*;
-import javax.swing.event.*;
+
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
 import com.toedter.calendar.*;

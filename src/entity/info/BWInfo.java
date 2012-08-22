@@ -62,7 +62,6 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "BWINFOID")
     private Long bwinfoid;
     @Version
@@ -322,6 +321,11 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public String getTitle() {
+        return bwinfotyp.getBWInfoKurz();
     }
 
     @Override

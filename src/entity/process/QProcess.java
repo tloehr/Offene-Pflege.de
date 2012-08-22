@@ -4,16 +4,17 @@
  */
 package entity.process;
 
-import entity.info.Resident;
 import entity.Users;
+import entity.info.Resident;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -22,69 +23,70 @@ import java.util.Date;
 @Table(name = "Vorgaenge")
 @NamedQueries({
         @NamedQuery(name = "Vorgaenge.findAll", query = "SELECT v FROM QProcess v "),
-        @NamedQuery(name = "Vorgaenge.findAllActiveSorted", query = "SELECT v FROM QProcess v WHERE v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findByVorgangID", query = "SELECT v FROM QProcess v WHERE v.vorgangID = :vorgangID"),
-        @NamedQuery(name = "Vorgaenge.findByTitel", query = "SELECT v FROM QProcess v WHERE v.titel = :titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.besitzer = :besitzer AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findInactiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.besitzer = :besitzer AND v.bis < '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveByBewohner", query = "SELECT v FROM QProcess v WHERE v.bewohner = :bewohner AND v.bis = '9999-12-31 23:59:59' ORDER BY v.titel"),
-        @NamedQuery(name = "Vorgaenge.findActiveRunningOut", query = "SELECT v FROM QProcess v WHERE v.bis = '9999-12-31 23:59:59' AND v.wv <= :wv ORDER BY v.wv"),
-        @NamedQuery(name = "Vorgaenge.findByVon", query = "SELECT v FROM QProcess v WHERE v.von = :von"),
-        @NamedQuery(name = "Vorgaenge.findByWv", query = "SELECT v FROM QProcess v WHERE v.wv = :wv"),
-        @NamedQuery(name = "Vorgaenge.findByBis", query = "SELECT v FROM QProcess v WHERE v.bis = :bis"),
-        @NamedQuery(name = "Vorgaenge.findByPdca", query = "SELECT v FROM QProcess v WHERE v.pdca = :pdca")})
-public class QProcess implements Serializable {
+        @NamedQuery(name = "Vorgaenge.findAllActiveSorted", query = "SELECT v FROM QProcess v WHERE v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
+        @NamedQuery(name = "Vorgaenge.findByVorgangID", query = "SELECT v FROM QProcess v WHERE v.pkid = :vorgangID"),
+        @NamedQuery(name = "Vorgaenge.findByTitel", query = "SELECT v FROM QProcess v WHERE v.title = :titel"),
+        @NamedQuery(name = "Vorgaenge.findActiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.owner = :besitzer AND v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
+        @NamedQuery(name = "Vorgaenge.findInactiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.owner = :besitzer AND v.to < '9999-12-31 23:59:59' ORDER BY v.title"),
+        @NamedQuery(name = "Vorgaenge.findActiveByBewohner", query = "SELECT v FROM QProcess v WHERE v.resident = :bewohner AND v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
+        @NamedQuery(name = "Vorgaenge.findActiveRunningOut", query = "SELECT v FROM QProcess v WHERE v.to = '9999-12-31 23:59:59' AND v.revision <= :wv ORDER BY v.revision"),
+        @NamedQuery(name = "Vorgaenge.findByVon", query = "SELECT v FROM QProcess v WHERE v.from = :from"),
+        @NamedQuery(name = "Vorgaenge.findByWv", query = "SELECT v FROM QProcess v WHERE v.revision = :wv"),
+        @NamedQuery(name = "Vorgaenge.findByBis", query = "SELECT v FROM QProcess v WHERE v.to = :bis")})
+public class QProcess implements Serializable, Comparable<QProcess> {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "VorgangID")
-    private Long vorgangID;
+    private Long pkid;
     @Basic(optional = false)
     @Column(name = "Titel")
-    private String titel;
+    private String title;
     @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date von;
+    private Date from;
     @Basic(optional = false)
     @Column(name = "WV")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date wv;
+    private Date revision;
     @Basic(optional = false)
     @Column(name = "Bis")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date bis;
+    private Date to;
     @JoinColumn(name = "Ersteller", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users ersteller;
+    private Users creator;
     @JoinColumn(name = "Besitzer", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users besitzer;
+    private Users owner;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     @JoinColumn(name = "VKatID", referencedColumnName = "VKatID")
     @ManyToOne
-    private PCat kategorie;
+    private PCat pcat;
     //
     // 1:n Relationen
     //
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<PReport> vorgangsBerichte;
+    private Collection<PReport> PReports;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSNR2PROCESS> attachedPflegeberichte;
+    private Collection<SYSNR2PROCESS> attachedNReports;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSPRE2PROCESS> attachedVerordnungen;
+    private Collection<SYSPRE2PROCESS> attachedPrescriptions;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSINF2PROCESS> attachedBWInfos;
+    private Collection<SYSINF2PROCESS> attachedInfos;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSNP2PROCESS> attachedPlanungen;
+    private Collection<SYSNP2PROCESS> attachedNursingProcesses;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    private Collection<SYSVAL2PROCESS> attachedResidentValues;
 
     // ==
     // M:N Relationen
@@ -118,99 +120,126 @@ public class QProcess implements Serializable {
     public QProcess() {
     }
 
-    public QProcess(String titel, Resident bewohner, PCat kategorie) {
-        this.titel = titel;
-        this.von = new Date();
-        this.wv = SYSCalendar.addDate(new Date(), 7);
-        this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
-        this.ersteller = OPDE.getLogin().getUser();
-        this.besitzer = OPDE.getLogin().getUser();
-        this.bewohner = bewohner;
-        this.kategorie = kategorie;
+    public QProcess(String title, Resident resident, PCat pcat) {
+        this.title = title;
+        this.from = new Date();
+        this.revision = SYSCalendar.addDate(new Date(), 7);
+        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.creator = OPDE.getLogin().getUser();
+        this.owner = OPDE.getLogin().getUser();
+        this.resident = resident;
+        this.pcat = pcat;
     }
 
-
-    public Long getVorgangID() {
-        return vorgangID;
+    public String getTitle() {
+        return title;
     }
 
-    public void setVorgangID(Long vorgangID) {
-        this.vorgangID = vorgangID;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getTitel() {
-        return titel;
+    public Date getFrom() {
+        return from;
     }
 
-    public void setTitel(String titel) {
-        this.titel = titel;
+    public void setFrom(Date from) {
+        this.from = from;
     }
 
-    public Date getVon() {
-        return von;
+    public Date getRevision() {
+        return revision;
     }
 
-    public void setVon(Date von) {
-        this.von = von;
+    public void setRevision(Date revision) {
+        this.revision = revision;
     }
 
-    public Date getWv() {
-        return wv;
+    public Date getTo() {
+        return to;
     }
 
-    public void setWv(Date wv) {
-        this.wv = wv;
+    public void setTo(Date to) {
+        this.to = to;
     }
 
-    public Date getBis() {
-        return bis;
+    public Users getCreator() {
+        return creator;
     }
 
-    public void setBis(Date bis) {
-        this.bis = bis;
+    public void setCreator(Users creator) {
+        this.creator = creator;
     }
 
-    public Users getBesitzer() {
-        return besitzer;
+    public Users getOwner() {
+        return owner;
     }
 
-    public void setBesitzer(Users besitzer) {
-        this.besitzer = besitzer;
+    public void setOwner(Users owner) {
+        this.owner = owner;
     }
 
-    public Resident getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
-    public Users getErsteller() {
-        return ersteller;
+    public PCat getPcat() {
+        return pcat;
     }
 
-    public void setErsteller(Users ersteller) {
-        this.ersteller = ersteller;
+    public void setPcat(PCat pcat) {
+        this.pcat = pcat;
     }
 
-    public PCat getKategorie() {
-        return kategorie;
+    public List<QProcessElement> getElements(){
+        ArrayList<QProcessElement> elements = new ArrayList<QProcessElement>();
+        elements.addAll(PReports);
+        for (SYSNR2PROCESS att : attachedNReports){
+             elements.add(att.getPflegebericht());
+        }
+        for (SYSNP2PROCESS att : attachedNursingProcesses){
+             elements.add(att.getNursingProcess());
+        }
+        for (SYSINF2PROCESS att : attachedInfos){
+             elements.add(att.getBwinfo());
+        }
+        for (SYSPRE2PROCESS att : attachedPrescriptions){
+             elements.add(att.getPrescription());
+        }
+        for (SYSVAL2PROCESS att : attachedResidentValues){
+             elements.add(att.getBwerte());
+        }
+        Collections.sort(elements, new Comparator<QProcessElement>() {
+            @Override
+            public int compare(QProcessElement o1, QProcessElement o2) {
+                return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis());
+            }
+        });
+        return elements;
     }
 
-    public void setKategorie(PCat kategorie) {
-        this.kategorie = kategorie;
-    }
-
-    public boolean isAbgeschlossen(){
-        return !bis.equals(SYSConst.DATE_BIS_AUF_WEITERES);
+    public boolean isClosed() {
+        return !to.equals(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (vorgangID != null ? vorgangID.hashCode() : 0);
+        hash += (pkid != null ? pkid.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public int compareTo(QProcess other) {
+        int result = new Boolean(isClosed()).compareTo(other.isClosed());
+        if (result == 0) {
+            result = from.compareTo(other.getFrom()) * -1;
+        }
+        return result;
     }
 
     @Override
@@ -220,7 +249,7 @@ public class QProcess implements Serializable {
             return false;
         }
         QProcess other = (QProcess) object;
-        if ((this.vorgangID == null && other.vorgangID != null) || (this.vorgangID != null && !this.vorgangID.equals(other.vorgangID))) {
+        if ((this.pkid == null && other.pkid != null) || (this.pkid != null && !this.pkid.equals(other.pkid))) {
             return false;
         }
         return true;
@@ -228,6 +257,6 @@ public class QProcess implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.process.QProcess[vorgangID=" + vorgangID + "]";
+        return "entity.process.QProcess[vorgangID=" + pkid + "]";
     }
 }

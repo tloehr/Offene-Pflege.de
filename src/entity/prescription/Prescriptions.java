@@ -163,7 +163,6 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "VerID")
     private Long verid;
     @Version
@@ -406,6 +405,11 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.angesetztDurch = angesetztDurch;
     }
 
+
+    @Override
+    public String getTitle() {
+        return PrescriptionsTools.getPrescriptionAsShortText(this);
+    }
 
     public Resident getResident() {
         return resident;

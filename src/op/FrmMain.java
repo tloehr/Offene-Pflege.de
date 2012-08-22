@@ -39,12 +39,12 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
 import com.jidesoft.wizard.WizardDialog;
-import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.files.SYSFilesTools;
 import entity.info.BWInfoTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.admin.residents.bwassistant.AddBWWizard;
@@ -52,12 +52,12 @@ import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
+import op.process.PnlProcess;
 import op.system.DlgLogin;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
-import op.vorgang.PnlProcess;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -301,20 +301,20 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
-                    "$rgap, $lgap, fill:13dlu, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                        "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
+                        "$rgap, $lgap, pref, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
-                lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
+                lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 22));
                 lblMainMsg.setForeground(new Color(105, 80, 69));
                 lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 lblMainMsg.setIcon(null);
@@ -566,7 +566,7 @@ public class FrmMain extends JFrame {
         if (classname.equals("op.bw.tg.PnlTG")) {
             panel = new PnlTG(jspSearch, bwchange);
         } else if (classname.equals("op.process.PnlProcess")) {
-            panel = new PnlProcess(null, null, this, null);
+            panel = new PnlProcess(null, jspSearch);
         } else if (classname.equals("op.care.med.PnlMed")) {
             panel = new PnlMed(jspSearch);
         }
@@ -621,11 +621,13 @@ public class FrmMain extends JFrame {
 
                         currentBewohner = innerbewohner;
 
-                        if (currentVisiblePanel instanceof NursingRecordsPanel) {
+//                        ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
+                        if (currentVisiblePanel instanceof PnlPflege) {
                             ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
                         } else {
                             setPanelTo(new PnlPflege(innerbewohner, jspSearch));
                         }
+
                     }
                 }
             };
@@ -701,9 +703,12 @@ public class FrmMain extends JFrame {
         if (blocked) {
             lblWait.setVisible(true);
             JPanel glass = new JPanel();
-            glass.addMouseListener(new MouseAdapter() {});
-            glass.addMouseMotionListener(new MouseMotionAdapter() {});
-            glass.addKeyListener(new KeyAdapter() {});
+            glass.addMouseListener(new MouseAdapter() {
+            });
+            glass.addMouseMotionListener(new MouseMotionAdapter() {
+            });
+            glass.addKeyListener(new KeyAdapter() {
+            });
             glass.setOpaque(false);
             setGlassPane(glass);
             getGlassPane().setVisible(true);

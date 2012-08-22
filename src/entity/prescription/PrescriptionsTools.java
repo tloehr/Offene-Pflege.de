@@ -273,7 +273,7 @@ public class PrescriptionsTools {
                 html += "<h2 id=\"fonth2\" " +
                         (pagebreak ? "style=\"page-break-before:always\">" : ">") +
                         ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
-                        + ResidentTools.getBWLabelText(verordnung.getResident())
+                        + ResidentTools.getLabelText(verordnung.getResident())
                         + "</h2>";
                 html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                         + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>";
@@ -603,7 +603,7 @@ public class PrescriptionsTools {
 
         if (!list.isEmpty()) {
             Prescriptions verordnung = list.get(0);
-            result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getBWLabelText(verordnung.getResident()) : "") + "</h2>" : "";
+            result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(verordnung.getResident()) : "") + "</h2>" : "";
 
 //            if (verordnung.getResident().getStation() != null) {
 //                result += EinrichtungenTools.getAsText(verordnung.getResident().getStation().getEinrichtung());

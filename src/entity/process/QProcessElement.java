@@ -30,6 +30,8 @@ public interface QProcessElement {
      */
     public String getContentAsHTML();
 
+    public String getTitle();
+
     /**
      * Liefert eine Darstellung für die Datumsspalte in HTML.
      *

@@ -17,9 +17,9 @@ import javax.persistence.*;
 @Table(name = "SYSBWERTE2VORGANG")
 @NamedQueries({
         @NamedQuery(name = "SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
+                " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
         @NamedQuery(name = "SYSBWerte2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
+                " SELECT s FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang = :vorgang AND s.vorgang.to = '9999-12-31 23:59:59' ")
 })
 public class SYSVAL2PROCESS {
     @Id

@@ -55,14 +55,14 @@
         <class>entity.prescription.Situationen</class>
         <class>entity.prescription.Prescriptions</class>
         <class>entity.prescription.PrescriptionSchedule</class>
-        <class>entity.QProcess.SYSINF2PROCESS</class>
-        <class>entity.QProcess.SYSVAL2PROCESS</class>
-        <class>entity.QProcess.SYSNR2PROCESS</class>
-        <class>entity.QProcess.SYSNP2PROCESS</class>
-        <class>entity.QProcess.SYSPRE2PROCESS</class>
-        <class>entity.QProcess.PReport</class>
-        <class>entity.QProcess.PCat</class>
-        <class>entity.QProcess.QProcess</class>
+        <class>entity.process.SYSINF2PROCESS</class>
+        <class>entity.process.SYSVAL2PROCESS</class>
+        <class>entity.process.SYSNR2PROCESS</class>
+        <class>entity.process.SYSNP2PROCESS</class>
+        <class>entity.process.SYSPRE2PROCESS</class>
+        <class>entity.process.PReport</class>
+        <class>entity.process.PCat</class>
+        <class>entity.process.QProcess</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>

@@ -43,7 +43,6 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "PlanID")
     private Long planID;
     @Basic(optional = false)
@@ -231,6 +230,11 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     public List<InterventionSchedule> getInterventionSchedule() {
         return interventionSchedules;
+    }
+
+    @Override
+    public String getTitle() {
+        return stichwort;
     }
 
     @Override

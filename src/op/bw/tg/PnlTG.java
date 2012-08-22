@@ -609,7 +609,7 @@ public class PnlTG extends CleanablePanel {
 //            lblBetrag.setForeground(Color.BLACK);
 //        }
 
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner) + ", Saldo: " + nf.format(zeilensaldo));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner) + ", Saldo: " + nf.format(zeilensaldo));
 
 
     }

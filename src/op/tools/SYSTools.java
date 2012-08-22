@@ -1111,8 +1111,7 @@ public class SYSTools {
 
         if (!catchNull(in).isEmpty()) {
             out = "<html>"
-                    + SYSConst.html_fontface
-                    + in + "</font></html>";
+                    + in + "</html>";
         }
         return htmlUmlautConversion(out);
     }

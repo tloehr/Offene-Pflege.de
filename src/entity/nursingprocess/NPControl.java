@@ -26,7 +26,6 @@ public class NPControl implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "PKonID")
     private Long pKonID;
     @Lob

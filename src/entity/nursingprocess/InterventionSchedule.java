@@ -49,7 +49,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "TermID")
     private Long termID;
     @Column(name = "NachtMo")

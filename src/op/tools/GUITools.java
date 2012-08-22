@@ -177,7 +177,7 @@ public class GUITools {
     }
 
     public static void setBWDisplay(Resident bewohner) {
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
         if (BWInfoTools.isAbwesend(bewohner)) {
             OPDE.getDisplayManager().setIconAway();
         } else if (BWInfoTools.isVerstorben(bewohner)) {

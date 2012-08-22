@@ -17,14 +17,13 @@ import javax.persistence.*;
 @Table(name = "SYSPLAN2VORGANG")
 @NamedQueries({
         @NamedQuery(name = "SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang.bis = '9999-12-31 23:59:59' "),
+                " SELECT s.vorgang FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
         @NamedQuery(name = "SYSPLAN2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang = :vorgang AND s.vorgang.bis = '9999-12-31 23:59:59' ")
+                " SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang = :vorgang AND s.vorgang.to = '9999-12-31 23:59:59' ")
 })
 public class SYSNP2PROCESS {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ID")
     private long id;
 

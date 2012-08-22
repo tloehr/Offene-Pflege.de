@@ -472,7 +472,7 @@ public class BWInfoTools {
 
         DateFormat df = DateFormat.getDateInstance();
         if (withlongheader) {
-            result += "<h2 id=\"fonth2\">" + ResidentTools.getBWLabelText(bewohner) + "</h2>";
+            result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(bewohner) + "</h2>";
         }
         result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
 

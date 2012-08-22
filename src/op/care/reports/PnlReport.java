@@ -26,8 +26,6 @@
  */
 package op.care.reports;
 
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
@@ -183,7 +181,7 @@ public class PnlReport extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.resident = bewohner;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
         txtSearch.setText(null);
         firstReport = NReportTools.getFirstReport(resident);
         jdcVon.setMaxSelectableDate(new Date());

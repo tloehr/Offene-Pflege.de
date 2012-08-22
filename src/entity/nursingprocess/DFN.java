@@ -30,7 +30,6 @@ public class DFN implements Serializable, Comparable<DFN> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "DFNID")
     private Long dfnid;
     @Basic(optional = false)

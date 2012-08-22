@@ -182,7 +182,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "PBID")
     private Long pbid;
     @Version
@@ -481,6 +480,11 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @Override
     public String toString() {
         return "entity.reports.NReport[pbid=" + pbid + "]";
+    }
+
+    @Override
+    public String getTitle() {
+        return text;
     }
 
     @Override

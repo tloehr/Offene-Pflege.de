@@ -127,7 +127,7 @@ public class PnlVorrat extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
         reloadVorratTable();
     }
 
@@ -461,7 +461,7 @@ public class PnlVorrat extends NursingRecordsPanel {
             if (bestand != null) {
                 if (!bewohner.equals(bestand.getInventory().getResident())) {
                     bewohner = bestand.getInventory().getResident();
-                    OPDE.getDisplayManager().setMainMessage(ResidentTools.getBWLabelText(bewohner));
+                    OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Medikament gehört eine[m|r] anderen Bewohner[in]. Habe umgeschaltet.", 2));
                     OPDE.getMainframe().change2Bewohner(bewohner);
                 }

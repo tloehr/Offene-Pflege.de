@@ -141,7 +141,7 @@ public class NReportTools {
         String text = SYSTools.replace(nReport.getText(), "\n", "<br/>");
 
         if (withResident) {
-            html += "<b>Pflegebericht für " + ResidentTools.getBWLabelText(nReport.getResident()) + "</b>";
+            html += "<b>Pflegebericht für " + ResidentTools.getLabelText(nReport.getResident()) + "</b>";
         } else {
             html += "<b>Pflegebericht</b>";
         }
@@ -161,7 +161,7 @@ public class NReportTools {
         boolean ihavesomethingtoshow = false;
 
         if (!berichte.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getBWLabelText(berichte.get(0).getResident()) : "") + "</h2>\n";
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(berichte.get(0).getResident()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
             for (NReport bericht : berichte) {

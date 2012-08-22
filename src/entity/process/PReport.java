@@ -24,14 +24,12 @@ import java.util.Date;
         @NamedQuery(name = "VBericht.findByVorgang", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang "),
         // 0 heisst nur normale Berichte.
         // VBERICHT_ART_USER = 0;
-        @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang AND v.art = 0"),
-        @NamedQuery(name = "VBericht.findByPdca", query = "SELECT v FROM PReport v WHERE v.pdca = :pdca")})
+        @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang AND v.art = 0")})
 public class PReport implements Serializable, QProcessElement {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "VBID")
     private Long vbid;
     @Lob
@@ -127,6 +125,11 @@ public class PReport implements Serializable, QProcessElement {
     @Override
     public String getPITAsHTML() {
         return PReportTools.getPITAsHTML(this);
+    }
+
+    @Override
+    public String getTitle() {
+        return text;
     }
 
     @Override
