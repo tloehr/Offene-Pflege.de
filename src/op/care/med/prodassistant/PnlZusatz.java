@@ -73,7 +73,7 @@ public class PnlZusatz extends JPanel {
         });
 
         cmbFormen.setModel(SYSTools.list2cmb(listFormen));
-        cmbFormen.setRenderer(DosageFormTools.getMedFormenRenderer(0));
+        cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
 
         form = (DosageForm) cmbFormen.getSelectedItem();

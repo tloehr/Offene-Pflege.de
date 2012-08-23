@@ -25,7 +25,7 @@
  * 
  */
 
-package op.care.planung;
+package op.care.nursingprocess;
 
 import op.OPDE;
 import op.tools.DlgException;

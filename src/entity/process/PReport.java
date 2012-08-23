@@ -23,7 +23,7 @@ import java.util.Date;
         @NamedQuery(name = "VBericht.findByArt", query = "SELECT v FROM PReport v WHERE v.art = :art"),
         @NamedQuery(name = "VBericht.findByVorgang", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang "),
         // 0 heisst nur normale Berichte.
-        // VBERICHT_ART_USER = 0;
+        // PREPORT_TYPE_USER = 0;
         @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM PReport v WHERE v.vorgang = :vorgang AND v.art = 0")})
 public class PReport implements Serializable, QProcessElement {
 
@@ -109,7 +109,7 @@ public class PReport implements Serializable, QProcessElement {
     }
 
     public boolean isSystem() {
-        return art != PReportTools.VBERICHT_ART_USER;
+        return art != PReportTools.PREPORT_TYPE_USER;
     }
 
     @Override

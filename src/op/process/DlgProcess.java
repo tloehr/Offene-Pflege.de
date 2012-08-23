@@ -4,16 +4,27 @@
 
 package op.process;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
-import com.toedter.calendar.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import com.toedter.calendar.JDateChooser;
+import entity.info.Resident;
+import entity.process.PCat;
+import entity.process.PCatTools;
 import entity.process.QProcess;
+import op.OPDE;
 import op.tools.MyJDialog;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateTime;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author Torsten Löhr
@@ -28,9 +39,38 @@ public class DlgProcess extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
+        setVisible(true);
     }
 
-    private void initDialog(){
+    private void initDialog() {
+        cmbPCat.setModel(SYSTools.list2cmb(PCatTools.getPCats()));
+        cmbPCat.setSelectedIndex(0);
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Resident.findAllActiveSorted");
+        cmbResident.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML("<i>" + OPDE.lang.getString(PnlProcess.internalClassID + ".commonprocess") + "</i>");
+                } else if (o instanceof PCat) {
+                    text = ((PCat) o).getText();
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        });
+        ArrayList<Resident> listResident = new ArrayList<Resident>(query.getResultList());
+        listResident.add(0, null);
+        cmbResident.setModel(SYSTools.list2cmb(listResident));
+        em.close();
+
+        jdcWV.setDate(qProcess.getRevision());
+        jdcWV.setMinSelectableDate(new DateTime().plusDays(1).toDate());
+
+        txtTitel.setText(qProcess.getTitle().trim());
 
     }
 
@@ -44,8 +84,11 @@ public class DlgProcess extends MyJDialog {
         dispose();
     }
 
-    private void save(){
-
+    private void save() {
+        qProcess.setResident((Resident) cmbResident.getSelectedItem());
+        qProcess.setPcat((PCat) cmbPCat.getSelectedItem());
+        qProcess.setRevision(jdcWV.getDate());
+        qProcess.setTitle(txtTitel.getText().trim());
     }
 
     @Override
@@ -58,19 +101,13 @@ public class DlgProcess extends MyJDialog {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         pnlDetails = new JPanel();
         lblTitle = new JLabel();
-        lblCreatedOn = new JLabel();
         lblEvalDate = new JLabel();
-        lblClosed = new JLabel();
-        lblCreated = new JLabel();
-        lblEditor = new JLabel();
+        lblBW = new JLabel();
         txtTitel = new JTextField();
-        lblStart = new JLabel();
-        lblEnde = new JLabel();
-        lblCreator = new JLabel();
-        lblOwner = new JLabel();
         jdcWV = new JDateChooser();
+        cmbResident = new JComboBox();
         lblCat = new JLabel();
-        cmbKat = new JComboBox();
+        cmbPCat = new JComboBox();
         panel2 = new JPanel();
         btnCancel = new JButton();
         btnApply = new JButton();
@@ -82,76 +119,45 @@ public class DlgProcess extends MyJDialog {
         //======== pnlDetails ========
         {
             pnlDetails.setLayout(new FormLayout(
-                "default, $lcgap, 0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, 0dlu, $lcgap, default",
-                "default, $lgap, 0dlu, 6*($lgap, fill:default), $lgap, pref, 2*($lgap, default)"));
+                    "default, 0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, 0dlu, default",
+                    "default, 0dlu, 3*($lgap, fill:default), $lgap, pref, 2*($lgap, default)"));
 
             //---- lblTitle ----
             lblTitle.setText("Titel");
             lblTitle.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblTitle, CC.xywh(5, 5, 2, 1));
-
-            //---- lblCreatedOn ----
-            lblCreatedOn.setText("Erstellt am");
-            lblCreatedOn.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblCreatedOn, CC.xywh(5, 7, 2, 1));
+            pnlDetails.add(lblTitle, CC.xywh(4, 4, 2, 1));
 
             //---- lblEvalDate ----
             lblEvalDate.setText("Wiedervorlage");
             lblEvalDate.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblEvalDate, CC.xywh(5, 9, 2, 1));
+            pnlDetails.add(lblEvalDate, CC.xywh(4, 6, 2, 1));
 
-            //---- lblClosed ----
-            lblClosed.setText("Abgeschlossen am");
-            lblClosed.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblClosed, CC.xywh(5, 11, 2, 1));
-
-            //---- lblCreated ----
-            lblCreated.setText("Erstellt von");
-            lblCreated.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblCreated, CC.xywh(5, 13, 2, 1));
-
-            //---- lblEditor ----
-            lblEditor.setText("Wird bearbeitet von");
-            lblEditor.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblEditor, CC.xywh(5, 15, 2, 1));
+            //---- lblBW ----
+            lblBW.setText("Zugeordnet zu");
+            lblBW.setFont(new Font("Arial", Font.PLAIN, 14));
+            pnlDetails.add(lblBW, CC.xywh(4, 8, 2, 1));
 
             //---- txtTitel ----
-            txtTitel.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(txtTitel, CC.xywh(7, 5, 2, 1));
-
-            //---- lblStart ----
-            lblStart.setText("15.05.2011");
-            lblStart.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblStart, CC.xywh(7, 7, 2, 1));
-
-            //---- lblEnde ----
-            lblEnde.setText("noch nicht abgeschlossen");
-            lblEnde.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblEnde, CC.xywh(7, 11, 2, 1));
-
-            //---- lblCreator ----
-            lblCreator.setText("text");
-            lblCreator.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblCreator, CC.xywh(7, 13, 2, 1));
-
-            //---- lblOwner ----
-            lblOwner.setText("text");
-            lblOwner.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblOwner, CC.xy(7, 15));
+            txtTitel.setFont(new Font("Arial", Font.PLAIN, 18));
+            pnlDetails.add(txtTitel, CC.xywh(6, 4, 2, 1));
 
             //---- jdcWV ----
             jdcWV.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(jdcWV, CC.xywh(7, 9, 2, 1));
+            pnlDetails.add(jdcWV, CC.xywh(6, 6, 2, 1));
+
+            //---- cmbResident ----
+            cmbResident.setFont(new Font("Arial", Font.PLAIN, 14));
+            pnlDetails.add(cmbResident, CC.xy(6, 8));
 
             //---- lblCat ----
             lblCat.setText("Kategorie");
             lblCat.setFont(new Font("Arial", Font.PLAIN, 14));
-            pnlDetails.add(lblCat, CC.xy(5, 17));
+            pnlDetails.add(lblCat, CC.xy(4, 10));
 
-            //---- cmbKat ----
-            cmbKat.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbKat.setToolTipText("Kategorie des Vorgangs");
-            pnlDetails.add(cmbKat, CC.xywh(7, 17, 2, 1));
+            //---- cmbPCat ----
+            cmbPCat.setFont(new Font("Arial", Font.PLAIN, 14));
+            cmbPCat.setToolTipText("Kategorie des Vorgangs");
+            pnlDetails.add(cmbPCat, CC.xy(6, 10));
 
             //======== panel2 ========
             {
@@ -177,10 +183,10 @@ public class DlgProcess extends MyJDialog {
                 });
                 panel2.add(btnApply);
             }
-            pnlDetails.add(panel2, CC.xy(7, 21, CC.RIGHT, CC.FILL));
+            pnlDetails.add(panel2, CC.xy(6, 14, CC.RIGHT, CC.FILL));
         }
         contentPane.add(pnlDetails);
-        setSize(640, 300);
+        setSize(705, 305);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -188,19 +194,13 @@ public class DlgProcess extends MyJDialog {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel pnlDetails;
     private JLabel lblTitle;
-    private JLabel lblCreatedOn;
     private JLabel lblEvalDate;
-    private JLabel lblClosed;
-    private JLabel lblCreated;
-    private JLabel lblEditor;
+    private JLabel lblBW;
     private JTextField txtTitel;
-    private JLabel lblStart;
-    private JLabel lblEnde;
-    private JLabel lblCreator;
-    private JLabel lblOwner;
     private JDateChooser jdcWV;
+    private JComboBox cmbResident;
     private JLabel lblCat;
-    private JComboBox cmbKat;
+    private JComboBox cmbPCat;
     private JPanel panel2;
     private JButton btnCancel;
     private JButton btnApply;

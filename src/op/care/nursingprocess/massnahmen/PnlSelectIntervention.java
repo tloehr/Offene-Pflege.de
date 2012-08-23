@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Wed Jul 25 16:15:09 CEST 2012
  */
 
-package op.care.planung.massnahmen;
+package op.care.nursingprocess.massnahmen;
 
 import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;

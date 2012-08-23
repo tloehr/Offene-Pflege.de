@@ -24,12 +24,11 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.planung;
+package op.care.nursingprocess;
 
 import op.OPDE;
 import op.tools.*;
 
-import javax.swing.*;
 import java.math.BigInteger;
 import java.sql.*;
 import java.text.DateFormat;

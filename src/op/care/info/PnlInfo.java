@@ -50,30 +50,6 @@ import java.util.List;
 public class PnlInfo extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.info";
 
-//    public final Icon icon16redStar = new ImageIcon(getClass().getResource("/artwork/16x16/redstar.png"));
-//    public final Icon icon22add = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png"));
-//
-//    public final Icon icon22addPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png"));
-//    public final Icon icon22attach = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach.png"));
-//    public final Icon icon22attachPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/attach_pressed.png"));
-//    public final Icon icon22edit = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread.png"));
-//    public final Icon icon22editPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/kspread_pressed.png"));
-//    public final Icon icon22gotoEnd = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png"));
-//    public final Icon icon22gotoEndPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end_pressed.png"));
-//    public final Icon icon22stop = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop.png"));
-//    public final Icon icon22stopPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop_pressed.png"));
-//    public final Icon icon48stop = new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_stop.png"));
-//    public final Icon icon22delete = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png"));
-//    public final Icon icon22deletePressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete_pressed.png"));
-//    public final Icon icon48delete = new ImageIcon(getClass().getResource("/artwork/48x48/bw/editdelete.png"));
-//    public final Icon icon22view = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag.png"));
-//    public final Icon icon22viewPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/viewmag-selected.png"));
-//    public final Icon icon22changePeriod = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page.png"));
-//    public final Icon icon22changePeriodPressed = new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_page_pressed.png"));
-//    public final Icon icon16bysecond = new ImageIcon(getClass().getResource("/artwork/16x16/bw/bysecond.png"));
-//    public final Icon icon16byday = new ImageIcon(getClass().getResource("/artwork/16x16/bw/byday.png"));
-//    public final Icon icon16pit = new ImageIcon(getClass().getResource("/artwork/16x16/bw/pointintime.png"));
-
     private final int MAX_HTML_LENGTH = 80;
     private Resident bewohner;
     private JScrollPane jspSearch;

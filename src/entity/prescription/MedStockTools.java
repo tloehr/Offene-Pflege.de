@@ -45,11 +45,11 @@ public class MedStockTools {
         };
     }
 
-//    public static MedBestand findByVerordnungImAnbruch(Verordnung verordnung) {
+//    public static MedBestand findByVerordnungImAnbruch(Verordnung prescription) {
 //        EntityManager em = OPDE.createEM();
 //        Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
-//        query.setParameter("bewohner", verordnung.getResident());
-//        query.setParameter("darreichung", verordnung.getTradeForm());
+//        query.setParameter("bewohner", prescription.getResident());
+//        query.setParameter("darreichung", prescription.getTradeForm());
 //
 //        MedBestand result = null;
 //
@@ -242,7 +242,7 @@ public class MedStockTools {
                     if (verordnung.isTillEndOfPackage()) {
                         verordnung = em.merge(verordnung);
                         em.lock(verordnung, LockModeType.OPTIMISTIC);
-                        verordnung.setAbDatum(new Date());
+                        verordnung.setTo(new Date());
                         verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                         verordnung.setAbArzt(verordnung.getAnArzt());
                         verordnung.setAbKH(verordnung.getAnKH());

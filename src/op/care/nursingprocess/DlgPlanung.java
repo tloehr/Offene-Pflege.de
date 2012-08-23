@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.planung;
+package op.care.nursingprocess;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -36,7 +36,7 @@ import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
 import entity.nursingprocess.NursingProcess;
 import op.OPDE;
-import op.care.planung.massnahmen.PnlSelectIntervention;
+import op.care.nursingprocess.massnahmen.PnlSelectIntervention;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.MyJDialog;

@@ -13,19 +13,12 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "VKat")
-@NamedQueries({
-        @NamedQuery(name = "VKat.findAll", query = "SELECT v FROM PCat v"),
-        @NamedQuery(name = "VKat.findAllSorted", query = "SELECT v FROM PCat v ORDER BY v.text"),
-        @NamedQuery(name = "VKat.findByVKatID", query = "SELECT v FROM PCat v WHERE v.vKatID = :vKatID"),
-        @NamedQuery(name = "VKat.findByText", query = "SELECT v FROM PCat v WHERE v.text = :text"),
-        @NamedQuery(name = "VKat.findByArt", query = "SELECT v FROM PCat v WHERE v.art = :art")})
 public class PCat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "VKatID")
-    private Long vKatID;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "Text")
     private String text;
@@ -36,21 +29,8 @@ public class PCat implements Serializable {
     public PCat() {
     }
 
-    public PCat(Long vKatID) {
-        this.vKatID = vKatID;
-    }
-
-    public PCat(String text) {
-        this.text = text;
-        this.art = PCatTools.VKAT_ART_ALLGEMEIN;
-    }
-
-    public Long getVKatID() {
-        return vKatID;
-    }
-
-    public void setVKatID(Long vKatID) {
-        this.vKatID = vKatID;
+    public Long getId() {
+        return id;
     }
 
     public String getText() {
@@ -70,23 +50,25 @@ public class PCat implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (vKatID != null ? vKatID.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PCat pCat = (PCat) o;
+
+        if (art != pCat.art) return false;
+        if (id != null ? !id.equals(pCat.id) : pCat.id != null) return false;
+        if (text != null ? !text.equals(pCat.text) : pCat.text != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof PCat)) {
-            return false;
-        }
-        PCat other = (PCat) object;
-        if ((this.vKatID == null && other.vKatID != null) || (this.vKatID != null && !this.vKatID.equals(other.vKatID))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (int) art;
+        return result;
     }
 
     @Override

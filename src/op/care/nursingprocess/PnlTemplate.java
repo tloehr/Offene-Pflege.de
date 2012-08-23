@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Fri Aug 03 14:53:03 CEST 2012
  */
 
-package op.care.planung;
+package op.care.nursingprocess;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;

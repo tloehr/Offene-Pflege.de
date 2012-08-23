@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.verordnung;
+package op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -232,7 +232,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    long numVerKennung = VerordnungTools.getNumVerodnungenMitGleicherKennung(verordnung);
+//                    long numVerKennung = VerordnungTools.getNumVerodnungenMitGleicherKennung(prescription);
 //                    int status = numVerKennung == 1 ? DlgVerordnung.EDIT_MODE : DlgVerordnung.EDIT_OF_CHANGE_MODE;
 
                     new DlgVerordnung(selectedVerordnung, DlgVerordnung.ALLOW_ALL_EDIT, new Closure() {
@@ -319,14 +319,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.lock(oldVerordnung, LockModeType.OPTIMISTIC);
 
                                     // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Arzt ABgesetzt.
-                                    oldVerordnung.setAbDatum(new Date());
+                                    oldVerordnung.setTo(new Date());
                                     oldVerordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                                     oldVerordnung.setAbArzt(newVerordnung.getAnArzt() == null ? null : em.merge(newVerordnung.getAnArzt()));
                                     oldVerordnung.setAbKH(newVerordnung.getAnKH() == null ? null : em.merge(newVerordnung.getAnKH()));
 
                                     // Dann wird die neue Verordnung angesetzt.
                                     // die neue Verordnung beginnt eine Sekunde, nachdem die vorherige Abgesetzt wurde.
-                                    newVerordnung.setAnDatum(SYSCalendar.addField(oldVerordnung.getAbDatum(), 1, GregorianCalendar.SECOND));
+                                    newVerordnung.setFrom(SYSCalendar.addField(oldVerordnung.getTo(), 1, GregorianCalendar.SECOND));
 
                                     // Dann werden die nicht mehr benötigten BHPs der alten Verordnung entfernt.
                                     BHPTools.cleanup(em, oldVerordnung);
@@ -377,7 +377,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     Prescriptions verordnung = (Prescriptions) em.merge(o);
                                     em.lock(verordnung, LockModeType.OPTIMISTIC);
-                                    verordnung.setAbDatum(new Date());
+                                    verordnung.setTo(new Date());
                                     verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
                                     BHPTools.cleanup(em, verordnung);
                                     em.getTransaction().commit();
@@ -508,14 +508,14 @@ public class PnlVerordnung extends NursingRecordsPanel {
             });
             menu.add(itemPopupPrint);
 
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isDiscontinued() && singleRowSelected) {
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !prescription.isDiscontinued() && singleRowSelected) {
 //                menu.add(new JSeparator());
-//                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, verordnung, standardActionListener));
+//                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, prescription, standardActionListener));
 //            }
 //
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !verordnung.isDiscontinued() && singleRowSelected) {
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !prescription.isDiscontinued() && singleRowSelected) {
 //                menu.add(new JSeparator());
-//                menu.add(QProcessTools.getVorgangContextMenu(parent, verordnung, bewohner, standardActionListener));
+//                menu.add(QProcessTools.getVorgangContextMenu(parent, prescription, bewohner, standardActionListener));
 //            }
 
 

@@ -4,7 +4,7 @@ import entity.info.Resident;
 import entity.EntityTools;
 import entity.info.BWInfoKat;
 import op.OPDE;
-import op.care.planung.PnlPlanung;
+import op.care.nursingprocess.PnlPlanung;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;

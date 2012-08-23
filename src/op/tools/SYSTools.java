@@ -1100,6 +1100,18 @@ public class SYSTools {
         return htmlUmlautConversion(out);
     }
 
+    public static Color brighter(Color color, float FACTOR) {
+        return new Color(Math.min((int) (color.getRed() * (1 / FACTOR)), 255),
+                Math.min((int) (color.getGreen() * (1 / FACTOR)), 255),
+                Math.min((int) (color.getBlue() * (1 / FACTOR)), 255));
+    }
+
+    public static Color darker(Color color, float FACTOR) {
+        return new Color(Math.max((int) (color.getRed() * FACTOR), 0),
+                Math.max((int) (color.getGreen() * FACTOR), 0),
+                Math.max((int) (color.getBlue() * FACTOR), 0));
+    }
+
     //    /**
 //     * Fügt html Tags vor und hinter den Eingangsstring ein.
 //     *
@@ -1228,6 +1240,7 @@ public class SYSTools {
     /**
      * Creates a Color object according to the names of the Java color constants.
      * A HTML color string like "62A9FF" may also be used. Please remove the leading "#".
+     *
      * @param colornameOrHTMLCode
      * @return the desired color. Defaults to BLACK, in case of an error.
      */

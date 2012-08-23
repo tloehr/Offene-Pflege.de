@@ -61,7 +61,7 @@ public class TMVerordnung extends AbstractTableModel {
         listeVerordnungen = new ArrayList<Object[]>();
 
         EntityManager em = OPDE.createEM();
-        Query queryVerordnung = em.createQuery("SELECT v FROM Prescriptions v WHERE " + (archiv ? "" : " v.abDatum >= :now AND ") + " v.resident = :bewohner ");
+        Query queryVerordnung = em.createQuery("SELECT v FROM Prescriptions v WHERE " + (archiv ? "" : " v.to >= :now AND ") + " v.resident = :bewohner ");
         if (!archiv) {
             queryVerordnung.setParameter("now", new Date());
         }
@@ -170,7 +170,7 @@ public class TMVerordnung extends AbstractTableModel {
      * Lokaler Cache.
      */
     private String getDosis(int row) {
-        // Verordnung verordnung, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand)
+        // Verordnung prescription, MedBestand bestandImAnbruch, BigDecimal bestandSumme, BigDecimal vorratSumme, boolean mitBestand)
         String result = "";
         if (cache.containsKey(getPrescription(row))) {
             result = cache.get(getPrescription(row)).toString();

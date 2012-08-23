@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -24,14 +25,14 @@ public class DosageFormTools {
      * @param maxlen maximale Zeichenlänge pro Zeile. maxlen < 1 heisst egal.
      * @return
      */
-    public static ListCellRenderer getMedFormenRenderer(int maxlen) {
+    public static ListCellRenderer getRenderer(int maxlen) {
         final int max = maxlen;
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                    text = SYSTools.toHTML("<i>"+ OPDE.lang.getString("misc.commands.noselection")+"</i>");
                 } else if (o instanceof DosageForm) {
                     DosageForm form = (DosageForm) o;
                     text = toPrettyString(form);

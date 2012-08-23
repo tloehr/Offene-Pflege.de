@@ -6,7 +6,7 @@ import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import entity.process.*;
 import op.OPDE;
-import op.care.vital.PnlVitalwerte;
+import op.care.values.PnlVitalwerte;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -13,8 +13,10 @@ import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescriptions;
 import entity.reports.NReport;
 import op.OPDE;
+import op.process.PnlProcess;
 import op.tools.DlgException;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -107,16 +109,40 @@ public class QProcessTools {
         return elements;
     }
 
-    public static void endAllVorgaenge(Resident bewohner) {
 
+    public static Color getBG1(QProcess qProcess) {
+        Color common = SYSTools.getColor("CEF0FF");
+        Color resident = SYSTools.getColor("DFB0FF");
+        Color closed = SYSTools.getColor("C0C0C0");
+        if (qProcess.isClosed()) {
+            return closed;
+        }
 
+        if (qProcess.isCommon()) {
+            return common;
+        }
+        return resident;
+    }
+
+    public static Color getBG2(QProcess qProcess) {
+        Color common = SYSTools.getColor("D9F3FF");
+        Color resident = SYSTools.getColor("F9EEFF");
+        Color closed = SYSTools.getColor("E8E8E8");
+        if (qProcess.isClosed()) {
+            return closed;
+        }
+
+        if (qProcess.isCommon()) {
+            return common;
+        }
+        return resident;
     }
 
     public static void endVorgang(QProcess vorgang) {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            PReport systemBericht = new PReport("Vorgang abgeschlossen", PReportTools.VBERICHT_ART_CLOSE, vorgang);
+            PReport systemBericht = new PReport("Vorgang abgeschlossen", PReportTools.PREPORT_TYPE_CLOSE, vorgang);
             em.persist(systemBericht);
             vorgang.setTo(new Date());
             em.merge(vorgang);
@@ -133,7 +159,7 @@ public class QProcessTools {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            PReport systemBericht = new PReport("Vorgang wieder geöffnet", PReportTools.VBERICHT_ART_REOPEN, vorgang);
+            PReport systemBericht = new PReport("Vorgang wieder geöffnet", PReportTools.PREPORT_TYPE_REOPEN, vorgang);
             em.persist(systemBericht);
             vorgang.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
             em.merge(vorgang);
@@ -146,22 +172,22 @@ public class QProcessTools {
         }
     }
 
-    public static QProcess createVorgang(String title, PCat vkat, Resident bw) {
-        QProcess vorgang = new QProcess(title, bw, vkat);
-        PReport vbericht = new PReport("Neuen Vorgang erstellt.", PReportTools.VBERICHT_ART_CREATE, vorgang);
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            em.persist(vorgang);
-            em.persist(vbericht);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-        } finally {
-            em.close();
-        }
-        return vorgang;
-    }
+//    public static QProcess createVorgang(String title, PCat vkat, Resident bw) {
+//        QProcess vorgang = new QProcess(title, bw, vkat);
+//        PReport vbericht = new PReport("Neuen Vorgang erstellt.", PReportTools.PREPORT_TYPE_CREATE, vorgang);
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//            em.persist(vorgang);
+//            em.persist(vbericht);
+//            em.getTransaction().commit();
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//        } finally {
+//            em.close();
+//        }
+//        return vorgang;
+//    }
 
     /**
      * Hängt ein QProcessElement an einen Vorgang an und erstellt einen entsprechenden SystemBericht dazu.
@@ -231,7 +257,7 @@ public class QProcessTools {
 //        EntityTools.merge(connectionObject);
 //
 //        // Nun noch den Systembericht erstellen.
-//        PReport vbericht = new PReport("Neue Zuordnung wurde vorgenommen für: " + elementBezeichnung + " ID: " + elementQ.getID(), PReportTools.VBERICHT_ART_ASSIGN_ELEMENT, process);
+//        PReport vbericht = new PReport("Neue Zuordnung wurde vorgenommen für: " + elementBezeichnung + " ID: " + elementQ.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, process);
 //        vbericht.setPdca(pdca);
 //        EntityTools.persist(vbericht);
 //
@@ -240,57 +266,38 @@ public class QProcessTools {
 //        EntityTools.refresh(elementQ);
     }
 
-    /**
-     * @param elementQ
-     * @param vorgang
-     */
-    public static void remove(QProcessElement elementQ, QProcess vorgang) {
-//        EntityManager em = OPDE.createEM();
-//        String elementBezeichnung = "";
-//        Query query = null;
-//        if (elementQ instanceof NReport) {
-//            query = em.createNamedQuery("SYSNR2PROCESS.findByElementAndVorgang");
-//            elementBezeichnung = "Pflegebericht";
-//        } else if (elementQ instanceof BWerte) {
-//            query = em.createNamedQuery("SYSVAL2PROCESS.findByElementAndVorgang");
-//            elementBezeichnung = "Bewohner Wert";
-//        } else if (elementQ instanceof Verordnung) {
-//            query = em.createNamedQuery("SYSPRE2PROCESS.findByElementAndVorgang");
-//            elementBezeichnung = "Ärztliche Verordnung";
-//        } else if (elementQ instanceof BWInfo) {
-//            query = em.createNamedQuery("SYSINF2PROCESS.findByElementAndVorgang");
-//            elementBezeichnung = "Bewohner Information";
-//        } else if (elementQ instanceof Planung) {
-//            query = em.createNamedQuery("SYSNP2PROCESS.findByElementAndVorgang");
-//            elementBezeichnung = "Pflegeplanung";
-//        } else {
-//
-//        }
-//
-//        query.setParameter("elementQ", elementQ);
-//        query.setParameter("process", process);
-//        connectionObjects = query.getSingleResult();
-//
-//
-//        // Eigentlich sollte es nie mehr als einen dieser Objekte geben, aber dennoch.
-//        Iterator it = connectionObjects.iterator();
-//        while (it.hasNext()) {
-//            Object obj = it.next();
-//            short pdca = PDCA_OFF;
-//            if (elementQ instanceof NReport) {
-//                pdca = ((SYSNR2PROCESS) obj).getPdca();
-//            } else {
-//
-//            }
-//            EntityTools.delete(obj);
-//            PReport vbericht = new PReport("Zuordnung entfernt für: " + elementBezeichnung + " ID: " + elementQ.getID(), PReportTools.VBERICHT_ART_REMOVE_ELEMENT, process);
-//            vbericht.setPdca(pdca);
-//            EntityTools.persist(vbericht);
-//        }
-//
-//        // Das ursprüngliche Element bekommt die Änderungen nicht mit. Und der JPA Cache auch nicht.
-//        // Daher muss das Objekt hier manuell neu gelesen werden.
-//        EntityTools.refresh(elementQ);
+
+    public static void removeElementFromProcess(EntityManager em, QProcessElement element, QProcess qProcess) {
+        String elementBezeichnung = "";
+        Query query = null;
+        if (element instanceof NReport) {
+            query = em.createNamedQuery("SYSNR2PROCESS.findByElementAndVorgang");
+            elementBezeichnung = "Pflegebericht";
+        } else if (element instanceof BWerte) {
+            query = em.createNamedQuery("SYSVAL2PROCESS.findByElementAndVorgang");
+            elementBezeichnung = "Bewohner Wert";
+        } else if (element instanceof Prescriptions) {
+            query = em.createNamedQuery("SYSPRE2PROCESS.findByElementAndVorgang");
+            elementBezeichnung = "Ärztliche Verordnung";
+        } else if (element instanceof BWInfo) {
+            query = em.createNamedQuery("SYSINF2PROCESS.findByElementAndVorgang");
+            elementBezeichnung = "Bewohner Information";
+        } else if (element instanceof NursingProcess) {
+            query = em.createNamedQuery("SYSNP2PROCESS.findByElementAndVorgang");
+            elementBezeichnung = "Pflegeplanung";
+        } else {
+
+        }
+
+        query.setParameter("element", element);
+        query.setParameter("process", qProcess);
+
+        QProcessElement connectionObject = (QProcessElement) query.getSingleResult();
+        em.remove(connectionObject);
+        qProcess.removeElement(element);
+
+        qProcess.getPReports().add(em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT)+": " + elementBezeichnung + " ID: " + element.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, qProcess)));
+
     }
 
     public static void setWVVorgang(QProcess vorgang, Date wv) {
@@ -300,7 +307,7 @@ public class QProcessTools {
         try {
             em.getTransaction().begin();
 
-            PReport systemBericht = new PReport("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), PReportTools.VBERICHT_ART_WV, vorgang);
+            PReport systemBericht = new PReport("Wiedervorlage gesetzt auf: " + DateFormat.getDateInstance().format(wv), PReportTools.PREPORT_TYPE_WV, vorgang);
             em.persist(systemBericht);
 
             vorgang.setRevision(wv);
@@ -369,36 +376,36 @@ public class QProcessTools {
         return list;
     }
 
-    private static JMenu getNeuMenu(QProcessElement elementQ, Resident bewohner) {
-        JMenu neu = new JMenu("Neu erstellen");
-        final JTextField txt = new JTextField("");
-        final Resident bw = bewohner;
-        final QProcessElement finalElementQ = elementQ;
-        neu.add(txt);
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("VKat.findAllSorted");
-
-        Iterator<PCat> it = query.getResultList().iterator();
-        while (it.hasNext()) {
-            final PCat kat = it.next();
-            JMenuItem mi = new JMenuItem(kat.getText());
-            mi.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (!txt.getText().trim().isEmpty()) {
-                        QProcess vorgang = createVorgang(txt.getText(), kat, bw);
-                        add(finalElementQ, vorgang);
-                        OPDE.debug("Vorgang '" + vorgang.getTitle() + "' für Bewohner '" + bw.getBWKennung() + "' angelegt. Element mit ID " + finalElementQ.getID() + " zugeordnet.");
-                    }
-                }
-            });
-            neu.add(mi);
-        }
-
-        em.close();
-
-        return neu;
-    }
+//    private static JMenu getNeuMenu(QProcessElement elementQ, Resident bewohner) {
+//        JMenu neu = new JMenu("Neu erstellen");
+//        final JTextField txt = new JTextField("");
+//        final Resident bw = bewohner;
+//        final QProcessElement finalElementQ = elementQ;
+//        neu.add(txt);
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createNamedQuery("VKat.findAllSorted");
+//
+//        Iterator<PCat> it = query.getResultList().iterator();
+//        while (it.hasNext()) {
+//            final PCat kat = it.next();
+//            JMenuItem mi = new JMenuItem(kat.getText());
+//            mi.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    if (!txt.getText().trim().isEmpty()) {
+//                        QProcess vorgang = createVorgang(txt.getText(), kat, bw);
+//                        add(finalElementQ, vorgang);
+//                        OPDE.debug("Vorgang '" + vorgang.getTitle() + "' für Bewohner '" + bw.getBWKennung() + "' angelegt. Element mit ID " + finalElementQ.getID() + " zugeordnet.");
+//                    }
+//                }
+//            });
+//            neu.add(mi);
+//        }
+//
+//        em.close();
+//
+//        return neu;
+//    }
 
     /**
      * Erstellt ein JMenu, dass zu einem bestimmten QProcessElement <code>elementQ</code> und für einen bestimmten Bewohner <code>bewohner</code> alle Vorgänge enthält,
@@ -408,124 +415,124 @@ public class QProcessTools {
      * @param bewohner
      * @return
      */
-    private static JMenu getVorgaenge2Assign(QProcessElement elementQ, Resident bewohner, ActionListener callback) {
-        JMenu result = new JMenu("Zuordnen zu");
-        EntityManager em = OPDE.createEM();
-        final ActionListener cb = callback;
+//    private static JMenu getVorgaenge2Assign(QProcessElement elementQ, Resident bewohner, ActionListener callback) {
+//        JMenu result = new JMenu("Zuordnen zu");
+//        EntityManager em = OPDE.createEM();
+//        final ActionListener cb = callback;
+//
+//        final QProcessElement finalElementQ = elementQ;
+//
+//        // 1. Alle Vorgänge für den betreffenden BW suchen und in die Liste packen.
+//        List<QProcess> proceses = new ArrayList();
+//        Query query;
+//        query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
+//        query.setParameter("bewohner", bewohner);
+//        proceses.addAll(query.getResultList());
+//
+//
+//        // 2. Alle die Vorgänge entfernen, zu denen das betreffenden Object bereits zugeordnet wurde.
+//        Query complement = null;
+//        if (elementQ instanceof NReport) {
+//            complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof BWerte) {
+//            complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof Prescriptions) {
+//            complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof BWInfo) {
+//            complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof NursingProcess) {
+//            complement = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else {
+//            complement = null;
+//        }
+//        complement.setParameter("element", elementQ);
+//        proceses.removeAll(complement.getResultList());
+//
+//        // 3. Nun alle Vorgänge als JMenuItems anhängen.
+//        Iterator<QProcess> it = proceses.iterator();
+//        while (it.hasNext()) {
+//            final QProcess vorgang = it.next();
+//            JMenuItem mi = new JMenuItem(vorgang.getTitle());
+//            // Bei Aufruf eines Menüs, wird dass Element an den Vorgang angehangen.
+//            mi.addActionListener(new java.awt.event.ActionListener() {
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    add(finalElementQ, vorgang);
+//                    cb.actionPerformed(new ActionEvent(this, 0, "VorgangAssign"));
+//                }
+//            });
+//            result.add(mi);
+//        }
+//        em.close();
+//        return result;
+//    }
+//
+//    private static JMenu getVorgaenge2Remove(QProcessElement elementQ, ActionListener callback) {
+//
+//        JMenu result = new JMenu("Entfernen von");
+//
+//        final ActionListener cb = callback;
+//
+//        final QProcessElement finalElementQ = elementQ;
+//        EntityManager em = OPDE.createEM();
+//
+//        // 1. Alle aktiven Vorgänge suchen, die diesem Element zugeordnet sind.
+//        List<QProcess> proceses = new ArrayList();
+//        Query query = null;
+//        if (elementQ instanceof NReport) {
+//            query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof BWerte) {
+//            query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof Prescriptions) {
+//            query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof BWInfo) {
+//            query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else if (elementQ instanceof NursingProcess) {
+//            query = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
+//        } else {
+//            query = null;
+//        }
+//        query.setParameter("element", elementQ);
+//        proceses.addAll(query.getResultList());
+//
+//        // 2. Nun diese Vorgänge als JMenuItems anhängen.
+//        Iterator<QProcess> it = proceses.iterator();
+//        while (it.hasNext()) {
+//            final QProcess vorgang = it.next();
+//            JMenuItem mi = new JMenuItem(vorgang.getTitle());
+//            // Bei Aufruf eines Menüs, wird dass Element vom Vorgang entfernt
+//            mi.addActionListener(new java.awt.event.ActionListener() {
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    remove(finalElementQ, vorgang);
+//                    cb.actionPerformed(new ActionEvent(this, 0, "VorgangRemove"));
+//                }
+//            });
+//            result.add(mi);
+//        }
+//
+//        em.close();
+//        return result;
+//    }
 
-        final QProcessElement finalElementQ = elementQ;
-
-        // 1. Alle Vorgänge für den betreffenden BW suchen und in die Liste packen.
-        List<QProcess> proceses = new ArrayList();
-        Query query;
-        query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
-        query.setParameter("bewohner", bewohner);
-        proceses.addAll(query.getResultList());
-
-
-        // 2. Alle die Vorgänge entfernen, zu denen das betreffenden Object bereits zugeordnet wurde.
-        Query complement = null;
-        if (elementQ instanceof NReport) {
-            complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof BWerte) {
-            complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof Prescriptions) {
-            complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof BWInfo) {
-            complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof NursingProcess) {
-            complement = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else {
-            complement = null;
-        }
-        complement.setParameter("element", elementQ);
-        proceses.removeAll(complement.getResultList());
-
-        // 3. Nun alle Vorgänge als JMenuItems anhängen.
-        Iterator<QProcess> it = proceses.iterator();
-        while (it.hasNext()) {
-            final QProcess vorgang = it.next();
-            JMenuItem mi = new JMenuItem(vorgang.getTitle());
-            // Bei Aufruf eines Menüs, wird dass Element an den Vorgang angehangen.
-            mi.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    add(finalElementQ, vorgang);
-                    cb.actionPerformed(new ActionEvent(this, 0, "VorgangAssign"));
-                }
-            });
-            result.add(mi);
-        }
-        em.close();
-        return result;
-    }
-
-    private static JMenu getVorgaenge2Remove(QProcessElement elementQ, ActionListener callback) {
-
-        JMenu result = new JMenu("Entfernen von");
-
-        final ActionListener cb = callback;
-
-        final QProcessElement finalElementQ = elementQ;
-        EntityManager em = OPDE.createEM();
-
-        // 1. Alle aktiven Vorgänge suchen, die diesem Element zugeordnet sind.
-        List<QProcess> proceses = new ArrayList();
-        Query query = null;
-        if (elementQ instanceof NReport) {
-            query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof BWerte) {
-            query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof Prescriptions) {
-            query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof BWInfo) {
-            query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else if (elementQ instanceof NursingProcess) {
-            query = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
-        } else {
-            query = null;
-        }
-        query.setParameter("element", elementQ);
-        proceses.addAll(query.getResultList());
-
-        // 2. Nun diese Vorgänge als JMenuItems anhängen.
-        Iterator<QProcess> it = proceses.iterator();
-        while (it.hasNext()) {
-            final QProcess vorgang = it.next();
-            JMenuItem mi = new JMenuItem(vorgang.getTitle());
-            // Bei Aufruf eines Menüs, wird dass Element vom Vorgang entfernt
-            mi.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    remove(finalElementQ, vorgang);
-                    cb.actionPerformed(new ActionEvent(this, 0, "VorgangRemove"));
-                }
-            });
-            result.add(mi);
-        }
-
-        em.close();
-        return result;
-    }
-
-
-    public static JMenu getVorgangContextMenu(Frame parent, QProcessElement elementQ, Resident bewohner, ActionListener callback) {
-        JMenu menu = new JMenu("<html>Vorgänge <font color=\"red\">&#9679;</font></html>");
-
-        // Neuer Vorgang Menü
-        menu.add(getNeuMenu(elementQ, bewohner));
-
-        // Untermenü mit vorhandenen Vorgängen einblenden.
-        // Aber nur, wenn die nicht leer sind.
-        JMenu addMenu = getVorgaenge2Assign(elementQ, bewohner, callback);
-        if (addMenu.getMenuComponentCount() > 0) {
-            menu.add(addMenu);
-        }
-        JMenu delMenu = getVorgaenge2Remove(elementQ, callback);
-        if (delMenu.getMenuComponentCount() > 0) {
-            menu.add(delMenu);
-        }
-
-        return menu;
-    }
+//
+//    public static JMenu getVorgangContextMenu(Frame parent, QProcessElement elementQ, Resident bewohner, ActionListener callback) {
+//        JMenu menu = new JMenu("<html>Vorgänge <font color=\"red\">&#9679;</font></html>");
+//
+//        // Neuer Vorgang Menü
+//        menu.add(getNeuMenu(elementQ, bewohner));
+//
+//        // Untermenü mit vorhandenen Vorgängen einblenden.
+//        // Aber nur, wenn die nicht leer sind.
+//        JMenu addMenu = getVorgaenge2Assign(elementQ, bewohner, callback);
+//        if (addMenu.getMenuComponentCount() > 0) {
+//            menu.add(addMenu);
+//        }
+//        JMenu delMenu = getVorgaenge2Remove(elementQ, callback);
+//        if (delMenu.getMenuComponentCount() > 0) {
+//            menu.add(delMenu);
+//        }
+//
+//        return menu;
+//    }
 
 
 }

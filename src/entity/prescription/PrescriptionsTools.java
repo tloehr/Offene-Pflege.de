@@ -9,7 +9,7 @@ import entity.Stationen;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
-import op.care.verordnung.PnlVerordnung;
+import op.care.prescription.PnlVerordnung;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -181,7 +181,7 @@ public class PrescriptionsTools {
 
     public static boolean hasBedarf(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT COUNT(v) FROM Prescriptions v WHERE v.resident = :resident AND v.abDatum >= :now AND v.situation IS NOT NULL ");
+        Query query = em.createQuery("SELECT COUNT(v) FROM Prescriptions v WHERE v.resident = :resident AND v.to >= :now AND v.situation IS NOT NULL ");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());
         return ((Long) query.getSingleResult()).longValue() > 0;
@@ -393,7 +393,7 @@ public class PrescriptionsTools {
 
     public static String getAN(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";
-        String datum = DateFormat.getDateInstance().format(verordnung.getAnDatum());
+        String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
 
         result += "<font color=\"green\">" + datum + "; ";
         if (verordnung.getAnKH() != null) {
@@ -413,8 +413,8 @@ public class PrescriptionsTools {
     public static String getAB(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";
 
-        if (verordnung.isBegrenzt()) {
-            String datum = DateFormat.getDateInstance().format(verordnung.getAbDatum());
+        if (verordnung.isLimited()) {
+            String datum = DateFormat.getDateInstance().format(verordnung.getTo());
 
             result += "<font color=\"" + (verordnung.isDiscontinued() ? "red" : "lime") + "\">" + datum + "; ";
 
@@ -576,7 +576,7 @@ public class PrescriptionsTools {
         EntityManager em = OPDE.createEM();
 
 //        List<Prescriptions> list = null;
-        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.anDatum <= :from AND p.abDatum >= :to ORDER BY p.situation.text, p.verid");
+        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.anDatum <= :from AND p.to >= :to ORDER BY p.situation.text, p.verid");
         query.setParameter("resident", resident);
         query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
         query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
@@ -605,8 +605,8 @@ public class PrescriptionsTools {
             Prescriptions verordnung = list.get(0);
             result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(verordnung.getResident()) : "") + "</h2>" : "";
 
-//            if (verordnung.getResident().getStation() != null) {
-//                result += EinrichtungenTools.getAsText(verordnung.getResident().getStation().getEinrichtung());
+//            if (prescription.getResident().getStation() != null) {
+//                result += EinrichtungenTools.getAsText(prescription.getResident().getStation().getEinrichtung());
 //            }
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
@@ -665,13 +665,13 @@ public class PrescriptionsTools {
     public static void absetzen(EntityManager em, Prescriptions verordnung) throws Exception {
         verordnung = em.merge(verordnung);
         em.lock(verordnung, LockModeType.OPTIMISTIC);
-        verordnung.setAbDatum(new Date());
+        verordnung.setTo(new Date());
         verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
         BHPTools.cleanup(em, verordnung);
     }
 
     public static void alleAbsetzen(EntityManager em, Resident resident) throws Exception {
-        Query query = em.createQuery("SELECT b FROM Prescriptions b WHERE b.resident = :resident AND b.abDatum >= :now");
+        Query query = em.createQuery("SELECT b FROM Prescriptions b WHERE b.resident = :resident AND b.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());
         List<Prescriptions> verordnungen = query.getResultList();

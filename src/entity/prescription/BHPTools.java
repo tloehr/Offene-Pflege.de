@@ -141,7 +141,7 @@ public class BHPTools {
                     // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
                     // Das heisst, wenn eine Verordnung heute endet, dann wird sie dennoch eingetragen.
                     // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
-                    " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.abDatum >= :abdatum " +
+                    " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.to >= :abdatum " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
                     " AND vp.lDatum <= :ldatum AND v.resident.adminonly <> 2 " +
                     " ORDER BY vp.bhppid ");
@@ -548,7 +548,7 @@ public class BHPTools {
         boolean residentAbsent = bhp.getResident().isActive() && BWInfoTools.absentSince(bhp.getResident()) != null;
 
         return !residentAbsent && bhp.getResident().isActive() &&
-                bhp.getPrescription().getAbDatum().after(new Date()) && // prescription is active or it is unassigned
+                !bhp.getPrescription().isDiscontinued() &&
                 (bhp.getUser() == null ||
                         (bhp.getUser().equals(OPDE.getLogin().getUser()) &&
                                 Minutes.minutesBetween(new DateTime(bhp.getMDate()), new DateTime()).getMinutes() < BHP_MAX_MINUTES_TO_WITHDRAW)) &&

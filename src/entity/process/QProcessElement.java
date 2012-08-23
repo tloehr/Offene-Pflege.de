@@ -4,6 +4,8 @@
  */
 package entity.process;
 
+import entity.Users;
+
 /**
  * Dieses Interface dient dazu, dass ich mit den Elementen eines Vorgangs
  * in den Hilfsklassen einheitlich umgehen kann. Ich definiere
@@ -45,4 +47,6 @@ public interface QProcessElement {
      * @return
      */
     public long getID();
+
+    public Users getUser();
 }

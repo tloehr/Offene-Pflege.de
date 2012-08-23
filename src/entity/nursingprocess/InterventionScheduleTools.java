@@ -1,7 +1,7 @@
 package entity.nursingprocess;
 
 import op.OPDE;
-import op.care.planung.PnlPlanung;
+import op.care.nursingprocess.PnlPlanung;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;

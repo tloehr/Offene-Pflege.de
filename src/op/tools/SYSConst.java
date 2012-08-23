@@ -309,6 +309,10 @@ public class SYSConst {
     public static final Icon icon22todoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo_pressed.png"));
     public static final Icon icon22stop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22stopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
+    public static final Icon icon22calendar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/calenders.png"));
+    public static final Icon icon22calendarPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/calenders_pressed.png"));
+    public static final Icon icon22play = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_play.png"));
+    public static final Icon icon22playPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_play_pressed.png"));
     public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
     public static final Icon icon22viewPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag-selected.png"));
     public static final Icon icon32ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2.png"));
@@ -322,4 +326,8 @@ public class SYSConst {
     public static final Icon icon22apply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply.png"));
     public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));
     public static final Icon icon22down = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1downarrow.png"));
+    public static final Icon icon22unlink = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink.png"));
+    public static final Icon icon22unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink_pressed.png"));
+    public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
+    public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
 }

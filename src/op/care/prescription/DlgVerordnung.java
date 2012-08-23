@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.verordnung;
+package op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -802,7 +802,7 @@ public class DlgVerordnung extends MyJDialog {
             cmbAB.setSelectedIndex(-1);
         } else {
             cbAB.setSelected(true);
-            jdcAB.setDate(verordnung.getAbDatum());
+            jdcAB.setDate(verordnung.getTo());
             lblAB.setText(verordnung.getAbgesetztDurch().getUKennung());
             cmbAB.setSelectedItem(verordnung.getAbArzt());
             cmbKHAb.setSelectedItem(verordnung.getAbKH());
@@ -945,21 +945,21 @@ public class DlgVerordnung extends MyJDialog {
                 OPDE.debug("jdcAB steht auf HEUTE");
                 if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
                     OPDE.debug("jdcAB und jdcAN sind gleich");
-                    verordnung.setAnDatum(new Date(SYSCalendar.startOfDay()));
-                    verordnung.setAbDatum(new Date(SYSCalendar.endOfDay()));
+                    verordnung.setFrom(new Date(SYSCalendar.startOfDay()));
+                    verordnung.setTo(new Date(SYSCalendar.endOfDay()));
                 } else {
-                    verordnung.setAbDatum(new Date());
+                    verordnung.setTo(new Date());
                 }
             } else {
                 OPDE.debug("jdcAB steht nicht auf HEUTE");
-                verordnung.setAbDatum(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
+                verordnung.setTo(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
 
             }
             verordnung.setAbgesetztDurch(OPDE.getLogin().getUser());
         } else {
             verordnung.setAbKH(null);
             verordnung.setAbArzt(null);
-            verordnung.setAbDatum(SYSConst.DATE_BIS_AUF_WEITERES);
+            verordnung.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
         }
 
         verordnung.setAnArzt((Arzt) cmbAN.getSelectedItem());

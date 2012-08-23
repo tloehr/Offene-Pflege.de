@@ -220,7 +220,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     private Collection<SYSPB2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
     private Collection<PB2User> usersAcknowledged;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pflegebericht")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedVorgaenge;
 
     // ==

@@ -51,7 +51,7 @@ import java.util.Date;
 //                + " SELECT s"
 //                + " FROM SYSFiles s "
 //                + " JOIN s.verAssignCollection sf "
-//                + " WHERE sf.verordnung = :verordnung"),
+//                + " WHERE sf.prescription = :prescription"),
         @NamedQuery(name = "SYSFiles.findByNReport", query = ""
                 + " SELECT s "
                 + " FROM SYSFiles s "

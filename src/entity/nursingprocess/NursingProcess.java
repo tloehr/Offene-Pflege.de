@@ -260,6 +260,11 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     @Override
+    public Users getUser() {
+        return angesetztDurch;
+    }
+
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (planID != null ? planID.hashCode() : 0);

@@ -52,7 +52,7 @@ public class DlgDAF extends javax.swing.JDialog {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("MedFormen.findAll");
         cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
-        cmbForm.setRenderer(DosageFormTools.getMedFormenRenderer(0));
+        cmbForm.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
         editMode = darreichung.getDafID() != null;
 

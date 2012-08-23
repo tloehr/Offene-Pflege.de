@@ -16,6 +16,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -58,18 +59,18 @@ import java.util.List;
  * </ul>
  * <h2>Beispiele</h2>
  * <h3>Bedarfsmedikation</h3>
- * <img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-bedarf1.png" />
+ * <img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-bedarf1.png" />
  * <ul>
  * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situationen[sitID=10], anKH=entity.rest.Krankenhaus[khid=16], abKH=null, anArzt=entity.rest.Arzt[arztID=21], abArzt=null}</code></li>
- * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4658, ...}}</code></li>
+ * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4658, ...}}</code></li>
  * </ul>
  * <p/>
  * <h3>Regelverordnung mit sehr unterschiedlichen Dosierungen</h3>
  * <ul>
- * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.Arzt[arztID=1], abArzt=null}</code></li>
- * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel1.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7406, nachtMo=0, morgens=1, mittags=1, nachmittags=0, abends=1, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 16:12:49 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
- * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel2.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7404, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=2.5, uhrzeit=Thu Dec 22 22:00:00 CET 2011, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=1, monatlich=0, tagNum=0, mon=0, die=1, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:10:52 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
- * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/verordnung-regel3.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7405, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=3, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=0, monatlich=2, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:11:49 CET 2011, uKennung='tloehr', verordnung=Verordnung{verid=4659, ...}}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.Arzt[arztID=1], abArzt=null}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel1.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7406, nachtMo=0, morgens=1, mittags=1, nachmittags=0, abends=1, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 16:12:49 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4659, ...}}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel2.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7404, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=2.5, uhrzeit=Thu Dec 22 22:00:00 CET 2011, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=1, monatlich=0, tagNum=0, mon=0, die=1, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:10:52 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4659, ...}}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel3.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7405, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=3, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=0, monatlich=2, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:11:49 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4659, ...}}</code></li>
  * </ul>
  *
  * @author tloehr
@@ -79,13 +80,13 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescriptions b"),
         @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescriptions b WHERE b.verid = :verid"),
-        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescriptions b WHERE b.anDatum = :anDatum"),
+        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescriptions b WHERE b.from = :from"),
         @NamedQuery(name = "Verordnung.findByVorgang", query = " "
                 + " SELECT ve FROM Prescriptions ve "
                 + " JOIN ve.attachedVorgaenge av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescriptions b WHERE b.abDatum = :abDatum"),
+        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescriptions b WHERE b.to = :to"),
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescriptions b WHERE b.bisPackEnde = :bisPackEnde"),
         @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescriptions b WHERE b.verKennung = :verKennung"),
         @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescriptions b WHERE b.stellplan = :stellplan")
@@ -171,11 +172,11 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     @Basic(optional = false)
     @Column(name = "AnDatum")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date anDatum;
+    private Date from;
     @Basic(optional = false)
     @Column(name = "AbDatum")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date abDatum;
+    private Date to;
     @Column(name = "BisPackEnde")
     private boolean bisPackEnde;
     @Basic(optional = false)
@@ -242,14 +243,14 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.attachedFiles = new ArrayList<Sysver2file>();
         this.attachedVorgaenge = new ArrayList<SYSPRE2PROCESS>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
-        this.anDatum = new Date();
-        this.abDatum = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.from = new Date();
+        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Prescriptions(Date anDatum, Date abDatum, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
-        this.anDatum = anDatum;
-        this.abDatum = abDatum;
+    public Prescriptions(Date from, Date to, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+        this.from = from;
+        this.to = to;
         this.bisPackEnde = bisPackEnde;
         this.verKennung = verKennung;
         this.bemerkung = bemerkung;
@@ -281,20 +282,20 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.verid = verid;
     }
 
-    public Date getAnDatum() {
-        return anDatum;
+    public Date getFrom() {
+        return from;
     }
 
-    public void setAnDatum(Date anDatum) {
-        this.anDatum = anDatum;
+    public void setFrom(Date from) {
+        this.from = from;
     }
 
-    public Date getAbDatum() {
-        return abDatum;
+    public Date getTo() {
+        return to;
     }
 
-    public void setAbDatum(Date abDatum) {
-        this.abDatum = abDatum;
+    public void setTo(Date to) {
+        this.to = to;
     }
 
     public Krankenhaus getAnKH() {
@@ -420,11 +421,11 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     }
 
     public boolean isDiscontinued() {
-        return abDatum.before(new Date());
+        return new DateTime(to).isBeforeNow();
     }
 
-    public boolean isBegrenzt() {
-        return abDatum.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    public boolean isLimited() {
+        return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
     public boolean isOnDemand() {
@@ -444,8 +445,13 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     }
 
     @Override
+    public Users getUser() {
+        return angesetztDurch;
+    }
+
+    @Override
     public long getPITInMillis() {
-        return anDatum.getTime();
+        return from.getTime();
     }
 
     @Override
@@ -476,12 +482,12 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         if (stellplan != that.stellplan) return false;
         if (verKennung != that.verKennung) return false;
         if (abArzt != null ? !abArzt.equals(that.abArzt) : that.abArzt != null) return false;
-        if (abDatum != null ? !abDatum.equals(that.abDatum) : that.abDatum != null) return false;
+        if (to != null ? !to.equals(that.to) : that.to != null) return false;
         if (abKH != null ? !abKH.equals(that.abKH) : that.abKH != null) return false;
         if (abgesetztDurch != null ? !abgesetztDurch.equals(that.abgesetztDurch) : that.abgesetztDurch != null)
             return false;
         if (anArzt != null ? !anArzt.equals(that.anArzt) : that.anArzt != null) return false;
-        if (anDatum != null ? !anDatum.equals(that.anDatum) : that.anDatum != null) return false;
+        if (from != null ? !from.equals(that.from) : that.from != null) return false;
         if (anKH != null ? !anKH.equals(that.anKH) : that.anKH != null) return false;
         if (angesetztDurch != null ? !angesetztDurch.equals(that.angesetztDurch) : that.angesetztDurch != null)
             return false;
@@ -506,8 +512,8 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     public int hashCode() {
         int result = verid != null ? verid.hashCode() : 0;
         result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (anDatum != null ? anDatum.hashCode() : 0);
-        result = 31 * result + (abDatum != null ? abDatum.hashCode() : 0);
+        result = 31 * result + (from != null ? from.hashCode() : 0);
+        result = 31 * result + (to != null ? to.hashCode() : 0);
         result = 31 * result + (bisPackEnde ? 1 : 0);
         result = 31 * result + (int) (verKennung ^ (verKennung >>> 32));
         result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
@@ -531,7 +537,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
 
     @Override
     public Object clone() {
-        final Prescriptions copy = new Prescriptions(anDatum, abDatum, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, resident, massnahme, tradeform, situation, anKH, abKH, anArzt, abArzt);
+        final Prescriptions copy = new Prescriptions(from, to, bisPackEnde, verKennung, bemerkung, stellplan, attachedFiles, attachedVorgaenge, angesetztDurch, abgesetztDurch, resident, massnahme, tradeform, situation, anKH, abKH, anArzt, abArzt);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
@@ -562,8 +568,8 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         return "Prescriptions{" +
                 "verid=" + verid +
                 ", version=" + version +
-                ", anDatum=" + anDatum +
-                ", abDatum=" + abDatum +
+                ", anDatum=" + from +
+                ", abDatum=" + to +
                 ", bisPackEnde=" + bisPackEnde +
                 ", verKennung=" + verKennung +
                 ", bemerkung='" + bemerkung + '\'' +

@@ -286,6 +286,11 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     }
 
     @Override
+    public Users getUser() {
+        return angesetztDurch;
+    }
+
+    @Override
     public String getContentAsHTML() {
         return html;
     }

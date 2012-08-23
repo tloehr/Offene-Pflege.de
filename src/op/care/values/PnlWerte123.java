@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Thu Jun 14 14:23:47 CEST 2012
  */
 
-package op.care.vital;
+package op.care.values;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;

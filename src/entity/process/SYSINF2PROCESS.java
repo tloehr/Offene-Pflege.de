@@ -16,10 +16,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "SYSBWI2VORGANG")
 @NamedQueries({
-        @NamedQuery(name = "SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
+        @NamedQuery(name = "SYSINF2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
                 " SELECT s.vorgang FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
-        @NamedQuery(name = "SYSBWI2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang = :vorgang AND s.vorgang.to = '9999-12-31 23:59:59' ")
+        @NamedQuery(name = "SYSINF2PROCESS.findByElementAndVorgang", query = " " +
+                " SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
 })
 public class SYSINF2PROCESS {
     @Id

@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Tue May 01 14:14:53 CEST 2012
  */
 
-package op.care.verordnung;
+package op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;

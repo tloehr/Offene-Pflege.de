@@ -16,10 +16,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "SYSPB2VORGANG")
 @NamedQueries({
-        @NamedQuery(name = "SYSPB2VORGANG.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSNR2PROCESS s WHERE s.pflegebericht = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
-        @NamedQuery(name = "SYSPB2VORGANG.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSNR2PROCESS s WHERE s.pflegebericht = :element AND s.vorgang = :vorgang AND s.vorgang.to = '9999-12-31 23:59:59' ")
+        @NamedQuery(name = "SYSNR2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
+                " SELECT s.vorgang FROM SYSNR2PROCESS s WHERE s.nreport = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
+        @NamedQuery(name = "SYSNR2PROCESS.findByElementAndVorgang", query = " " +
+                " SELECT s FROM SYSNR2PROCESS s WHERE s.nreport = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
 })
 public class SYSNR2PROCESS {
     @Id
@@ -33,15 +33,15 @@ public class SYSNR2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "PBID", referencedColumnName = "PBID")
-    private NReport pflegebericht;
+    private NReport nreport;
 
     protected SYSNR2PROCESS() {
     }
 
-    public SYSNR2PROCESS(QProcess vorgang, NReport pflegebericht) {
+    public SYSNR2PROCESS(QProcess vorgang, NReport nreport) {
         this.id = 0;
         this.vorgang = vorgang;
-        this.pflegebericht = pflegebericht;
+        this.nreport = nreport;
     }
 
     public QProcess getVorgang() {
@@ -53,10 +53,10 @@ public class SYSNR2PROCESS {
     }
 
     public NReport getPflegebericht() {
-        return pflegebericht;
+        return nreport;
     }
 
     public void setPflegebericht(NReport pflegebericht) {
-        this.pflegebericht = pflegebericht;
+        this.nreport = pflegebericht;
     }
 }

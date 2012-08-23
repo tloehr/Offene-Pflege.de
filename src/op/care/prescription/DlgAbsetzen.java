@@ -25,7 +25,7 @@
  * 
  */
 
-package op.care.verordnung;
+package op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;

@@ -34,7 +34,7 @@ public class ResidentTools {
 
     public static Resident findByBWKennung(String bwkennung) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Bewohner.findByBWKennung");
+        Query query = em.createNamedQuery("Resident.findByBWKennung");
         query.setParameter("bWKennung", bwkennung);
         Resident bewohner = (Resident) query.getSingleResult();
         em.close();
@@ -106,7 +106,7 @@ public class ResidentTools {
             muster += "%"; // MySQL Wildcard
             EntityManager em = OPDE.createEM();
 
-            Query query = em.createNamedQuery("Bewohner.findByNachname");
+            Query query = em.createNamedQuery("Resident.findByNachname");
             query.setParameter("nachname", muster);
             List<Resident> listBW = query.getResultList();
 

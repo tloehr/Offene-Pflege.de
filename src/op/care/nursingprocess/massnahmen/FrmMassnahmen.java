@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.planung.massnahmen;
+package op.care.nursingprocess.massnahmen;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -46,7 +46,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
