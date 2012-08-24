@@ -14,7 +14,7 @@ import javax.persistence.*;
  * Leider bin ich nicht selbst drauf gekommen.
  */
 @Entity
-@Table(name = "SYSPLAN2VORGANG")
+@Table(name = "SYSNP2PROCESS")
 @NamedQueries({
         @NamedQuery(name = "SYSNP2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
                 " SELECT s.vorgang FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),

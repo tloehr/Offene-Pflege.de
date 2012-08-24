@@ -23,6 +23,7 @@ public class PReportTools {
     public static final short PREPORT_TYPE_CREATE = 4;
     public static final String PREPORT_TEXT_CREATE = PnlProcess.internalClassID+".preport.text.create";
     public static final short PREPORT_TYPE_CLOSE = 5;
+    public static final String PREPORT_TEXT_CLOSE = PnlProcess.internalClassID+".preport.text.close";
     public static final short PREPORT_TYPE_REOPEN = 6;
     public static final short PREPORT_TYPE_EDIT = 7;
     public static final short PREPORT_TYPE_WV = 8;

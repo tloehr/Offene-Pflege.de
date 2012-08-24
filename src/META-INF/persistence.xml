@@ -31,9 +31,9 @@
         <class>entity.Uebergabebuch</class>
         <class>entity.Users</class>
         <class>entity.files.SYSFiles</class>
-        <class>entity.files.SYSBWI2FILE</class>
-        <class>entity.files.SYSPB2FILE</class>
-        <class>entity.files.Sysver2file</class>
+        <class>entity.files.SYSINF2FILE</class>
+        <class>entity.files.SYSNR2FILE</class>
+        <class>entity.files.SYSPRE2FILE</class>
         <class>entity.info.BWInfo</class>
         <class>entity.info.BWInfoKat</class>
         <class>entity.info.BWInfoTyp</class>

@@ -14,7 +14,7 @@ import javax.persistence.*;
  * Leider bin ich nicht selbst drauf gekommen.
  */
 @Entity
-@Table(name = "SYSBWERTE2VORGANG")
+@Table(name = "SYSVAL2PROCESS")
 @NamedQueries({
         @NamedQuery(name = "SYSVAL2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
                 " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
@@ -24,7 +24,6 @@ import javax.persistence.*;
 public class SYSVAL2PROCESS {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ID")
     private long id;
 

@@ -39,15 +39,14 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSPB2FILE")
+@Table(name = "SYSNR2FILE")
 @NamedQueries({
-        @NamedQuery(name = "Syspb2file.findAll", query = "SELECT s FROM SYSPB2FILE s"),
-        @NamedQuery(name = "Syspb2file.findById", query = "SELECT s FROM SYSPB2FILE s WHERE s.id = :id")})
-public class SYSPB2FILE implements Serializable {
+        @NamedQuery(name = "SYSNR2FILE.findAll", query = "SELECT s FROM SYSNR2FILE s"),
+        @NamedQuery(name = "SYSNR2FILE.findById", query = "SELECT s FROM SYSNR2FILE s WHERE s.id = :id")})
+public class SYSNR2FILE implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ID")
     private Long id;
     @Basic(optional = false)
@@ -64,10 +63,10 @@ public class SYSPB2FILE implements Serializable {
     @ManyToOne
     private Users user;
 
-    public SYSPB2FILE() {
+    public SYSNR2FILE() {
     }
 
-    public SYSPB2FILE(SYSFiles sysfile, NReport nReport, Users user, Date pit) {
+    public SYSNR2FILE(SYSFiles sysfile, NReport nReport, Users user, Date pit) {
         this.sysfile = sysfile;
         this.nReport = nReport;
         this.user = user;
@@ -120,10 +119,10 @@ public class SYSPB2FILE implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof SYSPB2FILE)) {
+        if (!(object instanceof SYSNR2FILE)) {
             return false;
         }
-        SYSPB2FILE other = (SYSPB2FILE) object;
+        SYSNR2FILE other = (SYSNR2FILE) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -132,6 +131,6 @@ public class SYSPB2FILE implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.files.SYSPB2FILE[id=" + id + "]";
+        return "entity.files.SYSNR2FILE[id=" + id + "]";
     }
 }

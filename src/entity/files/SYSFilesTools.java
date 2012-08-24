@@ -30,13 +30,10 @@ import entity.info.Resident;
 import entity.info.BWInfo;
 import entity.prescription.Prescriptions;
 import op.OPDE;
-import op.care.sysfiles.DlgFiles;
-import op.care.sysfiles.PnlFiles;
 import op.threads.DisplayMessage;
 import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -143,15 +140,15 @@ public class SYSFilesTools {
                     SYSFiles sysfile = putFile(em, ftp, file, bewohner);
                     if (attachable != null) {
                         if (attachable instanceof NReport) {
-                            SYSPB2FILE link = em.merge(new SYSPB2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
+                            SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getPbAssignCollection().add(link);
                             ((NReport) attachable).getAttachedFiles().add(link);
                         } else if (attachable instanceof Prescriptions) {
-                            Sysver2file link = em.merge(new Sysver2file(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
+                            SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getVerAssignCollection().add(link);
                             ((Prescriptions) attachable).getAttachedFiles().add(link);
                         } else if (attachable instanceof BWInfo) {
-                            SYSBWI2FILE link = em.merge(new SYSBWI2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
+                            SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                             sysfile.getBwiAssignCollection().add(link);
                             ((BWInfo) attachable).getAttachedFiles().add(link);
                         }

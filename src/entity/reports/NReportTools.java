@@ -40,7 +40,7 @@ public class NReportTools {
 //
 //        mybericht.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
 //
-//        for (SYSPB2FILE oldAssignment : mybericht.getAttachedFiles()) {
+//        for (SYSNR2FILE oldAssignment : mybericht.getAttachedFiles()) {
 //            em.remove(oldAssignment);
 //        }
 //        mybericht.getAttachedFiles().clear();

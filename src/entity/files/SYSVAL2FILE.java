@@ -1,3 +1,4 @@
+package entity.files;
 /*
  * OffenePflege
  * Copyright (C) 2011 Torsten Löhr
@@ -23,11 +24,9 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package entity.files;
 
+import entity.BWerte;
 import entity.Users;
-import entity.prescription.Prescriptions;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -36,25 +35,21 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSVER2FILE")
-@NamedQueries({
-        @NamedQuery(name = "Sysver2file.findAll", query = "SELECT s FROM Sysver2file s"),
-        @NamedQuery(name = "Sysver2file.findById", query = "SELECT s FROM Sysver2file s WHERE s.id = :id")})
-public class Sysver2file implements Serializable {
+@Table(name = "SYSVAL2FILE")
+public class SYSVAL2FILE implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ID")
     private Long id;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
-    @JoinColumn(name = "VERID", referencedColumnName = "VerID")
+    @JoinColumn(name = "ForeignID", referencedColumnName = "BWID")
     @ManyToOne
-    private Prescriptions verordnung;
+    private BWerte value;
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
@@ -62,12 +57,12 @@ public class Sysver2file implements Serializable {
     @ManyToOne
     private Users user;
 
-    public Sysver2file() {
+    public SYSVAL2FILE() {
     }
 
-    public Sysver2file(SYSFiles sysfile, Prescriptions verordnung, Users user, Date pit) {
+    public SYSVAL2FILE(SYSFiles sysfile, BWerte value, Users user, Date pit) {
         this.sysfile = sysfile;
-        this.verordnung = verordnung;
+        this.value = value;
         this.user = user;
         this.pit = pit;
     }
@@ -89,8 +84,8 @@ public class Sysver2file implements Serializable {
         return sysfile;
     }
 
-    public Prescriptions getPrescription() {
-        return verordnung;
+    public BWerte getValue() {
+        return value;
     }
 
     public Long getId() {
@@ -109,20 +104,29 @@ public class Sysver2file implements Serializable {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        if (!(object instanceof Sysver2file)) {
-            return false;
-        }
-        Sysver2file other = (Sysver2file) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
+        SYSVAL2FILE that = (SYSVAL2FILE) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
+        if (sysfile != null ? !sysfile.equals(that.sysfile) : that.sysfile != null) return false;
+        if (user != null ? !user.equals(that.user) : that.user != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "entity.files.Sysver2file[id=" + id + "]";
+        return "SYSVAL2FILE{" +
+                "id=" + id +
+                ", pit=" + pit +
+                ", value=" + value +
+                ", sysfile=" + sysfile +
+                ", user=" + user +
+                '}';
     }
 }

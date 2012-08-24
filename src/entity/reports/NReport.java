@@ -6,7 +6,7 @@ package entity.reports;
 
 import entity.PB2User;
 import entity.Users;
-import entity.files.SYSPB2FILE;
+import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.process.SYSNR2PROCESS;
 import entity.process.QProcessElement;
@@ -217,7 +217,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @OneToOne
     private NReport replacementFor;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
-    private Collection<SYSPB2FILE> attachedFiles;
+    private Collection<SYSNR2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
     private Collection<PB2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
@@ -247,7 +247,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.minutes = 3;
         this.resident = resident;
         this.user = OPDE.getLogin().getUser();
-        this.attachedFiles = new ArrayList<SYSPB2FILE>();
+        this.attachedFiles = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
         this.attachedVorgaenge = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<PB2User>();
@@ -264,7 +264,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.editedBy = editedBy;
         this.replacedBy = replacedBy;
         this.replacementFor = replacementFor;
-        this.attachedFiles = new ArrayList<SYSPB2FILE>();
+        this.attachedFiles = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
         this.attachedVorgaenge = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<PB2User>();
@@ -339,11 +339,11 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return resident;
     }
 
-    public Collection<SYSPB2FILE> getAttachedFiles() {
+    public Collection<SYSNR2FILE> getAttachedFiles() {
         return attachedFiles;
     }
 
-    public void setAttachedFiles(Collection<SYSPB2FILE> attachedFiles) {
+    public void setAttachedFiles(Collection<SYSNR2FILE> attachedFiles) {
         this.attachedFiles = attachedFiles;
     }
 
@@ -507,8 +507,8 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
         CollectionUtils.forAllDo(attachedFiles, new Closure() {
             public void execute(Object o) {
-                SYSPB2FILE oldAssignment = (SYSPB2FILE) o;
-                clonedReport.attachedFiles.add(new SYSPB2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getUser(), clonedReport.getPit()));
+                SYSNR2FILE oldAssignment = (SYSNR2FILE) o;
+                clonedReport.attachedFiles.add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getUser(), clonedReport.getPit()));
             }
         });
         return clonedReport;

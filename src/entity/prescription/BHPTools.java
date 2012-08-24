@@ -141,7 +141,7 @@ public class BHPTools {
                     // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
                     // Das heisst, wenn eine Verordnung heute endet, dann wird sie dennoch eingetragen.
                     // Also alle, die bis EINSCHLIEßLICH heute gültig sind.
-                    " WHERE v.situation IS NULL AND v.anDatum <= :andatum AND v.to >= :abdatum " +
+                    " WHERE v.situation IS NULL AND v.from <= :andatum AND v.to >= :abdatum " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
                     " AND vp.lDatum <= :ldatum AND v.resident.adminonly <> 2 " +
                     " ORDER BY vp.bhppid ");

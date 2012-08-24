@@ -14,6 +14,7 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.info.Resident;
@@ -22,6 +23,7 @@ import entity.process.*;
 import op.OPDE;
 import op.events.TaskPaneContentChangedListener;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
@@ -31,6 +33,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -51,7 +54,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
     private Resident resident;
     private boolean initPhase = false;
-    private JToggleButton tbClosed;
+    private JToggleButton tbClosed, tbSystem;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
@@ -88,47 +91,6 @@ public class PnlProcess extends NursingRecordsPanel {
     public void reload() {
         reloadDisplay();
     }
-
-
-//    protected CollapsiblePane addVorgaengeFuerBW(Resident bewohner) {
-//
-//        JPanel labelPanel = new JPanel();
-//        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
-//
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createNamedQuery("Vorgaenge.findActiveByBewohner");
-//        query.setParameter("bewohner", bewohner);
-//        List<QProcess> listProceses = query.getResultList();
-//        Iterator<QProcess> it = listProceses.iterator();
-//        em.close();
-//
-//        CollapsiblePane bwpanel = new CollapsiblePane(bewohner.getNachname() + ", " + bewohner.getVorname());
-//        try {
-//            bwpanel.setCollapsed(false);
-//        } catch (PropertyVetoException e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
-//
-//
-//        if (!listProceses.isEmpty()) {
-//            while (it.hasNext()) {
-//                final QProcess innervorgang = it.next();
-//                JideButton buttonBW = GUITools.createHyperlinkButton(innervorgang.getTitel(), null, new ActionListener() {
-//                    @Override
-//                    public void actionPerformed(ActionEvent actionEvent) {
-//                        loadTable(innervorgang);
-//                        loadDetails(innervorgang);
-//                    }
-//                });
-//                labelPanel.add(buttonBW);
-//            }
-//        }
-//
-//        bwpanel.setContentPane(labelPanel);
-//
-//        return bwpanel;
-//    }
-
 
     private void reloadDisplay() {
         /***
@@ -289,7 +251,79 @@ public class PnlProcess extends NursingRecordsPanel {
             btnAddPReport.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
+                    final JButton btnSave = new JButton(SYSConst.icon22apply);
+                    final JTextArea editor = new JTextArea("", 10, 40);
+                    btnSave.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent evt) {
 
+                            if (editor.getText().trim().isEmpty()) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+                                return;
+                            }
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                QProcess myProcess = em.merge(qProcess);
+                                if (!myProcess.isCommon()) {
+                                    em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
+                                }
+                                em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                PReport pReport = em.merge(new PReport(editor.getText().trim(), PReportTools.PREPORT_TYPE_USER, myProcess));
+                                myProcess.getPReports().add(pReport);
+
+                                em.getTransaction().commit();
+
+                                qProcessMap.remove(qProcess);
+                                qProcessMap.put(myProcess, createCP4(myProcess));
+                                try {
+                                    qProcessMap.get(myProcess).setCollapsed(false);
+                                } catch (PropertyVetoException e) {
+
+                                }
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+
+                    editor.setLineWrap(true);
+                    editor.setWrapStyleWord(true);
+                    editor.setEditable(true);
+                    JScrollPane jspEditor = new JScrollPane(editor);
+                    JPanel pnl = new JPanel(new BorderLayout(10, 10));
+
+                    pnl.add(jspEditor, BorderLayout.CENTER);
+                    JPanel buttonPanel = new JPanel();
+                    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+                    buttonPanel.add(btnSave);
+                    pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                    pnl.add(buttonPanel, BorderLayout.SOUTH);
+
+                    popup.setOwner(btnAddPReport);
+                    popup.getContentPane().add(pnl);
+
+                    popup.setDefaultFocusComponent(editor);
+                    GUITools.showPopup(popup, SwingUtilities.WEST);
                 }
             });
             btnAddPReport.setEnabled(!qProcess.isClosed());
@@ -313,6 +347,54 @@ public class PnlProcess extends NursingRecordsPanel {
                 btnClose.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
+
+
+                        new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48stop, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+
+                                        QProcess myProcess = em.merge(qProcess);
+                                        if (!myProcess.isCommon()) {
+                                            em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
+                                        }
+                                        em.lock(myProcess, LockModeType.OPTIMISTIC);
+
+                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, qProcess));
+
+                                        myProcess.setTo(new Date());
+                                        myProcess.getPReports().add(pReport);
+                                        em.getTransaction().commit();
+                                        processList.remove(qProcess);
+                                        processList.add(myProcess);
+                                        Collections.sort(processList);
+                                        qProcessMap.remove(qProcess);
+                                        qProcessMap.put(myProcess, createCP4(myProcess));
+                                        buildPanel();
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
+                            }
+                        });
+
 
                     }
                 });
@@ -397,54 +479,24 @@ public class PnlProcess extends NursingRecordsPanel {
         JPanel titlePanel = new JPanel();
         titlePanel.setOpaque(false);
 
-        titlePanel.setLayout(new
+        titlePanel.setLayout(new GridBagLayout());
+        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
 
-                GridBagLayout()
-
-        );
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]
-
-                {
-                        0, 80
-                }
-
-        ;
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]
-
-                {
-                        1.0, 1.0
-                }
-
-        ;
-
-        titlePanel.add(titlePanelleft, new
-
-                GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5),
+                new Insets(0, 0, 0, 5), 0, 0));
 
-                0, 0));
-
-        titlePanel.add(titlePanelright, new
-
-                GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0),
-
-                0, 0));
+                new Insets(0, 0, 0, 0), 0, 0));
 
         cp.setTitleLabelComponent(titlePanel);
         cp.setSlidingDirection(SwingConstants.SOUTH);
 
-        try
-
-        {
+        try {
             cp.setCollapsed(true);
-        } catch (
-                PropertyVetoException e
-                )
-
-        {
+        } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
 
@@ -496,6 +548,7 @@ public class PnlProcess extends NursingRecordsPanel {
             cpElement.setBackground(QProcessTools.getBG2(qProcess));
             elementMap.put(element, cpElement);
             elementPanel.add(elementMap.get(element));
+
         }
         return elementPanel;
     }
@@ -803,36 +856,42 @@ public class PnlProcess extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase) return;
-//                SYSPropsTools.storeState(internalClassID + ":tbShowReplaced", tbShowReplaced);
                 buildPanel();
             }
         });
-//        SYSPropsTools.restoreState(internalClassID + ":tbShowReplaced", tbShowReplaced);
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbClosed);
+
+
+        /***
+         *      _   _    ____            _
+         *     | |_| |__/ ___| _   _ ___| |_ ___ _ __ ___
+         *     | __| '_ \___ \| | | / __| __/ _ \ '_ ` _ \
+         *     | |_| |_) |__) | |_| \__ \ ||  __/ | | | | |
+         *      \__|_.__/____/ \__, |___/\__\___|_| |_| |_|
+         *                     |___/
+         */
+        tbSystem = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID+".tbsystem.text"));
+        tbSystem.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase) return;
+                buildPanel();
+            }
+        });
+        tbSystem.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbSystem);
 
         return list;
     }
 
 
-    private void buildPanel
-            () {
+    private void buildPanel() {
         cpProcess.removeAll();
         cpProcess.setLayout(new JideBoxLayout(cpProcess, JideBoxLayout.Y_AXIS));
         for (QProcess process : processList) {
             if (tbClosed.isSelected() || !process.isClosed()) {
                 CollapsiblePane cp = qProcessMap.get(process);
-
-//                JPanel elementPanel = new JPanel();
-//                elementPanel.setLayout(new VerticalLayout());
-//                elementPanel.add(new CollapsiblePane("test"));
-//                elementPanel.add(new CollapsiblePane("test2"));
-////                for (final QProcessElement element : qProcess2ElementMap.get(process)) {
-////                    elementPanel.add(new CollapsiblePane("test"));
-////                    elementPanel.add(new CollapsiblePane("test2"));
-////                }
-//                cp.setContentPane(elementPanel);
-//                cp.setOpaque(false);
                 cpProcess.add(cp);
             }
         }

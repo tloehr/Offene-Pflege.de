@@ -36,7 +36,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.files.SYSFilesTools;
-import entity.files.SYSPB2FILE;
+import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.SYSNR2PROCESS;
@@ -581,7 +581,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     em.lock(oldReport, LockModeType.OPTIMISTIC);
                                     newReport.setReplacementFor(oldReport);
 
-                                    for (SYSPB2FILE oldAssignment : oldReport.getAttachedFiles()) {
+                                    for (SYSNR2FILE oldAssignment : oldReport.getAttachedFiles()) {
                                         em.remove(oldAssignment);
                                     }
                                     oldReport.getAttachedFiles().clear();
@@ -660,7 +660,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     NReport delReport = em.merge(report);
                                     em.lock(delReport, LockModeType.OPTIMISTIC);
                                     delReport.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-                                    for (SYSPB2FILE oldAssignment : delReport.getAttachedFiles()) {
+                                    for (SYSNR2FILE oldAssignment : delReport.getAttachedFiles()) {
                                         em.remove(oldAssignment);
                                     }
                                     delReport.getAttachedFiles().clear();

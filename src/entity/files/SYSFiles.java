@@ -108,11 +108,11 @@ public class SYSFiles implements Serializable, Comparable {
     //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
 //    private Collection<Sysbw2file> bwAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<SYSPB2FILE> pbAssignCollection;
+    private Collection<SYSNR2FILE> pbAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<SYSBWI2FILE> bwiAssignCollection;
+    private Collection<SYSINF2FILE> bwiAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Sysver2file> verAssignCollection;
+    private Collection<SYSPRE2FILE> verAssignCollection;
 
     public SYSFiles() {
     }
@@ -132,7 +132,7 @@ public class SYSFiles implements Serializable, Comparable {
 //        return bwAssignCollection;
 //    }
 
-    public Collection<SYSBWI2FILE> getBwiAssignCollection() {
+    public Collection<SYSINF2FILE> getBwiAssignCollection() {
         return bwiAssignCollection;
     }
 
@@ -144,11 +144,11 @@ public class SYSFiles implements Serializable, Comparable {
         this.user = user;
     }
 
-    public Collection<SYSPB2FILE> getPbAssignCollection() {
+    public Collection<SYSNR2FILE> getPbAssignCollection() {
         return pbAssignCollection;
     }
 
-    public Collection<Sysver2file> getVerAssignCollection() {
+    public Collection<SYSPRE2FILE> getVerAssignCollection() {
         return verAssignCollection;
     }
 

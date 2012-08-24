@@ -36,16 +36,15 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSBWI2FILE")
+@Table(name = "SYSINF2FILE")
 @NamedQueries({
-        @NamedQuery(name = "Sysbwi2file.findAll", query = "SELECT s FROM SYSBWI2FILE s"),
-        @NamedQuery(name = "Sysbwi2file.findById", query = "SELECT s FROM SYSBWI2FILE s WHERE s.id = :id")})
-public class SYSBWI2FILE implements Serializable {
+        @NamedQuery(name = "SYSINF2FILE.findAll", query = "SELECT s FROM SYSINF2FILE s"),
+        @NamedQuery(name = "SYSINF2FILE.findById", query = "SELECT s FROM SYSINF2FILE s WHERE s.id = :id")})
+public class SYSINF2FILE implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ID")
     private Long id;
     @Basic(optional = false)
@@ -95,10 +94,10 @@ public class SYSBWI2FILE implements Serializable {
     }
 
 
-    public SYSBWI2FILE() {
+    public SYSINF2FILE() {
     }
 
-    public SYSBWI2FILE(SYSFiles sysfile, BWInfo bwinfo, Users user, Date pit) {
+    public SYSINF2FILE(SYSFiles sysfile, BWInfo bwinfo, Users user, Date pit) {
         this.sysfile = sysfile;
         this.bwinfo = bwinfo;
         this.user = user;
@@ -122,10 +121,10 @@ public class SYSBWI2FILE implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof SYSBWI2FILE)) {
+        if (!(object instanceof SYSINF2FILE)) {
             return false;
         }
-        SYSBWI2FILE other = (SYSBWI2FILE) object;
+        SYSINF2FILE other = (SYSINF2FILE) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -134,6 +133,6 @@ public class SYSBWI2FILE implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.files.SYSBWI2FILE[id=" + id + "]";
+        return "entity.files.SYSINF2FILE[id=" + id + "]";
     }
 }

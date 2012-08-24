@@ -6,7 +6,7 @@
 package entity.prescription;
 
 import entity.*;
-import entity.files.Sysver2file;
+import entity.files.SYSPRE2FILE;
 import entity.info.Resident;
 import entity.nursingprocess.Intervention;
 import entity.process.SYSPRE2PROCESS;
@@ -193,7 +193,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
-    private List<Sysver2file> attachedFiles;
+    private List<SYSPRE2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<SYSPRE2PROCESS> attachedVorgaenge;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
@@ -240,7 +240,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
 
     public Prescriptions(Resident resident) {
         this.resident = resident;
-        this.attachedFiles = new ArrayList<Sysver2file>();
+        this.attachedFiles = new ArrayList<SYSPRE2FILE>();
         this.attachedVorgaenge = new ArrayList<SYSPRE2PROCESS>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.from = new Date();
@@ -248,7 +248,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Prescriptions(Date from, Date to, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<Sysver2file> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Prescriptions(Date from, Date to, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.from = from;
         this.to = to;
         this.bisPackEnde = bisPackEnde;
@@ -432,7 +432,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         return situation != null;
     }
 
-    public List<Sysver2file> getAttachedFiles() {
+    public List<SYSPRE2FILE> getAttachedFiles() {
         return attachedFiles;
     }
 

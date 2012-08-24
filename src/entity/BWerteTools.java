@@ -254,9 +254,9 @@ public class BWerteTools {
             mywert.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
 
 //            // Datei Zuordnungen entfernen
-//            Iterator<SYSPB2FILE> files = bericht.getAttachedFiles().iterator();
+//            Iterator<SYSNR2FILE> files = bericht.getAttachedFiles().iterator();
 //            while (files.hasNext()) {
-//                SYSPB2FILE oldAssignment = files.next();
+//                SYSNR2FILE oldAssignment = files.next();
 //                em.remove(oldAssignment);
 //            }
 //            bericht.getAttachedFiles().clear();

@@ -138,22 +138,22 @@ public class QProcessTools {
         return resident;
     }
 
-    public static void endVorgang(QProcess vorgang) {
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            PReport systemBericht = new PReport("Vorgang abgeschlossen", PReportTools.PREPORT_TYPE_CLOSE, vorgang);
-            em.persist(systemBericht);
-            vorgang.setTo(new Date());
-            em.merge(vorgang);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-    }
+//    public static void endVorgang(QProcess vorgang) {
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//            PReport systemBericht = new PReport("Vorgang abgeschlossen", PReportTools.PREPORT_TYPE_CLOSE, vorgang);
+//            em.persist(systemBericht);
+//            vorgang.setTo(new Date());
+//            em.merge(vorgang);
+//            em.getTransaction().commit();
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+//    }
 
     public static void reopenVorgang(QProcess vorgang) {
         EntityManager em = OPDE.createEM();

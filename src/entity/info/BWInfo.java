@@ -26,7 +26,7 @@
 package entity.info;
 
 import entity.Users;
-import entity.files.SYSBWI2FILE;
+import entity.files.SYSINF2FILE;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
 import op.OPDE;
@@ -109,7 +109,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
-    private Collection<SYSBWI2FILE> attachedFiles;
+    private Collection<SYSINF2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
     private Collection<SYSINF2PROCESS> attachedVorgaenge;
 
@@ -135,7 +135,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         this.bwinfotyp = bwinfotyp;
         this.angesetztDurch = OPDE.getLogin().getUser();
         this.bewohner = bewohner;
-        this.attachedFiles = new ArrayList<SYSBWI2FILE>();
+        this.attachedFiles = new ArrayList<SYSINF2FILE>();
         this.attachedVorgaenge = new ArrayList<SYSINF2PROCESS>();
     }
 
@@ -150,7 +150,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         this.angesetztDurch = OPDE.getLogin().getUser();
         this.abgesetztDurch = null;
         this.bewohner = bewohner;
-        this.attachedFiles = new ArrayList<SYSBWI2FILE>();
+        this.attachedFiles = new ArrayList<SYSINF2FILE>();
         this.attachedVorgaenge = new ArrayList<SYSINF2PROCESS>();
     }
 
@@ -251,7 +251,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     }
 
 
-    public Collection<SYSBWI2FILE> getAttachedFiles() {
+    public Collection<SYSINF2FILE> getAttachedFiles() {
         return attachedFiles;
     }
 
