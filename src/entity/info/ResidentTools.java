@@ -5,6 +5,7 @@
 package entity.info;
 
 import entity.EntityTools;
+import entity.Users;
 import entity.prescription.PrescriptionsTools;
 import op.OPDE;
 import op.tools.DlgListSelector;
@@ -18,7 +19,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.awt.*;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -142,6 +145,15 @@ public class ResidentTools {
         // Alle Bestände schließen
         // Alle nicht abgehakten BHPs und DFNs löschen
         // Alle Vorgänge schließen
+    }
+
+
+    public static ArrayList<Resident> getAllActive() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Resident.findAllActiveSorted");
+        ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
+        em.close();
+        return list;
     }
 
 

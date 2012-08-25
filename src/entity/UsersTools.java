@@ -4,18 +4,17 @@
  */
 package entity;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.swing.*;
-
 import op.OPDE;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author tloehr
  */
 public class UsersTools {
@@ -75,5 +74,14 @@ public class UsersTools {
         }
 
         return user;
+    }
+
+    public static ArrayList<Users> getAllActive() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNamedQuery("Users.findByStatusSorted");
+        query.setParameter("status", STATUS_ACTIVE);
+        ArrayList<Users> list = new ArrayList<Users>(query.getResultList());
+        em.close();
+        return list;
     }
 }

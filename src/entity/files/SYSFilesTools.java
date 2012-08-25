@@ -31,7 +31,6 @@ import entity.info.BWInfo;
 import entity.prescription.Prescriptions;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.DlgException;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.net.ftp.FTP;
@@ -226,7 +225,6 @@ public class SYSFilesTools {
             ftp.disconnect();
         } catch (Exception ex) {
             result = null;
-            new DlgException(ex);
             OPDE.fatal(ex);
         }
         return result;

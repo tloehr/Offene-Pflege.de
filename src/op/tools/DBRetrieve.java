@@ -62,7 +62,7 @@ public class DBRetrieve {
 //            }
 //        } // try
 //        catch (SQLException se) {
-//            new DlgException(se);
+//            // new DlgException(se);
 //        } // catch
 //
 //        return p;
@@ -93,7 +93,7 @@ public class DBRetrieve {
 //
 //        } // try
 //        catch (SQLException se) {
-//            new DlgException(se);
+//            // new DlgException(se);
 //        } // catch
 //        return d;
 //    }
@@ -114,7 +114,7 @@ public class DBRetrieve {
 //            hm.put("gebdatum", rs.getDate("b.GebDatum"));
 //
 //        } catch (SQLException ex) {
-//            new DlgException(ex);
+//            // new DlgException(ex);
 //        }
 //
 //
@@ -163,7 +163,7 @@ public class DBRetrieve {
                 o = rs.getObject(1);
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
         }
         return o;
     }
@@ -188,7 +188,7 @@ public class DBRetrieve {
                 }
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
         }
         return result;
     }
@@ -321,7 +321,7 @@ public class DBRetrieve {
 
             rs = stmt.executeQuery();
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
         }
         return rs;
 
@@ -338,7 +338,7 @@ public class DBRetrieve {
                 result.add(rsmd.getColumnName(col));
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
         }
         return result.toArray();
     }
@@ -397,12 +397,12 @@ public class DBRetrieve {
                     hm.put("title", "Details für " + rs.getString("dfn.MassID") + "-" + rs.getString("mass.Bezeichnung"));
 
                 } catch (SQLException ex) {
-                    new DlgException(ex);
+                    // new DlgException(ex);
                 }
             }
 
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
         }
 
         return hm;
@@ -434,7 +434,7 @@ public class DBRetrieve {
 //                result = null;
 //            }
 //        } catch (SQLException ex) {
-//            new DlgException(ex);
+//            // new DlgException(ex);
 //        }
 //        return result;
 //    }
@@ -470,7 +470,7 @@ public class DBRetrieve {
                 result = null;
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
         }
         return result;
     }
@@ -576,7 +576,7 @@ public class DBRetrieve {
                 result.add(date);
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
             result = null;
         }
 
@@ -662,7 +662,7 @@ public class DBRetrieve {
                 OPDE.debug("DBRetrieve.getFreeIntervalsDisjunctive(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
             result = null;
         }
 
@@ -727,7 +727,7 @@ public class DBRetrieve {
                 OPDE.debug("DBRetrieve.getFreeIntervalsOverlap(): bis =>" + SYSCalendar.printGermanStyle(SYSConst.DATE_BIS_AUF_WEITERES));
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
             result = null;
         }
 
@@ -780,7 +780,7 @@ public class DBRetrieve {
             }
 
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
             result = null;
         }
         return result;
@@ -806,7 +806,7 @@ public class DBRetrieve {
                 rs.close();
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+            // new DlgException(ex);
             result = null;
         }
         return result;
@@ -834,7 +834,7 @@ public class DBRetrieve {
 //            rs.close();
 //            stmt.close();
 //        } catch (SQLException ex) {
-//            new DlgException(ex);
+//            // new DlgException(ex);
 //            result = null;
 //        }
 //        return result;
@@ -870,7 +870,7 @@ public class DBRetrieve {
 //            }
 //        } // try
 //        catch (SQLException se) {
-//            new DlgException(se);
+//            // new DlgException(se);
 //        } // catch
 //
 //        return dcbmMassnahmen;
@@ -945,7 +945,7 @@ public class DBRetrieve {
 //            rs.first();
 //            ekennung = rs.getString("EKennung");
 //        } catch (SQLException ex) {
-//            new DlgException(ex);
+//            // new DlgException(ex);
 //        }
 //        return ekennung;
 //    }
@@ -976,7 +976,7 @@ public class DBRetrieve {
 //
 //                einrichtung = op.tools.DBRetrieve.getSingleRecord("Einrichtung", "Ekennung", ekennung);
 //            } catch (SQLException ex) {
-//                new DlgException(ex);
+//                // new DlgException(ex);
 //            }
 //        } else {
 //            einrichtung = op.tools.DBRetrieve.getSingleRecord("Einrichtung", "standard", true);

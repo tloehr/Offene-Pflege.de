@@ -309,7 +309,7 @@ public class DlgLogin extends MyJDialog {
 
         try {
 
-            OPDE.initDB();
+//            OPDE.initDB();
 
             // Hier wird erst geprüft, ob Username und Passwort stimmen.
             registerLogin();
@@ -318,7 +318,7 @@ public class DlgLogin extends MyJDialog {
                 OPDE.info("Falsches Passwort eingegeben.");
             } else {
 
-                OPDE.newOCSec();
+//                OPDE.newOCSec();
 
                 OPDE.initProps();
 

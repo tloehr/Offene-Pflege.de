@@ -87,7 +87,6 @@ public class OPDE {
     protected static boolean anonym;
     protected static SortedProperties localProps;
     protected static Logger logger;
-    private static OCSec ocsec;
     public static HashMap[] anonymize = null;
     // Diese listener List ist dazu da, dass wir immer
     // wissen, welchen Fenstern wir bescheid sagen müssen, wenn
@@ -221,13 +220,13 @@ public class OPDE {
      */
     @Deprecated
     public static void initDB() throws Exception {
-        if (db != null) return;
-        String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
-        String dbpw = localProps.getProperty("javax.persistence.jdbc.password");
-        String hostkey = OPDE.getLocalProps().getProperty("hostkey");
-        // Passwort entschlüsseln
-        DesEncrypter desEncrypter = new DesEncrypter(hostkey);
-        db = new Database(url, dbuser, desEncrypter.decrypt(dbpw).toCharArray());
+//        if (db != null) return;
+//        String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
+//        String dbpw = localProps.getProperty("javax.persistence.jdbc.password");
+//        String hostkey = OPDE.getLocalProps().getProperty("hostkey");
+//        // Passwort entschlüsseln
+//        DesEncrypter desEncrypter = new DesEncrypter(hostkey);
+//        db = new Database(url, dbuser, desEncrypter.decrypt(dbpw).toCharArray());
     }
 
     public static void warn(Object message) {
@@ -237,8 +236,8 @@ public class OPDE {
 
     @Deprecated
     public static void closeDB() throws SQLException {
-        db.db.close();
-        db = null;
+//        db.db.close();
+//        db = null;
     }
 
     public static void info(Object message) {
@@ -785,10 +784,6 @@ public class OPDE {
         return UsersTools.isAdmin(login.getUser());
     }
 
-    public static OCSec getOCSec() {
-        return ocsec;
-    }
-
     public static void setStandardFont() {
         UIManager.put("Button.font", SYSConst.ARIAL14);
         UIManager.put("ToggleButton.font", SYSConst.ARIAL14);
@@ -823,10 +818,4 @@ public class OPDE {
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
 
-    public static void newOCSec() {
-        if (ocsec != null) {
-            ocsec.cleanup();
-        }
-        ocsec = new OCSec();
-    }
 }

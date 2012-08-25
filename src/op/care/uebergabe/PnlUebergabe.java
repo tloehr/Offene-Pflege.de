@@ -32,7 +32,6 @@ import com.toedter.calendar.JDateChooser;
 import entity.*;
 import entity.reports.NReport;
 import op.FrmMain;
-import op.OCSec;
 import op.OPDE;
 import op.tools.*;
 import tablerenderer.RNDHTML;
@@ -71,7 +70,7 @@ public class PnlUebergabe extends CleanablePanel {
     private long selectedTBID = 0;
     private FrmMain pflege;
     private String classname;
-    private OCSec ocs;
+//    private OCSec ocs;
     private javax.swing.JFrame parent;
     private JPopupMenu menu;
 
@@ -83,7 +82,7 @@ public class PnlUebergabe extends CleanablePanel {
         this.initPhase = true;
         this.classname = this.getClass().getName();
         this.parent = pflege;
-        ocs = OPDE.getOCSec();
+//        ocs = OPDE.getOCSec();
         initComponents();
 
         EinrichtungenTools.setComboBox(cmbEinrichtung);

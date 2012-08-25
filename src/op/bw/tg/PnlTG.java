@@ -541,7 +541,7 @@ public class PnlTG extends CleanablePanel {
             out.close();
             SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
-            new DlgException(e);
+//            new DlgException(e);
         }
 
     }

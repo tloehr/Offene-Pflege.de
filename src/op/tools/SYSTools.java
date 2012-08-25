@@ -569,7 +569,7 @@ public class SYSTools {
                     rs.first();
                     result = rs.getString("BWKennung");
                 } catch (SQLException ex) {
-                    new DlgException(ex);
+//                    new DlgException(ex);
                     ex.printStackTrace();
                 }
             } else {
@@ -671,7 +671,7 @@ public class SYSTools {
                 }
             } // try
             catch (SQLException se) {
-                new DlgException(se);
+//                new DlgException(se);
                 se.printStackTrace();
             } // catch
         }

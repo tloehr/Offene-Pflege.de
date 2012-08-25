@@ -543,7 +543,7 @@ public class SYSCalendar {
             rs.first();
             now = rs.getTimestamp(1).getTime();
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
         }
         return now;
     }

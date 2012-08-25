@@ -1476,7 +1476,7 @@ public class FrmUser extends javax.swing.JFrame {
                 em.getTransaction().commit();
             } catch (Exception e1) {
                 em.getTransaction().rollback();
-                new DlgException(e1);
+//                new DlgException(e1);
             } finally {
                 em.close();
             }

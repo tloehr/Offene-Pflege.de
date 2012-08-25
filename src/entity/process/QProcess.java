@@ -12,9 +12,9 @@ import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescriptions;
 import entity.reports.NReport;
 import op.OPDE;
-import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -220,8 +220,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return to;
     }
 
-    public boolean isYours(){
-        return OPDE.isAdmin() || owner.equals(OPDE.getLogin().getUser());
+    public boolean isYours() {
+        return /* OPDE.isAdmin() || */ owner.equals(OPDE.getLogin().getUser());
     }
 
     public void setTo(Date to) {
@@ -260,32 +260,36 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.pcat = pcat;
     }
 
-//    public List<Pair<QProcessElement, Object>> getElements() {
-//        ArrayList<QProcessElement> elements = new ArrayList<QProcessElement>();
-//        elements.addAll(PReports);
-//        for (SYSNR2PROCESS att : attachedNReports) {
-//            elements.add(att.getPflegebericht());
-//        }
-//        for (SYSNP2PROCESS att : attachedNursingProcesses) {
-//            elements.add(att.getNursingProcess());
-//        }
-//        for (SYSINF2PROCESS att : attachedInfos) {
-//            elements.add(att.getBwinfo());
-//        }
-//        for (SYSPRE2PROCESS att : attachedPrescriptions) {
-//            elements.add(att.getPrescription());
-//        }
-//        for (SYSVAL2PROCESS att : attachedResidentValues) {
-//            elements.add(att.getBwerte());
-//        }
-//        Collections.sort(elements, new Comparator<QProcessElement>() {
-//            @Override
-//            public int compare(QProcessElement o1, QProcessElement o2) {
-//                return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis());
-//            }
-//        });
-//        return elements;
-//    }
+    public List<QProcessElement> getElements() {
+        ArrayList<QProcessElement> elements = new ArrayList<QProcessElement>();
+        elements.addAll(PReports);
+        for (SYSNR2PROCESS att : attachedNReports) {
+            elements.add(att.getPflegebericht());
+        }
+        for (SYSNP2PROCESS att : attachedNursingProcesses) {
+            elements.add(att.getNursingProcess());
+        }
+        for (SYSINF2PROCESS att : attachedInfos) {
+            elements.add(att.getBwinfo());
+        }
+        for (SYSPRE2PROCESS att : attachedPrescriptions) {
+            elements.add(att.getPrescription());
+        }
+        for (SYSVAL2PROCESS att : attachedResidentValues) {
+            elements.add(att.getBwerte());
+        }
+
+
+        OPDE.debug(this);
+
+        Collections.sort(elements, new Comparator<QProcessElement>() {
+            @Override
+            public int compare(QProcessElement o1, QProcessElement o2) {
+                return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis());
+            }
+        });
+        return elements;
+    }
 
     public Collection<PReport> getPReports() {
         return PReports;
@@ -297,6 +301,10 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 
     public boolean isCommon() {
         return resident == null;
+    }
+
+    public boolean isRevisionDue(){
+        return !isClosed() && revision.before(new DateMidnight().plusDays(6).toDateTime().minusSeconds(1).toDate());
     }
 
     @Override
@@ -330,6 +338,15 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 
     @Override
     public String toString() {
-        return "entity.process.QProcess[vorgangID=" + pkid + "]";
+        return "QProcess{" +
+                "title='" + title + '\'' +
+                ", from=" + from +
+                ", revision=" + revision +
+                ", to=" + to +
+                ", version=" + version +
+                ", creator=" + creator +
+                ", owner=" + owner +
+                ", resident=" + resident +
+                '}';
     }
 }

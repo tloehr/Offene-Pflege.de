@@ -27,7 +27,7 @@
 package op.care.schichtleitung;
 
 import op.OPDE;
-import op.tools.DlgException;
+
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 
@@ -141,7 +141,7 @@ public class DBHandling {
             rs.close();
             stmt.close();
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
         }
 
         return s;
@@ -210,7 +210,7 @@ public class DBHandling {
             rs.close();
             stmt.close();
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
         }
 
         return s;
@@ -284,7 +284,7 @@ public class DBHandling {
             rs.close();
             stmt.close();
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
         }
 
         return s;

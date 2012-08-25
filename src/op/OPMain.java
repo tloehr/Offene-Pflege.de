@@ -29,9 +29,8 @@ import entity.system.SYSLoginTools;
 import op.share.tools.PnlEditor;
 
 import op.threads.PrintProcessor;
-import op.tools.DlgException;
 import op.tools.SYSTools;
-import tablemodels.TMVorgang;
+//import tablemodels.TMVorgang;
 import tablerenderer.RNDHTML;
 
 import javax.swing.*;
@@ -340,38 +339,38 @@ public class OPMain extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowDeiconified
 
     private void tblVorgangMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVorgangMousePressed
-        TMVorgang tm = (TMVorgang) tblVorgang.getModel();
-        if (OPDE.getLogin().getLoginID() < 0 || tm.getRowCount() == 0) {
-            return;
-        }
-        Point p = evt.getPoint();
-        //int col = tblVorgang.columnAtPoint(p);
-        int row = tblVorgang.rowAtPoint(p);
-        ListSelectionModel lsm = tblVorgang.getSelectionModel();
-        lsm.setSelectionInterval(row, row);
-
-
-        if (evt.isPopupTrigger()) {
-
-            SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
-
-            JMenuItem itemPopupEnd = new JMenuItem("Vorgänge bearbeiten");
-            itemPopupEnd.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    ///newVrgFrame();
-                    newFrame("op.share.process.PnlProcess");
-                }
-            });
-            menu.add(itemPopupEnd);
-            itemPopupEnd.setEnabled(true);
-            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-        } else {
-            if (evt.getClickCount() == 2) {
-                newFrame("op.share.process.PnlProcess");
-            }
-        }
+//        TMVorgang tm = (TMVorgang) tblVorgang.getModel();
+//        if (OPDE.getLogin().getLoginID() < 0 || tm.getRowCount() == 0) {
+//            return;
+//        }
+//        Point p = evt.getPoint();
+//        //int col = tblVorgang.columnAtPoint(p);
+//        int row = tblVorgang.rowAtPoint(p);
+//        ListSelectionModel lsm = tblVorgang.getSelectionModel();
+//        lsm.setSelectionInterval(row, row);
+//
+//
+//        if (evt.isPopupTrigger()) {
+//
+//            SYSTools.unregisterListeners(menu);
+//            menu = new JPopupMenu();
+//
+//            JMenuItem itemPopupEnd = new JMenuItem("Vorgänge bearbeiten");
+//            itemPopupEnd.addActionListener(new java.awt.event.ActionListener() {
+//
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    ///newVrgFrame();
+//                    newFrame("op.share.process.PnlProcess");
+//                }
+//            });
+//            menu.add(itemPopupEnd);
+//            itemPopupEnd.setEnabled(true);
+//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//        } else {
+//            if (evt.getClickCount() == 2) {
+//                newFrame("op.share.process.PnlProcess");
+//            }
+//        }
     }//GEN-LAST:event_tblVorgangMousePressed
 
     private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
@@ -417,8 +416,8 @@ public class OPMain extends javax.swing.JFrame {
 
     private void reloadAlarm() {
         String alarm = "";
-        alarm += op.controlling.DBHandling.getAlarmStuhl(1);
-        alarm += op.controlling.DBHandling.getAlarmEinfuhr(1);
+//        alarm += op.controlling.DBHandling.getAlarmStuhl(1);
+//        alarm += op.controlling.DBHandling.getAlarmEinfuhr(1);
         if (alarm.equals("")) {
             alarm = "Keine Alarmmeldungen gefunden";
         }
@@ -448,7 +447,7 @@ public class OPMain extends javax.swing.JFrame {
             try {
                 OPDE.closeDB();
             } catch (SQLException ex) {
-                new DlgException(ex);
+//                new DlgException(ex);
                 ex.printStackTrace();
                 System.exit(1);
             }
@@ -485,105 +484,105 @@ public class OPMain extends javax.swing.JFrame {
         createMenuAndButtons();
         reloadVTable();
         reloadAlarm();
-        txtGeburtstag.setText(op.controlling.DBHandling.getGeburtstage(4));
+//        txtGeburtstag.setText(op.controlling.DBHandling.getGeburtstage(4));
 
         btnLogout.setEnabled(true);
     }
 
     private void reloadVTable() {
-        TMVorgang tm = new TMVorgang(null, false, 0, OPDE.getLogin().getUser().getUKennung());
-        int rows = tm.getRowCount();
-        tblVorgang.setVisible(rows > 0);
-        if (rows > 0) {
-            tblVorgang.setModel(tm);
-            tblVorgang.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-            tblVorgang.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-            tblVorgang.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-            jspVorgang.dispatchEvent(new ComponentEvent(jspVorgang, ComponentEvent.COMPONENT_RESIZED));
-            //tblVorgang.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-        } else {
-            tm = null;
-        }
+//        TMVorgang tm = new TMVorgang(null, false, 0, OPDE.getLogin().getUser().getUKennung());
+//        int rows = tm.getRowCount();
+//        tblVorgang.setVisible(rows > 0);
+//        if (rows > 0) {
+//            tblVorgang.setModel(tm);
+//            tblVorgang.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+//            tblVorgang.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+//            tblVorgang.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+//            jspVorgang.dispatchEvent(new ComponentEvent(jspVorgang, ComponentEvent.COMPONENT_RESIZED));
+//            //tblVorgang.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+//        } else {
+//            tm = null;
+//        }
     }
 
     private void createMenuAndButtons() {
         // Dieser Teil ist immer dabei.
-        JMenu datei = new JMenu("Datei");
-        JMenuItem logout = new JMenuItem("Abmelden");
-        logout.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                SYSTools.deiconify(parent);
-                lockOC();
-            }
-        });
-        JMenuItem quit = new JMenuItem("Beenden");
-        quit.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-        datei.add(logout);
-        datei.add(quit);
-        jmbMain.add(datei);
-        // Ein neues Panel für die Buttons erstellen.
-        pnlMainButtons = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        jspMainButtons.setViewportView(pnlMainButtons);
-        // Jetzt beginnt der dynamische Teil.
-        OCSec ocs = OPDE.getOCSec();
-        String classname = this.getClass().getName();
-        ocs.init(classname);
-        JMenu currentRoot = null;
-        for (int item = 0; item
-                < menuStructure.size(); item++) {
-            String[] menuItem = (String[]) menuStructure.get(item);
-            // Nur erstellen, wenn der User auch die passenden Rechte dafür hat.
-            if (ocs.isExecutable(classname, menuItem[1])) {
-                StringTokenizer st = new StringTokenizer(menuItem[0], "/");
-                final String frameName = menuItem[1];
-                String rootName = st.nextToken();
-                if (currentRoot == null || !currentRoot.getText().equals(rootName)) {
-                    if (currentRoot != null) { // Fügt den vorhergehenden Menüstrang hinzu.
-                        jmbMain.add(currentRoot);
-                    }
-
-                    currentRoot = new JMenu(rootName);
-                }
-
-                JMenuItem thisItem = currentRoot;
-                while (st.hasMoreTokens()) {
-                    String name = st.nextToken();
-                    if (thisItem == null || !thisItem.getText().equals(name)) {
-                        thisItem = new JMenuItem(name);
-                        if (!menuItem[2].equals("")) {
-                            thisItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/" + menuItem[2])));
-                        }
-                        currentRoot.add(thisItem);
-                    }
-
-                    if (!st.hasMoreTokens()) { // Hier ist das eigentliche Blatt erreicht.
-                        ActionListener al = new ActionListener() {
-
-                            public void actionPerformed(ActionEvent e) {
-                                newFrame(frameName);
-                            }
-                        };
-                        thisItem.addActionListener(al);
-                        JButton btn = new JButton(name);
-                        if (!menuItem[2].equals("")) {
-                            btn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/48x48/" + menuItem[2])));
-                        }
-
-                        btn.addActionListener(al);
-                        pnlMainButtons.add(btn);
-                    }
-
-                } // while
-            }
-        }
-        jmbMain.add(currentRoot); // Fügt das letzte Menü hinzu.
-        this.pack();
+//        JMenu datei = new JMenu("Datei");
+//        JMenuItem logout = new JMenuItem("Abmelden");
+//        logout.addActionListener(new ActionListener() {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                SYSTools.deiconify(parent);
+//                lockOC();
+//            }
+//        });
+//        JMenuItem quit = new JMenuItem("Beenden");
+//        quit.addActionListener(new ActionListener() {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                dispose();
+//            }
+//        });
+//        datei.add(logout);
+//        datei.add(quit);
+//        jmbMain.add(datei);
+//        // Ein neues Panel für die Buttons erstellen.
+//        pnlMainButtons = new JPanel(new FlowLayout(FlowLayout.LEADING));
+//        jspMainButtons.setViewportView(pnlMainButtons);
+//        // Jetzt beginnt der dynamische Teil.
+//        OCSec ocs = OPDE.getOCSec();
+//        String classname = this.getClass().getName();
+//        ocs.init(classname);
+//        JMenu currentRoot = null;
+//        for (int item = 0; item
+//                < menuStructure.size(); item++) {
+//            String[] menuItem = (String[]) menuStructure.get(item);
+//            // Nur erstellen, wenn der User auch die passenden Rechte dafür hat.
+//            if (ocs.isExecutable(classname, menuItem[1])) {
+//                StringTokenizer st = new StringTokenizer(menuItem[0], "/");
+//                final String frameName = menuItem[1];
+//                String rootName = st.nextToken();
+//                if (currentRoot == null || !currentRoot.getText().equals(rootName)) {
+//                    if (currentRoot != null) { // Fügt den vorhergehenden Menüstrang hinzu.
+//                        jmbMain.add(currentRoot);
+//                    }
+//
+//                    currentRoot = new JMenu(rootName);
+//                }
+//
+//                JMenuItem thisItem = currentRoot;
+//                while (st.hasMoreTokens()) {
+//                    String name = st.nextToken();
+//                    if (thisItem == null || !thisItem.getText().equals(name)) {
+//                        thisItem = new JMenuItem(name);
+//                        if (!menuItem[2].equals("")) {
+//                            thisItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/" + menuItem[2])));
+//                        }
+//                        currentRoot.add(thisItem);
+//                    }
+//
+//                    if (!st.hasMoreTokens()) { // Hier ist das eigentliche Blatt erreicht.
+//                        ActionListener al = new ActionListener() {
+//
+//                            public void actionPerformed(ActionEvent e) {
+//                                newFrame(frameName);
+//                            }
+//                        };
+//                        thisItem.addActionListener(al);
+//                        JButton btn = new JButton(name);
+//                        if (!menuItem[2].equals("")) {
+//                            btn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/48x48/" + menuItem[2])));
+//                        }
+//
+//                        btn.addActionListener(al);
+//                        pnlMainButtons.add(btn);
+//                    }
+//
+//                } // while
+//            }
+//        }
+//        jmbMain.add(currentRoot); // Fügt das letzte Menü hinzu.
+//        this.pack();
 //        this.paintComponents(this.getGraphics());
 //        this.paintAll(this.getGraphics());
     }

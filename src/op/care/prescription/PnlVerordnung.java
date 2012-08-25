@@ -179,7 +179,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             String html = SYSTools.htmlUmlautConversion(PrescriptionsTools.getPrescriptionAsHTML(listVerordnung, true, true, false));
             SYSFilesTools.print(html, true);
         } catch (IOException e) {
-            new DlgException(e);
+//            new DlgException(e);
         }
 
     }
@@ -195,7 +195,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
             out.close();
             SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
-            new DlgException(e);
+//            new DlgException(e);
         }
 
     }

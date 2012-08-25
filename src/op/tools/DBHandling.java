@@ -164,65 +164,65 @@ public class DBHandling {
 //
 //        return p;
 //    }
-    public static HashMap getBW(String bwkennung) {
-        HashMap hm = new HashMap();
-
-        // Bewohnernamen in den Label schreiben.
-        try {
-            String sql = ""
-                    + " SELECT b.nachname, b.vorname, b.GebDatum, b.Geschlecht "
-                    + " FROM Bewohner b "
-                    + " WHERE b.BWKennung = ?";
-
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            stmt.setString(1, bwkennung);
-            ResultSet rs = stmt.executeQuery();
-            rs.first();
-            String vorname;
-            String nachname;
-            Date gebdatum;
-
-            if (OPDE.isAnonym()) {
-                String nachnameErsterBuchstabe = rs.getString("b.nachname").toLowerCase().substring(0, 1);
-                String vornameErsterBuchstabe = rs.getString("b.vorname").toLowerCase().substring(0, 1);
-                //String letzterBuchstabe = in.get("nachname").toString().toLowerCase().substring(in.get("nachname").toString().length()-1, in.get("nachname").toString().length());
-                gebdatum = SYSTools.anonymizeDate(rs.getDate("b.GebDatum"));
-
-                //int random = letzterBuchstabe.codePointAt(0) % 5;
-                int random1 = rs.getString("b.nachname").toString().toLowerCase().charAt(1) % 5;
-                int random2 = rs.getString("b.vorname").toString().toLowerCase().charAt(1) % 5;
-                nachname = ((String[]) OPDE.anonymize[SYSTools.INDEX_NACHNAME].get(nachnameErsterBuchstabe))[random1];
-
-                if (rs.getInt("Geschlecht") == 2) {
-                    vorname = ((String[]) OPDE.anonymize[SYSTools.INDEX_VORNAME_FRAU].get(vornameErsterBuchstabe))[random2];
-                } else {
-                    vorname = ((String[]) OPDE.anonymize[SYSTools.INDEX_VORNAME_MANN].get(vornameErsterBuchstabe))[random2];
-                }
-            } else {
-                vorname = rs.getString("b.vorname");
-                nachname = rs.getString("b.nachname");
-                gebdatum = rs.getDate("b.GebDatum");
-            }
-
-            hm.put("vorname", vorname);
-            hm.put("nachname", nachname);
-            hm.put("bwkennung", bwkennung);
-            hm.put("gebdatum", gebdatum);
-            hm.put("geschlecht", (rs.getInt("Geschlecht") == 2 ? "weiblich" : "männlich"));
-
-        } catch (SQLException ex) {
-            new DlgException(ex);
-        }
-
-        return hm;
-    }
-
-
-    public static Object getSingleValue(String table, String field, String wherefield, Object wherevalue) {
-        HashMap where = new HashMap();
-        where.put(wherefield, new Object[]{wherevalue, "="});
-        return getSingleValue(table, field, where);
-    }
+//    public static HashMap getBW(String bwkennung) {
+//        HashMap hm = new HashMap();
+//
+//        // Bewohnernamen in den Label schreiben.
+//        try {
+//            String sql = ""
+//                    + " SELECT b.nachname, b.vorname, b.GebDatum, b.Geschlecht "
+//                    + " FROM Bewohner b "
+//                    + " WHERE b.BWKennung = ?";
+//
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            stmt.setString(1, bwkennung);
+//            ResultSet rs = stmt.executeQuery();
+//            rs.first();
+//            String vorname;
+//            String nachname;
+//            Date gebdatum;
+//
+//            if (OPDE.isAnonym()) {
+//                String nachnameErsterBuchstabe = rs.getString("b.nachname").toLowerCase().substring(0, 1);
+//                String vornameErsterBuchstabe = rs.getString("b.vorname").toLowerCase().substring(0, 1);
+//                //String letzterBuchstabe = in.get("nachname").toString().toLowerCase().substring(in.get("nachname").toString().length()-1, in.get("nachname").toString().length());
+//                gebdatum = SYSTools.anonymizeDate(rs.getDate("b.GebDatum"));
+//
+//                //int random = letzterBuchstabe.codePointAt(0) % 5;
+//                int random1 = rs.getString("b.nachname").toString().toLowerCase().charAt(1) % 5;
+//                int random2 = rs.getString("b.vorname").toString().toLowerCase().charAt(1) % 5;
+//                nachname = ((String[]) OPDE.anonymize[SYSTools.INDEX_NACHNAME].get(nachnameErsterBuchstabe))[random1];
+//
+//                if (rs.getInt("Geschlecht") == 2) {
+//                    vorname = ((String[]) OPDE.anonymize[SYSTools.INDEX_VORNAME_FRAU].get(vornameErsterBuchstabe))[random2];
+//                } else {
+//                    vorname = ((String[]) OPDE.anonymize[SYSTools.INDEX_VORNAME_MANN].get(vornameErsterBuchstabe))[random2];
+//                }
+//            } else {
+//                vorname = rs.getString("b.vorname");
+//                nachname = rs.getString("b.nachname");
+//                gebdatum = rs.getDate("b.GebDatum");
+//            }
+//
+//            hm.put("vorname", vorname);
+//            hm.put("nachname", nachname);
+//            hm.put("bwkennung", bwkennung);
+//            hm.put("gebdatum", gebdatum);
+//            hm.put("geschlecht", (rs.getInt("Geschlecht") == 2 ? "weiblich" : "männlich"));
+//
+//        } catch (SQLException ex) {
+//            new DlgException(ex);
+//        }
+//
+//        return hm;
+//    }
+//
+//
+//    public static Object getSingleValue(String table, String field, String wherefield, Object wherevalue) {
+//        HashMap where = new HashMap();
+//        where.put(wherefield, new Object[]{wherevalue, "="});
+//        return getSingleValue(table, field, where);
+//    }
 
     /**
      * Fügt einen neuen Datensatz in eine Tabelle ein.
@@ -283,7 +283,7 @@ public class DBHandling {
             result = OPDE.getDb().getLastInsertedID();
 
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
             result = -1;
         }
         return result;
@@ -340,7 +340,7 @@ public class DBHandling {
             stmt.setObject(val.size() + 1, pk);
             result = stmt.executeUpdate() > 0;
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
             result = false;
         }
         return result;
@@ -398,7 +398,7 @@ public class DBHandling {
             stmt.setLong(val.size() + 1, pk);
             result = stmt.executeUpdate() > 0;
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
             result = false;
         }
         return result;
@@ -447,7 +447,7 @@ public class DBHandling {
             deletedRows = stmt.executeUpdate();
         } catch (SQLException ex) {
             deletedRows = -1;
-            new DlgException(ex);
+//            new DlgException(ex);
             ex.printStackTrace();
         }
         return deletedRows;
@@ -487,7 +487,7 @@ public class DBHandling {
                 o = rs.getObject(1);
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
             ex.printStackTrace();
         }
         return o;
@@ -568,7 +568,7 @@ public class DBHandling {
                 rs = rs1;
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
             ex.printStackTrace();
         }
         return rs;

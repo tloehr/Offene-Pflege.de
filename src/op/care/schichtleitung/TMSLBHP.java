@@ -28,7 +28,6 @@
 package op.care.schichtleitung;
 
 import op.OPDE;
-import op.tools.DlgException;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -168,7 +167,7 @@ public class TMSLBHP
             rs.first();
         } // try
         catch (SQLException se) {
-            new DlgException(se);
+//            new DlgException(se);
         } // catch
     }
 
@@ -178,7 +177,7 @@ public class TMSLBHP
             rs.first();
             fireTableRowsUpdated(row, col);
         } catch (SQLException se) {
-            new DlgException(se);
+//            new DlgException(se);
         }
     }
 
@@ -293,7 +292,7 @@ public class TMSLBHP
                 result += "</s>"; // Abgesetzte
             }
         } catch (SQLException ex) {
-            new DlgException(ex);
+//            new DlgException(ex);
         }
 
         result += "</body></html>";
@@ -412,7 +411,7 @@ public class TMSLBHP
                 }
             }
         } catch (SQLException se) {
-            new DlgException(se);
+//            new DlgException(se);
         }
         return result;
     }

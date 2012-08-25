@@ -45,10 +45,6 @@ import java.util.Date;
 @Deprecated
 public class DBHandling {
 
-
-
-
-
     public static String getAnonymSturz(int headertiefe, int monate) {
         StringBuilder html = new StringBuilder(1000);
         String sql = "" +
@@ -92,7 +88,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -189,7 +185,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -256,7 +252,7 @@ public class DBHandling {
 //            }
 //
 //        } catch (SQLException sQLException) {
-//            new DlgException(sQLException);
+//            // new DlgException(sQLException);
 //        }
 //        return html.toString();
 //    }
@@ -346,7 +342,7 @@ public class DBHandling {
 //            }
 //
 //        } catch (SQLException sQLException) {
-//            new DlgException(sQLException);
+//            // new DlgException(sQLException);
 //        }
 //        return html.toString();
 //    }
@@ -501,7 +497,7 @@ public class DBHandling {
                 rs.close();
                 stmt.close();
             } catch (SQLException ex) {
-                new DlgException(ex);
+//                new DlgException(ex);
             }
         }
 
@@ -608,7 +604,7 @@ public class DBHandling {
 //            }
 //
 //        } catch (SQLException sQLException) {
-//            new DlgException(sQLException);
+//            // new DlgException(sQLException);
 //        }
 //        return html.toString();
 //    }
@@ -644,7 +640,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -679,7 +675,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -708,7 +704,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -935,7 +931,7 @@ public class DBHandling {
             stmt.close();
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
 
         isCancelled = (Boolean) o[2];
@@ -1007,7 +1003,7 @@ public class DBHandling {
             }
             pb.setIndeterminate(false);
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -1095,7 +1091,7 @@ public class DBHandling {
             }
             pb.setIndeterminate(false);
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -1196,7 +1192,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -1254,7 +1250,7 @@ public class DBHandling {
 
             }
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
 
         return html.toString();
@@ -1324,7 +1320,7 @@ public class DBHandling {
                 html.append("<br/>keine Einträge gefunden...");
             }
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -1384,7 +1380,7 @@ public class DBHandling {
                 html.append("</table>");
             }
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -1471,7 +1467,7 @@ public class DBHandling {
                 }
             }
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
@@ -1584,7 +1580,7 @@ public class DBHandling {
             }
 
         } catch (SQLException sQLException) {
-            new DlgException(sQLException);
+            // new DlgException(sQLException);
         }
         return html.toString();
     }
