@@ -8,8 +8,10 @@ import entity.PB2User;
 import entity.Users;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
-import entity.process.SYSNR2PROCESS;
+import entity.process.QProcess;
 import entity.process.QProcessElement;
+import entity.process.SYSNR2PROCESS;
+import entity.process.SYSVAL2PROCESS;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -481,6 +483,16 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     public String toString() {
         return "entity.reports.NReport[pbid=" + pbid + "]";
     }
+
+    @Override
+    public ArrayList<QProcess> getAttachedProcesses() {
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        for (SYSNR2PROCESS att : attachedVorgaenge) {
+            list.add(att.getVorgang());
+        }
+        return list;
+    }
+
 
     @Override
     public String getTitle() {

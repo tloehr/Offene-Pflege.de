@@ -9,8 +9,10 @@ import entity.*;
 import entity.files.SYSPRE2FILE;
 import entity.info.Resident;
 import entity.nursingprocess.Intervention;
+import entity.process.QProcess;
 import entity.process.SYSPRE2PROCESS;
 import entity.process.QProcessElement;
+import entity.process.SYSVAL2PROCESS;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -453,6 +455,16 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     public long getPITInMillis() {
         return from.getTime();
     }
+
+@Override
+    public ArrayList<QProcess> getAttachedProcesses(){
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        for (SYSPRE2PROCESS att : attachedVorgaenge){
+            list.add(att.getVorgang());
+        }
+        return list;
+    }
+
 
     @Override
     public String getContentAsHTML() {

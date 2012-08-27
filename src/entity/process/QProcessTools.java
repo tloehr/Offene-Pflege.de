@@ -34,12 +34,6 @@ import java.util.List;
  */
 public class QProcessTools {
 
-
-
-
-
-
-
     public static Color getBG1(QProcess qProcess) {
         Color common = SYSTools.getColor("CEF0FF");
         Color resident = SYSTools.getColor("DFB0FF");
@@ -158,7 +152,7 @@ public class QProcessTools {
 
     public static List<QProcess> getProcesses4(PCat pcat) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.pcat = :pcat");
+        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :tfn AND qp.pcat = :pcat");
         query.setParameter("pcat", pcat);
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();
@@ -167,7 +161,7 @@ public class QProcessTools {
 
     public static List<QProcess> getProcesses4(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.resident = :resident");
+        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :tfn AND qp.resident = :resident");
         query.setParameter("resident", resident);
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();
@@ -176,7 +170,7 @@ public class QProcessTools {
 
     public static List<QProcess> getProcesses4(Users owner) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.owner = :owner");
+        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :tfn AND qp.owner = :owner");
         query.setParameter("owner", owner);
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();

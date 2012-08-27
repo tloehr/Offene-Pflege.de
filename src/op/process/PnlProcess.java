@@ -69,8 +69,6 @@ public class PnlProcess extends NursingRecordsPanel {
     private List<QProcess> processList;
     private int MAX_TEXT_LENGTH = 65;
 
-    //    private int positionToAddPanels;
-//    protected HashMap<JComponent, ArrayList<Short>> authorizationMap;
     private TaskPaneContentChangedListener taskPaneContentChangedListener;
     private Timeline textmessageTL;
 
@@ -173,8 +171,6 @@ public class PnlProcess extends NursingRecordsPanel {
 //            worker.execute();
 
         } else {
-
-//            Collections.sort(processList);
             for (QProcess qProcess : processList) {
                 qProcessMap.put(qProcess, createCP4(qProcess));
             }
@@ -1010,15 +1006,6 @@ public class PnlProcess extends NursingRecordsPanel {
         return cpElement;
     }
 
-
-//
-//    private void btnTakeOverActionPerformed(ActionEvent e) {
-//        aktuellerVorgang.setBesitzer(OPDE.getLogin().getUser());
-//        lblEnde.setText(aktuellerVorgang.getBesitzer().getNameUndVorname());
-//
-//    }
-
-
     /**
      * This method is called from within the constructor to
      * initialize the form.
@@ -1050,7 +1037,10 @@ public class PnlProcess extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-
+        qProcessCollapsiblePaneHashMap.clear();
+        qProcess2ElementMap.clear();
+        qProcessMap.clear();
+        processList.clear();
     }
 
     @Override
@@ -1119,13 +1109,13 @@ public class PnlProcess extends NursingRecordsPanel {
             });
             list.add(cmbUser);
 
-            JComboBox cmbPCat = new JComboBox(SYSTools.list2cmb(asda));
+            JComboBox cmbPCat = new JComboBox(SYSTools.list2cmb(PCatTools.getPCats()));
             cmbPCat.setFont(SYSConst.ARIAL14);
             cmbPCat.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent itemEvent) {
                     if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-                    processList = QProcessTools.getProcesses4((Resident) itemEvent.getItem());
+                    processList = QProcessTools.getProcesses4((PCat) itemEvent.getItem());
                     reloadDisplay();
                 }
             });

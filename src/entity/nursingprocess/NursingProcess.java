@@ -4,9 +4,10 @@
  */
 package entity.nursingprocess;
 
-import entity.info.Resident;
 import entity.Users;
 import entity.info.BWInfoKat;
+import entity.info.Resident;
+import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSNP2PROCESS;
 import op.OPDE;
@@ -265,6 +266,16 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     @Override
+    public ArrayList<QProcess> getAttachedProcesses() {
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        for (SYSNP2PROCESS att : attachedVorgaenge) {
+            list.add(att.getVorgang());
+        }
+        return list;
+    }
+
+
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (planID != null ? planID.hashCode() : 0);
@@ -286,7 +297,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public int compareTo(NursingProcess nursingProcess) {
-        if (stichwort.compareTo(nursingProcess.getStichwort()) != 0){
+        if (stichwort.compareTo(nursingProcess.getStichwort()) != 0) {
             return stichwort.compareTo(nursingProcess.getStichwort());
         }
 
@@ -314,7 +325,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @Override
     public NursingProcess clone() {
         NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, resident, kategorie, new ArrayList<SYSNP2PROCESS>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
-        for (InterventionSchedule is : interventionSchedules){
+        for (InterventionSchedule is : interventionSchedules) {
             InterventionSchedule myIS = is.clone();
             myIS.setNursingProcess(myNewNP);
             myNewNP.getInterventionSchedule().add(myIS);

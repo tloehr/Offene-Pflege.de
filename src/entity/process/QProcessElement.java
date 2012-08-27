@@ -5,6 +5,9 @@
 package entity.process;
 
 import entity.Users;
+import entity.info.Resident;
+
+import java.util.ArrayList;
 
 /**
  * Dieses Interface dient dazu, dass ich mit den Elementen eines Vorgangs
@@ -24,6 +27,8 @@ public interface QProcessElement {
      * @return
      */
     public long getPITInMillis();
+
+    public ArrayList<QProcess> getAttachedProcesses();
 
     /**
      * Liefert eine Beschreibung des Elements als HTML.
@@ -49,4 +54,6 @@ public interface QProcessElement {
     public long getID();
 
     public Users getUser();
+
+    public Resident getResident();
 }

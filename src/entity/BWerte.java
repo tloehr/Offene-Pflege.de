@@ -5,12 +5,14 @@
 package entity;
 
 import entity.info.Resident;
+import entity.process.QProcess;
 import entity.process.SYSVAL2PROCESS;
 import entity.process.QProcessElement;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -217,6 +219,15 @@ public class BWerte implements Serializable, QProcessElement, Cloneable {
 
     public Collection<SYSVAL2PROCESS> getAttachedVorgaenge() {
         return attachedVorgaenge;
+    }
+
+    @Override
+    public ArrayList<QProcess> getAttachedProcesses(){
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        for (SYSVAL2PROCESS att : attachedVorgaenge){
+            list.add(att.getVorgang());
+        }
+        return list;
     }
 
     public Resident getBewohner() {

@@ -27,6 +27,7 @@ package entity.info;
 
 import entity.Users;
 import entity.files.SYSINF2FILE;
+import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
 import op.OPDE;
@@ -300,6 +301,16 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         // TODO: fehlt noch
         return "<html>not yet</html>";
     }
+
+    @Override
+    public ArrayList<QProcess> getAttachedProcesses() {
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        for (SYSINF2PROCESS att : attachedVorgaenge) {
+            list.add(att.getVorgang());
+        }
+        return list;
+    }
+
 
     @Override
     public long getID() {

@@ -37,10 +37,6 @@ public class PReportTools {
     public static String getBerichtAsHTML(PReport bericht) {
         String html = "";
         html += "<b>Vorgangsbericht</b>";
-        if (bericht.getArt() > 0) {
-            html += " <font color=\"blue\"><i>" + PREPORT_TYPES[bericht.getArt()] + "</i></font>";
-        }
-
         html += "<p>" + bericht.getText() + "</p>";
         return html;
     }
@@ -48,18 +44,8 @@ public class PReportTools {
     public static String getPITAsHTML(PReport bericht) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
-        if (bericht.getArt() != PREPORT_TYPE_USER) {
-            html += "<font color=\"blue\">";
-        }
         html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
-        if (bericht.getArt() != PREPORT_TYPE_USER) {
-            html += "</font>";
-        }
         return html;
     }
 
-    public static void newBericht(QProcess vorgang, String text, short art) {
-        PReport vbericht = new PReport(text, art, vorgang);
-        EntityTools.persist(vbericht);
-    }
 }

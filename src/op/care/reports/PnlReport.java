@@ -948,7 +948,29 @@ public class PnlReport extends NursingRecordsPanel {
             btnProcess.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
+                    Closure closure = null;
+                    if (!report.isObsolete()) {
+                        closure = new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                EntityManager em = OPDE.createEM();
+                                NReport myReport = em.merge(report);
+                                em.refresh(myReport);
+                                DateMidnight dm = new DateMidnight(myReport.getPit());
+                                if (!dayMap.containsKey(dm)) {
+                                    dayMap.put(dm, new ArrayList<NReport>());
+                                }
+                                dayMap.get(dm).remove(report);
+                                dayMap.get(dm).add(myReport);
+                                Collections.sort(dayMap.get(dm));
+                                reportMap.remove(report);
+                                reportMap.put(myReport, createCP4(myReport));
+                                buildPanel();
+                                em.close();
+                            }
+                        };
+                    }
+                    new DlgFiles(report, closure);
                 }
             });
             btnProcess.setEnabled(!report.isObsolete());

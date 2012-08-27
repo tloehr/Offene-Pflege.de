@@ -566,7 +566,7 @@ public class FrmMain extends JFrame {
         if (classname.equals("op.bw.tg.PnlTG")) {
             panel = new PnlTG(jspSearch, bwchange);
         } else if (classname.equals("op.process.PnlProcess")) {
-            panel = new PnlProcess(null, jspSearch);
+            panel = new PnlProcess(jspSearch);
         } else if (classname.equals("op.care.med.PnlMed")) {
             panel = new PnlMed(jspSearch);
         }
@@ -577,7 +577,7 @@ public class FrmMain extends JFrame {
         bwButtonMap = new HashMap<Resident, JideButton>();
 
         EntityManager em = OPDE.createEM();
-        Query query = null;
+        Query query;
         if (station == null) {
             query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
         } else {

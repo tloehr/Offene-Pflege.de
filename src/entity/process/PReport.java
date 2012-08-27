@@ -9,6 +9,7 @@ import op.OPDE;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -116,6 +117,14 @@ public class PReport implements Serializable, QProcessElement {
     public String getContentAsHTML() {
         return PReportTools.getBerichtAsHTML(this);
     }
+
+@Override
+    public ArrayList<QProcess> getAttachedProcesses(){
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        list.add(vorgang);
+        return list;
+    }
+
 
     @Override
     public long getPITInMillis() {
