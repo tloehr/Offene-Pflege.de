@@ -230,7 +230,8 @@ public class BWerte implements Serializable, QProcessElement, Cloneable {
         return list;
     }
 
-    public Resident getBewohner() {
+    @Override
+    public Resident getResident() {
         return bewohner;
     }
 

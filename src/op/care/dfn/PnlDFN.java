@@ -38,7 +38,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.*;
 import op.OPDE;
-import op.care.nursingprocess.massnahmen.PnlSelectIntervention;
+import op.care.nursingprocess.PnlSelectIntervention;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;

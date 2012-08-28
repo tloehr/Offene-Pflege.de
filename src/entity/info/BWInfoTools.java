@@ -105,7 +105,7 @@ public class BWInfoTools {
     public static Pair<Date, Date> getMinMaxAusdehnung(BWInfo info, ArrayList<BWInfo> sortedInfoList) {
         Date min = null, max = null;
 
-        BWInfo firstHauf = getFirstBWInfo(info.getBewohner(), BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME));
+        BWInfo firstHauf = getFirstBWInfo(info.getResident(), BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME));
 //        min = firstHauf.getVon();
 
         if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {

@@ -80,6 +80,11 @@
                javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
+        <class name="opde.users" short="Benutzerverwaltung"
+               long="Benutzer- und Gruppenverwaltung" main="true"
+               javaclass="op.users.PnlUser" icon="usergroup.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
         <class name="nursingrecords.info" short="Pflegeakte/Informationen"
                long="Hier können Informationen zu den BewohnerInnen eingegeben werden."
                javaclass="op.care.info.PnlInfo">

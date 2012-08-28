@@ -58,6 +58,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
+import op.users.PnlUser;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -569,6 +570,8 @@ public class FrmMain extends JFrame {
             panel = new PnlProcess(jspSearch);
         } else if (classname.equals("op.care.med.PnlMed")) {
             panel = new PnlMed(jspSearch);
+        } else if (classname.equals("op.users.PnlUser")) {
+            panel = new PnlUser(jspSearch);
         }
         return panel;
     }

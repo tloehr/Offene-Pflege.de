@@ -25,10 +25,10 @@
  */
 package entity.files;
 
-import entity.reports.NReport;
-import entity.info.Resident;
 import entity.info.BWInfo;
+import entity.info.Resident;
 import entity.prescription.Prescriptions;
+import entity.reports.NReport;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
@@ -121,7 +121,7 @@ public class SYSFilesTools {
         } else if (attachable instanceof Prescriptions) {
             bw = ((Prescriptions) attachable).getResident();
         } else if (attachable instanceof BWInfo) {
-            bw = ((BWInfo) attachable).getBewohner();
+            bw = ((BWInfo) attachable).getResident();
         }
         return putFiles(files, bw, attachable);
     }
@@ -136,23 +136,28 @@ public class SYSFilesTools {
             try {
                 em.getTransaction().begin();
                 for (File file : files) {
-                    SYSFiles sysfile = putFile(em, ftp, file, bewohner);
-                    if (attachable != null) {
-                        if (attachable instanceof NReport) {
-                            SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
-                            sysfile.getPbAssignCollection().add(link);
-                            ((NReport) attachable).getAttachedFiles().add(link);
-                        } else if (attachable instanceof Prescriptions) {
-                            SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
-                            sysfile.getVerAssignCollection().add(link);
-                            ((Prescriptions) attachable).getAttachedFiles().add(link);
-                        } else if (attachable instanceof BWInfo) {
-                            SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
-                            sysfile.getBwiAssignCollection().add(link);
-                            ((BWInfo) attachable).getAttachedFiles().add(link);
+                    if (file.isFile()) { // prevents exceptions if somebody has the bright idea to include directories.
+                        SYSFiles sysfile = putFile(em, ftp, file, bewohner);
+                        if (attachable != null) {
+                            if (attachable instanceof NReport) {
+                                SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getPbAssignCollection().add(link);
+                                ((NReport) attachable).getAttachedFiles().add(link);
+                            } else if (attachable instanceof Prescriptions) {
+                                SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getVerAssignCollection().add(link);
+                                ((Prescriptions) attachable).getAttachedFiles().add(link);
+                            } else if (attachable instanceof BWInfo) {
+                                SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getBwiAssignCollection().add(link);
+                                ((BWInfo) attachable).getAttachedFiles().add(link);
+                            }
                         }
+                        successful.add(sysfile);
                     }
-                    successful.add(sysfile);
+                    if (successful.size() != files.length){
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nodirectories")));
+                    }
                 }
                 em.getTransaction().commit();
             } catch (Exception ex) {

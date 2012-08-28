@@ -12,7 +12,6 @@ import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescriptions;
 import entity.reports.NReport;
 import op.OPDE;
-import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -78,11 +77,11 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     //
     // 1:n Relationen
     //
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<PReport> PReports;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSNR2PROCESS> attachedNReports;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
+    private Collection<SYSNR2PROCESS> attachedNReportConnections;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<SYSPRE2PROCESS> attachedPrescriptions;
@@ -135,10 +134,11 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.to = SYSConst.DATE_BIS_AUF_WEITERES;
         this.creator = OPDE.getLogin().getUser();
         this.owner = OPDE.getLogin().getUser();
-        this.resident = null;
+        this.resident = resident;
         this.pcat = null;
         this.PReports = new ArrayList<PReport>();
-        this.attachedNReports = new ArrayList<SYSNR2PROCESS>();
+        this.PReports.add(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CREATE), PReportTools.PREPORT_TYPE_CREATE, this));
+        this.attachedNReportConnections = new ArrayList<SYSNR2PROCESS>();
         this.attachedPrescriptions = new ArrayList<SYSPRE2PROCESS>();
         this.attachedInfos = new ArrayList<SYSINF2PROCESS>();
         this.attachedNursingProcesses = new ArrayList<SYSNP2PROCESS>();
@@ -146,19 +146,14 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     }
 
     public QProcess(String title, Resident resident, PCat pcat) {
+        this(resident);
         this.title = title;
-        this.from = new Date();
-        this.revision = SYSCalendar.addDate(new Date(), 7);
-        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
-        this.creator = OPDE.getLogin().getUser();
-        this.owner = OPDE.getLogin().getUser();
-        this.resident = resident;
         this.pcat = pcat;
     }
 
     public void removeElement(QProcessElement element) {
         if (element instanceof NReport) {
-            getAttachedNReports().remove(element);
+            getAttachedNReportConnections().remove(element);
         } else if (element instanceof BWerte) {
             getAttachedResidentValues().remove(element);
         } else if (element instanceof Prescriptions) {
@@ -172,8 +167,16 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         }
     }
 
-    public Collection<SYSNR2PROCESS> getAttachedNReports() {
-        return attachedNReports;
+    public Collection<SYSNR2PROCESS> getAttachedNReportConnections() {
+        return attachedNReportConnections;
+    }
+
+    public ArrayList<NReport> getAttachedNReports() {
+        ArrayList<NReport> list = new ArrayList<NReport>();
+        for (SYSNR2PROCESS att : attachedNReportConnections) {
+            list.add(att.getNReport());
+        }
+        return list;
     }
 
     public Collection<SYSPRE2PROCESS> getAttachedPrescriptions() {
@@ -190,6 +193,10 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 
     public Collection<SYSVAL2PROCESS> getAttachedResidentValues() {
         return attachedResidentValues;
+    }
+
+    public Long getPkid() {
+        return pkid;
     }
 
     public String getTitle() {
@@ -263,8 +270,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     public List<QProcessElement> getElements() {
         ArrayList<QProcessElement> elements = new ArrayList<QProcessElement>();
         elements.addAll(PReports);
-        for (SYSNR2PROCESS att : attachedNReports) {
-            elements.add(att.getPflegebericht());
+        for (SYSNR2PROCESS att : attachedNReportConnections) {
+            elements.add(att.getNReport());
         }
         for (SYSNP2PROCESS att : attachedNursingProcesses) {
             elements.add(att.getNursingProcess());
@@ -303,7 +310,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return resident == null;
     }
 
-    public boolean isRevisionDue(){
+    public boolean isRevisionDue() {
         return !isClosed() && revision.before(new DateMidnight().plusDays(6).toDateTime().minusSeconds(1).toDate());
     }
 
@@ -338,15 +345,6 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 
     @Override
     public String toString() {
-        return "QProcess{" +
-                "title='" + title + '\'' +
-                ", from=" + from +
-                ", revision=" + revision +
-                ", to=" + to +
-                ", version=" + version +
-                ", creator=" + creator +
-                ", owner=" + owner +
-                ", resident=" + resident +
-                '}';
+        return title;
     }
 }

@@ -4,7 +4,7 @@ import entity.info.Resident;
 import entity.EntityTools;
 import entity.info.BWInfoKat;
 import op.OPDE;
-import op.care.nursingprocess.PnlPlanung;
+import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -56,7 +56,7 @@ public class NursingProcessTools {
 
         String html = "";
         html += "<h2 id=\"fonth2\" >";
-        html += (withHeader ? OPDE.lang.getString(PnlPlanung.internalClassID) : "") + "&raquo;" + planung.getStichwort() + "&laquo;";
+        html += (withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) : "") + "&raquo;" + planung.getStichwort() + "&laquo;";
         html += "</h2>";
 
         html += "<div id=\"fonttext\">";
@@ -75,13 +75,13 @@ public class NursingProcessTools {
         html += "<h3 id=\"fonth3\">Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>");
         html += "<h3 id=\"fonth3\">Ziel(e):</h3>" + SYSTools.replace(planung.getZiel(), "\n", "<br/>");
 
-        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</h3>";
+        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</h3>";
 
         if (planung.getInterventionSchedule().isEmpty()) {
             html += "<ul><li><b>Massnahmen fehlen !!!</b></li></ul>";
         } else {
             html += "<ul>";
-//            html += "<li><b>" + OPDE.lang.getString(PnlPlanung.internalClassID + ".interventions") + "</b></li><ul>";
+//            html += "<li><b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</b></li><ul>";
             for (InterventionSchedule interventionSchedule : planung.getInterventionSchedule()) {
                 html += "<li>";
                 html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div>";

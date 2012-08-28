@@ -79,6 +79,7 @@ public class DlgFiles extends MyJDialog {
         new FileDrop(dropPanel, new FileDrop.Listener() {
             @Override
             public void filesDropped(File[] files) {
+
                 java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attachable);
                 if (!successful.isEmpty()) {
                     list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));

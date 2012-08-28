@@ -163,7 +163,8 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         this.bwinfoid = bwinfoid;
     }
 
-    public Resident getBewohner() {
+    @Override
+    public Resident getResident() {
         return bewohner;
     }
 

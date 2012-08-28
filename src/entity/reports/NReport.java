@@ -11,7 +11,6 @@ import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSNR2PROCESS;
-import entity.process.SYSVAL2PROCESS;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -78,8 +77,8 @@ import java.util.Iterator;
          */
         @NamedQuery(name = "Pflegeberichte.findByVorgang", query = " "
                 + " SELECT p FROM NReport p "
-                + " JOIN p.attachedVorgaenge av"
-                + " JOIN av.vorgang v"
+                + " JOIN p.attachedProcessConnections av"
+                + " JOIN av.qProcess v"
                 + " WHERE v = :vorgang "),
         /**
          * Ermittelt NReport eines Bewohner innerhalb eines bestimmten Zeitraums. Diesmal aber ohne
@@ -223,7 +222,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
     private Collection<PB2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
-    private Collection<SYSNR2PROCESS> attachedVorgaenge;
+    private Collection<SYSNR2PROCESS> attachedProcessConnections;
 
     // ==
     // M:N Relationen
@@ -251,7 +250,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.user = OPDE.getLogin().getUser();
         this.attachedFiles = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
-        this.attachedVorgaenge = new ArrayList<SYSNR2PROCESS>();
+        this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<PB2User>();
         this.version = 0l;
     }
@@ -268,7 +267,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.replacementFor = replacementFor;
         this.attachedFiles = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
-        this.attachedVorgaenge = new ArrayList<SYSNR2PROCESS>();
+        this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<PB2User>();
         this.version = 0l;
     }
@@ -440,9 +439,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.user = user;
     }
 
-    public Collection<SYSNR2PROCESS> getAttachedVorgaenge() {
-        return attachedVorgaenge;
-    }
 
     @Override
     public int hashCode() {
@@ -487,12 +483,19 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSNR2PROCESS att : attachedVorgaenge) {
-            list.add(att.getVorgang());
+        for (SYSNR2PROCESS att : attachedProcessConnections) {
+            list.add(att.getQProcess());
         }
         return list;
     }
 
+    public Collection<SYSNR2PROCESS> getAttachedProcessConnections() {
+        return attachedProcessConnections;
+    }
+
+    public void setAttachedProcessConnections(Collection<SYSNR2PROCESS> attachedProcessConnections) {
+        this.attachedProcessConnections = attachedProcessConnections;
+    }
 
     @Override
     public String getTitle() {
@@ -510,10 +513,10 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
             }
         });
 
-        CollectionUtils.forAllDo(attachedVorgaenge, new Closure() {
+        CollectionUtils.forAllDo(attachedProcessConnections, new Closure() {
             public void execute(Object o) {
                 SYSNR2PROCESS oldAssignment = (SYSNR2PROCESS) o;
-                clonedReport.attachedVorgaenge.add(new SYSNR2PROCESS(oldAssignment.getVorgang(), clonedReport));
+                clonedReport.attachedProcessConnections.add(new SYSNR2PROCESS(oldAssignment.getQProcess(), clonedReport));
             }
         });
 

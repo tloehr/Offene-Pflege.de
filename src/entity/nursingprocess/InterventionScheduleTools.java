@@ -1,7 +1,7 @@
 package entity.nursingprocess;
 
 import op.OPDE;
-import op.care.nursingprocess.PnlPlanung;
+import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -90,7 +90,7 @@ public class InterventionScheduleTools {
         result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
         if (termin.isFloating()) {
-            result += "<div id=\"fonttext\"><font color=\"blue\">" + OPDE.lang.getString(PnlPlanung.internalClassID + ".floatinginterventions") + "</font></div>";
+            result += "<div id=\"fonttext\"><font color=\"blue\">" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".floatinginterventions") + "</font></div>";
         }
 
         return result;

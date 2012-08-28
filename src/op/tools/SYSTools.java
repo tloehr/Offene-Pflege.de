@@ -763,8 +763,7 @@ public class SYSTools {
     }
 
     // Taken From: http://www.rgagnon.com/javadetails/java-0416.html
-    public static byte[] createChecksum(File file) throws
-            Exception {
+    public static byte[] createChecksum(File file) throws Exception {
         InputStream fis = new FileInputStream(file);
 
         byte[] buffer = new byte[1024];

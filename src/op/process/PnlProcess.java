@@ -20,6 +20,7 @@ import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.Users;
 import entity.UsersTools;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.*;
@@ -338,22 +339,6 @@ public class PnlProcess extends NursingRecordsPanel {
 
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-            final JButton btnPrint = new JButton(SYSConst.icon22print);
-            btnPrint.setPressedIcon(SYSConst.icon22printPressed);
-            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnPrint.setContentAreaFilled(false);
-            btnPrint.setBorder(null);
-            btnPrint.setToolTipText(OPDE.lang.getString(internalClassID + ".btnrevision.tooltip"));
-            btnPrint.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-
-
-                }
-            });
-            titlePanelright.add(btnPrint);
-        }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             if (!qProcess.isClosed()) {
@@ -526,7 +511,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                     for (PReport report : myProcess.getPReports()) {
                                         em.remove(report);
                                     }
-                                    for (SYSNR2PROCESS att : myProcess.getAttachedNReports()) {
+                                    for (SYSNR2PROCESS att : myProcess.getAttachedNReportConnections()) {
                                         em.remove(att);
                                     }
                                     for (SYSNP2PROCESS att : myProcess.getAttachedNursingProcesses()) {
@@ -568,9 +553,35 @@ public class PnlProcess extends NursingRecordsPanel {
                     });
                 }
             });
-
             btnDelete.setEnabled(OPDE.isAdmin());
             titlePanelright.add(btnDelete);
+
+
+            /***
+             *      _     _         ____       _       _
+             *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
+             *     | '_ \| __| '_ \| |_) | '__| | '_ \| __|
+             *     | |_) | |_| | | |  __/| |  | | | | | |_
+             *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
+             *
+             */
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+                final JButton btnPrint = new JButton(SYSConst.icon22print);
+                btnPrint.setPressedIcon(SYSConst.icon22printPressed);
+                btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnPrint.setContentAreaFilled(false);
+                btnPrint.setBorder(null);
+                btnPrint.setToolTipText(OPDE.lang.getString(internalClassID + ".btnrevision.tooltip"));
+                btnPrint.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        String html = QProcessTools.getAsHTML(qProcess);
+                        html += QProcessTools.getElementsAsHTML(qProcess, tbSystem.isSelected());
+                        SYSFilesTools.print(html, true);
+                    }
+                });
+                titlePanelright.add(btnPrint);
+            }
 
             /***
              *      _     _         ____            _     _
@@ -892,7 +903,7 @@ public class PnlProcess extends NursingRecordsPanel {
         JTextPane contentPane = new JTextPane();
         contentPane.setContentType("text/html");
         contentPane.setEditable(false);
-        contentPane.setText(SYSTools.toHTML("<div id=\"fonttext\">" + QProcessTools.getAsHTML(qProcess)) + "</div>");
+        contentPane.setText(SYSTools.toHTML(QProcessTools.getAsHTML(qProcess)));
 
         JPanel elementPanel = new JPanel();
         elementPanel.setLayout(new VerticalLayout());
@@ -1240,12 +1251,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     QProcess qProcess = em.merge((QProcess) o);
-                                    PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CREATE), PReportTools.PREPORT_TYPE_CREATE, qProcess));
-                                    qProcess.getPReports().add(pReport);
                                     em.getTransaction().commit();
-
                                     processList.add(qProcess);
-//                                    Collections.sort(processList);
                                     qProcessMap.put(qProcess, createCP4(qProcess));
                                     buildPanel();
                                 } catch (Exception e) {

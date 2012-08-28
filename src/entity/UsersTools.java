@@ -6,13 +6,15 @@ package entity;
 
 import op.OPDE;
 import op.tools.SYSTools;
+import tablemodels.TMUser;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author tloehr
@@ -20,6 +22,25 @@ import java.util.List;
 public class UsersTools {
     public static final short STATUS_INACTIVE = 0;
     public static final short STATUS_ACTIVE = 1;
+
+    public static ArrayList<Users> getUsers(boolean inactiveToo) {
+        EntityManager em = OPDE.createEM();
+
+        Query query;
+        if (inactiveToo) {
+            query = em.createQuery("SELECT u FROM Users u ORDER BY u.nachname, u.vorname ");
+        } else {
+            query = em.createQuery("SELECT u FROM Users u WHERE u.status = :status ORDER BY u.nachname, u.vorname ");
+            query.setParameter("status", STATUS_ACTIVE);
+        }
+
+        ArrayList<Users> list = new ArrayList<Users>(query.getResultList());
+
+        em.close();
+
+        return list;
+
+    }
 
     public static ListCellRenderer
     getUserRenderer() {

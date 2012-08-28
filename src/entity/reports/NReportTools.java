@@ -27,36 +27,10 @@ import java.util.*;
  */
 public class NReportTools {
 
-    /**
-     * Marks a nursing report as "deleted". It is then incative but can still be read.
-     *
-     * @param bericht
-     * @return
-     */
-//    public static NReport deleteBericht(EntityManager em, NReport bericht) throws Exception {
-//
-//        NReport mybericht = em.merge(bericht);
-//        em.lock(mybericht, LockModeType.OPTIMISTIC);
-//
-//        mybericht.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-//
-//        for (SYSNR2FILE oldAssignment : mybericht.getAttachedFiles()) {
-//            em.remove(oldAssignment);
-//        }
-//        mybericht.getAttachedFiles().clear();
-//
-//        for (SYSNR2PROCESS oldAssignment : mybericht.getAttachedVorgaenge()) {
-//            em.remove(oldAssignment);
-//        }
-//        mybericht.getAttachedVorgaenge().clear();
-//
-//        return mybericht;
-//    }
-
-    public static NReport getFirstReport(Resident bewohner) {
+    public static NReport getFirstReport(Resident resident) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
-        query.setParameter("bewohner", bewohner);
+        query.setParameter("bewohner", resident);
         query.setFirstResult(0);
         query.setMaxResults(1);
         NReport p = (NReport) query.getSingleResult();
@@ -225,9 +199,7 @@ public class NReportTools {
      * @return
      */
     public static String getAsHTML(NReport nReport) {
-        String result = "";
-
-//        String fonthead = "<div id=\"fonttext\"><font #" + OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP") + ">";
+        String result = "<div id=\"fonttext\">";
 
         result += getDatumUndUser(nReport, false, true);
 
@@ -254,7 +226,7 @@ public class NReportTools {
 
         result += "<p>[" + nReport.getPbid() + "] " + SYSTools.replace(nReport.getText(), "\n", "<br/>") + "<p/>";
 
-
+        result += "<div/>";
         return result;
     }
 

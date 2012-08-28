@@ -576,7 +576,7 @@ public class PrescriptionsTools {
         EntityManager em = OPDE.createEM();
 
 //        List<Prescriptions> list = null;
-        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.anDatum <= :from AND p.to >= :to ORDER BY p.situation.text, p.verid");
+        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.verid");
         query.setParameter("resident", resident);
         query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
         query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());

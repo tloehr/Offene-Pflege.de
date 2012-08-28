@@ -70,7 +70,7 @@ public class OPMain extends javax.swing.JFrame {
         menuStructure.add(new String[]{"Pflege/Massnahmen", "op.care.nursingprocess.massnahmen.FrmMassnahmen", "work.png"});
         menuStructure.add(new String[]{"Bewohner/Bewohnerdaten", "op.bw.admin.FrmBWAttr", "groupevent.png"});
         menuStructure.add(new String[]{"Bewohner/Barbeträge", "op.bw.tg.FrmTG", "coins.png"});
-        menuStructure.add(new String[]{"System/Mitarbeiter", "op.ma.admin.FrmUser", "identity.png"});
+        menuStructure.add(new String[]{"System/Mitarbeiter", "op.users.admin.PnlUser", "identity.png"});
         menuStructure.add(new String[]{"System/Datei-Manager", "op.sysfiles.FrmFilesManager", "kfm.png"});
         menuStructure.add(new String[]{"Controlling/Controlling", "op.controlling.FrmCtrlMonitor", "kfind.png"});
 //        menuStructure.add(new String[]{"Controlling/Vorgänge", "op.process.FrmVorgang", "utilities-file-archiver.png"});

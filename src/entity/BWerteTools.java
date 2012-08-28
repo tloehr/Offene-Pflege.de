@@ -208,7 +208,7 @@ public class BWerteTools {
 
         String html = "";
 
-        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(bwerte.get(0).getBewohner()) + "</h1>";
+        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(bwerte.get(0).getResident()) + "</h1>";
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader1") +

@@ -39,6 +39,8 @@ import entity.files.SYSFilesTools;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.process.QProcess;
+import entity.process.QProcessElement;
 import entity.process.SYSNR2PROCESS;
 import entity.reports.NReport;
 import entity.reports.NReportTAGS;
@@ -47,6 +49,7 @@ import entity.reports.NReportTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.care.sysfiles.PnlFiles;
+import op.process.DlgProcessAssign;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -72,6 +75,7 @@ import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author root
@@ -585,10 +589,10 @@ public class PnlReport extends NursingRecordsPanel {
                                         em.remove(oldAssignment);
                                     }
                                     oldReport.getAttachedFiles().clear();
-                                    for (SYSNR2PROCESS oldAssignment : oldReport.getAttachedVorgaenge()) {
+                                    for (SYSNR2PROCESS oldAssignment : oldReport.getAttachedProcessConnections()) {
                                         em.remove(oldAssignment);
                                     }
-                                    oldReport.getAttachedVorgaenge().clear();
+                                    oldReport.getAttachedProcessConnections().clear();
 
                                     oldReport.setEditedBy(em.merge(OPDE.getLogin().getUser()));
                                     oldReport.setEditpit(new Date());
@@ -664,10 +668,10 @@ public class PnlReport extends NursingRecordsPanel {
                                         em.remove(oldAssignment);
                                     }
                                     delReport.getAttachedFiles().clear();
-                                    for (SYSNR2PROCESS oldAssignment : delReport.getAttachedVorgaenge()) {
+                                    for (SYSNR2PROCESS oldAssignment : delReport.getAttachedProcessConnections()) {
                                         em.remove(oldAssignment);
                                     }
-                                    delReport.getAttachedVorgaenge().clear();
+                                    delReport.getAttachedProcessConnections().clear();
                                     em.getTransaction().commit();
 
                                     DateMidnight dm = new DateMidnight(delReport.getPit());
@@ -916,6 +920,7 @@ public class PnlReport extends NursingRecordsPanel {
                 }
             });
 
+            btnFiles.setEnabled(!report.isObsolete());
             if (report.getAttachedFiles().size() > 0) {
                 JLabel lblNum = new JLabel(Integer.toString(report.getAttachedFiles().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL10BOLD);
@@ -953,28 +958,90 @@ public class PnlReport extends NursingRecordsPanel {
                         closure = new Closure() {
                             @Override
                             public void execute(Object o) {
-                                EntityManager em = OPDE.createEM();
-                                NReport myReport = em.merge(report);
-                                em.refresh(myReport);
-                                DateMidnight dm = new DateMidnight(myReport.getPit());
-                                if (!dayMap.containsKey(dm)) {
-                                    dayMap.put(dm, new ArrayList<NReport>());
+                                if (o == null) {
+                                    return;
                                 }
-                                dayMap.get(dm).remove(report);
-                                dayMap.get(dm).add(myReport);
-                                Collections.sort(dayMap.get(dm));
-                                reportMap.remove(report);
-                                reportMap.put(myReport, createCP4(myReport));
-                                buildPanel();
-                                em.close();
+                                Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                ArrayList<QProcess> assigned = result.getFirst();
+                                ArrayList<QProcess> unassigned = result.getSecond();
+
+                                EntityManager em = OPDE.createEM();
+
+                                try {
+                                    em.getTransaction().begin();
+
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    NReport myReport = em.merge(report);
+                                    em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+
+                                    for (SYSNR2PROCESS linkObject : myReport.getAttachedProcessConnections()) {
+                                        if (unassigned.contains(linkObject.getQProcess())) {
+                                            em.remove(em.merge(linkObject));
+                                        }
+                                    }
+
+                                    for (QProcess qProcess : assigned) {
+                                        List<QProcessElement> listElements = qProcess.getElements();
+                                        if (!listElements.contains(myReport)) {
+                                            QProcess myQProcess = em.merge(qProcess);
+                                            SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                            qProcess.getAttachedNReportConnections().add(myLinkObject);
+                                            myReport.getAttachedProcessConnections().add(myLinkObject);
+                                        }
+                                    }
+
+                                    em.getTransaction().commit();
+
+                                    DateMidnight dm = new DateMidnight(myReport.getPit());
+                                    if (!dayMap.containsKey(dm)) {
+                                        dayMap.put(dm, new ArrayList<NReport>());
+                                    }
+                                    dayMap.get(dm).remove(report);
+                                    dayMap.get(dm).add(myReport);
+                                    Collections.sort(dayMap.get(dm));
+                                    reportMap.remove(report);
+                                    reportMap.put(myReport, createCP4(myReport));
+                                    buildPanel();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
                             }
                         };
                     }
-                    new DlgFiles(report, closure);
+                    new DlgProcessAssign(report, closure);
                 }
             });
             btnProcess.setEnabled(!report.isObsolete());
-            titlePanelright.add(btnProcess);
+
+            if (!report.getAttachedProcessConnections().isEmpty()) {
+                JLabel lblNum = new JLabel(Integer.toString(report.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+                lblNum.setFont(SYSConst.ARIAL10BOLD);
+                lblNum.setForeground(Color.YELLOW);
+                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.SOUTH_EAST);
+                overlayableBtn.setOpaque(false);
+                titlePanelright.add(overlayableBtn);
+            } else {
+                titlePanelright.add(btnProcess);
+            }
+
         }
 
         titlePanelleft.setOpaque(false);
