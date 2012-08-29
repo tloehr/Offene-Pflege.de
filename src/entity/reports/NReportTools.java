@@ -126,7 +126,7 @@ public class NReportTools {
     public static String getPITAsHTML(NReport nReport) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
-        html += df.format(nReport.getPit()) + "; " + nReport.getUser().getNameUndVorname();
+        html += df.format(nReport.getPit()) + "; " + nReport.getUser().getFullname();
         return html;
     }
 
@@ -183,7 +183,7 @@ public class NReportTools {
     public static String getDatumUndUser(NReport bericht, boolean showIDs, boolean showMinutes) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
+        result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
         if (showMinutes && !bericht.isDeleted() && !bericht.isReplaced()) {
             result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + bericht.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)");
         }
@@ -208,13 +208,13 @@ public class NReportTools {
         DateFormat df = DateFormat.getDateTimeInstance();
 
         if (nReport.isDeleted()) {
-            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getNameUndVorname() + "</i><br/>";
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "</i><br/>";
         }
         if (nReport.isReplacement() && !nReport.isReplaced()) {
             result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditpit()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "</i><br/>";
         }
         if (nReport.isReplaced()) {
-            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getNameUndVorname();
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "</i><br/>";
         }
 //        if (!nReport.getAttachedFiles().isEmpty()) {
@@ -296,12 +296,12 @@ public class NReportTools {
             } else {
                 html.append("<td>" + df.format(bericht.getPit()) + "</td>");
                 html.append("<td>" + bericht.getText() + "</td>");
-                html.append("<td>" + bericht.getUser().getUKennung() + "</td>");
+                html.append("<td>" + bericht.getUser().getUID() + "</td>");
             }
             if (bewohner.getBv1() == null) {
                 html.append("<td><b>kein BV zugeordnet</b></td>");
             } else {
-                html.append("<td>" + bewohner.getBv1().getUKennung() + "</td>");
+                html.append("<td>" + bewohner.getBv1().getUID() + "</td>");
             }
             html.append("</tr>");
         }
@@ -379,7 +379,7 @@ public class NReportTools {
                         html.append("<td>" + ResidentTools.getBWLabel1(bericht.getResident()) + "</td>");
                         html.append("<td>" + df.format(bericht.getPit()) + "</td>");
                         html.append("<td>" + bericht.getText() + "</td>");
-                        html.append("<td>" + bericht.getUser().getUKennung() + "</td>");
+                        html.append("<td>" + bericht.getUser().getUID() + "</td>");
                         html.append("</tr>");
                     }
                     html.append("</table>");

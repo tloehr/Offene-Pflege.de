@@ -4,7 +4,7 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
     <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <class>entity.Acl</class>
+        <class>entity.system.Acl</class>
         <class>entity.Arzt</class>
         <class>entity.BWerte</class>
         <class>entity.Barbetrag</class>
@@ -12,7 +12,7 @@
         <class>entity.info.Resident</class>
         <class>entity.nursingprocess.DFN</class>
         <class>entity.Einrichtungen</class>
-        <class>entity.Groups</class>
+        <class>entity.system.Groups</class>
         <class>entity.info.ICD</class>
         <class>entity.KKasse</class>
         <class>entity.Krankenhaus</class>
@@ -29,7 +29,7 @@
         <class>entity.Stationen</class>
         <class>entity.Uebergabe2User</class>
         <class>entity.Uebergabebuch</class>
-        <class>entity.Users</class>
+        <class>entity.system.Users</class>
         <class>entity.files.SYSFiles</class>
         <class>entity.files.SYSINF2FILE</class>
         <class>entity.files.SYSNR2FILE</class>

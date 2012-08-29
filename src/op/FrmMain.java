@@ -54,6 +54,8 @@ import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.process.PnlProcess;
 import op.system.DlgLogin;
+import op.system.InternalClass;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
@@ -241,7 +243,7 @@ public class FrmMain extends JFrame {
     public void afterLogin() {
 
         prepareSearchArea();
-        labelUSER.setText(OPDE.getLogin().getUser().getNameUndVorname());
+        labelUSER.setText(OPDE.getLogin().getUser().getFullname());
 
         Runnable runnable = new Runnable() {
             @Override

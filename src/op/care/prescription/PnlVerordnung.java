@@ -42,6 +42,7 @@ import op.OPDE;
 import op.care.med.vorrat.DlgBestand;
 import op.care.med.vorrat.DlgBestandAbschliessen;
 import op.care.med.vorrat.DlgBestandAnbrechen;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;

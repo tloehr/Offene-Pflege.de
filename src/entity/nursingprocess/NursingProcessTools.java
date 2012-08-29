@@ -65,10 +65,10 @@ public class NursingProcessTools {
 
         DateFormat df = DateFormat.getDateInstance();
         html += "<b>Prüfungstermin:</b> " + df.format(planung.getNKontrolle()) + "<br/>";
-        html += "<b>Erstellt von:</b> " + planung.getAngesetztDurch().getNameUndVorname() + "  ";
+        html += "<b>Erstellt von:</b> " + planung.getAngesetztDurch().getFullname() + "  ";
         html += "<b>Am:</b> " + df.format(planung.getVon()) + "<br/>";
         if (planung.isAbgesetzt()) {
-            html += "<b>Abgesetzt von:</b> " + planung.getAbgesetztDurch().getNameUndVorname() + "  ";
+            html += "<b>Abgesetzt von:</b> " + planung.getAbgesetztDurch().getFullname() + "  ";
             html += "<b>Am:</b> " + df.format(planung.getBis()) + "<br/>";
         }
 

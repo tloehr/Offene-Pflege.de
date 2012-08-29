@@ -5,7 +5,6 @@
 package entity.info;
 
 import entity.EntityTools;
-import entity.Users;
 import entity.prescription.PrescriptionsTools;
 import op.OPDE;
 import op.tools.DlgListSelector;
@@ -19,7 +18,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.awt.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;

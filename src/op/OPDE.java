@@ -27,14 +27,13 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
-import entity.Users;
-import entity.UsersTools;
+import entity.system.*;
+import entity.system.UsersTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
-import entity.system.SYSLogin;
-import entity.system.SYSPropsTools;
-import entity.system.SyslogTools;
 import entity.prescription.BHPTools;
+import entity.system.Users;
+import op.system.AppInfo;
 import op.system.FrmInit;
 import op.system.PrinterTypes;
 import op.threads.DisplayManager;
@@ -42,7 +41,6 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
-import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -299,7 +297,7 @@ public class OPDE {
                         "Es ist ein Fehler in OPDE aufgetreten.\n" +
                         "Auf Host: " + localMachine.getHostName() + "\n" +
                         "IP-Adresse: " + localMachine.getHostAddress() + "\n" +
-                        "Angemelet war: " + getLogin().getUser().getUKennung() + "\n" +
+                        "Angemelet war: " + getLogin().getUser().getUID() + "\n" +
                         "Zeitpunkt: " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
                         "Siehe Anhang für Stacktrace");
 

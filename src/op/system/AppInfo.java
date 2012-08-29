@@ -2,9 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package op.tools;
+package op.system;
 
 import op.OPDE;
+import op.system.InternalClass;
+import op.system.InternalClassACL;
+import op.tools.SYSTools;
+import op.tools.SortedProperties;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

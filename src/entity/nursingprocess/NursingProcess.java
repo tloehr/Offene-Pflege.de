@@ -4,7 +4,7 @@
  */
 package entity.nursingprocess;
 
-import entity.Users;
+import entity.system.Users;
 import entity.info.BWInfoKat;
 import entity.info.Resident;
 import entity.process.QProcess;

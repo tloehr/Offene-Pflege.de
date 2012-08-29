@@ -563,7 +563,7 @@ public class DlgNursingProcess extends MyJDialog {
 //        hm.put("BWIKID", lel.getPk());
 //        hm.put("Von", "!NOW!");
 //        hm.put("Bis", "!BAW!");
-//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUKennung());
+//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUID());
 //        hm.put("AbUKennung", null);
 //        hm.put("PlanKennung", OPDE.getDb().getUID("__plankenn"));
 //        hm.put("NKontrolle", jdcKontrolle.getDate());
@@ -609,7 +609,7 @@ public class DlgNursingProcess extends MyJDialog {
 //        hm.put("BWIKID", lel.getPk());
 //        hm.put("Von", "!NOW+1!");
 //        hm.put("Bis", "!BAW!");
-//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUKennung());
+//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUID());
 //        hm.put("AbUKennung", null);
 //        hm.put("PlanKennung", plankenn);
 //        hm.put("NKontrolle", jdcKontrolle.getDate());

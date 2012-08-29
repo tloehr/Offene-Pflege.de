@@ -18,14 +18,15 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import entity.Users;
-import entity.UsersTools;
+import entity.system.Users;
+import entity.system.UsersTools;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.*;
 import op.OPDE;
 import op.events.TaskPaneContentChangedListener;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -722,7 +723,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                         em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                     }
                                     em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + handOverTo.getNameUndVorname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, myProcess));
+                                    PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + handOverTo.getFullname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, myProcess));
                                     myProcess.getPReports().add(pReport);
                                     myProcess.setOwner(em.merge(handOverTo));
                                     em.getTransaction().commit();
@@ -803,7 +804,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                             em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
-                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + OPDE.getLogin().getUser().getNameUndVorname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, qProcess));
+                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + OPDE.getLogin().getUser().getFullname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, qProcess));
                                         myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
                                         myProcess.getPReports().add(pReport);
                                         myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
@@ -926,7 +927,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4(final QProcessElement element, final QProcess qProcess) {
         String elementTitle = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(element.getPITInMillis())) + "] " + SYSTools.left(element.getTitle(), MAX_TEXT_LENGTH);
-        elementTitle += " [" + element.getUser().getUKennung() + "]";
+        elementTitle += " [" + element.getUser().getUID() + "]";
         final CollapsiblePane cpElement = new CollapsiblePane(elementTitle);
         try {
             cpElement.setCollapsed(true);

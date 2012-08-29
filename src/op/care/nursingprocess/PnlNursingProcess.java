@@ -39,6 +39,7 @@ import entity.system.SYSPropsTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;

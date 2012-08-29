@@ -20,7 +20,7 @@ public class UebergabebuchTools {
     public static String getDatumUndUser(Uebergabebuch bericht, boolean showIDs) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
+        result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
         if (showIDs) {
             result += "<br/><i>(" + bericht.getUebid() + ")</i>";
         }

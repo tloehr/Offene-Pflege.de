@@ -5,6 +5,8 @@
 
 package entity;
 
+import entity.system.Users;
+
 import java.util.Collection;
 import java.util.Iterator;
 

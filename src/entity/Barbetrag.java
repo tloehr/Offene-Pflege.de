@@ -6,6 +6,7 @@
 package entity;
 
 import entity.info.Resident;
+import entity.system.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;

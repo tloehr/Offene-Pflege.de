@@ -5,7 +5,7 @@
 package entity.reports;
 
 import entity.PB2User;
-import entity.Users;
+import entity.system.Users;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.process.QProcess;

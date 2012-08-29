@@ -214,10 +214,10 @@ public class SYSPrint {
 ////                params.put("txtHeim", ein);
 ////            }
 //            if (!params.containsKey("PRTTimeAndUser")) {
-//                params.put("PRTTimeAndUser", "Gedruckt am: " + SYSCalendar.printGCGermanStyle(new GregorianCalendar()) + " // " + OPDE.getLogin().getUser().getUKennung());
+//                params.put("PRTTimeAndUser", "Gedruckt am: " + SYSCalendar.printGCGermanStyle(new GregorianCalendar()) + " // " + OPDE.getLogin().getUser().getUID());
 //            }
 //            if (!params.containsKey("prtInfo")) {
-//                params.put("prtInfo", "Gedruckt am: " + SYSCalendar.printGCGermanStyle(new GregorianCalendar()) + " // " + OPDE.getLogin().getUser().getUKennung());
+//                params.put("prtInfo", "Gedruckt am: " + SYSCalendar.printGCGermanStyle(new GregorianCalendar()) + " // " + OPDE.getLogin().getUser().getUID());
 //            }
 //
 //            String reportTargetFilename = compileReport(reportFilenameWOExtension);
@@ -262,7 +262,7 @@ public class SYSPrint {
 //                    }
 //
 //                }
-//                OPDE.info("Druck " + reportFilenameWOExtension + " von " + OPDE.getLogin().getUser().getUKennung());
+//                OPDE.info("Druck " + reportFilenameWOExtension + " von " + OPDE.getLogin().getUser().getUID());
 //            } else {
 //                OPDE.info("Reportdatei " + reportFilenameWOExtension + " nicht verf¸gbar.");
 //            }
@@ -358,7 +358,7 @@ public class SYSPrint {
 //            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
 //                    + "<hr/>" +
 //                    "<div font=\"fonttext\">" +
-//                    "<b>"+OPDE.lang.getString("misc.msg.endofreport")+"</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
+//                    "<b>"+OPDE.lang.getString("misc.msg.endofreport")+"</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
 //                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
 //                    + "<br/>http://www.offene-pflege.de</div></body></html>";
 //

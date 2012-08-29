@@ -26,7 +26,7 @@
 package entity.files;
 
 import entity.info.BWInfo;
-import entity.Users;
+import entity.system.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;

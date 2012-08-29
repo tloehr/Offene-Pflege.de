@@ -109,7 +109,7 @@ public class DBHandling {
 //    public static void putOCProps(String k, String v, String ip) {
 //        HashMap hm = new HashMap();
 //        hm.put("K", new Object[]{k, "="});
-//        hm.put("UKennung", new Object[]{OPDE.getLogin().getUser().getUKennung(), "="});
+//        hm.put("UKennung", new Object[]{OPDE.getLogin().getUser().getUID(), "="});
 //        hm.put("IP", new Object[]{ip, "="});
 //        long ocpid = ((BigInteger) DBRetrieve.getSingleValue("OCProps", "OCPID", hm)).longValue();
 //        hm.clear();
@@ -119,7 +119,7 @@ public class DBHandling {
 //        } else {
 //            hm.put("K", k);
 //            hm.put("IP", ip);
-//            hm.put("UKennung", OPDE.getLogin().getUser().getUKennung());
+//            hm.put("UKennung", OPDE.getLogin().getUser().getUID());
 //            insertRecord("OCProps", hm);
 //        }
 //        OPDE.getProps().put(k, v);
@@ -146,7 +146,7 @@ public class DBHandling {
 //            stmt = OPDE.getDb().db.prepareStatement(sql);
 //            stmt.setString(1, ip);
 //            if (only4me) {
-//                stmt.setString(2, OPDE.getLogin().getUser().getUKennung());
+//                stmt.setString(2, OPDE.getLogin().getUser().getUID());
 //            }
 //            rs = stmt.executeQuery();
 //            OPDE.debug("getOCProps/2: " + sql);

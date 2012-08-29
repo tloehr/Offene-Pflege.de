@@ -65,7 +65,7 @@ public class TMBuchungen extends AbstractTableModel {
                 break;
             }
             case COL_User : {
-                result = data.get(row).getUser().getNameUndVorname();
+                result = data.get(row).getUser().getFullname();
                 break;
             }
             default: {

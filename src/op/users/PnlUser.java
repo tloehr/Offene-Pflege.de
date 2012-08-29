@@ -25,31 +25,42 @@
  */
 package op.users;
 
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.Groups;
-import entity.Users;
-import entity.UsersTools;
 import entity.files.SYSFilesTools;
-import entity.system.IntClassesTools;
+import entity.system.Groups;
+import entity.system.GroupsTools;
+import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
+import op.system.InternalClass;
+import op.system.InternalClassACL;
+import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.event.*;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * @author tloehr
@@ -76,11 +87,14 @@ public class PnlUser extends CleanablePanel {
     private CheckTreeSelectionModel sm;
 
     private boolean initPhase = false;
-    private JToggleButton tbRefactor;
+    private JToggleButton tbOldUsers, tbShowUsers, tbShowGroups;
+    private ButtonGroup bg1;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-
+    private HashMap<Users, CollapsiblePane> userMap;
+    private HashMap<Groups, CollapsiblePane> groupMap;
     private ArrayList<Users> lstUsers;
+    private ArrayList<Groups> lstGroups;
 
     /**
      * Creates new form PnlUser
@@ -111,47 +125,88 @@ public class PnlUser extends CleanablePanel {
 //            }
 //        });
 
-        jtpMain.setSelectedIndex(TAB_USER);
+        initPhase = true;
         initPanel();
+        reloadDisplay();
     }
 
     private void initPanel() {
-        lstUsers = UsersTools.getUsers(true);
-        listUsers.setModel(SYSTools.list2dlm(lstUsers));
-        listAvailableGroups.setModel(new DefaultListModel());
-        listMemberIn.setModel(new DefaultListModel());
+
+        userMap = new HashMap<Users, CollapsiblePane>();
+        groupMap = new HashMap<Groups, CollapsiblePane>();
         prepareSearchArea();
     }
 
-//    private void loadUserTable() {
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            Query query = em.createNamedQuery("Users.findAllSorted");
-//            tblUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//            tblUsers.setModel(new TMUser(query.getResultList()));
-//            tblUsers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+    private void reloadDisplay() {
+        /***
+         *               _                 _ ____  _           _
+         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
+         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
+         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
+         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
+         *                                              |_|            |___/
+         */
+
+
+        final boolean withworker = false;
+        if (withworker) {
+
+//            OPDE.getMainframe().setBlocked(true);
+//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+//
+//            cpDFN.removeAll();
+//
+//            SwingWorker worker = new SwingWorker() {
 //
 //                @Override
-//                public void valueChanged(ListSelectionEvent lse) {
-//                    if (!lse.getValueIsAdjusting()) {
-//                        if (tblUsers.getSelectedRow() >= 0) {
-//                            selectedUser = ((TMUser) tblUsers.getModel()).getUserAt(tblUsers.getSelectedRow());
-//                            setRightSideOnUserTab();
-//                            setLeftSideOnUserTab();
-//                        } else {
-//                            selectedUser = null;
-//                        }
-//                    }
-//                }
-//            });
-//            tblUsers.getColumnModel().getColumn(0).setCellRenderer(new RNDOCUsers());
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
+//                protected Object doInBackground() throws Exception {
 //
-//    }
+//                    int progress = 0;
+//                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+//
+//                    for (DFN dfn : DFNTools.getDFNs(resident, jdcDatum.getDate())) {
+//                        shiftMAPDFN.get(dfn.getShift()).add(dfn);
+//                    }
+//
+//                    for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+//                        shiftMAPpane.put(shift, createCP4(shift));
+//                        try {
+//                            shiftMAPpane.get(shift).setCollapsed(shift == DFNTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
+//                        } catch (PropertyVetoException e) {
+//                            OPDE.debug(e);
+//                        }
+//                        progress += 20;
+//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+//                    }
+//
+//                    return null;
+//                }
+//
+//                @Override
+//                protected void done() {
+//                    buildPanel(true);
+//                    initPhase = false;
+//                    OPDE.getDisplayManager().setProgressBarMessage(null);
+//                    OPDE.getMainframe().setBlocked(false);
+//                }
+//            };
+//            worker.execute();
+
+        } else {
+            lstUsers = UsersTools.getUsers(true);
+            lstGroups = GroupsTools.getGroups();
+            for (Users user : lstUsers) {
+                userMap.put(user, createCP4(user));
+            }
+            for (Groups group : lstGroups) {
+                groupMap.put(group, createCP4(group));
+            }
+            buildPanel();
+        }
+        initPhase = false;
+    }
+
 
     @Override
     public void cleanup() {
@@ -160,7 +215,7 @@ public class PnlUser extends CleanablePanel {
 
     @Override
     public void reload() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        reloadDisplay();
     }
 
 //    private void setGroupTab() {
@@ -225,9 +280,9 @@ public class PnlUser extends CleanablePanel {
 //
 //        if (selectedGroup != null) {
 //
-//            txtGKennung.setText(SYSTools.catchNull(selectedGroup.getGkennung()));
-//            txtGroupDescription.setText(SYSTools.catchNull(selectedGroup.getBeschreibung()));
-//            cbExamen.setSelected(selectedGroup.isExamen());
+//            txtGKennung.setText(SYSTools.catchNull(selectedGroup.getID()));
+//            txtGroupDescription.setText(SYSTools.catchNull(selectedGroup.getDescription()));
+//            cbExamen.setSelected(selectedGroup.isQualified());
 //
 //            lstMembers.getModel().removeListDataListener(ldlMember);
 //            lstUsers.getModel().removeListDataListener(ldlUser);
@@ -235,7 +290,7 @@ public class PnlUser extends CleanablePanel {
 //            // TODO: hier liegt noch was im Argen
 //            // Hab den Teil auskommentiert
 ////            if (em.contains(selectedGroup)) { // EntityBean ist schon gespeichert.
-////                if (selectedGroup.getGkennung().equalsIgnoreCase("everyone")) {
+////                if (selectedGroup.getID().equalsIgnoreCase("everyone")) {
 ////                    // everyone hat immer alle Benutzer als Mitglied.
 ////                    lstMembers.setModel(SYSTools.newListModel("Users.findAllSorted"));
 ////                    lstUsers.setModel(new DefaultListModel());
@@ -323,7 +378,7 @@ public class PnlUser extends CleanablePanel {
 //            listMembership.setBackground(Color.LIGHT_GRAY);
 //        }
 //
-//        txtUKennung.setText(selectedUser.getUKennung());
+//        txtUKennung.setText(selectedUser.getUID());
 //        txtVorname.setText(selectedUser.getVorname());
 //        txtName.setText(selectedUser.getNachname());
 //        txtEMail.setText(SYSTools.catchNull(selectedUser.getEMail()));
@@ -352,452 +407,22 @@ public class PnlUser extends CleanablePanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jtpMain = new JTabbedPane();
-        pnlUserTab = new JPanel();
-        label3 = new JLabel();
-        label1 = new JLabel();
-        label2 = new JLabel();
-        jsp0 = new JScrollPane();
-        listUsers = new JList();
-        jPanel5 = new JPanel();
-        btnAddUser = new JButton();
-        btnPassword = new JButton();
-        btnEditUser = new JButton();
-        btnEnableUser = new JToggleButton();
-        jsp1 = new JScrollPane();
-        listMemberIn = new JList();
-        jsp2 = new JScrollPane();
-        listAvailableGroups = new JList();
-        pnlGroupTab = new JPanel();
-        pnlLeftGrp = new JPanel();
-        jScrollPane3 = new JScrollPane();
-        lstAllGroups = new JList();
-        jPanel8 = new JPanel();
-        btnEditGroup = new JButton();
-        btnAddGroup = new JButton();
-        btnDeleteGroup = new JButton();
-        pnlRightGrp = new JPanel();
-        jPanel6 = new JPanel();
-        jScrollPane5 = new JScrollPane();
-        treeRights = new JTree();
-        jLabel10 = new JLabel();
-        jPanel7 = new JPanel();
-        btnCancelGroups = new JButton();
-        btnSaveGroups = new JButton();
-        jPanel9 = new JPanel();
-        jLabel11 = new JLabel();
-        jLabel12 = new JLabel();
-        txtGKennung = new JTextField();
-        txtGroupDescription = new JTextField();
-        lblGKennungFree = new JLabel();
-        cbExamen = new JCheckBox();
+        scrollPane1 = new JScrollPane();
+        cpMain = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== jtpMain ========
+        //======== scrollPane1 ========
         {
-            jtpMain.setTabPlacement(SwingConstants.RIGHT);
-            jtpMain.setFont(new Font("Arial", Font.PLAIN, 14));
-            jtpMain.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    jtpMainStateChanged(e);
-                }
-            });
 
-            //======== pnlUserTab ========
+            //======== cpMain ========
             {
-                pnlUserTab.setLayout(new FormLayout(
-                        "2*(default:grow, $lcgap), default:grow",
-                        "default, $lgap, default:grow, 3*($lgap, default)"));
-
-                //---- label3 ----
-                label3.setText("text");
-                label3.setFont(new Font("Arial", Font.PLAIN, 14));
-                pnlUserTab.add(label3, CC.xy(1, 1));
-
-                //---- label1 ----
-                label1.setText("text");
-                label1.setFont(new Font("Arial", Font.PLAIN, 14));
-                pnlUserTab.add(label1, CC.xy(3, 1));
-
-                //---- label2 ----
-                label2.setText("text");
-                label2.setFont(new Font("Arial", Font.PLAIN, 14));
-                pnlUserTab.add(label2, CC.xy(5, 1));
-
-                //======== jsp0 ========
-                {
-
-                    //---- listUsers ----
-                    listUsers.setFont(new Font("Arial", Font.PLAIN, 14));
-                    listUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                    listUsers.addListSelectionListener(new ListSelectionListener() {
-                        @Override
-                        public void valueChanged(ListSelectionEvent e) {
-                            listUsersValueChanged(e);
-                        }
-                    });
-                    jsp0.setViewportView(listUsers);
-                }
-                pnlUserTab.add(jsp0, CC.xy(1, 3, CC.FILL, CC.FILL));
-
-                //======== jPanel5 ========
-                {
-                    jPanel5.setLayout(new BoxLayout(jPanel5, BoxLayout.X_AXIS));
-
-                    //---- btnAddUser ----
-                    btnAddUser.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
-                    btnAddUser.setToolTipText("Neuen Mitarbeiter eintragen.");
-                    jPanel5.add(btnAddUser);
-
-                    //---- btnPassword ----
-                    btnPassword.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/password.png")));
-                    btnPassword.setToolTipText("Passwort erzeugen");
-                    btnPassword.setEnabled(false);
-                    jPanel5.add(btnPassword);
-
-                    //---- btnEditUser ----
-                    btnEditUser.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                    btnEditUser.setToolTipText("\u00c4nderungen vornehmen.");
-                    btnEditUser.setEnabled(false);
-                    jPanel5.add(btnEditUser);
-
-                    //---- btnEnableUser ----
-                    btnEnableUser.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/user_active.png")));
-                    btnEnableUser.setToolTipText("Aktiv / Inaktiv schalten");
-                    btnEnableUser.setEnabled(false);
-                    jPanel5.add(btnEnableUser);
-                }
-                pnlUserTab.add(jPanel5, CC.xy(3, 7));
-
-                //======== jsp1 ========
-                {
-
-                    //---- listMemberIn ----
-                    listMemberIn.setModel(new AbstractListModel() {
-                        String[] values = {
-
-                        };
-
-                        @Override
-                        public int getSize() {
-                            return values.length;
-                        }
-
-                        @Override
-                        public Object getElementAt(int i) {
-                            return values[i];
-                        }
-                    });
-                    listMemberIn.setDragEnabled(true);
-                    listMemberIn.setEnabled(false);
-                    listMemberIn.setFont(new Font("Arial", Font.PLAIN, 14));
-                    listMemberIn.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            listMembershipMouseClicked(e);
-                        }
-                    });
-                    jsp1.setViewportView(listMemberIn);
-                }
-                pnlUserTab.add(jsp1, CC.xy(3, 3, CC.FILL, CC.FILL));
-
-                //======== jsp2 ========
-                {
-
-                    //---- listAvailableGroups ----
-                    listAvailableGroups.setModel(new AbstractListModel() {
-                        String[] values = {
-
-                        };
-
-                        @Override
-                        public int getSize() {
-                            return values.length;
-                        }
-
-                        @Override
-                        public Object getElementAt(int i) {
-                            return values[i];
-                        }
-                    });
-                    listAvailableGroups.setDragEnabled(true);
-                    listAvailableGroups.setEnabled(false);
-                    listAvailableGroups.setFont(new Font("Arial", Font.PLAIN, 14));
-                    listAvailableGroups.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            listGroupsMouseClicked(e);
-                        }
-                    });
-                    jsp2.setViewportView(listAvailableGroups);
-                }
-                pnlUserTab.add(jsp2, CC.xy(5, 3, CC.FILL, CC.FILL));
+                cpMain.setLayout(new BoxLayout(cpMain, BoxLayout.X_AXIS));
             }
-            jtpMain.addTab("Benutzer", pnlUserTab);
-
-
-            //======== pnlGroupTab ========
-            {
-                pnlGroupTab.setLayout(new FormLayout(
-                        "default, $lcgap, default",
-                        "fill:default"));
-
-                //======== pnlLeftGrp ========
-                {
-                    pnlLeftGrp.setLayout(new FormLayout(
-                            "default",
-                            "fill:default, $lgap, fill:default"));
-
-                    //======== jScrollPane3 ========
-                    {
-
-                        //---- lstAllGroups ----
-                        lstAllGroups.setModel(new AbstractListModel() {
-                            String[] values = {
-                                    "Item 1",
-                                    "Item 2",
-                                    "Item 3",
-                                    "Item 4",
-                                    "Item 5"
-                            };
-
-                            @Override
-                            public int getSize() {
-                                return values.length;
-                            }
-
-                            @Override
-                            public Object getElementAt(int i) {
-                                return values[i];
-                            }
-                        });
-                        jScrollPane3.setViewportView(lstAllGroups);
-                    }
-                    pnlLeftGrp.add(jScrollPane3, CC.xy(1, 1));
-
-                    //======== jPanel8 ========
-                    {
-                        jPanel8.setLayout(new BoxLayout(jPanel8, BoxLayout.X_AXIS));
-
-                        //---- btnEditGroup ----
-                        btnEditGroup.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit.png")));
-                        btnEditGroup.setToolTipText("\u00c4nderungen vornehmen.");
-                        btnEditGroup.setEnabled(false);
-                        jPanel8.add(btnEditGroup);
-
-                        //---- btnAddGroup ----
-                        btnAddGroup.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
-                        btnAddGroup.setToolTipText("Neuen Mitarbeiter eintragen.");
-                        jPanel8.add(btnAddGroup);
-
-                        //---- btnDeleteGroup ----
-                        btnDeleteGroup.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_remove.png")));
-                        btnDeleteGroup.setToolTipText("Gruppe l\u00f6schen");
-                        btnDeleteGroup.setEnabled(false);
-                        jPanel8.add(btnDeleteGroup);
-                    }
-                    pnlLeftGrp.add(jPanel8, CC.xy(1, 3));
-                }
-                pnlGroupTab.add(pnlLeftGrp, CC.xy(1, 1));
-
-                //======== pnlRightGrp ========
-                {
-
-                    //======== jPanel6 ========
-                    {
-                        jPanel6.setBorder(LineBorder.createBlackLineBorder());
-
-                        //======== jScrollPane5 ========
-                        {
-
-                            //---- treeRights ----
-                            treeRights.setEnabled(false);
-                            jScrollPane5.setViewportView(treeRights);
-                        }
-
-                        //---- jLabel10 ----
-                        jLabel10.setBackground(Color.blue);
-                        jLabel10.setFont(new Font("Lucida Grande", Font.BOLD, 13));
-                        jLabel10.setForeground(Color.yellow);
-                        jLabel10.setHorizontalAlignment(SwingConstants.CENTER);
-                        jLabel10.setText("Rechte");
-                        jLabel10.setOpaque(true);
-
-                        GroupLayout jPanel6Layout = new GroupLayout(jPanel6);
-                        jPanel6.setLayout(jPanel6Layout);
-                        jPanel6Layout.setHorizontalGroup(
-                                jPanel6Layout.createParallelGroup()
-                                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGroup(jPanel6Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(jScrollPane5, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-                                                        .addComponent(jLabel10, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
-                                                .addContainerGap())
-                        );
-                        jPanel6Layout.setVerticalGroup(
-                                jPanel6Layout.createParallelGroup()
-                                        .addGroup(jPanel6Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(jLabel10)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jScrollPane5, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
-                                                .addContainerGap())
-                        );
-                    }
-
-                    //======== jPanel7 ========
-                    {
-
-                        //---- btnCancelGroups ----
-                        btnCancelGroups.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                        btnCancelGroups.setToolTipText("Abbrechen");
-                        btnCancelGroups.setEnabled(false);
-
-                        //---- btnSaveGroups ----
-                        btnSaveGroups.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                        btnSaveGroups.setToolTipText("Sichern");
-                        btnSaveGroups.setEnabled(false);
-
-                        GroupLayout jPanel7Layout = new GroupLayout(jPanel7);
-                        jPanel7.setLayout(jPanel7Layout);
-                        jPanel7Layout.setHorizontalGroup(
-                                jPanel7Layout.createParallelGroup()
-                                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                                                .addContainerGap(12, Short.MAX_VALUE)
-                                                .addComponent(btnSaveGroups)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btnCancelGroups)
-                                                .addContainerGap())
-                        );
-                        jPanel7Layout.setVerticalGroup(
-                                jPanel7Layout.createParallelGroup()
-                                        .addGroup(jPanel7Layout.createSequentialGroup()
-                                                .addGap(7, 7, 7)
-                                                .addGroup(jPanel7Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(btnSaveGroups, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(btnCancelGroups, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addContainerGap())
-                        );
-                    }
-
-                    //======== jPanel9 ========
-                    {
-                        jPanel9.setBorder(LineBorder.createBlackLineBorder());
-
-                        //---- jLabel11 ----
-                        jLabel11.setText("Gruppenbezeichnung");
-
-                        //---- jLabel12 ----
-                        jLabel12.setText("Erl\u00e4uterung");
-
-                        //---- txtGKennung ----
-                        txtGKennung.setDragEnabled(false);
-                        txtGKennung.addCaretListener(new CaretListener() {
-                            @Override
-                            public void caretUpdate(CaretEvent e) {
-                                txtGKennungCaretUpdate(e);
-                            }
-                        });
-                        txtGKennung.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                txtGKennungActionPerformed(e);
-                            }
-                        });
-
-                        //---- txtGroupDescription ----
-                        txtGroupDescription.setDragEnabled(false);
-                        txtGroupDescription.addCaretListener(new CaretListener() {
-                            @Override
-                            public void caretUpdate(CaretEvent e) {
-                                txtGroupDescriptionCaretUpdate(e);
-                            }
-                        });
-
-                        //---- lblGKennungFree ----
-                        lblGKennungFree.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
-
-                        //---- cbExamen ----
-                        cbExamen.setText("Examen");
-                        cbExamen.setToolTipText("Die Mitgliedschaft in dieser Gruppe gew\u00e4hrt Examensrechte.");
-                        cbExamen.addItemListener(new ItemListener() {
-                            @Override
-                            public void itemStateChanged(ItemEvent e) {
-                                cbExamenItemStateChanged(e);
-                            }
-                        });
-
-                        GroupLayout jPanel9Layout = new GroupLayout(jPanel9);
-                        jPanel9.setLayout(jPanel9Layout);
-                        jPanel9Layout.setHorizontalGroup(
-                                jPanel9Layout.createParallelGroup()
-                                        .addGroup(jPanel9Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGroup(jPanel9Layout.createParallelGroup()
-                                                        .addComponent(jLabel11)
-                                                        .addComponent(jLabel12))
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(jPanel9Layout.createParallelGroup()
-                                                        .addComponent(txtGroupDescription, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
-                                                        .addGroup(GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
-                                                                .addComponent(txtGKennung, GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(lblGKennungFree)
-                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(cbExamen)))
-                                                .addContainerGap())
-                        );
-                        jPanel9Layout.setVerticalGroup(
-                                jPanel9Layout.createParallelGroup()
-                                        .addGroup(jPanel9Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGroup(jPanel9Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(txtGKennung, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                                                        .addComponent(jLabel11)
-                                                        .addComponent(lblGKennungFree, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                                                        .addComponent(cbExamen, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addGap(18, 18, 18)
-                                                .addGroup(jPanel9Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(jLabel12)
-                                                        .addComponent(txtGroupDescription, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(30, 30, 30))
-                        );
-                    }
-
-                    GroupLayout pnlRightGrpLayout = new GroupLayout(pnlRightGrp);
-                    pnlRightGrp.setLayout(pnlRightGrpLayout);
-                    pnlRightGrpLayout.setHorizontalGroup(
-                            pnlRightGrpLayout.createParallelGroup()
-                                    .addGroup(pnlRightGrpLayout.createSequentialGroup()
-                                            .addContainerGap()
-                                            .addGroup(pnlRightGrpLayout.createParallelGroup()
-                                                    .addComponent(jPanel9, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addGroup(pnlRightGrpLayout.createSequentialGroup()
-                                                            .addGap(222, 222, 222)
-                                                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                    .addComponent(jPanel7, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                            .addContainerGap())
-                    );
-                    pnlRightGrpLayout.setVerticalGroup(
-                            pnlRightGrpLayout.createParallelGroup()
-                                    .addGroup(GroupLayout.Alignment.TRAILING, pnlRightGrpLayout.createSequentialGroup()
-                                            .addContainerGap()
-                                            .addComponent(jPanel9, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(jPanel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(jPanel7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    );
-                }
-                pnlGroupTab.add(pnlRightGrp, CC.xy(3, 1));
-            }
-            jtpMain.addTab("Gruppen", pnlGroupTab);
-
+            scrollPane1.setViewportView(cpMain);
         }
-        add(jtpMain);
+        add(scrollPane1);
     }// </editor-fold>//GEN-END:initComponents
 
 //    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -852,7 +477,7 @@ public class PnlUser extends CleanablePanel {
 //                lblUKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballgreen.png")));
 //                lblUKennungFree.setToolTipText(null);
 //                ukennung_status = OK;
-//                selectedUser.setUKennung(txtUKennung.getText().trim());
+//                selectedUser.setUID(txtUKennung.getText().trim());
 //            } else {
 //                lblUKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
 //                lblUKennungFree.setToolTipText("Benutzerkennung ist schon vergeben.");
@@ -945,7 +570,7 @@ public class PnlUser extends CleanablePanel {
 //    }//GEN-LAST:event_btnEditGroupActionPerformed
 //
 //    private void btnDeleteGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteGroupActionPerformed
-//        if (JOptionPane.showConfirmDialog(this, "Möchten Sie die Gruppe '" + selectedGroup.getGkennung() + "' wirklich löschen  ?", "Gruppe löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//        if (JOptionPane.showConfirmDialog(this, "Möchten Sie die Gruppe '" + selectedGroup.getID() + "' wirklich löschen  ?", "Gruppe löschen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 //            EntityManager em = OPDE.createEM();
 //
 //            try {
@@ -981,64 +606,64 @@ public class PnlUser extends CleanablePanel {
 //        saveGroup();
 //    }//GEN-LAST:event_btnSaveGroupsActionPerformed
 //
-    private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
-        if (jtpMain.getSelectedIndex() == TAB_USER) {
-            IntClassesTools.clearEntitiesFromAllInternalClasses();
-            mode = BROWSE_USER;
-//            setUserTab();
-        } else {
-            mode = BROWSE_GROUP;
-//            setGroupTab();
-        }
-    }//GEN-LAST:event_jtpMainStateChanged
-
-    private void txtGKennungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtGKennungCaretUpdate
-        if (mode == NEW_GROUP) {
-            if (txtGKennung.getText().matches("[a-zA-Z0-9]+")) {
-                EntityManager em = OPDE.createEM();
-                Query query = em.createNamedQuery("Groups.findByGkennung");
-                query.setParameter("gkennung", txtGKennung.getText());
-                if (query.getResultList().isEmpty()) {
-                    lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballgreen.png")));
-                    lblGKennungFree.setToolTipText(null);
-                    gkennung_status = OK;
-                    selectedGroup.setGkennung(txtGKennung.getText().trim());
-                } else {
-                    lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
-                    lblGKennungFree.setToolTipText("Gruppenkennung ist schon vergeben.");
-                    selectedGroup.setGkennung(null);
-                    gkennung_status = CONFLICT;
-                }
-                em.close();
-            } else {
-                lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
-                lblGKennungFree.setToolTipText("Keine Leer- oder Sonderzeichen als Gruppenkennung verwenden.");
-                selectedGroup.setGkennung(null);
-                gkennung_status = CONFLICT;
-            }
-//            setRightButtonsOnGroupTab();
-        }
-    }//GEN-LAST:event_txtGKennungCaretUpdate
-
-    private void txtGKennungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGKennungActionPerformed
-        txtGroupDescription.requestFocus();
-    }//GEN-LAST:event_txtGKennungActionPerformed
-
-    private void txtGroupDescriptionCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtGroupDescriptionCaretUpdate
-        if (selectedGroup != null) {
-            selectedGroup.setBeschreibung(txtGroupDescription.getText().trim());
-        }
-    }//GEN-LAST:event_txtGroupDescriptionCaretUpdate
-
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        IntClassesTools.clearEntitiesFromAllInternalClasses();
-    }//GEN-LAST:event_formWindowClosing
-
-    private void cbExamenItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbExamenItemStateChanged
-        if (mode != BROWSE_GROUP) {
-            selectedGroup.setExamen(cbExamen.isSelected());
-        }
-    }//GEN-LAST:event_cbExamenItemStateChanged
+//    private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
+//        if (jtpMain.getSelectedIndex() == TAB_USER) {
+//            IntClassesTools.clearEntitiesFromAllInternalClasses();
+//            mode = BROWSE_USER;
+////            setUserTab();
+//        } else {
+//            mode = BROWSE_GROUP;
+////            setGroupTab();
+//        }
+//    }//GEN-LAST:event_jtpMainStateChanged
+//
+//    private void txtGKennungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtGKennungCaretUpdate
+//        if (mode == NEW_GROUP) {
+//            if (txtGKennung.getText().matches("[a-zA-Z0-9]+")) {
+//                EntityManager em = OPDE.createEM();
+//                Query query = em.createNamedQuery("Groups.findByGkennung");
+//                query.setParameter("gkennung", txtGKennung.getText());
+//                if (query.getResultList().isEmpty()) {
+//                    lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballgreen.png")));
+//                    lblGKennungFree.setToolTipText(null);
+//                    gkennung_status = OK;
+//                    selectedGroup.setGkennung(txtGKennung.getText().trim());
+//                } else {
+//                    lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
+//                    lblGKennungFree.setToolTipText("Gruppenkennung ist schon vergeben.");
+//                    selectedGroup.setGkennung(null);
+//                    gkennung_status = CONFLICT;
+//                }
+//                em.close();
+//            } else {
+//                lblGKennungFree.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/ballred.png")));
+//                lblGKennungFree.setToolTipText("Keine Leer- oder Sonderzeichen als Gruppenkennung verwenden.");
+//                selectedGroup.setGkennung(null);
+//                gkennung_status = CONFLICT;
+//            }
+////            setRightButtonsOnGroupTab();
+//        }
+//    }//GEN-LAST:event_txtGKennungCaretUpdate
+//
+//    private void txtGKennungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGKennungActionPerformed
+//        txtGroupDescription.requestFocus();
+//    }//GEN-LAST:event_txtGKennungActionPerformed
+//
+//    private void txtGroupDescriptionCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtGroupDescriptionCaretUpdate
+//        if (selectedGroup != null) {
+//            selectedGroup.setBeschreibung(txtGroupDescription.getText().trim());
+//        }
+//    }//GEN-LAST:event_txtGroupDescriptionCaretUpdate
+//
+//    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+//        IntClassesTools.clearEntitiesFromAllInternalClasses();
+//    }//GEN-LAST:event_formWindowClosing
+//
+//    private void cbExamenItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbExamenItemStateChanged
+//        if (mode != BROWSE_GROUP) {
+//            selectedGroup.setQualified(cbExamen.isSelected());
+//        }
+//    }//GEN-LAST:event_cbExamenItemStateChanged
 
 //    private void generatePassword() {
 //        Random generator = new Random(System.currentTimeMillis());
@@ -1072,8 +697,8 @@ public class PnlUser extends CleanablePanel {
                     + "</body>";
         }
 
-        html = SYSTools.replace(html, "<opde-user-fullname/>", selectedUser.getNameUndVorname());
-        html = SYSTools.replace(html, "<opde-user-userid/>", selectedUser.getUKennung());
+        html = SYSTools.replace(html, "<opde-user-fullname/>", selectedUser.getFullname());
+        html = SYSTools.replace(html, "<opde-user-userid/>", selectedUser.getUID());
         html = SYSTools.replace(html, "<opde-user-pw/>", password);
         html = SYSTools.htmlUmlautConversion(html);
 
@@ -1110,7 +735,7 @@ public class PnlUser extends CleanablePanel {
 //            } else {
 //                em.persist(selectedGroup);
 //            }
-//            if (!selectedGroup.getGkennung().equalsIgnoreCase("admin")) { // Bei Admin kann man den Beaum nicht ändern.
+//            if (!selectedGroup.getID().equalsIgnoreCase("admin")) { // Bei Admin kann man den Beaum nicht ändern.
 //                IntClassesTools.saveTree((DefaultMutableTreeNode) treeRights.getModel().getRoot(), sm);
 //            }
 //            em.getTransaction().commit();
@@ -1132,7 +757,7 @@ public class PnlUser extends CleanablePanel {
 //
 //        try {
 //            em.getTransaction().begin();
-//            if (selectedUser.getUKennung() == null) {
+//            if (selectedUser.getUID() == null) {
 //                generatePassword();
 //                em.persist(selectedUser);
 //            } else {
@@ -1191,23 +816,60 @@ public class PnlUser extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         /***
-         *      _   _      ____ _                    _
-         *     | |_| |__  / ___| | ___  ___  ___  __| |
-         *     | __| '_ \| |   | |/ _ \/ __|/ _ \/ _` |
-         *     | |_| |_) | |___| | (_) \__ \  __/ (_| |
-         *      \__|_.__/ \____|_|\___/|___/\___|\__,_|
+         *      _   _      ___  _     _ _   _
+         *     | |_| |__  / _ \| | __| | | | |___  ___ _ __ ___
+         *     | __| '_ \| | | | |/ _` | | | / __|/ _ \ '__/ __|
+         *     | |_| |_) | |_| | | (_| | |_| \__ \  __/ |  \__ \
+         *      \__|_.__/ \___/|_|\__,_|\___/|___/\___|_|  |___/
          *
          */
-        tbRefactor = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showclosed"));
-        tbRefactor.addItemListener(new ItemListener() {
+        tbOldUsers = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showclosed"));
+        tbOldUsers.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase) return;
-//                buildPanel();
+                buildPanel();
             }
         });
-        tbRefactor.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbRefactor);
+        tbOldUsers.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbOldUsers);
+
+
+        /***
+         *      _   _    ____  _                   _   _                      ______
+         *     | |_| |__/ ___|| |__   _____      _| | | |___  ___ _ __ ___   / / ___|_ __ ___  _   _ _ __  ___
+         *     | __| '_ \___ \| '_ \ / _ \ \ /\ / / | | / __|/ _ \ '__/ __| / / |  _| '__/ _ \| | | | '_ \/ __|
+         *     | |_| |_) |__) | | | | (_) \ V  V /| |_| \__ \  __/ |  \__ \/ /| |_| | | | (_) | |_| | |_) \__ \
+         *      \__|_.__/____/|_| |_|\___/ \_/\_/  \___/|___/\___|_|  |___/_/  \____|_|  \___/ \__,_| .__/|___/
+         *                                                                                          |_|
+         */
+        tbShowUsers = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showusers"));
+        tbShowUsers.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
+                buildPanel();
+            }
+        });
+        tbShowUsers.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbShowUsers);
+
+        tbShowGroups = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showgroups"));
+        tbShowGroups.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
+                buildPanel();
+            }
+        });
+        tbShowGroups.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbShowGroups);
+
+        bg1 = new ButtonGroup();
+        bg1.add(tbShowGroups);
+        bg1.add(tbShowUsers);
+
+        tbShowUsers.setSelected(true);
 
 
         return list;
@@ -1219,14 +881,13 @@ public class PnlUser extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         /***
-         *      _     _            _       _     _
-         *     | |__ | |_ _ __    / \   __| | __| |
-         *     | '_ \| __| '_ \  / _ \ / _` |/ _` |
-         *     | |_) | |_| | | |/ ___ \ (_| | (_| |
-         *     |____/ \__|_| |_/_/   \_\__,_|\__,_|
+         *         _       _     _ _   _
+         *        / \   __| | __| | | | |___  ___ _ __
+         *       / _ \ / _` |/ _` | | | / __|/ _ \ '__|
+         *      / ___ \ (_| | (_| | |_| \__ \  __/ |
+         *     /_/   \_\__,_|\__,_|\___/|___/\___|_|
          *
          */
-
         final JideButton btnAddUser = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnAddUser"), SYSConst.icon22addUser, null);
         btnAddUser.addActionListener(new ActionListener() {
             @Override
@@ -1255,6 +916,14 @@ public class PnlUser extends CleanablePanel {
         });
         list.add(btnAddUser);
 
+        /***
+         *         _       _     _  ____
+         *        / \   __| | __| |/ ___|_ __ ___  _   _ _ __
+         *       / _ \ / _` |/ _` | |  _| '__/ _ \| | | | '_ \
+         *      / ___ \ (_| | (_| | |_| | | | (_) | |_| | |_) |
+         *     /_/   \_\__,_|\__,_|\____|_|  \___/ \__,_| .__/
+         *                                              |_|
+         */
         final JideButton btnAddGroup = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnAddGroup"), SYSConst.icon22addGroup, null);
         btnAddGroup.addActionListener(new ActionListener() {
             @Override
@@ -1283,49 +952,700 @@ public class PnlUser extends CleanablePanel {
         });
         list.add(btnAddGroup);
 
+        /***
+         *      _     _         ____       _       _
+         *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
+         *     | '_ \| __| '_ \| |_) | '__| | '_ \| __|
+         *     | |_) | |_| | | |  __/| |  | | | | | |_
+         *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
+         *
+         */
+        JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+            }
+        });
+        list.add(btnPrint);
+
 
         return list;
     }
 
+    private CollapsiblePane createCP4(final Users user) {
+        final CollapsiblePane cp = new CollapsiblePane();
+
+        /***
+         *      _   _ _____    _    ____  _____ ____
+         *     | | | | ____|  / \  |  _ \| ____|  _ \
+         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
+         *     |  _  | |___ / ___ \| |_| | |___|  _ <
+         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
+         *
+         */
+
+        JPanel titlePanelleft = new JPanel();
+        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
+
+
+        /***
+         *      _     _       _    _           _   _                _   _                _
+         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
+         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
+         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
+        JideButton btnUser = GUITools.createHyperlinkButton("<html><font size=+1>" +
+                user.toString() +
+                (UsersTools.isQualified(user) ?
+                        ", Examen" : "") +
+                "</font></html>", null, null);
+
+        btnUser.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnUser.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    cp.setCollapsed(!cp.isCollapsed());
+                } catch (PropertyVetoException e) {
+                    OPDE.error(e);
+                }
+            }
+        });
+        btnUser.setForeground(user.isActive() ? Color.black : Color.gray);
+        titlePanelleft.add(btnUser);
+
+
+        JPanel titlePanelright = new JPanel();
+        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+
+
+        /***
+         *       ____ _                            ______        __
+         *      / ___| |__   __ _ _ __   __ _  ___|  _ \ \      / /
+         *     | |   | '_ \ / _` | '_ \ / _` |/ _ \ |_) \ \ /\ / /
+         *     | |___| | | | (_| | | | | (_| |  __/  __/ \ V  V /
+         *      \____|_| |_|\__,_|_| |_|\__, |\___|_|     \_/\_/
+         *                              |___/
+         */
+        final JButton btnChangePW = new JButton(SYSConst.icon22password);
+        btnChangePW.setPressedIcon(SYSConst.icon22passwordPressed);
+        btnChangePW.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnChangePW.setContentAreaFilled(false);
+        btnChangePW.setBorder(null);
+        btnChangePW.setToolTipText(OPDE.lang.getString(internalClassID + ".btnChangePW.tooltip"));
+        btnChangePW.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                new DlgChangePW(user, new Closure() {
+                    @Override
+                    public void execute(Object answer) {
+                        if (answer != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Users myUser = em.merge(user);
+                                em.lock(myUser, LockModeType.OPTIMISTIC);
+                                myUser.setMd5pw(SYSTools.hashword(answer.toString()));
+                                em.getTransaction().commit();
+
+                                lstUsers.remove(user);
+                                lstUsers.add(myUser);
+                                Collections.sort(lstUsers);
+                                CollapsiblePane cp = createCP4(myUser);
+                                boolean wasCollapsed = userMap.get(user).isCollapsed();
+                                userMap.remove(user);
+                                userMap.put(myUser, cp);
+                                cp.setCollapsed(wasCollapsed);
+                                buildPanel();
+
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        titlePanelright.add(btnChangePW);
+
+        /***
+         *      _     _            _        _   _           ___                  _   _
+         *     | |__ | |_ _ __    / \   ___| |_(_)_   _____|_ _|_ __   __ _  ___| |_(_)_   _____
+         *     | '_ \| __| '_ \  / _ \ / __| __| \ \ / / _ \| || '_ \ / _` |/ __| __| \ \ / / _ \
+         *     | |_) | |_| | | |/ ___ \ (__| |_| |\ V /  __/| || | | | (_| | (__| |_| |\ V /  __/
+         *     |_.__/ \__|_| |_/_/   \_\___|\__|_| \_/ \___|___|_| |_|\__,_|\___|\__|_| \_/ \___|
+         *
+         */
+        final JButton btnActiveInactive = new JButton(user.isActive() ? SYSConst.icon22stop : SYSConst.icon22play);
+        btnActiveInactive.setPressedIcon(user.isActive() ? SYSConst.icon22stopPressed : SYSConst.icon22playPressed);
+        btnActiveInactive.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnActiveInactive.setContentAreaFilled(false);
+        btnActiveInactive.setBorder(null);
+        btnActiveInactive.setToolTipText(OPDE.lang.getString(internalClassID + (user.isActive() ? ".btnActiveInactive.stop" : ".btnActiveInactive.play")));
+        btnActiveInactive.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Users myUser = em.merge(user);
+                    em.lock(myUser, LockModeType.OPTIMISTIC);
+
+                    myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
+                    em.getTransaction().commit();
+
+                    lstUsers.remove(user);
+                    lstUsers.add(myUser);
+                    Collections.sort(lstUsers);
+                    CollapsiblePane cp = createCP4(myUser);
+                    boolean wasCollapsed = userMap.get(user).isCollapsed();
+                    userMap.remove(user);
+                    userMap.put(myUser, cp);
+                    cp.setCollapsed(wasCollapsed);
+
+                    buildPanel();
+                } catch (OptimisticLockException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
+            }
+
+
+        });
+        titlePanelright.add(btnActiveInactive);
+
+        titlePanelleft.setOpaque(false);
+        titlePanelright.setOpaque(false);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setOpaque(false);
+
+        titlePanel.setLayout(new GridBagLayout());
+        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+
+        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 5), 0, 0));
+
+        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+        cp.setTitleLabelComponent(titlePanel);
+        cp.setSlidingDirection(SwingConstants.SOUTH);
+
+        try {
+            cp.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+
+        /***
+         *       ___ ___  _  _ _____ ___ _  _ _____
+         *      / __/ _ \| \| |_   _| __| \| |_   _|
+         *     | (_| (_) | .` | | | | _|| .` | | |
+         *      \___\___/|_|\_| |_| |___|_|\_| |_|
+         *
+         */
+
+        cp.addCollapsiblePaneListener(new
+
+                CollapsiblePaneAdapter() {
+                    @Override
+                    public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                        cp.setContentPane(createContentPanel4(user));
+                        cp.setOpaque(false);
+                    }
+                }
+
+        );
+        cp.setBackground(UsersTools.getBG1(user));
+        cp.setCollapsible(user.isActive());
+
+        cp.setHorizontalAlignment(SwingConstants.LEADING);
+        cp.setOpaque(false);
+
+        return cp;
+    }
+
+    private JPanel createContentPanel4(final Users user) {
+
+//        CollapsiblePane cpContent = new CollapsiblePane();
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new VerticalLayout());
+//        contentPanel.add(cpContent);
+
+        for (final Groups group : lstGroups) {
+            JCheckBox cbGroup = new JCheckBox(group.toString());
+            cbGroup.setFont(SYSConst.ARIAL14);
+            cbGroup.setSelected(user.getGroups().contains(group));
+            cbGroup.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent itemEvent) {
+
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Users myUser = em.merge(user);
+                        em.lock(myUser, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        Groups myGroup = em.merge(group);
+                        em.lock(myGroup, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                            myUser.getGroups().add(myGroup);
+                            myGroup.getMembers().add(myUser);
+                        } else {
+                            myUser.getGroups().remove(myGroup);
+                            myGroup.getMembers().remove(myUser);
+                        }
+
+                        em.getTransaction().commit();
+                        lstUsers.remove(user);
+                        lstUsers.add(myUser);
+                        lstGroups.remove(group);
+                        lstGroups.add(myGroup);
+                        Collections.sort(lstGroups);
+
+                        userMap.remove(user);
+                        CollapsiblePane cp = createCP4(myUser);
+                        cp.setCollapsed(false);
+                        userMap.put(myUser, cp);
+                        groupMap.remove(group);
+                        groupMap.put(myGroup, createCP4(myGroup));
+                        buildPanel();
+                    } catch (OptimisticLockException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                }
+            });
+
+            contentPanel.add(cbGroup);
+
+        }
+        return contentPanel;
+    }
+
+    private CollapsiblePane createCP4(final Groups group) {
+        final CollapsiblePane cp = new CollapsiblePane();
+
+        /***
+         *      _   _ _____    _    ____  _____ ____
+         *     | | | | ____|  / \  |  _ \| ____|  _ \
+         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
+         *     |  _  | |___ / ___ \| |_| | |___|  _ <
+         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
+         *
+         */
+
+        JPanel titlePanelleft = new JPanel();
+        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
+
+
+        /***
+         *      _     _       _    _           _   _                _   _                _
+         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
+         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
+         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
+        JideButton btnUser = GUITools.createHyperlinkButton("<html><font size=+1>" +
+                group.toString() +
+                (group.isQualified() ?
+                        ", " + OPDE.lang.getString(internalClassID + ".qualifiedGroup") : "") +
+                "</font></html>", null, null);
+
+        btnUser.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnUser.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    cp.setCollapsed(!cp.isCollapsed());
+                } catch (PropertyVetoException e) {
+                    OPDE.error(e);
+                }
+            }
+        });
+        titlePanelleft.add(btnUser);
+
+
+        JPanel titlePanelright = new JPanel();
+        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+
+
+//        final JButton btnChangePW = new JButton(SYSConst.icon22password);
+//        btnChangePW.setPressedIcon(SYSConst.icon22passwordPressed);
+//        btnChangePW.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnChangePW.setContentAreaFilled(false);
+//        btnChangePW.setBorder(null);
+//        btnChangePW.setToolTipText(OPDE.lang.getString(internalClassID + ".btnChangePW.tooltip"));
+//        btnChangePW.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                new DlgChangePW(user, new Closure() {
+//                    @Override
+//                    public void execute(Object answer) {
+//                        if (answer != null) {
+//                            EntityManager em = OPDE.createEM();
+//                            try {
+//                                em.getTransaction().begin();
+//                                Users myUser = em.merge(user);
+//                                em.lock(myUser, LockModeType.OPTIMISTIC);
+//                                myUser.setMd5pw(SYSTools.hashword(answer.toString()));
+//                                em.getTransaction().commit();
+//
+//                                lstUsers.remove(user);
+//                                lstUsers.add(myUser);
+//                                Collections.sort(lstUsers);
+//                                CollapsiblePane cp = createCP4(myUser);
+//                                boolean wasCollapsed = userMap.get(user).isCollapsed();
+//                                userMap.remove(user);
+//                                userMap.put(myUser, cp);
+//                                cp.setCollapsed(wasCollapsed);
+//                                buildPanel();
+//
+//                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
+//
+//                            } catch (OptimisticLockException ole) {
+//                                if (em.getTransaction().isActive()) {
+//                                    em.getTransaction().rollback();
+//                                }
+//                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+//                                    OPDE.getMainframe().emptyFrame();
+//                                    OPDE.getMainframe().afterLogin();
+//                                }
+//                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//                            } catch (Exception e) {
+//                                if (em.getTransaction().isActive()) {
+//                                    em.getTransaction().rollback();
+//                                }
+//                                OPDE.fatal(e);
+//                            } finally {
+//                                em.close();
+//                            }
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//        titlePanelright.add(btnChangePW);
+
+
+        titlePanelleft.setOpaque(false);
+        titlePanelright.setOpaque(false);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setOpaque(false);
+
+        titlePanel.setLayout(new GridBagLayout());
+        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+
+        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 5), 0, 0));
+
+        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+        cp.setTitleLabelComponent(titlePanel);
+        cp.setSlidingDirection(SwingConstants.SOUTH);
+
+        try {
+            cp.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+
+        /***
+         *       ___ ___  _  _ _____ ___ _  _ _____
+         *      / __/ _ \| \| |_   _| __| \| |_   _|
+         *     | (_| (_) | .` | | | | _|| .` | | |
+         *      \___\___/|_|\_| |_| |___|_|\_| |_|
+         *
+         */
+
+        cp.addCollapsiblePaneListener(new
+
+                CollapsiblePaneAdapter() {
+                    @Override
+                    public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                        cp.setContentPane(createContentPanel4(group));
+                        cp.setOpaque(false);
+                    }
+                }
+
+        );
+
+        cp.setHorizontalAlignment(SwingConstants.LEADING);
+        cp.setOpaque(false);
+
+        return cp;
+    }
+
+
+    private JPanel createContentPanel4(final Groups group) {
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new VerticalLayout());
+
+        if (!group.isEveryone()) { // everyone does not need a membership.
+            CollapsiblePane cpMember = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".members"));
+            JPanel contentMember = new JPanel();
+            contentMember.setLayout(new VerticalLayout());
+
+            for (final Users user : lstUsers) {
+                if (user.isActive()) {
+                    JCheckBox cbUser = new JCheckBox(user.toString());
+                    cbUser.setFont(SYSConst.ARIAL14);
+                    cbUser.setSelected(group.getMembers().contains(user));
+                    cbUser.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent itemEvent) {
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Users myUser = em.merge(user);
+                                em.lock(myUser, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                Groups myGroup = em.merge(group);
+                                em.lock(myGroup, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                                    myUser.getGroups().add(myGroup);
+                                    myGroup.getMembers().add(myUser);
+                                } else {
+                                    myUser.getGroups().remove(myGroup);
+                                    myGroup.getMembers().remove(myUser);
+                                }
+
+                                em.getTransaction().commit();
+                                lstUsers.remove(user);
+                                lstUsers.add(myUser);
+                                lstGroups.remove(group);
+                                lstGroups.add(myGroup);
+                                Collections.sort(lstUsers);
+                                userMap.remove(user);
+                                userMap.put(myUser, createCP4(myUser));
+
+                                groupMap.remove(group);
+                                CollapsiblePane cp = createCP4(myGroup);
+                                cp.setCollapsed(false);
+                                groupMap.put(myGroup, cp);
+
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+                    contentMember.add(cbUser);
+                }
+                cpMember.setContentPane(contentMember);
+            }
+
+            try {
+                cpMember.setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            contentPanel.add(cpMember);
+            cpMember.setFont(SYSConst.ARIAL14BOLD);
+        }
+
+        if (!group.isAdmin()) { // admin does not need further acls. he is in godmode anyways
+            contentPanel.add(createClassesPanel4(group));
+        }
+
+        return contentPanel;
+    }
+
+
+    private JPanel createClassesPanel4(final Groups group) {
+
+        CollapsiblePane cpClasses = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".modules"));
+        JPanel contentClasses = new JPanel();
+        contentClasses.setLayout(new VerticalLayout());
+
+//        JPanel classPanel = new JPanel();
+//        classPanel.setLayout(new VerticalLayout());
+
+        for (final InternalClass ic : OPDE.getAppInfo().getInternalClasses().values()) {
+
+
+            JPanel aclPanel = new JPanel();
+            aclPanel.setLayout(new VerticalLayout());
+
+
+            for (final InternalClassACL acl : ic.getAcls()) {
+                JCheckBox cbACL = new JCheckBox(InternalClassACL.strACLS[acl.getAcl()]);
+                cbACL.setFont(SYSConst.ARIAL14);
+//                cbACL.setSelected(group.getMembers().contains(user));
+//                cbACL.addItemListener(new ItemListener() {
+//                    @Override
+//                    public void itemStateChanged(ItemEvent itemEvent) {
+//
+//                        EntityManager em = OPDE.createEM();
+//                        try {
+//                            em.getTransaction().begin();
+//                            Users myUser = em.merge(user);
+//                            em.lock(myUser, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//                            Groups myGroup = em.merge(group);
+//                            em.lock(myGroup, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//                            if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+//                                myUser.getGroups().add(myGroup);
+//                                myGroup.getMembers().add(myUser);
+//                            } else {
+//                                myUser.getGroups().remove(myGroup);
+//                                myGroup.getMembers().remove(myUser);
+//                            }
+//
+//                            em.getTransaction().commit();
+//                            lstUsers.remove(user);
+//                            lstUsers.add(myUser);
+//                            lstGroups.remove(group);
+//                            lstGroups.add(myGroup);
+//                            Collections.sort(lstUsers);
+//                            userMap.remove(user);
+//                            userMap.put(myUser, createCP4(myUser));
+//
+//                            groupMap.remove(group);
+//                            CollapsiblePane cp = createCP4(myGroup);
+//                            cp.setCollapsed(false);
+//                            groupMap.put(myGroup, cp);
+//
+//                            buildPanel();
+//                        } catch (OptimisticLockException ole) {
+//                            if (em.getTransaction().isActive()) {
+//                                em.getTransaction().rollback();
+//                            }
+//                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+//                                OPDE.getMainframe().emptyFrame();
+//                                OPDE.getMainframe().afterLogin();
+//                            }
+//                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//                        } catch (Exception e) {
+//                            if (em.getTransaction().isActive()) {
+//                                em.getTransaction().rollback();
+//                            }
+//                            OPDE.fatal(e);
+//                        } finally {
+//                            em.close();
+//                        }
+//                    }
+//                });
+
+                aclPanel.add(cbACL);
+            }
+            CollapsiblePane cpClass = new CollapsiblePane(ic.getShortDescription() + " / " + ic.getLongDescription());
+            cpClass.setStyle(CollapsiblePane.TREE_STYLE);
+            cpClass.setContentPane(aclPanel);
+
+            contentClasses.add(cpClass);
+            try {
+                cpClass.setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
+        cpClasses.setContentPane(contentClasses);
+        try {
+            cpClasses.setCollapsed(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        cpClasses.setFont(SYSConst.ARIAL14BOLD);
+
+        return cpClasses;
+    }
+
+
+    private void buildPanel() {
+        cpMain.removeAll();
+        cpMain.setLayout(new JideBoxLayout(cpMain, JideBoxLayout.Y_AXIS));
+        Collections.sort(lstUsers);
+        Collections.sort(lstGroups);
+        if (tbShowUsers.isSelected()) {
+            for (Users user : lstUsers) {
+                if (tbOldUsers.isSelected() || user.isActive()) {
+                    CollapsiblePane cp = userMap.get(user);
+                    cpMain.add(cp);
+                }
+            }
+        } else {
+            for (Groups group : lstGroups) {
+                CollapsiblePane cp = groupMap.get(group);
+                cpMain.add(cp);
+            }
+        }
+        cpMain.addExpansion();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JTabbedPane jtpMain;
-    private JPanel pnlUserTab;
-    private JLabel label3;
-    private JLabel label1;
-    private JLabel label2;
-    private JScrollPane jsp0;
-    private JList listUsers;
-    private JPanel jPanel5;
-    private JButton btnAddUser;
-    private JButton btnPassword;
-    private JButton btnEditUser;
-    private JToggleButton btnEnableUser;
-    private JScrollPane jsp1;
-    private JList listMemberIn;
-    private JScrollPane jsp2;
-    private JList listAvailableGroups;
-    private JPanel pnlGroupTab;
-    private JPanel pnlLeftGrp;
-    private JScrollPane jScrollPane3;
-    private JList lstAllGroups;
-    private JPanel jPanel8;
-    private JButton btnEditGroup;
-    private JButton btnAddGroup;
-    private JButton btnDeleteGroup;
-    private JPanel pnlRightGrp;
-    private JPanel jPanel6;
-    private JScrollPane jScrollPane5;
-    private JTree treeRights;
-    private JLabel jLabel10;
-    private JPanel jPanel7;
-    private JButton btnCancelGroups;
-    private JButton btnSaveGroups;
-    private JPanel jPanel9;
-    private JLabel jLabel11;
-    private JLabel jLabel12;
-    private JTextField txtGKennung;
-    private JTextField txtGroupDescription;
-    private JLabel lblGKennungFree;
-    private JCheckBox cbExamen;
+    private JScrollPane scrollPane1;
+    private CollapsiblePanes cpMain;
     // End of variables declaration//GEN-END:variables
 }

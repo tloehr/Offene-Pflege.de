@@ -5,7 +5,7 @@
 package entity.process;
 
 import entity.BWerte;
-import entity.Users;
+import entity.system.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;

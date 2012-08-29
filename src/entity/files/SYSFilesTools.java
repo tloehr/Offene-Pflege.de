@@ -387,7 +387,7 @@ public class SYSFilesTools {
     public static String getDatumUndUser(SYSFiles sysFiles) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getNameUndVorname();
+        result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getFullname();
 
         return SYSConst.html_fontface + result + "</font>";
     }
@@ -416,7 +416,7 @@ public class SYSFilesTools {
             text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
                     + "<hr/>" +
                     "<div id=\"fonttext\">" +
-                    "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
+                    "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
                     + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuild() + "</div></body></html>";
 

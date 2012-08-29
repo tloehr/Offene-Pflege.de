@@ -40,6 +40,7 @@ import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.*;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -389,7 +390,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDosis()) +
                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                 BHPTools.getScheduleText(bhp, ", ", "") +
-                (bhp.getUser() != null ? ", <i>" + bhp.getUser().getUKennung() + "</i>" : "") +
+                (bhp.getUser() != null ? ", <i>" + bhp.getUser().getUID() + "</i>" : "") +
                 "</font></html>", BHPTools.getIcon(bhp), null);
 
 //        title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());

@@ -37,6 +37,7 @@ import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import entity.prescription.*;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.tools.DlgYesNo;
 import op.threads.DisplayMessage;
 import op.tools.*;

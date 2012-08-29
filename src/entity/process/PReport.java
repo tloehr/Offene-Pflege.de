@@ -4,7 +4,7 @@
  */
 package entity.process;
 
-import entity.Users;
+import entity.system.Users;
 import entity.info.Resident;
 import op.OPDE;
 

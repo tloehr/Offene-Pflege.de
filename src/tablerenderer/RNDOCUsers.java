@@ -5,13 +5,13 @@
 
 package tablerenderer;
 
-import entity.Users;
+import entity.system.Users;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-import op.OPDE;
+
 import tablemodels.TMUser;
 import op.tools.SYSConst;
 

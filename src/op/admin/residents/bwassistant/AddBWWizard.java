@@ -9,6 +9,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
+import entity.system.Users;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
@@ -417,7 +418,7 @@ public class AddBWWizard {
             result += "<ul>";
             result += "<li>" + ResidentTools.getFullName(bewohner) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.bv") + ": " + bewohner.getBv1().getNameUndVorname() + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.bv") + ": " + bewohner.getBv1().getFullname() + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + ArztTools.getFullName(bewohner.getHausarzt()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.lg") + ": " + BetreuerTools.getFullName(bewohner.getBetreuer1()) + "</li>";
 

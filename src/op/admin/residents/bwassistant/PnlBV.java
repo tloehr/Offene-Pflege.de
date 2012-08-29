@@ -6,8 +6,8 @@ package op.admin.residents.bwassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Users;
-import entity.UsersTools;
+import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

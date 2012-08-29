@@ -25,7 +25,7 @@
  */
 package entity.info;
 
-import entity.Users;
+import entity.system.Users;
 import entity.files.SYSINF2FILE;
 import entity.process.QProcess;
 import entity.process.QProcessElement;

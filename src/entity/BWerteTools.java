@@ -66,7 +66,7 @@ public class BWerteTools {
                 color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
             }
         }
-        String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getNameUndVorname();
+        String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getFullname();
         if (showids) {
             result += "<br/><i>(" + bwert.getBwid() + ")</i>";
         }
@@ -144,13 +144,13 @@ public class BWerteTools {
 //        }
         DateFormat df = DateFormat.getDateTimeInstance();
         if (bwert.isDeleted()) {
-            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getMdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getNameUndVorname() + "</i><br/>";
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getMdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getFullname() + "</i><br/>";
         }
         if (bwert.isReplacement() && !bwert.isReplaced()) {
             result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCdate()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + bwert.getReplacementFor().getBwid() + "</i><br/>";
         }
         if (bwert.isReplaced()) {
-            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getNameUndVorname();
+            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getFullname();
             result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + bwert.getReplacedBy().getBwid() + "</i><br/>";
         }
 

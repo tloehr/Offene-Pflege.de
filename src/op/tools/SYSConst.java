@@ -27,7 +27,6 @@
 package op.tools;
 
 import op.OPDE;
-import org.apache.commons.collections.bag.SynchronizedSortedBag;
 
 import javax.swing.*;
 import java.awt.*;
@@ -154,7 +153,7 @@ public class SYSConst {
 
     public static final String html_report_footer = "<hr/>" +
             html_fontface +
-            "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getNameUndVorname()) : "")
+            "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
             + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
             + "<br/>http://www.offene-pflege.de</font>\n";
 
@@ -341,4 +340,6 @@ public class SYSConst {
     public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
     public static final Icon icon22addUser = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_user.png"));
     public static final Icon icon22addGroup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_group.png"));
+    public static final Icon icon22password = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/password.png"));
+    public static final Icon icon22passwordPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/password_pressed.png"));
 }

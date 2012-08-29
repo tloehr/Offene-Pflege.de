@@ -4,7 +4,7 @@
  */
 package op.users;
 
-import entity.Users;
+import entity.system.Users;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -17,6 +17,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
+
 import op.OPDE;
 
 /**
@@ -117,7 +118,7 @@ public class TxHdlrUsers extends TransferHandler {
 
         for (int i = 0; i < values.length; i++) {
             Users user = (Users) values[i];
-            buff.append(user.getUKennung());
+            buff.append(user.getUID());
             if (i != values.length - 1) {
                 buff.append("\n");
             }

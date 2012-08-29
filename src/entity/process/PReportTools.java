@@ -4,7 +4,6 @@
  */
 package entity.process;
 
-import entity.EntityTools;
 import op.process.PnlProcess;
 
 import java.text.DateFormat;
@@ -44,7 +43,7 @@ public class PReportTools {
     public static String getPITAsHTML(PReport bericht) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
-        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getNameUndVorname();
+        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
         return html;
     }
 

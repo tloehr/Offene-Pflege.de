@@ -6,6 +6,7 @@
 package entity;
 
 import entity.reports.NReport;
+import entity.system.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -107,7 +108,7 @@ public class PB2User implements Serializable, Comparable<PB2User> {
 
     @Override
     public int compareTo(PB2User o) {
-        return getUser().getNameUndVorname().compareTo(o.getUser().getNameUndVorname());
+        return getUser().getFullname().compareTo(o.getUser().getFullname());
     }
 
 

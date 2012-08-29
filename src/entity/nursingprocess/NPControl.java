@@ -5,7 +5,7 @@
 
 package entity.nursingprocess;
 
-import entity.Users;
+import entity.system.Users;
 import op.OPDE;
 
 import javax.persistence.*;

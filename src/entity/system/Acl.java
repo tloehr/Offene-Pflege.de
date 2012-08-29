@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -17,11 +17,10 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import entity.system.IntClasses;
 import op.OPDE;
 
 /**
- *
+ * This entity is assigned to IntClasses in order to store rights for a specific user group.
  * @author tloehr
  */
 @Entity
@@ -38,7 +37,6 @@ public class Acl implements Serializable, Comparable<Acl> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ACLID")
     private Long aclid;
     @Basic(optional = false)

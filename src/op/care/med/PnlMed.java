@@ -38,6 +38,7 @@ import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.care.med.vorrat.DlgBestand;
+import op.system.InternalClassACL;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;

@@ -39,6 +39,7 @@ import entity.info.ResidentTools;
 import entity.nursingprocess.*;
 import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -357,7 +358,7 @@ public class PnlDFN extends NursingRecordsPanel {
         JideButton btnDFN = GUITools.createHyperlinkButton("<html><font size=+1>" +
                 SYSTools.left(dfn.getIntervention().getBezeichnung(), MAX_TEXT_LENGTH) +
                 DFNTools.getScheduleText(dfn, " [", "]") +
-                ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <I>" + dfn.getUser().getUKennung() + "</I>" : "") +
+                ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <I>" + dfn.getUser().getUID() + "</I>" : "") +
                 "</font></html>", DFNTools.getIcon(dfn), null);
 
         btnDFN.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -4,12 +4,10 @@
  */
 package entity.system;
 
-import entity.Acl;
-import entity.Groups;
 import op.OPDE;
+import op.system.InternalClass;
+import op.system.InternalClassACL;
 import op.tools.CheckTreeSelectionModel;
-import op.tools.InternalClass;
-import op.tools.InternalClassACL;
 
 import javax.persistence.EntityManager;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,6 +29,12 @@ public class IntClassesTools {
      * IntClasses) enthält, welche Rechte für die entsprechende Gruppe gesetzt
      * wurden. So werden die vorselektierten Pfade gesetzt.
      * Der Baum hat die Tiefe 3. Die Klassen der einzelnen Ebenen sind festgelegt: (String GKennung, InternalClass, InternalClassACL)
+     *
+     * This methode creates a tree structure which contains all classes described in /appinfo.xml.
+     * A common "primary key" between the internal XML structure and the actual JPA entity entity.system.IntClasses is a string "name" tag in XML, classname in the entity and
+     * internalClassID in many actual java classes used in OPDE.
+     *
+     *
      *
      * @param Gruppe, für die die Klassen in Baumform benötigt werden.
      * @return eine Liste mit zwei Einträgen (MutableTreeNode root, TreePath[] selection).
@@ -75,7 +79,7 @@ public class IntClassesTools {
                     classnode.add(node);
 
                     // Admin hat IMMER alle Rechte.
-                    if (group.getGkennung().equalsIgnoreCase("admin")) {
+                    if (group.getID().equalsIgnoreCase("admin")) {
                         selection.add(new TreePath(new Object[]{root, classnode, node}));
                     } else {
                         // Ist bei der übergebenen Gruppe dieses Recht auch dabei ?
@@ -109,7 +113,7 @@ public class IntClassesTools {
     public static void saveTree(DefaultMutableTreeNode node, CheckTreeSelectionModel selmodel) {
         if (node.getUserObject() instanceof Groups) { // Root
             boolean rootWasSelected = selmodel.isPathSelected(new TreePath(node.getPath()));
-            OPDE.debug("saveTree: speichere Gruppe: " + ((Groups) node.getUserObject()).getGkennung());
+            OPDE.debug("saveTree: speichere Gruppe: " + ((Groups) node.getUserObject()).getID());
             OPDE.debug("saveTree: Gruppe war " + (rootWasSelected ? "" : "NICHT") + " ausgewählt.");
             Enumeration<DefaultMutableTreeNode> enumInternalClasses = node.children();
             while (enumInternalClasses.hasMoreElements()) {
@@ -131,7 +135,7 @@ public class IntClassesTools {
                 OPDE.debug("       saveTree: speichere EntityBean IntClass: " + myInternalClass.getInternalClassname());
             } else {
                 OPDE.debug("       saveTree: hat schon EntityBean: " + myInternalClass.getIntClass().getClassname());
-                OPDE.debug("       saveTree: und zwar für die Gruppe: " + myInternalClass.getIntClass().getGroups().getGkennung());
+                OPDE.debug("       saveTree: und zwar für die Gruppe: " + myInternalClass.getIntClass().getGroups().getID());
 
             }
             OPDE.debug("       saveTree: sie war " + (selmodel.isPathSelected(new TreePath(node.getPath())) ? "" : "NICHT") + " ausgewählt.");
@@ -158,7 +162,7 @@ public class IntClassesTools {
                     Acl acl = new Acl(myACL.getAcl(), myClass.getIntClass());
                     em.persist(acl);
                 } else {
-                    OPDE.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
+                    OPDE.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getID());
                 }
             } else { // ACL entziehen
                 OPDE.debug("              saveTree: LÖSCHE ACL " + InternalClassACL.strACLS[myACL.getAcl()]);
@@ -166,7 +170,7 @@ public class IntClassesTools {
                 if (myACL.hasAclEntity()) { // Nur löschen, wenn nötig.
                     OPDE.debug("              saveTree: lösche jetzt die EntityBean");
                     em.remove(myACL.getAclEntity());
-                    OPDE.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGkennung());
+                    OPDE.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getID());
                 }
             }
             myACL.setAclEntity(null);
@@ -174,6 +178,11 @@ public class IntClassesTools {
         em.close();
     }
 
+    /**
+     * creates a hashmap which contains all assigned IntClasses for a group.
+     * @param group
+     * @return
+     */
     public static HashMap<String, IntClasses> getDBLookupTable(Groups group) {
         HashMap<String, IntClasses> dblookup = new HashMap();
         if (group.getIcCollection() != null) {
@@ -250,14 +259,14 @@ public class IntClassesTools {
 //            if (!found) { // Am Ende und war nicht dabei ?
 //                // Dann hinzufügen.
 //                dbclass.getAclCollection().add(new Acl(acl, dbclass));
-//                OPDE.debug("++ Gruppe " + dbclass.getGroups().getGkennung() + " erhält das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getClassname());
+//                OPDE.debug("++ Gruppe " + dbclass.getGroups().getID() + " erhält das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getClassname());
 //            }
 //        } else { // ACL soll entfernt werden
 //            while (!found && aclList.hasNext()) {
 //                Acl thisAcl = aclList.next();
 //                if (thisAcl.getAcl() == acl) { // Eintrag gefunden
 //                    toBeDeleted.add(thisAcl);
-//                    OPDE.debug("-- Gruppe " + dbclass.getGroups().getGkennung() + " verliert das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getClassname());
+//                    OPDE.debug("-- Gruppe " + dbclass.getGroups().getID() + " verliert das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getClassname());
 //                    found = true;
 //                }
 //            }

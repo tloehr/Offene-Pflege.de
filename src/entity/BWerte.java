@@ -8,6 +8,7 @@ import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.SYSVAL2PROCESS;
 import entity.process.QProcessElement;
+import entity.system.Users;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -26,6 +26,7 @@
 package entity.info;
 
 import entity.*;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
 

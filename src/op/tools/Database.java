@@ -81,7 +81,7 @@ public class Database {
 //            PreparedStatement stmtLogout= db.prepareStatement(sqlLogout);
 //            stmtLogout.setLong(1, OPDE.getLogin().getLoginID());
 //            stmtLogout.executeUpdate();
-//            OPDE.info("Abmeldung erfolgt: UKennung: "+OPDE.getLogin().getUser().getUKennung() + " Grund: "+message);
+//            OPDE.info("Abmeldung erfolgt: UKennung: "+OPDE.getLogin().getUser().getUID() + " Grund: "+message);
 //            OPDE.setLogin(null);
 //            //OPDE.UPW = SYSTools.cleanCharArray(OPDE.UPW);
 //            //OPDE.lastlogout = 0l;

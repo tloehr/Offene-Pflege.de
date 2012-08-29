@@ -1,6 +1,6 @@
 package entity.prescription;
 
-import entity.Users;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
 
@@ -678,7 +678,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
                 ", sam=" + sam +
                 ", son=" + son +
                 ", lDatum=" + lDatum +
-                ", uKennung='" + user.getUKennung() + '\'' +
+                ", uKennung='" + user.getUID() + '\'' +
                 ", prescription=" + prescription +
                 '}';
     }

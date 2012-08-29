@@ -26,7 +26,8 @@ package entity.files;
  */
 
 import entity.BWerte;
-import entity.Users;
+import entity.system.Users;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;

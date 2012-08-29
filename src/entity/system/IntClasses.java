@@ -4,9 +4,6 @@
  */
 package entity.system;
 
-import entity.Acl;
-import entity.Groups;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
+ * This entity connects the user groups of OPDE with inner XML structure defined in appinfo.xml
  *
  * @author tloehr
  */
@@ -44,7 +42,6 @@ public class IntClasses implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "ICID")
     private Long icid;
     @Basic(optional = false)

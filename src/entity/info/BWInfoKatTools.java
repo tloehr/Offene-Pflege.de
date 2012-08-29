@@ -2,7 +2,7 @@ package entity.info;
 
 import op.OPDE;
 import op.care.info.PnlInfo;
-import op.tools.InternalClassACL;
+import op.system.InternalClassACL;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;

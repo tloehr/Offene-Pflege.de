@@ -1,6 +1,6 @@
 package entity.nursingprocess;
 
-import entity.Users;
+import entity.system.Users;
 import entity.info.Resident;
 import op.OPDE;
 import op.tools.SYSCalendar;

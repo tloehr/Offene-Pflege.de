@@ -4,6 +4,8 @@
  */
 package entity;
 
+import entity.system.Users;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -101,7 +103,7 @@ public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> 
 
     @Override
     public int compareTo(Uebergabe2User o) {
-        return getUser().getNameUndVorname().compareTo(o.getUser().getNameUndVorname());
+        return getUser().getFullname().compareTo(o.getUser().getFullname());
     }
 
 

@@ -33,6 +33,7 @@ import entity.*;
 import entity.reports.NReport;
 import op.FrmMain;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.tools.*;
 import tablerenderer.RNDHTML;
 
@@ -548,7 +549,7 @@ public class PnlUebergabe extends CleanablePanel {
                         Iterator<Uebergabe2User> it = ((Uebergabebuch) bericht).getUsersAcknowledged().iterator();
                         while (it.hasNext()) {
                             Uebergabe2User u2u = it.next();
-                            menuListAck.add(new JMenuItem(u2u.getUser().getNameUndVorname() + " <b>[" + df.format(u2u.getPit()) + "]</b>"));
+                            menuListAck.add(new JMenuItem(u2u.getUser().getFullname() + " <b>[" + df.format(u2u.getPit()) + "]</b>"));
                         }
                     }
                 } else {
@@ -560,7 +561,7 @@ public class PnlUebergabe extends CleanablePanel {
                         Iterator<PB2User> it = usersackn.iterator();
                         while (it.hasNext()) {
                             PB2User p2u = it.next();
-                            menuListAck.add(new JMenuItem(HTMLTools.toHTML(p2u.getUser().getNameUndVorname() + " <b>[" + df.format(p2u.getPit()) + "]</b>")));
+                            menuListAck.add(new JMenuItem(HTMLTools.toHTML(p2u.getUser().getFullname() + " <b>[" + df.format(p2u.getPit()) + "]</b>")));
                         }
                     }
                 }

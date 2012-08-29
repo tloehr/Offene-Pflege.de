@@ -27,13 +27,10 @@ package op.system;
 
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
-import com.sun.awt.AWTUtilities;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -323,7 +320,7 @@ public class DlgLogin extends MyJDialog {
                 OPDE.initProps();
 
                 OPDE.info("Anmeldung erfolgt: UKennung: " + username);
-                OPDE.info("LoginID: " + OPDE.getLogin().getUser().getUKennung());
+                OPDE.info("LoginID: " + OPDE.getLogin().getUser().getUID());
 
                 dispose();
             }

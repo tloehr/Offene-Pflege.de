@@ -23,11 +23,13 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package entity;
+package entity.system;
 
-import entity.files.*;
+import entity.files.SYSFiles;
+import entity.files.SYSINF2FILE;
+import entity.files.SYSNR2FILE;
+import entity.files.SYSPRE2FILE;
 import entity.reports.NReport;
-import entity.system.SYSLogin;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
@@ -43,8 +45,8 @@ import java.util.Collection;
 @NamedQueries({
         @NamedQuery(name = "Users.findAll", query = "SELECT o FROM Users o"),
         @NamedQuery(name = "Users.findAllSorted", query = "SELECT o FROM Users o ORDER BY o.nachname, o.vorname "),
-        @NamedQuery(name = "Users.findByUKennung", query = "SELECT o FROM Users o WHERE o.uKennung = :uKennung"),
-        @NamedQuery(name = "Users.findForLogin", query = "SELECT o FROM Users o WHERE o.uKennung = :uKennung AND o.md5pw = :md5pw"),
+        @NamedQuery(name = "Users.findByUKennung", query = "SELECT o FROM Users o WHERE o.uid = :uKennung"),
+        @NamedQuery(name = "Users.findForLogin", query = "SELECT o FROM Users o WHERE o.uid = :uKennung AND o.md5pw = :md5pw"),
         @NamedQuery(name = "Users.findByVorname", query = "SELECT o FROM Users o WHERE o.vorname = :vorname"),
         @NamedQuery(name = "Users.findByNachname", query = "SELECT o FROM Users o WHERE o.nachname = :nachname"),
         @NamedQuery(name = "Users.findByStatusSorted", query = "SELECT o FROM Users o WHERE o.status = :status ORDER BY o.nachname, o.vorname"),
@@ -53,12 +55,14 @@ import java.util.Collection;
         @NamedQuery(name = "Users.findAllNonMembers", query = "SELECT o FROM Users o "
                 + " WHERE :group NOT MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
         @NamedQuery(name = "Users.findByEMail", query = "SELECT o FROM Users o WHERE o.eMail = :eMail")})
-public class Users implements Serializable {
+public class Users implements Serializable, Comparable<Users> {
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
     @Column(name = "UKennung")
-    private String uKennung;
+    private String uid;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "Vorname")
     private String vorname;
@@ -108,12 +112,12 @@ public class Users implements Serializable {
 //        this.md5pw = md5pw;
 //    }
 
-    public String getUKennung() {
-        return uKennung;
+    public String getUID() {
+        return uid;
     }
 
-    public void setUKennung(String uKennung) {
-        this.uKennung = uKennung;
+    public void setUID(String uid) {
+        this.uid = uid;
     }
 
     public String getVorname() {
@@ -159,7 +163,7 @@ public class Users implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (uKennung != null ? uKennung.hashCode() : 0);
+        hash += (uid != null ? uid.hashCode() : 0);
         return hash;
     }
 
@@ -181,13 +185,18 @@ public class Users implements Serializable {
     }
 
     @Override
+    public int compareTo(Users o) {
+        return toString().compareTo(o.toString());
+    }
+
+    @Override
     public boolean equals(Object object) {
 
         if (!(object instanceof Users)) {
             return false;
         }
         Users other = (Users) object;
-        if ((this.uKennung == null && other.uKennung != null) || (this.uKennung != null && !this.uKennung.equals(other.uKennung))) {
+        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
             return false;
         }
         return true;
@@ -195,10 +204,10 @@ public class Users implements Serializable {
 
     @Override
     public String toString() {
-        return getNameUndVorname() + " [" + uKennung + "]";
+        return getFullname() + " [" + uid + "]";
     }
 
-    public String getNameUndVorname() {
+    public String getFullname() {
         return getNachname() + ", " + getVorname();
     }
 }

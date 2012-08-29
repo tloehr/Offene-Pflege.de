@@ -1,7 +1,7 @@
 package entity.prescription;
 
 import entity.info.Resident;
-import entity.Users;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSConst;
 

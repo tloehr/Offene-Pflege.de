@@ -50,6 +50,7 @@ import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.care.sysfiles.PnlFiles;
 import op.process.DlgProcessAssign;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -391,7 +392,7 @@ public class PnlReport extends NursingRecordsPanel {
             mypanel.add(addButton);
 
 //            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-//                JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+//                JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print, new ActionListener() {
 //                    @Override
 //                    public void actionPerformed(ActionEvent actionEvent) {
 //

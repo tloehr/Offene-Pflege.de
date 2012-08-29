@@ -4,6 +4,8 @@
  */
 package entity;
 
+import entity.system.Users;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;

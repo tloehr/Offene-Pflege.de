@@ -12,7 +12,7 @@ import entity.nursingprocess.Intervention;
 import entity.process.QProcess;
 import entity.process.SYSPRE2PROCESS;
 import entity.process.QProcessElement;
-import entity.process.SYSVAL2PROCESS;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

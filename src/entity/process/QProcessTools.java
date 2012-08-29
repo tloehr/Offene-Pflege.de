@@ -5,7 +5,7 @@
 package entity.process;
 
 import entity.BWerte;
-import entity.Users;
+import entity.system.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.info.ResidentTools;
@@ -126,8 +126,8 @@ public class QProcessTools {
         }
         html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".revision") + ":</b> ";
         html += DateFormat.getDateInstance().format(qProcess.getRevision()) + "</font>";
-        html += "<br/><b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getNameUndVorname();
-        html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".ownedby") + ":</b> " + qProcess.getOwner().getNameUndVorname();
+        html += "<br/><b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getFullname();
+        html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".ownedby") + ":</b> " + qProcess.getOwner().getFullname();
 
         html += "</div>";
         return html;

@@ -123,7 +123,7 @@ public class TMDFN
                 break;
             }
             case COL_UKENNUNG: {
-                result = dfn.getUser() != null ? dfn.getUser().getUKennung() : "";
+                result = dfn.getUser() != null ? dfn.getUser().getUID() : "";
                 break;
             }
             case COL_BEMDFN: {

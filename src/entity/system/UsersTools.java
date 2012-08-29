@@ -2,17 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.system;
 
 import op.OPDE;
 import op.tools.SYSTools;
-import tablemodels.TMUser;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -70,14 +67,25 @@ public class UsersTools {
         return admin;
     }
 
-    public static boolean isExamen(Users user) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Groups.findByUserAndExamen");
-        query.setParameter("user", user);
-        boolean examen = query.getResultList().size() > 0;
-//        OPDE.debug("Benutzer ist " + (examen ? "" : "kein") + " Admin");
-        em.close();
-        return examen;
+    public static Color getBG1(Users user) {
+        Color active = SYSTools.getColor("CEF0FF");
+        Color closed = SYSTools.getColor("C0C0C0");
+        if (user.isActive()) {
+            return active;
+        }
+
+        return closed;
+    }
+
+    public static boolean isQualified(Users user) {
+        boolean qualified = false;
+        for (Groups group : user.getGroups()) {
+            if (group.isQualified()) {
+                qualified = true;
+                break;
+            }
+        }
+        return qualified;
     }
 
     public static Users checkPassword(String username, String password) {

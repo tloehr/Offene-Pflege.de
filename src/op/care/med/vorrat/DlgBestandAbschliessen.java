@@ -352,7 +352,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
             em.lock(bestand, LockModeType.OPTIMISTIC);
 
             OPDE.info("Bestands Nr. " + bestand.getBestID() + " wird abgeschlossen");
-            OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUKennung());
+            OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUID());
 
             MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {

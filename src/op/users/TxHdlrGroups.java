@@ -4,7 +4,7 @@
  */
 package op.users;
 
-import entity.Groups;
+import entity.system.Groups;
 import op.OPDE;
 
 import javax.persistence.EntityManager;
@@ -113,7 +113,7 @@ public class TxHdlrGroups extends TransferHandler {
 
         for (int i = 0; i < values.length; i++) {
             Groups grp = (Groups) values[i];
-            buff.append(grp.getGkennung());
+            buff.append(grp.getID());
             if (i != values.length - 1) {
                 buff.append("\n");
             }

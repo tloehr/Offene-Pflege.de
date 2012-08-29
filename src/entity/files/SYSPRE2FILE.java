@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.Users;
+import entity.system.Users;
 import entity.prescription.Prescriptions;
 
 import javax.persistence.*;

@@ -405,7 +405,7 @@ public class PrescriptionsTools {
             }
             result += verordnung.getAnArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAnArzt().getName(), SYSTools.INDEX_NACHNAME);
         }
-        result += "; " + verordnung.getAngesetztDurch().getNameUndVorname() + "</font>";
+        result += "; " + verordnung.getAngesetztDurch().getFullname() + "</font>";
 
         return result + "</div>";
     }
@@ -426,7 +426,7 @@ public class PrescriptionsTools {
                 }
                 result += verordnung.getAbArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAbArzt().getName(), SYSTools.INDEX_NACHNAME);
             }
-            result += "; " + verordnung.getAbgesetztDurch().getNameUndVorname() + "</font>";
+            result += "; " + verordnung.getAbgesetztDurch().getFullname() + "</font>";
 
         }
         return result + "</div>";

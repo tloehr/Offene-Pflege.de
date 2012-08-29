@@ -490,7 +490,7 @@ public class OPMain extends javax.swing.JFrame {
     }
 
     private void reloadVTable() {
-//        TMVorgang tm = new TMVorgang(null, false, 0, OPDE.getLogin().getUser().getUKennung());
+//        TMVorgang tm = new TMVorgang(null, false, 0, OPDE.getLogin().getUser().getUID());
 //        int rows = tm.getRowCount();
 //        tblVorgang.setVisible(rows > 0);
 //        if (rows > 0) {

@@ -14,8 +14,8 @@ public class NPControlTools {
     public static String getAsHTML(NPControl kontrolle) {
         String result = "";
         DateFormat df = DateFormat.getDateInstance();
-        result += "<b>" + df.format(kontrolle.getDatum()) + "</b>; <u>"+kontrolle.getUser().getNameUndVorname()+"</u>; "+kontrolle.getBemerkung() ;
-//        result += "<p><b>Durchgeführt von:</b> " + kontrolle.getUser().getNameUndVorname() + "</p>";
+        result += "<b>" + df.format(kontrolle.getDatum()) + "</b>; <u>"+kontrolle.getUser().getFullname()+"</u>; "+kontrolle.getBemerkung() ;
+//        result += "<p><b>Durchgeführt von:</b> " + kontrolle.getUser().getFullname() + "</p>";
 //        result += "<p><b>Ergebnis:</b> " + kontrolle.getBemerkung() + "</p>";
         if (kontrolle.isAbschluss()) {
             result += "<u>Die Pflegeplanung wurde mit dieser Kontrolle geändert bzw. abgeschlossen</u>";

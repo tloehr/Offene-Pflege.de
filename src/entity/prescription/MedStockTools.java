@@ -136,8 +136,8 @@ public class MedStockTools {
         hm.put("bestand.packung.pzn", pzn);
         hm.put("bestand.bestid", bestand.getBestID());
         hm.put("bestand.eingang", bestand.getEin());
-        hm.put("bestand.userkurz", bestand.getUser().getUKennung());
-        hm.put("bestand.userlang", bestand.getUser().getNameUndVorname());
+        hm.put("bestand.userkurz", bestand.getUser().getUID());
+        hm.put("bestand.userlang", bestand.getUser().getFullname());
         hm.put("bestand.vorrat.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
         hm.put("bestand.vorrat.bewohnergebdatum", bestand.getInventory().getResident().getGebDatum());
         hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getResident().getBWKennung());
@@ -153,7 +153,7 @@ public class MedStockTools {
 //        result += SYSPrint.EPL2_labelformat(57, 19, 3);
 //        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz())
 //        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
-//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUKennung() + ")");
+//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUID() + ")");
 //        }
 //
 //        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getBestID()));

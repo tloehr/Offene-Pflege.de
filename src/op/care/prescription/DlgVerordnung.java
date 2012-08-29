@@ -763,7 +763,7 @@ public class DlgVerordnung extends MyJDialog {
 
         btnSave.setEnabled(true);
         jdcAN.setDate(new Date());
-        lblAN.setText(verordnung.getAngesetztDurch().getNameUndVorname());
+        lblAN.setText(verordnung.getAngesetztDurch().getFullname());
         cmbAN.setSelectedItem(verordnung.getAnArzt());
         cmbKHAn.setSelectedItem(verordnung.getAnKH());
 
@@ -803,7 +803,7 @@ public class DlgVerordnung extends MyJDialog {
         } else {
             cbAB.setSelected(true);
             jdcAB.setDate(verordnung.getTo());
-            lblAB.setText(verordnung.getAbgesetztDurch().getUKennung());
+            lblAB.setText(verordnung.getAbgesetztDurch().getUID());
             cmbAB.setSelectedItem(verordnung.getAbArzt());
             cmbKHAb.setSelectedItem(verordnung.getAbKH());
             cmbAB.setToolTipText(cmbAB.getSelectedItem().toString());
@@ -1087,7 +1087,7 @@ public class DlgVerordnung extends MyJDialog {
         cmbKHAb.setSelectedIndex(0);
         jdcAB.setDate(new Date());
         jdcAB.setMinSelectableDate(jdcAN.getDate());
-        lblAB.setText(cbAB.isSelected() ? OPDE.getLogin().getUser().getUKennung() : "");
+        lblAB.setText(cbAB.isSelected() ? OPDE.getLogin().getUser().getUID() : "");
         cbPackEnde.setSelected(false);
         cbPackEnde.setEnabled(!cbAB.isSelected());
 

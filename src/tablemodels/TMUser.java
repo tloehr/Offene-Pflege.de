@@ -5,7 +5,7 @@
 
 package tablemodels;
 
-import entity.Users;
+import entity.system.Users;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -28,7 +28,7 @@ public class TMUser extends DefaultTableModel {
         switch (column) {
             case 0: {
 
-                value = ocuser.getNameUndVorname();
+                value = ocuser.getFullname();
 
                 break;
             }

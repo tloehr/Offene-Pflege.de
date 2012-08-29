@@ -477,7 +477,7 @@ public class BWInfoTools {
         result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
 
 //        if (print) {
-//            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(new Date()) + " (" + OPDE.getLogin().getUser().getNameUndVorname() + ")</b></td></tr>";
+//            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(new Date()) + " (" + OPDE.getLogin().getUser().getFullname() + ")</b></td></tr>";
 //        }
 
         /***
@@ -639,7 +639,7 @@ public class BWInfoTools {
          */
         if (bewohner.getBv1() != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.bv") + "</td><td valign=\"top\">";
-            result += bewohner.getBv1().getNameUndVorname();
+            result += bewohner.getBv1().getFullname();
             result += "</td></tr>";
         }
 

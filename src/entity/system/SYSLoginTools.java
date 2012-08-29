@@ -7,10 +7,7 @@ package entity.system;
 import java.util.Date;
 
 import entity.EntityTools;
-import entity.Users;
-import entity.UsersTools;
 import op.OPDE;
-import op.tools.SYSConst;
 
 import javax.persistence.EntityManager;
 

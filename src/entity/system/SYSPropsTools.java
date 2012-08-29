@@ -4,11 +4,9 @@
  */
 package entity.system;
 
-import entity.Users;
 import op.OPDE;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;

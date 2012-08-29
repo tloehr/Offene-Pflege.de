@@ -21,6 +21,7 @@ import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.care.sysfiles.PnlFiles;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -657,7 +658,7 @@ public class PnlInfo extends NursingRecordsPanel {
         if (bwinfo.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
             df = DateFormat.getDateInstance();
         }
-        html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr; ") + bwinfo.getAngesetztDurch().getNameUndVorname();
+        html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr; ") + bwinfo.getAngesetztDurch().getFullname();
         html += "</div>";
         return html;
     }
