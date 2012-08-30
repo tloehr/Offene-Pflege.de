@@ -702,7 +702,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         popup.setMovable(false);
                         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
                         final JButton btnSave = new JButton(SYSConst.icon22apply);
-                        final JList editor = new JList(SYSTools.list2dlm(UsersTools.getAllActive()));
+                        final JList editor = new JList(SYSTools.list2dlm(UsersTools.getUsers(false)));
                         editor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                         editor.setCellRenderer(UsersTools.getUserRenderer());
                         btnSave.addActionListener(new ActionListener() {
@@ -1108,7 +1108,7 @@ public class PnlProcess extends NursingRecordsPanel {
         list.add(cmbBW);
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-            final JComboBox cmbUser = new JComboBox(SYSTools.list2cmb(UsersTools.getAllActive()));
+            final JComboBox cmbUser = new JComboBox(SYSTools.list2cmb(UsersTools.getUsers(false)));
             cmbUser.setRenderer(UsersTools.getUserRenderer());
             cmbUser.setFont(SYSConst.ARIAL14);
             cmbUser.addItemListener(new ItemListener() {

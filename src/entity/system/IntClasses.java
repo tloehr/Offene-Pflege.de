@@ -33,10 +33,10 @@ import javax.persistence.Table;
     @NamedQuery(name = "IntClasses.findByIcid", query = "SELECT i FROM IntClasses i WHERE i.icid = :icid"),
     @NamedQuery(name = "IntClasses.findByUserAndClassnameAndACL", query = " "
     + "SELECT i FROM IntClasses i "
-    + "WHERE i.classname = :classname AND :ocuser MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)"  ),
+    + "WHERE i.internalClassID = :classname AND :ocuser MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)"  ),
     @NamedQuery(name = "IntClasses.findByGroup", query = " "
     + "SELECT i FROM IntClasses i WHERE i.groups = :gruppe "),
-    @NamedQuery(name = "IntClasses.findByClassname", query = "SELECT i FROM IntClasses i WHERE i.classname = :classname")})
+    @NamedQuery(name = "IntClasses.findByClassname", query = "SELECT i FROM IntClasses i WHERE i.internalClassID = :classname")})
 public class IntClasses implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,9 +45,9 @@ public class IntClasses implements Serializable {
     @Column(name = "ICID")
     private Long icid;
     @Basic(optional = false)
-    @Column(name = "classname")
-    private String classname;
-    @JoinColumn(name = "gkennung", referencedColumnName = "GKENNUNG")
+    @Column(name = "internalClassesID")
+    private String internalClassID;
+    @JoinColumn(name = "gid", referencedColumnName = "GKENNUNG")
     @ManyToOne
     private Groups groups;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "intclass")
@@ -56,8 +56,8 @@ public class IntClasses implements Serializable {
     public IntClasses() {
     }
 
-    public IntClasses(String classname, Groups groups) {
-        this.classname = classname;
+    public IntClasses(String internalClassID, Groups groups) {
+        this.internalClassID = internalClassID;
         this.groups = groups;
         this.aclCollection = new ArrayList();
     }
@@ -86,12 +86,12 @@ public class IntClasses implements Serializable {
         this.aclCollection = aclCollection;
     }
 
-    public String getClassname() {
-        return classname;
+    public String getInternalClassID() {
+        return internalClassID;
     }
 
     public void setClassname(String classname) {
-        this.classname = classname;
+        this.internalClassID = classname;
     }
 
     @Override
@@ -116,6 +116,6 @@ public class IntClasses implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.system.IntClasses[" + classname + " " + icid + "]";
+        return "entity.system.IntClasses[" + internalClassID + " " + icid + "]";
     }
 }

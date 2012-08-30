@@ -19,13 +19,15 @@ import java.util.ArrayList;
 public class UsersTools {
     public static final short STATUS_INACTIVE = 0;
     public static final short STATUS_ACTIVE = 1;
+    public static final short STATUS_ROOT = 2;
 
     public static ArrayList<Users> getUsers(boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
 
         Query query;
         if (inactiveToo) {
-            query = em.createQuery("SELECT u FROM Users u ORDER BY u.nachname, u.vorname ");
+            query = em.createQuery("SELECT u FROM Users u WHERE u.status <> :status ORDER BY u.nachname, u.vorname ");
+            query.setParameter("status", STATUS_ROOT);
         } else {
             query = em.createQuery("SELECT u FROM Users u WHERE u.status = :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ACTIVE);
@@ -105,12 +107,4 @@ public class UsersTools {
         return user;
     }
 
-    public static ArrayList<Users> getAllActive() {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Users.findByStatusSorted");
-        query.setParameter("status", STATUS_ACTIVE);
-        ArrayList<Users> list = new ArrayList<Users>(query.getResultList());
-        em.close();
-        return list;
-    }
 }

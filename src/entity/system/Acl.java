@@ -30,7 +30,7 @@ import op.OPDE;
     @NamedQuery(name = "Acl.findByAclid", query = "SELECT a FROM Acl a WHERE a.aclid = :aclid"),
     @NamedQuery(name = "Acl.findByAclidAndSHORTACL", query = " "
     + " SELECT a FROM Acl a "
-    + " WHERE a.intclass.classname = :classname AND a.acl = :shortacl AND a.intclass.groups = :gruppe"),
+    + " WHERE a.intclass.internalClassID = :classname AND a.acl = :shortacl AND a.intclass.groups = :gruppe"),
     @NamedQuery(name = "Acl.findByAcl", query = "SELECT a FROM Acl a WHERE a.acl = :acl")})
 public class Acl implements Serializable, Comparable<Acl> {
 
@@ -56,10 +56,6 @@ public class Acl implements Serializable, Comparable<Acl> {
 
     public Long getAclid() {
         return aclid;
-    }
-
-    public void setAclid(Long aclid) {
-        this.aclid = aclid;
     }
 
     public IntClasses getIntclass() {
@@ -100,7 +96,7 @@ public class Acl implements Serializable, Comparable<Acl> {
 
     @Override
     public String toString() {
-        return OPDE.getAppInfo().getInternalClasses().get(intclass.getClassname()).getAcls().get(acl).getDescription();
+        return OPDE.getAppInfo().getInternalClasses().get(intclass.getInternalClassID()).getAcls().get(acl).getDescription();
     }
 
     @Override

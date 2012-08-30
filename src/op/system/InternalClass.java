@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class InternalClass implements Comparable<InternalClass> {
 
-    private String internalClassname;
+    private String internalClassID;
     private String shortDescription;
     private String longDescription;
-    private String javaClass;
+    private String javaclass;
     private boolean mainClass;
     private String iconname;
 
@@ -32,12 +32,12 @@ public class InternalClass implements Comparable<InternalClass> {
 
     private IntClasses intClass;
 
-    public InternalClass(String internalClassname, String shortDescription, String longDescription, boolean mainClass, String javaClass, String iconname) {
-        this.internalClassname = internalClassname;
+    public InternalClass(String internalClassID, String shortDescription, String longDescription, boolean mainClass, String javaclass, String iconname) {
+        this.internalClassID = internalClassID;
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
         this.mainClass = mainClass;
-        this.javaClass = javaClass;
+        this.javaclass = javaclass;
         acls = new ArrayList();
         this.intClass = null;
         this.iconname = iconname;
@@ -91,16 +91,16 @@ public class InternalClass implements Comparable<InternalClass> {
         return shortDescription;
     }
 
-    public String getInternalClassname() {
-        return internalClassname;
+    public String getInternalClassID() {
+        return internalClassID;
     }
 
     /**
      * String Bezeichnung, anhand der sich diese Klasse mittels der Reflection API laden lässt.
      * @return
      */
-    public String getJavaClass() {
-        return javaClass;
+    public String getJavaclass() {
+        return javaclass;
     }
 
     /**

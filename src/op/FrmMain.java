@@ -484,11 +484,11 @@ public class FrmMain extends JFrame {
 
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassname(), InternalClassACL.EXECUTE)) {
+            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassID(), InternalClassACL.EXECUTE)) {
 
                 final String shortDescription = ic.getShortDescription();
                 final String longDescription = ic.getLongDescription();
-                final String javaclass = ic.getJavaClass();
+                final String javaclass = ic.getJavaclass();
 
                 Icon icon = null;
                 try {

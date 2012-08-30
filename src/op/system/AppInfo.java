@@ -5,8 +5,6 @@
 package op.system;
 
 import op.OPDE;
-import op.system.InternalClass;
-import op.system.InternalClassACL;
 import op.tools.SYSTools;
 import op.tools.SortedProperties;
 import org.xml.sax.Attributes;
@@ -181,7 +179,7 @@ public class AppInfo {
             } else if (environment.equalsIgnoreCase("classes")) { // oder wir sind schon in einer Umgebung.
                 if (tagName.equalsIgnoreCase("class")) {
                     thisClass = new InternalClass(attributes.getValue("name"), attributes.getValue("short"), attributes.getValue("long"), SYSTools.catchNull(attributes.getValue("main")).equalsIgnoreCase("true"), attributes.getValue("javaclass"), SYSTools.catchNull(attributes.getValue("icon"), "run.png"));
-//                    OPDE.debug(thisClass.getInternalClassname());
+//                    OPDE.debug(thisClass.getInternalClassID());
                 } else if (tagName.equalsIgnoreCase("insert")) {
                     thisClass.getAcls().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.INSERT));
                 } else if (tagName.equalsIgnoreCase("select")) {
@@ -226,7 +224,7 @@ public class AppInfo {
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if (localName.equalsIgnoreCase("class")) {
-                internalClasses.put(thisClass.getInternalClassname(), thisClass);
+                internalClasses.put(thisClass.getInternalClassID(), thisClass);
                 if (thisClass.isMainClass()) {
                     mainClasses.add(thisClass);
                 }

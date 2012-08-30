@@ -55,12 +55,8 @@ public class Groups implements Serializable, Comparable<Groups> {
         return members;
     }
 
-    public Collection<IntClasses> getIcCollection() {
+    public Collection<IntClasses> getIntClasses() {
         return icCollection;
-    }
-
-    public void setIcCollection(Collection<IntClasses> icCollection) {
-        this.icCollection = icCollection;
     }
 
     public String getID() {
