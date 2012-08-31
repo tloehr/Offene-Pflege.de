@@ -88,7 +88,7 @@ public class PnlUser extends CleanablePanel {
     private ButtonGroup bg1;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-//    private HashMap<Users, CollapsiblePane> userMap;
+    //    private HashMap<Users, CollapsiblePane> userMap;
 //    private HashMap<Groups, CollapsiblePane> groupMap;
     private ArrayList<Users> lstUsers;
     private ArrayList<Groups> lstGroups;
@@ -208,10 +208,11 @@ public class PnlUser extends CleanablePanel {
             lstUsers = UsersTools.getUsers(true);
             lstGroups = GroupsTools.getGroups();
             for (Users user : lstUsers) {
-                cpMap.put(user.getUID(), createCP4(user));
+                createCP4(user);
+
             }
             for (Groups group : lstGroups) {
-                cpMap.put(group.getID(), createCP4(group));
+                cpMap.put(group.getID() + ".xgroup", createCP4(group));
             }
             buildPanel();
         }
@@ -493,7 +494,16 @@ public class PnlUser extends CleanablePanel {
     }
 
     private CollapsiblePane createCP4(final Users user) {
-        final CollapsiblePane cp = new CollapsiblePane();
+        if (!cpMap.containsKey(user.getUID() + ".xusers")) {
+            cpMap.put(user.getUID() + ".xusers", new CollapsiblePane());
+            try {
+                cpMap.get(user.getUID() + ".xusers").setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+        final CollapsiblePane cp = cpMap.get(user.getUID() + ".xusers");
 
         /***
          *      _   _ _____    _    ____  _____ ____
@@ -686,11 +696,11 @@ public class PnlUser extends CleanablePanel {
         cp.setTitleLabelComponent(titlePanel);
         cp.setSlidingDirection(SwingConstants.SOUTH);
 
-        try {
-            cp.setCollapsed(true);
-        } catch (PropertyVetoException e) {
-            OPDE.error(e);
-        }
+//        try {
+//            cp.setCollapsed(true);
+//        } catch (PropertyVetoException e) {
+//            OPDE.error(e);
+//        }
 
 
         /***
@@ -742,9 +752,9 @@ public class PnlUser extends CleanablePanel {
                     try {
                         em.getTransaction().begin();
                         Users myUser = em.merge(user);
-                        em.lock(myUser, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        em.lock(myUser, LockModeType.OPTIMISTIC);
                         Groups myGroup = em.merge(group);
-                        em.lock(myGroup, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        em.lock(myGroup, LockModeType.OPTIMISTIC);
                         if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
                             myUser.getGroups().add(myGroup);
                             myGroup.getMembers().add(myUser);
@@ -794,7 +804,34 @@ public class PnlUser extends CleanablePanel {
     }
 
     private CollapsiblePane createCP4(final Groups group) {
-        final CollapsiblePane cp = new CollapsiblePane();
+        final String key = group.getID() + ".xgroups";
+        if (!cpMap.containsKey(key)) {
+            cpMap.put(key, new CollapsiblePane());
+            cpMap.get(key).setSlidingDirection(SwingConstants.SOUTH);
+
+            cpMap.get(key).setBackground(bg);
+            cpMap.get(key).setForeground(fg);
+
+            cpMap.get(key).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+                @Override
+                public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                    if (!contentMap.containsKey(key)) {
+                        contentMap.put(key, createContentPanel4(group));
+                    }
+                    cpMap.get(key).setContentPane(contentMap.get(key));
+                }
+            });
+
+            cpMap.get(key).setHorizontalAlignment(SwingConstants.LEADING);
+            cpMap.get(key).setOpaque(false);
+            try {
+                cpMap.get(key).setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+        final CollapsiblePane cp = cpMap.get(key);
 
         /***
          *      _   _ _____    _    ____  _____ ____
@@ -858,40 +895,13 @@ public class PnlUser extends CleanablePanel {
                 new Insets(0, 0, 0, 0), 0, 0));
 
         cp.setTitleLabelComponent(titlePanel);
-        cp.setSlidingDirection(SwingConstants.SOUTH);
 
-        cp.setBackground(bg);
-        cp.setForeground(fg);
-
-        try {
-            cp.setCollapsed(true);
-        } catch (PropertyVetoException e) {
-            OPDE.error(e);
-        }
-
-
-        /***
-         *       ___ ___  _  _ _____ ___ _  _ _____
-         *      / __/ _ \| \| |_   _| __| \| |_   _|
-         *     | (_| (_) | .` | | | | _|| .` | | |
-         *      \___\___/|_|\_| |_| |___|_|\_| |_|
-         *
-         */
-
-        cp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-            @Override
-            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                String key = group.getID();
-                if (!contentMap.containsKey(key)) {
-                    contentMap.put(key, createContentPanel4(group));
-                }
-                cp.setContentPane(contentMap.get(key));
-                cp.setOpaque(false);
+        if (!cp.isCollapsed()) {
+            if (!contentMap.containsKey(key)) {
+                contentMap.put(key, createContentPanel4(group));
             }
-        });
-
-        cp.setHorizontalAlignment(SwingConstants.LEADING);
-        cp.setOpaque(false);
+            cp.setContentPane(contentMap.get(key));
+        }
 
         return cp;
     }
@@ -899,7 +909,7 @@ public class PnlUser extends CleanablePanel {
     private JPanel createContentPanel4(final Groups group) {
         JPanel contentPanel = new JPanel(new VerticalLayout());
         if (!group.isEveryone()) { // everyone does not need a membership.
-            contentPanel.add(createMemberPanel4(group, true));
+            contentPanel.add(createMemberPanel4(group));
         }
 
         if (!group.isAdmin()) { // admin does not need further acls. he is in godmode anyways
@@ -909,17 +919,27 @@ public class PnlUser extends CleanablePanel {
     }
 
 
-    private JPanel createMemberPanel4(final Groups group, boolean membersCollapse) {
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new VerticalLayout());
+    private JPanel createMemberPanel4(final Groups group) {
 
-        CollapsiblePane cpMember = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".members"));
+        if (!cpMap.containsKey(group.getID() + ".xmembers")) {
+            cpMap.put(group.getID() + ".xmembers", new CollapsiblePane(OPDE.lang.getString(internalClassID + ".members")));
+            try {
+                cpMap.get(group.getID() + ".xmembers").setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+        CollapsiblePane cpMember = cpMap.get(group.getID() + ".xmembers");
         cpMember.setBackground(bg.darker()); // a little darker
         cpMember.setForeground(Color.WHITE);
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new VerticalLayout());
         contentPanel.setOpaque(false);
+
         JPanel contentMember = new JPanel();
         contentMember.setLayout(new VerticalLayout());
-
         for (final Users user : lstUsers) {
             String key = group.getID() + "." + user.getUID();
             if (user.isActive()) {
@@ -929,12 +949,6 @@ public class PnlUser extends CleanablePanel {
                 contentMember.add(checkBoxMap.get(key));
             }
             cpMember.setContentPane(contentMember);
-        }
-
-        try {
-            cpMember.setCollapsed(membersCollapse);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         contentPanel.add(cpMember);
@@ -947,17 +961,16 @@ public class PnlUser extends CleanablePanel {
 
     private JPanel createClassesPanel4(final Groups group) {
 
-        if (!cpMap.containsKey(group.getID()+".xclasses")) {
-            cpMap.put(group.getID()+".xclasses", new CollapsiblePane(OPDE.lang.getString(internalClassID + ".modules")));
+        if (!cpMap.containsKey(group.getID() + ".xclasses")) {
+            cpMap.put(group.getID() + ".xclasses", new CollapsiblePane(OPDE.lang.getString(internalClassID + ".modules")));
             try {
-                cpMap.get(group.getID()+".xclasses").setCollapsed(true);
+                cpMap.get(group.getID() + ".xclasses").setCollapsed(true);
             } catch (PropertyVetoException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
         }
-        CollapsiblePane cpClasses = cpMap.get(group.getID()+".xclasses");
-        //TODO: das gleiche für die User
+        CollapsiblePane cpClasses = cpMap.get(group.getID() + ".xclasses");
 
         JPanel contentClasses = new JPanel();
         contentClasses.setLayout(new VerticalLayout());
@@ -1011,9 +1024,9 @@ public class PnlUser extends CleanablePanel {
                 try {
                     em.getTransaction().begin();
                     Users myUser = em.merge(user);
-                    em.lock(myUser, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    em.lock(myUser, LockModeType.OPTIMISTIC);
                     Groups myGroup = em.merge(group);
-                    em.lock(myGroup, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    em.lock(myGroup, LockModeType.OPTIMISTIC);
                     if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
                         myUser.getGroups().add(myGroup);
                         myGroup.getMembers().add(myUser);
@@ -1028,10 +1041,11 @@ public class PnlUser extends CleanablePanel {
                     lstUsers.add(myUser);
                     lstGroups.remove(group);
                     lstGroups.add(myGroup);
+                    Collections.sort(lstUsers);
 
-                    String key = group.getID() + "." + user.getUID();
-                    checkBoxMap.put(key, createCB4Membership(myUser, myGroup));
-                    cpMap.put(myGroup.getID(), createCP4(myGroup));
+                    contentMap.remove(myGroup.getID()+ ".xgroups");
+                    checkBoxMap.put(group.getID() + "." + user.getUID(), createCB4Membership(myUser, myGroup));
+                    cpMap.put(myGroup.getID() + ".xgroups", createCP4(myGroup));
 
                     buildPanel();
                 } catch (OptimisticLockException ole) {
@@ -1058,7 +1072,7 @@ public class PnlUser extends CleanablePanel {
         cbACL.setFont(SYSConst.ARIAL14);
         // The CB should be selected if (and only if) the IntClass (with the fitting internalClassesID) is assigned to the group and
         // a ACL is assigned to the IntClasses object with the same SHORT code for the acl.
-        cbACL.setSelected(intClassesMap.containsKey(ic.getInternalClassID()) && intClassesMap.get(ic.getInternalClassID()).getAclCollection().contains(acl));
+        cbACL.setSelected(IntClassesTools.findACLbyCODE(intClassesMap.get(ic.getInternalClassID()), acl) != null);
         cbACL.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -1067,12 +1081,12 @@ public class PnlUser extends CleanablePanel {
                 try {
                     em.getTransaction().begin();
                     Groups myGroup = em.merge(group);
-                    em.lock(myGroup, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    em.lock(myGroup, LockModeType.OPTIMISTIC);
 
                     IntClasses myIntClasses;
                     if (intClassesMap.containsKey(ic.getInternalClassID())) {
                         myIntClasses = em.merge(intClassesMap.get(ic.getInternalClassID()));
-                        em.lock(myIntClasses, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        em.lock(myIntClasses, LockModeType.OPTIMISTIC);
                     } else {
                         myIntClasses = em.merge(new IntClasses(ic.getInternalClassID(), myGroup));
                     }
@@ -1091,8 +1105,9 @@ public class PnlUser extends CleanablePanel {
                     lstGroups.add(myGroup);
                     Collections.sort(lstGroups);
                     String key = myGroup.getID() + "." + ic.getInternalClassID() + "." + InternalClassACL.strACLS[acl];
+                    contentMap.remove(myGroup.getID()+ ".xgroups");
                     checkBoxMap.put(key, createCB4ACLs(myGroup, acl, ic));
-                    cpMap.put(myGroup.getID(), createCP4(myGroup));
+                    cpMap.put(myGroup.getID() + ".xgroups", createCP4(myGroup));
                     buildPanel();
                 } catch (OptimisticLockException ole) {
                     if (em.getTransaction().isActive()) {
@@ -1120,12 +1135,12 @@ public class PnlUser extends CleanablePanel {
         if (tbShowUsers.isSelected()) {
             for (Users user : lstUsers) {
                 if (tbOldUsers.isSelected() || user.isActive()) {
-                    cpMain.add(cpMap.get(user.getUID()));
+                    cpMain.add(cpMap.get(user.getUID() + ".xusers"));
                 }
             }
         } else {
             for (Groups group : lstGroups) {
-                cpMain.add(cpMap.get(group.getID()));
+                cpMain.add(cpMap.get(group.getID() + ".xgroups"));
             }
         }
         cpMain.addExpansion();

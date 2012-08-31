@@ -192,9 +192,18 @@ public class IntClassesTools {
         return dblookup;
     }
 
-
+    /**
+     * searches for a Acl which is assigned to intClasses according to the aclCode.
+     *
+     * @param intClasses
+     * @param aclCode
+     * @return the found Acl, null if not found or incClasses == null
+     */
     public static Acl findACLbyCODE(IntClasses intClasses, short aclCode){
         Acl result = null;
+        if (intClasses == null){
+            return null;
+        }
         for (Acl acl : intClasses.getAclCollection()){
             if (acl.getAcl() == aclCode){
                 result = acl;
