@@ -5,7 +5,7 @@
 
 package op.system;
 
-import entity.system.IntClasses;
+import entity.system.SYSGROUPS2ACL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class InternalClass implements Comparable<InternalClass> {
     // inklusive der Beschreibungen (wenn vorhanden).
     private List<InternalClassACL> acls;
 
-    private IntClasses intClass;
+    private SYSGROUPS2ACL intClass;
 
     public InternalClass(String internalClassID, String shortDescription, String longDescription, boolean mainClass, String javaclass, String iconname) {
         this.internalClassID = internalClassID;
@@ -44,11 +44,11 @@ public class InternalClass implements Comparable<InternalClass> {
     }
 
 
-    public IntClasses getIntClass() {
+    public SYSGROUPS2ACL getIntClass() {
         return intClass;
     }
 
-    public void setIntClass(IntClasses intClass) {
+    public void setIntClass(SYSGROUPS2ACL intClass) {
         this.intClass = intClass;
     }
 
@@ -78,7 +78,7 @@ public class InternalClass implements Comparable<InternalClass> {
      *
      * @return
      */
-    public List<InternalClassACL> getAcls() {
+    public List<InternalClassACL> getPossibleACLs() {
         return acls;
     }
 

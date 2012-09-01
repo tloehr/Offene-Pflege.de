@@ -47,7 +47,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
-import op.admin.residents.bwassistant.AddBWWizard;
+import op.residents.bwassistant.AddBWWizard;
 import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
 import op.care.info.PnlInfo;

@@ -65,6 +65,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class SYSTools {
 
@@ -2106,6 +2107,16 @@ public class SYSTools {
             return -1;
         }
         return 0;
+    }
+
+    /**
+     * http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
+     * @return
+     */
+    public static boolean isValidEMail(String mail) {
+        String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        return pattern.matcher(mail).matches();
     }
 
 }

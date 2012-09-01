@@ -194,9 +194,9 @@ public class MedProductWizard {
 //            addPageListener(new PageListener() {
 //                @Override
 //                public void pageEventFired(PageEvent pageEvent) {
-//                    if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
+//                    if (pageEvent.getGID() == PageEvent.PAGE_CLOSING) {
 //                        OPDE.debug(pageEvent.getSource());
-//                    } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+//                    } else if (pageEvent.getGID() == PageEvent.PAGE_OPENED) {
 //                        OPDE.debug("ProduktPage OPENDED");
 //                    }
 //                }

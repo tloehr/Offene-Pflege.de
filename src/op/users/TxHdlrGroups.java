@@ -113,7 +113,7 @@ public class TxHdlrGroups extends TransferHandler {
 
         for (int i = 0; i < values.length; i++) {
             Groups grp = (Groups) values[i];
-            buff.append(grp.getID());
+            buff.append(grp.getGID());
             if (i != values.length - 1) {
                 buff.append("\n");
             }

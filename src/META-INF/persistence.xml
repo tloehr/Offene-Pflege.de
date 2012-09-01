@@ -38,7 +38,7 @@
         <class>entity.info.BWInfoKat</class>
         <class>entity.info.BWInfoTyp</class>
         <class>entity.info.BWInfoVorlagen</class>
-        <class>entity.system.IntClasses</class>
+        <class>entity.system.SYSGROUPS2ACL</class>
         <class>entity.system.SYSLogin</class>
         <class>entity.system.SYSProps</class>
         <class>entity.system.Syslog</class>

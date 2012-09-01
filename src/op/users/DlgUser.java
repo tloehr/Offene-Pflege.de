@@ -4,69 +4,147 @@
 
 package op.users;
 
-import java.awt.event.*;
-import javax.swing.event.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import entity.files.SYSFilesTools;
+import entity.system.Users;
+import entity.system.UsersTools;
+import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
-import java.awt.*;
+import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * @author Torsten Löhr
  */
 public class DlgUser extends MyJDialog {
-    public DlgUser() {
-        super();
-        initComponents();
-    }
+    public static final String internalClassID = "opde.users.dlgusers";
+    private Users user;
+    private Closure callback;
 
-    private void txtNameCaretUpdate(CaretEvent e) {
-        // TODO add your code here
+    public DlgUser(Users user, Closure callback) {
+        super();
+        this.user = user;
+        this.callback = callback;
+        initComponents();
+        pack();
+        setVisible(true);
     }
 
     private void txtNameFocusLost(FocusEvent e) {
-        // TODO add your code here
-    }
-
-    private void txtEMailFocusLost(FocusEvent e) {
-        // TODO add your code here
-    }
-
-    private void txtVornameCaretUpdate(CaretEvent e) {
-        // TODO add your code here
+        if (!txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
+            txtPW.setText(generatePassword(txtVorname.getText(), txtName.getText()));
+        }
     }
 
     private void txtVornameFocusLost(FocusEvent e) {
-        // TODO add your code here
-    }
-
-    private void txtUKennungFocusLost(FocusEvent e) {
-
+        if (!txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
+            txtPW.setText(generatePassword(txtVorname.getText(), txtName.getText()));
+        }
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        user = null;
+        dispose();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (user != null){
+            print(txtPW.getText().trim());
+        }
+        callback.execute(user);
+    }
+
+    private void print(String password) {
+        String html;
+
+        try {
+            html = SYSTools.readFileAsString(OPDE.getOpwd() + System.getProperty("file.separator") + "newuser.html");
+        } catch (IOException ie) {
+            html = "<body>"
+                    + "<h1>Access to Offene-Pflege.de (OPDE)</h1>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<h2>For <opde-user-fullname/></h2>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<p>UserID: <b><opde-user-userid/></b></p>"
+                    + "<p>Password: <b><opde-user-pw/></b></p>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "Please keep this note in a safe place. Don't tell Your password to anyone."
+                    + "</body>";
+        }
+
+        html = SYSTools.replace(html, "<opde-user-fullname/>", user.getFullname());
+        html = SYSTools.replace(html, "<opde-user-userid/>", user.getUID());
+        html = SYSTools.replace(html, "<opde-user-pw/>", password);
+        html = SYSTools.htmlUmlautConversion(html);
+
+
+        SYSFilesTools.print(html, true);
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        if (txtName.getText().isEmpty() || txtVorname.getText().isEmpty() || txtPW.getText().isEmpty() || txtUID.getText().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyentry"));
+            return;
+        }
+
+        if (!txtEMail.getText().isEmpty() && !SYSTools.isValidEMail(txtEMail.getText().trim())) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".wrongemail")));
+            return;
+        }
+
+        EntityManager em = OPDE.createEM();
+        Users check4user = em.find(Users.class, txtUID.getText().trim());
+        if (check4user != null) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".uidtaken")));
+            return;
+        }
+
+        user.setUID(txtUID.getText().trim());
+        user.setEMail(txtEMail.getText().isEmpty() ? null : txtEMail.getText().trim());
+        user.setVorname(txtVorname.getText().trim());
+        user.setNachname(txtName.getText().trim());
+        user.setMd5pw(SYSTools.hashword(txtPW.getText()));
+        dispose();
     }
 
-
+    private String generatePassword(String firstname, String lastname) {
+        Random generator = new Random(System.currentTimeMillis());
+        return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
+    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         jPanel4 = new JPanel();
-        jLabel6 = new JLabel();
-        txtUKennung = new JTextField();
+        lblUID = new JLabel();
+        txtUID = new JTextField();
         lblFirstname = new JLabel();
         txtName = new JTextField();
         txtEMail = new JTextField();
-        jLabel5 = new JLabel();
+        lblEmail = new JLabel();
         txtVorname = new JTextField();
         lblName = new JLabel();
+        lblPW = new JLabel();
+        txtPW = new JTextField();
         jPanel3 = new JPanel();
         btnCancel = new JButton();
         btnSave = new JButton();
@@ -78,26 +156,18 @@ public class DlgUser extends MyJDialog {
         //======== jPanel4 ========
         {
             jPanel4.setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
-                "default, 4*($lgap, fill:default), $lgap, default"));
+                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 4*($lgap, fill:default), 2*($lgap, default), $lgap, 14dlu"));
 
-            //---- jLabel6 ----
-            jLabel6.setText("UKennung");
-            jLabel6.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(jLabel6, CC.xy(3, 3));
+            //---- lblUID ----
+            lblUID.setText("UKennung");
+            lblUID.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel4.add(lblUID, CC.xy(3, 3));
 
-            //---- txtUKennung ----
-            txtUKennung.setColumns(10);
-            txtUKennung.setDragEnabled(false);
-            txtUKennung.setEnabled(false);
-            txtUKennung.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtUKennung.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtUKennungFocusLost(e);
-                }
-            });
-            jPanel4.add(txtUKennung, CC.xywh(5, 3, 3, 1));
+            //---- txtUID ----
+            txtUID.setColumns(10);
+            txtUID.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel4.add(txtUID, CC.xywh(5, 3, 2, 1));
 
             //---- lblFirstname ----
             lblFirstname.setText("Vorname");
@@ -106,61 +176,49 @@ public class DlgUser extends MyJDialog {
 
             //---- txtName ----
             txtName.setDragEnabled(false);
-            txtName.setEnabled(false);
             txtName.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtName.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtNameCaretUpdate(e);
-                }
-            });
             txtName.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtNameFocusLost(e);
                 }
             });
-            jPanel4.add(txtName, CC.xywh(5, 7, 3, 1));
+            jPanel4.add(txtName, CC.xywh(5, 7, 2, 1));
 
             //---- txtEMail ----
             txtEMail.setDragEnabled(false);
-            txtEMail.setEnabled(false);
             txtEMail.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtEMail.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtEMailFocusLost(e);
-                }
-            });
-            jPanel4.add(txtEMail, CC.xywh(5, 9, 3, 1));
+            jPanel4.add(txtEMail, CC.xywh(5, 9, 2, 1));
 
-            //---- jLabel5 ----
-            jLabel5.setText("E-Mail");
-            jLabel5.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(jLabel5, CC.xy(3, 9));
+            //---- lblEmail ----
+            lblEmail.setText("E-Mail");
+            lblEmail.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel4.add(lblEmail, CC.xy(3, 9));
 
             //---- txtVorname ----
             txtVorname.setDragEnabled(false);
-            txtVorname.setEnabled(false);
             txtVorname.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtVorname.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtVornameCaretUpdate(e);
-                }
-            });
             txtVorname.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtVornameFocusLost(e);
                 }
             });
-            jPanel4.add(txtVorname, CC.xywh(5, 5, 3, 1));
+            jPanel4.add(txtVorname, CC.xywh(5, 5, 2, 1));
 
             //---- lblName ----
             lblName.setText("Nachname");
             lblName.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel4.add(lblName, CC.xy(3, 7));
+
+            //---- lblPW ----
+            lblPW.setText("Passwort");
+            lblPW.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel4.add(lblPW, CC.xy(3, 11));
+
+            //---- txtPW ----
+            txtPW.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel4.add(txtPW, CC.xywh(5, 11, 2, 1));
 
             //======== jPanel3 ========
             {
@@ -169,7 +227,6 @@ public class DlgUser extends MyJDialog {
                 //---- btnCancel ----
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
                 btnCancel.setToolTipText("Abbrechen");
-                btnCancel.setEnabled(false);
                 btnCancel.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -181,7 +238,6 @@ public class DlgUser extends MyJDialog {
                 //---- btnSave ----
                 btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                 btnSave.setToolTipText("Sichern");
-                btnSave.setEnabled(false);
                 btnSave.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -190,24 +246,26 @@ public class DlgUser extends MyJDialog {
                 });
                 jPanel3.add(btnSave);
             }
-            jPanel4.add(jPanel3, CC.xy(1, 11));
+            jPanel4.add(jPanel3, CC.xywh(5, 13, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel4);
-        pack();
+        setSize(400, 240);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel jPanel4;
-    private JLabel jLabel6;
-    private JTextField txtUKennung;
+    private JLabel lblUID;
+    private JTextField txtUID;
     private JLabel lblFirstname;
     private JTextField txtName;
     private JTextField txtEMail;
-    private JLabel jLabel5;
+    private JLabel lblEmail;
     private JTextField txtVorname;
     private JLabel lblName;
+    private JLabel lblPW;
+    private JTextField txtPW;
     private JPanel jPanel3;
     private JButton btnCancel;
     private JButton btnSave;

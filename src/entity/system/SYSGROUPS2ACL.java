@@ -17,15 +17,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "IntClasses")
 @NamedQueries({
-    @NamedQuery(name = "IntClasses.findAll", query = "SELECT i FROM IntClasses i"),
-    @NamedQuery(name = "IntClasses.findByIcid", query = "SELECT i FROM IntClasses i WHERE i.icid = :icid"),
+    @NamedQuery(name = "IntClasses.findAll", query = "SELECT i FROM SYSGROUPS2ACL i"),
+    @NamedQuery(name = "IntClasses.findByIcid", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.icid = :icid"),
     @NamedQuery(name = "IntClasses.findByUserAndClassnameAndACL", query = " "
-    + "SELECT i FROM IntClasses i "
-    + "WHERE i.internalClassID = :classname AND :ocuser MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)"  ),
+    + "SELECT i FROM SYSGROUPS2ACL i "
+    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)"  ),
     @NamedQuery(name = "IntClasses.findByGroup", query = " "
-    + "SELECT i FROM IntClasses i WHERE i.groups = :gruppe "),
-    @NamedQuery(name = "IntClasses.findByClassname", query = "SELECT i FROM IntClasses i WHERE i.internalClassID = :classname")})
-public class IntClasses implements Serializable {
+    + "SELECT i FROM SYSGROUPS2ACL i WHERE i.groups = :gruppe "),
+    @NamedQuery(name = "IntClasses.findByClassname", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.internalClassID = :classname")})
+public class SYSGROUPS2ACL implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -44,10 +44,10 @@ public class IntClasses implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "intclass")
     private Collection<Acl> aclCollection;
 
-    public IntClasses() {
+    public SYSGROUPS2ACL() {
     }
 
-    public IntClasses(String internalClassID, Groups groups) {
+    public SYSGROUPS2ACL(String internalClassID, Groups groups) {
         this.internalClassID = internalClassID;
         this.groups = groups;
         this.aclCollection = new ArrayList();
@@ -95,10 +95,10 @@ public class IntClasses implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof IntClasses)) {
+        if (!(object instanceof SYSGROUPS2ACL)) {
             return false;
         }
-        IntClasses other = (IntClasses) object;
+        SYSGROUPS2ACL other = (SYSGROUPS2ACL) object;
         if ((this.icid == null && other.icid != null) || (this.icid != null && !this.icid.equals(other.icid))) {
             return false;
         }
@@ -107,6 +107,6 @@ public class IntClasses implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.system.IntClasses[" + internalClassID + " " + icid + "]";
+        return "entity.system.SYSGROUPS2ACL[" + internalClassID + " " + icid + "]";
     }
 }

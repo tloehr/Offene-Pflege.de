@@ -20,7 +20,7 @@ import javax.persistence.Table;
 import op.OPDE;
 
 /**
- * This entity is assigned to IntClasses in order to store rights for a specific user group.
+ * This entity is assigned to SYSGROUPS2ACL in order to store rights for a specific user group.
  * @author tloehr
  */
 @Entity
@@ -44,12 +44,12 @@ public class Acl implements Serializable, Comparable<Acl> {
     private short acl;
     @JoinColumn(name = "ICID", referencedColumnName = "ICID")
     @ManyToOne
-    private IntClasses intclass;
+    private SYSGROUPS2ACL intclass;
 
     public Acl() {
     }
 
-    public Acl(short acl, IntClasses intclass) {
+    public Acl(short acl, SYSGROUPS2ACL intclass) {
         this.acl = acl;
         this.intclass = intclass;
     }
@@ -58,11 +58,11 @@ public class Acl implements Serializable, Comparable<Acl> {
         return aclid;
     }
 
-    public IntClasses getIntclass() {
+    public SYSGROUPS2ACL getIntclass() {
         return intclass;
     }
 
-    public void setIntclass(IntClasses intclass) {
+    public void setIntclass(SYSGROUPS2ACL intclass) {
         this.intclass = intclass;
     }
 
@@ -96,7 +96,7 @@ public class Acl implements Serializable, Comparable<Acl> {
 
     @Override
     public String toString() {
-        return OPDE.getAppInfo().getInternalClasses().get(intclass.getInternalClassID()).getAcls().get(acl).getDescription();
+        return OPDE.getAppInfo().getInternalClasses().get(intclass.getInternalClassID()).getPossibleACLs().get(acl).getDescription();
     }
 
     @Override

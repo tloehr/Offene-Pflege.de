@@ -32,40 +32,36 @@ public class InternalClassACL implements Comparable<InternalClassACL> {
 
     private String description;
     private short acl;
-    private Acl aclEntity; // Wenn es eine bestehende Zuordnung zur Entity Acl gibt, dann steht die hier.
+//    private Acl aclEntity; // Wenn es eine bestehende Zuordnung zur Entity Acl gibt, dann steht die hier.
 
-    public InternalClassACL(String description, short acl, Acl aclEntity) {
-        this.description = description;
-        this.acl = acl;
-        this.aclEntity = aclEntity;
-    }
+//    public InternalClassACL(String description, short acl, Acl aclEntity) {
+//        this.description = description;
+//        this.acl = acl;
+////        this.aclEntity = aclEntity;
+//    }
 
     public InternalClassACL(String langbundle, short acl) {
         this.description = OPDE.lang.getString(langbundle);
         this.acl = acl;
-        this.aclEntity = null;
+//        this.aclEntity = null;
     }
 
 
-    public short getAcl() {
+    public short getACLcode() {
         return acl;
     }
 
-    public void setAcl(short acl) {
-        this.acl = acl;
-    }
-
-    public Acl getAclEntity() {
-        return aclEntity;
-    }
-
-    public void setAclEntity(Acl aclEntity) {
-        this.aclEntity = aclEntity;
-    }
-
-    public boolean hasAclEntity() {
-        return this.aclEntity != null;
-    }
+//    public Acl getAclEntity() {
+//        return aclEntity;
+//    }
+//
+//    public void setAclEntity(Acl aclEntity) {
+//        this.aclEntity = aclEntity;
+//    }
+//
+//    public boolean hasAclEntity() {
+//        return this.aclEntity != null;
+//    }
 
 
     public String getDescription() {
@@ -83,7 +79,7 @@ public class InternalClassACL implements Comparable<InternalClassACL> {
 
     @Override
     public int compareTo(InternalClassACL o) {
-        return new Short(acl).compareTo(o.getAcl());
+        return new Short(acl).compareTo(o.getACLcode());
     }
 
 }

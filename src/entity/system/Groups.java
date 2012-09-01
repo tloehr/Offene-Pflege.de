@@ -41,7 +41,7 @@ public class Groups implements Serializable, Comparable<Groups> {
     @ManyToMany(mappedBy = "groups")
     private Collection<Users> members;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "groups")
-    private Collection<IntClasses> icCollection;
+    private Collection<SYSGROUPS2ACL> icCollection;
 
     public Groups() {
         this.gid = null;
@@ -55,11 +55,11 @@ public class Groups implements Serializable, Comparable<Groups> {
         return members;
     }
 
-    public Collection<IntClasses> getIntClasses() {
+    public Collection<SYSGROUPS2ACL> getIntClasses() {
         return icCollection;
     }
 
-    public String getID() {
+    public String getGID() {
         return gid;
     }
 
@@ -97,7 +97,7 @@ public class Groups implements Serializable, Comparable<Groups> {
 
     @Override
     public int compareTo(Groups o) {
-        return gid.compareTo(o.getID());
+        return gid.compareTo(o.getGID());
     }
 
     @Override
