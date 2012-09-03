@@ -102,7 +102,7 @@ public class TMBHP extends AbstractTableModel {
                     // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
                     " AND ( ? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?)) ");
             queryOHNEmedi.setParameter(1, datum);
-            queryOHNEmedi.setParameter(2, bewohner.getBWKennung());
+            queryOHNEmedi.setParameter(2, bewohner.getRID());
 
             queryOHNEmedi.setParameter(3, schicht == SYSConst.ZEIT_ALLES);
 
@@ -146,9 +146,9 @@ public class TMBHP extends AbstractTableModel {
                     " WHERE bhp.DafID IS NOT NULL AND Date(bhp.Soll)=Date(?) AND bhp.BWKennung=?" +
                     // Durch den Kniff mit ? = 1 kann man den ganzen Ausdruck anhängen oder abhängen.
                     " AND (? = TRUE OR (SZeit >= ? AND SZeit <= ?) OR (SZeit = 0 AND TIME(Soll) >= ? AND TIME(Soll) <= ?))");
-            queryMITmedi.setParameter(1, bewohner.getBWKennung());
+            queryMITmedi.setParameter(1, bewohner.getRID());
             queryMITmedi.setParameter(2, datum);
-            queryMITmedi.setParameter(3, bewohner.getBWKennung());
+            queryMITmedi.setParameter(3, bewohner.getRID());
 
             queryMITmedi.setParameter(4, schicht == SYSConst.ZEIT_ALLES);
 

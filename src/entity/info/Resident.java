@@ -77,7 +77,7 @@ public class Resident implements Serializable {
     private short adminonly;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
-    private Collection<Barbetrag> konto;
+    private Collection<Allowance> konto;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<NReport> pflegeberichteCollection;
@@ -122,11 +122,11 @@ public class Resident implements Serializable {
         this.adminonly = 0;
     }
 
-    public String getBWKennung() {
+    public String getRID() {
         return bWKennung;
     }
 
-    public void setBWKennung(String bWKennung) {
+    public void setRID(String bWKennung) {
         if (this.bWKennung == null) {
             this.bWKennung = bWKennung;
         }
@@ -206,7 +206,7 @@ public class Resident implements Serializable {
         this.adminonly = adminonly;
     }
 
-    public Collection<Barbetrag> getKonto() {
+    public Collection<Allowance> getKonto() {
         return konto;
     }
 

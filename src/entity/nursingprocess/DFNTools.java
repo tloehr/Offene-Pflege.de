@@ -197,7 +197,7 @@ public class DFNTools {
 //                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("MassTermin: " + termin.getTermID());
-//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getBWKennung());
+//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getRID());
 //                OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
 
                 boolean treffer = false;

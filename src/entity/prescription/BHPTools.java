@@ -257,7 +257,7 @@ public class BHPTools {
 //                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
-//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getBWKennung());
+//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getRID());
 //                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
 
 
@@ -368,7 +368,7 @@ public class BHPTools {
 //                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
-//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getBWKennung());
+//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getRID());
 //                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
 
 //        OPDE.debug("Erzeugte BHPs: " + numbhp);

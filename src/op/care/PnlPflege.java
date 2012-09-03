@@ -10,7 +10,7 @@ import com.jidesoft.pane.CollapsiblePanes;
 import entity.info.Resident;
 import entity.files.SYSFilesTools;
 import op.OPDE;
-import op.bw.tg.PnlTG;
+import op.allowance.PnlAllowance;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.care.reports.PnlReport;
 import op.care.bhp.PnlBHP;
@@ -233,7 +233,7 @@ public class PnlPflege extends NursingRecordsPanel {
         }
 //        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlReport.internalClassID, InternalClassACL.EXECUTE));
 //        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
-        jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlTG.internalClassID, InternalClassACL.EXECUTE));
+        jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlAllowance.internalClassID, InternalClassACL.EXECUTE));
     }
 
 //    private void print(String html) {

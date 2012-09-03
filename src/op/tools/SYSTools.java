@@ -27,7 +27,9 @@
 package op.tools;
 
 import com.jidesoft.swing.JideSplitPane;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
+import entity.system.Users;
 import op.OPDE;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
@@ -265,7 +267,7 @@ public class SYSTools {
     }
 
 //    public static void setBWLabel(JLabel bwlabel, Bewohner bewohner) {
-//        setBWLabel(bwlabel, bewohner.getBWKennung());
+//        setBWLabel(bwlabel, bewohner.getRID());
 //    }
 
 //    public static void setBWLabel(JLabel bwlabel, String currentBW) {
@@ -2117,6 +2119,43 @@ public class SYSTools {
         String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
         return pattern.matcher(mail).matches();
+    }
+
+    public static String generatePassword(String firstname, String lastname) {
+        Random generator = new Random(System.currentTimeMillis());
+        return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
+    }
+
+    public static void printpw(String password, Users user) {
+        String html;
+
+        try {
+            html = SYSTools.readFileAsString(OPDE.getOpwd() + System.getProperty("file.separator") + "newuser.html");
+        } catch (IOException ie) {
+            html = "<body>"
+                    + "<h1>Access to Offene-Pflege.de (OPDE)</h1>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<h2>For <opde-user-fullname/></h2>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "<p>UserID: <b><opde-user-userid/></b></p>"
+                    + "<p>Password: <b><opde-user-pw/></b></p>"
+                    + "<br/>"
+                    + "<br/>"
+                    + "Please keep this note in a safe place. Don't tell Your password to anyone."
+                    + "</body>";
+        }
+
+        html = SYSTools.replace(html, "<opde-user-fullname/>", user.getFullname());
+        html = SYSTools.replace(html, "<opde-user-userid/>", user.getUID());
+        html = SYSTools.replace(html, "<opde-user-pw/>", password);
+        html = SYSTools.htmlUmlautConversion(html);
+
+
+        SYSFilesTools.print(html, true);
     }
 
 }

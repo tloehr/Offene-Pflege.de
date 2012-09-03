@@ -47,8 +47,8 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
+import op.allowance.PnlAllowance;
 import op.residents.bwassistant.AddBWWizard;
-import op.bw.tg.PnlTG;
 import op.care.PnlPflege;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
@@ -566,8 +566,8 @@ public class FrmMain extends JFrame {
     private CleanablePanel loadPanel(String classname) {
         CleanablePanel panel = null;
         currentBewohner = null;
-        if (classname.equals("op.bw.tg.PnlTG")) {
-            panel = new PnlTG(jspSearch, bwchange);
+        if (classname.equals("op.allowance.PnlAllowance")) {
+            panel = new PnlAllowance(jspSearch, bwchange);
         } else if (classname.equals("op.process.PnlProcess")) {
             panel = new PnlProcess(jspSearch);
         } else if (classname.equals("op.care.med.PnlMed")) {
@@ -637,7 +637,7 @@ public class FrmMain extends JFrame {
                 }
             };
 
-            String titel = innerbewohner.getNachname() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getBWKennung() + "]";
+            String titel = innerbewohner.getNachname() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getRID() + "]";
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
             button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGeschlecht() == ResidentTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);

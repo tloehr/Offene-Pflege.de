@@ -140,7 +140,7 @@ public class MedStockTools {
         hm.put("bestand.userlang", bestand.getUser().getFullname());
         hm.put("bestand.vorrat.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
         hm.put("bestand.vorrat.bewohnergebdatum", bestand.getInventory().getResident().getGebDatum());
-        hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getResident().getBWKennung());
+        hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getResident().getRID());
 
         return hm;
     }

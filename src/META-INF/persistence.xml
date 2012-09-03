@@ -7,7 +7,7 @@
         <class>entity.system.Acl</class>
         <class>entity.Arzt</class>
         <class>entity.BWerte</class>
-        <class>entity.Barbetrag</class>
+        <class>entity.Allowance</class>
         <class>entity.Betreuer</class>
         <class>entity.info.Resident</class>
         <class>entity.nursingprocess.DFN</class>

@@ -150,9 +150,9 @@ public class PrescriptionsTools {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createNativeQuery(sql);
-        query.setParameter(1, bewohner.getBWKennung());
-        query.setParameter(2, bewohner.getBWKennung());
-        query.setParameter(3, bewohner.getBWKennung());
+        query.setParameter(1, bewohner.getRID());
+        query.setParameter(2, bewohner.getRID());
+        query.setParameter(3, bewohner.getRID());
         List<Object[]> listeRohfassung = query.getResultList();
         ArrayList<Object[]> listeBedarf = null;
 
@@ -254,7 +254,7 @@ public class PrescriptionsTools {
 
             // Wenn der Bewohnername sich in der Liste ändert, muss
             // einmal die Überschrift drüber gesetzt werden.
-            boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getResident().getBWKennung());
+            boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getResident().getRID());
 
             if (pagebreak || stationsWechsel || bewohnerWechsel) {
                 // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
@@ -268,7 +268,7 @@ public class PrescriptionsTools {
                     html += "</table>";
                 }
 
-                bwkennung = verordnung.getResident().getBWKennung();
+                bwkennung = verordnung.getResident().getRID();
 
                 html += "<h2 id=\"fonth2\" " +
                         (pagebreak ? "style=\"page-break-before:always\">" : ">") +

@@ -762,10 +762,10 @@ public class BWInfoTools {
                         + "ON DATE(aus.PIT) = DATE(ein.PIT) "
                         + "ORDER BY aus.PIT desc";
                 Query query = em.createNativeQuery(sql);
-                query.setParameter(1, bewohner.getBWKennung());
+                query.setParameter(1, bewohner.getRID());
                 query.setParameter(2, BWerteTools.BILANZ);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
-                query.setParameter(4, bewohner.getBWKennung());
+                query.setParameter(4, bewohner.getRID());
                 query.setParameter(5, BWerteTools.BILANZ);
                 query.setParameter(6, new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
@@ -820,7 +820,7 @@ public class BWInfoTools {
                         + " ORDER BY PIT desc";
 
                 Query query = em.createNativeQuery(sql);
-                query.setParameter(1, bewohner.getBWKennung());
+                query.setParameter(1, bewohner.getRID());
                 query.setParameter(2, BWerteTools.BILANZ);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 List<Object[]> list = query.getResultList();

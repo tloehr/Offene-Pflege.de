@@ -230,7 +230,7 @@ public class QProcessTools {
 //                    if (!txt.getText().trim().isEmpty()) {
 //                        QProcess vorgang = createVorgang(txt.getText(), kat, bw);
 //                        add(finalElementQ, vorgang);
-//                        OPDE.debug("Vorgang '" + vorgang.getTitle() + "' für Bewohner '" + bw.getBWKennung() + "' angelegt. Element mit ID " + finalElementQ.getGID() + " zugeordnet.");
+//                        OPDE.debug("Vorgang '" + vorgang.getTitle() + "' für Bewohner '" + bw.getRID() + "' angelegt. Element mit ID " + finalElementQ.getGID() + " zugeordnet.");
 //                    }
 //                }
 //            });

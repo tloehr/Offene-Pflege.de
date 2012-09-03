@@ -27,7 +27,7 @@
 
 package tablemodels;
 
-import entity.Barbetrag;
+import entity.Allowance;
 import entity.info.Resident;
 import entity.EntityTools;
 import op.OPDE;
@@ -56,7 +56,7 @@ public class TMBarbetrag extends AbstractTableModel {
     Date von;
     Date bis;
     Resident bewohner;
-    List<Barbetrag> listData;
+    List<Allowance> listData;
 
     boolean editable = false;
 
@@ -75,14 +75,14 @@ public class TMBarbetrag extends AbstractTableModel {
 
         EntityManager em = OPDE.createEM();
 
-        String jpql = " SELECT tg FROM Barbetrag tg WHERE tg.bewohner = :bewohner ";
+        String jpql = " SELECT tg FROM Allowance tg WHERE tg.bewohner = :bewohner ";
 
         if (!subset) {
             vortrag = BigDecimal.ZERO;
         } else {
-            jpql += " AND tg.belegDatum >= :von AND tg.belegDatum <= :bis ";
+            jpql += " AND allowance.belegDatum >= :von AND allowance.belegDatum <= :bis ";
 
-            Query queryVortrag = em.createQuery(" SELECT SUM(tg.betrag) FROM Barbetrag tg WHERE tg.bewohner = :bewohner AND tg.belegDatum < :von ");
+            Query queryVortrag = em.createQuery(" SELECT SUM(tg.betrag) FROM Allowance tg WHERE tg.bewohner = :bewohner AND tg.belegDatum < :von ");
             queryVortrag.setParameter("bewohner", bewohner);
             queryVortrag.setParameter("von", von);
             vortrag = (BigDecimal) queryVortrag.getSingleResult();
@@ -93,7 +93,7 @@ public class TMBarbetrag extends AbstractTableModel {
 
         }
 
-        jpql += " ORDER BY tg.belegDatum, tg.tgid ";
+        jpql += " ORDER BY allowance.belegDatum, allowance.tgid ";
 
         Query queryList = em.createQuery(jpql);
         queryList.setParameter("bewohner", bewohner);
@@ -178,7 +178,7 @@ public class TMBarbetrag extends AbstractTableModel {
         return c;
     }
 
-    public List<Barbetrag> getListData() {
+    public List<Allowance> getListData() {
         return listData;
     }
 
@@ -285,7 +285,7 @@ public class TMBarbetrag extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        Barbetrag tg2edit = listData.get(subset ? rowIndex - 1 : rowIndex);
+        Allowance tg2edit = listData.get(subset ? rowIndex - 1 : rowIndex);
         switch (columnIndex) {
             case COL_Datum: {
                 tg2edit.setBelegDatum((Date) aValue);

@@ -45,13 +45,13 @@ public class DlgUser extends MyJDialog {
 
     private void txtNameFocusLost(FocusEvent e) {
         if (!txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
-            txtPW.setText(generatePassword(txtVorname.getText(), txtName.getText()));
+            txtPW.setText(SYSTools.generatePassword(txtVorname.getText(), txtName.getText()));
         }
     }
 
     private void txtVornameFocusLost(FocusEvent e) {
         if (!txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
-            txtPW.setText(generatePassword(txtVorname.getText(), txtName.getText()));
+            txtPW.setText(SYSTools.generatePassword(txtVorname.getText(), txtName.getText()));
         }
     }
 
@@ -64,42 +64,12 @@ public class DlgUser extends MyJDialog {
     public void dispose() {
         super.dispose();
         if (user != null){
-            print(txtPW.getText().trim());
+            SYSTools.printpw(txtPW.getText().trim(), user);
         }
         callback.execute(user);
     }
 
-    private void print(String password) {
-        String html;
 
-        try {
-            html = SYSTools.readFileAsString(OPDE.getOpwd() + System.getProperty("file.separator") + "newuser.html");
-        } catch (IOException ie) {
-            html = "<body>"
-                    + "<h1>Access to Offene-Pflege.de (OPDE)</h1>"
-                    + "<br/>"
-                    + "<br/>"
-                    + "<br/>"
-                    + "<h2>For <opde-user-fullname/></h2>"
-                    + "<br/>"
-                    + "<br/>"
-                    + "<br/>"
-                    + "<p>UserID: <b><opde-user-userid/></b></p>"
-                    + "<p>Password: <b><opde-user-pw/></b></p>"
-                    + "<br/>"
-                    + "<br/>"
-                    + "Please keep this note in a safe place. Don't tell Your password to anyone."
-                    + "</body>";
-        }
-
-        html = SYSTools.replace(html, "<opde-user-fullname/>", user.getFullname());
-        html = SYSTools.replace(html, "<opde-user-userid/>", user.getUID());
-        html = SYSTools.replace(html, "<opde-user-pw/>", password);
-        html = SYSTools.htmlUmlautConversion(html);
-
-
-        SYSFilesTools.print(html, true);
-    }
 
     private void btnSaveActionPerformed(ActionEvent e) {
         if (txtName.getText().isEmpty() || txtVorname.getText().isEmpty() || txtPW.getText().isEmpty() || txtUID.getText().isEmpty()) {
@@ -127,10 +97,7 @@ public class DlgUser extends MyJDialog {
         dispose();
     }
 
-    private String generatePassword(String firstname, String lastname) {
-        Random generator = new Random(System.currentTimeMillis());
-        return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
-    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -249,7 +216,7 @@ public class DlgUser extends MyJDialog {
             jPanel4.add(jPanel3, CC.xywh(5, 13, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel4);
-        setSize(400, 240);
+        setSize(400, 235);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

@@ -53,11 +53,11 @@ public class ResidentTools {
     }
 
     public static String getBWLabel2(Resident bewohner) {
-        return "(*" + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + ") [" + bewohner.getBWKennung() + "]";
+        return "(*" + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + ") [" + bewohner.getRID() + "]";
     }
 
     public static String getBWLabelTextKompakt(Resident bewohner) {
-        return bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getBWKennung() + "]";
+        return bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getRID() + "]";
     }
 
 
@@ -88,7 +88,7 @@ public class ResidentTools {
         DateTime refdate = verstorben ? new DateTime(hauf.getBis()) : new DateTime();
         Years age = Years.yearsBetween(birthdate, refdate);
 
-        result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getBWKennung() + "]";
+        result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRID() + "]";
 
         if (verstorben || ausgezogen) {
             result += "  " + (verstorben ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(hauf.getBis()) + ", ";

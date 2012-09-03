@@ -19,17 +19,19 @@ import java.util.Date;
 @Entity
 @Table(name = "Taschengeld")
 @NamedQueries({
-        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Barbetrag t"),
-        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Barbetrag t WHERE t.tgid = :tgid"),
-        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Barbetrag t WHERE t.belegDatum = :belegDatum"),
-        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Barbetrag t WHERE t.belegtext = :belegtext")})
-public class Barbetrag implements Serializable, Comparable<Barbetrag> {
+        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Allowance t"),
+        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Allowance t WHERE t.id = :tgid"),
+        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Allowance t WHERE t.belegDatum = :belegDatum"),
+        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Allowance t WHERE t.belegtext = :belegtext")})
+public class Allowance implements Serializable, Comparable<Allowance> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "TGID")
-    private Long tgid;
+    private Long id;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "BelegDatum")
     @Temporal(TemporalType.DATE)
@@ -49,10 +51,10 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date erstelltAm;
 
-    public Barbetrag() {
+    public Allowance() {
     }
 
-    public Barbetrag(Date belegDatum, String belegtext, BigDecimal betrag, Resident bewohner, Users erstelltVon) {
+    public Allowance(Date belegDatum, String belegtext, BigDecimal betrag, Resident bewohner, Users erstelltVon) {
         this.belegDatum = belegDatum;
         this.belegtext = belegtext;
         this.betrag = betrag;
@@ -71,15 +73,6 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     @JoinColumn(name = "_creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users erstelltVon;
-
-    public Long getTgid() {
-        return tgid;
-    }
-
-    public void setTgid(Long tgid) {
-        this.tgid = tgid;
-    }
-
 
     public Date getBelegDatum() {
         return belegDatum;
@@ -149,17 +142,17 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (tgid != null ? tgid.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof Barbetrag)) {
+        if (!(object instanceof Allowance)) {
             return false;
         }
-        Barbetrag other = (Barbetrag) object;
-        if ((this.tgid == null && other.tgid != null) || (this.tgid != null && !this.tgid.equals(other.tgid))) {
+        Allowance other = (Allowance) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -168,7 +161,7 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     @Override
     public String toString() {
         return "Taschengeld{" +
-                "tgid=" + tgid +
+                "tgid=" + id +
                 ", belegDatum=" + belegDatum +
                 ", belegtext='" + belegtext + '\'' +
                 ", betrag=" + betrag +
@@ -181,7 +174,7 @@ public class Barbetrag implements Serializable, Comparable<Barbetrag> {
     }
 
     @Override
-    public int compareTo(Barbetrag other) {
+    public int compareTo(Allowance other) {
         return belegDatum.compareTo(other.getBelegDatum());
     }
 }

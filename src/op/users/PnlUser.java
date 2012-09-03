@@ -31,7 +31,6 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.files.SYSFilesTools;
 import entity.system.*;
 import op.OPDE;
 import op.system.InternalClass;
@@ -54,7 +53,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,6 +75,8 @@ public class PnlUser extends CleanablePanel {
 
     private HashMap<String, JPanel> contentMap;
     private HashMap<String, CollapsiblePane> cpMap;
+
+    private HashMap<String, Users> usermap;
 
 //    private HashMap<Groups, Pair<ArrayList<Users>, ArrayList<InternalClass>>> groupMap2;
 
@@ -122,6 +122,7 @@ public class PnlUser extends CleanablePanel {
         bg = SYSTools.getColor(OPDE.getProps().getProperty("EARLY_BGBHP"));
         contentMap = new HashMap<String, JPanel>();
         cpMap = new HashMap<String, CollapsiblePane>();
+        usermap = new HashMap<String, Users>();
         prepareSearchArea();
     }
 
@@ -185,8 +186,8 @@ public class PnlUser extends CleanablePanel {
             lstUsers = UsersTools.getUsers(true);
             lstGroups = GroupsTools.getGroups();
             for (Users user : lstUsers) {
+                usermap.put(user.getUID(), user);
                 createCP4(user);
-
             }
             for (Groups group : lstGroups) {
                 createCP4(group);
@@ -201,6 +202,11 @@ public class PnlUser extends CleanablePanel {
     public void cleanup() {
         lstGroups.clear();
         lstUsers.clear();
+        usermap.clear();
+        contentMap.clear();
+        cpMap.clear();
+        cpMain.removeAll();
+        searchPanes.removeAll();
     }
 
     @Override
@@ -244,7 +250,6 @@ public class PnlUser extends CleanablePanel {
 //            print(pw);
 //        }
     }
-
 
 
     private void prepareSearchArea() {
@@ -532,52 +537,88 @@ public class PnlUser extends CleanablePanel {
         btnChangePW.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new DlgChangePW(user, new Closure() {
-                    @Override
-                    public void execute(Object answer) {
-                        if (answer != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Users myUser = em.merge(user);
-                                em.lock(myUser, LockModeType.OPTIMISTIC);
-                                myUser.setMd5pw(SYSTools.hashword(answer.toString()));
-                                em.getTransaction().commit();
 
-//                                lstUsers.remove(user);
-//                                lstUsers.add(myUser);
-//                                Collections.sort(lstUsers);
-//                                CollapsiblePane cp = createCP4(myUser);
-//                                boolean wasCollapsed = userMap.get(user).isCollapsed();
-//                                userMap.remove(user);
-//                                userMap.put(myUser, cp);
-//                                cp.setCollapsed(wasCollapsed);
-                                buildPanel();
 
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Users myUser = em.merge(usermap.get(user.getUID()));
+                    String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getNachname());
+                    em.lock(myUser, LockModeType.OPTIMISTIC);
+                    myUser.setMd5pw(SYSTools.hashword(newpw));
+                    em.getTransaction().commit();
 
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
+                    lstUsers.remove(user);
+                    lstUsers.add(myUser);
+                    usermap.put(key, myUser);
+                    Collections.sort(lstUsers);
+
+                    SYSTools.printpw(newpw, myUser);
+
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
+                } catch (OptimisticLockException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
-                });
+
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
+
+
+//                new DlgChangePW(user, new Closure() {
+//                    @Override
+//                    public void execute(Object answer) {
+//                        if (answer != null) {
+//                            EntityManager em = OPDE.createEM();
+//                            try {
+//                                em.getTransaction().begin();
+//                                Users myUser = em.merge(user);
+//                                em.lock(myUser, LockModeType.OPTIMISTIC);
+//                                myUser.setMd5pw(SYSTools.hashword(answer.toString()));
+//                                em.getTransaction().commit();
+//
+////                                lstUsers.remove(user);
+////                                lstUsers.add(myUser);
+////                                Collections.sort(lstUsers);
+////                                CollapsiblePane cp = createCP4(myUser);
+////                                boolean wasCollapsed = userMap.get(user).isCollapsed();
+////                                userMap.remove(user);
+////                                userMap.put(myUser, cp);
+////                                cp.setCollapsed(wasCollapsed);
+//                                buildPanel();
+//
+//                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
+//
+//                            } catch (OptimisticLockException ole) {
+//                                if (em.getTransaction().isActive()) {
+//                                    em.getTransaction().rollback();
+//                                }
+//                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+//                                    OPDE.getMainframe().emptyFrame();
+//                                    OPDE.getMainframe().afterLogin();
+//                                }
+//                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//                            } catch (Exception e) {
+//                                if (em.getTransaction().isActive()) {
+//                                    em.getTransaction().rollback();
+//                                }
+//                                OPDE.fatal(e);
+//                            } finally {
+//                                em.close();
+//                            }
+//                        }
+//                    }
+//                });
             }
         });
+        btnChangePW.setEnabled(user.isActive());
         titlePanelright.add(btnChangePW);
 
         /***
@@ -601,21 +642,20 @@ public class PnlUser extends CleanablePanel {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
-                    Users myUser = em.merge(user);
+                    Users myUser = em.merge(usermap.get(user.getUID()));
                     em.lock(myUser, LockModeType.OPTIMISTIC);
 
                     myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
                     em.getTransaction().commit();
+                    lstUsers.remove(user);
+                    lstUsers.add(myUser);
+                    usermap.put(myUser.getUID(), myUser);
+                    Collections.sort(lstUsers);
+                    CollapsiblePane cp = createCP4(myUser);
+                    boolean wasCollapsed = cpMap.get(key).isCollapsed();
+                    cpMap.put(key, cp);
 
-//                    lstUsers.remove(user);
-//                    lstUsers.add(myUser);
-//                    Collections.sort(lstUsers);
-//                    CollapsiblePane cp = createCP4(myUser);
-//                    boolean wasCollapsed = userMap.get(user).isCollapsed();
-//                    userMap.remove(user);
-//                    userMap.put(myUser, cp);
-//                    cp.setCollapsed(wasCollapsed);
-
+                    cp.setCollapsed(myUser.isActive() ? wasCollapsed : true);
                     buildPanel();
                 } catch (OptimisticLockException ole) {
                     if (em.getTransaction().isActive()) {

@@ -93,7 +93,7 @@ public class TMTGStat extends AbstractTableModel {
         BigDecimal saldo = listData.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) listData.get(row)[1];
         switch (col) {
             case COL_BW: {
-                result = SYSTools.htmlUmlautConversion("<b>"+ ResidentTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getBWKennung()+"]");
+                result = SYSTools.htmlUmlautConversion("<b>"+ ResidentTools.getBWLabel1(bewohner)+"</b> ["+bewohner.getRID()+"]");
                 break;
             }
             case COL_SALDO: {

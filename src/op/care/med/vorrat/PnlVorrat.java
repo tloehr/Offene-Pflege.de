@@ -841,8 +841,8 @@ public class PnlVorrat extends NursingRecordsPanel {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("MedVorrat.findVorraeteMitSummen");
-        query.setParameter(1, bewohner.getBWKennung());
-        query.setParameter(2, bewohner.getBWKennung());
+        query.setParameter(1, bewohner.getRID());
+        query.setParameter(2, bewohner.getRID());
         query.setParameter(3, cbClosedVorrat.isSelected());
 
         java.util.List<Pair<MedInventory, BigDecimal>> list = new ArrayList();

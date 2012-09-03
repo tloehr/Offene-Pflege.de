@@ -99,7 +99,7 @@ public class TMWerte
                             " ORDER BY bw.PIT desc ";
 
             Query query = em.createNativeQuery(sql);
-            query.setParameter(1, bewohner.getBWKennung());
+            query.setParameter(1, bewohner.getRID());
             query.setParameter(2, from);
 
             if (type > 0){

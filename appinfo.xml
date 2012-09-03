@@ -19,7 +19,7 @@
         -->
         <class name="admin.residents.cash" short="Barbeträge"
                long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true"
-               javaclass="op.bw.tg.PnlTG" icon="coins.png">
+               javaclass="op.allowance.PnlAllowance" icon="coins.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <delete langbundle="appinfo.default.acl.delete"/>
             <insert langbundle="appinfo.default.acl.insert"/>

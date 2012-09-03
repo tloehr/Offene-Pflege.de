@@ -9,11 +9,16 @@ import entity.info.ResidentTools;
 import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
+import org.joda.time.DateTime;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -21,10 +26,10 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class BarbetragTools {
+public class AllowanceTools {
 
     // TGID, BelegDatum, Belegtext, Betrag, _creator, _editor, _cdate, _edate, _cancel
-    public static String getEinzelnAsHTML(List<Barbetrag> listTG, BigDecimal vortrag, Resident bewohner) {
+    public static String getEinzelnAsHTML(List<Allowance> listTG, BigDecimal vortrag, Resident bewohner) {
 
         SimpleDateFormat df = new SimpleDateFormat("MMMM yyyy");
         DecimalFormat currency = new DecimalFormat("######.00");
@@ -58,7 +63,7 @@ public class BarbetragTools {
 
         int monat = -1;
 
-        for (Barbetrag tg : listTG){
+        for (Allowance tg : listTG) {
 
             GregorianCalendar belegDatum = SYSCalendar.toGC(tg.getBelegDatum());
             boolean monatsWechsel = monat != belegDatum.get(GregorianCalendar.MONTH);
@@ -132,4 +137,64 @@ public class BarbetragTools {
 
         return html;
     }
+
+
+    public static BigDecimal getSUM(Resident resident, Date month) {
+        DateTime from = new DateTime(month).dayOfMonth().withMinimumValue();
+        DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT SUM(al.betrag) FROM Allowance al WHERE al.bewohner = :resident AND al.belegDatum >= :from AND al.belegDatum <= :to ");
+        query.setParameter("resident", resident);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        BigDecimal sum = BigDecimal.ZERO;
+        try {
+            sum = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            sum = BigDecimal.ZERO;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        if (sum == null) {
+            sum = BigDecimal.ZERO;
+        }
+        return sum;
+    }
+
+    public static BigDecimal getSUM(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT SUM(al.betrag) FROM Allowance al WHERE al.bewohner = :resident ");
+        query.setParameter("resident", resident);
+        BigDecimal sum = BigDecimal.ZERO;
+        try {
+            sum = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            sum = BigDecimal.ZERO;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        if (sum == null) {
+            sum = BigDecimal.ZERO;
+        }
+        return sum;
+    }
+
+
+    public static ArrayList<Allowance> getAll(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.bewohner = :resident ORDER BY al.belegDatum ");
+        query.setParameter("resident", resident);
+        ArrayList<Allowance> result = null;
+        try {
+            result = new ArrayList<Allowance>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        if (result == null) {
+            result = new ArrayList<Allowance>();
+        }
+        return result;
+    }
+
 }
