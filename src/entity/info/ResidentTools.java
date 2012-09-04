@@ -82,7 +82,7 @@ public class ResidentTools {
         BWInfo hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("hauf"));
 
         DateFormat df = DateFormat.getDateInstance();
-        String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + ", ";
+        String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + "), ";
 
         DateMidnight birthdate = new DateTime(bewohner.getGebDatum()).toDateMidnight();
         DateTime refdate = verstorben ? new DateTime(hauf.getBis()) : new DateTime();

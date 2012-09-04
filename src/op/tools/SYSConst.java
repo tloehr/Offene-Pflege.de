@@ -108,6 +108,15 @@ public class SYSConst {
     public static Color grey80 = new Color(0xc7, 0xc7, 0xc5);
     public static Color grey50 = new Color(0x74, 0x71, 0x70);
 
+    public static Color[] purple_pastel1 = new Color[]{
+            SYSTools.getColor("800080"), SYSTools.getColor("BF00BF"),
+            SYSTools.getColor("DB00DB"), SYSTools.getColor("F900F9"),
+            SYSTools.getColor("FF4AFF"), SYSTools.getColor("FF86FF"),
+            SYSTools.getColor("FFA4FF"), SYSTools.getColor("FFBBFF"),
+            SYSTools.getColor("FFCEFF"), SYSTools.getColor("FFDFFF"),
+            SYSTools.getColor("FFECFF"), SYSTools.getColor("FFF9FF")
+    };
+
     public static Color colorWeekday = SYSTools.getColor("FFE6D0");
     public static Color colorWeekend = SYSTools.getColor("FFC895");
     public static Color colorHolliday = SYSTools.getColor("FF800D");
@@ -321,7 +330,7 @@ public class SYSConst {
     public static final Icon icon48ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2_pressed.png"));
     public static final Icon icon48delete = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/editdelete.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
-//    public static final Icon icon48attach = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/attach"));
+    //    public static final Icon icon48attach = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/attach"));
     public static final Icon icon48kgetdock = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/kget_dock.png"));
     public static final Icon icon22apply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply.png"));
     public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));

@@ -50,6 +50,9 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date erstelltAm;
+    @Transient
+    private BigDecimal rowsum;
+
 
     public Allowance() {
     }
@@ -76,6 +79,10 @@ public class Allowance implements Serializable, Comparable<Allowance> {
 
     public Date getBelegDatum() {
         return belegDatum;
+    }
+
+    public Long getID() {
+        return id;
     }
 
     public void setBelegDatum(Date belegDatum) {
@@ -105,6 +112,14 @@ public class Allowance implements Serializable, Comparable<Allowance> {
 
     public void setBewohner(Resident bewohner) {
         this.bewohner = bewohner;
+    }
+
+    public BigDecimal getRowsum() {
+        return rowsum;
+    }
+
+    public void setRowsum(BigDecimal rowsum) {
+        this.rowsum = rowsum;
     }
 
     public Date getBearbeitetAm() {
@@ -175,6 +190,10 @@ public class Allowance implements Serializable, Comparable<Allowance> {
 
     @Override
     public int compareTo(Allowance other) {
-        return belegDatum.compareTo(other.getBelegDatum());
+        int result = belegDatum.compareTo(other.getBelegDatum()) * -1;
+        if (result == 0){
+            result = id.compareTo(other.getID());
+        }
+        return result;
     }
 }

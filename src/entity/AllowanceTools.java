@@ -8,6 +8,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
 import op.tools.HTMLTools;
+import op.tools.Pair;
 import op.tools.SYSCalendar;
 import org.joda.time.DateTime;
 
@@ -139,14 +140,12 @@ public class AllowanceTools {
     }
 
 
-    public static BigDecimal getSUM(Resident resident, Date month) {
-        DateTime from = new DateTime(month).dayOfMonth().withMinimumValue();
-        DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
-
+    public static BigDecimal getSUM(Resident resident, DateTime to) {
+        OPDE.debug("getSUM to: "+DateFormat.getDateInstance().format(to.toDate()));
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(al.betrag) FROM Allowance al WHERE al.bewohner = :resident AND al.belegDatum >= :from AND al.belegDatum <= :to ");
+        Query query = em.createQuery("SELECT SUM(al.betrag) FROM Allowance al WHERE al.bewohner = :resident AND al.belegDatum <= :to ");
         query.setParameter("resident", resident);
-        query.setParameter("from", from.toDate());
+//        query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
         BigDecimal sum = BigDecimal.ZERO;
         try {
@@ -159,6 +158,7 @@ public class AllowanceTools {
         if (sum == null) {
             sum = BigDecimal.ZERO;
         }
+        OPDE.debug("getSUM sum: "+ sum.toPlainString());
         return sum;
     }
 
@@ -180,7 +180,6 @@ public class AllowanceTools {
         return sum;
     }
 
-
     public static ArrayList<Allowance> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.bewohner = :resident ORDER BY al.belegDatum ");
@@ -197,4 +196,51 @@ public class AllowanceTools {
         return result;
     }
 
+    public static ArrayList<Allowance> getMonth(Resident resident, Date month) {
+        DateTime from = new DateTime(month).dayOfMonth().withMinimumValue();
+        DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.bewohner = :resident AND al.belegDatum >= :from AND al.belegDatum <= :to ORDER BY al.belegDatum DESC, al.id DESC");
+        query.setParameter("resident", resident);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+
+        ArrayList<Allowance> result = null;
+
+        try {
+            result = new ArrayList<Allowance>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        return result;
+    }
+
+    /**
+     * retrieves the first and the last entry in the allowance table.
+     * @param resident
+     * @return
+     */
+    public static Pair<Allowance, Allowance> getMinMax(Resident resident) {
+        Pair<Allowance, Allowance> result = null;
+
+        EntityManager em = OPDE.createEM();
+        Query queryMin = em.createQuery("SELECT al FROM Allowance al WHERE al.bewohner = :resident ORDER BY al.belegDatum ASC ");
+        queryMin.setParameter("resident", resident);
+        queryMin.setMaxResults(1);
+
+        Query queryMax = em.createQuery("SELECT al FROM Allowance al WHERE al.bewohner = :resident ORDER BY al.belegDatum DESC ");
+        queryMax.setParameter("resident", resident);
+        queryMax.setMaxResults(1);
+
+        try {
+            ArrayList<Allowance> min = new ArrayList<Allowance>(queryMin.getResultList());
+            ArrayList<Allowance> max = new ArrayList<Allowance>(queryMax.getResultList());
+            result = new Pair<Allowance, Allowance>(min.get(0), max.get(0));
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return result;
+    }
 }
