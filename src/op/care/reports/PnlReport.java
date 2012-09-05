@@ -223,7 +223,6 @@ public class PnlReport extends NursingRecordsPanel {
             }
         });
 
-
         labelPanel.add(txtSearch);
 
         jdcVon = new JDateChooser(new Date());

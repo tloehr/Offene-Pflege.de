@@ -7,6 +7,7 @@ package entity;
 
 import entity.info.Resident;
 import entity.system.Users;
+import op.OPDE;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -50,26 +51,19 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date erstelltAm;
-    @Transient
-    private BigDecimal rowsum;
-
 
     public Allowance() {
     }
 
-    public Allowance(Date belegDatum, String belegtext, BigDecimal betrag, Resident bewohner, Users erstelltVon) {
-        this.belegDatum = belegDatum;
-        this.belegtext = belegtext;
-        this.betrag = betrag;
-        this.bewohner = bewohner;
-        this.erstelltVon = erstelltVon;
-        this.bearbeitetAm = new Date();
-        this.erstelltAm = bearbeitetAm;
+    public Allowance(Resident resident) {
+        this.resident = resident;
+        this.erstelltVon = OPDE.getLogin().getUser();
+        this.erstelltAm = new Date();
     }
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     @JoinColumn(name = "_editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users bearbeitetVon;
@@ -105,21 +99,12 @@ public class Allowance implements Serializable, Comparable<Allowance> {
         this.betrag = betrag;
     }
 
-
-    public Resident getBewohner() {
-        return bewohner;
+    public Resident getResident() {
+        return resident;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
-    }
-
-    public BigDecimal getRowsum() {
-        return rowsum;
-    }
-
-    public void setRowsum(BigDecimal rowsum) {
-        this.rowsum = rowsum;
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
     public Date getBearbeitetAm() {
@@ -182,7 +167,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
                 ", betrag=" + betrag +
                 ", bearbeitetAm=" + bearbeitetAm +
                 ", erstelltAm=" + erstelltAm +
-                ", bewohner=" + bewohner +
+                ", bewohner=" + resident +
                 ", bearbeitetVon=" + bearbeitetVon +
                 ", erstelltVon=" + erstelltVon +
                 '}';
@@ -191,8 +176,8 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     @Override
     public int compareTo(Allowance other) {
         int result = belegDatum.compareTo(other.getBelegDatum()) * -1;
-        if (result == 0){
-            result = id.compareTo(other.getID());
+        if (result == 0) {
+            result = id.compareTo(other.getID()) * -1;
         }
         return result;
     }

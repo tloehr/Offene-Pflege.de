@@ -13,6 +13,7 @@ import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Years;
+import sun.jvm.hotspot.oops.ArrayKlass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -98,32 +99,38 @@ public class ResidentTools {
     }
 
     /**
-     * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
+     * creates a list of fitting residents by the given pattern
+     * @param pattern
+     * @return
      */
-    public static void findeBW(String muster, Closure applyClosure) {
-        Resident bewohner = EntityTools.find(Resident.class, muster);
+    public static ArrayList<Resident> getBy(String pattern) {
+        ArrayList<Resident> lstResult = null;
+        Resident resident = EntityTools.find(Resident.class, pattern);
 
-        if (bewohner == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
-            muster += "%"; // MySQL Wildcard
+        if (resident == null) { // the pattern is not a valid RID
+            pattern += "%"; // MySQL Wildcard
             EntityManager em = OPDE.createEM();
 
             Query query = em.createNamedQuery("Resident.findByNachname");
-            query.setParameter("nachname", muster);
-            List<Resident> listBW = query.getResultList();
-
-            DefaultListModel dlm = SYSTools.list2dlm(listBW);
-
-            if (dlm.getSize() > 1) {
-                new DlgListSelector("Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm, applyClosure).setVisible(true);
-            } else if (dlm.getSize() == 1) {
-                bewohner = listBW.get(0);
-                applyClosure.execute(bewohner);
-            } else {
-                applyClosure.execute(null);
-            }
+            query.setParameter("nachname", pattern);
+            lstResult = new ArrayList<Resident>(query.getResultList());
         } else {
-            applyClosure.execute(bewohner);
+            lstResult = new ArrayList<Resident>();
+            lstResult.add(resident);
         }
+
+        return lstResult;
+//        DefaultListModel dlm = SYSTools.list2dlm(listBW);
+//
+//            if (dlm.getSize() > 1) {
+//                new DlgListSelector("Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm, applyClosure).setVisible(true);
+//            } else if (dlm.getSize() == 1) {
+//                resident = listBW.get(0);
+//                applyClosure.execute(resident);
+//            } else {
+//                applyClosure.execute(null);
+//            }
+
     }
 
 
@@ -148,7 +155,15 @@ public class ResidentTools {
 
     public static ArrayList<Resident> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Resident.findAllActiveSorted");
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname");
+        ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
+        em.close();
+        return list;
+    }
+
+    public static ArrayList<Resident> getAllInactive() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
         em.close();
         return list;

@@ -49,7 +49,7 @@ import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
 import op.residents.bwassistant.AddBWWizard;
-import op.care.PnlPflege;
+import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.process.PnlProcess;
@@ -234,10 +234,6 @@ public class FrmMain extends JFrame {
         if (!initPhase) {
             SYSPropsTools.storeProp(internalClassID + ":splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString(), OPDE.getLogin().getUser());
         }
-    }
-
-    private void button1ActionPerformed(ActionEvent e) {
-        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
     }
 
     public void afterLogin() {
@@ -567,7 +563,7 @@ public class FrmMain extends JFrame {
         CleanablePanel panel = null;
         currentBewohner = null;
         if (classname.equals("op.allowance.PnlAllowance")) {
-            panel = new PnlAllowance(jspSearch, bwchange);
+            panel = new PnlAllowance(jspSearch);
         } else if (classname.equals("op.process.PnlProcess")) {
             panel = new PnlProcess(jspSearch);
         } else if (classname.equals("op.care.med.PnlMed")) {
@@ -627,10 +623,10 @@ public class FrmMain extends JFrame {
                         currentBewohner = innerbewohner;
 
 //                        ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
-                        if (currentVisiblePanel instanceof PnlPflege) {
+                        if (currentVisiblePanel instanceof PnlCare) {
                             ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
                         } else {
-                            setPanelTo(new PnlPflege(innerbewohner, jspSearch));
+                            setPanelTo(new PnlCare(innerbewohner, jspSearch));
                         }
 
                     }

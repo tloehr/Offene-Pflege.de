@@ -684,16 +684,20 @@ public class SYSTools {
 
     public static DefaultListModel list2dlm(List list) {
         DefaultListModel dlm = new DefaultListModel();
-        for (Object o : list) {
-            dlm.addElement(o);
+        if (list != null) {
+            for (Object o : list) {
+                dlm.addElement(o);
+            }
         }
         return dlm;
     }
 
     public static DefaultComboBoxModel list2cmb(List list) {
         DefaultComboBoxModel cmb = new DefaultComboBoxModel();
-        for (Object o : list) {
-            cmb.addElement(o);
+        if (list != null) {
+            for (Object o : list) {
+                cmb.addElement(o);
+            }
         }
         return cmb;
     }
@@ -2113,6 +2117,7 @@ public class SYSTools {
 
     /**
      * http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
+     *
      * @return
      */
     public static boolean isValidEMail(String mail) {

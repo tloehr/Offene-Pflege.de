@@ -117,6 +117,15 @@ public class SYSConst {
             SYSTools.getColor("FFECFF"), SYSTools.getColor("FFF9FF")
     };
 
+    public static Color[] greyscale = new Color[]{
+            SYSTools.getColor("2E2E2E"), SYSTools.getColor("424242"),
+            SYSTools.getColor("585858"), SYSTools.getColor("6E6E6E"),
+            SYSTools.getColor("848484"), SYSTools.getColor("A4A4A4"),
+            SYSTools.getColor("BDBDBD"), SYSTools.getColor("D8D8D8"),
+            SYSTools.getColor("E6E6E6"), SYSTools.getColor("F2F2F2"),
+            SYSTools.getColor("FAFAFA"), SYSTools.getColor("FFFFFF")
+    };
+
     public static Color colorWeekday = SYSTools.getColor("FFE6D0");
     public static Color colorWeekend = SYSTools.getColor("FFC895");
     public static Color colorHolliday = SYSTools.getColor("FF800D");
@@ -351,4 +360,5 @@ public class SYSConst {
     public static final Icon icon22addGroup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_group.png"));
     public static final Icon icon22password = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/password.png"));
     public static final Icon icon22passwordPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/password_pressed.png"));
+    public static final Icon icon22residentActive = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-active.png"));
 }

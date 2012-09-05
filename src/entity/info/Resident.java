@@ -42,7 +42,7 @@ import java.util.Date;
 @Table(name = "Bewohner")
 @NamedQueries({
         @NamedQuery(name = "Resident.findAll", query = "SELECT b FROM Resident b"),
-        @NamedQuery(name = "Resident.findAllActiveSorted", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname"),
+        @NamedQuery(name = "Resident.findAllActiveSorted", query = " SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname "),
         @NamedQuery(name = "Resident.findAllActiveSortedByStationen", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
         @NamedQuery(name = "Resident.findByBWKennung", query = "SELECT b FROM Resident b WHERE b.bWKennung = :bWKennung"),
         @NamedQuery(name = "Resident.findByNachname", query = "SELECT b FROM Resident b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
@@ -51,7 +51,7 @@ import java.util.Date;
         @NamedQuery(name = "Resident.findByGebDatum", query = "SELECT b FROM Resident b WHERE b.gebDatum = :gebDatum"),
         @NamedQuery(name = "Resident.findByEditor", query = "SELECT b FROM Resident b WHERE b.editor = :editor"),
         @NamedQuery(name = "Resident.findByAdminonly", query = "SELECT b FROM Resident b WHERE b.adminonly = :adminonly")})
-public class Resident implements Serializable {
+public class Resident implements Serializable, Comparable<Resident> {
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "BWKennung")
@@ -76,7 +76,7 @@ public class Resident implements Serializable {
     @Column(name = "adminonly")
     private short adminonly;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "resident")
     private Collection<Allowance> konto;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
@@ -260,6 +260,11 @@ public class Resident implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(Resident o) {
+        return toString().compareTo(o.toString());
     }
 
     @Override

@@ -33,7 +33,7 @@ import javax.swing.event.ChangeListener;
 /**
  * @author Torsten Löhr
  */
-public class PnlPflege extends NursingRecordsPanel {
+public class PnlCare extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.main";
     public static final int TAB_UEBERSICHT = 0;
@@ -47,7 +47,7 @@ public class PnlPflege extends NursingRecordsPanel {
     public static final int TAB_PPLANUNG = 8;
     public static final int TAB_VORGANG = 9;
     public static final int TAB_FILES = 10;
-    public static final int TAB_CASH = 11;
+//    public static final int TAB_CASH = 11;
 
     private boolean initPhase;
     private String[] tabs = new String[]{
@@ -61,15 +61,15 @@ public class PnlPflege extends NursingRecordsPanel {
             OPDE.lang.getString(internalClassID + ".tab8"),
             OPDE.lang.getString(internalClassID + ".tab9"),
             OPDE.lang.getString(internalClassID + ".tab10"),
-            OPDE.lang.getString(internalClassID + ".tab11"),
-            OPDE.lang.getString(internalClassID + ".tab12")
+            OPDE.lang.getString(internalClassID + ".tab11")
+//            OPDE.lang.getString(internalClassID + ".tab12")
     };
     private Resident currentBewohner = null;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
     private NursingRecordsPanel previousPanel;
 
-    public PnlPflege(Resident bewohner, JScrollPane jspSearch) {
+    public PnlCare(Resident bewohner, JScrollPane jspSearch) {
         initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
@@ -185,12 +185,12 @@ public class PnlPflege extends NursingRecordsPanel {
 
                 break;
             }
-            case TAB_CASH: {
-//                previousPanel = new PnlFiles(currentBewohner, jspSearch);
-//                jtpPflegeakte.setComponentAt(TAB_FILES, previousPanel);
-
-                break;
-            }
+//            case TAB_CASH: {
+////                previousPanel = new PnlFiles(currentBewohner, jspSearch);
+////                jtpPflegeakte.setComponentAt(TAB_FILES, previousPanel);
+//
+//                break;
+//            }
             default: {
             }
         }
@@ -233,7 +233,7 @@ public class PnlPflege extends NursingRecordsPanel {
         }
 //        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlReport.internalClassID, InternalClassACL.EXECUTE));
 //        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
-        jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlAllowance.internalClassID, InternalClassACL.EXECUTE));
+//        jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlAllowance.internalClassID, InternalClassACL.EXECUTE));
     }
 
 //    private void print(String html) {

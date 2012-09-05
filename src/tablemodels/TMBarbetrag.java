@@ -75,14 +75,14 @@ public class TMBarbetrag extends AbstractTableModel {
 
         EntityManager em = OPDE.createEM();
 
-        String jpql = " SELECT tg FROM Allowance tg WHERE tg.bewohner = :bewohner ";
+        String jpql = " SELECT tg FROM Allowance tg WHERE tg.resident = :bewohner ";
 
         if (!subset) {
             vortrag = BigDecimal.ZERO;
         } else {
             jpql += " AND allowance.belegDatum >= :von AND allowance.belegDatum <= :bis ";
 
-            Query queryVortrag = em.createQuery(" SELECT SUM(tg.betrag) FROM Allowance tg WHERE tg.bewohner = :bewohner AND tg.belegDatum < :von ");
+            Query queryVortrag = em.createQuery(" SELECT SUM(tg.betrag) FROM Allowance tg WHERE tg.resident = :bewohner AND tg.belegDatum < :von ");
             queryVortrag.setParameter("bewohner", bewohner);
             queryVortrag.setParameter("von", von);
             vortrag = (BigDecimal) queryVortrag.getSingleResult();

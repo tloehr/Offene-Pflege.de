@@ -439,7 +439,7 @@ public class SYSCalendar {
 
     public static Date parseDate(String input) throws NumberFormatException {
         if (input == null || input.equals("")) {
-            throw new NumberFormatException("leere Eingabe");
+            throw new NumberFormatException("empty");
         }
         if (input.indexOf(".") + input.indexOf(",") + input.indexOf("-") == -3) {
             input += "."; // er war zu faul auch nur einen punkt anzuhängen.
@@ -458,7 +458,7 @@ public class SYSCalendar {
             st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
         }
         if (st.countTokens() != 3) {
-            throw new NumberFormatException("falsches Format");
+            throw new NumberFormatException("wrong format");
         }
         String sTag = st.nextToken();
         String sMonat = st.nextToken();
@@ -472,24 +472,24 @@ public class SYSCalendar {
         try {
             tag = Integer.parseInt(sTag);
         } catch (NumberFormatException nfe) {
-            throw new NumberFormatException("tag");
+            throw new NumberFormatException("day");
         }
         try {
             monat = Integer.parseInt(sMonat);
         } catch (NumberFormatException nfe) {
-            throw new NumberFormatException("monat");
+            throw new NumberFormatException("month");
         }
         try {
             jahr = Integer.parseInt(sJahr);
         } catch (NumberFormatException nfe) {
-            throw new NumberFormatException("jahr");
+            throw new NumberFormatException("year");
         }
 
         if (jahr < 0) {
-            throw new NumberFormatException("jahr");
+            throw new NumberFormatException("year");
         }
         if (jahr > 9999) {
-            throw new NumberFormatException("jahr");
+            throw new NumberFormatException("year");
         }
         if (jahr < 10) {
             jahr += decade;
@@ -498,11 +498,11 @@ public class SYSCalendar {
             jahr += century;
         }
         if (monat < 1 || monat > 12) {
-            throw new NumberFormatException("monat");
+            throw new NumberFormatException("month");
         }
 
         if (tag < 1 || tag > eom(new GregorianCalendar(jahr, monat - 1, 1))) {
-            throw new NumberFormatException("monat");
+            throw new NumberFormatException("month");
         }
 
         return new Date(new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0).getTimeInMillis());

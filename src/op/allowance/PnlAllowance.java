@@ -26,41 +26,36 @@
  */
 package op.allowance;
 
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.Allowance;
 import entity.AllowanceTools;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.system.Users;
 import op.OPDE;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
-import op.users.DlgUser;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -68,8 +63,7 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -77,21 +71,13 @@ import java.util.HashMap;
  */
 public class PnlAllowance extends CleanablePanel {
     public static final String internalClassID = "admin.residents.cash";
-    private TableModelListener tml;
 
-    private Date min;
-    private Date max;
-    private BigDecimal betrag;
-    private JPopupMenu menu;
     private Resident currentResident;
-    private CollapsiblePane panelText, panelTime;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private JComboBox cmbVon, cmbBis, cmbMonat;
-    private JXSearchField txtBW;
-    private boolean ignoreDateComboEvent;
-    private HashMap<Resident, Object[]> searchSaldoButtonMap;
-    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+    private JXSearchField txtSearch;
+    private JComboBox cmbResident;
+
     NumberFormat cf = NumberFormat.getCurrencyInstance();
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
@@ -312,7 +298,8 @@ public class PnlAllowance extends CleanablePanel {
         lstResidents.clear();
         cpCash.removeAll();
         searchPanes.removeAll();
-        searchPanes.removeAll();
+        cashmap.clear();
+        cpMap.clear();
     }
 
     /**
@@ -324,115 +311,26 @@ public class PnlAllowance extends CleanablePanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         pnlBarbetrag = new JPanel();
-        jPanel4 = new JPanel();
         jspCash = new JScrollPane();
         cpCash = new CollapsiblePanes();
-        jPanel5 = new JPanel();
-        txtDatum = new JTextField();
-        txtBelegtext = new JTextField();
-        txtBetrag = new JTextField();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         //======== pnlBarbetrag ========
         {
-            pnlBarbetrag.setLayout(new FormLayout(
-                    "default:grow, $lcgap, pref",
-                    "fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+            pnlBarbetrag.setLayout(new BoxLayout(pnlBarbetrag, BoxLayout.X_AXIS));
 
-            //======== jPanel4 ========
+            //======== jspCash ========
             {
-                jPanel4.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
-                jPanel4.setLayout(new FormLayout(
-                        "default:grow",
-                        "fill:default:grow"));
 
-                //======== jspCash ========
+                //======== cpCash ========
                 {
-
-                    //======== cpCash ========
-                    {
-                        cpCash.setLayout(new BoxLayout(cpCash, BoxLayout.X_AXIS));
-                    }
-                    jspCash.setViewportView(cpCash);
+                    cpCash.setLayout(new BoxLayout(cpCash, BoxLayout.X_AXIS));
                 }
-                jPanel4.add(jspCash, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
+                jspCash.setViewportView(cpCash);
             }
-            pnlBarbetrag.add(jPanel4, CC.xywh(1, 1, 3, 1));
-
-            //======== jPanel5 ========
-            {
-                jPanel5.setBorder(LineBorder.createBlackLineBorder());
-                jPanel5.setLayout(new FormLayout(
-                        "default:grow(0.30000000000000004), $lcgap, default:grow(0.7000000000000001), $lcgap, 30dlu:grow(0.30000000000000004)",
-                        "fill:default"));
-
-                //---- txtDatum ----
-                txtDatum.setEnabled(false);
-                txtDatum.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtDatumActionPerformed(e);
-                    }
-                });
-                txtDatum.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtDatumFocusGained(e);
-                    }
-
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtDatumFocusLost(e);
-                    }
-                });
-                jPanel5.add(txtDatum, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
-
-                //---- txtBelegtext ----
-                txtBelegtext.setEnabled(false);
-                txtBelegtext.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtBelegtextActionPerformed(e);
-                    }
-                });
-                txtBelegtext.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtBelegtextFocusGained(e);
-                    }
-
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtBelegtextFocusLost(e);
-                    }
-                });
-                jPanel5.add(txtBelegtext, CC.xy(3, 1, CC.FILL, CC.DEFAULT));
-
-                //---- txtBetrag ----
-                txtBetrag.setHorizontalAlignment(SwingConstants.RIGHT);
-                txtBetrag.setEnabled(false);
-                txtBetrag.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtBetragActionPerformed(e);
-                    }
-                });
-                txtBetrag.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        txtBetragFocusGained(e);
-                    }
-
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtBetragFocusLost(e);
-                    }
-                });
-                jPanel5.add(txtBetrag, CC.xy(5, 1, CC.FILL, CC.DEFAULT));
-            }
-            pnlBarbetrag.add(jPanel5, CC.xywh(1, 3, 3, 1));
+            pnlBarbetrag.add(jspCash);
         }
         add(pnlBarbetrag);
     }// </editor-fold>//GEN-END:initComponents
@@ -446,74 +344,6 @@ public class PnlAllowance extends CleanablePanel {
 //        ((TMBarbetrag) tblTG.getModel()).setEditable(btnEdit.isSelected());
 //    }//GEN-LAST:event_btnEditActionPerformed
 
-    private void txtBelegtextFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBelegtextFocusLost
-        if (txtBelegtext.getText().trim().isEmpty()) {
-            txtBelegtext.setText("Geben Sie einen Belegtext ein.");
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie können das Belegtextfeld nicht leer lassen.", 2));
-//            lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Sie können das Belegtextfeld nicht leer lassen.");
-        }
-    }//GEN-LAST:event_txtBelegtextFocusLost
-
-    private void txtBelegtextFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBelegtextFocusGained
-        ((JTextField) evt.getSource()).selectAll();
-    }//GEN-LAST:event_txtBelegtextFocusGained
-
-    private void txtBetragFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBetragFocusGained
-        ((JTextField) evt.getSource()).selectAll();
-    }//GEN-LAST:event_txtBetragFocusGained
-
-    private void txtBetragFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBetragFocusLost
-//        betrag = SYSTools.parseCurrency(txtBetrag.getText());
-//        if (betrag != null) {
-//            if (!betrag.equals(BigDecimal.ZERO)) {
-//                insert();
-//                summeNeuRechnen();
-//            } else {
-//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Beträge mit '0,00 " + SYSConst.eurosymbol + "' werden nicht angenommen.", 2));
-////                lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Beträge mit '0,00 " + SYSConst.eurosymbol + "' werden nicht angenommen.");
-//            }
-//
-//        } else {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'", 2));
-////            lblMessage.setText(timeDF.format(new Date()) + " Uhr : " + "Bitte geben Sie Euro Beträge in der folgenden Form ein: '10,0 " + SYSConst.eurosymbol + "'");
-//            betrag = BigDecimal.ZERO;
-//        }
-//        txtBetrag.setText(NumberFormat.getCurrencyInstance().format(betrag));
-    }//GEN-LAST:event_txtBetragFocusLost
-
-    private void txtBetragActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBetragActionPerformed
-        txtDatum.requestFocus();
-    }//GEN-LAST:event_txtBetragActionPerformed
-
-    private void txtBelegtextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBelegtextActionPerformed
-        txtBetrag.requestFocus();
-    }//GEN-LAST:event_txtBelegtextActionPerformed
-
-    private void txtDatumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDatumActionPerformed
-        txtBelegtext.requestFocus();
-    }//GEN-LAST:event_txtDatumActionPerformed
-
-    private void txtDatumFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDatumFocusLost
-        GregorianCalendar gc;
-        try {
-            gc = SYSCalendar.erkenneDatum(((JTextField) evt.getSource()).getText());
-        } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie haben ein falsches Datum eingegeben. Wurde auf heute zurückgesetzt.", 2));
-//            lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie haben ein falsches Datum eingegeben. Wurde auf heute zurückgesetzt.");
-            gc = SYSCalendar.today();
-        }
-        // Datum in der Zukunft ?
-        if (SYSCalendar.sameDay(gc, SYSCalendar.today()) > 0) {
-            gc = SYSCalendar.today();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Sie haben ein Datum in der Zukunft eingegeben. Wurde auf heute zurückgesetzt.", 2));
-//            lblMessage.setText(timeDF.format(new Date()) + " Uhr : Sie haben ein Datum in der Zukunft eingegeben. Wurde auf heute zurückgesetzt.");
-        }
-        ((JTextField) evt.getSource()).setText(SYSCalendar.printGCGermanStyle(gc));
-    }//GEN-LAST:event_txtDatumFocusLost
-
-    private void txtDatumFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDatumFocusGained
-        ((JTextField) evt.getSource()).selectAll();
-    }//GEN-LAST:event_txtDatumFocusGained
 
 //    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
 //        TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
@@ -531,7 +361,7 @@ public class PnlAllowance extends CleanablePanel {
 //
 //            // Write to temp file
 //            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-//            String html = SYSTools.htmlUmlautConversion(AllowanceTools.getEinzelnAsHTML(liste, vortrag, bewohner));
+//            String html = SYSTools.htmlUmlautConversion(AllowanceTools.getMonthAsHTML(liste, vortrag, bewohner));
 //
 //            out.write(html);
 //
@@ -594,6 +424,10 @@ public class PnlAllowance extends CleanablePanel {
 
 
         final boolean withworker = false;
+        cpCash.removeAll();
+        cashmap.clear();
+        cpMap.clear();
+
         if (withworker) {
 
 //            OPDE.getMainframe().setBlocked(true);
@@ -638,21 +472,29 @@ public class PnlAllowance extends CleanablePanel {
 //            worker.execute();
 
         } else {
-            lstResidents = ResidentTools.getAllActive();
 
             for (Resident resident : lstResidents) {
                 createCP4(resident);
             }
-//            for (Groups group : lstGroups) {
-//                createCP4(group);
-//            }
+            if (currentResident != null) {
+                OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(currentResident));
+            } else {
+                OPDE.getDisplayManager().setMainMessage(" ");
+            }
             buildPanel();
         }
-//        initPhase = false;
+
     }
 
-
     private CollapsiblePane createCP4(final Resident resident) {
+        /***
+         *                          _        ____ ____  _  _    ______           _     _            _ __
+         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ ___  ___(_) __| | ___ _ __ | |\ \
+         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_| || |_) / _ \/ __| |/ _` |/ _ \ '_ \| __| |
+         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _| ||  _ <  __/\__ \ | (_| |  __/ | | | |_| |
+         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||_| \_\___||___/_|\__,_|\___|_| |_|\__| |
+         *                                                     \_\                                    /_/
+         */
         final String key = resident.getRID();
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
@@ -665,27 +507,8 @@ public class PnlAllowance extends CleanablePanel {
         }
         final CollapsiblePane cpResident = cpMap.get(key);
 
-        /***
-         *      _   _ _____    _    ____  _____ ____
-         *     | | | | ____|  / \  |  _ \| ____|  _ \
-         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
-         *     |  _  | |___ / ___ \| |_| | |___|  _ <
-         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
-         *
-         */
-
         JPanel titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
-
-
-        /***
-         *      _     _       _    _           _   _                _   _                _
-         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
         JideButton btnResident = GUITools.createHyperlinkButton("<html><font size=+1><table border=\"0\">" +
                 "<tr>" +
 
@@ -715,6 +538,31 @@ public class PnlAllowance extends CleanablePanel {
 
         JPanel titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+
+
+        /***
+         *      ____       _       _   ____           _     _            _
+         *     |  _ \ _ __(_)_ __ | |_|  _ \ ___  ___(_) __| | ___ _ __ | |_
+         *     | |_) | '__| | '_ \| __| |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
+         *     |  __/| |  | | | | | |_|  _ <  __/\__ \ | (_| |  __/ | | | |_
+         *     |_|   |_|  |_|_| |_|\__|_| \_\___||___/_|\__,_|\___|_| |_|\__|
+         *
+         */
+        final JButton btnPrintResident = new JButton(SYSConst.icon22print);
+        btnPrintResident.setPressedIcon(SYSConst.icon22printPressed);
+        btnPrintResident.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnPrintResident.setContentAreaFilled(false);
+        btnPrintResident.setBorder(null);
+        btnPrintResident.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintresident.tooltip"));
+        btnPrintResident.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, currentResident), true);
+            }
+
+
+        });
+        titlePanelright.add(btnPrintResident);
 
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);
@@ -750,13 +598,8 @@ public class PnlAllowance extends CleanablePanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
 
-
                 // somebody clicks on the name of the resident. the cash informations
                 // are loaded from the database, if necessary.
-
-
-//                    final String cashmapkey = resident.getRID()+"-"+monthFormatter.format();
-//                cashmap.put(resident, AllowanceTools.getAll(resident));
 
                 Pair<Allowance, Allowance> minmax = AllowanceTools.getMinMax(resident);
 
@@ -781,8 +624,7 @@ public class PnlAllowance extends CleanablePanel {
             }
 
         });
-        cpResident.setBackground(SYSConst.purple_pastel1[7]);
-//        cp.setCollapsible(user.isActive());
+        cpResident.setBackground(getBG(resident, 7));
 
         cpResident.setHorizontalAlignment(SwingConstants.LEADING);
         cpResident.setOpaque(false);
@@ -792,6 +634,18 @@ public class PnlAllowance extends CleanablePanel {
 
 
     private CollapsiblePane createCP4(final Resident resident, final int year) {
+        /***
+         *                          _        ____ ____  _  _    ______           _     _            _       _       _ __
+         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ ___  ___(_) __| | ___ _ __ | |_    (_)_ __ | |\ \
+         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_| || |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|   | | '_ \| __| |
+         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _| ||  _ <  __/\__ \ | (_| |  __/ | | | |_ _  | | | | | |_| |
+         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||_| \_\___||___/_|\__,_|\___|_| |_|\__( ) |_|_| |_|\__| |
+         *                                                     \_\                                     |/             /_/
+         */
+
+        final DateTime start = new DateTime(year, 1, 1, 0, 0);
+        final DateTime end = new DateTime(year, 12, 31, 23, 59).isAfterNow() ? new DateTime() : new DateTime(year, 12, 31, 23, 59);
+
         final String key = resident.getRID() + "-" + Integer.toString(year);
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
@@ -803,36 +657,8 @@ public class PnlAllowance extends CleanablePanel {
 
         }
         final CollapsiblePane cpYear = cpMap.get(key);
-
-        /***
-         *      _   _ _____    _    ____  _____ ____
-         *     | | | | ____|  / \  |  _ \| ____|  _ \
-         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
-         *     |  _  | |___ / ___ \| |_| | |___|  _ <
-         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
-         *
-         */
-
         JPanel titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
-
-
-        /***
-         *      _     _       _    _           _   _                _   _                _
-         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
-//        JideButton btnResident = GUITools.createHyperlinkButton("<html><font size=+1>" +
-//
-//                Integer.toString(year) +
-//
-//                "</font></html>", null, null);
-
-
-        DateTime from = new DateTime(year, 1, 1, 0, 0);
         DateTime to = new DateTime(year, 1, 1, 0, 0).dayOfYear().withMaximumValue();
         final BigDecimal carry = AllowanceTools.getSUM(resident, to);
 
@@ -866,9 +692,34 @@ public class PnlAllowance extends CleanablePanel {
 
         titlePanelleft.add(btnYear);
 
-
         JPanel titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+
+
+        /***
+         *      ____       _       _ __   __
+         *     |  _ \ _ __(_)_ __ | |\ \ / /__  __ _ _ __
+         *     | |_) | '__| | '_ \| __\ V / _ \/ _` | '__|
+         *     |  __/| |  | | | | | |_ | |  __/ (_| | |
+         *     |_|   |_|  |_|_| |_|\__||_|\___|\__,_|_|
+         *
+         */
+        final JButton btnPrintYear = new JButton(SYSConst.icon22print);
+        btnPrintYear.setPressedIcon(SYSConst.icon22printPressed);
+        btnPrintYear.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnPrintYear.setContentAreaFilled(false);
+        btnPrintYear.setBorder(null);
+        btnPrintYear.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintmonth.tooltip"));
+        btnPrintYear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carry, currentResident), true);
+            }
+
+
+        });
+        titlePanelright.add(btnPrintYear);
+
 
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);
@@ -913,9 +764,6 @@ public class PnlAllowance extends CleanablePanel {
                 // monthly informations will be generated. even if there
                 // are no allowances for that month
 
-                DateTime start = new DateTime(year, 1, 1, 0, 0);
-                DateTime end = new DateTime(year, 12, 31, 23, 59).isAfterNow() ? new DateTime() : new DateTime(year, 12, 31, 23, 59);
-
                 for (DateTime month = end; month.compareTo(start) > 0; month = month.minusMonths(1)) {
 //                    CollapsiblePane cpYear = new CollapsiblePane(Integer.toString(year.getYear()));
 //                    cpYear.setFont(SYSConst.ARIAL14BOLD);
@@ -933,7 +781,7 @@ public class PnlAllowance extends CleanablePanel {
             }
 
         });
-        cpYear.setBackground(SYSConst.purple_pastel1[9]);
+        cpYear.setBackground(getBG(resident, 9));
 //        cp.setCollapsible(user.isActive());
 
         cpYear.setHorizontalAlignment(SwingConstants.LEADING);
@@ -944,8 +792,16 @@ public class PnlAllowance extends CleanablePanel {
 
 
     private CollapsiblePane createCP4(final Resident resident, final DateTime month) {
+        /***
+         *                          _        ____ ____  _  _    ______           _     _            _       ____        _      _____ _              __
+         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ ___  ___(_) __| | ___ _ __ | |_    |  _ \  __ _| |_ __|_   _(_)_ __ ___   __\ \
+         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_| || |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|   | | | |/ _` | __/ _ \| | | | '_ ` _ \ / _ \ |
+         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _| ||  _ <  __/\__ \ | (_| |  __/ | | | |_ _  | |_| | (_| | ||  __/| | | | | | | | |  __/ |
+         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||_| \_\___||___/_|\__,_|\___|_| |_|\__( ) |____/ \__,_|\__\___||_| |_|_| |_| |_|\___| |
+         *                                                     \_\                                     |/                                           /_/
+         */
 
-//        final String key = resident.getRID() + "-" + DateFormat.getDateInstance().format(month) + ".xmonth";
+
         final String key = resident.getRID() + "-" + month.getYear() + "-" + month.getMonthOfYear();
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
@@ -958,29 +814,8 @@ public class PnlAllowance extends CleanablePanel {
         }
         final CollapsiblePane cpMonth = cpMap.get(key);
 
-        /***
-         *      _   _ _____    _    ____  _____ ____
-         *     | | | | ____|  / \  |  _ \| ____|  _ \
-         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
-         *     |  _  | |___ / ___ \| |_| | |___|  _ <
-         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
-         *
-         */
-
         JPanel titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
-
-
-        /***
-         *      _     _       _    _           _   _                _   _                _
-         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
-
-//        DateTime from = new DateTime(month).dayOfMonth().withMinimumValue();
         final DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
         final BigDecimal carry = AllowanceTools.getSUM(resident, to);
         JideButton btnMonth = GUITools.createHyperlinkButton("<html><table border=\"0\">" +
@@ -1016,6 +851,32 @@ public class PnlAllowance extends CleanablePanel {
         JPanel titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
+        /***
+         *      ____       _       _   __  __             _   _
+         *     |  _ \ _ __(_)_ __ | |_|  \/  | ___  _ __ | |_| |__
+         *     | |_) | '__| | '_ \| __| |\/| |/ _ \| '_ \| __| '_ \
+         *     |  __/| |  | | | | | |_| |  | | (_) | | | | |_| | | |
+         *     |_|   |_|  |_|_| |_|\__|_|  |_|\___/|_| |_|\__|_| |_|
+         *
+         */
+        final JButton btnPrintMonth = new JButton(SYSConst.icon22print);
+        btnPrintMonth.setPressedIcon(SYSConst.icon22printPressed);
+        btnPrintMonth.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnPrintMonth.setContentAreaFilled(false);
+        btnPrintMonth.setBorder(null);
+        btnPrintMonth.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintmonth.tooltip"));
+        btnPrintMonth.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                if (!cashmap.containsKey(key)) {
+                    cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
+                }
+                SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry, currentResident), true);
+            }
+        });
+        titlePanelright.add(btnPrintMonth);
+
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);
         JPanel titlePanel = new JPanel();
@@ -1036,7 +897,7 @@ public class PnlAllowance extends CleanablePanel {
         cpMonth.setTitleLabelComponent(titlePanel);
         cpMonth.setSlidingDirection(SwingConstants.SOUTH);
 
-        cpMonth.setBackground(SYSConst.purple_pastel1[10]);
+        cpMonth.setBackground(getBG(resident, 10));
 
         /***
          *           _ _      _            _                                       _   _
@@ -1057,7 +918,6 @@ public class PnlAllowance extends CleanablePanel {
 
                 if (!cashmap.containsKey(key)) {
                     cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
-//                    Collections.sort(cashmap.get(key));
                 }
 
                 if (cashmap.get(key).isEmpty()) {
@@ -1077,10 +937,50 @@ public class PnlAllowance extends CleanablePanel {
 
                 JPanel pnlMonth = new JPanel(new VerticalLayout());
                 BigDecimal rowsum = carry; //AllowanceTools.getSUM(resident, to.dayOfMonth().withMinimumValue().minusDays(1));
-                for (Allowance allowance : cashmap.get(key)) {
-                    rowsum = rowsum.subtract(allowance.getBetrag());
 
-                    JLabel lbl = new JLabel("<html><table border=\"0\">" +
+                JLabel lblEOM = new JLabel("<html><table border=\"0\">" +
+                        "<tr>" +
+                        "<td width=\"130\" align=\"left\">" + DateFormat.getDateInstance().format(month.dayOfMonth().withMaximumValue().toDate()) + "</td>" +
+                        "<td width=\"400\" align=\"left\">" + OPDE.lang.getString(internalClassID + ".endofmonth") + "</td>" +
+                        "<td width=\"100\" align=\"right\"></td>" +
+                        "<td width=\"100\" align=\"right\">" +
+                        (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
+                        cf.format(rowsum) +
+                        (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
+                        "</td>" +
+                        "</tr>" +
+                        "</table>" +
+
+                        "</font></html>");
+                lblEOM.setBackground(getBG(resident, 11));
+                pnlMonth.add(lblEOM);
+
+                for (final Allowance allowance : cashmap.get(key)) {
+
+                    JPanel singlePaneLeft = new JPanel();
+                    singlePaneLeft.setLayout(new BoxLayout(singlePaneLeft, BoxLayout.LINE_AXIS));
+                    JPanel singlePaneRight = new JPanel();
+                    singlePaneRight.setLayout(new BoxLayout(singlePaneRight, BoxLayout.LINE_AXIS));
+
+                    singlePaneLeft.setOpaque(false);
+                    singlePaneRight.setOpaque(false);
+                    JPanel singlePaneBoth = new JPanel();
+                    singlePaneBoth.setOpaque(false);
+
+                    singlePaneBoth.setLayout(new GridBagLayout());
+                    ((GridBagLayout) singlePaneBoth.getLayout()).columnWidths = new int[]{0, 80};
+                    ((GridBagLayout) singlePaneBoth.getLayout()).columnWeights = new double[]{1.0, 1.0};
+
+                    singlePaneBoth.add(singlePaneLeft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                            GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                            new Insets(0, 0, 0, 5), 0, 0));
+
+                    singlePaneBoth.add(singlePaneRight, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                            GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                            new Insets(0, 0, 0, 0), 0, 0));
+
+
+                    JLabel lblSingle = new JLabel("<html><table border=\"0\">" +
                             "<tr>" +
                             "<td width=\"130\" align=\"left\">" + DateFormat.getDateInstance().format(allowance.getBelegDatum()) + "</td>" +
                             "<td width=\"400\" align=\"left\">" + allowance.getBelegtext() + "</td>" +
@@ -1098,9 +998,118 @@ public class PnlAllowance extends CleanablePanel {
                             "</table>" +
 
                             "</font></html>");
-                    lbl.setBackground(SYSConst.purple_pastel1[11]);
-                    pnlMonth.add(lbl);
+                    lblSingle.setBackground(getBG(resident, 11));
+
+
+                    singlePaneLeft.add(lblSingle);
+
+                    /***
+                     *      _____    _ _ _
+                     *     | ____|__| (_) |_
+                     *     |  _| / _` | | __|
+                     *     | |__| (_| | | |_
+                     *     |_____\__,_|_|\__|
+                     *
+                     */
+                    final JButton btnEdit = new JButton(SYSConst.icon22edit1);
+                    btnEdit.setPressedIcon(SYSConst.icon22edit1Pressed);
+                    btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnEdit.setContentAreaFilled(false);
+                    btnEdit.setBorder(null);
+                    btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnedit.tooltip"));
+                    btnEdit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+
+                        }
+                    });
+                    singlePaneRight.add(btnEdit);
+
+                    /***
+                     *      ____       _      _
+                     *     |  _ \  ___| | ___| |_ ___
+                     *     | | | |/ _ \ |/ _ \ __/ _ \
+                     *     | |_| |  __/ |  __/ ||  __/
+                     *     |____/ \___|_|\___|\__\___|
+                     *
+                     */
+                    final JButton btnDelete = new JButton(SYSConst.icon22delete);
+                    btnDelete.setPressedIcon(SYSConst.icon22deletePressed);
+                    btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnDelete.setContentAreaFilled(false);
+                    btnDelete.setBorder(null);
+                    btnDelete.setToolTipText(OPDE.lang.getString(internalClassID + ".btndelete.tooltip"));
+                    btnDelete.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + allowance.getBelegtext() + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                                @Override
+                                public void execute(Object answer) {
+                                    if (answer.equals(JOptionPane.YES_OPTION)) {
+                                        EntityManager em = OPDE.createEM();
+                                        try {
+                                            em.getTransaction().begin();
+                                            Allowance myAllowance = em.merge(allowance);
+                                            em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                                            em.remove(myAllowance);
+                                            em.getTransaction().commit();
+
+                                            DateTime txDate = new DateTime(myAllowance.getBelegDatum());
+                                            final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                                            cashmap.get(keyMonth).remove(myAllowance);
+                                            createCP4(myAllowance.getResident());
+                                            buildPanel();
+                                        } catch (OptimisticLockException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            }
+                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        } catch (Exception e) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            OPDE.fatal(e);
+                                        } finally {
+                                            em.close();
+                                        }
+                                    }
+                                }
+                            });
+
+
+                        }
+                    });
+                    singlePaneRight.add(btnDelete);
+
+
+                    pnlMonth.add(singlePaneBoth);
+
+                    rowsum = rowsum.subtract(allowance.getBetrag());
                 }
+
+                JLabel lblBOM = new JLabel("<html><table border=\"0\">" +
+                        "<tr>" +
+                        "<td width=\"130\" align=\"left\">" + DateFormat.getDateInstance().format(month.dayOfMonth().withMinimumValue().toDate()) + "</td>" +
+                        "<td width=\"400\" align=\"left\">" + OPDE.lang.getString(internalClassID + ".startofmonth") + "</td>" +
+                        "<td width=\"100\" align=\"right\"></td>" +
+                        "<td width=\"100\" align=\"right\">" +
+                        (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
+                        cf.format(rowsum) +
+                        (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
+                        "</td>" +
+                        "</tr>" +
+                        "</table>" +
+
+                        "</font></html>");
+                lblBOM.setBackground(getBG(resident, 11));
+                pnlMonth.add(lblBOM);
+
                 cpMonth.setContentPane(pnlMonth);
             }
         });
@@ -1111,414 +1120,14 @@ public class PnlAllowance extends CleanablePanel {
         return cpMonth;
     }
 
-
-//    private void updateSummenAngabe() {
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("SELECT SUM(tg.betrag) FROM Allowance tg ");
-//        BigDecimal summe = BigDecimal.ZERO;
-//        try {
-//            summe = (BigDecimal) query.getSingleResult();
-//        } catch (NoResultException nre) {
-//            summe = BigDecimal.ZERO;
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        }
-//
-//        NumberFormat nf = NumberFormat.getCurrencyInstance();
-//        String summentext = nf.format(summe);
-//
-//        // Ist auch eine Anzeige für die Vergangenheit gewünscht ?
-//        // Nur wenn ein anderer Monat als der aktuelle gewählt ist.
-//        if (cmbPast.getSelectedIndex() < cmbPast.getModel().getSize() - 1) {
-//            Query queryPast = em.createQuery("SELECT SUM(tg.betrag) FROM Allowance tg WHERE tg.belegDatum <= :datum");
-//            queryPast.setParameter("datum", SYSCalendar.eom((Date) cmbPast.getSelectedItem()));
-//
-//            BigDecimal summePast = BigDecimal.ZERO;
-//            try {
-//                summePast = (BigDecimal) queryPast.getSingleResult();
-//            } catch (NoResultException nre) {
-//                summePast = BigDecimal.ZERO;
-//            } catch (Exception e) {
-//                OPDE.fatal(e);
-//            }
-//
-//            summentext += " (" + nf.format(summePast) + ")";
-//        }
-//
-//        em.close();
-//
-//        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Gesamtsaldo aller Barbeträge: " + summentext, 10));
-//
-////        if (summe.compareTo(BigDecimal.ZERO) < 0) {
-////            lblSumme.setForeground(Color.RED);
-////        } else {
-////            lblSumme.setForeground(Color.BLACK);
-////        }
-//
-//    }
-
-//    private void insert() {
-//
-//        Date datum = new Date(SYSCalendar.erkenneDatum(txtDatum.getText()).getTimeInMillis());
-//        TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
-//
-//        Allowance allowance = new Allowance(datum, txtBelegtext.getText().trim(), betrag, bewohner, OPDE.getLogin().getUser());
-//        EntityTools.persist(allowance);
-//        tm.getListData().add(allowance);
-//        Collections.sort(tm.getListData());
-//
-////        schaltet auf den Monat um, in dem der letzte Beleg eingegeben wurde.
-////        Sofern die ein bestimmter Monat eingestellt war.
-//        if (!panelTime.isCollapsed()) {
-////            GregorianCalendar gcDatum = SYSCalendar.toGC(datum);
-//            if (min.after(datum)) {
-//                // Neuer Eintrag liegt ausserhalb des bisherigen Intervals.
-//                min = SYSCalendar.bom(datum);
-//                initSearchTime();
-//            }
-//            cmbMonat.setSelectedItem(SYSCalendar.bom(datum));
-//        } else {
-//            reloadTable();
-//        }
-//
-////        reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
-//        txtBelegtext.setText("Bitte geben Sie einen Belegtext ein.");
-//        txtBetrag.setText("0.00 " + SYSConst.eurosymbol);
-//        betrag = BigDecimal.ZERO;
-//        txtDatum.requestFocus();
-//
-//        BigDecimal saldo = (BigDecimal) searchSaldoButtonMap.get(bewohner)[0];
-//        JideButton button = (JideButton) searchSaldoButtonMap.get(bewohner)[1];
-//
-//        saldo = saldo.add(allowance.getBetrag());
-//        searchSaldoButtonMap.put(bewohner, new Object[]{saldo, button});
-//
-//        String titel = "<html>" + bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getRID() + "] <b><font " + (saldo.compareTo(BigDecimal.ZERO) < 0 ? "color=\"red\"" : "color=\"black\"") + ">" + currencyFormat.format(saldo) + "</font></b></html>";
-//        button.setText(titel);
-//
-//
-//        // Das hier markiert den zuletzt eingefügten Datensatz.
-//        int index = tm.getListData().indexOf(allowance);
-//        ListSelectionModel lsm = tblTG.getSelectionModel();
-//        lsm.setSelectionInterval(index, index);
-//        // Das hier rollt auf den zuletzt eingefügten Datensatz.
-//        tblTG.invalidate();
-//        Rectangle rect = tblTG.getCellRect(index, 0, true);
-//        tblTG.scrollRectToVisible(rect);
-//    }
-
-//    private void reloadTable() {
-//        reloadTable(null, null);
-//    }
-//
-//    private void reloadTable(Date von, Date bis) {
-//        if (bewohner == null) {
-//            return;
-//        }
-//
-//        tml = new TableModelListener() {
-//            public void tableChanged(TableModelEvent e) {
-//                if (e.getColumn() == 2) { // Betrag hat sich geändert
-//                    summeNeuRechnen();
-//                }
-//            }
-//        };
-//
-//        tblTG.setModel(new TMBarbetrag(bewohner, von, bis, false));
-//        tblTG.getModel().addTableModelListener(tml);
-//        tblTG.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        tblTG.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-//
-//        jspData.dispatchEvent(new ComponentEvent(jspData, ComponentEvent.COMPONENT_RESIZED));
-//
-//        tblTG.getColumnModel().getColumn(2).setCellRenderer(new CurrencyRenderer());
-//        tblTG.getColumnModel().getColumn(3).setCellRenderer(new CurrencyRenderer());
-//
-////        tblTG.getColumnModel().getColumn(0).setCellEditor(new CEDefault());
-////        tblTG.getColumnModel().getColumn(1).setCellEditor(new CEDefault());
-////        tblTG.getColumnModel().getColumn(2).setCellEditor(new CEDefault());
-//    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlBarbetrag;
-    private JPanel jPanel4;
     private JScrollPane jspCash;
     private CollapsiblePanes cpCash;
-    private JPanel jPanel5;
-    private JTextField txtDatum;
-    private JTextField txtBelegtext;
-    private JTextField txtBetrag;
     // End of variables declaration//GEN-END:variables
 
 
-//    private void prepareSearchArea() {
-//        searchPanes = new CollapsiblePanes();
-//        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
-//        jspSearch.setViewportView(searchPanes);
-//
-//        JPanel mypanel = new JPanel();
-//        mypanel.setLayout(new VerticalLayout());
-//        mypanel.setBackground(Color.WHITE);
-////        mypanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//
-//        JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                if (bewohner != null) {
-//                    TMBarbetrag tm = (TMBarbetrag) tblTG.getModel();
-//                    printSingle(tm.getListData(), tm.getVortrag());
-//                } else {
-//                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wählen Sie zuerst eine(n) BewohnerIn aus.", 2));
-//                }
-//            }
-//        });
-//        mypanel.add(printButton);
-//
-//        if (OPDE.isAdmin()) {
-//            JideButton gesamtSummeButton = GUITools.createHyperlinkButton("Gesamtsumme ermitteln", new ImageIcon(getClass().getResource("/artwork/22x22/bw/kcalc.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    updateSummenAngabe();
-//                }
-//            });
-//            mypanel.add(gesamtSummeButton);
-//
-//            cmbPast = new JComboBox();
-//            cmbPast.setModel(SYSCalendar.createMonthList(SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.YEAR), SYSCalendar.today_date()));
-//            cmbPast.setSelectedIndex(cmbPast.getModel().getSize() - 1);
-//            cmbPast.setRenderer(new ListCellRenderer() {
-//                Format formatter = new SimpleDateFormat("MMMM yyyy");
-//
-//                @Override
-//                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//                    String text = formatter.format(o);
-//                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//                }
-//            });
-//            cmbPast.addItemListener(new ItemListener() {
-//                @Override
-//                public void itemStateChanged(ItemEvent itemEvent) {
-//                    if (!ignoreDateComboEvent) {
-//                        updateSummenAngabe();
-//                    }
-//                }
-//            });
-//            cmbPast.setToolTipText("Monat für den die Gesamtsummenberechnung ermittelt werden soll");
-//
-//            mypanel.add(cmbPast);
-//        }
-//
-//        txtBW = new JXSearchField("Bewohnername oder Kennung");
-//        txtBW.setInstantSearchDelay(2000); // 2 Sekunden bevor der Caret Update zieht
-//        txtBW.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (txtBW.getText().trim().isEmpty()) {
-//                    return;
-//                }
-//                ResidentTools.findeBW(txtBW.getText().trim(), new Closure() {
-//                    @Override
-//                    public void execute(Object o) {
-//                        if (o == null) {
-//                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Keine(n) passende(n) Bewohner(in) gefunden.", 2));
-//                        } else {
-//                            bewohner = (Resident) o;
-//                            reloadDisplay();
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//
-//        mypanel.add(new JXTitledSeparator("Suchkriterien"));
-//        mypanel.add(txtBW);
-//
-//
-//        cmbVon = new JComboBox();
-//
-//        cmbVon.setRenderer(new ListCellRenderer() {
-//            Format formatter = new SimpleDateFormat("MMMM yyyy");
-//
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//                String text = formatter.format(o);
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//            }
-//        });
-//
-//        cmbVon.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (ignoreDateComboEvent) {
-//                    return;
-//                }
-//                if (cmbVon.getSelectedIndex() > cmbBis.getSelectedIndex()) {
-//                    ignoreDateComboEvent = true;
-//                    cmbBis.setSelectedIndex(cmbVon.getSelectedIndex());
-//                    ignoreDateComboEvent = false;
-//                }
-//                reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
-//            }
-//        });
-//
-//        cmbVon.setToolTipText("Anzeigen der Belege ab welchem Monat ?");
-//        mypanel.add(new JXTitledSeparator("Zeitraum Von - Bis"));
-////        mypanel.add(new TitledSeparator("Von", TitledSeparator.TYPE_PARTIAL_LINE, SwingConstants.LEADING));
-//        mypanel.add(cmbVon);
-//
-//
-//        cmbBis = new JComboBox();
-//        cmbBis.setRenderer(new ListCellRenderer() {
-//            Format formatter = new SimpleDateFormat("MMMM yyyy");
-//
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//                String text = formatter.format(o);
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//            }
-//        });
-//
-//        cmbBis.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (ignoreDateComboEvent) {
-//                    return;
-//                }
-//                if (cmbVon.getSelectedIndex() > cmbBis.getSelectedIndex()) {
-//                    ignoreDateComboEvent = true;
-//                    cmbVon.setSelectedIndex(cmbBis.getSelectedIndex());
-//                    ignoreDateComboEvent = false;
-//                }
-//                reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
-//            }
-//        });
-//
-////        panelTime.add(new JLabel(" "));
-////        mypanel.add(new TitledSeparator("Bis", TitledSeparator.TYPE_PARTIAL_GRADIENT_LINE, SwingConstants.LEADING));
-//        mypanel.add(cmbBis);
-//        cmbBis.setToolTipText("Anzeigen der Belege bis zu welchem Monat ?");
-//
-//        cmbMonat = new JComboBox();
-//        cmbMonat.setRenderer(new ListCellRenderer() {
-//            Format formatter = new SimpleDateFormat("MMMM yyyy");
-//
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-////                OPDE.debug(o.toString());
-//                String text = formatter.format(o);
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//            }
-//        });
-//
-//        cmbMonat.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                ignoreDateComboEvent = true;
-//                cmbVon.setSelectedItem(cmbMonat.getSelectedItem());
-//                cmbBis.setSelectedItem(cmbMonat.getSelectedItem());
-//                ignoreDateComboEvent = false;
-//                reloadTable((Date) cmbVon.getSelectedItem(), (Date) cmbBis.getSelectedItem());
-//            }
-//        });
-//
-////        panelTime.add(new JLabel(" "));
-////        TitledSeparator ts = new TitledSeparator("Bestimmter Monat");
-//
-////        com.jidesoft.swing.PartialLineBorder
-////        new PartialLineBorder(Color.WHITE, 1);
-//        mypanel.add(new JXTitledSeparator("Bestimmter Monat"));
-//
-//        cmbMonat.setToolTipText("Anzeigen der Belege nur für einen bestimmten Monat");
-//        mypanel.add(cmbMonat);
-//
-//        JPanel buttonPanel = new JPanel();
-//        buttonPanel.setBackground(Color.WHITE);
-//        buttonPanel.setLayout(new HorizontalLayout());
-//        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-//
-//        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
-//        homeButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                if (cmbMonat.getSelectedIndex() > 0) {
-//                    cmbMonat.setSelectedIndex(0);
-//                }
-//            }
-//        });
-//        homeButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start_pressed.png")));
-//        homeButton.setBorder(null);
-//        homeButton.setBorderPainted(false);
-//        homeButton.setOpaque(false);
-//        homeButton.setContentAreaFilled(false);
-//
-//        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev.png")));
-//        backButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                if (cmbMonat.getSelectedIndex() > 0) {
-//                    cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() - 1);
-//                }
-//            }
-//        });
-//        backButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_rev_pressed.png")));
-//        backButton.setBorder(null);
-//        backButton.setBorderPainted(false);
-//        backButton.setOpaque(false);
-//        backButton.setContentAreaFilled(false);
-//
-//
-//        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd.png")));
-//        fwdButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
-//                    cmbMonat.setSelectedIndex(cmbMonat.getSelectedIndex() + 1);
-//                }
-//            }
-//        });
-//        fwdButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_fwd_pressed.png")));
-//        fwdButton.setBorder(null);
-//        fwdButton.setBorderPainted(false);
-//        fwdButton.setOpaque(false);
-//        fwdButton.setContentAreaFilled(false);
-//
-//        JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
-//        endButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                if (cmbMonat.getSelectedIndex() < cmbMonat.getModel().getSize() - 1) {
-//                    cmbMonat.setSelectedIndex(cmbMonat.getModel().getSize() - 1);
-//                }
-//            }
-//        });
-//        endButton.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end_pressed.png")));
-//        endButton.setBorder(null);
-//        endButton.setBorderPainted(false);
-//        endButton.setOpaque(false);
-//        endButton.setContentAreaFilled(false);
-//
-//
-//        buttonPanel.add(homeButton);
-//        buttonPanel.add(backButton);
-//        buttonPanel.add(fwdButton);
-//        buttonPanel.add(endButton);
-//        mypanel.add(buttonPanel);
-//
-//        CollapsiblePane searchPane = new CollapsiblePane("Barbeträge");
-//        searchPane.setSlidingDirection(SwingConstants.SOUTH);
-//        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
-//        searchPane.setCollapsible(false);
-//        searchPane.setContentPane(mypanel);
-//
-//        searchPanes.add(searchPane);
-//        searchPanes.add(addBySearchBW());
-//
-//        searchPanes.addExpansion();
-//        jspSearch.validate();
-//    }
-
-
-     private void prepareSearchArea() {
+    private void prepareSearchArea() {
         searchPanes = new CollapsiblePanes();
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
@@ -1538,7 +1147,7 @@ public class PnlAllowance extends CleanablePanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
-//        GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -1548,63 +1157,164 @@ public class PnlAllowance extends CleanablePanel {
     }
 
 
+    private java.util.List<Component> addFilters() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setFont(SYSConst.ARIAL14);
+        txtSearch.setInstantSearchDelay(750);
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getBy(txtSearch.getText().trim())));
+                lstResidents = new ArrayList<Resident>();
+                lstResidents.add((Resident) cmbResident.getSelectedItem());
+                currentResident = (Resident) cmbResident.getSelectedItem();
+                reloadDisplay();
+            }
+        });
+
+        list.add(txtSearch);
+
+        cmbResident = new JComboBox();
+        cmbResident.setFont(SYSConst.ARIAL14);
+        cmbResident.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    lstResidents = new ArrayList<Resident>();
+                    lstResidents.add((Resident) e.getItem());
+                    currentResident = (Resident) e.getItem();
+                    reloadDisplay();
+                }
+            }
+        });
+        list.add(cmbResident);
+
+        final JideButton btnAllActiveResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallactiveresidents"), null, null);
+        btnAllActiveResidents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                lstResidents = ResidentTools.getAllActive();
+                currentResident = null;
+                reloadDisplay();
+            }
+        });
+        list.add(btnAllActiveResidents);
+
+        final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallactiveresidents"), null, null);
+        btnAllInactiveResidents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                lstResidents = ResidentTools.getAllInactive();
+                currentResident = null;
+                reloadDisplay();
+            }
+        });
+        list.add(btnAllInactiveResidents);
+
+        final JideButton btnAllResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallresidents"), null, null);
+        btnAllResidents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                lstResidents = ResidentTools.getAllInactive();
+                lstResidents.addAll(ResidentTools.getAllActive());
+                Collections.sort(lstResidents);
+                currentResident = null;
+                reloadDisplay();
+            }
+        });
+        list.add(btnAllResidents);
+
+        return list;
+    }
+
     private java.util.List<Component> addCommands() {
 
         java.util.List<Component> list = new ArrayList<Component>();
 
         /***
-         *         _       _     _ _   _
-         *        / \   __| | __| | | | |___  ___ _ __
-         *       / _ \ / _` |/ _` | | | / __|/ _ \ '__|
-         *      / ___ \ (_| | (_| | |_| \__ \  __/ |
-         *     /_/   \_\__,_|\__,_|\___/|___/\___|_|
+         *      _____       _              _______  __
+         *     | ____|_ __ | |_ ___ _ __  |_   _\ \/ /___
+         *     |  _| | '_ \| __/ _ \ '__|   | |  \  // __|
+         *     | |___| | | | ||  __/ |      | |  /  \\__ \
+         *     |_____|_| |_|\__\___|_|      |_| /_/\_\___/
          *
          */
-        final JideButton btnNewTX = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnAddUser"), SYSConst.icon22addUser, null);
+        final JidePopup popupTX = new JidePopup();
+        popupTX.setMovable(false);
+        PnlTX pnlTX = new PnlTX(new Allowance(currentResident), new Closure() {
+            @Override
+            public void execute(Object o) {
+                OPDE.debug(o);
+                if (o != null) {
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Allowance myAllowance = em.merge((Allowance) o);
+                        em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                        em.getTransaction().commit();
+
+                        DateTime txDate = new DateTime(myAllowance.getBelegDatum());
+
+                        final String keyResident = myAllowance.getResident().getRID();
+                        final String keyYear = myAllowance.getResident().getRID() + "-" + txDate.getYear();
+                        final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                        createCP4(myAllowance.getResident());
+                        cpMap.remove(keyMonth);
+                        if (!cashmap.containsKey(keyMonth)) {
+                            cashmap.put(keyMonth, new ArrayList<Allowance>());
+                            cashmap.put(keyMonth, AllowanceTools.getMonth(myAllowance.getResident(), myAllowance.getBelegDatum()));
+                        }
+
+                        try {
+                            cpMap.get(keyResident).setCollapsed(false);
+                            cpMap.get(keyYear).setCollapsed(false);
+                            cpMap.get(keyMonth).setCollapsed(false);
+                        } catch (PropertyVetoException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                buildPanel();
+                                jspCash.getVerticalScrollBar().setValue(SwingUtilities.convertPoint(cpMap.get(keyMonth), cpMap.get(keyMonth).getLocation(), cpCash).y);
+                            }
+                        });
+
+                    } catch (OptimisticLockException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                }
+            }
+        });
+        popupTX.setContentPane(pnlTX);
+        popupTX.removeExcludedComponent(pnlTX);
+        popupTX.setDefaultFocusComponent(pnlTX);
+
+        final JideButton btnNewTX = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".enterTXs"), SYSConst.icon22addUser, null);
         btnNewTX.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new DlgUser(new Users(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Users user = em.merge((Users) o);
-                                em.getTransaction().commit();
-                                lstUsers.add(user);
-                                reloadDisplay();
-                            } catch (Exception e) {
-                                em.getTransaction().rollback();
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    }
-                });
-
-
-//                    new DlgProcess(new QProcess(resident), new Closure() {
-//                        @Override
-//                        public void execute(Object o) {
-//                            if (o != null) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    QProcess qProcess = em.merge((QProcess) o);
-//                                    em.getTransaction().commit();
-//                                    processList.add(qProcess);
-//                                    qProcessMap.put(qProcess, createCP4(qProcess));
-//                                    buildPanel();
-//                                } catch (Exception e) {
-//                                    em.getTransaction().rollback();
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-//                        }
-//                    });
+                popupTX.setOwner(btnNewTX);
+                GUITools.showPopup(popupTX, SwingConstants.NORTH_EAST);
             }
         });
         list.add(btnNewTX);
@@ -1612,104 +1322,20 @@ public class PnlAllowance extends CleanablePanel {
         return list;
     }
 
-//    private CollapsiblePane addBySearchBW() {
-//        panelText = new CollapsiblePane("Bewohnerliste");
-//
-//        JPanel mypanel = new JPanel();
-//        mypanel.setLayout(new VerticalLayout());
-//        mypanel.setBackground(Color.WHITE);
-//        searchSaldoButtonMap = new HashMap<Resident, Object[]>();
-//
-//        EntityManager em = OPDE.createEM();
-//
-//        Query query = em.createQuery(" " +
-//                " SELECT b, SUM(k.betrag) FROM Resident b " +
-//                " LEFT JOIN b.konto k " +
-//                " WHERE b.station IS NOT NULL " +
-//                " GROUP BY b " +
-//                " ORDER BY b.nachname, b.vorname, b.bWKennung ");
-//
-//        List<Object[]> bwSearchList = query.getResultList();
-//
-//        em.close();
-//
-//        for (int row = 0; row < bwSearchList.size(); row++) {
-//            final Resident myBewohner = (Resident) bwSearchList.get(row)[0];
-//            BigDecimal saldo = bwSearchList.get(row)[1] == null ? BigDecimal.ZERO : (BigDecimal) bwSearchList.get(row)[1];
-//
-//            String titel = "<html>" + myBewohner.getNachname() + ", " + myBewohner.getVorname() + " [" + myBewohner.getRID() + "] <b><font " + (saldo.compareTo(BigDecimal.ZERO) < 0 ? "color=\"red\"" : "color=\"black\"") + ">" + currencyFormat.format(saldo) + "</font></b></html>";
-//
-//            JideButton button = GUITools.createHyperlinkButton(titel, null, new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    bewohner = myBewohner;
-//                    reloadDisplay();
-//                }
-//            });
-//            button.setButtonStyle(JideButton.FLAT_STYLE);
-//            searchSaldoButtonMap.put(myBewohner, new Object[]{saldo, button});
-//            mypanel.add(button);
-//        }
-//
-//        try {
-//            panelText.setCollapsed(true);
-//        } catch (PropertyVetoException e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
-//        panelText.setSlidingDirection(SwingConstants.SOUTH);
-//        panelText.setStyle(CollapsiblePane.PLAIN_STYLE);
-//        panelText.setContentPane(mypanel);
-//        return panelText;
-//    }
-
-//    private void initSearchTime() {
-//
-//        ignoreDateComboEvent = true;
-//
-//        cmbVon.setModel(SYSCalendar.createMonthList(min, max));
-//        cmbVon.setSelectedIndex(cmbVon.getModel().getSize() - 1);
-//
-//        cmbBis.setModel(SYSCalendar.createMonthList(min, max));
-//        cmbBis.setSelectedIndex(cmbBis.getModel().getSize() - 1);
-//
-//        cmbMonat.setModel(SYSCalendar.createMonthList(min, max));
-//        cmbMonat.setSelectedIndex(cmbMonat.getModel().getSize() - 1);
-//
-//        ignoreDateComboEvent = false;
-//    }
-
-    private class CurrencyRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable jTable, Object value, boolean b, boolean b1, int i, int i1) {
-            String text = value.toString();
-            if (value instanceof BigDecimal) {
-                BigDecimal bd = (BigDecimal) value;
-                if (bd.compareTo(BigDecimal.ZERO) < 0) {
-                    setForeground(Color.RED);
-                } else {
-                    setForeground(Color.BLACK);
-                }
-
-                NumberFormat nf = NumberFormat.getCurrencyInstance();
-                text = nf.format(value);
-                setHorizontalAlignment(JLabel.RIGHT);
-            }
-            return super.getTableCellRendererComponent(jTable, text, b, b1, i, i1);    //To change body of overridden methods use File | Settings | File Templates.
+    private Color getBG(Resident resident, int level) {
+        if (lstResidents.indexOf(resident) % 2 == 0) {
+            return SYSConst.purple_pastel1[level];
+        } else {
+            return SYSConst.greyscale[level];
         }
     }
-
-
-
 
     private void buildPanel() {
         cpCash.removeAll();
         cpCash.setLayout(new JideBoxLayout(cpCash, JideBoxLayout.Y_AXIS));
 
-
         for (Resident resident : lstResidents) {
-
             cpCash.add(cpMap.get(resident.getRID()));
-
         }
 
         cpCash.addExpansion();

@@ -538,7 +538,6 @@ public class PnlUser extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
 
-
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
