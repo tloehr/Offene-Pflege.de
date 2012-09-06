@@ -1,10 +1,11 @@
 package op.tools;
 
+import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
+import entity.info.BWInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.info.BWInfoTools;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
 import op.system.FileDrop;
@@ -15,6 +16,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyVetoException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -195,5 +197,17 @@ public class GUITools {
             index++;
         }
         return result;
+    }
+
+    public static void setCollapsed(Container root, boolean collapsed) throws PropertyVetoException {
+        if (root instanceof CollapsiblePane) {
+            ((CollapsiblePane) root).setCollapsed(collapsed);
+        }
+        for (Component component : root.getComponents()) {
+            if (component instanceof Container) {
+                setCollapsed((Container) component, collapsed);
+            }
+        }
+
     }
 }

@@ -8,6 +8,7 @@ import entity.EntityTools;
 import entity.prescription.PrescriptionsTools;
 import op.OPDE;
 import op.tools.DlgListSelector;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
@@ -168,6 +169,7 @@ public class ResidentTools {
         em.close();
         return list;
     }
+
 
 
 }

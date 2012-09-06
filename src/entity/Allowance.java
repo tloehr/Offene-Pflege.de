@@ -22,8 +22,8 @@ import java.util.Date;
 @NamedQueries({
         @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Allowance t"),
         @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Allowance t WHERE t.id = :tgid"),
-        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Allowance t WHERE t.belegDatum = :belegDatum"),
-        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Allowance t WHERE t.belegtext = :belegtext")})
+        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Allowance t WHERE t.date = :belegDatum"),
+        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Allowance t WHERE t.text = :belegtext")})
 public class Allowance implements Serializable, Comparable<Allowance> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -36,29 +36,33 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     @Basic(optional = false)
     @Column(name = "BelegDatum")
     @Temporal(TemporalType.DATE)
-    private Date belegDatum;
+    private Date date;
     @Basic(optional = false)
     @Column(name = "Belegtext")
-    private String belegtext;
+    private String text;
     @Basic(optional = false)
     @Column(name = "Betrag")
-    private BigDecimal betrag;
+    private BigDecimal amount;
     @Basic(optional = false)
     @Column(name = "_edate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date bearbeitetAm;
+    private Date editDate;
     @Basic(optional = false)
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date erstelltAm;
+    private Date createDate;
 
     public Allowance() {
     }
 
     public Allowance(Resident resident) {
+        this.text = "";
+        this.date = new Date();
+        this.amount = BigDecimal.ZERO;
+
         this.resident = resident;
-        this.erstelltVon = OPDE.getLogin().getUser();
-        this.erstelltAm = new Date();
+        this.createdBy = OPDE.getLogin().getUser();
+        this.createDate = new Date();
     }
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
@@ -66,78 +70,11 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     private Resident resident;
     @JoinColumn(name = "_editor", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users bearbeitetVon;
+    private Users editedBy;
     @JoinColumn(name = "_creator", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users erstelltVon;
+    private Users createdBy;
 
-    public Date getBelegDatum() {
-        return belegDatum;
-    }
-
-    public Long getID() {
-        return id;
-    }
-
-    public void setBelegDatum(Date belegDatum) {
-        this.belegDatum = belegDatum;
-    }
-
-    public String getBelegtext() {
-        return belegtext;
-    }
-
-    public void setBelegtext(String belegtext) {
-        this.belegtext = belegtext;
-    }
-
-    public BigDecimal getBetrag() {
-        return betrag;
-    }
-
-    public void setBetrag(BigDecimal betrag) {
-        this.betrag = betrag;
-    }
-
-    public Resident getResident() {
-        return resident;
-    }
-
-    public void setResident(Resident resident) {
-        this.resident = resident;
-    }
-
-    public Date getBearbeitetAm() {
-        return bearbeitetAm;
-    }
-
-    public void setBearbeitetAm(Date bearbeitetAm) {
-        this.bearbeitetAm = bearbeitetAm;
-    }
-
-    public Date getErstelltAm() {
-        return erstelltAm;
-    }
-
-    public void setErstelltAm(Date erstelltAm) {
-        this.erstelltAm = erstelltAm;
-    }
-
-    public Users getBearbeitetVon() {
-        return bearbeitetVon;
-    }
-
-    public void setBearbeitetVon(Users bearbeitetVon) {
-        this.bearbeitetVon = bearbeitetVon;
-    }
-
-    public Users getErstelltVon() {
-        return erstelltVon;
-    }
-
-    public void setErstelltVon(Users erstelltVon) {
-        this.erstelltVon = erstelltVon;
-    }
 
     @Override
     public int hashCode() {
@@ -158,26 +95,98 @@ public class Allowance implements Serializable, Comparable<Allowance> {
         return true;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public Date getEditDate() {
+        return editDate;
+    }
+
+    public void setEditDate(Date editDate) {
+        this.editDate = editDate;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Resident getResident() {
+        return resident;
+    }
+
+    public void setResident(Resident resident) {
+        this.resident = resident;
+    }
+
+    public Users getEditedBy() {
+        return editedBy;
+    }
+
+    public void setEditedBy(Users editedBy) {
+        this.editedBy = editedBy;
+    }
+
+    public Users getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Users createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Taschengeld{" +
                 "tgid=" + id +
-                ", belegDatum=" + belegDatum +
-                ", belegtext='" + belegtext + '\'' +
-                ", betrag=" + betrag +
-                ", bearbeitetAm=" + bearbeitetAm +
-                ", erstelltAm=" + erstelltAm +
+                ", belegDatum=" + date +
+                ", belegtext='" + text + '\'' +
+                ", betrag=" + amount +
+                ", bearbeitetAm=" + editDate +
+                ", erstelltAm=" + createDate +
                 ", bewohner=" + resident +
-                ", bearbeitetVon=" + bearbeitetVon +
-                ", erstelltVon=" + erstelltVon +
+                ", bearbeitetVon=" + editedBy +
+                ", erstelltVon=" + createdBy +
                 '}';
     }
 
     @Override
     public int compareTo(Allowance other) {
-        int result = belegDatum.compareTo(other.getBelegDatum()) * -1;
+        int result = date.compareTo(other.getDate()) * -1;
         if (result == 0) {
-            result = id.compareTo(other.getID()) * -1;
+            result = id.compareTo(other.getId()) * -1;
         }
         return result;
     }

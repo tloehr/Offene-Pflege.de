@@ -25,6 +25,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 
@@ -35,7 +36,7 @@ public class PnlTX extends JPanel {
     public static final String internalClassID = "admin.residents.cash.pnltx";
     private Allowance tx;
     private Closure afterChange;
-//    private JToggleButton tbSaveImmediately;
+    DecimalFormat cf = new DecimalFormat("######.00");
 
     public PnlTX(Allowance tx, Closure afterChange) {
         super();
@@ -88,20 +89,18 @@ public class PnlTX extends JPanel {
     }
 
     private void txtCashActionPerformed(ActionEvent e) {
-//        if (!tbSaveImmediately.isSelected()) {
-//            return;
-//        }
         save();
         afterChange.execute(tx);
         tx = new Allowance((Resident) cmbResident.getSelectedItem());
+        txtDate.requestFocus();
     }
 
     private void save() {
-        tx.setBearbeitetVon(OPDE.getLogin().getUser());
-        tx.setBearbeitetAm(new Date());
-        tx.setBelegDatum(SYSCalendar.parseDate(txtDate.getText()));
-        tx.setBetrag(checkCash(txtCash.getText(), BigDecimal.ONE));
-        tx.setBelegtext(txtText.getText().trim());
+        tx.setEditedBy(OPDE.getLogin().getUser());
+        tx.setEditDate(new Date());
+        tx.setDate(SYSCalendar.parseDate(txtDate.getText()));
+        tx.setAmount(checkCash(txtCash.getText(), BigDecimal.ONE));
+        tx.setText(txtText.getText().trim());
         tx.setResident((Resident) cmbResident.getSelectedItem());
     }
 
@@ -216,12 +215,10 @@ public class PnlTX extends JPanel {
         lblDate.setText(OPDE.lang.getString(internalClassID + ".lbldate"));
         lblText.setText(OPDE.lang.getString(internalClassID + ".lbltext"));
         lblCash.setText(OPDE.lang.getString(internalClassID + ".lblcash"));
-        txtDate.setText(DateFormat.getDateInstance().format(new Date()));
-        txtCash.setText("0,00");
+        txtDate.setText(DateFormat.getDateInstance().format(tx.getDate()));
+        txtCash.setText(cf.format(tx.getAmount()));
+        txtText.setText(tx.getText());
         cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
-
-//        tbSaveImmediately = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbSaveImmediately"));
-//        add(tbSaveImmediately, CC.xywh(3, 11, 3, 1));
         txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
 
         if (tx.getResident() != null) {

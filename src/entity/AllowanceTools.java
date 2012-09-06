@@ -10,6 +10,7 @@ import op.OPDE;
 import op.allowance.PnlAllowance;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
@@ -32,9 +33,9 @@ public class AllowanceTools {
         Collections.sort(lstCash, new Comparator<Allowance>() {
             @Override
             public int compare(Allowance o1, Allowance o2) {
-                int result = o1.getBelegDatum().compareTo(o2.getBelegDatum());
+                int result = o1.getDate().compareTo(o2.getDate());
                 if (result == 0) {
-                    result = o1.getID().compareTo(o2.getID());
+                    result = o1.getId().compareTo(o2.getId());
                 }
                 return result;
             }
@@ -60,7 +61,7 @@ public class AllowanceTools {
 
         for (Allowance tg : lstCash) {
 
-            GregorianCalendar belegDatum = SYSCalendar.toGC(tg.getBelegDatum());
+            GregorianCalendar belegDatum = SYSCalendar.toGC(tg.getDate());
             boolean monatsWechsel = monat != belegDatum.get(GregorianCalendar.MONTH);
 
 
@@ -106,12 +107,12 @@ public class AllowanceTools {
                 }
             }
 
-            saldo = saldo.add(tg.getBetrag());
+            saldo = saldo.add(tg.getAmount());
 
             html += "<tr>";
             html += "<td width=\"90\"  align=\"center\" >" + DateFormat.getDateInstance().format(new Date(belegDatum.getTimeInMillis())) + "</td>";
-            html += "<td width=\"340\">" + tg.getBelegtext() + "</td>";
-            html += "<td width=\"100\" align=\"right\">&euro; " + cf.format(tg.getBetrag()) + "</td>";
+            html += "<td width=\"340\">" + tg.getText() + "</td>";
+            html += "<td width=\"100\" align=\"right\">&euro; " + cf.format(tg.getAmount()) + "</td>";
             html += "<td width=\"100\" align=\"right\">&euro; " + cf.format(saldo) + "</td>";
             html += "</tr>\n";
             elementNumber += 1;
@@ -135,7 +136,7 @@ public class AllowanceTools {
     public static BigDecimal getSUM(Resident resident, DateTime to) {
 //        OPDE.debug("getSUM to: " + DateFormat.getDateInstance().format(to.toDate()));
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(al.betrag) FROM Allowance al WHERE al.resident = :resident AND al.belegDatum <= :to ");
+        Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.resident = :resident AND al.date <= :to ");
         query.setParameter("resident", resident);
 //        query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
@@ -156,7 +157,7 @@ public class AllowanceTools {
 
     public static BigDecimal getSUM(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(al.betrag) FROM Allowance al WHERE al.resident = :resident ");
+        Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.resident = :resident ");
         query.setParameter("resident", resident);
         BigDecimal sum = BigDecimal.ZERO;
         try {
@@ -174,7 +175,7 @@ public class AllowanceTools {
 
     public static ArrayList<Allowance> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.belegDatum DESC, al.id DESC ");
+        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.date DESC, al.id DESC ");
         query.setParameter("resident", resident);
         ArrayList<Allowance> result = null;
         try {
@@ -193,7 +194,7 @@ public class AllowanceTools {
         DateTime to = new DateTime(year).dayOfYear().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident AND al.belegDatum >= :from AND al.belegDatum <= :to ORDER BY al.belegDatum DESC, al.id DESC");
+        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident AND al.date >= :from AND al.date <= :to ORDER BY al.date DESC, al.id DESC");
         query.setParameter("resident", resident);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
@@ -214,7 +215,7 @@ public class AllowanceTools {
         DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident AND al.belegDatum >= :from AND al.belegDatum <= :to ORDER BY al.belegDatum DESC, al.id DESC");
+        Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident AND al.date >= :from AND al.date <= :to ORDER BY al.date DESC, al.id DESC");
         query.setParameter("resident", resident);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
@@ -240,11 +241,11 @@ public class AllowanceTools {
         Pair<Allowance, Allowance> result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.belegDatum ASC ");
+        Query queryMin = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.date ASC ");
         queryMin.setParameter("resident", resident);
         queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.belegDatum DESC ");
+        Query queryMax = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.date DESC ");
         queryMax.setParameter("resident", resident);
         queryMax.setMaxResults(1);
 
@@ -256,5 +257,34 @@ public class AllowanceTools {
             OPDE.fatal(e);
         }
         return result;
+    }
+
+
+    public static String getOverallSumAsHTML(int monthsback) {
+        DecimalFormat cf = new DecimalFormat("######.00");
+        Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
+        String html = "<h1  align=\"center\" id=\"fonth1\">"+OPDE.lang.getString(PnlAllowance.internalClassID+".overallsum")+"</h1>";
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.date <= :end");
+
+        DateMidnight from = new DateMidnight().dayOfMonth().withMinimumValue().minusMonths(monthsback);
+
+
+        html += "<table>";
+
+        for (DateMidnight end = new DateMidnight().dayOfMonth().withMaximumValue(); end.isAfter(from); end = end.minusMonths(1)){
+            query.setParameter("end", end.toDate());
+            BigDecimal bd = (BigDecimal) query.getSingleResult();
+
+            String fonttext = end.getMonthOfYear() % 2 == 0 ? "fonttext" : "fonttextgray";
+
+
+            html += "<tr><td id=\""+fonttext+"\" width=\"300\" align=\"right\">"+monthFormatter.format(end.toDate())+"</td><td  id=\""+fonttext+"\"  width=\"100\" align=\"right\">"+cf.format(bd)+" &euro;</td></tr>";
+        }
+
+        html += "</table>";
+        em.close();
+        return html;
     }
 }

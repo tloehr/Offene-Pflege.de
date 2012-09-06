@@ -56,7 +56,7 @@ public class TMTGStat extends AbstractTableModel {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT b, SUM(k.betrag) FROM Resident b " +
+                " SELECT b, SUM(k.amount) FROM Resident b " +
                 " LEFT JOIN b.konto k " +
                 (alle ? "" : " WHERE b.station IS NOT NULL ") +
                 " GROUP BY b " +
