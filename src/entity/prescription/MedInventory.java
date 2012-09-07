@@ -15,10 +15,10 @@ import java.util.Date;
 @Table(name = "MPVorrat")
 @NamedQueries({
         @NamedQuery(name = "MedInventory.findAll", query = "SELECT m FROM MedInventory m"),
-        @NamedQuery(name = "MedInventory.findByVorID", query = "SELECT m FROM MedInventory m WHERE m.vorID = :vorID"),
+        @NamedQuery(name = "MedInventory.findByVorID", query = "SELECT m FROM MedInventory m WHERE m.id = :vorID"),
         @NamedQuery(name = "MedInventory.findByText", query = "SELECT m FROM MedInventory m WHERE m.text = :text"),
-        @NamedQuery(name = "MedInventory.findByVon", query = "SELECT m FROM MedInventory m WHERE m.von = :von"),
-        @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.bis = :bis"),
+        @NamedQuery(name = "MedInventory.findByVon", query = "SELECT m FROM MedInventory m WHERE m.from = :von"),
+        @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.to = :bis"),
         @NamedQuery(name = "MedInventory.getSumme", query = " " +
                 " SELECT SUM(buch.menge) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
 //        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
@@ -29,7 +29,7 @@ import java.util.Date;
         @NamedQuery(name = "MedInventory.findByBewohnerMitBestand", query = " " +
                 " SELECT best.inventory, SUM(buch.menge) FROM MedStock best " +
                 " JOIN best.stockTransaction buch " +
-                " WHERE best.inventory.resident = :bewohner AND best.inventory.bis = '9999-12-31 23:59:59' " +
+                " WHERE best.inventory.resident = :bewohner AND best.inventory.to = '9999-12-31 23:59:59' " +
                 " GROUP BY best.inventory ")
 })
 
@@ -63,9 +63,8 @@ public class MedInventory implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "VorID")
-    private Long vorID;
+    private Long id;
     @Version
     @Column(name = "version")
     private Long version;
@@ -75,11 +74,11 @@ public class MedInventory implements Serializable {
     @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date von;
+    private Date from;
     @Basic(optional = false)
     @Column(name = "Bis")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date bis;
+    private Date to;
 
     public MedInventory() {
 
@@ -102,17 +101,13 @@ public class MedInventory implements Serializable {
         this.resident = resident;
         this.text = text;
         this.user = OPDE.getLogin().getUser();
-        this.von = new Date();
-        this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.from = new Date();
+        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
         this.medStocks = new ArrayList<MedStock>();
     }
 
-    public Long getVorID() {
-        return vorID;
-    }
-
-    public void setVorID(Long vorID) {
-        this.vorID = vorID;
+    public Long getID() {
+        return id;
     }
 
     public String getText() {
@@ -123,25 +118,18 @@ public class MedInventory implements Serializable {
         this.text = text;
     }
 
-    public Date getVon() {
-        return von;
+    public Date getFrom() {
+        return from;
     }
 
-    public void setVon(Date von) {
-        this.von = von;
-    }
-
-    public Date getBis() {
-        return bis;
+    public Date getTo() {
+        return to;
     }
 
     public boolean isAbgeschlossen(){
-        return bis.before(SYSConst.DATE_BIS_AUF_WEITERES);
+        return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
-    public void setBis(Date bis) {
-        this.bis = bis;
-    }
 
     // ==
     // 1:N Relationen
@@ -165,7 +153,7 @@ public class MedInventory implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (vorID != null ? vorID.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -176,7 +164,7 @@ public class MedInventory implements Serializable {
             return false;
         }
         MedInventory other = (MedInventory) object;
-        if ((this.vorID == null && other.vorID != null) || (this.vorID != null && !this.vorID.equals(other.vorID))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -184,7 +172,7 @@ public class MedInventory implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedInventory[vorID=" + vorID + "]";
+        return "entity.rest.MedInventory[vorID=" + id + "]";
     }
 
     public Collection<MedStock> getMedStocks() {

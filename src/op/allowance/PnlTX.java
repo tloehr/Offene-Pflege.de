@@ -246,6 +246,8 @@ public class PnlTX extends JPanel {
             cmbResident.setEnabled(false);
         }
 
+        txtDate.requestFocus();
+
     }
 
     private BigDecimal checkCash(String text, BigDecimal defaultAmount) {

@@ -157,7 +157,7 @@ public class DlgVerordnung extends MyJDialog {
         if (txtSit.getText().isEmpty()) {
             cmbSit.setModel(new DefaultComboBoxModel());
         } else {
-            cmbSit.setModel(new DefaultComboBoxModel(SituationenTools.findSituationByText(txtSit.getText()).toArray()));
+            cmbSit.setModel(new DefaultComboBoxModel(SituationsTools.findSituationByText(txtSit.getText()).toArray()));
         }
     }
 
@@ -166,12 +166,12 @@ public class DlgVerordnung extends MyJDialog {
             return;
         }
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Situationen s WHERE s.text = :text");
+        Query query = em.createQuery("SELECT s FROM Situations s WHERE s.text = :text");
         query.setParameter("text", text);
         if (query.getResultList().isEmpty()) {
-            Situationen neueSituation = new Situationen(text);
+            Situations neueSituation = new Situations(text);
             em.persist(neueSituation);
-            cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{neueSituation}));
+            cmbSit.setModel(new DefaultComboBoxModel(new Situations[]{neueSituation}));
         } else {
             cmbSit.setModel(new DefaultComboBoxModel(query.getResultList().toArray()));
         }
@@ -236,7 +236,7 @@ public class DlgVerordnung extends MyJDialog {
             OPDE.getDisplayManager().setDBActionMessage(true);
             EntityManager em = OPDE.createEM();
 
-            String pzn = MedPackungTools.parsePZN(txtMed.getText());
+            String pzn = MedPackageTools.parsePZN(txtMed.getText());
 
             if (pzn != null) {
 
@@ -244,8 +244,8 @@ public class DlgVerordnung extends MyJDialog {
                 pznQuery.setParameter("pzn", pzn);
 
                 try {
-                    MedPackung medPackung = (MedPackung) pznQuery.getSingleResult();
-                    cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackung.getDarreichung()}));
+                    MedPackage medPackage = (MedPackage) pznQuery.getSingleResult();
+                    cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackage.getDarreichung()}));
                 } catch (NoResultException nre) {
                     OPDE.debug("Nichts passendes zu dieser PZN gefunden");
                 } catch (Exception ex) {
@@ -428,7 +428,7 @@ public class DlgVerordnung extends MyJDialog {
             jPanel1.add(cmbMass, CC.xywh(3, 5, 3, 1));
 
             //---- txtSit ----
-            txtSit.setPrompt("Situationen");
+            txtSit.setPrompt("Situations");
             txtSit.setFont(new Font("Arial", Font.PLAIN, 14));
             txtSit.addActionListener(new ActionListener() {
                 @Override
@@ -758,7 +758,7 @@ public class DlgVerordnung extends MyJDialog {
         jdcAN.setMinSelectableDate(new Date());
         jdcAB.setMinSelectableDate(new Date());
         cmbMed.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
-        cmbSit.setRenderer(SituationenTools.getSituationenRenderer());
+        cmbSit.setRenderer(SituationsTools.getSituationenRenderer());
         cmbMed.setModel(new DefaultComboBoxModel());
 
         btnSave.setEnabled(true);
@@ -781,7 +781,7 @@ public class DlgVerordnung extends MyJDialog {
         cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
         cbStellplan.setSelected(verordnung.isStellplan());
 
-        cmbSit.setModel(new DefaultComboBoxModel(new Situationen[]{verordnung.getSituation()}));
+        cmbSit.setModel(new DefaultComboBoxModel(new Situations[]{verordnung.getSituation()}));
 
         cmbMass.setSelectedItem(verordnung.getMassnahme());
 
@@ -822,15 +822,15 @@ public class DlgVerordnung extends MyJDialog {
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
 
-        String pzn = MedPackungTools.parsePZN(txtMed.getText());
+        String pzn = MedPackageTools.parsePZN(txtMed.getText());
         final JidePopup popup = new JidePopup();
 
         WizardDialog wizard = new MedProductWizard(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    MedPackung packung = (MedPackung) o;
-                    txtMed.setText(packung.getPzn());
+                    MedPackage aPackage = (MedPackage) o;
+                    txtMed.setText(aPackage.getPzn());
                 }
                 popup.hidePopup();
             }
@@ -974,7 +974,7 @@ public class DlgVerordnung extends MyJDialog {
         verordnung.setTradeForm((TradeForm) cmbMed.getSelectedItem());
         verordnung.setStellplan(cbStellplan.isSelected());
 
-        verordnung.setSituation((Situationen) cmbSit.getSelectedItem());
+        verordnung.setSituation((Situations) cmbSit.getSelectedItem());
         return true;
     }
 

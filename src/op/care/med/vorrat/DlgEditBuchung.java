@@ -72,7 +72,7 @@ public class DlgEditBuchung extends JPanel {
         lblEinheit.setText(TradeFormTools.getPackungsEinheit(bestand.getTradeForm()));
 
         if (bestand.hasPackung()) {
-            packgroesse = bestand.getPackung().getInhalt();
+            packgroesse = bestand.getaPackage().getInhalt();
         } else {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }

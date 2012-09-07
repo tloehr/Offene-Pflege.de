@@ -161,7 +161,7 @@ public class PrescriptionsTools {
 
             for (Object[] rohdaten : listeRohfassung) {
                 Prescriptions verordnung = em.find(Prescriptions.class, ((BigInteger) rohdaten[0]).longValue());
-                Situationen situation = em.find(Situationen.class, ((BigInteger) rohdaten[1]).longValue());
+                Situations situation = em.find(Situations.class, ((BigInteger) rohdaten[1]).longValue());
                 PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) rohdaten[2]).longValue());
                 BigDecimal vorratSaldo = (BigDecimal) rohdaten[3];
                 BigDecimal tagesdosisBisher = (BigDecimal) rohdaten[4];
@@ -553,7 +553,7 @@ public class PrescriptionsTools {
                 " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
                 " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
                 " WHERE b.VorID=? AND ver.AbDatum > now() ");
-        query.setParameter(1, inventory.getVorID());
+        query.setParameter(1, inventory.getID());
         list = query.getResultList();
 
         if (!list.isEmpty()) {

@@ -58,7 +58,6 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "BestID")
     private Long bestID;
     @Version
@@ -85,12 +84,12 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     public MedStock() {
     }
 
-    public MedStock(MedInventory inventory, TradeForm darreichung, MedPackung packung, String text) {
+    public MedStock(MedInventory inventory, TradeForm darreichung, MedPackage aPackage, String text) {
         this.apv = BigDecimal.ONE;
 
         this.inventory = inventory;
         this.tradeform = tradeform;
-        this.packung = packung;
+        this.aPackage = aPackage;
         this.text = text;
         this.ein = new Date();
         this.anbruch = SYSConst.DATE_BIS_AUF_WEITERES;
@@ -166,7 +165,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     // N:1 Relationen
     @JoinColumn(name = "MPID", referencedColumnName = "MPID")
     @ManyToOne
-    private MedPackung packung;
+    private MedPackage aPackage;
 
     @JoinColumn(name = "VorID", referencedColumnName = "VorID")
     @ManyToOne
@@ -193,13 +192,13 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return stockTransaction;
     }
 
-    public MedPackung getPackung() {
+    public MedPackage getaPackage() {
 
-        return packung;
+        return aPackage;
     }
 
-    public void setPackung(MedPackung packung) {
-        this.packung = packung;
+    public void setaPackage(MedPackage aPackage) {
+        this.aPackage = aPackage;
     }
 
     public MedInventory getInventory() {
@@ -242,7 +241,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     public boolean hasPackung() {
-        return packung != null;
+        return aPackage != null;
     }
 
     @Override

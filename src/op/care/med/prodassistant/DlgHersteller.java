@@ -11,7 +11,7 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
-import entity.prescription.MedHersteller;
+import entity.prescription.MedFactory;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
  */
 public class DlgHersteller extends JPanel {
     private Closure actionBlock;
-    private MedHersteller hersteller;
+    private MedFactory factory;
     private JLabel attentionIconFirma, attentionIconOrt;
     private OverlayTextField txtFirma, txtOrt;
     private DefaultOverlayable ovrFirma, ovrOrt;
@@ -72,11 +72,11 @@ public class DlgHersteller extends JPanel {
 
     private void btnOKActionPerformed(ActionEvent e) {
         if (txtFirma.getText().trim().isEmpty() || txtOrt.getText().trim().isEmpty()) {
-            hersteller = null;
+            factory = null;
         } else {
-            hersteller = new MedHersteller(txtFirma.getText().trim(), txtStrasse.getText().trim(), txtPLZ.getText().trim(), txtOrt.getText().trim(), txtTel.getText().trim(), txtFax.getText().trim(), txtWWW.getText().trim());
+            factory = new MedFactory(txtFirma.getText().trim(), txtStrasse.getText().trim(), txtPLZ.getText().trim(), txtOrt.getText().trim(), txtTel.getText().trim(), txtFax.getText().trim(), txtWWW.getText().trim());
         }
-        actionBlock.execute(hersteller);
+        actionBlock.execute(factory);
     }
 
     private void initComponents() {

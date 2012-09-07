@@ -48,11 +48,11 @@
         <class>entity.prescription.MedStock</class>
         <class>entity.prescription.MedStockTransaction</class>
         <class>entity.prescription.DosageForm</class>
-        <class>entity.prescription.MedHersteller</class>
-        <class>entity.prescription.MedPackung</class>
-        <class>entity.prescription.MedProdukte</class>
+        <class>entity.prescription.MedFactory</class>
+        <class>entity.prescription.MedPackage</class>
+        <class>entity.prescription.MedProducts</class>
         <class>entity.prescription.MedInventory</class>
-        <class>entity.prescription.Situationen</class>
+        <class>entity.prescription.Situations</class>
         <class>entity.prescription.Prescriptions</class>
         <class>entity.prescription.PrescriptionSchedule</class>
         <class>entity.process.SYSINF2PROCESS</class>

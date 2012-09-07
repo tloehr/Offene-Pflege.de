@@ -31,8 +31,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.EntityTools;
 import entity.prescription.TradeFormTools;
-import entity.prescription.MedPackung;
-import entity.prescription.MedPackungTools;
+import entity.prescription.MedPackage;
+import entity.prescription.MedPackageTools;
 import op.tools.SYSTools;
 
 import javax.swing.*;
@@ -48,24 +48,24 @@ import java.text.DecimalFormat;
  * @author tloehr
  */
 public class DlgPack extends javax.swing.JDialog {
-    private MedPackung packung;
+    private MedPackage aPackage;
 
     /**
      * Creates new form DlgPack
      */
-    public DlgPack(JFrame parent, String title, MedPackung packung) {
+    public DlgPack(JFrame parent, String title, MedPackage aPackage) {
         super(parent, true);
         initComponents();
         setTitle(title);
-        this.packung = packung;
-        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
+        this.aPackage = aPackage;
+        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageTools.GROESSE));
 
-        if (packung.getMpid() != null) {
-            txtPZN.setText(SYSTools.catchNull(packung.getPzn()));
-            txtInhalt.setText(packung.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-            cmbGroesse.setSelectedIndex(packung.getGroesse());
+        if (aPackage.getMpid() != null) {
+            txtPZN.setText(SYSTools.catchNull(aPackage.getPzn()));
+            txtInhalt.setText(aPackage.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+            cmbGroesse.setSelectedIndex(aPackage.getGroesse());
         }
-        lblPackEinheit.setText(TradeFormTools.getPackungsEinheit(packung.getDarreichung()));
+        lblPackEinheit.setText(TradeFormTools.getPackungsEinheit(aPackage.getDarreichung()));
         SYSTools.centerOnParent(parent, this);
         pack();
         setVisible(true);
@@ -187,7 +187,7 @@ public class DlgPack extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        String pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim(), packung.getMpid() != null ? packung : null);
+        String pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), aPackage.getMpid() != null ? aPackage : null);
         BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
         if (inhalt.compareTo(BigDecimal.ZERO) <= 0){
             inhalt = null;
@@ -209,14 +209,14 @@ public class DlgPack extends javax.swing.JDialog {
 
 
         if (pzn != null && inhalt != null) {
-            packung.setPzn(txtPZN.getText());
-            packung.setGroesse((short) cmbGroesse.getSelectedIndex());
-            packung.setInhalt(inhalt);
+            aPackage.setPzn(txtPZN.getText());
+            aPackage.setGroesse((short) cmbGroesse.getSelectedIndex());
+            aPackage.setInhalt(inhalt);
 
-            if (packung.getMpid() != null) {
-                packung = EntityTools.merge(packung);
+            if (aPackage.getMpid() != null) {
+                aPackage = EntityTools.merge(aPackage);
             } else {
-                EntityTools.persist(packung);
+                EntityTools.persist(aPackage);
 
             }
             dispose();

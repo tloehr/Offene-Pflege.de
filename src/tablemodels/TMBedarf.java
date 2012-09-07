@@ -73,8 +73,8 @@ public class TMBedarf
         return (Prescriptions) listeBedarf.get(row)[0];
     }
 
-    public Situationen getSituation(int row) {
-        return (Situationen) listeBedarf.get(row)[1];
+    public Situations getSituation(int row) {
+        return (Situations) listeBedarf.get(row)[1];
     }
 
     public PrescriptionSchedule getPrescriptionSchedule(int row) {

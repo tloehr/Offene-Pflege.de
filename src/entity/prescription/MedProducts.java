@@ -8,12 +8,12 @@ import java.util.Collection;
 @Entity
 @Table(name = "MProdukte")
 @NamedQueries({
-        @NamedQuery(name = "MedProdukte.findAll", query = "SELECT m FROM MedProdukte m"),
-        @NamedQuery(name = "MedProdukte.findByMedPID", query = "SELECT m FROM MedProdukte m WHERE m.medPID = :medPID"),
-        @NamedQuery(name = "MedProdukte.findByBezeichnungLike", query = "SELECT m FROM MedProdukte m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung"),
-        @NamedQuery(name = "MedProdukte.findByBezeichnung", query = "SELECT m FROM MedProdukte m WHERE m.bezeichnung = :bezeichnung")
+        @NamedQuery(name = "MedProdukte.findAll", query = "SELECT m FROM MedProducts m"),
+        @NamedQuery(name = "MedProdukte.findByMedPID", query = "SELECT m FROM MedProducts m WHERE m.medPID = :medPID"),
+        @NamedQuery(name = "MedProdukte.findByBezeichnungLike", query = "SELECT m FROM MedProducts m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung"),
+        @NamedQuery(name = "MedProdukte.findByBezeichnung", query = "SELECT m FROM MedProducts m WHERE m.bezeichnung = :bezeichnung")
 })
-public class MedProdukte implements Serializable {
+public class MedProducts implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,17 +24,17 @@ public class MedProdukte implements Serializable {
     @Column(name = "Bezeichnung")
     private String bezeichnung;
 
-    public MedProdukte() {
+    public MedProducts() {
     }
 
-    public MedProdukte(MedHersteller hersteller, String bezeichnung) {
-        this.hersteller = hersteller;
+    public MedProducts(MedFactory factory, String bezeichnung) {
+        this.factory = factory;
         this.bezeichnung = bezeichnung;
         this.darreichungen = new ArrayList<TradeForm>();
     }
 
-    public MedProdukte(String bezeichnung) {
-        this.hersteller = null;
+    public MedProducts(String bezeichnung) {
+        this.factory = null;
         this.bezeichnung = bezeichnung;
         this.darreichungen = new ArrayList<TradeForm>();
     }
@@ -56,12 +56,12 @@ public class MedProdukte implements Serializable {
         this.bezeichnung = bezeichnung;
     }
 
-    public MedHersteller getHersteller() {
-        return hersteller;
+    public MedFactory getFactory() {
+        return factory;
     }
 
-    public void setHersteller(MedHersteller hersteller) {
-        this.hersteller = hersteller;
+    public void setFactory(MedFactory factory) {
+        this.factory = factory;
     }
 
     public Collection<TradeForm> getDarreichungen() {
@@ -70,7 +70,7 @@ public class MedProdukte implements Serializable {
 
     @JoinColumn(name = "MPHID", referencedColumnName = "MPHID")
     @ManyToOne
-    private MedHersteller hersteller;
+    private MedFactory factory;
 
     @Override
     public int hashCode() {
@@ -85,10 +85,10 @@ public class MedProdukte implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedProdukte)) {
+        if (!(object instanceof MedProducts)) {
             return false;
         }
-        MedProdukte other = (MedProdukte) object;
+        MedProducts other = (MedProducts) object;
         if ((this.medPID == null && other.medPID != null) || (this.medPID != null && !this.medPID.equals(other.medPID))) {
             return false;
         }
@@ -97,7 +97,7 @@ public class MedProdukte implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedProdukte[medPID=" + medPID + "]";
+        return "entity.rest.MedProducts[medPID=" + medPID + "]";
     }
 
 }

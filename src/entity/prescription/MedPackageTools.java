@@ -15,7 +15,7 @@ import java.awt.*;
  * Time: 15:24
  * To change this template use File | Settings | File Templates.
  */
-public class MedPackungTools {
+public class MedPackageTools {
     public static final String GROESSE[] = {"N1", "N2", "N3", "AP", "OP"};
 
     public static ListCellRenderer getMedPackungRenderer() {
@@ -25,10 +25,10 @@ public class MedPackungTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedPackung) {
-                    MedPackung packung = (MedPackung) o;
+                } else if (o instanceof MedPackage) {
+                    MedPackage aPackage = (MedPackage) o;
 
-                    text = toPrettyString(packung);
+                    text = toPrettyString(aPackage);
                 } else {
                     text = o.toString();
                 }
@@ -37,9 +37,9 @@ public class MedPackungTools {
         };
     }
 
-    public static String toPrettyString(MedPackung packung) {
-        String text = packung.getInhalt().toString() + " " + TradeFormTools.getPackungsEinheit(packung.getDarreichung()) + ", " + GROESSE[packung.getGroesse()] + ", ";
-        text += "PZN: " + packung.getPzn();
+    public static String toPrettyString(MedPackage aPackage) {
+        String text = aPackage.getInhalt().toString() + " " + TradeFormTools.getPackungsEinheit(aPackage.getDarreichung()) + ", " + GROESSE[aPackage.getGroesse()] + ", ";
+        text += "PZN: " + aPackage.getPzn();
         return text;
     }
 
@@ -51,14 +51,14 @@ public class MedPackungTools {
      * @param ignoreMe lässt die betreffende Packung bei der Suche ausser acht. Null, wenn nicht gewünscht.
      * @return gibt die PZN zurück, wenn sie gültig ist. NULL sonst.
      */
-    public static String checkNewPZN(String pzn, MedPackung ignoreMe) {
+    public static String checkNewPZN(String pzn, MedPackage ignoreMe) {
         pzn = parsePZN(pzn);
 
         if (pzn != null) {
             // PZN's darfs nur einmal geben. Gibts die hier schon ?
             // Dann ist die Packung falsch.
             EntityManager em = OPDE.createEM();
-            String jpql = "SELECT m FROM MedPackung m WHERE m.pzn = :pzn " + (ignoreMe != null ? " AND m <> :packung " : "");
+            String jpql = "SELECT m FROM MedPackage m WHERE m.pzn = :pzn " + (ignoreMe != null ? " AND m <> :packung " : "");
             Query query = em.createQuery(jpql);
             query.setParameter("pzn", pzn);
             if (ignoreMe != null) {

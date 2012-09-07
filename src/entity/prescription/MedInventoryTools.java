@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import entity.info.Resident;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -49,15 +50,15 @@ public class MedInventoryTools {
         String htmlcolor = inventory.isAbgeschlossen() ? "gray" : "blue";
 
         result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
-        result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getVorID() + "</u></b></font>&nbsp; ";
+        result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getID() + "</u></b></font>&nbsp; ";
         result += inventory.getText();
 
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getVon()) + "</font>";
+        result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getFrom()) + "</font>";
         if (inventory.isAbgeschlossen()) {
-            result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getBis()) + "</font>";
+            result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getTo()) + "</font>";
         }
 
         result += "</font>";
@@ -214,17 +215,17 @@ public class MedInventoryTools {
      * Der muss dann nur noch persistiert werden.
      *
      * @param inventory
-     * @param packung
+     * @param aPackage
      * @param darreichung
      * @param text
      * @param menge
      * @return
      * @throws Exception
      */
-    public static MedStock addTo(MedInventory inventory, MedPackung packung, TradeForm darreichung, String text, BigDecimal menge) {
+    public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm darreichung, String text, BigDecimal menge) {
         MedStock bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            bestand = new MedStock(inventory, darreichung, packung, text);
+            bestand = new MedStock(inventory, darreichung, aPackage, text);
             bestand.setApv(MedStockTools.getPassendesAPV(bestand));
             MedStockTransaction buchung = new MedStockTransaction(bestand, menge);
             bestand.getStockTransaction().add(buchung);
@@ -291,7 +292,6 @@ public class MedInventoryTools {
     }
 
     public static DosageForm getForm(MedInventory inventory) {
-
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT tf.dosageForm FROM MedInventory i " +
@@ -305,6 +305,33 @@ public class MedInventoryTools {
         em.close();
 
         return form;
+    }
+
+    public static ArrayList<MedInventory> getAllActive(Resident resident){
+        ArrayList<MedInventory> result;
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT inv FROM MedInventory inv WHERE inv.resident = :resident AND inv.to = :to ORDER BY inv.text");
+        query.setParameter("resident", resident);
+        query.setParameter("to", SYSConst.DATE_BIS_AUF_WEITERES);
+
+        result = new ArrayList<MedInventory>(query.getResultList());
+        em.close();
+
+        return result;
+    }
+
+    public static ArrayList<MedInventory> getAll(Resident resident){
+        ArrayList<MedInventory> result;
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT inv FROM MedInventory inv WHERE inv.resident = :resident ORDER BY inv.text");
+        query.setParameter("resident", resident);
+
+        result = new ArrayList<MedInventory>(query.getResultList());
+        em.close();
+
+        return result;
     }
 
 }

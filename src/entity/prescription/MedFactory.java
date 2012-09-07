@@ -6,17 +6,17 @@ import java.io.Serializable;
 @Entity
 @Table(name = "MPHersteller")
 @NamedQueries({
-    @NamedQuery(name = "MedHersteller.findAll", query = "SELECT m FROM MedHersteller m ORDER BY m.firma, m.ort"),
-    @NamedQuery(name = "MedHersteller.findByMphid", query = "SELECT m FROM MedHersteller m WHERE m.mphid = :mphid"),
-    @NamedQuery(name = "MedHersteller.findByFirma", query = "SELECT m FROM MedHersteller m WHERE m.firma = :firma"),
-    @NamedQuery(name = "MedHersteller.findByStrasse", query = "SELECT m FROM MedHersteller m WHERE m.strasse = :strasse"),
-    @NamedQuery(name = "MedHersteller.findByPlz", query = "SELECT m FROM MedHersteller m WHERE m.plz = :plz"),
-    @NamedQuery(name = "MedHersteller.findByOrt", query = "SELECT m FROM MedHersteller m WHERE m.ort = :ort"),
-    @NamedQuery(name = "MedHersteller.findByTel", query = "SELECT m FROM MedHersteller m WHERE m.tel = :tel"),
-    @NamedQuery(name = "MedHersteller.findByFax", query = "SELECT m FROM MedHersteller m WHERE m.fax = :fax"),
-    @NamedQuery(name = "MedHersteller.findByWww", query = "SELECT m FROM MedHersteller m WHERE m.www = :www")
+    @NamedQuery(name = "MedHersteller.findAll", query = "SELECT m FROM MedFactory m ORDER BY m.firma, m.ort"),
+    @NamedQuery(name = "MedHersteller.findByMphid", query = "SELECT m FROM MedFactory m WHERE m.mphid = :mphid"),
+    @NamedQuery(name = "MedHersteller.findByFirma", query = "SELECT m FROM MedFactory m WHERE m.firma = :firma"),
+    @NamedQuery(name = "MedHersteller.findByStrasse", query = "SELECT m FROM MedFactory m WHERE m.strasse = :strasse"),
+    @NamedQuery(name = "MedHersteller.findByPlz", query = "SELECT m FROM MedFactory m WHERE m.plz = :plz"),
+    @NamedQuery(name = "MedHersteller.findByOrt", query = "SELECT m FROM MedFactory m WHERE m.ort = :ort"),
+    @NamedQuery(name = "MedHersteller.findByTel", query = "SELECT m FROM MedFactory m WHERE m.tel = :tel"),
+    @NamedQuery(name = "MedHersteller.findByFax", query = "SELECT m FROM MedFactory m WHERE m.fax = :fax"),
+    @NamedQuery(name = "MedHersteller.findByWww", query = "SELECT m FROM MedFactory m WHERE m.www = :www")
     })
-public class MedHersteller implements Serializable {
+public class MedFactory implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +39,10 @@ public class MedHersteller implements Serializable {
     @Column(name = "WWW")
     private String www;
 
-    public MedHersteller() {
+    public MedFactory() {
     }
 
-    public MedHersteller(String firma, String strasse, String plz, String ort, String tel, String fax, String www) {
+    public MedFactory(String firma, String strasse, String plz, String ort, String tel, String fax, String www) {
         this.firma = firma;
         this.strasse = strasse;
         this.plz = plz;
@@ -127,10 +127,10 @@ public class MedHersteller implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedHersteller)) {
+        if (!(object instanceof MedFactory)) {
             return false;
         }
-        MedHersteller other = (MedHersteller) object;
+        MedFactory other = (MedFactory) object;
         if ((this.mphid == null && other.mphid != null) || (this.mphid != null && !this.mphid.equals(other.mphid))) {
             return false;
         }
@@ -139,7 +139,7 @@ public class MedHersteller implements Serializable {
 
     @Override
     public String toString() {
-        return "MedHersteller{" +
+        return "MedFactory{" +
                 "mphid=" + mphid +
                 ", firma='" + firma + '\'' +
                 ", strasse='" + strasse + '\'' +

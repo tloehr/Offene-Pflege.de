@@ -6,8 +6,8 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.prescription.MedProdukte;
-import entity.prescription.MedProdukteTools;
+import entity.prescription.MedProducts;
+import entity.prescription.MedProductsTools;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
  */
 public class PnlProdukt extends JPanel {
     private java.util.List listProd;
-    private MedProdukte produkt;
+    private MedProducts produkt;
     private Closure validate;
     private String template;
 
@@ -55,9 +55,9 @@ public class PnlProdukt extends JPanel {
         em.close();
 
         if (!listProd.isEmpty()) {
-            if (listProd.size() == 1 && ((MedProdukte) listProd.get(0)).getBezeichnung().equalsIgnoreCase(txtProd.getText().trim())) {
+            if (listProd.size() == 1 && ((MedProducts) listProd.get(0)).getBezeichnung().equalsIgnoreCase(txtProd.getText().trim())) {
                 // Die Eingabe des Produktnamens entspricht GENAU einem bestehenden Produkt. Dann muss das das gleiche sein.
-                produkt = (MedProdukte) listProd.get(0);
+                produkt = (MedProducts) listProd.get(0);
                 lblProdMsg.setVisible(false);
                 jsp1.setVisible(false);
                 lstProd.setVisible(false);
@@ -70,10 +70,10 @@ public class PnlProdukt extends JPanel {
                 DefaultListModel lmProd;
                 lmProd = SYSTools.list2dlm(listProd);
                 lstProd.setModel(lmProd);
-                lstProd.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+                lstProd.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
             }
         } else {
-            produkt = txtProd.getText().trim().isEmpty() ? null : new MedProdukte(txtProd.getText().trim());
+            produkt = txtProd.getText().trim().isEmpty() ? null : new MedProducts(txtProd.getText().trim());
             lblProdMsg.setVisible(false);
             jsp1.setVisible(false);
             lstProd.setVisible(false);
@@ -84,9 +84,9 @@ public class PnlProdukt extends JPanel {
     private void lstProdValueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             if (lstProd.getSelectedIndex() == 0) {
-                produkt = txtProd.getText().trim().isEmpty() ? null : new MedProdukte(txtProd.getText().trim());
+                produkt = txtProd.getText().trim().isEmpty() ? null : new MedProducts(txtProd.getText().trim());
             } else {
-                produkt = (MedProdukte) lstProd.getSelectedValue();
+                produkt = (MedProducts) lstProd.getSelectedValue();
             }
             validate.execute(produkt);
         }

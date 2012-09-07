@@ -147,7 +147,7 @@ public class TradeFormTools {
         Query query = em.createQuery(" SELECT DISTINCT inv FROM MedInventory inv " +
                 " JOIN inv.medStocks stock " +
                 " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +
-                " AND inv.bis = :to");
+                " AND inv.to = :to");
         query.setParameter("resident", resident);
         query.setParameter("tradeform", tradeform);
         query.setParameter("to", SYSConst.DATE_BIS_AUF_WEITERES);
@@ -216,7 +216,7 @@ public class TradeFormTools {
         Query queryVorraete = em.createQuery(" " +
                 " SELECT DISTINCT b.inventory FROM MedStock b " +
                 " WHERE b.inventory.resident = :resident " +
-                " AND b.inventory.bis = :to " +
+                " AND b.inventory.to = :to " +
                 " AND b.tradeform.dosageForm.formID  IN " +
                 " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );

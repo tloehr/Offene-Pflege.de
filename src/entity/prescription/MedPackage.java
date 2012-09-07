@@ -10,13 +10,13 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "MPackung")
 @NamedQueries({
-        @NamedQuery(name = "MedPackung.findAll", query = "SELECT m FROM MedPackung m"),
-        @NamedQuery(name = "MedPackung.findByMpid", query = "SELECT m FROM MedPackung m WHERE m.mpid = :mpid"),
-        @NamedQuery(name = "MedPackung.findByPzn", query = "SELECT m FROM MedPackung m WHERE m.pzn = :pzn"),
-        @NamedQuery(name = "MedPackung.findByGroesse", query = "SELECT m FROM MedPackung m WHERE m.groesse = :groesse"),
-        @NamedQuery(name = "MedPackung.findByInhalt", query = "SELECT m FROM MedPackung m WHERE m.inhalt = :inhalt")
+        @NamedQuery(name = "MedPackung.findAll", query = "SELECT m FROM MedPackage m"),
+        @NamedQuery(name = "MedPackung.findByMpid", query = "SELECT m FROM MedPackage m WHERE m.mpid = :mpid"),
+        @NamedQuery(name = "MedPackung.findByPzn", query = "SELECT m FROM MedPackage m WHERE m.pzn = :pzn"),
+        @NamedQuery(name = "MedPackung.findByGroesse", query = "SELECT m FROM MedPackage m WHERE m.groesse = :groesse"),
+        @NamedQuery(name = "MedPackung.findByInhalt", query = "SELECT m FROM MedPackage m WHERE m.inhalt = :inhalt")
 })
-public class MedPackung implements Serializable {
+public class MedPackage implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +35,10 @@ public class MedPackung implements Serializable {
     @ManyToOne
     private TradeForm darreichung;
 
-    public MedPackung() {
+    public MedPackage() {
     }
 
-    public MedPackung(TradeForm darreichung) {
+    public MedPackage(TradeForm darreichung) {
         this.darreichung = darreichung;
 //        this.darreichung.getPackungen().add(this);
     }
@@ -94,10 +94,10 @@ public class MedPackung implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof MedPackung)) {
+        if (!(object instanceof MedPackage)) {
             return false;
         }
-        MedPackung other = (MedPackung) object;
+        MedPackage other = (MedPackage) object;
         if ((this.mpid == null && other.mpid != null) || (this.mpid != null && !this.mpid.equals(other.mpid))) {
             return false;
         }
@@ -106,7 +106,7 @@ public class MedPackung implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedPackung[mpid=" + mpid + "]";
+        return "entity.rest.MedPackage[mpid=" + mpid + "]";
     }
 
 }

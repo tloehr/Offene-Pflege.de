@@ -67,7 +67,7 @@ public class PnlMed extends CleanablePanel {
 
     public static final String internalClassID = "opde.medication";
     private DefaultTreeModel tree;
-    private MedProdukte produkt;
+    private MedProducts produkt;
     private JPopupMenu menu;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
@@ -129,7 +129,7 @@ public class PnlMed extends CleanablePanel {
 
     private void lstPraepValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstPraepValueChanged
         if (!evt.getValueIsAdjusting() && lstPraep.getSelectedValue() != null) {
-            produkt = (MedProdukte) lstPraep.getSelectedValue();
+            produkt = (MedProducts) lstPraep.getSelectedValue();
             createTree();
         }
     }//GEN-LAST:event_lstPraepValueChanged
@@ -193,14 +193,14 @@ public class PnlMed extends CleanablePanel {
 //                    itempack = new JMenuItem("Neue Verpackung");
 //                    itempack.addActionListener(new java.awt.event.ActionListener() {
 //                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            MedPackung mypack = new MedPackung(darreichung);
+//                            MedPackage mypack = new MedPackage(darreichung);
 //                            new DlgPack(thisFrame, "Neu", mypack);
 ////                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
 //                            createTree();
 //                        }
 //                    });
-//                } else if (dmtn.getUserObject() instanceof MedPackung) {
-//                    final MedPackung packung = (MedPackung) dmtn.getUserObject();
+//                } else if (dmtn.getUserObject() instanceof MedPackage) {
+//                    final MedPackage packung = (MedPackage) dmtn.getUserObject();
 //                    itemedit = new JMenuItem("Bearbeiten");
 //                    itemedit.addActionListener(new java.awt.event.ActionListener() {
 //                        public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -284,8 +284,8 @@ public class PnlMed extends CleanablePanel {
 
     private java.util.List getPackung(TradeForm darreichung) {
         java.util.List result = new ArrayList();
-        for (MedPackung packung : darreichung.getPackungen()) {
-            result.add(new DefaultMutableTreeNode(packung));
+        for (MedPackage aPackage : darreichung.getPackungen()) {
+            result.add(new DefaultMutableTreeNode(aPackage));
         }
 
 
@@ -307,16 +307,16 @@ public class PnlMed extends CleanablePanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel component = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (node.getUserObject() instanceof MedProdukte) {
+            if (node.getUserObject() instanceof MedProducts) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
-                MedProdukte myprod = (MedProdukte) node.getUserObject();
-                component.setText(myprod.getBezeichnung() + ", " + myprod.getHersteller().getFirma() + ", " + myprod.getHersteller().getOrt());
+                MedProducts myprod = (MedProducts) node.getUserObject();
+                component.setText(myprod.getBezeichnung() + ", " + myprod.getFactory().getFirma() + ", " + myprod.getFactory().getOrt());
             } else if (node.getUserObject() instanceof TradeForm) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
                 component.setText(TradeFormTools.toPrettyStringMedium((TradeForm) node.getUserObject()));
-            } else if (node.getUserObject() instanceof MedPackung) {
+            } else if (node.getUserObject() instanceof MedPackage) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
-                component.setText(MedPackungTools.toPrettyString((MedPackung) node.getUserObject()));
+                component.setText(MedPackageTools.toPrettyString((MedPackage) node.getUserObject()));
             } else {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
                 component.setText(null);
@@ -375,7 +375,7 @@ public class PnlMed extends CleanablePanel {
         labelPanel.add(txtSuche);
 
         lstPraep = new JList(new DefaultListModel());
-        lstPraep.setCellRenderer(MedProdukteTools.getMedProdukteRenderer());
+        lstPraep.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
         lstPraep.setFont(SYSConst.ARIAL14);
         lstPraep.addListSelectionListener(new ListSelectionListener() {
             @Override

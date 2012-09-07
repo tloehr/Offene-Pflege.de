@@ -30,7 +30,7 @@ import java.util.List;
  * OPDE kann verschiedene Arten von wiederkehrenden Terminen für die Anwendung einer ärztlichen Verordnung
  * speichern. Dazu sind zwei Entity Classes nötig. Verordnungen und VerordnungPlanung.
  * <ul>
- * <li><b>Verordnungen</b> enthält die Angaben über die Medikamente und Maßnahmen. Ärzte und Krankenhäuser, sowie Situationen bei
+ * <li><b>Verordnungen</b> enthält die Angaben über die Medikamente und Maßnahmen. Ärzte und Krankenhäuser, sowie Situations bei
  * Bedarfsmedikattion.</li>
  * <li><b>VerordnungPlanung</b> sind die Termine und die Dosis bzw. Häufigkeit in der ein Medikament oder eine Maßnahme angewendet werden soll.
  * Ebenso stehen hier drin, die maximale Tagesdosis einer Bedarfsmedikation. Zu jeder Verordnung können unterschiedliche Termin-Muster und Dosen
@@ -57,13 +57,13 @@ import java.util.List;
  * </li>
  * </ul>
  * </li>
- * <li><b>Bedarfsverordnungen</b>, die nur für die Anwendung in <b>bestimmten Situationen</b> gedacht sind.</li>
+ * <li><b>Bedarfsverordnungen</b>, die nur für die Anwendung in <b>bestimmten Situations</b> gedacht sind.</li>
  * </ul>
  * <h2>Beispiele</h2>
  * <h3>Bedarfsmedikation</h3>
  * <img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-bedarf1.png" />
  * <ul>
- * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situationen[sitID=10], anKH=entity.rest.Krankenhaus[khid=16], abKH=null, anArzt=entity.rest.Arzt[arztID=21], abArzt=null}</code></li>
+ * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situations[sitID=10], anKH=entity.rest.Krankenhaus[khid=16], abKH=null, anArzt=entity.rest.Arzt[arztID=21], abArzt=null}</code></li>
  * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4658, ...}}</code></li>
  * </ul>
  * <p/>
@@ -107,7 +107,7 @@ import java.util.List;
                 columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
         ),
         @SqlResultSetMapping(name = "Verordnung.findAllBedarfResultMapping",
-                entities = {@EntityResult(entityClass = Prescriptions.class), @EntityResult(entityClass = Situationen.class), @EntityResult(entityClass = PrescriptionSchedule.class)},
+                entities = {@EntityResult(entityClass = Prescriptions.class), @EntityResult(entityClass = Situations.class), @EntityResult(entityClass = PrescriptionSchedule.class)},
                 columns = {@ColumnResult(name = "vor.Saldo"), @ColumnResult(name = "bisher.tagesdosis"), @ColumnResult(name = "bestand.APV"), @ColumnResult(name = "bestand.Summe"),
                         @ColumnResult(name = "bestand.BestID")
                 }
@@ -222,7 +222,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     private TradeForm tradeform;
     @JoinColumn(name = "SitID", referencedColumnName = "SitID")
     @ManyToOne
-    private Situationen situation;
+    private Situations situation;
     @JoinColumn(name = "AnKHID", referencedColumnName = "KHID")
     @ManyToOne
     private Krankenhaus anKH;
@@ -250,7 +250,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.angesetztDurch = OPDE.getLogin().getUser();
     }
 
-    public Prescriptions(Date from, Date to, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situationen situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
+    public Prescriptions(Date from, Date to, boolean bisPackEnde, long verKennung, String bemerkung, boolean stellplan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedVorgaenge, Users angesetztDurch, Users abgesetztDurch, Resident resident, Intervention massnahme, TradeForm tradeform, Situations situation, Krankenhaus anKH, Krankenhaus abKH, Arzt anArzt, Arzt abArzt) {
         this.from = from;
         this.to = to;
         this.bisPackEnde = bisPackEnde;
@@ -368,7 +368,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         return abgesetztDurch;
     }
 
-    public Situationen getSituation() {
+    public Situations getSituation() {
         return situation;
     }
 
@@ -376,7 +376,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         return tradeform != null;
     }
 
-    public void setSituation(Situationen situation) {
+    public void setSituation(Situations situation) {
         this.situation = situation;
     }
 

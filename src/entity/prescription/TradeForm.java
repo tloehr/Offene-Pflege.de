@@ -26,17 +26,17 @@ public class TradeForm implements Serializable {
     public TradeForm() {
     }
 
-    public TradeForm(MedProdukte medProdukt) {
+    public TradeForm(MedProducts medProdukt) {
         this.medProdukt = medProdukt;
-        this.packungen = new ArrayList<MedPackung>();
+        this.packungen = new ArrayList<MedPackage>();
         this.bestaende = new ArrayList<MedStock>();
     }
 
-    public TradeForm(MedProdukte medProdukt, String zusatz, DosageForm dosageForm) {
+    public TradeForm(MedProducts medProdukt, String zusatz, DosageForm dosageForm) {
         this.medProdukt = medProdukt;
         this.zusatz = zusatz;
         this.dosageForm = dosageForm;
-        this.packungen = new ArrayList<MedPackung>();
+        this.packungen = new ArrayList<MedPackage>();
         this.bestaende = new ArrayList<MedStock>();
     }
 
@@ -56,7 +56,7 @@ public class TradeForm implements Serializable {
         this.zusatz = zusatz;
     }
 
-    public Collection<MedPackung> getPackungen() {
+    public Collection<MedPackage> getPackungen() {
         return packungen;
     }
 
@@ -64,7 +64,7 @@ public class TradeForm implements Serializable {
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "darreichung")
-    private Collection<MedPackung> packungen;
+    private Collection<MedPackage> packungen;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeform")
     private Collection<MedStock> bestaende;
@@ -72,17 +72,17 @@ public class TradeForm implements Serializable {
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")
     @ManyToOne
-    private MedProdukte medProdukt;
+    private MedProducts medProdukt;
 
     @JoinColumn(name = "FormID", referencedColumnName = "FormID")
     @ManyToOne
     private DosageForm dosageForm;
 
-    public MedProdukte getMedProdukt() {
+    public MedProducts getMedProdukt() {
         return medProdukt;
     }
 
-    public void setMedProdukt(MedProdukte medProdukt) {
+    public void setMedProdukt(MedProducts medProdukt) {
         this.medProdukt = medProdukt;
     }
 

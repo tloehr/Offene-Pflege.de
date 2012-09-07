@@ -7,9 +7,9 @@ package op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.prescription.MedHersteller;
-import entity.prescription.MedHerstellerTools;
-import entity.prescription.MedProdukte;
+import entity.prescription.MedFactory;
+import entity.prescription.MedFactoryTools;
+import entity.prescription.MedProducts;
 import op.OPDE;
 import org.apache.commons.collections.Closure;
 
@@ -26,11 +26,11 @@ import java.awt.event.ActionListener;
  * @author Torsten Löhr
  */
 public class PnlHersteller extends JPanel {
-    private MedProdukte produkt;
+    private MedProducts produkt;
     private Closure validate;
     private Dialog parent;
 
-    public PnlHersteller(Closure validate, MedProdukte produkt, Dialog parent) {
+    public PnlHersteller(Closure validate, MedProducts produkt, Dialog parent) {
         this.validate = validate;
         this.produkt = produkt;
         this.parent = parent;
@@ -38,15 +38,15 @@ public class PnlHersteller extends JPanel {
         initPanel();
     }
 
-    public void setProdukt(MedProdukte produkt) {
+    public void setProdukt(MedProducts produkt) {
         this.produkt = produkt;
     }
 
     private void initPanel() {
         EntityManager em = OPDE.createEM();
         Query query2 = em.createNamedQuery("MedHersteller.findAll");
-        lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedHersteller[]{})));
-        lstHersteller.setCellRenderer(MedHerstellerTools.getHerstellerRenderer(0));
+        lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedFactory[]{})));
+        lstHersteller.setCellRenderer(MedFactoryTools.getHerstellerRenderer(0));
         em.close();
     }
 
@@ -57,7 +57,7 @@ public class PnlHersteller extends JPanel {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    lstHersteller.setModel(new DefaultComboBoxModel(new MedHersteller[]{(MedHersteller) o}));
+                    lstHersteller.setModel(new DefaultComboBoxModel(new MedFactory[]{(MedFactory) o}));
                     lstHersteller.setSelectedIndex(0);
                     popup.hidePopup();
                 }
@@ -77,7 +77,7 @@ public class PnlHersteller extends JPanel {
     }
 
     private void lstHerstellerValueChanged(ListSelectionEvent e) {
-        produkt.setHersteller((MedHersteller) lstHersteller.getSelectedValue());
+        produkt.setFactory((MedFactory) lstHersteller.getSelectedValue());
         validate.execute(lstHersteller.getSelectedValue());
     }
 

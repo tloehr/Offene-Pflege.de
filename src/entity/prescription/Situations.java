@@ -6,11 +6,11 @@ import java.io.Serializable;
 @Entity
 @Table(name = "Situationen")
 @NamedQueries({
-    @NamedQuery(name = "Situationen.findAll", query = "SELECT s FROM Situationen s"),
-    @NamedQuery(name = "Situationen.findBySitID", query = "SELECT s FROM Situationen s WHERE s.sitID = :sitID"),
-    @NamedQuery(name = "Situationen.findByKategorie", query = "SELECT s FROM Situationen s WHERE s.kategorie = :kategorie"),
-    @NamedQuery(name = "Situationen.findByUKategorie", query = "SELECT s FROM Situationen s WHERE s.uKategorie = :uKategorie")})
-public class Situationen implements Serializable {
+    @NamedQuery(name = "Situationen.findAll", query = "SELECT s FROM Situations s"),
+    @NamedQuery(name = "Situationen.findBySitID", query = "SELECT s FROM Situations s WHERE s.sitID = :sitID"),
+    @NamedQuery(name = "Situationen.findByKategorie", query = "SELECT s FROM Situations s WHERE s.kategorie = :kategorie"),
+    @NamedQuery(name = "Situationen.findByUKategorie", query = "SELECT s FROM Situations s WHERE s.uKategorie = :uKategorie")})
+public class Situations implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,10 +25,10 @@ public class Situationen implements Serializable {
     @Column(name = "Text")
     private String text;
 
-    public Situationen() {
+    public Situations() {
     }
 
-    public Situationen(String text) {
+    public Situations(String text) {
         this.text = text;
     }
 
@@ -74,10 +74,10 @@ public class Situationen implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Situationen)) {
+        if (!(object instanceof Situations)) {
             return false;
         }
-        Situationen other = (Situationen) object;
+        Situations other = (Situations) object;
         if ((this.sitID == null && other.sitID != null) || (this.sitID != null && !this.sitID.equals(other.sitID))) {
             return false;
         }
@@ -86,7 +86,7 @@ public class Situationen implements Serializable {
 
     @Override
     public String toString() {
-        return "Situationen{" +
+        return "Situations{" +
                 "sitID=" + sitID +
                 ", kategorie=" + kategorie +
                 ", uKategorie=" + uKategorie +

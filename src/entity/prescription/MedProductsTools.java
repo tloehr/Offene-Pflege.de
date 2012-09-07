@@ -8,26 +8,24 @@ import java.awt.*;
 /**
  * Created by IntelliJ IDEA.
  * User: tloehr
- * Date: 05.01.12
- * Time: 15:43
+ * Date: 14.12.11
+ * Time: 11:27
  * To change this template use File | Settings | File Templates.
  */
-public class MedHerstellerTools {
-    public static ListCellRenderer getHerstellerRenderer(int maxlen) {
-        final int max = maxlen;
+public class MedProductsTools {
+
+    public static ListCellRenderer getMedProdukteRenderer() {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedHersteller) {
-                    text = ((MedHersteller) o).getFirma() + SYSTools.catchNull(((MedHersteller) o).getOrt(), ", ", "");
+                } else if (o instanceof MedProducts) {
+                    MedProducts produkt = (MedProducts) o;
+                    text = produkt.getBezeichnung();
                 } else {
                     text = o.toString();
-                }
-                if (max > 0) {
-                    text = SYSTools.left(text, max);
                 }
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }

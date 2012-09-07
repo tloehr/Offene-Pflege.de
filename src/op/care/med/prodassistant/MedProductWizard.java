@@ -26,10 +26,10 @@ public class MedProductWizard {
     public static final String internalClassID = "opde.medication.medproduct.wizard";
 
     private WizardDialog wizard;
-    private MedProdukte produkt;
+    private MedProducts produkt;
     private TradeForm darreichung;
-    private MedPackung packung;
-    private MedHersteller hersteller;
+    private MedPackage aPackage;
+    private MedFactory factory;
     private Closure finishAction;
     private String pzntemplate = null, prodtemplate = null;
 
@@ -44,7 +44,7 @@ public class MedProductWizard {
         this.finishAction = finishAction;
 
         if (template != null) {
-            pzntemplate = MedPackungTools.parsePZN(template);
+            pzntemplate = MedPackageTools.parsePZN(template);
             if (pzntemplate == null) {
                 prodtemplate = template.trim();
             }
@@ -118,20 +118,20 @@ public class MedProductWizard {
             em.getTransaction().begin();
             produkt = em.merge(produkt);
             darreichung = em.merge(darreichung);
-            packung = em.merge(packung);
-            if (hersteller != null) {
-                hersteller = em.merge(hersteller);
+            aPackage = em.merge(aPackage);
+            if (factory != null) {
+                factory = em.merge(factory);
             }
 
             if (!produkt.getDarreichungen().contains(darreichung)) {
                 produkt.getDarreichungen().add(darreichung);
             }
 
-            darreichung.getPackungen().add(packung);
+            darreichung.getPackungen().add(aPackage);
 
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + TradeFormTools.toPrettyString(darreichung) + ", " + MedPackungTools.toPrettyString(packung) + " erfolgreich eingetragen", 6));
-            finishAction.execute(packung);
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + TradeFormTools.toPrettyString(darreichung) + ", " + MedPackageTools.toPrettyString(aPackage) + " erfolgreich eingetragen", 6));
+            finishAction.execute(aPackage);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -224,7 +224,7 @@ public class MedProductWizard {
             addComponent(new PnlProdukt(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    produkt = (MedProdukte) o;
+                    produkt = (MedProducts) o;
                     setupWizardButtons();
                 }
             }, prodtemplate), true);
@@ -289,7 +289,7 @@ public class MedProductWizard {
             pnlPackung = new PnlPackung(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    packung = (MedPackung) o;
+                    aPackage = (MedPackage) o;
                     setupWizardButtons();
                 }
             }, pzntemplate);
@@ -302,7 +302,7 @@ public class MedProductWizard {
                         OPDE.debug(pageEvent.getSource());
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         OPDE.debug("PackungPage OPENDED");
-//                        packung = null;
+//                        aPackage = null;
                         pnlPackung.setLabelEinheit(DosageFormTools.toPrettyStringPackung(darreichung.getDosageForm()));
                         pnlPackung.setDarreichung(darreichung);
                     }
@@ -320,7 +320,7 @@ public class MedProductWizard {
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(packung == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(aPackage == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
             updateNextPage();
@@ -333,7 +333,7 @@ public class MedProductWizard {
         }
 
         private void updateNextPage() {
-            if (produkt.getHersteller() != null) {
+            if (produkt.getFactory() != null) {
                 getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_COMPLETION));
             } else {
                 getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_HERSTELLER));
@@ -354,7 +354,7 @@ public class MedProductWizard {
                         OPDE.debug(pageEvent.getSource());
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         OPDE.debug("HerstellerPage OPENDED");
-//                        hersteller = null;
+//                        factory = null;
                         pnlHersteller.setProdukt(produkt);
 //                        setupWizardButtons();
                     }
@@ -371,7 +371,7 @@ public class MedProductWizard {
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(hersteller == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(factory == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -382,7 +382,7 @@ public class MedProductWizard {
             pnlHersteller = new PnlHersteller(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    hersteller = (MedHersteller) o;
+                    factory = (MedFactory) o;
                     setupWizardButtons();
                 }
             }, produkt, wizard);
@@ -435,10 +435,10 @@ public class MedProductWizard {
             result += "<ul>";
             result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
             result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + TradeFormTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackungTools.toPrettyString(packung) + "</b></li>";
+            result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
-            MedHersteller displayHersteller = hersteller == null ? produkt.getHersteller() : hersteller;
-            result += "<li>Hersteller: <b>" + displayHersteller.getFirma() + ", " + displayHersteller.getOrt() + "</b>" + (displayHersteller.getMphid() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            MedFactory displayFactory = factory == null ? produkt.getFactory() : factory;
+            result += "<li>Hersteller: <b>" + displayFactory.getFirma() + ", " + displayFactory.getOrt() + "</b>" + (displayFactory.getMphid() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
 
             result += "</ul>";
 

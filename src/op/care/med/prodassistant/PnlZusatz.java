@@ -31,13 +31,13 @@ import java.util.Comparator;
  * @author Torsten Löhr
  */
 public class PnlZusatz extends JPanel {
-    private MedProdukte produkt;
+    private MedProducts produkt;
     private TradeForm darreichung;
     private DosageForm form;
     private Closure validate;
     private boolean ignoreEvent = false;
 
-    public PnlZusatz(Closure validate, MedProdukte produkt) {
+    public PnlZusatz(Closure validate, MedProducts produkt) {
         OPDE.debug("CONSTRUCTOR PNLZUSATZ");
         this.validate = validate;
         this.produkt = produkt;
@@ -45,7 +45,7 @@ public class PnlZusatz extends JPanel {
         initPanel();
     }
 
-    public void setProdukt(MedProdukte produkt) {
+    public void setProdukt(MedProducts produkt) {
         this.produkt = produkt;
     }
 

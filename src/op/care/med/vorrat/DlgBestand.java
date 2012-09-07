@@ -75,7 +75,7 @@ public class DlgBestand extends MyJDialog {
 //    private boolean packungEingegeben = false;
 
     private BigDecimal menge;
-    private MedPackung packung;
+    private MedPackage aPackage;
     private TradeForm darreichung;
     private Resident bewohner;
     private MedInventory inventory;
@@ -110,21 +110,21 @@ public class DlgBestand extends MyJDialog {
             cmbMProdukt.setModel(new DefaultComboBoxModel());
             cmbPackung.setModel(new DefaultComboBoxModel());
             darreichung = null;
-            packung = null;
+            aPackage = null;
             initCmbVorrat();
 
         } else {
 
             OPDE.getDisplayManager().setDBActionMessage(true);
 
-            String pzn = MedPackungTools.parsePZN(txtMedSuche.getText());
+            String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
             if (pzn != null) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
                 EntityManager em = OPDE.createEM();
                 Query query = em.createNamedQuery("MedPackung.findByPzn");
                 query.setParameter("pzn", pzn);
                 try {
-                    packung = (MedPackung) query.getSingleResult();
-                    darreichung = packung.getDarreichung();
+                    aPackage = (MedPackage) query.getSingleResult();
+                    darreichung = aPackage.getDarreichung();
                     cmbMProdukt.setModel(new DefaultComboBoxModel(new TradeForm[]{darreichung}));
                     cmbMProdukt.getModel().setSelectedItem(darreichung);
                 } catch (NoResultException nre) {
@@ -454,7 +454,7 @@ public class DlgBestand extends MyJDialog {
         if (darreichung == null) {
             text += "Kein Medikament ausgewählt. ";
         }
-        if (menge == null && packung == null) {
+        if (menge == null && aPackage == null) {
             text += "Keine korrekte Mengenangabe. ";
         }
         if (inventory == null) {
@@ -481,22 +481,22 @@ public class DlgBestand extends MyJDialog {
 
             em.lock(bewohner, LockModeType.OPTIMISTIC);
 
-            // Wenn die packung null ist, dann ist eine Sonderpackung
-            if (packung != null) {
-                packung = em.merge(packung);
+            // Wenn die aPackage null ist, dann ist eine Sonderpackung
+            if (aPackage != null) {
+                aPackage = em.merge(aPackage);
                 if (menge == null) {
-                    menge = packung.getInhalt();
+                    menge = aPackage.getInhalt();
                 }
             }
 
             darreichung = em.merge(darreichung);
             inventory = em.merge(inventory);
 
-            if (inventory.getVorID() == null) { // neuen Vorrat anlegen
+            if (inventory.getID() == null) { // neuen Vorrat anlegen
                 inventory.setText(darreichung.getMedProdukt().getBezeichnung());
             }
 
-            MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, packung, darreichung, txtBemerkung.getText(), menge));
+            MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, aPackage, darreichung, txtBemerkung.getText(), menge));
             inventory.getMedStocks().add(bestand);
 
             if (MedStockTools.getStockInUse(inventory) == null) {
@@ -532,15 +532,15 @@ public class DlgBestand extends MyJDialog {
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
 
-        String pzn = MedPackungTools.parsePZN(txtMedSuche.getText());
+        String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
         final JidePopup popup = new JidePopup();
 
         WizardDialog wizard = new MedProductWizard(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    MedPackung packung = (MedPackung) o;
-                    txtMedSuche.setText(packung.getPzn());
+                    MedPackage aPackage = (MedPackage) o;
+                    txtMedSuche.setText(aPackage.getPzn());
                 }
                 popup.hidePopup();
 
@@ -592,10 +592,10 @@ public class DlgBestand extends MyJDialog {
                     ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
                     attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
                     menge = null;
-                } else if (packung != null && menge.compareTo(packung.getInhalt()) > 0) {
+                } else if (aPackage != null && menge.compareTo(aPackage.getInhalt()) > 0) {
                     ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
                     attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
-                    menge = packung.getInhalt();
+                    menge = aPackage.getInhalt();
                 } else {
                     ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_WEST);
                 }
@@ -667,10 +667,10 @@ public class DlgBestand extends MyJDialog {
         }
 
         OPDE.debug("cmbPackungItemStateChanged: " + cmbPackung.getSelectedItem());
-        if (cmbPackung.getSelectedItem() instanceof MedPackung) {
-            packung = (MedPackung) cmbPackung.getSelectedItem();
+        if (cmbPackung.getSelectedItem() instanceof MedPackage) {
+            aPackage = (MedPackage) cmbPackung.getSelectedItem();
         } else {
-            packung = null;
+            aPackage = null;
         }
         txtMenge.setText("");
 
@@ -741,12 +741,12 @@ public class DlgBestand extends MyJDialog {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel(darreichung.getPackungen().toArray());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
-            cmbPackung.setRenderer(MedPackungTools.getMedPackungRenderer());
+            cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());
             cmbPackung.setSelectedIndex(cmbPackung.getModel().getSize() - 1);
             cmbPackungItemStateChanged(null);
         } else {
             cmbPackung.setModel(new DefaultComboBoxModel());
-            packung = null;
+            aPackage = null;
         }
 
         initCmbVorrat();

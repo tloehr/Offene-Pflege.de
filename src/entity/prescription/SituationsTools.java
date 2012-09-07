@@ -16,7 +16,7 @@ import java.util.List;
  * Time: 15:36
  * To change this template use File | Settings | File Templates.
  */
-public class SituationenTools {
+public class SituationsTools {
     public static ListCellRenderer getSituationenRenderer() {
         return new ListCellRenderer() {
             @Override
@@ -25,8 +25,8 @@ public class SituationenTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof Situationen) {
-                    text = ((Situationen) o).getText();
+                } else if (o instanceof Situations) {
+                    text = ((Situations) o).getText();
                 } else {
                     text = o.toString();
                 }
@@ -35,12 +35,12 @@ public class SituationenTools {
         };
     }
 
-    public static List<Situationen> findSituationByText(String suche) {
+    public static List<Situations> findSituationByText(String suche) {
         suche = "%" + suche + "%";
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Situationen s WHERE s.text like :suche");
+        Query query = em.createQuery("SELECT s FROM Situations s WHERE s.text like :suche");
         query.setParameter("suche", suche);
-        List<Situationen> list = query.getResultList();
+        List<Situations> list = query.getResultList();
         em.close();
         return list;
     }

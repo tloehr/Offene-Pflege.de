@@ -6,9 +6,9 @@ package op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.prescription.MedPackage;
 import entity.prescription.TradeForm;
-import entity.prescription.MedPackung;
-import entity.prescription.MedPackungTools;
+import entity.prescription.MedPackageTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
@@ -31,14 +31,14 @@ public class PnlPackung extends JPanel {
     String pzn;
     BigDecimal inhalt;
     private TradeForm darreichung;
-    private MedPackung packung;
+    private MedPackage aPackage;
     private Closure validate;
     private String template;
 
     public PnlPackung(Closure validate, String template) {
         pzn = null;
         inhalt = null;
-        packung = null;
+        aPackage = null;
         this.template = template;
         this.validate = validate;
         initComponents();
@@ -50,7 +50,7 @@ public class PnlPackung extends JPanel {
     }
 
     private void initPanel() {
-        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackungTools.GROESSE));
+        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageTools.GROESSE));
         txtPZN.setText(template);
     }
 
@@ -59,9 +59,9 @@ public class PnlPackung extends JPanel {
     }
 
     private void txtPZNActionPerformed(ActionEvent e) {
-        pzn = MedPackungTools.checkNewPZN(txtPZN.getText().trim(), null);
+        pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), null);
 
-        if (MedPackungTools.parsePZN(txtPZN.getText().trim()) == null) {
+        if (MedPackageTools.parsePZN(txtPZN.getText().trim()) == null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist falsch. Sie muss aus genau 7 Ziffern bestehen.", DisplayMessage.WARNING));
         } else if (pzn == null){
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist wird bereits verwendet.", DisplayMessage.WARNING));
@@ -148,14 +148,14 @@ public class PnlPackung extends JPanel {
         OPDE.debug("inhalt: " + inhalt);
 
         if (pzn != null && inhalt != null) {
-            packung = new MedPackung(darreichung);
-            packung.setPzn(pzn);
-            packung.setInhalt(inhalt);
-            packung.setGroesse((short) cmbGroesse.getSelectedIndex());
+            aPackage = new MedPackage(darreichung);
+            aPackage.setPzn(pzn);
+            aPackage.setInhalt(inhalt);
+            aPackage.setGroesse((short) cmbGroesse.getSelectedIndex());
         } else {
-            packung = null;
+            aPackage = null;
         }
-        validate.execute(packung);
+        validate.execute(aPackage);
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

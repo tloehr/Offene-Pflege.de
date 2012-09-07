@@ -50,12 +50,12 @@ import java.awt.event.ItemListener;
  */
 public class PnlNewProdukt extends javax.swing.JDialog {
 
-    private MedProdukte produkt;
+    private MedProducts produkt;
 
     /**
      * Creates new form DlgProdukt
      */
-    public PnlNewProdukt(JFrame parent, MedProdukte produkt, String template) {
+    public PnlNewProdukt(JFrame parent, MedProducts produkt, String template) {
         super(parent, true);
         this.produkt = produkt;
         initComponents();
@@ -64,12 +64,12 @@ public class PnlNewProdukt extends javax.swing.JDialog {
 
         EntityManager em = OPDE.createEM();
         Query query2 = em.createNamedQuery("MedHersteller.findAll");
-        cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedHersteller[]{})));
-        cmbHersteller.setRenderer(MedHerstellerTools.getHerstellerRenderer(0));
+        cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedFactory[]{})));
+        cmbHersteller.setRenderer(MedFactoryTools.getHerstellerRenderer(0));
         em.close();
 
         if (produkt != null){
-            cmbHersteller.setSelectedItem(produkt.getHersteller());
+            cmbHersteller.setSelectedItem(produkt.getFactory());
         }
 
         setVisible(true);
@@ -155,18 +155,18 @@ public class PnlNewProdukt extends javax.swing.JDialog {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("MedProdukte.findByBezeichnung");
         query.setParameter("bezeichnung", txtBezeichnung.getText());
-        java.util.List<MedProdukte> list = query.getResultList();
+        java.util.List<MedProducts> list = query.getResultList();
         em.close();
 
         if (list.isEmpty()) {
-            MedHersteller hersteller = (MedHersteller) cmbHersteller.getSelectedItem();
-            produkt = new MedProdukte(hersteller, txtBezeichnung.getText());
+            MedFactory factory = (MedFactory) cmbHersteller.getSelectedItem();
+            produkt = new MedProducts(factory, txtBezeichnung.getText());
             EntityTools.persist(produkt);
             dispose();
         }
     }//GEN-LAST:event_btnOKActionPerformed
 
-    public MedProdukte getProdukt() {
+    public MedProducts getProdukt() {
         return produkt;
     }
 

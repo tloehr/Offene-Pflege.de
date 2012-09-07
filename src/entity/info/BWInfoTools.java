@@ -106,7 +106,7 @@ public class BWInfoTools {
         Date min = null, max = null;
 
         BWInfo firstHauf = getFirstBWInfo(info.getResident(), BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME));
-//        min = firstHauf.getVon();
+//        min = firstHauf.getFrom();
 
         if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             return new Pair<Date, Date>(null, null);

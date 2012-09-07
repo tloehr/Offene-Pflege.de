@@ -174,7 +174,6 @@ public class PnlAllowance extends CleanablePanel {
         cpCash.removeAll();
         cashmap.clear();
         cpMap.clear();
-        cpMap.clear();
         contentmap.clear();
 
         if (withworker) {

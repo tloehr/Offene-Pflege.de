@@ -132,7 +132,7 @@ public class MedStockTools {
         HashMap hm = new HashMap();
         hm.put("bestand.darreichung", TradeFormTools.toPrettyString(bestand.getTradeForm()));
 
-        String pzn = bestand.getPackung().getPzn() == null ? "??" : bestand.getPackung().getPzn();
+        String pzn = bestand.getaPackage().getPzn() == null ? "??" : bestand.getaPackage().getPzn();
         hm.put("bestand.packung.pzn", pzn);
         hm.put("bestand.bestid", bestand.getBestID());
         hm.put("bestand.eingang", bestand.getEin());
@@ -152,8 +152,8 @@ public class MedStockTools {
 //        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
 //        result += SYSPrint.EPL2_labelformat(57, 19, 3);
 //        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz())
-//        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
-//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackung().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUID() + ")");
+//        if (!SYSTools.catchNull(bestand.getaPackage().getPzn()).equals("")) {
+//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getaPackage().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUID() + ")");
 //        }
 //
 //        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getBestID()));
@@ -362,9 +362,9 @@ public class MedStockTools {
         String result = "";
         result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz() + ", ";
 
-        if (!SYSTools.catchNull(bestand.getPackung().getPzn()).equals("")) {
-            result += "PZN: " + bestand.getPackung().getPzn() + ", ";
-            result += MedPackungTools.GROESSE[bestand.getPackung().getGroesse()] + ", " + bestand.getPackung().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackEinheit()] + " ";
+        if (!SYSTools.catchNull(bestand.getaPackage().getPzn()).equals("")) {
+            result += "PZN: " + bestand.getaPackage().getPzn() + ", ";
+            result += MedPackageTools.GROESSE[bestand.getaPackage().getGroesse()] + ", " + bestand.getaPackage().getInhalt() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackEinheit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getZubereitung());
             String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getAnwText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
@@ -383,8 +383,8 @@ public class MedStockTools {
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + bestand.getBestID() + "</u></b></font>&nbsp; ";
         result += TradeFormTools.toPrettyString(bestand.getTradeForm());
 
-        if (bestand.getPackung() != null) {
-            result += ", " + MedPackungTools.toPrettyString(bestand.getPackung());
+        if (bestand.getaPackage() != null) {
+            result += ", " + MedPackageTools.toPrettyString(bestand.getaPackage());
         }
 
         result += ", APV: " + bestand.getApv().setScale(2, BigDecimal.ROUND_HALF_UP);
