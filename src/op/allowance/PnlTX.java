@@ -11,7 +11,6 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -28,6 +27,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Vector;
 
 /**
  * @author Torsten Löhr
@@ -108,6 +108,10 @@ public class PnlTX extends JPanel {
         txtCash.setText(NumberFormat.getCurrencyInstance().format(checkCash(txtCash.getText(), BigDecimal.ONE)));
     }
 
+    private void cmbResidentActionPerformed(ActionEvent e) {
+        txtDate.requestFocus();
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblResident = new JLabel();
@@ -121,8 +125,8 @@ public class PnlTX extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
-            "default, $lgap, pref, 4*($lgap, default)"));
+                "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
+                "default, $lgap, pref, 4*($lgap, default)"));
 
         //---- lblResident ----
         lblResident.setText("text");
@@ -131,6 +135,12 @@ public class PnlTX extends JPanel {
 
         //---- cmbResident ----
         cmbResident.setFont(new Font("Arial", Font.PLAIN, 14));
+        cmbResident.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cmbResidentActionPerformed(e);
+            }
+        });
         add(cmbResident, CC.xy(5, 3));
 
         //---- lblDate ----
@@ -145,6 +155,7 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
@@ -170,6 +181,7 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtTextFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtTextFocusLost(e);
@@ -195,6 +207,7 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtCashFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtCashFocusLost(e);
@@ -221,6 +234,13 @@ public class PnlTX extends JPanel {
         cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
         txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
 
+//        Vector<Component> traversalOrder = new Vector<Component>();
+//        traversalOrder.add(cmbResident);
+//        traversalOrder.add(txtDate);
+//        traversalOrder.add(txtText);
+//        traversalOrder.add(txtCash);
+//        setFocusTraversalPolicy(new MyOwnFocusTraversalPolicy(traversalOrder));
+
         if (tx.getResident() != null) {
             cmbResident.setSelectedItem(tx.getResident());
             cmbResident.setEnabled(false);
@@ -241,6 +261,47 @@ public class PnlTX extends JPanel {
         }
         return myamount;
     }
+
+
+//    /**
+//     * http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/misc/FocusTraversalDemoProject/src/misc/FocusTraversalDemo.java
+//     */
+//    public static class MyOwnFocusTraversalPolicy
+//            extends FocusTraversalPolicy {
+//        Vector<Component> order;
+//
+//        public MyOwnFocusTraversalPolicy(Vector<Component> order) {
+//            this.order = new Vector<Component>(order.size());
+//            this.order.addAll(order);
+//        }
+//
+//        public Component getComponentAfter(Container focusCycleRoot,
+//                                           Component aComponent) {
+//            int idx = (order.indexOf(aComponent) + 1) % order.size();
+//            return order.get(idx);
+//        }
+//
+//        public Component getComponentBefore(Container focusCycleRoot,
+//                                            Component aComponent) {
+//            int idx = order.indexOf(aComponent) - 1;
+//            if (idx < 0) {
+//                idx = order.size() - 1;
+//            }
+//            return order.get(idx);
+//        }
+//
+//        public Component getDefaultComponent(Container focusCycleRoot) {
+//            return order.get(0);
+//        }
+//
+//        public Component getLastComponent(Container focusCycleRoot) {
+//            return order.lastElement();
+//        }
+//
+//        public Component getFirstComponent(Container focusCycleRoot) {
+//            return order.get(0);
+//        }
+//    }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblResident;

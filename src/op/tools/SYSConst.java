@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2008 Torsten Löhr
+ * Copyright (C) 2006-2012 Torsten Löhr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -367,5 +367,9 @@ public class SYSConst {
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon48take = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/take-over.png"));
     public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
+    public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse.png"));
+    public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_arrow.png"));
+//    public static final Icon icon22collapsePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_pressed.png"));
+//    public static final Icon icon22expandPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_arrow_pressed.png"));
 
 }

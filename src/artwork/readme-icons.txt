@@ -13,3 +13,5 @@ On/Off Icons by Jelle Elferink (www.jt11.nl). Used with his kind permission.
 Lots of different icons and symbols taken from www.wpclipart.com. This material is PD.
 -- ambulance1.png (http://www.wpclipart.com/transportation/ambulance/ambulance_sketch..png.html)
 -- ambulance2.png (http://www.wpclipart.com/medical/medical_clip_art/ambulance.png.html)
+-- collapse.png (http://www.webdesignerdepot.com via FindIcons.com)
+-- collapse_arrow.png (http://www.webdesignerdepot.com via FindIcons.com)

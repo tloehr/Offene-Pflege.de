@@ -9,6 +9,12 @@ import entity.info.ResidentTools;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
 import op.system.FileDrop;
+import org.apache.commons.collections.Closure;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.TimingSource;
+import org.jdesktop.core.animation.timing.TimingTargetAdapter;
+import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
+import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -17,6 +23,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
+import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -208,6 +216,97 @@ public class GUITools {
                 setCollapsed((Container) component, collapsed);
             }
         }
+    }
 
+    public static void scroll2show(final JScrollPane jsp, final Component component, Container container, final Closure what2doAfterwards) {
+
+        final int start = jsp.getVerticalScrollBar().getValue();
+        final int end = SwingUtilities.convertPoint(component, component.getLocation(), container).y;
+        final int distance = end - start;
+
+        final TimingSource ts = new SwingTimerTimingSource();
+        Animator.setDefaultTimingSource(ts);
+        ts.init();
+
+        Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(750, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+            @Override
+            public void begin(Animator source) {
+            }
+
+            @Override
+            public void timingEvent(Animator animator, double fraction) {
+                final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jsp.getVerticalScrollBar().setValue(value.intValue());
+                    }
+                });
+            }
+
+            @Override
+            public void end(Animator source) {
+                component.repaint();
+                what2doAfterwards.execute(null);
+            }
+        }).build();
+        animator.start();
+
+//        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
+    }
+
+
+    public static void flashBackground(final JComponent component, final Color flashcolor, int repeatTimes) {
+        final Color originalColor = component.getBackground();
+        final TimingSource ts = new SwingTimerTimingSource();
+        Animator.setDefaultTimingSource(ts);
+        ts.init();
+        component.setOpaque(true);
+        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeatTimes).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+            @Override
+            public void begin(Animator source) {
+            }
+
+            @Override
+            public void timingEvent(Animator animator, final double fraction) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        // interpolateColor(component.getBackground(), flashcolor, fraction)
+                        component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
+                        component.repaint();
+                    }
+                });
+            }
+
+            @Override
+            public void end(Animator source) {
+                component.setOpaque(false);
+                component.repaint();
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        // interpolateColor(component.getBackground(), flashcolor, fraction)
+////                        component.setBackground(originalColor);
+//
+//                    }
+//                });
+            }
+        }).build();
+        animator.start();
+
+//        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
+    }
+
+    /**
+     * @param distance a double between 0.0f and 1.0f to express the distance between the source and destination color
+     *                 see http://stackoverflow.com/questions/27532/generating-gradients-programatically
+     * @return
+     */
+    public static Color interpolateColor(Color source, Color destination, double distance) {
+        int red = (int) (destination.getRed() * distance + source.getRed() * (1 - distance));
+        int green = (int) (destination.getGreen() * distance + source.getGreen() * (1 - distance));
+        int blue = (int) (destination.getBlue() * distance + source.getBlue() * (1 - distance));
+        return new Color(red, green, blue);
     }
 }
